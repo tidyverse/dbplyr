@@ -22,11 +22,13 @@
 #' win_over(sql("avg(x)"), order = "y", con = con)
 #' win_over(sql("avg(x)"), order = c("x", "y"), con = con)
 #' win_over(sql("avg(x)"), frame = c(-Inf, 0), order = "y", con = con)
-win_over <- function(expr,
-                     partition = NULL,
-                     order = NULL,
-                     frame = NULL,
-                     con = sql_current_con()) {
+win_over <- function(
+  expr,
+  partition = NULL,
+  order = NULL,
+  frame = NULL,
+  con = sql_current_con()
+) {
   if (length(partition) > 0) {
     partition <- as.sql(partition, con = con)
     partition <- glue_sql2(con, "PARTITION BY {.val partition*}")
@@ -44,7 +46,9 @@ win_over <- function(expr,
       ))
     }
 
-    if (is.numeric(frame)) frame <- rows(frame[1], frame[2])
+    if (is.numeric(frame)) {
+      frame <- rows(frame[1], frame[2])
+    }
     frame <- glue_sql2(con, "ROWS {frame}")
   }
 
@@ -107,12 +111,16 @@ win_reset <- function() {
 }
 
 rows <- function(from = -Inf, to = 0) {
-  if (from >= to) cli_abort("{.arg from} ({from}) must be less than {.arg to} ({to})")
+  if (from >= to) {
+    cli_abort("{.arg from} ({from}) must be less than {.arg to} ({to})")
+  }
 
   dir <- function(x) if (x < 0) "PRECEDING" else "FOLLOWING"
   val <- function(x) if (is.finite(x)) as.integer(abs(x)) else "UNBOUNDED"
   bound <- function(x) {
-    if (x == 0) return("CURRENT ROW")
+    if (x == 0) {
+      return("CURRENT ROW")
+    }
     paste(val(x), dir(x))
   }
 
@@ -137,12 +145,19 @@ win_rank <- function(f, empty_order = FALSE) {
     if (!is_null(order)) {
       order_over <- translate_sql_(order, con = con)
 
-      order_symbols <- purrr::map_if(order, ~ quo_is_call(.x, "desc", n = 1L), ~ call_args(.x)[[1L]])
+      order_symbols <- purrr::map_if(
+        order,
+        ~ quo_is_call(.x, "desc", n = 1L),
+        ~ call_args(.x)[[1L]]
+      )
 
       is_na_exprs <- purrr::map(order_symbols, ~ expr(is.na(!!.x)))
       any_na_expr <- purrr::reduce(is_na_exprs, ~ call2("|", .x, .y))
 
-      cond <- translate_sql((case_when(!!any_na_expr ~ 1L, TRUE ~ 0L)), con = con)
+      cond <- translate_sql(
+        (case_when(!!any_na_expr ~ 1L, TRUE ~ 0L)),
+        con = con
+      )
       group <- sql(group, cond)
 
       not_is_na_exprs <- purrr::map(order_symbols, ~ expr(!is.na(!!.x)))
@@ -192,7 +207,6 @@ win_aggregate <- function(f) {
 #' @rdname win_over
 #' @export
 win_aggregate_2 <- function(f) {
-
   function(x, y) {
     frame <- win_current_frame()
 
@@ -225,12 +239,14 @@ win_cumulative <- function(f) {
   }
 }
 
-sql_nth <- function(x,
-                    n,
-                    order_by = NULL,
-                    na_rm = FALSE,
-                    ignore_nulls = c("inside", "outside", "bool"),
-                    error_call = caller_env()) {
+sql_nth <- function(
+  x,
+  n,
+  order_by = NULL,
+  na_rm = FALSE,
+  ignore_nulls = c("inside", "outside", "bool"),
+  error_call = caller_env()
+) {
   check_bool(na_rm, call = error_call)
   ignore_nulls <- arg_match(ignore_nulls, error_call = error_call)
   con <- sql_current_con()
@@ -410,7 +426,8 @@ common_window_funs <- function() {
 #' translate_window_where(quote(n() > 10))
 #' translate_window_where(quote(rank() > cumsum(AB)))
 translate_window_where <- function(expr, window_funs = common_window_funs()) {
-  switch(typeof(expr),
+  switch(
+    typeof(expr),
     logical = ,
     integer = ,
     double = ,
@@ -425,14 +442,17 @@ translate_window_where <- function(expr, window_funs = common_window_funs()) {
         name <- unique_column_name()
         window_where(sym(name), set_names(list(expr), name))
       } else {
-        args <- lapply(expr[-1], translate_window_where, window_funs = window_funs)
+        args <- lapply(
+          expr[-1],
+          translate_window_where,
+          window_funs = window_funs
+        )
         expr <- call2(node_car(expr), splice(lapply(args, "[[", "expr")))
 
         window_where(
           expr = expr,
           comp = unlist(lapply(args, "[[", "comp"), recursive = FALSE)
         )
-
       }
     },
     cli_abort("Unknown type: {typeof(expr)}") # nocov

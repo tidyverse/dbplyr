@@ -1,13 +1,15 @@
-sql_select_clauses <- function(con,
-                               select,
-                               from,
-                               where,
-                               group_by,
-                               having,
-                               window,
-                               order_by,
-                               limit = NULL,
-                               lvl) {
+sql_select_clauses <- function(
+  con,
+  select,
+  from,
+  where,
+  group_by,
+  having,
+  window,
+  order_by,
+  limit = NULL,
+  lvl
+) {
   out <- list(
     select = select,
     from = from,
@@ -34,12 +36,14 @@ sql_clause <- function(kw, parts, sep = ",", parens = FALSE, lvl = 0) {
   clause
 }
 
-sql_clause_select <- function(con,
-                              select,
-                              distinct = FALSE,
-                              top = NULL,
-                              lvl = 0,
-                              call = caller_env()) {
+sql_clause_select <- function(
+  con,
+  select,
+  distinct = FALSE,
+  top = NULL,
+  lvl = 0,
+  call = caller_env()
+) {
   check_character(select, call = call)
   if (is_empty(select)) {
     cli_abort("Query contains no columns")
@@ -59,7 +63,7 @@ sql_clause_select <- function(con,
   sql_clause(clause, select)
 }
 
-sql_clause_from  <- function(from, lvl = 0) {
+sql_clause_from <- function(from, lvl = 0) {
   sql_clause("FROM", from, lvl = lvl)
 }
 
@@ -91,7 +95,12 @@ sql_clause_window <- function(window) {
   sql_clause("WINDOW", window)
 }
 
-sql_clause_order_by <- function(order_by, subquery = FALSE, limit = NULL, lvl = 0) {
+sql_clause_order_by <- function(
+  order_by,
+  subquery = FALSE,
+  limit = NULL,
+  lvl = 0
+) {
   if (subquery && length(order_by) > 0 && is.null(limit)) {
     warn_drop_order_by()
     NULL
@@ -100,7 +109,7 @@ sql_clause_order_by <- function(order_by, subquery = FALSE, limit = NULL, lvl = 
   }
 }
 
-sql_clause_limit <- function(con, limit, lvl = 0){
+sql_clause_limit <- function(con, limit, lvl = 0) {
   if (!is.null(limit) && !identical(limit, Inf)) {
     sql_clause("LIMIT", sql(format(limit, scientific = FALSE)))
   }
@@ -151,7 +160,12 @@ sql_format_clauses <- function(clauses, lvl, con) {
   clauses <- unname(clauses)
   clauses <- purrr::discard(clauses, ~ !is.sql(.x) && is_empty(.x$parts))
 
-  formatted_clauses <- purrr::map(clauses, sql_format_clause, lvl = lvl, con = con)
+  formatted_clauses <- purrr::map(
+    clauses,
+    sql_format_clause,
+    lvl = lvl,
+    con = con
+  )
   clause_level <- purrr::map_dbl(clauses, "lvl", .default = 0)
   out <- indent_lvl(formatted_clauses, lvl + clause_level)
 
@@ -177,7 +191,8 @@ sql_format_clause <- function(x, lvl, con, nchar_max = 80) {
 
   x$kw <- style_kw(x$kw)
   same_line_clause <- paste0(x$kw, " ", fields_same_line)
-  nchar_same_line <- cli::ansi_nchar(lvl_indent(lvl)) + cli::ansi_nchar(same_line_clause)
+  nchar_same_line <- cli::ansi_nchar(lvl_indent(lvl)) +
+    cli::ansi_nchar(same_line_clause)
 
   if (length(x$parts) == 1 || nchar_same_line <= nchar_max) {
     return(sql(same_line_clause))
@@ -187,8 +202,11 @@ sql_format_clause <- function(x, lvl, con, nchar_max = 80) {
   collapse <- paste0(x$sep, "\n", indent)
 
   field_string <- paste0(
-    x$kw, if (x$parens) " (", "\n",
-    indent, escape(x$parts, collapse = collapse, con = con),
+    x$kw,
+    if (x$parens) " (",
+    "\n",
+    indent,
+    escape(x$parts, collapse = collapse, con = con),
     if (x$parens) paste0("\n", indent_lvl(")", lvl))
   )
 

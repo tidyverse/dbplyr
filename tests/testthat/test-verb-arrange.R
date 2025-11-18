@@ -115,7 +115,7 @@ test_that("grouped arrange order by groups when .by_group  is set to TRUE", {
     group_by(x) %>%
     arrange(y, .by_group = TRUE) %>%
     sql_build()
-  expect_equal(out$order_by, sql(c('`x`','`y`')))
+  expect_equal(out$order_by, sql(c('`x`', '`y`')))
 })
 
 # ops ---------------------------------------------------------------------

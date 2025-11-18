@@ -1,8 +1,7 @@
 #' @export
 #' @rdname sql_variant
 sql_paste <- function(default_sep, f = "CONCAT_WS") {
-
-  function(..., sep = default_sep, collapse = NULL){
+  function(..., sep = default_sep, collapse = NULL) {
     check_collapse(collapse)
     sql_call2(f, sep, ...)
   }
@@ -15,7 +14,7 @@ sql_paste_infix <- function(default_sep, op, cast) {
   op <- as.symbol(paste0("%", op, "%"))
   force(cast)
 
-  function(..., sep = default_sep, collapse = NULL){
+  function(..., sep = default_sep, collapse = NULL) {
     check_collapse(collapse)
 
     args <- list(...)
@@ -34,8 +33,9 @@ sql_paste_infix <- function(default_sep, op, cast) {
 }
 
 check_collapse <- function(collapse) {
-  if (is.null(collapse))
+  if (is.null(collapse)) {
     return()
+  }
 
   cli_abort(c(
     "{.arg collapse} not supported in DB translation of {.fun paste}.",

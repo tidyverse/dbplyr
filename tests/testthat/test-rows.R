@@ -1,4 +1,3 @@
-
 # rows_insert -------------------------------------------------------------
 
 test_that("rows_insert() checks arguments", {
@@ -9,7 +8,8 @@ test_that("rows_insert() checks arguments", {
     (rows_insert(lf, lf, by = "x"))
   })
 
-  expect_snapshot(error = TRUE,
+  expect_snapshot(
+    error = TRUE,
     (rows_insert(
       lf,
       lazy_frame(x = 1, y = 2, z = 3),
@@ -18,18 +18,27 @@ test_that("rows_insert() checks arguments", {
     ))
   )
 
-  expect_snapshot(error = TRUE,
-    (rows_insert(lf, lf, by = "x", conflict = "ignore", returning = everything()))
+  expect_snapshot(
+    error = TRUE,
+    (rows_insert(
+      lf,
+      lf,
+      by = "x",
+      conflict = "ignore",
+      returning = everything()
+    ))
   )
 
   df <- memdb_frame(x = 1)
-  expect_snapshot(error = TRUE,
+  expect_snapshot(
+    error = TRUE,
     (df %>%
       mutate(x = x + 1) %>%
       rows_insert(df, by = "x", conflict = "ignore", in_place = TRUE))
   )
 
-  expect_snapshot(error = TRUE,
+  expect_snapshot(
+    error = TRUE,
     (df %>%
       rows_insert(df, by = "x", conflict = "ignore", returning = c(y)))
   )
@@ -53,7 +62,8 @@ test_that("`rows_insert()` errors for `conflict = 'error'` and `in_place = FALSE
   expect_snapshot(
     (expect_error(
       rows_insert(
-        lf, lf,
+        lf,
+        lf,
         by = "x",
         conflict = "error",
         in_place = FALSE
@@ -76,7 +86,8 @@ test_that("`rows_insert()` works with `in_place = FALSE`", {
   df <- memdb_frame(x = 1:3, y = 11:13)
   expect_equal(
     rows_insert(
-      df, memdb_frame(x = 3:4, y = 23:24),
+      df,
+      memdb_frame(x = 3:4, y = 23:24),
       by = "x",
       conflict = "ignore",
       in_place = FALSE
@@ -118,7 +129,8 @@ test_that("`rows_insert()` works with `in_place = FALSE` and `returning`", {
 })
 
 test_that("`rows_insert()` works with `in_place = TRUE`", {
-  expect_snapshot(error = TRUE,
+  expect_snapshot(
+    error = TRUE,
     (rows_insert(
       lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
       lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
@@ -129,7 +141,8 @@ test_that("`rows_insert()` works with `in_place = TRUE`", {
 
   df <- memdb_frame(x = 1:3, y = 11:13)
   rows_insert(
-    df, memdb_frame(x = 3:4, y = 23:24),
+    df,
+    memdb_frame(x = 3:4, y = 23:24),
     by = "x",
     conflict = "ignore",
     in_place = TRUE
@@ -142,7 +155,8 @@ test_that("`rows_insert()` with `in_place = TRUE` and `returning`", {
 
   df <- memdb_frame(x = 1:3, y = 11:13)
   df_inserted <- rows_insert(
-    df, memdb_frame(x = 3:4, y = 23:24),
+    df,
+    memdb_frame(x = 3:4, y = 23:24),
     by = "x",
     conflict = "ignore",
     in_place = TRUE,
@@ -159,38 +173,45 @@ test_that("rows_get_or_execute() gives error context", {
   local_db_table(con, tibble(x = 1, y = 1), "mtcars", overwrite = TRUE)
   DBI::dbExecute(con, "CREATE UNIQUE INDEX `mtcars_x` ON `mtcars` (`x`)")
 
-  expect_snapshot({
-    (expect_error(
-      rows_append(
-        tbl(con, "mtcars"),
-        tibble(x = 1),
-        copy = TRUE,
-        in_place = TRUE
-      )
-    ))
+  expect_snapshot(
+    {
+      (expect_error(
+        rows_append(
+          tbl(con, "mtcars"),
+          tibble(x = 1),
+          copy = TRUE,
+          in_place = TRUE
+        )
+      ))
 
-    (expect_error(
-      rows_append(
-        tbl(con, "mtcars"),
-        tibble(x = 1),
-        copy = TRUE,
-        in_place = TRUE,
-        returning = x
-      )
-    ))
-  }, transform = snap_transform_dbi)
+      (expect_error(
+        rows_append(
+          tbl(con, "mtcars"),
+          tibble(x = 1),
+          copy = TRUE,
+          in_place = TRUE,
+          returning = x
+        )
+      ))
+    },
+    transform = snap_transform_dbi
+  )
 })
 
 test_that("`sql_query_insert()` works", {
   con <- simulate_dbi()
   df_y <- lazy_frame(
-    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    a = 2:3,
+    b = c(12L, 13L),
+    c = -(2:3),
+    d = c("y", "z"),
     con = con,
     .name = "df_y"
   ) %>%
     mutate(c = c + 1)
 
-  expect_snapshot(error = TRUE,
+  expect_snapshot(
+    error = TRUE,
     (sql_query_insert(
       con = con,
       table = ident("df_x"),
@@ -238,7 +259,8 @@ test_that("`rows_append()` works with `in_place = FALSE`", {
   df <- memdb_frame(x = 1:3, y = 11:13)
   expect_equal(
     rows_append(
-      df, memdb_frame(x = 3:4, y = 23:24),
+      df,
+      memdb_frame(x = 3:4, y = 23:24),
       in_place = FALSE
     ) %>%
       collect(),
@@ -274,7 +296,8 @@ test_that("`rows_append()` works with `in_place = FALSE` and `returning`", {
 })
 
 test_that("`rows_append()` works with `in_place = TRUE`", {
-  expect_snapshot(error = TRUE,
+  expect_snapshot(
+    error = TRUE,
     (rows_append(
       lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
       lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
@@ -284,7 +307,8 @@ test_that("`rows_append()` works with `in_place = TRUE`", {
 
   df <- memdb_frame(x = 1:3, y = 11:13)
   rows_append(
-    df, memdb_frame(x = 3:4, y = 23:24),
+    df,
+    memdb_frame(x = 3:4, y = 23:24),
     in_place = TRUE
   )
   expect_equal(df %>% collect(), tibble(x = c(1:3, 3:4), y = c(11:13, 23:24)))
@@ -295,20 +319,27 @@ test_that("`rows_append()` with `in_place = TRUE` and `returning`", {
 
   df <- memdb_frame(x = 1:3, y = 11:13)
   df_inserted <- rows_append(
-    df, memdb_frame(x = 3:4, y = 23:24),
+    df,
+    memdb_frame(x = 3:4, y = 23:24),
     in_place = TRUE,
     returning = everything()
   )
 
   expect_equal(get_returned_rows(df_inserted), tibble(x = 3:4, y = 23:24))
 
-  expect_equal(df_inserted %>% collect(), tibble(x = c(1:3, 3:4), y = c(11:13, 23:24)))
+  expect_equal(
+    df_inserted %>% collect(),
+    tibble(x = c(1:3, 3:4), y = c(11:13, 23:24))
+  )
 })
 
 test_that("`sql_query_append()` works", {
   con <- simulate_dbi()
   df_y <- lazy_frame(
-    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    a = 2:3,
+    b = c(12L, 13L),
+    c = -(2:3),
+    d = c("y", "z"),
     con = con,
     .name = "df_y"
   ) %>%
@@ -328,7 +359,10 @@ test_that("`sql_query_append()` works", {
 test_that("sql_query_append supports old interface works", {
   con <- simulate_dbi()
   df_y <- lazy_frame(
-    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    a = 2:3,
+    b = c(12L, 13L),
+    c = -(2:3),
+    d = c("y", "z"),
     con = con,
     .name = "df_y"
   ) %>%
@@ -349,18 +383,28 @@ test_that("sql_query_append supports old interface works", {
 test_that("arguments are checked", {
   lf <- lazy_frame(x = 1:3, y = 11:13, .name = "df_x")
 
-  expect_snapshot(error = TRUE, (rows_update(lf, lf, by = 1, unmatched = "ignore")))
+  expect_snapshot(
+    error = TRUE,
+    (rows_update(lf, lf, by = 1, unmatched = "ignore"))
+  )
 
-  expect_snapshot(error = TRUE, (rows_update(lf, lf, by = c(y = "x"), unmatched = "ignore")))
+  expect_snapshot(
+    error = TRUE,
+    (rows_update(lf, lf, by = c(y = "x"), unmatched = "ignore"))
+  )
 
-  expect_snapshot(error = TRUE, (rows_update(lf, lf, by = "z", unmatched = "ignore")))
+  expect_snapshot(
+    error = TRUE,
+    (rows_update(lf, lf, by = "z", unmatched = "ignore"))
+  )
 
   expect_snapshot(error = TRUE, {
     (rows_update(lf, lf, by = "x", unmatched = "error"))
     (rows_update(lf, lf, by = "x"))
   })
 
-  expect_snapshot(error = TRUE,
+  expect_snapshot(
+    error = TRUE,
     (rows_update(
       lf,
       lazy_frame(x = 1, y = 2, z = 3),
@@ -369,12 +413,20 @@ test_that("arguments are checked", {
     ))
   )
 
-  expect_snapshot(error = TRUE,
-    (rows_update(lf, lf, by = "x", unmatched = "ignore", returning = everything()))
+  expect_snapshot(
+    error = TRUE,
+    (rows_update(
+      lf,
+      lf,
+      by = "x",
+      unmatched = "ignore",
+      returning = everything()
+    ))
   )
 
   df <- memdb_frame(x = 1)
-  expect_snapshot(error = TRUE,
+  expect_snapshot(
+    error = TRUE,
     (df %>%
       mutate(x = x + 1) %>%
       rows_update(df, by = "x", unmatched = "ignore", in_place = TRUE))
@@ -446,7 +498,8 @@ test_that("`rows_update()` works with `in_place = FALSE`", {
   df <- memdb_frame(x = 1:3, y = 11:13)
   expect_equal(
     rows_update(
-      df, memdb_frame(x = 2:3, y = 22:23),
+      df,
+      memdb_frame(x = 2:3, y = 22:23),
       by = "x",
       unmatched = "ignore",
       in_place = FALSE
@@ -474,7 +527,8 @@ test_that("`rows_update()` works with `in_place = FALSE` and `returning`", {
 })
 
 test_that("`rows_update()` works with `in_place = TRUE`", {
-  expect_snapshot(error = TRUE,
+  expect_snapshot(
+    error = TRUE,
     (rows_update(
       lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
       lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
@@ -486,7 +540,8 @@ test_that("`rows_update()` works with `in_place = TRUE`", {
 
   df <- memdb_frame(x = 1:3, y = 11:13)
   rows_update(
-    df, memdb_frame(x = 2:3, y = 22:23),
+    df,
+    memdb_frame(x = 2:3, y = 22:23),
     by = "x",
     unmatched = "ignore",
     in_place = TRUE
@@ -500,7 +555,8 @@ test_that("`rows_update()` with `in_place = TRUE` and `returning`", {
 
   df <- memdb_frame(x = 1:3, y = 11:13)
   df_updated <- rows_update(
-    df, memdb_frame(x = 2:4, y = 22:24),
+    df,
+    memdb_frame(x = 2:4, y = 22:24),
     by = "x",
     unmatched = "ignore",
     in_place = TRUE,
@@ -515,7 +571,10 @@ test_that("`rows_update()` with `in_place = TRUE` and `returning`", {
 test_that("`sql_query_update_from()` works", {
   con <- simulate_dbi()
   df_y <- lazy_frame(
-    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    a = 2:3,
+    b = c(12L, 13L),
+    c = -(2:3),
+    d = c("y", "z"),
     con = con,
     .name = "df_y"
   ) %>%
@@ -600,7 +659,8 @@ test_that("`rows_patch()` works with `in_place = FALSE`", {
   df <- memdb_frame(x = 1:3, y = c(11, 12, NA))
   expect_equal(
     rows_patch(
-      df, memdb_frame(x = 2:3, y = 22:23),
+      df,
+      memdb_frame(x = 2:3, y = 22:23),
       by = "x",
       unmatched = "ignore",
       in_place = FALSE
@@ -626,7 +686,8 @@ test_that("`rows_patch()` works with multiple columns to update", {
   df <- memdb_frame(x = 1:3, y = c(11, 12, NA), z = c(31, NA, 33))
   expect_equal(
     rows_patch(
-      df, memdb_frame(x = 2:3, y = 22:23, z = 42:43),
+      df,
+      memdb_frame(x = 2:3, y = 22:23, z = 42:43),
       by = "x",
       unmatched = "ignore",
       in_place = FALSE
@@ -635,7 +696,10 @@ test_that("`rows_patch()` works with multiple columns to update", {
     tibble(x = 1:3, y = c(11, 12, 23), z = c(31, 42, 33))
   )
 
-  expect_equal(df %>% collect(), tibble(x = 1:3, y = c(11, 12, NA), z = c(31, NA, 33)))
+  expect_equal(
+    df %>% collect(),
+    tibble(x = 1:3, y = c(11, 12, NA), z = c(31, NA, 33))
+  )
 })
 
 test_that("`rows_patch()` works with `in_place = FALSE` and `returning`", {
@@ -654,7 +718,8 @@ test_that("`rows_patch()` works with `in_place = FALSE` and `returning`", {
 })
 
 test_that("`rows_patch()` works with `in_place = TRUE`", {
-  expect_snapshot(error = TRUE,
+  expect_snapshot(
+    error = TRUE,
     (rows_patch(
       lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
       lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
@@ -666,7 +731,8 @@ test_that("`rows_patch()` works with `in_place = TRUE`", {
 
   df <- memdb_frame(x = 1:3, y = c(11, 12, NA))
   rows_patch(
-    df, memdb_frame(x = 2:3, y = 22:23),
+    df,
+    memdb_frame(x = 2:3, y = 22:23),
     by = "x",
     unmatched = "ignore",
     in_place = TRUE
@@ -680,7 +746,8 @@ test_that("`rows_patch()` works with `in_place = TRUE` and `returning`", {
 
   df <- memdb_frame(x = 1:3, y = c(11, 12, NA))
   df_patched <- rows_patch(
-    df, memdb_frame(x = 2:4, y = 22:24),
+    df,
+    memdb_frame(x = 2:4, y = 22:24),
     by = "x",
     unmatched = "ignore",
     in_place = TRUE,
@@ -752,7 +819,8 @@ test_that("`rows_upsert()` works with `in_place = FALSE`", {
   df <- memdb_frame(x = 1:3, y = 11:13)
   expect_equal(
     rows_upsert(
-      df, memdb_frame(x = 2:4, y = 22:24),
+      df,
+      memdb_frame(x = 2:4, y = 22:24),
       by = "x",
       in_place = FALSE
     ) %>%
@@ -778,7 +846,8 @@ test_that("`rows_upsert()` works with `in_place = FALSE` and `returning`", {
 })
 
 test_that("`rows_upsert()` works with `in_place = TRUE`", {
-  expect_snapshot(error = TRUE,
+  expect_snapshot(
+    error = TRUE,
     (rows_upsert(
       lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
       lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
@@ -789,11 +858,18 @@ test_that("`rows_upsert()` works with `in_place = TRUE`", {
 
   skip_if_not_installed("RSQLite", "2.2.8")
   con <- src_memdb()
-  x <- copy_to(con, tibble(x = 1:3, y = 11:13), name = "df_x", overwrite = TRUE, unique_indexes = "x")
+  x <- copy_to(
+    con,
+    tibble(x = 1:3, y = 11:13),
+    name = "df_x",
+    overwrite = TRUE,
+    unique_indexes = "x"
+  )
   y <- copy_to(con, tibble(x = 2:4, y = 22:24), name = "df_y", overwrite = TRUE)
 
   rows_upsert(
-    x, y,
+    x,
+    y,
     by = "x",
     in_place = TRUE
   )
@@ -805,10 +881,17 @@ test_that("`rows_upsert()` works with `in_place = TRUE` and `returning`", {
   skip_if_not_installed("RSQLite", "2.2.8")
 
   con <- src_memdb()
-  x <- copy_to(con, tibble(x = 1:3, y = 11:13), name = "df_x", overwrite = TRUE, unique_indexes = "x")
+  x <- copy_to(
+    con,
+    tibble(x = 1:3, y = 11:13),
+    name = "df_x",
+    overwrite = TRUE,
+    unique_indexes = "x"
+  )
   y <- copy_to(con, tibble(x = 2:4, y = 22:24), name = "df_y", overwrite = TRUE)
   df_upserted <- rows_upsert(
-    x, y,
+    x,
+    y,
     by = "x",
     in_place = TRUE,
     returning = everything()
@@ -826,7 +909,10 @@ test_that("`rows_upsert()` works with `in_place = TRUE` and `returning`", {
 test_that("`sql_query_upsert()` is correct", {
   con <- simulate_dbi()
   df_y <- lazy_frame(
-    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    a = 2:3,
+    b = c(12L, 13L),
+    c = -(2:3),
+    d = c("y", "z"),
     con = con,
     .name = "df_y"
   ) %>%
@@ -885,7 +971,8 @@ test_that("`rows_delete()` works with `in_place = FALSE`", {
   df <- memdb_frame(x = 1:3, y = c(11, 12, NA))
   expect_equal(
     rows_delete(
-      df, memdb_frame(x = 2:3),
+      df,
+      memdb_frame(x = 2:3),
       by = "x",
       unmatched = "ignore",
       in_place = FALSE
@@ -913,7 +1000,8 @@ test_that("`rows_delete()` works with `in_place = FALSE` with `returning`", {
 })
 
 test_that("`rows_delete()` works with `in_place = TRUE`", {
-  expect_snapshot(error = TRUE,
+  expect_snapshot(
+    error = TRUE,
     (rows_delete(
       lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
       lazy_frame(x = 2:3, .name = "df_y"),
@@ -925,7 +1013,8 @@ test_that("`rows_delete()` works with `in_place = TRUE`", {
 
   df <- memdb_frame(x = 1:3, y = 11:13)
   rows_delete(
-    df, memdb_frame(x = 2:3),
+    df,
+    memdb_frame(x = 2:3),
     by = "x",
     unmatched = "ignore",
     in_place = TRUE
@@ -939,7 +1028,8 @@ test_that("`rows_delete()` works with `in_place = TRUE` and `returning`", {
 
   df <- memdb_frame(x = 1:3, y = 11:13)
   df_deleted <- rows_delete(
-    df, memdb_frame(x = 2:4),
+    df,
+    memdb_frame(x = 2:4),
     by = "x",
     unmatched = "ignore",
     in_place = TRUE,
@@ -953,7 +1043,10 @@ test_that("`rows_delete()` works with `in_place = TRUE` and `returning`", {
 
 test_that("`sql_query_delete()` is correct", {
   df_y <- lazy_frame(
-    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    a = 2:3,
+    b = c(12L, 13L),
+    c = -(2:3),
+    d = c("y", "z"),
     con = simulate_dbi(),
     .name = "df_y"
   ) %>%
