@@ -21,12 +21,14 @@
 #' db %>%
 #'   mutate(x1 = x + 1, x2 = x1 * 2) %>%
 #'   show_query()
-mutate.tbl_lazy <- function(.data,
-                            ...,
-                            .by = NULL,
-                            .keep = c("all", "used", "unused", "none"),
-                            .before = NULL,
-                            .after = NULL) {
+mutate.tbl_lazy <- function(
+  .data,
+  ...,
+  .by = NULL,
+  .keep = c("all", "used", "unused", "none"),
+  .before = NULL,
+  .after = NULL
+) {
   keep <- arg_match(.keep)
 
   by <- compute_by({{ .by }}, .data, by_arg = ".by", data_arg = ".data")
@@ -97,7 +99,10 @@ transmute.tbl_lazy <- function(.data, ...) {
 
 add_mutate <- function(lazy_query, vars) {
   # drop NULLs
-  vars <- purrr::discard(vars, ~ (is_quosure(.x) && quo_is_null(.x)) || is.null(.x))
+  vars <- purrr::discard(
+    vars,
+    ~ (is_quosure(.x) && quo_is_null(.x)) || is.null(.x)
+  )
 
   if (is_projection(vars)) {
     sel_vars <- purrr::map_chr(vars, as_string)
@@ -112,7 +117,11 @@ add_mutate <- function(lazy_query, vars) {
     # the logic in get_mutate_layers()
     select <- lazy_query$select
     is_select_op <- lazy_query$select_operation %in% c("select", "mutate")
-    if (is_pure_projection(select$expr, select$name) && is_select_op && !is_true(lazy_query$distinct)) {
+    if (
+      is_pure_projection(select$expr, select$name) &&
+        is_select_op &&
+        !is_true(lazy_query$distinct)
+    ) {
       lazy_query$select <- new_lazy_select(
         vars,
         group_vars = op_grps(lazy_query),
@@ -160,7 +169,13 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
   for (i in seq_along(dots)) {
     dot <- dots[[i]]
     dot_name <- dot_names[[i]]
-    quosures <- partial_eval_quo(dot, cur_data, error_call, dot_name, was_named[[i]])
+    quosures <- partial_eval_quo(
+      dot,
+      cur_data,
+      error_call,
+      dot_name,
+      was_named[[i]]
+    )
 
     if (!is.list(quosures)) {
       quosures <- set_names(list(quosures), names(dots)[[i]])

@@ -1,6 +1,10 @@
 cache <- function() {
   if (!is_attached("dbplyr_cache")) {
-    get("attach")(new_environment(), name = "dbplyr_cache", pos = length(search()) - 1)
+    get("attach")(
+      new_environment(),
+      name = "dbplyr_cache",
+      pos = length(search()) - 1
+    )
   }
   search_env("dbplyr_cache")
 }
@@ -42,15 +46,21 @@ db_location <- function(path = NULL, filename) {
     if (!file.exists(path) || !file.info(path)$isdir) {
       cli_abort("{.path {path}} is not a directory")
     }
-    if (!is_writeable(path)) cli_abort("Can not write to {.path {path}}")
+    if (!is_writeable(path)) {
+      cli_abort("Can not write to {.path {path}}")
+    }
     return(file.path(path, filename))
   }
 
   pkg <- file.path(system.file("db", package = "dplyr"))
-  if (is_writeable(pkg)) return(file.path(pkg, filename))
+  if (is_writeable(pkg)) {
+    return(file.path(pkg, filename))
+  }
 
   tmp <- tempdir()
-  if (is_writeable(tmp)) return(file.path(tmp, filename))
+  if (is_writeable(tmp)) {
+    return(file.path(tmp, filename))
+  }
 
   cli_abort("Could not find writeable location to cache db")
 }

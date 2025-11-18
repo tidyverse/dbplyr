@@ -107,29 +107,32 @@
 #'     values_from = value
 #'   )
 #' @exportS3Method tidyr::pivot_wider
-pivot_wider.tbl_lazy <- function(data,
-                                 ...,
-                                 id_cols = NULL,
-                                 id_expand = FALSE,
-                                 names_from = name,
-                                 names_prefix = "",
-                                 names_sep = "_",
-                                 names_glue = NULL,
-                                 names_sort = FALSE,
-                                 names_vary = "fastest",
-                                 names_expand = FALSE,
-                                 names_repair = "check_unique",
-                                 values_from = value,
-                                 values_fill = NULL,
-                                 values_fn = ~ max(.x, na.rm = TRUE),
-                                 unused_fn = NULL) {
+pivot_wider.tbl_lazy <- function(
+  data,
+  ...,
+  id_cols = NULL,
+  id_expand = FALSE,
+  names_from = name,
+  names_prefix = "",
+  names_sep = "_",
+  names_glue = NULL,
+  names_sort = FALSE,
+  names_vary = "fastest",
+  names_expand = FALSE,
+  names_repair = "check_unique",
+  values_from = value,
+  values_fill = NULL,
+  values_fn = ~ max(.x, na.rm = TRUE),
+  unused_fn = NULL
+) {
   rlang::check_dots_empty()
   check_unsupported_arg(id_expand, FALSE)
 
   names_from <- enquo(names_from)
   values_from <- enquo(values_from)
 
-  spec <- dbplyr_build_wider_spec(data,
+  spec <- dbplyr_build_wider_spec(
+    data,
     names_from = !!names_from,
     values_from = !!values_from,
     names_prefix = names_prefix,
@@ -143,7 +146,7 @@ pivot_wider.tbl_lazy <- function(data,
 
   id_cols <- build_wider_id_cols_expr(
     data = data,
-    id_cols = {{id_cols}},
+    id_cols = {{ id_cols }},
     names_from = !!names_from,
     values_from = !!values_from
   )
@@ -162,16 +165,18 @@ pivot_wider.tbl_lazy <- function(data,
   )
 }
 
-dbplyr_build_wider_spec <- function(data,
-                                    names_from = name,
-                                    values_from = value,
-                                    names_prefix = "",
-                                    names_sep = "_",
-                                    names_glue = NULL,
-                                    names_sort = FALSE,
-                                    names_vary = "fastest",
-                                    names_expand = FALSE,
-                                    error_call = current_env()) {
+dbplyr_build_wider_spec <- function(
+  data,
+  names_from = name,
+  values_from = value,
+  names_prefix = "",
+  names_sep = "_",
+  names_glue = NULL,
+  names_sort = FALSE,
+  names_vary = "fastest",
+  names_expand = FALSE,
+  error_call = current_env()
+) {
   if (!inherits(data, "tbl_sql")) {
     cli_abort(c(
       "{.fun dbplyr_build_wider_spec} doesn't work with local lazy tibbles.",
@@ -199,7 +204,8 @@ dbplyr_build_wider_spec <- function(data,
     .name_repair = "check_unique"
   )
 
-  tidyr::build_wider_spec(dummy_data,
+  tidyr::build_wider_spec(
+    dummy_data,
     names_from = !!enquo(names_from),
     values_from = !!enquo(values_from),
     names_prefix = names_prefix,
@@ -216,16 +222,18 @@ dbplyr_build_wider_spec <- function(data,
 #' @inheritParams tidyr::pivot_wider_spec
 #' @export
 #' @rdname pivot_wider.tbl_lazy
-dbplyr_pivot_wider_spec <- function(data,
-                                    spec,
-                                    ...,
-                                    names_repair = "check_unique",
-                                    id_cols = NULL,
-                                    id_expand = FALSE,
-                                    values_fill = NULL,
-                                    values_fn = ~ max(.x, na.rm = TRUE),
-                                    unused_fn = NULL,
-                                    error_call = current_env()) {
+dbplyr_pivot_wider_spec <- function(
+  data,
+  spec,
+  ...,
+  names_repair = "check_unique",
+  id_cols = NULL,
+  id_expand = FALSE,
+  values_fill = NULL,
+  values_fn = ~ max(.x, na.rm = TRUE),
+  unused_fn = NULL,
+  error_call = current_env()
+) {
   check_unsupported_arg(id_expand, FALSE)
   spec <- tidyr::check_pivot_spec(spec)
 
@@ -240,10 +248,21 @@ dbplyr_pivot_wider_spec <- function(data,
     error_call = error_call
   )
 
-  values_fn <- check_list_of_functions(values_fn, values_from_cols, call = error_call)
+  values_fn <- check_list_of_functions(
+    values_fn,
+    values_from_cols,
+    call = error_call
+  )
 
-  unused_cols <- setdiff(colnames(data), c(id_cols, names_from_cols, values_from_cols))
-  unused_fn <- check_list_of_functions(unused_fn, unused_cols, call = error_call)
+  unused_cols <- setdiff(
+    colnames(data),
+    c(id_cols, names_from_cols, values_from_cols)
+  )
+  unused_fn <- check_list_of_functions(
+    unused_fn,
+    unused_cols,
+    call = error_call
+  )
   unused_cols <- names(unused_fn)
 
   if (is.null(values_fill)) {
@@ -260,7 +279,9 @@ dbplyr_pivot_wider_spec <- function(data,
 
   missing_values <- setdiff(values_from_cols, names(values_fn))
   if (!is_empty(missing_values)) {
-    cli_abort("{.arg values_fn} must specify a function for each col in {.arg values_from}")
+    cli_abort(
+      "{.arg values_fn} must specify a function for each col in {.arg values_from}"
+    )
   }
 
   n_unused_fn <- length(unused_fn)
@@ -272,7 +293,11 @@ dbplyr_pivot_wider_spec <- function(data,
     unused_col <- unused_cols[[i]]
     unused_fn_i <- unused_fn[[i]]
 
-    unused_col_expr[[i]] <- resolve_fun(unused_fn_i, sym(unused_col), call = error_call)
+    unused_col_expr[[i]] <- resolve_fun(
+      unused_fn_i,
+      sym(unused_col),
+      call = error_call
+    )
   }
 
   spec_idx <- set_names(vctrs::vec_seq_along(spec), spec$.name)
@@ -312,11 +337,13 @@ dbplyr_pivot_wider_spec <- function(data,
 
 utils::globalVariables(c("name", "value"))
 
-build_wider_id_cols_expr <- function(data,
-                                     id_cols = NULL,
-                                     names_from = name,
-                                     values_from = value,
-                                     call = caller_env()) {
+build_wider_id_cols_expr <- function(
+  data,
+  id_cols = NULL,
+  names_from = name,
+  values_from = value,
+  call = caller_env()
+) {
   # COPIED FROM tidyr
   names_from <- tidyselect::eval_select(
     enquo(names_from),
@@ -343,17 +370,22 @@ build_wider_id_cols_expr <- function(data,
   expr(c(!!!out))
 }
 
-select_wider_id_cols <- function(data,
-                                 id_cols = NULL,
-                                 names_from_cols = character(),
-                                 values_from_cols = character(),
-                                 error_call = caller_env()) {
+select_wider_id_cols <- function(
+  data,
+  id_cols = NULL,
+  names_from_cols = character(),
+  values_from_cols = character(),
+  error_call = caller_env()
+) {
   # COPIED FROM tidyr
   id_cols <- enquo(id_cols)
   sim_data <- tidyselect_data_proxy(data)
 
   # Remove known non-id-cols so they are never selected
-  sim_data <- sim_data[setdiff(names(sim_data), c(names_from_cols, values_from_cols))]
+  sim_data <- sim_data[setdiff(
+    names(sim_data),
+    c(names_from_cols, values_from_cols)
+  )]
 
   if (quo_is_null(id_cols)) {
     # Default selects everything in `sim_data` after non-id-cols have been removed
@@ -401,7 +433,13 @@ stop_id_cols_oob <- function(i, arg, call) {
   )
 }
 
-build_pivot_wider_exprs <- function(row_id, spec, values_fill, values_fn, call) {
+build_pivot_wider_exprs <- function(
+  row_id,
+  spec,
+  values_fill,
+  values_fn,
+  call
+) {
   values_col <- spec[[".value"]][row_id]
   fill_value <- values_fill[[values_col]]
 
@@ -421,7 +459,12 @@ build_pivot_wider_exprs <- function(row_id, spec, values_fill, values_fn, call) 
   case_expr <- expr(ifelse(!!keys_cond, !!sym(values_col), !!fill_value))
 
   agg_fn <- values_fn[[values_col]]
-  resolve_fun(agg_fn, case_expr, arg = paste0("values_fn$", values_col), call = call)
+  resolve_fun(
+    agg_fn,
+    case_expr,
+    arg = paste0("values_fn$", values_col),
+    call = call
+  )
 }
 
 is_scalar <- function(x) {
@@ -444,7 +487,10 @@ resolve_fun <- function(x, var, arg = caller_arg(x), call = caller_env()) {
   } else {
     fn_name <- find_fun(x)
     if (is_null(fn_name)) {
-      cli_abort("Can't convert {.arg {arg}}, {.code {as_label(x)}}, to a function.", call = call)
+      cli_abort(
+        "Can't convert {.arg {arg}}, {.code {as_label(x)}}, to a function.",
+        call = call
+      )
     }
     call2(fn_name, var)
   }
