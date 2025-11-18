@@ -293,8 +293,7 @@ all_calls <- function(x) {
     return(NULL)
   }
 
-  fname <- as.character(x[[1]])
-  unique(c(fname, unlist(lapply(x[-1], all_calls), use.names = FALSE)))
+  setdiff(all.names(x, unique = TRUE), all_names(x))
 }
 
 all_names <- function(x) {
@@ -308,7 +307,7 @@ all_names <- function(x) {
     return(NULL)
   }
 
-  unique(unlist(lapply(x[-1], all_names), use.names = FALSE))
+  all.vars(x)
 }
 
 # character vector -> environment
