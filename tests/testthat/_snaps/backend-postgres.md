@@ -168,8 +168,8 @@
       FROM "test"
       
       <PLAN>
-                                                                                                                                                                                                                                                                                                QUERY PLAN
-      1 [\n  {\n    "Plan": {\n      "Node Type": "Seq Scan",\n      "Parallel Aware": false,\n      "Async Capable": false,\n      "Relation Name": "test",\n      "Alias": "test",\n      "Startup Cost": 0.00,\n      "Total Cost": 1.04,\n      "Plan Rows": 3,\n      "Plan Width": 36\n    }\n  }\n]
+                                                                                                                                                                                                                                                                                                                          QUERY PLAN
+      1 [\n  {\n    "Plan": {\n      "Node Type": "Seq Scan",\n      "Parallel Aware": false,\n      "Async Capable": false,\n      "Relation Name": "test",\n      "Alias": "test",\n      "Startup Cost": 0.00,\n      "Total Cost": 1.04,\n      "Plan Rows": 3,\n      "Plan Width": 36,\n      "Disabled": false\n    }\n  }\n]
 
 # can insert with returning
 
