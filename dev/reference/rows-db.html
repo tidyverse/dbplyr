@@ -19,7 +19,7 @@ the database: the connection needs permission to insert, modify or delete
 rows, but not to alter the structure of the table.
 The default, in_place = FALSE, generates equivalent lazy tables (using
 SELECT queries) that allow previewing the result without actually
-modifying the underlying table on the database."><meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png"><meta name="robots" content="noindex"><script defer data-domain="dbplyr.tidyverse.org,all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script></head><body>
+modifying the underlying table on the database."><meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png"><meta name="robots" content="noindex"><script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js" data-max-height="43" data-light-bg="#666f76" data-light-fg="#f9f9f9"></script><script defer data-domain="dbplyr.tidyverse.org,all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script></head><body>
     <a href="#container" class="visually-hidden-focusable">Skip to content</a>
 
 
@@ -265,14 +265,14 @@ in the table behind <code>x</code>.</p>
 <span class="r-in"><span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_insert</a></span><span class="op">(</span><span class="va">ponies</span>, <span class="va">applejack</span>, conflict <span class="op">=</span> <span class="st">"ignore"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Matching, by = "name"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   SQL [?? x 3]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.50.4 [:memory:]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.51.0 [:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   id    name       cutie_mark  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> <span style="color: #BB0000;">NA</span>    Apple Jack three apples</span>
 <span class="r-in"><span><span class="co"># And the original table is left unchanged:</span></span></span>
 <span class="r-in"><span><span class="va">ponies</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   table&lt;`Ponies`&gt; [?? x 3]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.50.4 [:memory:]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.51.0 [:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 3 variables: id &lt;int&gt;, name &lt;chr&gt;, cutie_mark &lt;chr&gt;</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># You can also choose to modify the table with in_place = TRUE:</span></span></span>
@@ -282,7 +282,7 @@ in the table behind <code>x</code>.</p>
 <span class="r-in"><span><span class="co"># data is modified</span></span></span>
 <span class="r-in"><span><span class="va">ponies</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   table&lt;`Ponies`&gt; [?? x 3]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.50.4 [:memory:]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.51.0 [:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      id name       cutie_mark  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     1 Apple Jack three apples</span>
@@ -299,7 +299,7 @@ in the table behind <code>x</code>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
   </div></footer></body></html>

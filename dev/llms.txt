@@ -1,0 +1,352 @@
+# dbplyr
+
+## Overview
+
+dbplyr is the database backend for [dplyr](https://dplyr.tidyverse.org).
+It allows you to use remote database tables as if they are in-memory
+data frames by automatically converting dplyr code into SQL.
+
+To learn more about why you might use dbplyr instead of writing SQL, see
+[`vignette("sql")`](https://dbplyr.tidyverse.org/dev/articles/sql.md).
+To learn more about the details of the SQL translation, see
+[`vignette("translation-verb")`](https://dbplyr.tidyverse.org/dev/articles/translation-verb.md)
+and
+[`vignette("translation-function")`](https://dbplyr.tidyverse.org/dev/articles/translation-function.md).
+
+## Installation
+
+``` r
+# The easiest way to get dbplyr is to install the whole tidyverse:
+install.packages("tidyverse")
+
+# Alternatively, install just dbplyr:
+install.packages("dbplyr")
+
+# Or the development version from GitHub:
+# install.packages("pak")
+pak::pak("tidyverse/dbplyr")
+```
+
+## Usage
+
+dbplyr is designed to work with database tables as if they were local
+data frames. To demonstrate this I’ll first create an in-memory SQLite
+database and copy over a dataset:
+
+``` r
+library(dplyr, warn.conflicts = FALSE)
+
+con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+copy_to(con, mtcars)
+```
+
+Note that you don’t actually need to load dbplyr with
+[`library(dbplyr)`](https://dbplyr.tidyverse.org/); dplyr automatically
+loads it for you when it sees you working with a database. Database
+connections are coordinated by the DBI package. Learn more at
+<https://dbi.r-dbi.org/>
+
+Now you can retrieve a table using
+[`tbl()`](https://dplyr.tidyverse.org/reference/tbl.html) (see
+[`?tbl_dbi`](https://dbplyr.tidyverse.org/dev/reference/tbl.src_dbi.md)
+for more details). Printing it just retrieves the first few rows:
+
+``` r
+mtcars2 <- tbl(con, "mtcars")
+mtcars2
+#> # Source:   table<`mtcars`> [?? x 11]
+#> # Database: sqlite 3.50.4 [:memory:]
+#>      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
+#>    <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+#>  1  21       6  160    110  3.9   2.62  16.5     0     1     4     4
+#>  2  21       6  160    110  3.9   2.88  17.0     0     1     4     4
+#>  3  22.8     4  108     93  3.85  2.32  18.6     1     1     4     1
+#>  4  21.4     6  258    110  3.08  3.22  19.4     1     0     3     1
+#>  5  18.7     8  360    175  3.15  3.44  17.0     0     0     3     2
+#>  6  18.1     6  225    105  2.76  3.46  20.2     1     0     3     1
+#>  7  14.3     8  360    245  3.21  3.57  15.8     0     0     3     4
+#>  8  24.4     4  147.    62  3.69  3.19  20       1     0     4     2
+#>  9  22.8     4  141.    95  3.92  3.15  22.9     1     0     4     2
+#> 10  19.2     6  168.   123  3.92  3.44  18.3     1     0     4     4
+#> # ℹ more rows
+```
+
+All dplyr calls are evaluated lazily, generating SQL that is only sent
+to the database when you request the data.
+
+``` r
+# lazily generates query
+summary <- mtcars2 %>% 
+  group_by(cyl) %>% 
+  summarise(mpg = mean(mpg, na.rm = TRUE)) %>% 
+  arrange(desc(mpg))
+
+# see query
+summary %>% show_query()
+#> <SQL>
+#> SELECT `cyl`, AVG(`mpg`) AS `mpg`
+#> FROM `mtcars`
+#> GROUP BY `cyl`
+#> ORDER BY `mpg` DESC
+
+# execute query and retrieve results
+summary %>% collect()
+#> # A tibble: 3 × 2
+#>     cyl   mpg
+#>   <dbl> <dbl>
+#> 1     4  26.7
+#> 2     6  19.7
+#> 3     8  15.1
+```
+
+## Code of Conduct
+
+Please note that the dbplyr project is released with a [Contributor Code
+of Conduct](https://dbplyr.tidyverse.org/CODE_OF_CONDUCT.html). By
+contributing to this project, you agree to abide by its terms.
+
+# Package index
+
+## dplyr verbs
+
+### Connecting, copying, and retrieving data
+
+- [`tbl(`*`<src_dbi>`*`)`](https://dbplyr.tidyverse.org/dev/reference/tbl.src_dbi.md)
+  : Use dplyr verbs with a remote database table
+- [`copy_to(`*`<src_sql>`*`)`](https://dbplyr.tidyverse.org/dev/reference/copy_to.src_sql.md)
+  : Copy a local data frame to a remote database
+- [`copy_inline()`](https://dbplyr.tidyverse.org/dev/reference/copy_inline.md)
+  : Use a local data frame in a dbplyr query
+- [`collapse(`*`<tbl_sql>`*`)`](https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.md)
+  [`compute(`*`<tbl_sql>`*`)`](https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.md)
+  [`collect(`*`<tbl_sql>`*`)`](https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.md)
+  : Compute results of a query
+- [`pull(`*`<tbl_sql>`*`)`](https://dbplyr.tidyverse.org/dev/reference/pull.tbl_sql.md)
+  : Extract a single column
+
+### Verbs that affect rows
+
+- [`arrange(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/arrange.tbl_lazy.md)
+  : Arrange rows by column values
+- [`distinct(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/distinct.tbl_lazy.md)
+  : Subset distinct/unique rows
+- [`filter(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/filter.tbl_lazy.md)
+  : Subset rows using column values
+- [`head(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/head.tbl_lazy.md)
+  : Subset the first rows
+- [`slice_min(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/dbplyr-slice.md)
+  [`slice_max(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/dbplyr-slice.md)
+  [`slice_sample(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/dbplyr-slice.md)
+  : Subset rows using their positions
+
+### Verbs that affect columns
+
+- [`mutate(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/mutate.tbl_lazy.md)
+  : Create, modify, and delete columns
+- [`select(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/select.tbl_lazy.md)
+  [`rename(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/select.tbl_lazy.md)
+  [`rename_with(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/select.tbl_lazy.md)
+  [`relocate(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/select.tbl_lazy.md)
+  : Subset, rename, and reorder columns using their names
+
+### Grouping and summarising verbs
+
+- [`count(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/count.tbl_lazy.md)
+  [`add_count(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/count.tbl_lazy.md)
+  [`tally(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/count.tbl_lazy.md)
+  : Count observations by group
+- [`group_by(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/group_by.tbl_lazy.md)
+  : Group by one or more variables
+- [`summarise(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/summarise.tbl_lazy.md)
+  : Summarise each group to one row
+- [`do(`*`<tbl_sql>`*`)`](https://dbplyr.tidyverse.org/dev/reference/do.tbl_sql.md)
+  : Perform arbitrary computation on remote backend
+
+### Verbs that work with multiple tables
+
+- [`inner_join(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/join.tbl_sql.md)
+  [`left_join(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/join.tbl_sql.md)
+  [`right_join(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/join.tbl_sql.md)
+  [`full_join(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/join.tbl_sql.md)
+  [`cross_join(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/join.tbl_sql.md)
+  [`semi_join(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/join.tbl_sql.md)
+  [`anti_join(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/join.tbl_sql.md)
+  : Join SQL tables
+- [`intersect(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/intersect.tbl_lazy.md)
+  [`union(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/intersect.tbl_lazy.md)
+  [`union_all(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/intersect.tbl_lazy.md)
+  [`setdiff(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/intersect.tbl_lazy.md)
+  : SQL set operations
+
+### Verbs that modify the underlying data
+
+- [`rows_insert(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/rows-db.md)
+  [`rows_append(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/rows-db.md)
+  [`rows_update(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/rows-db.md)
+  [`rows_patch(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/rows-db.md)
+  [`rows_upsert(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/rows-db.md)
+  [`rows_delete(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/rows-db.md)
+  : Edit individual rows in the underlying database table
+
+- [`get_returned_rows()`](https://dbplyr.tidyverse.org/dev/reference/get_returned_rows.md)
+  [`has_returned_rows()`](https://dbplyr.tidyverse.org/dev/reference/get_returned_rows.md)
+  **\[experimental\]** :
+
+  Extract and check the `RETURNING` rows
+
+## tidyr verbs
+
+- [`complete(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/complete.tbl_lazy.md)
+  : Complete a SQL table with missing combinations of data
+- [`dbplyr_uncount()`](https://dbplyr.tidyverse.org/dev/reference/dbplyr_uncount.md)
+  : "Uncount" a database table
+- [`expand(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/expand.tbl_lazy.md)
+  : Expand SQL tables to include all possible combinations of values
+- [`fill(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/fill.tbl_lazy.md)
+  : Fill in missing values with previous or next value
+- [`pivot_longer(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/pivot_longer.tbl_lazy.md)
+  : Pivot data from wide to long
+- [`pivot_wider(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/pivot_wider.tbl_lazy.md)
+  [`dbplyr_pivot_wider_spec()`](https://dbplyr.tidyverse.org/dev/reference/pivot_wider.tbl_lazy.md)
+  : Pivot data from long to wide
+- [`replace_na(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/replace_na.tbl_lazy.md)
+  : Replace NAs with specified values
+
+## Built-in database backends
+
+- [`simulate_access()`](https://dbplyr.tidyverse.org/dev/reference/backend-access.md)
+  : Backend: MS Access
+- [`simulate_hana()`](https://dbplyr.tidyverse.org/dev/reference/backend-hana.md)
+  : Backend: SAP HANA
+- [`simulate_hive()`](https://dbplyr.tidyverse.org/dev/reference/backend-hive.md)
+  : Backend: Hive
+- [`simulate_impala()`](https://dbplyr.tidyverse.org/dev/reference/backend-impala.md)
+  : Backend: Impala
+- [`simulate_mssql()`](https://dbplyr.tidyverse.org/dev/reference/backend-mssql.md)
+  : Backend: SQL server
+- [`simulate_mysql()`](https://dbplyr.tidyverse.org/dev/reference/backend-mysql.md)
+  [`simulate_mariadb()`](https://dbplyr.tidyverse.org/dev/reference/backend-mysql.md)
+  : Backend: MySQL/MariaDB
+- [`simulate_odbc()`](https://dbplyr.tidyverse.org/dev/reference/backend-odbc.md)
+  : Backend: ODBC
+- [`simulate_oracle()`](https://dbplyr.tidyverse.org/dev/reference/backend-oracle.md)
+  : Backend: Oracle
+- [`simulate_postgres()`](https://dbplyr.tidyverse.org/dev/reference/backend-postgres.md)
+  : Backend: PostgreSQL
+- [`simulate_redshift()`](https://dbplyr.tidyverse.org/dev/reference/backend-redshift.md)
+  : Backend: Redshift
+- [`simulate_snowflake()`](https://dbplyr.tidyverse.org/dev/reference/backend-snowflake.md)
+  : Backend: Snowflake
+- [`simulate_spark_sql()`](https://dbplyr.tidyverse.org/dev/reference/backend-spark-sql.md)
+  : Backend: Databricks Spark SQL
+- [`simulate_sqlite()`](https://dbplyr.tidyverse.org/dev/reference/backend-sqlite.md)
+  : Backend: SQLite
+- [`simulate_teradata()`](https://dbplyr.tidyverse.org/dev/reference/backend-teradata.md)
+  : Backend: Teradata
+
+## Database connection
+
+- [`memdb_frame()`](https://dbplyr.tidyverse.org/dev/reference/memdb_frame.md)
+  [`tbl_memdb()`](https://dbplyr.tidyverse.org/dev/reference/memdb_frame.md)
+  [`src_memdb()`](https://dbplyr.tidyverse.org/dev/reference/memdb_frame.md)
+  : Create a database table in temporary in-memory database.
+- [`remote_name()`](https://dbplyr.tidyverse.org/dev/reference/remote_name.md)
+  [`remote_table()`](https://dbplyr.tidyverse.org/dev/reference/remote_name.md)
+  [`remote_src()`](https://dbplyr.tidyverse.org/dev/reference/remote_name.md)
+  [`remote_con()`](https://dbplyr.tidyverse.org/dev/reference/remote_name.md)
+  [`remote_query()`](https://dbplyr.tidyverse.org/dev/reference/remote_name.md)
+  [`remote_query_plan()`](https://dbplyr.tidyverse.org/dev/reference/remote_name.md)
+  : Metadata about a remote table
+
+## SQL generation
+
+- [`build_sql()`](https://dbplyr.tidyverse.org/dev/reference/build_sql.md)
+  : Build a SQL string.
+- [`escape()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
+  [`escape_ansi()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
+  [`sql_vector()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
+  : Escape/quote a string.
+- [`partial_eval()`](https://dbplyr.tidyverse.org/dev/reference/partial_eval.md)
+  : Partially evaluate an expression.
+- [`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md)
+  [`is.sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md)
+  [`as.sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md) : SQL
+  escaping.
+- [`sql_expr()`](https://dbplyr.tidyverse.org/dev/reference/sql_expr.md)
+  [`sql_call2()`](https://dbplyr.tidyverse.org/dev/reference/sql_expr.md)
+  : Generate SQL from R expressions
+- [`translate_sql()`](https://dbplyr.tidyverse.org/dev/reference/translate_sql.md)
+  [`translate_sql_()`](https://dbplyr.tidyverse.org/dev/reference/translate_sql.md)
+  : Translate an expression to SQL
+- [`window_order()`](https://dbplyr.tidyverse.org/dev/reference/window_order.md)
+  [`window_frame()`](https://dbplyr.tidyverse.org/dev/reference/window_order.md)
+  : Override window order and frame
+- [`sql_options()`](https://dbplyr.tidyverse.org/dev/reference/sql_options.md)
+  : Options for generating SQL
+
+## dbplyr Backends
+
+Documentation for authors of new dbplyr backends
+
+- [`db_copy_to()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md)
+  [`db_compute()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md)
+  [`db_collect()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md)
+  [`db_table_temporary()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md)
+  : Database I/O generics
+- [`db_connection_describe()`](https://dbplyr.tidyverse.org/dev/reference/db-misc.md)
+  [`sql_join_suffix()`](https://dbplyr.tidyverse.org/dev/reference/db-misc.md)
+  [`db_sql_render()`](https://dbplyr.tidyverse.org/dev/reference/db-misc.md)
+  [`db_col_types()`](https://dbplyr.tidyverse.org/dev/reference/db-misc.md)
+  [`dbplyr_edition()`](https://dbplyr.tidyverse.org/dev/reference/db-misc.md)
+  : Miscellaneous database generics
+- [`sql_expr_matches()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`sql_translation()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`sql_random()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`sql_table_analyze()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`sql_table_index()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`sql_query_explain()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`sql_query_fields()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`sql_query_save()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`sql_query_wrap()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`sql_indent_subquery()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`sql_query_rows()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`supports_window_clause()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`db_supports_table_alias_with_as()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`sql_query_select()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`sql_query_join()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`sql_query_multi_join()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`sql_query_semi_join()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`sql_query_set_op()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`sql_query_union()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`sql_returning_cols()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  : SQL generation generics
+- [`sql_escape_logical()`](https://dbplyr.tidyverse.org/dev/reference/db-quote.md)
+  [`sql_escape_date()`](https://dbplyr.tidyverse.org/dev/reference/db-quote.md)
+  [`sql_escape_datetime()`](https://dbplyr.tidyverse.org/dev/reference/db-quote.md)
+  [`sql_escape_raw()`](https://dbplyr.tidyverse.org/dev/reference/db-quote.md)
+  : SQL escaping/quoting generics
+- [`sql_query_insert()`](https://dbplyr.tidyverse.org/dev/reference/sql_query_insert.md)
+  [`sql_query_append()`](https://dbplyr.tidyverse.org/dev/reference/sql_query_insert.md)
+  [`sql_query_update_from()`](https://dbplyr.tidyverse.org/dev/reference/sql_query_insert.md)
+  [`sql_query_upsert()`](https://dbplyr.tidyverse.org/dev/reference/sql_query_insert.md)
+  [`sql_query_delete()`](https://dbplyr.tidyverse.org/dev/reference/sql_query_insert.md)
+  : Generate SQL for Insert, Update, Upsert, and Delete
+
+# Articles
+
+### All vignettes
+
+- [dbplyr 2.0.0 backend
+  API](https://dbplyr.tidyverse.org/dev/articles/backend-2.md):
+- [Introduction to
+  dbplyr](https://dbplyr.tidyverse.org/dev/articles/dbplyr.md):
+- [Adding a new DBI
+  backend](https://dbplyr.tidyverse.org/dev/articles/new-backend.md):
+- [Reprexes for
+  dbplyr](https://dbplyr.tidyverse.org/dev/articles/reprex.md):
+- [Writing SQL with
+  dbplyr](https://dbplyr.tidyverse.org/dev/articles/sql.md):
+- [Function
+  translation](https://dbplyr.tidyverse.org/dev/articles/translation-function.md):
+- [Verb
+  translation](https://dbplyr.tidyverse.org/dev/articles/translation-verb.md):

@@ -7,7 +7,7 @@ queries."><meta property="og:description" content="These generics translate indi
 generics are DBI::dbQuoteIdentifier() and DBI::dbQuoteString
 for quoting identifiers and strings, but dbplyr needs additional
 tools for inserting logical, date, date-time, and raw values into
-queries."><meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png"><meta name="robots" content="noindex"><script defer data-domain="dbplyr.tidyverse.org,all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script></head><body>
+queries."><meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png"><meta name="robots" content="noindex"><script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js" data-max-height="43" data-light-bg="#666f76" data-light-fg="#f9f9f9"></script><script defer data-domain="dbplyr.tidyverse.org,all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script></head><body>
     <a href="#container" class="visually-hidden-focusable">Skip to content</a>
 
 
@@ -88,8 +88,8 @@ queries.</p>
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other generic:
 <code><a href="db-sql.html">db-sql</a></code>,
-<code><a href="db-misc.html">db_connection_describe</a>()</code>,
-<code><a href="db-io.html">db_copy_to</a>()</code></p></div>
+<code><a href="db-misc.html">db_connection_describe()</a></code>,
+<code><a href="db-io.html">db_copy_to()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -98,9 +98,9 @@ queries.</p>
 <span class="r-in"><span><span class="fu">sql_escape_logical</span><span class="op">(</span><span class="va">con</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "TRUE"  "FALSE" "NULL" </span>
 <span class="r-in"><span><span class="fu">sql_escape_date</span><span class="op">(</span><span class="va">con</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "'2025-09-10'"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "'2025-11-18'"</span>
 <span class="r-in"><span><span class="fu">sql_escape_date</span><span class="op">(</span><span class="va">con</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "'2025-09-10 12:45:48.161003'"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "'2025-11-18 06:28:44.384935'"</span>
 <span class="r-in"><span><span class="fu">sql_escape_raw</span><span class="op">(</span><span class="va">con</span>, <span class="fu"><a href="https://rdrr.io/r/base/rawConversion.html" class="external-link">charToRaw</a></span><span class="op">(</span><span class="st">"hi"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "X'6869'"</span>
 </code></pre></div>
@@ -116,7 +116,7 @@ queries.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
   </div></footer></body></html>

@@ -1,0 +1,148 @@
+# Verb translation
+
+There are two parts to dbplyr SQL translation: translating dplyr verbs,
+and translating expressions within those verbs. This vignette describes
+how entire verbs are translated;
+[`vignette("translation-function")`](https://dbplyr.tidyverse.org/dev/articles/translation-function.md)
+describes how individual expressions within those verbs are translated.
+
+All dplyr verbs generate a `SELECT` statement. To demonstrate we’ll make
+a temporary database with a couple of tables
+
+``` r
+library(dplyr)
+
+con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+flights <- copy_to(con, nycflights13::flights)
+airports <- copy_to(con, nycflights13::airports)
+```
+
+## Single table verbs
+
+- [`select()`](https://dplyr.tidyverse.org/reference/select.html) and
+  [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html) modify
+  the `SELECT` clause:
+
+  ``` r
+  flights %>%
+    select(contains("delay")) %>%
+    show_query()
+  ```
+
+      ## <SQL>
+      ## SELECT `dep_delay`, `arr_delay`
+      ## FROM `nycflights13::flights`
+
+  ``` r
+  flights %>%
+    select(distance, air_time) %>%  
+    mutate(speed = distance / (air_time / 60)) %>%
+    show_query()
+  ```
+
+      ## <SQL>
+      ## SELECT `distance`, `air_time`, `distance` / (`air_time` / 60.0) AS `speed`
+      ## FROM `nycflights13::flights`
+
+- [`filter()`](https://dplyr.tidyverse.org/reference/filter.html)
+  generates a `WHERE` clause:
+
+  ``` r
+  flights %>% 
+    filter(month == 1, day == 1) %>%
+    show_query()
+  ```
+
+      ## <SQL>
+      ## SELECT `nycflights13::flights`.*
+      ## FROM `nycflights13::flights`
+      ## WHERE (`month` = 1.0) AND (`day` = 1.0)
+
+- [`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html)
+  generates an `ORDER BY` clause:
+
+  ``` r
+  flights %>% 
+    arrange(carrier, desc(arr_delay)) %>%
+    show_query()
+  ```
+
+      ## <SQL>
+      ## SELECT `nycflights13::flights`.*
+      ## FROM `nycflights13::flights`
+      ## ORDER BY `carrier`, `arr_delay` DESC
+
+- [`summarise()`](https://dplyr.tidyverse.org/reference/summarise.html)
+  and
+  [`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html)
+  work together to generate a `GROUP BY` clause:
+
+  ``` r
+  flights %>%
+    group_by(month, day) %>%
+    summarise(delay = mean(dep_delay, na.rm = TRUE)) %>%
+    show_query()
+  ```
+
+      ## `summarise()` has grouped output by "month". You can override using
+      ## the `.groups` argument.
+
+      ## <SQL>
+      ## SELECT `month`, `day`, AVG(`dep_delay`) AS `delay`
+      ## FROM `nycflights13::flights`
+      ## GROUP BY `month`, `day`
+
+## Dual table verbs
+
+| R                                                                         | SQL                                                                  |
+|---------------------------------------------------------------------------|----------------------------------------------------------------------|
+| [`inner_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html) | `SELECT * FROM x JOIN y ON x.a = y.a`                                |
+| [`left_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html)  | `SELECT * FROM x LEFT JOIN y ON x.a = y.a`                           |
+| [`right_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html) | `SELECT * FROM x RIGHT JOIN y ON x.a = y.a`                          |
+| [`full_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html)  | `SELECT * FROM x FULL JOIN y ON x.a = y.a`                           |
+| [`semi_join()`](https://dplyr.tidyverse.org/reference/filter-joins.html)  | `SELECT * FROM x WHERE EXISTS (SELECT 1 FROM y WHERE x.a = y.a)`     |
+| [`anti_join()`](https://dplyr.tidyverse.org/reference/filter-joins.html)  | `SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = y.a)` |
+| `intersect(x, y)`                                                         | `SELECT * FROM x INTERSECT SELECT * FROM y`                          |
+| `union(x, y)`                                                             | `SELECT * FROM x UNION SELECT * FROM y`                              |
+| `setdiff(x, y)`                                                           | `SELECT * FROM x EXCEPT SELECT * FROM y`                             |
+
+`x` and `y` don’t have to be tables in the same database. If you specify
+`copy = TRUE`, dplyr will copy the `y` table into the same location as
+the `x` variable. This is useful if you’ve downloaded a summarised
+dataset and determined a subset of interest that you now want the full
+data for. You can use `semi_join(x, y, copy = TRUE)` to upload the
+indices of interest to a temporary table in the same database as `x`,
+and then perform a efficient semi join in the database.
+
+If you’re working with large data, it maybe also be helpful to set
+`auto_index = TRUE`. That will automatically add an index on the join
+variables to the temporary table.
+
+## Behind the scenes
+
+The verb level SQL translation is implemented on top of `tbl_lazy`,
+which basically tracks the operations you perform in a pipeline (see
+`lazy-ops.R`). Turning that into a SQL query takes place in three steps:
+
+- [`sql_build()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)
+  recurses over the lazy op data structure building up query objects
+  ([`select_query()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md),
+  [`join_query()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md),
+  [`set_op_query()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)
+  etc) that represent the different subtypes of `SELECT` queries that we
+  might generate.
+
+- [`sql_optimise()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)
+  takes a pass over these SQL objects, looking for potential
+  optimisations. Currently this only involves removing subqueries where
+  possible.
+
+- [`sql_render()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)
+  calls an SQL generation function
+  ([`sql_query_select()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md),
+  [`sql_query_join()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md),
+  [`sql_query_semi_join()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md),
+  [`sql_query_set_op()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md),
+  …) to produce the actual SQL. Each of these functions is a generic,
+  taking the connection as an argument, so that the translation can be
+  customised for different databases.
