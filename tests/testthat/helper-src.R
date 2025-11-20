@@ -2,18 +2,21 @@ on_gha <- function() identical(Sys.getenv("GITHUB_ACTIONS"), "true")
 on_cran <- function() !identical(Sys.getenv("NOT_CRAN"), "true")
 
 if (test_srcs$length() == 0) {
-
   test_register_con("sqlite", RSQLite::SQLite(), ":memory:")
 
   if (identical(Sys.getenv("GITHUB_POSTGRES"), "true")) {
-    test_register_con("postgres", RPostgres::Postgres(),
+    test_register_con(
+      "postgres",
+      RPostgres::Postgres(),
       dbname = "test",
       user = "postgres",
       password = "password",
       host = "127.0.0.1"
     )
   } else if (identical(Sys.getenv("GITHUB_MSSQL"), "true")) {
-    test_register_con("mssql", odbc::odbc(),
+    test_register_con(
+      "mssql",
+      odbc::odbc(),
       driver = "ODBC Driver 17 for SQL Server",
       database = "test",
       uid = "SA",
@@ -24,12 +27,16 @@ if (test_srcs$length() == 0) {
   } else if (on_gha() || on_cran()) {
     # Only test with sqlite
   } else {
-    test_register_con("MariaDB", RMariaDB::MariaDB(),
+    test_register_con(
+      "MariaDB",
+      RMariaDB::MariaDB(),
       dbname = "test",
       host = "localhost",
       username = Sys.getenv("USER")
     )
-    test_register_con("postgres", RPostgres::Postgres(),
+    test_register_con(
+      "postgres",
+      RPostgres::Postgres(),
       dbname = "test",
       host = "localhost",
       user = ""

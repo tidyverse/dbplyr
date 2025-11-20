@@ -9,12 +9,14 @@ dbplyr_edition.PostgreSQLConnection <- function(con) {
 }
 
 #' @export
-db_write_table.PostgreSQLConnection <- function(con,
-                                                table,
-                                                types,
-                                                values,
-                                                temporary = TRUE,
-                                                ...) {
+db_write_table.PostgreSQLConnection <- function(
+  con,
+  table,
+  types,
+  values,
+  temporary = TRUE,
+  ...
+) {
   if (!isFALSE(temporary)) {
     cli_abort(c(
       "RPostgreSQL backend does not support creation of temporary tables",

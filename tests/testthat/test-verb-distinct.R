@@ -97,7 +97,8 @@ test_that("distinct() produces optimized SQL", {
   expect_true(out$lazy_query$distinct)
   expect_equal(out$lazy_query$select$name, c("x", "y"))
   expect_equal(
-    out$lazy_query$select$expr, list(sym("x"), quo(mean(y, na.rm = TRUE))),
+    out$lazy_query$select$expr,
+    list(sym("x"), quo(mean(y, na.rm = TRUE))),
     ignore_formula_env = TRUE
   )
   expect_equal(out$lazy_query$group_by, syms("x"))
@@ -115,7 +116,11 @@ test_that("distinct() produces optimized SQL", {
   expect_true(out$lazy_query$distinct)
   expect_equal(out$lazy_query$select$name, "y")
   expect_equal(out$lazy_query$select$expr, syms("y"))
-  expect_equal(out$lazy_query$where, list(quo(x == 1L)), ignore_formula_env = TRUE)
+  expect_equal(
+    out$lazy_query$where,
+    list(quo(x == 1L)),
+    ignore_formula_env = TRUE
+  )
 
   # Note: currently this needs `distinct()` or `distinct(x, y)` because
   # `summarise()` + `select()` is not inlined.
@@ -127,7 +132,9 @@ test_that("distinct() produces optimized SQL", {
 
   expect_equal(
     remote_query(out),
-    sql("SELECT DISTINCT `x`, AVG(`y`) AS `y`\nFROM `df`\nGROUP BY `x`\nHAVING (`x` = 1.0)")
+    sql(
+      "SELECT DISTINCT `x`, AVG(`y`) AS `y`\nFROM `df`\nGROUP BY `x`\nHAVING (`x` = 1.0)"
+    )
   )
   expect_true(out$lazy_query$distinct)
   expect_equal(out$lazy_query$select$name, c("x", "y"))
@@ -148,8 +155,8 @@ test_that("distinct() produces optimized SQL", {
 
   expect_snapshot(
     (out <- lf %>%
-       head(2) %>%
-       distinct(x, y))
+      head(2) %>%
+      distinct(x, y))
   )
 
   expect_s3_class(out$lazy_query$x, "lazy_select_query")
@@ -241,16 +248,18 @@ test_that("distinct produces correct vars when .keep_all is TRUE", {
   out <- lf %>% distinct(a = x, .keep_all = TRUE)
   expect_equal(op_vars(out), c("x", "y", "a"))
 
-  out <- lazy_frame(x = 1, y = 2, z = 3) %>% group_by(x) %>% distinct(y, .keep_all = TRUE)
+  out <- lazy_frame(x = 1, y = 2, z = 3) %>%
+    group_by(x) %>%
+    distinct(y, .keep_all = TRUE)
   expect_equal(op_vars(out), c("x", "y", "z"))
 })
 
-test_that("distinct respects order of the specified variables (#3195, #6156)",{
+test_that("distinct respects order of the specified variables (#3195, #6156)", {
   d <- lazy_frame(x = 1:2, y = 3:4)
   expect_equal(colnames(distinct(d, y, x)), c("y", "x"))
 })
 
-test_that("distinct adds grouping variables to front if missing",{
+test_that("distinct adds grouping variables to front if missing", {
   d <- lazy_frame(x = 1:2, y = 3:4)
   expect_equal(colnames(distinct(group_by(d, y), x)), c("y", "x"))
   expect_equal(colnames(distinct(group_by(d, y), x, y)), c("x", "y"))

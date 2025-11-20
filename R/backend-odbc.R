@@ -73,9 +73,17 @@ db_connection_describe.OdbcConnection <- function(con, ...) {
   port <- if (info$port == "") "" else paste0(":", info$port)
 
   paste0(
-    info$dbms.name, " ", info$db.version,
-    "[", info$username, "@", host, port,
-    "/", info$dbname, "]"
+    info$dbms.name,
+    " ",
+    info$db.version,
+    "[",
+    info$username,
+    "@",
+    host,
+    port,
+    "/",
+    info$dbname,
+    "]"
   )
 }
 # nocov end

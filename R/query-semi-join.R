@@ -1,12 +1,14 @@
 #' @export
 #' @rdname sql_build
-semi_join_query <- function(x,
-                            y,
-                            vars,
-                            anti = FALSE,
-                            by = NULL,
-                            where = NULL,
-                            na_matches = FALSE) {
+semi_join_query <- function(
+  x,
+  y,
+  vars,
+  anti = FALSE,
+  by = NULL,
+  where = NULL,
+  na_matches = FALSE
+) {
   structure(
     list(
       x = x,
@@ -42,12 +44,14 @@ print.semi_join_query <- function(x, ...) {
 }
 
 #' @export
-sql_render.semi_join_query <- function(query,
-                                       con = NULL,
-                                       ...,
-                                       sql_options = NULL,
-                                       subquery = FALSE,
-                                       lvl = 0) {
+sql_render.semi_join_query <- function(
+  query,
+  con = NULL,
+  ...,
+  sql_options = NULL,
+  subquery = FALSE,
+  lvl = 0
+) {
   from_x <- sql_render(query$x, con, ..., subquery = TRUE, lvl = lvl + 1)
   from_y <- sql_render(query$y, con, ..., subquery = TRUE, lvl = lvl + 1)
 
