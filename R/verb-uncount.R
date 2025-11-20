@@ -46,7 +46,10 @@ dbplyr_uncount <- function(data, weights, .remove = TRUE, .id = NULL) {
     )
   }
 
-  n_max <- pull(summarise(ungroup(data), "max" = max(!!sym(weights_col), na.rm = TRUE)))
+  n_max <- pull(summarise(
+    ungroup(data),
+    max = max(!!sym(weights_col), na.rm = TRUE)
+  ))
   n_max <- vctrs::vec_cast(n_max, integer(), x_arg = "weights")
 
   if (is_null(.id)) {
