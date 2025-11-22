@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `dbplyr_uncount()` now works with Redshift (@owenjonesuob, #1601).
+
 # dbplyr 2.5.1
 
 * Improved translations:
