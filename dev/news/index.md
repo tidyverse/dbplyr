@@ -2,6 +2,11 @@
 
 ## dbplyr (development version)
 
+- [`dbplyr_uncount()`](https://dbplyr.tidyverse.org/dev/reference/dbplyr_uncount.md)
+  now works with Redshift
+  ([@owenjonesuob](https://github.com/owenjonesuob),
+  [\#1601](https://github.com/tidyverse/dbplyr/issues/1601)).
+
 ## dbplyr 2.5.1
 
 CRAN release: 2025-09-10

@@ -34,9 +34,9 @@ con <- simulate_dbi()
 sql_escape_logical(con, c(TRUE, FALSE, NA))
 #> [1] "TRUE"  "FALSE" "NULL" 
 sql_escape_date(con, Sys.Date())
-#> [1] "'2025-11-18'"
+#> [1] "'2025-11-22'"
 sql_escape_date(con, Sys.time())
-#> [1] "'2025-11-18 06:44:16.562523'"
+#> [1] "'2025-11-22 07:29:06.000489'"
 sql_escape_raw(con, charToRaw("hi"))
 #> [1] "X'6869'"
 ```
