@@ -40,16 +40,13 @@ dbplyr_uncount <- function(data, weights, .remove = TRUE, .id = NULL) {
     weights_col <- quo_name(weights_quo)
   } else {
     weights_col <- "..dbplyr_weight_col"
-    data <- mutate(
-      data,
-      !!weights_col := !!weights_quo,
-    )
+    data <- mutate(data, !!weights_col := !!weights_quo)
   }
 
-  n_max <- pull(summarise(
-    ungroup(data),
-    max = max(!!sym(weights_col), na.rm = TRUE)
-  ))
+  n_max <- data |>
+    ungroup() |>
+    summarise(max = max(!!sym(weights_col), na.rm = TRUE)) |>
+    pull()
   n_max <- vctrs::vec_cast(n_max, integer(), x_arg = "weights")
 
   if (is_null(.id)) {
