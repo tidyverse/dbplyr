@@ -80,6 +80,7 @@ downloads the data into R.</p>
 <span>  <span class="va">x</span>,</span>
 <span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  temporary <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  unique_indexes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  indexes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  analyze <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -110,6 +111,12 @@ downloads the data into R.</p>
 <dt id="arg-temporary">temporary<a class="anchor" aria-label="anchor" href="#arg-temporary"></a></dt>
 <dd><p>Should the table be temporary (<code>TRUE</code>, the default) or
 persistent (<code>FALSE</code>)?</p></dd>
+
+
+<dt id="arg-overwrite">overwrite<a class="anchor" aria-label="anchor" href="#arg-overwrite"></a></dt>
+<dd><p>If <code>TRUE</code>, will overwrite an existing table with
+name <code>name</code>. If <code>FALSE</code>, will throw an error if <code>name</code> already
+exists.</p></dd>
 
 
 <dt id="arg-unique-indexes">unique_indexes<a class="anchor" aria-label="anchor" href="#arg-unique-indexes"></a></dt>

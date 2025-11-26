@@ -23,6 +23,7 @@ compute(
   x,
   name = NULL,
   temporary = TRUE,
+  overwrite = FALSE,
   unique_indexes = list(),
   indexes = list(),
   analyze = TRUE,
@@ -52,6 +53,11 @@ collect(x, ..., n = Inf, warn_incomplete = TRUE, cte = FALSE)
 
   Should the table be temporary (`TRUE`, the default) or persistent
   (`FALSE`)?
+
+- overwrite:
+
+  If `TRUE`, will overwrite an existing table with name `name`. If
+  `FALSE`, will throw an error if `name` already exists.
 
 - unique_indexes:
 

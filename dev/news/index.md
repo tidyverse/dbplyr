@@ -2,6 +2,11 @@
 
 ## dbplyr (development version)
 
+- Fixed overwrite flag in
+  [`copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html) to
+  work when source is in the same DB as destination
+  ([@liudvikasakelis](https://github.com/liudvikasakelis),
+  [\#1535](https://github.com/tidyverse/dbplyr/issues/1535))
 - Snowflake correctly translates `$` to `:`
   ([@jsowder](https://github.com/jsowder),
   [\#1608](https://github.com/tidyverse/dbplyr/issues/1608))
