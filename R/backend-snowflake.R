@@ -316,6 +316,13 @@ sql_translation.Snowflake <- function(con) {
         } else {
           glue_sql2(sql_current_con(), "GREATEST({.val dots*})")
         }
+      },
+      `$` = function(x, name) {
+        if (is.sql(x)) {
+          glue_sql2(sql_current_con(), "{x}:{.col name}")
+        } else {
+          eval(bquote(`$`(x, .(substitute(name)))))
+        }
       }
     ),
     sql_translator(
