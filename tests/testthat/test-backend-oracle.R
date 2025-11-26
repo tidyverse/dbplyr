@@ -1,11 +1,20 @@
 test_that("custom scalar functions translated correctly", {
   local_con(simulate_oracle())
 
-  expect_equal(test_translate_sql(as.character(x)), sql("CAST(`x` AS VARCHAR2(255))"))
-  expect_equal(test_translate_sql(as.integer64(x)), sql("CAST(`x` AS NUMBER(19))"))
-  expect_equal(test_translate_sql(as.double(x)),    sql("CAST(`x` AS NUMBER)"))
-  expect_equal(test_translate_sql(as.Date(x)),      sql("DATE `x`"))
-  expect_equal(test_translate_sql(as.Date("2023-01-01")), sql("DATE '2023-01-01'"))
+  expect_equal(
+    test_translate_sql(as.character(x)),
+    sql("CAST(`x` AS VARCHAR2(255))")
+  )
+  expect_equal(
+    test_translate_sql(as.integer64(x)),
+    sql("CAST(`x` AS NUMBER(19))")
+  )
+  expect_equal(test_translate_sql(as.double(x)), sql("CAST(`x` AS NUMBER)"))
+  expect_equal(test_translate_sql(as.Date(x)), sql("DATE `x`"))
+  expect_equal(
+    test_translate_sql(as.Date("2023-01-01")),
+    sql("DATE '2023-01-01'")
+  )
 })
 
 test_that("paste and paste0 translate correctly", {
@@ -34,7 +43,10 @@ test_that("queries translate correctly", {
 test_that("`sql_query_upsert()` is correct", {
   con <- simulate_oracle()
   df_y <- lazy_frame(
-    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    a = 2:3,
+    b = c(12L, 13L),
+    c = -(2:3),
+    d = c("y", "z"),
     con = con,
     .name = "df_y"
   ) %>%
@@ -62,8 +74,17 @@ test_that("generates custom sql", {
   lf <- lazy_frame(x = 1, con = con)
   expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
 
-  expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl")))
-  expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"), temporary = FALSE))
+  expect_snapshot(sql_query_save(
+    con,
+    sql("SELECT * FROM foo"),
+    in_schema("schema", "tbl")
+  ))
+  expect_snapshot(sql_query_save(
+    con,
+    sql("SELECT * FROM foo"),
+    in_schema("schema", "tbl"),
+    temporary = FALSE
+  ))
 
   expect_snapshot(slice_sample(lf, n = 1))
 })
@@ -85,16 +106,42 @@ test_that("copy_inline uses UNION ALL", {
 
 test_that("custom clock functions translated correctly", {
   local_con(simulate_oracle())
-  expect_equal(test_translate_sql(add_years(x, 1)), sql("(`x` + NUMTODSINTERVAL(1.0 * 365.25, 'day'))"))
-  expect_equal(test_translate_sql(add_days(x, 1)), sql("(`x` + NUMTODSINTERVAL(1.0, 'day'))"))
-  expect_error(test_translate_sql(add_days(x, 1, "dots", "must", "be empty")))
+  expect_equal(
+    test_translate_sql(add_years(x, 1)),
+    sql("(`x` + NUMTODSINTERVAL(1.0 * 365.25, 'day'))")
+  )
+  expect_equal(
+    test_translate_sql(add_days(x, 1)),
+    sql("(`x` + NUMTODSINTERVAL(1.0, 'day'))")
+  )
+  expect_error(
+    test_translate_sql(add_days(x, 1, "dots", "must", "be empty")),
+    class = "rlib_error_dots_nonempty"
+  )
 })
 
 test_that("difftime is translated correctly", {
   local_con(simulate_oracle())
-  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("CEIL(CAST(`end_date` AS DATE) - CAST(`start_date` AS DATE))"))
-  expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("CEIL(CAST(`end_date` AS DATE) - CAST(`start_date` AS DATE))"))
+  expect_equal(
+    test_translate_sql(difftime(start_date, end_date, units = "days")),
+    sql("CEIL(CAST(`end_date` AS DATE) - CAST(`start_date` AS DATE))")
+  )
+  expect_equal(
+    test_translate_sql(difftime(start_date, end_date)),
+    sql("CEIL(CAST(`end_date` AS DATE) - CAST(`start_date` AS DATE))")
+  )
 
-  expect_error(test_translate_sql(difftime(start_date, end_date, units = "auto")))
-  expect_error(test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days")))
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(difftime(start_date, end_date, units = "auto"))
+  )
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(difftime(
+      start_date,
+      end_date,
+      tz = "UTC",
+      units = "days"
+    ))
+  )
 })

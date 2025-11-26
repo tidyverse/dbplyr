@@ -82,10 +82,13 @@ unwrap_order_expr <- function(order_by, f, error_call = caller_env()) {
   if (is_call(order_by_expr, "c")) {
     args <- call_args(order_by_expr)
     tibble_expr <- expr_text(expr(tibble(!!!args)))
-    cli_abort(c(
-      "Can't use `c()` in {.fun {f}}",
-      i = "Did you mean to use `{tibble_expr}` instead?"
-    ), call = error_call)
+    cli_abort(
+      c(
+        "Can't use `c()` in {.fun {f}}",
+        i = "Did you mean to use `{tibble_expr}` instead?"
+      ),
+      call = error_call
+    )
   }
 
   if (is_call(order_by_expr, c("tibble", "data.frame"))) {

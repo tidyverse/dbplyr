@@ -114,7 +114,7 @@ Tables:
 \itemize{
 \item \code{sql_table_analyze(con, table)} generates SQL that "analyzes" the table,
 ensuring that the database has up-to-date statistics for use in the query
-planner. It called from \code{\link[=copy_to]{copy_to()}} when \code{analyze = TRUE}.
+planner. It called from \code{\link[dplyr:copy_to]{dplyr::copy_to()}} when \code{analyze = TRUE}.
 \item \code{sql_table_index()} generates SQL for adding an index to table.
 }
 

@@ -12,10 +12,10 @@ test_that("basic arithmetic is correct", {
   local_con(simulate_dbi())
   expect_equal(test_translate_sql(1 + 2), sql("1.0 + 2.0"))
   expect_equal(test_translate_sql(2 * 4), sql("2.0 * 4.0"))
-  expect_equal(test_translate_sql(5 ^ 2), sql("POWER(5.0, 2.0)"))
+  expect_equal(test_translate_sql(5^2), sql("POWER(5.0, 2.0)"))
   expect_equal(test_translate_sql(100L %% 3L), sql("100 % 3"))
 
-  expect_error(test_translate_sql(100L %/% 3L), "not available")
+  expect_snapshot(error = TRUE, test_translate_sql(100L %/% 3L))
 })
 
 test_that("small numbers aren't converted to 0", {
@@ -33,7 +33,10 @@ test_that("unary plus works with numbers", {
 test_that("unary plus works for non-numeric expressions", {
   local_con(simulate_dbi())
   expect_equal(test_translate_sql(+(1L + 2L)), sql("(1 + 2)"))
-  expect_equal(test_translate_sql(mean(x, na.rm = TRUE), window = FALSE), sql('AVG(`x`)'))
+  expect_equal(
+    test_translate_sql(mean(x, na.rm = TRUE), window = FALSE),
+    sql('AVG(`x`)')
+  )
 })
 
 test_that("unary minus flips sign of number", {
@@ -47,7 +50,10 @@ test_that("unary minus flips sign of number", {
 test_that("unary minus wraps non-numeric expressions", {
   local_con(simulate_dbi())
   expect_equal(test_translate_sql(-(1L + 2L)), sql("-(1 + 2)"))
-  expect_equal(test_translate_sql(-mean(x, na.rm = TRUE), window = FALSE), sql('-AVG(`x`)'))
+  expect_equal(
+    test_translate_sql(-mean(x, na.rm = TRUE), window = FALSE),
+    sql('-AVG(`x`)')
+  )
 })
 
 test_that("binary minus subtracts", {
@@ -95,7 +101,10 @@ test_that("useful error if $ used with inlined value", {
 test_that("lead and lag translate n to integers", {
   local_con(simulate_dbi())
 
-  expect_equal(test_translate_sql(lead(x, 1)), sql("LEAD(`x`, 1, NULL) OVER ()"))
+  expect_equal(
+    test_translate_sql(lead(x, 1)),
+    sql("LEAD(`x`, 1, NULL) OVER ()")
+  )
   expect_equal(test_translate_sql(lag(x, 1)), sql("LAG(`x`, 1, NULL) OVER ()"))
 })
 
@@ -112,7 +121,10 @@ test_that("can translate case insensitive like", {
 
 test_that("can translate nzchar", {
   local_con(simulate_dbi())
-  expect_equal(test_translate_sql(nzchar(y)), sql("((`y` IS NULL) OR `y` != '')"))
+  expect_equal(
+    test_translate_sql(nzchar(y)),
+    sql("((`y` IS NULL) OR `y` != '')")
+  )
   expect_equal(test_translate_sql(nzchar(y, TRUE)), sql("`y` != ''"))
 })
 
@@ -152,10 +164,10 @@ test_that("all and any translated correctly", {
 
 test_that("bitwise operations", {
   local_con(simulate_dbi())
-  expect_equal(test_translate_sql(bitwNot(x)),        sql("~(`x`)"))
-  expect_equal(test_translate_sql(bitwAnd(x, 128L)),  sql("`x` & 128"))
-  expect_equal(test_translate_sql(bitwOr(x, 128L)),   sql("`x` | 128"))
-  expect_equal(test_translate_sql(bitwXor(x, 128L)),  sql("`x` ^ 128"))
+  expect_equal(test_translate_sql(bitwNot(x)), sql("~(`x`)"))
+  expect_equal(test_translate_sql(bitwAnd(x, 128L)), sql("`x` & 128"))
+  expect_equal(test_translate_sql(bitwOr(x, 128L)), sql("`x` | 128"))
+  expect_equal(test_translate_sql(bitwXor(x, 128L)), sql("`x` ^ 128"))
   expect_equal(test_translate_sql(bitwShiftL(x, 2L)), sql("`x` << 2"))
   expect_equal(test_translate_sql(bitwShiftR(x, 2L)), sql("`x` >> 2"))
 })
@@ -187,7 +199,16 @@ test_that("DDL operations generate expected SQL", {
   expect_snapshot(sql_query_wrap(con, sql("SELECT * FROM foo")))
 
   expect_snapshot(sql_table_index(con, in_schema("schema", "tbl"), c("a", "b")))
-  expect_snapshot(sql_table_index(con, in_schema("schema", "tbl"), "c", unique = TRUE))
+  expect_snapshot(sql_table_index(
+    con,
+    in_schema("schema", "tbl"),
+    "c",
+    unique = TRUE
+  ))
 
-  expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("temp", "tbl")))
+  expect_snapshot(sql_query_save(
+    con,
+    sql("SELECT * FROM foo"),
+    in_schema("temp", "tbl")
+  ))
 })

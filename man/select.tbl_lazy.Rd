@@ -33,7 +33,7 @@ columns selected by \code{...}. Supplying neither will move columns to the
 left-hand side; specifying both is an error.}
 }
 \description{
-These are methods for the dplyr \code{\link[=select]{select()}}, \code{\link[=rename]{rename()}}, and \code{\link[=relocate]{relocate()}}
+These are methods for the dplyr \code{\link[dplyr:select]{dplyr::select()}}, \code{\link[dplyr:rename]{dplyr::rename()}}, and \code{\link[dplyr:relocate]{dplyr::relocate()}}
 generics. They generate the \code{SELECT} clause of the SQL query.
 
 These functions do not support predicate functions, i.e. you can

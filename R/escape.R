@@ -50,12 +50,22 @@ escape.ident <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
 }
 
 #' @export
-escape.dbplyr_schema <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
+escape.dbplyr_schema <- function(
+  x,
+  parens = FALSE,
+  collapse = ", ",
+  con = NULL
+) {
   sql_vector(as.sql(x, con = con), parens, collapse, con = con)
 }
 
 #' @export
-escape.dbplyr_catalog <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
+escape.dbplyr_catalog <- function(
+  x,
+  parens = FALSE,
+  collapse = ", ",
+  con = NULL
+) {
   sql_vector(as.sql(x, con = con), parens, collapse, con = con)
 }
 
@@ -143,7 +153,12 @@ escape.data.frame <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
 }
 
 #' @export
-escape.reactivevalues <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
+escape.reactivevalues <- function(
+  x,
+  parens = TRUE,
+  collapse = ", ",
+  con = NULL
+) {
   error_embed("shiny inputs", "input$x")
 }
 
@@ -154,10 +169,13 @@ escape.default <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
 
 # Also used in default_ops() for reactives
 error_embed <- function(type, expr) {
-  cli_abort(c(
-    "Cannot translate {type} to SQL.",
-    `i` = "Do you want to force evaluation in R with (e.g.) `!!{expr}` or `local({expr})`?"
-  ), call = NULL)
+  cli_abort(
+    c(
+      "Cannot translate {type} to SQL.",
+      `i` = "Do you want to force evaluation in R with (e.g.) `!!{expr}` or `local({expr})`?"
+    ),
+    call = NULL
+  )
 }
 
 #' @export
@@ -179,7 +197,9 @@ sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
 
   x <- names_to_as(x, con = con)
   x <- paste(x, collapse = collapse)
-  if (parens) x <- paste0("(", x, ")")
+  if (parens) {
+    x <- paste0("(", x, ")")
+  }
   sql(x)
 }
 
