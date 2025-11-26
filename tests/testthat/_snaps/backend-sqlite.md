@@ -36,5 +36,5 @@
       
       <PLAN>
         id parent notused                                        detail
-      1  2      0       0 SEARCH test USING COVERING INDEX test_x (x>?)
+      1  2      0      35 SEARCH test USING COVERING INDEX test_x (x>?)
 

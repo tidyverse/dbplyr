@@ -31,7 +31,10 @@ test_that("namespace calls are translated", {
 
 test_that("Wrong number of arguments raises error", {
   local_con(simulate_dbi())
-  expect_error(test_translate_sql(mean(1, 2, na.rm = TRUE), window = FALSE), "unused argument")
+  expect_error(
+    test_translate_sql(mean(1, 2, na.rm = TRUE), window = FALSE),
+    "unused argument"
+  )
 })
 
 test_that("between translated to special form (#503)", {
@@ -69,7 +72,10 @@ test_that("n_distinct(x) translated to COUNT(distinct, x)", {
     test_translate_sql(n_distinct(x), window = TRUE),
     sql("COUNT(DISTINCT `x`) OVER ()")
   )
-  expect_error(test_translate_sql(n_distinct(x, y), window = FALSE), "unused argument")
+  expect_error(
+    test_translate_sql(n_distinct(x, y), window = FALSE),
+    "unused argument"
+  )
 })
 
 test_that("na_if is translated to NULLIF (#211)", {
@@ -85,7 +91,10 @@ test_that("connection affects quoting character", {
 
 test_that("magrittr pipe is translated", {
   local_con(simulate_dbi())
-  expect_identical(test_translate_sql(1 %>% is.na()), test_translate_sql(is.na(1)))
+  expect_identical(
+    test_translate_sql(1 %>% is.na()),
+    test_translate_sql(is.na(1))
+  )
 })
 
 test_that("user infix functions are translated", {
@@ -115,7 +124,7 @@ test_that("sql() evaluates input locally in across()", {
   expect_equal(
     lf %>%
       summarise(
-        across(x, ~ sql(gsub("x","y",cur_column())))
+        across(x, ~ sql(gsub("x", "y", cur_column())))
       ) %>%
       remote_query(),
     sql("SELECT y AS `x`\nFROM `df`")
@@ -127,8 +136,8 @@ test_that("sql() evaluates input locally in across()", {
 test_that("casts as expected", {
   local_con(simulate_dbi())
   expect_equal(test_translate_sql(as.integer64(x)), sql("CAST(`x` AS BIGINT)"))
-  expect_equal(test_translate_sql(as.logical(x)),   sql("CAST(`x` AS BOOLEAN)"))
-  expect_equal(test_translate_sql(as.Date(x)),      sql("CAST(`x` AS DATE)"))
+  expect_equal(test_translate_sql(as.logical(x)), sql("CAST(`x` AS BOOLEAN)"))
+  expect_equal(test_translate_sql(as.Date(x)), sql("CAST(`x` AS DATE)"))
 })
 
 # numeric -----------------------------------------------------------------
@@ -137,29 +146,47 @@ test_that("hypergeometric functions use manual calculation", {
   local_con(simulate_dbi())
   expect_equal(test_translate_sql(cosh(x)), sql("(EXP(`x`) + EXP(-(`x`))) / 2"))
   expect_equal(test_translate_sql(sinh(x)), sql("(EXP(`x`) - EXP(-(`x`))) / 2"))
-  expect_equal(test_translate_sql(tanh(x)), sql("(EXP(2 * (`x`)) - 1) / (EXP(2 * (`x`)) + 1)"))
-  expect_equal(test_translate_sql(coth(x)), sql("(EXP(2 * (`x`)) + 1) / (EXP(2 * (`x`)) - 1)"))
+  expect_equal(
+    test_translate_sql(tanh(x)),
+    sql("(EXP(2 * (`x`)) - 1) / (EXP(2 * (`x`)) + 1)")
+  )
+  expect_equal(
+    test_translate_sql(coth(x)),
+    sql("(EXP(2 * (`x`)) + 1) / (EXP(2 * (`x`)) - 1)")
+  )
 })
 
 test_that("pmin and max use GREATEST and LEAST", {
   local_con(simulate_dbi())
-  expect_equal(test_translate_sql(pmin(x, y, z, na.rm = TRUE)), sql("LEAST(`x`, `y`, `z`)"))
-  expect_equal(test_translate_sql(pmax(x, y, na.rm = TRUE)), sql("GREATEST(`x`, `y`)"))
+  expect_equal(
+    test_translate_sql(pmin(x, y, z, na.rm = TRUE)),
+    sql("LEAST(`x`, `y`, `z`)")
+  )
+  expect_equal(
+    test_translate_sql(pmax(x, y, na.rm = TRUE)),
+    sql("GREATEST(`x`, `y`)")
+  )
 })
 
 test_that("round uses integer digits", {
   local_con(simulate_dbi())
   expect_equal(test_translate_sql(round(10.1)), sql("ROUND(10.1, 0)"))
-  expect_equal(test_translate_sql(round(10.1, digits = 1)),  sql("ROUND(10.1, 1)"))
+  expect_equal(
+    test_translate_sql(round(10.1, digits = 1)),
+    sql("ROUND(10.1, 1)")
+  )
 })
 
 # string functions --------------------------------------------------------
 
 test_that("paste() translated to CONCAT_WS", {
   local_con(simulate_dbi())
-  expect_equal(test_translate_sql(paste0(x, y)),             sql("CONCAT_WS('', `x`, `y`)"))
-  expect_equal(test_translate_sql(paste(x, y)),              sql("CONCAT_WS(' ', `x`, `y`)"))
-  expect_equal(test_translate_sql(paste(x, y, sep = ",")),   sql("CONCAT_WS(',', `x`, `y`)"))
+  expect_equal(test_translate_sql(paste0(x, y)), sql("CONCAT_WS('', `x`, `y`)"))
+  expect_equal(test_translate_sql(paste(x, y)), sql("CONCAT_WS(' ', `x`, `y`)"))
+  expect_equal(
+    test_translate_sql(paste(x, y, sep = ",")),
+    sql("CONCAT_WS(',', `x`, `y`)")
+  )
 })
 
 # stringr -------------------------------------------
@@ -189,6 +216,8 @@ test_that("str_trim() translates correctly ", {
 
 test_that("[ treated as if it is logical subsetting", {
   local_con(simulate_dbi())
-  expect_equal(test_translate_sql(y[x == 0L]), sql("CASE WHEN (`x` = 0) THEN (`y`) END"))
+  expect_equal(
+    test_translate_sql(y[x == 0L]),
+    sql("CASE WHEN (`x` = 0) THEN (`y`) END")
+  )
 })
-

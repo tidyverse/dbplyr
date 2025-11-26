@@ -12,7 +12,7 @@ details of overall translation technology. Key differences for this backend
 are:
 \itemize{
 \item Temporary tables get \verb{#} prefix and use \verb{LOCAL TEMPORARY COLUMN}.
-\item No table analysis performed in \code{\link[=copy_to]{copy_to()}}.
+\item No table analysis performed in \code{\link[dplyr:copy_to]{dplyr::copy_to()}}.
 \item \code{paste()} uses \code{||}
 \item Note that you can't create new boolean columns from logical expressions;
 you need to wrap with explicit \code{ifelse}: \code{ifelse(x > y, TRUE, FALSE)}.

@@ -52,8 +52,9 @@ succeeds <- function(x, quiet = FALSE) {
       TRUE
     },
     error = function(e) {
-      if (!quiet)
-        message("Error: ", e$message) # nocov
+      if (!quiet) {
+        message("Error: ", e$message)
+      } # nocov
       FALSE
     }
   )
@@ -76,13 +77,18 @@ cat_line <- function(...) cat(paste0(..., "\n"), sep = "")
 
 # nocov start
 res_warn_incomplete <- function(res, hint = "n = -1") {
-  if (dbHasCompleted(res)) return()
+  if (dbHasCompleted(res)) {
+    return()
+  }
 
   rows <- big_mark(dbGetRowCount(res))
-  cli::cli_warn("Only first {rows} results retrieved. Use {hint} to retrieve all.")
+  cli::cli_warn(
+    "Only first {rows} results retrieved. Use {hint} to retrieve all."
+  )
 }
 
 add_temporary_prefix <- function(con, table, temporary = TRUE) {
+  check_bool(temporary)
   check_table_path(table)
 
   if (!temporary) {
@@ -111,7 +117,14 @@ local_methods <- function(..., .frame = caller_env()) {
   local_bindings(..., .env = global_env(), .frame = .frame)
 }
 
-local_db_table <- function(con, value, name, ..., temporary = TRUE, envir = parent.frame()) {
+local_db_table <- function(
+  con,
+  value,
+  name,
+  ...,
+  temporary = TRUE,
+  envir = parent.frame()
+) {
   if (inherits(con, "Microsoft SQL Server") && temporary) {
     name <- paste0("#", name)
   }

@@ -56,9 +56,11 @@
 #' # Any functions not explicitly listed in the converter will be translated
 #' # to sql as is, so you don't need to convert all functions.
 #' translate_sql(regr_intercept(y, x), con = con)
-sql_variant <- function(scalar = sql_translator(),
-                        aggregate = sql_translator(),
-                        window = sql_translator()) {
+sql_variant <- function(
+  scalar = sql_translator(),
+  aggregate = sql_translator(),
+  window = sql_translator()
+) {
   check_environment(scalar)
   check_environment(aggregate)
   check_environment(window)
@@ -80,7 +82,12 @@ sql_variant <- function(scalar = sql_translator(),
   env_bind(aggregate, !!!set_names(missing_funs, missing))
 
   structure(
-    list(scalar = scalar, aggregate = aggregate, window = window, aggregate_fns = aggregate_fns),
+    list(
+      scalar = scalar,
+      aggregate = aggregate,
+      window = window,
+      aggregate_fns = aggregate_fns
+    ),
     class = "sql_variant"
   )
 }
@@ -92,7 +99,9 @@ print.sql_variant <- function(x, ...) {
   wrap_ls <- function(x, ...) {
     vars <- sort(ls(envir = x))
     wrapped <- strwrap(paste0(vars, collapse = ", "), ...)
-    if (identical(wrapped, "")) return()
+    if (identical(wrapped, "")) {
+      return()
+    }
     paste0(wrapped, "\n", collapse = "")
   }
 
@@ -118,11 +127,15 @@ names.sql_variant <- function(x) {
 
 #' @export
 #' @rdname sql_variant
-sql_translator <- function(...,
-                           .funs = list(),
-                           .parent = new.env(parent = emptyenv())) {
+sql_translator <- function(
+  ...,
+  .funs = list(),
+  .parent = new.env(parent = emptyenv())
+) {
   funs <- c(list2(...), .funs)
-  if (length(funs) == 0) return(.parent)
+  if (length(funs) == 0) {
+    return(.parent)
+  }
 
   if (anyDuplicated(names(funs))) {
     bullets <- unique(names(funs)[duplicated(names(funs))])
@@ -181,7 +194,8 @@ escape_infix_expr <- function(xq, x, escape_unary_minus = FALSE) {
   infix_calls <- c("+", "-", "*", "/", "%%", "^")
   is_infix <- is_call(xq, infix_calls, n = 2)
   is_unary_minus <- escape_unary_minus &&
-    is_call(xq, "-", n = 1) && !is_atomic(x, n = 1)
+    is_call(xq, "-", n = 1) &&
+    !is_atomic(x, n = 1)
 
   if (is_infix || is_unary_minus) {
     enpared <- glue_sql2(sql_current_con(), "({.val x})")
@@ -202,7 +216,7 @@ sql_prefix <- function(f, n = NULL) {
       cli_abort(
         "Invalid number of args to SQL function {f}",
         i = "Expecting {n} and got {length(args)}"
-     )
+      )
     }
     if (any(names2(args) != "")) {
       cli::cli_warn("Named arguments ignored for SQL {f}")
@@ -248,7 +262,9 @@ sql_aggregate_win <- function(f) {
   force(f)
 
   function(...) {
-    cli_abort("{.fun {f}} is only available in a windowed ({.fun mutate}) context")
+    cli_abort(
+      "{.fun {f}} is only available in a windowed ({.fun mutate}) context"
+    )
   }
 }
 
@@ -348,7 +364,7 @@ sql_try_cast <- function(type) {
 #' @rdname sql_variant
 #' @export
 sql_log <- function() {
-  function(x, base = exp(1)){
+  function(x, base = exp(1)) {
     if (isTRUE(all.equal(base, exp(1)))) {
       sql_expr(ln(!!x))
     } else {
@@ -360,8 +376,8 @@ sql_log <- function() {
 
 #' @rdname sql_variant
 #' @export
-sql_cot <- function(){
-  function(x){
+sql_cot <- function() {
+  function(x) {
     sql_expr(1L / tan(!!x))
   }
 }

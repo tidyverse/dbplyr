@@ -47,7 +47,8 @@
       test_translate_sql(date_count_between(date_column_1, date_column_2, "year"))
     Condition
       Error in `date_count_between()`:
-      ! `precision` must be "day" on SQL backends.
+      ! `precision = "year"` isn't supported on database backends.
+      i It must be "day" instead.
 
 ---
 
@@ -55,7 +56,8 @@
       test_translate_sql(date_count_between(date_column_1, date_column_2, "day", n = 5))
     Condition
       Error in `date_count_between()`:
-      ! `n` must be "1" on SQL backends.
+      ! `n = 5` isn't supported on database backends.
+      i It must be 1 instead.
 
 # difftime is translated correctly
 
@@ -63,7 +65,8 @@
       test_translate_sql(difftime(start_date, end_date, units = "auto"))
     Condition
       Error in `difftime()`:
-      ! The only supported value for `units` on SQL backends is "days"
+      ! `units = "auto"` isn't supported on database backends.
+      i It must be "days" instead.
 
 ---
 
@@ -71,7 +74,7 @@
       test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days"))
     Condition
       Error in `difftime()`:
-      ! The `tz` argument is not supported for SQL backends.
+      ! Argument `tz` isn't supported on database backends.
 
 # convert between bit and boolean as needed
 
@@ -494,19 +497,14 @@
       FROM `df`
       ORDER BY `y`
 
-# can copy_to() and compute() with temporary tables (#438)
+# count_big
 
     Code
-      db <- copy_to(con, df, name = unique_table_name(), temporary = TRUE)
-    Message
-      Created a temporary table named #dbplyr_{tmp}
-
----
-
-    Code
-      db2 <- db %>% mutate(y = x + 1) %>% compute()
-    Message
-      Created a temporary table named #dbplyr_{tmp}
+      count(mf)
+    Output
+      <SQL>
+      SELECT COUNT_BIG(*) AS `n`
+      FROM `df`
 
 # add prefix to temporary table
 

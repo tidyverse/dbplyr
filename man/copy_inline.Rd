@@ -21,7 +21,7 @@ If \code{NULL}, the default, the types are determined from \code{df}.}
 A \code{tbl_lazy}.
 }
 \description{
-This is an alternative to \code{\link[=copy_to]{copy_to()}} that does not need write access and
+This is an alternative to \code{\link[dplyr:copy_to]{dplyr::copy_to()}} that does not need write access and
 is faster for small data.
 }
 \details{
@@ -36,5 +36,5 @@ copy_inline(con, df)
 copy_inline(con, df) \%>\% dplyr::show_query()
 }
 \seealso{
-\code{\link[=copy_to]{copy_to()}} to copy the data into a new database table.
+\code{\link[dplyr:copy_to]{dplyr::copy_to()}} to copy the data into a new database table.
 }
