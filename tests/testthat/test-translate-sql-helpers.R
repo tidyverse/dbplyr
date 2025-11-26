@@ -66,7 +66,7 @@ test_that("can translate infix expression without parentheses", {
 
 test_that("unary minus works with expressions", {
   local_con(simulate_dbi())
-  expect_equal(test_translate_sql(-!!expr(x+2)), sql("-(`x` + 2.0)"))
+  expect_equal(test_translate_sql(-!!expr(x + 2)), sql("-(`x` + 2.0)"))
   expect_equal(test_translate_sql(--x), sql("--`x`"))
 })
 

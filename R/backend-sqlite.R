@@ -57,7 +57,8 @@ sqlite_version <- function() {
 #' @export
 sql_translation.SQLiteConnection <- function(con) {
   sql_variant(
-    sql_translator(.parent = base_scalar,
+    sql_translator(
+      .parent = base_scalar,
       as.numeric = sql_cast("REAL"),
       as.double = sql_cast("REAL"),
       log = function(x, base = exp(1)) {
@@ -67,8 +68,12 @@ sql_translation.SQLiteConnection <- function(con) {
           sql_expr(log(!!x))
         }
       },
-      paste = sql_paste_infix(" ", "||", function(x) sql_expr(cast(!!x %as% text))),
-      paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
+      paste = sql_paste_infix(" ", "||", function(x) {
+        sql_expr(cast(!!x %as% text))
+      }),
+      paste0 = sql_paste_infix("", "||", function(x) {
+        sql_expr(cast(!!x %as% text))
+      }),
       # https://www.sqlite.org/lang_corefunc.html#maxoreunc
       pmin = sql_aggregate_n("MIN", "pmin"),
       pmax = sql_aggregate_n("MAX", "pmax"),
@@ -98,15 +103,16 @@ sql_translation.SQLiteConnection <- function(con) {
       minute = function(x) sql_expr(cast(strftime("%M", !!x) %as% NUMERIC)),
       second = function(x) sql_expr(cast(strftime("%f", !!x) %as% REAL)),
       yday = function(x) sql_expr(cast(strftime("%j", !!x) %as% NUMERIC)),
-
     ),
-    sql_translator(.parent = base_agg,
+    sql_translator(
+      .parent = base_agg,
       sd = sql_aggregate("STDEV", "sd"),
       median = sql_aggregate("MEDIAN"),
       quantile = sql_not_supported("quantile"),
     ),
     if (sqlite_version() >= "3.25") {
-      sql_translator(.parent = base_win,
+      sql_translator(
+        .parent = base_win,
         sd = win_aggregate("STDEV"),
         median = win_absent("median"),
         quantile = sql_not_supported("quantile"),
@@ -118,7 +124,7 @@ sql_translation.SQLiteConnection <- function(con) {
 }
 
 #' @export
-sql_escape_logical.SQLiteConnection <- function(con, x){
+sql_escape_logical.SQLiteConnection <- function(con, x) {
   y <- as.character(as.integer(x))
   y[is.na(x)] <- "NULL"
   y
@@ -132,8 +138,15 @@ sql_expr_matches.SQLiteConnection <- function(con, x, y, ...) {
 
 #' @export
 values_prepare.SQLiteConnection <- function(con, df) {
-  needs_escape <- purrr::map_lgl(df, ~ methods::is(.x, "Date") || inherits(.x, "POSIXct"))
-  purrr::modify_if(df, needs_escape, ~ escape(.x, con = con, parens = FALSE, collapse = NULL))
+  needs_escape <- purrr::map_lgl(
+    df,
+    ~ methods::is(.x, "Date") || inherits(.x, "POSIXct")
+  )
+  purrr::modify_if(
+    df,
+    needs_escape,
+    ~ escape(.x, con = con, parens = FALSE, collapse = NULL)
+  )
 }
 
 #' @export

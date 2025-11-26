@@ -41,18 +41,31 @@ db_connection_describe.PqConnection <- function(con, ...) {
   info <- dbGetInfo(con)
   host <- if (info$host == "") "localhost" else info$host
 
-  paste0("postgres ", info$serverVersion, " [", info$username, "@",
-    host, ":", info$port, "/", info$dbname, "]")
+  paste0(
+    "postgres ",
+    info$serverVersion,
+    " [",
+    info$username,
+    "@",
+    host,
+    ":",
+    info$port,
+    "/",
+    info$dbname,
+    "]"
+  )
 }
 #' @export
 db_connection_describe.PostgreSQL <- db_connection_describe.PqConnection
 
-postgres_grepl <- function(pattern,
-                           x,
-                           ignore.case = FALSE,
-                           perl = FALSE,
-                           fixed = FALSE,
-                           useBytes = FALSE) {
+postgres_grepl <- function(
+  pattern,
+  x,
+  ignore.case = FALSE,
+  perl = FALSE,
+  fixed = FALSE,
+  useBytes = FALSE
+) {
   # https://www.postgresql.org/docs/current/static/functions-matching.html#FUNCTIONS-POSIX-TABLE
   check_unsupported_arg(perl, FALSE, backend = "PostgreSQL")
   check_unsupported_arg(fixed, FALSE, backend = "PostgreSQL")
@@ -79,15 +92,16 @@ postgres_period <- function(x, unit) {
 #' @export
 sql_translation.PqConnection <- function(con) {
   sql_variant(
-    sql_translator(.parent = base_scalar,
+    sql_translator(
+      .parent = base_scalar,
       bitwXor = sql_infix("#"),
-      log10  = function(x) sql_expr(log(!!x)),
-      log    = sql_log(),
-      cot    = sql_cot(),
-      round  = postgres_round,
-      grepl  = postgres_grepl,
+      log10 = function(x) sql_expr(log(!!x)),
+      log = sql_log(),
+      cot = sql_cot(),
+      round = postgres_round,
+      grepl = postgres_grepl,
 
-      paste  = sql_paste(" "),
+      paste = sql_paste(" "),
       paste0 = sql_paste(""),
 
       # stringr functions
@@ -95,7 +109,7 @@ sql_translation.PqConnection <- function(con) {
       # https://www.postgresql.org/docs/9.1/functions-matching.html#FUNCTIONS-POSIX-REGEXP
       str_c = sql_paste(""),
 
-      str_locate  = function(string, pattern) {
+      str_locate = function(string, pattern) {
         sql_expr(strpos(!!string, !!pattern))
       },
       # https://www.postgresql.org/docs/9.1/functions-string.html
@@ -131,19 +145,19 @@ sql_translation.PqConnection <- function(con) {
           sql_expr(!!string %LIKE% !!pattern)
         }
       },
-      str_replace = function(string, pattern, replacement){
+      str_replace = function(string, pattern, replacement) {
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
       },
-      str_replace_all = function(string, pattern, replacement){
+      str_replace_all = function(string, pattern, replacement) {
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement, 'g'))
       },
-      str_squish = function(string){
+      str_squish = function(string) {
         sql_expr(ltrim(rtrim(regexp_replace(!!string, '\\s+', ' ', 'g'))))
       },
-      str_remove = function(string, pattern){
+      str_remove = function(string, pattern) {
         sql_expr(regexp_replace(!!string, !!pattern, ''))
       },
-      str_remove_all = function(string, pattern){
+      str_remove_all = function(string, pattern) {
         sql_expr(regexp_replace(!!string, !!pattern, '', 'g'))
       },
       str_starts = function(string, pattern, negate = FALSE) {
@@ -181,7 +195,7 @@ sql_translation.PqConnection <- function(con) {
       },
       yday = function(x) sql_expr(EXTRACT(DOY %FROM% !!x)),
       week = function(x) {
-        sql_expr(FLOOR ((EXTRACT(DOY %FROM% !!x) - 1L) / 7L) + 1L)
+        sql_expr(FLOOR((EXTRACT(DOY %FROM% !!x) - 1L) / 7L) + 1L)
       },
       isoweek = function(x) {
         sql_expr(EXTRACT(WEEK %FROM% !!x))
@@ -204,7 +218,9 @@ sql_translation.PqConnection <- function(con) {
         check_unsupported_arg(fiscal_start, 1, backend = "PostgreSQL")
 
         if (with_year) {
-          sql_expr((EXTRACT(YEAR %FROM% !!x) || '.' || EXTRACT(QUARTER %FROM% !!x)))
+          sql_expr(
+            (EXTRACT(YEAR %FROM% !!x) || '.' || EXTRACT(QUARTER %FROM% !!x))
+          )
         } else {
           sql_expr(EXTRACT(QUARTER %FROM% !!x))
         }
@@ -238,8 +254,18 @@ sql_translation.PqConnection <- function(con) {
 
       # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
       floor_date = function(x, unit = "seconds") {
-        unit <- arg_match(unit,
-          c("second", "minute", "hour", "day", "week", "month", "quarter", "year")
+        unit <- arg_match(
+          unit,
+          c(
+            "second",
+            "minute",
+            "hour",
+            "day",
+            "week",
+            "month",
+            "quarter",
+            "year"
+          )
         )
         sql_expr(DATE_TRUNC(!!unit, !!x))
       },
@@ -257,8 +283,7 @@ sql_translation.PqConnection <- function(con) {
         check_unsupported_arg(invalid, allow_null = TRUE)
         sql_expr(make_date(!!year, !!month, !!day))
       },
-      date_count_between = function(start, end, precision, ..., n = 1L){
-
+      date_count_between = function(start, end, precision, ..., n = 1L) {
         check_dots_empty()
         check_unsupported_arg(precision, allowed = "day")
         check_unsupported_arg(n, allowed = 1L)
@@ -276,14 +301,14 @@ sql_translation.PqConnection <- function(con) {
       },
 
       difftime = function(time1, time2, tz, units = "days") {
-
         check_unsupported_arg(tz)
         check_unsupported_arg(units, allowed = "days")
 
         sql_expr((CAST(!!time1 %AS% DATE) - CAST(!!time2 %AS% DATE)))
       },
     ),
-    sql_translator(.parent = base_agg,
+    sql_translator(
+      .parent = base_agg,
       cor = sql_aggregate_2("CORR"),
       cov = sql_aggregate_2("COVAR_SAMP"),
       sd = sql_aggregate("STDDEV_SAMP", "sd"),
@@ -294,10 +319,11 @@ sql_translation.PqConnection <- function(con) {
         sql_expr(string_agg(!!x, !!collapse))
       }
     ),
-    sql_translator(.parent = base_win,
+    sql_translator(
+      .parent = base_win,
       cor = win_aggregate_2("CORR"),
       cov = win_aggregate_2("COVAR_SAMP"),
-      sd =  win_aggregate("STDDEV_SAMP"),
+      sd = win_aggregate("STDDEV_SAMP"),
       var = win_aggregate("VAR_SAMP"),
       all = win_aggregate("BOOL_AND"),
       any = win_aggregate("BOOL_OR"),
@@ -335,15 +361,17 @@ sql_query_explain.PqConnection <- function(con, sql, format = "text", ...) {
 sql_query_explain.PostgreSQL <- sql_query_explain.PqConnection
 
 #' @export
-sql_query_insert.PqConnection <- function(con,
-                                          table,
-                                          from,
-                                          insert_cols,
-                                          by,
-                                          conflict = c("error", "ignore"),
-                                          ...,
-                                          returning_cols = NULL,
-                                          method = NULL) {
+sql_query_insert.PqConnection <- function(
+  con,
+  table,
+  from,
+  insert_cols,
+  by,
+  conflict = c("error", "ignore"),
+  ...,
+  returning_cols = NULL,
+  method = NULL
+) {
   check_string(method, allow_null = TRUE)
   method <- method %||% "on_conflict"
   arg_match(method, c("on_conflict", "where_not_exists"), error_arg = "method")
@@ -363,7 +391,9 @@ sql_query_insert.PqConnection <- function(con,
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from),
     sql_clause("ON CONFLICT", by_sql),
-    {if (conflict == "ignore") sql("DO NOTHING")},
+    {
+      if (conflict == "ignore") sql("DO NOTHING")
+    },
     sql_returning_cols(con, returning_cols, table)
   )
   sql_format_clauses(clauses, lvl = 0, con)
@@ -372,14 +402,16 @@ sql_query_insert.PqConnection <- function(con,
 sql_query_insert.PostgreSQL <- sql_query_insert.PqConnection
 
 #' @export
-sql_query_upsert.PqConnection <- function(con,
-                                          table,
-                                          from,
-                                          by,
-                                          update_cols,
-                                          ...,
-                                          returning_cols = NULL,
-                                          method = NULL) {
+sql_query_upsert.PqConnection <- function(
+  con,
+  table,
+  from,
+  by,
+  update_cols,
+  ...,
+  returning_cols = NULL,
+  method = NULL
+) {
   check_string(method, allow_null = TRUE)
   method <- method %||% "on_conflict"
   arg_match(method, c("cte_update", "on_conflict"), error_arg = "method")
@@ -394,7 +426,12 @@ sql_query_upsert.PqConnection <- function(con,
 
   insert_cols <- c(by, update_cols)
   select_cols <- ident(insert_cols)
-  insert_cols <- escape(ident(insert_cols), collapse = ", ", parens = TRUE, con = con)
+  insert_cols <- escape(
+    ident(insert_cols),
+    collapse = ", ",
+    parens = TRUE,
+    con = con
+  )
 
   update_values <- set_names(
     sql_table_prefix(con, update_cols, "excluded"),
@@ -457,7 +494,10 @@ db_supports_table_alias_with_as.PostgreSQL <- function(con) {
 #' @export
 db_col_types.PqConnection <- function(con, table, call) {
   table <- as_table_path(table, con, error_call = call)
-  res <- DBI::dbSendQuery(con, glue_sql2(con, "SELECT * FROM {.tbl table} LIMIT 0"))
+  res <- DBI::dbSendQuery(
+    con,
+    glue_sql2(con, "SELECT * FROM {.tbl table} LIMIT 0")
+  )
   on.exit(DBI::dbClearResult(res))
   DBI::dbFetch(res, n = 0)
   col_info_df <- DBI::dbColumnInfo(res)
@@ -467,4 +507,23 @@ db_col_types.PqConnection <- function(con, table, call) {
 #' @export
 db_col_types.PostgreSQL <- db_col_types.PqConnection
 
-utils::globalVariables(c("strpos", "%::%", "%FROM%", "%ILIKE%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY", "DATE_TRUNC", "INTERVAL", "FLOOR", "WEEK", "make_date", "date_part"))
+utils::globalVariables(c(
+  "strpos",
+  "%::%",
+  "%FROM%",
+  "%ILIKE%",
+  "DATE",
+  "EXTRACT",
+  "TO_CHAR",
+  "string_agg",
+  "%~*%",
+  "%~%",
+  "MONTH",
+  "DOY",
+  "DATE_TRUNC",
+  "INTERVAL",
+  "FLOOR",
+  "WEEK",
+  "make_date",
+  "date_part"
+))

@@ -97,7 +97,6 @@ tbl_src_dbi <- function(src, from, vars) {
 }
 
 
-
 #' Database src
 #'
 #' @description
