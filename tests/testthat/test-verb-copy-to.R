@@ -41,7 +41,13 @@ test_that("overwrite flag works when copying *within* db sources", {
   copy_to(con, df, "df2", temporary = FALSE)
 
   expect_error(copy_to(con, df, name = "df2", temporary = FALSE), "exists")
-  expect_silent(copy_to(con, df, name = "df2", temporary = FALSE, overwrite = TRUE))
+  expect_silent(copy_to(
+    con,
+    df,
+    name = "df2",
+    temporary = FALSE,
+    overwrite = TRUE
+  ))
 })
 
 test_that("can create a new table in non-default schema", {
