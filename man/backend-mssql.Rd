@@ -34,7 +34,7 @@ values:
 \itemize{
 \item The \code{BOOLEAN} type is the result of logical comparisons (e.g. \code{x > y})
 and can be used \code{WHERE} but not to create new columns in \code{SELECT}.
-\url{https://docs.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql}
+\url{https://learn.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql}
 \item The \code{BIT} type is a special type of numeric column used to store
 \code{TRUE} and \code{FALSE} values, but can't be used in \code{WHERE} clauses.
 \url{https://learn.microsoft.com/en-us/sql/t-sql/data-types/bit-transact-sql?view=sql-server-ver15}

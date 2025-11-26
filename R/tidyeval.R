@@ -51,16 +51,21 @@
 #' f <- function(x) x + 1
 #' partial_eval(quote(year > f(1980)), lf)
 #' partial_eval(quote(year > local(f(1980))), lf)
-partial_eval <- function(call,
-                         data,
-                         env = caller_env(),
-                         vars = deprecated(),
-                         error_call) {
+partial_eval <- function(
+  call,
+  data,
+  env = caller_env(),
+  vars = deprecated(),
+  error_call
+) {
   if (lifecycle::is_present(vars)) {
     lifecycle::deprecate_stop("2.1.2", "partial_eval(vars)")
   }
   if (is.character(data)) {
-    lifecycle::deprecate_stop("2.1.2", "partial_eval(data = 'must be a lazy frame')", )
+    lifecycle::deprecate_stop(
+      "2.1.2",
+      "partial_eval(data = 'must be a lazy frame')",
+    )
   }
 
   if (is_sql_literal(call)) {
@@ -70,10 +75,22 @@ partial_eval <- function(call,
   } else if (is_quosure(call)) {
     partial_eval(get_expr(call), data, get_env(call), error_call = error_call)
   } else if (is_call(call, "if_any")) {
-    out <- partial_eval_if(call, data, env, reduce = "|", error_call = error_call)
+    out <- partial_eval_if(
+      call,
+      data,
+      env,
+      reduce = "|",
+      error_call = error_call
+    )
     expr(((!!out)))
   } else if (is_call(call, "if_all")) {
-    out <- partial_eval_if(call, data, env, reduce = "&", error_call = error_call)
+    out <- partial_eval_if(
+      call,
+      data,
+      env,
+      reduce = "&",
+      error_call = error_call
+    )
     expr(((!!out)))
   } else if (is_call(call, "across")) {
     partial_eval_across(call, data, env, error_call)
@@ -94,11 +111,13 @@ capture_dot <- function(.data, x) {
   partial_eval(enquo(x), data = .data)
 }
 
-partial_eval_dots <- function(.data,
-                              ...,
-                              # .env = NULL,
-                              .named = TRUE,
-                              error_call = caller_env()) {
+partial_eval_dots <- function(
+  .data,
+  ...,
+  # .env = NULL,
+  .named = TRUE,
+  error_call = caller_env()
+) {
   # corresponds to `capture_dots()`
   # browser()
   dots <- as.list(enquos(..., .named = .named))
@@ -111,7 +130,13 @@ partial_eval_dots <- function(.data,
     #   dot <- quo_set_env(dot, .env)
     # }
     dot_name <- dot_names[[i]]
-    dots[[i]] <- partial_eval_quo(dot, .data, error_call, dot_name, was_named[[i]])
+    dots[[i]] <- partial_eval_quo(
+      dot,
+      .data,
+      error_call,
+      dot_name,
+      was_named[[i]]
+    )
   }
 
   # Remove names from any list elements
@@ -126,7 +151,12 @@ partial_eval_dots <- function(.data,
 partial_eval_quo <- function(x, data, error_call, dot_name, was_named) {
   # no direct equivalent in `dtplyr`, mostly handled in `dt_squash()`
   withCallingHandlers(
-    expr <- partial_eval(get_expr(x), data, get_env(x), error_call = error_call),
+    expr <- partial_eval(
+      get_expr(x),
+      data,
+      get_env(x),
+      error_call = error_call
+    ),
     error = function(cnd) {
       label <- expr_as_label(x, dot_name)
       msg <- c(i = "In argument: {.code {label}}")
@@ -195,7 +225,10 @@ partial_eval_call <- function(call, data, env) {
   # Compound calls, apart from `::` aren't translatable
   if (is_call(fun) && !is_call(fun, "::")) {
     if (is_mask_pronoun(fun)) {
-      stop("Use local() or remote() to force evaluation of functions", call. = FALSE)
+      stop(
+        "Use local() or remote() to force evaluation of functions",
+        call. = FALSE
+      )
     } else {
       return(eval_bare(call, env))
     }
@@ -255,12 +288,14 @@ fun_name <- function(fun) {
   known <- c(ls(base_agg), ls(base_scalar))
 
   for (x in known) {
-    if (!env_has(pkg_env, x, inherit = TRUE))
+    if (!env_has(pkg_env, x, inherit = TRUE)) {
       next
+    }
 
     fun_x <- env_get(pkg_env, x, inherit = TRUE)
-    if (identical(fun, fun_x))
+    if (identical(fun, fun_x)) {
       return(sym(x))
+    }
   }
 
   NULL

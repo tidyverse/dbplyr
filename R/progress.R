@@ -5,7 +5,8 @@ progress_estimated <- function(n, min_time = 0) {
 }
 
 #' @importFrom R6 R6Class
-Progress <- R6::R6Class("Progress",
+Progress <- R6::R6Class(
+  "Progress",
   public = list(
     n = NULL,
     i = 0,
@@ -41,15 +42,21 @@ Progress <- R6::R6Class("Progress",
 
     tick = function() {
       "Process one element"
-      if (self$stopped) return(self)
+      if (self$stopped) {
+        return(self)
+      }
 
-      if (self$i == self$n) cli_abort("No more ticks")
+      if (self$i == self$n) {
+        cli_abort("No more ticks")
+      }
       self$i <- self$i + 1
       self
     },
 
     stop = function() {
-      if (self$stopped) return(self)
+      if (self$stopped) {
+        return(self)
+      }
 
       self$stopped <- TRUE
       self$stop_time <- now()
@@ -57,14 +64,19 @@ Progress <- R6::R6Class("Progress",
     },
 
     print = function(...) {
-      if (!isTRUE(getOption("dplyr.show_progress")) || # user sepecifies no progress
-        !interactive() || # not an interactive session
-        !is.null(getOption("knitr.in.progress"))) { # dplyr used within knitr document
+      if (
+        !isTRUE(getOption("dplyr.show_progress")) || # user sepecifies no progress
+          !interactive() || # not an interactive session
+          !is.null(getOption("knitr.in.progress"))
+      ) {
+        # dplyr used within knitr document
         return(invisible(self))
       }
 
       now_ <- now()
-      if (now_ - self$init_time < self$min_time || now_ - self$last_update < 0.05) {
+      if (
+        now_ - self$init_time < self$min_time || now_ - self$last_update < 0.05
+      ) {
         return(invisible(self))
       }
       self$last_update <- now_
@@ -86,9 +98,15 @@ Progress <- R6::R6Class("Progress",
       nbars <- trunc(self$i / self$n * self$width())
 
       cat_line(
-        "|", str_rep("=", nbars), str_rep(" ", self$width() - nbars), "|",
-        format(round(self$i / self$n * 100), width = 3), "% ",
-        "~", show_time(time_left), " remaining"
+        "|",
+        str_rep("=", nbars),
+        str_rep(" ", self$width() - nbars),
+        "|",
+        format(round(self$i / self$n * 100), width = 3),
+        "% ",
+        "~",
+        show_time(time_left),
+        " remaining"
       )
 
       invisible(self)

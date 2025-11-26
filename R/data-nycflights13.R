@@ -35,15 +35,20 @@ nycflights13_postgres <- function(dbname = "nycflights13", ...) {
 #' @rdname nycflights13
 #' @export
 has_nycflights13 <- function(type = c("sqlite", "postgres"), ...) {
-  if (!requireNamespace("nycflights13", quietly = TRUE)) return(FALSE)
+  if (!requireNamespace("nycflights13", quietly = TRUE)) {
+    return(FALSE)
+  }
 
   type <- match.arg(type)
 
-  succeeds(switch(
-    type,
-    sqlite = nycflights13_sqlite(...),
-    postgres = nycflights13_postgres(...)
-  ), quiet = TRUE)
+  succeeds(
+    switch(
+      type,
+      sqlite = nycflights13_sqlite(...),
+      postgres = nycflights13_postgres(...)
+    ),
+    quiet = TRUE
+  )
 }
 
 
@@ -53,12 +58,18 @@ copy_nycflights13 <- function(con, ...) {
   all <- utils::data(package = "nycflights13")$results[, 3]
   unique_index <- list(
     airlines = list("carrier"),
-    planes =   list("tailnum")
+    planes = list("tailnum")
   )
   index <- list(
     airports = list("faa"),
-    flights =  list(c("year", "month", "day"), "carrier", "tailnum", "origin", "dest"),
-    weather =  list(c("year", "month", "day"), "origin")
+    flights = list(
+      c("year", "month", "day"),
+      "carrier",
+      "tailnum",
+      "origin",
+      "dest"
+    ),
+    weather = list(c("year", "month", "day"), "origin")
   )
 
   tables <- setdiff(all, DBI::dbListTables(con))
@@ -69,7 +80,9 @@ copy_nycflights13 <- function(con, ...) {
     message("Creating table: ", table)
 
     copy_to(
-      con, df, table,
+      con,
+      df,
+      table,
       unique_indexes = unique_index[[table]],
       indexes = index[[table]],
       temporary = FALSE

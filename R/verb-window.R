@@ -105,6 +105,16 @@ check_frame_range <- function(range, call = caller_env()) {
   }
 
   vctrs::vec_assert(range, size = 2L, arg = "frame", call = call)
-  check_number_whole(range[1], allow_infinite = TRUE, arg = "frame", call = call)
-  check_number_whole(range[2], allow_infinite = TRUE, arg = "frame", call = call)
+  check_number_whole(
+    range[1],
+    allow_infinite = TRUE,
+    arg = "frame",
+    call = call
+  )
+  check_number_whole(
+    range[2],
+    allow_infinite = TRUE,
+    arg = "frame",
+    call = call
+  )
 }

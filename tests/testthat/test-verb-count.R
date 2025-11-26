@@ -15,7 +15,10 @@ test_that("preserves group of input", {
   expect_equal(db %>% group_by(g) %>% count() %>% group_vars(), "g")
   expect_equal(db %>% group_by(g, x) %>% count() %>% group_vars(), c("g", "x"))
 
-  expect_equal(db %>% group_by(g, x) %>% add_count(g) %>% group_vars(), c("g", "x"))
+  expect_equal(
+    db %>% group_by(g, x) %>% add_count(g) %>% group_vars(),
+    c("g", "x")
+  )
   expect_equal(db %>% add_count(g) %>% group_vars(), character())
 })
 

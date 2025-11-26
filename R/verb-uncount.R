@@ -32,7 +32,6 @@ dbplyr_uncount <- function(data, weights, .remove = TRUE, .id = NULL) {
   # more code and testing across backends.
   # See https://stackoverflow.com/questions/33327837/repeat-rows-n-times-according-to-column-value
 
-
   weights_quo <- enquo(weights)
   weights_is_col <- quo_is_symbol(weights_quo) &&
     quo_name(weights_quo) %in% colnames(data)
@@ -41,13 +40,13 @@ dbplyr_uncount <- function(data, weights, .remove = TRUE, .id = NULL) {
     weights_col <- quo_name(weights_quo)
   } else {
     weights_col <- "..dbplyr_weight_col"
-    data <- mutate(
-      data,
-      !!weights_col := !!weights_quo,
-    )
+    data <- mutate(data, !!weights_col := !!weights_quo)
   }
 
-  n_max <- pull(summarise(ungroup(data), max(!!sym(weights_col), na.rm = TRUE)))
+  n_max <- data |>
+    ungroup() |>
+    summarise(max = max(!!sym(weights_col), na.rm = TRUE)) |>
+    pull()
   n_max <- vctrs::vec_cast(n_max, integer(), x_arg = "weights")
 
   if (is_null(.id)) {
@@ -82,7 +81,6 @@ dbplyr_uncount <- function(data, weights, .remove = TRUE, .id = NULL) {
     # need to regroup to be able to remove weights_col
     grps <- setdiff(grps, weights_col)
   }
-
 
   data_uncounted %>%
     ungroup() %>%
