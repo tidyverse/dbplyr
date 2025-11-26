@@ -37,17 +37,12 @@ test_that("only overwrite existing table if explicitly requested", {
 
 test_that("overwrite flag works when copying *within* db sources", {
   con <- local_sqlite_connection()
-  df <- copy_to(con, tibble(x = 1:10), "df", temporary = FALSE)
+  df <- copy_to(con, tibble(x = 1), "df", temporary = FALSE)
   copy_to(con, df, "df2", temporary = FALSE)
 
-  expect_error(copy_to(con, df, name = "df2", temporary = FALSE), "exists")
-  expect_silent(copy_to(
-    con,
-    df,
-    name = "df2",
-    temporary = FALSE,
-    overwrite = TRUE
-  ))
+  df2 <- tibble(x = 2)
+  out <- copy_to(con, df2, name = "df2", temporary = FALSE, overwrite = TRUE)
+  expect_equal(collect(out), df2)
 })
 
 test_that("can create a new table in non-default schema", {
