@@ -54,7 +54,13 @@ test_that("can create a new table in non-default schema", {
   expect_equal(collect(db1), df1)
 
   # And can overwrite
-  db2 <- copy_to(con, df2, in_schema("aux", "df"), temporary = FALSE, overwrite = TRUE)
+  db2 <- copy_to(
+    con,
+    df2,
+    in_schema("aux", "df"),
+    temporary = FALSE,
+    overwrite = TRUE
+  )
   expect_equal(collect(db2), df2)
 })
 
@@ -92,7 +98,10 @@ test_that("can translate a table", {
   )
 
   expect_equal(
-    copy_inline(con, tibble(date = as.Date(c("2020-01-01", "2020-01-02"), tz = "UTC"))) %>%
+    copy_inline(
+      con,
+      tibble(date = as.Date(c("2020-01-01", "2020-01-02"), tz = "UTC"))
+    ) %>%
       collect(),
     tibble(date = c("2020-01-01", "2020-01-02"))
   )

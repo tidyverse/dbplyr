@@ -61,9 +61,7 @@ NULL
 #' @export
 #' @rdname backend-mssql
 simulate_mssql <- function(version = "15.0") {
-  simulate_dbi("Microsoft SQL Server",
-    version = numeric_version(version)
-  )
+  simulate_dbi("Microsoft SQL Server", version = numeric_version(version))
 }
 
 #' @export
@@ -72,41 +70,46 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_select.Microsoft SQL Server` <- function(con,
-                                                    select,
-                                                    from,
-                                                    where = NULL,
-                                                    group_by = NULL,
-                                                    having = NULL,
-                                                    window = NULL,
-                                                    order_by = NULL,
-                                                    limit = NULL,
-                                                    distinct = FALSE,
-                                                    ...,
-                                                    subquery = FALSE,
-                                                    lvl = 0) {
-  sql_select_clauses(con,
-    select    = sql_clause_select(con, select, distinct, top = limit),
-    from      = sql_clause_from(from),
-    where     = sql_clause_where(where),
-    group_by  = sql_clause_group_by(group_by),
-    having    = sql_clause_having(having),
-    window    = sql_clause_window(window),
-    order_by  = sql_clause_order_by(order_by, subquery, limit),
-    lvl       = lvl
+`sql_query_select.Microsoft SQL Server` <- function(
+  con,
+  select,
+  from,
+  where = NULL,
+  group_by = NULL,
+  having = NULL,
+  window = NULL,
+  order_by = NULL,
+  limit = NULL,
+  distinct = FALSE,
+  ...,
+  subquery = FALSE,
+  lvl = 0
+) {
+  sql_select_clauses(
+    con,
+    select = sql_clause_select(con, select, distinct, top = limit),
+    from = sql_clause_from(from),
+    where = sql_clause_where(where),
+    group_by = sql_clause_group_by(group_by),
+    having = sql_clause_having(having),
+    window = sql_clause_window(window),
+    order_by = sql_clause_order_by(order_by, subquery, limit),
+    lvl = lvl
   )
 }
 
 #' @export
-`sql_query_insert.Microsoft SQL Server` <- function(con,
-                                                    table,
-                                                    from,
-                                                    insert_cols,
-                                                    by,
-                                                    ...,
-                                                    conflict = c("error", "ignore"),
-                                                    returning_cols = NULL,
-                                                    method = NULL) {
+`sql_query_insert.Microsoft SQL Server` <- function(
+  con,
+  table,
+  from,
+  insert_cols,
+  by,
+  ...,
+  conflict = c("error", "ignore"),
+  returning_cols = NULL,
+  method = NULL
+) {
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   conflict <- rows_check_conflict(conflict)
 
@@ -130,14 +133,21 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_append.Microsoft SQL Server` <- function(con,
-                                                    table,
-                                                    from,
-                                                    insert_cols,
-                                                    ...,
-                                                    returning_cols = NULL) {
+`sql_query_append.Microsoft SQL Server` <- function(
+  con,
+  table,
+  from,
+  insert_cols,
+  ...,
+  returning_cols = NULL
+) {
   parts <- rows_prep(con, table, from, by = list(), lvl = 0)
-  insert_cols <- escape(ident(insert_cols), collapse = ", ", parens = TRUE, con = con)
+  insert_cols <- escape(
+    ident(insert_cols),
+    collapse = ", ",
+    parens = TRUE,
+    con = con
+  )
 
   clauses <- list2(
     sql_clause_insert(con, insert_cols, table),
@@ -150,13 +160,15 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_update_from.Microsoft SQL Server` <- function(con,
-                                                         table,
-                                                         from,
-                                                         by,
-                                                         update_values,
-                                                         ...,
-                                                         returning_cols = NULL) {
+`sql_query_update_from.Microsoft SQL Server` <- function(
+  con,
+  table,
+  from,
+  by,
+  update_values,
+  ...,
+  returning_cols = NULL
+) {
   # https://stackoverflow.com/a/2334741/946850
   parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols <- sql_escape_ident(con, names(update_values))
@@ -173,14 +185,16 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_upsert.Microsoft SQL Server` <- function(con,
-                                                    table,
-                                                    from,
-                                                    by,
-                                                    update_cols,
-                                                    ...,
-                                                    returning_cols = NULL,
-                                                    method = NULL) {
+`sql_query_upsert.Microsoft SQL Server` <- function(
+  con,
+  table,
+  from,
+  by,
+  update_cols,
+  ...,
+  returning_cols = NULL,
+  method = NULL
+) {
   check_string(method, allow_null = TRUE)
   method <- method %||% "merge"
   arg_match(method, "merge", error_arg = "method")
@@ -211,12 +225,14 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_delete.Microsoft SQL Server` <- function(con,
-                                                    table,
-                                                    from,
-                                                    by,
-                                                    ...,
-                                                    returning_cols = NULL) {
+`sql_query_delete.Microsoft SQL Server` <- function(
+  con,
+  table,
+  from,
+  by,
+  ...,
+  returning_cols = NULL
+) {
   parts <- rows_prep(con, table, from, by, lvl = 0)
 
   clauses <- list2(
@@ -230,48 +246,59 @@ simulate_mssql <- function(version = "15.0") {
 #' @export
 `sql_translation.Microsoft SQL Server` <- function(con) {
   mssql_scalar <-
-    sql_translator(.parent = base_odbc_scalar,
+    sql_translator(
+      .parent = base_odbc_scalar,
 
-      `!`           = function(x) {
-                        if (mssql_needs_bit()) {
-                          x <- with_mssql_bool(x)
-                          sql_expr(~ !!mssql_as_bit(x))
-                        } else {
-                          sql_expr(NOT(!!x))
-                        }
-                      },
+      `!` = function(x) {
+        if (mssql_needs_bit()) {
+          x <- with_mssql_bool(x)
+          sql_expr(~ !!mssql_as_bit(x))
+        } else {
+          sql_expr(NOT(!!x))
+        }
+      },
 
-      `!=`           = mssql_infix_comparison("!="),
-      `==`           = mssql_infix_comparison("="),
-      `<`            = mssql_infix_comparison("<"),
-      `<=`           = mssql_infix_comparison("<="),
-      `>`            = mssql_infix_comparison(">"),
-      `>=`           = mssql_infix_comparison(">="),
+      `!=` = mssql_infix_comparison("!="),
+      `==` = mssql_infix_comparison("="),
+      `<` = mssql_infix_comparison("<"),
+      `<=` = mssql_infix_comparison("<="),
+      `>` = mssql_infix_comparison(">"),
+      `>=` = mssql_infix_comparison(">="),
 
-      `&`            = mssql_infix_boolean("&", "%AND%"),
-      `&&`           = mssql_infix_boolean("&", "%AND%"),
-      `|`            = mssql_infix_boolean("|", "%OR%"),
-      `||`           = mssql_infix_boolean("|", "%OR%"),
+      `&` = mssql_infix_boolean("&", "%AND%"),
+      `&&` = mssql_infix_boolean("&", "%AND%"),
+      `|` = mssql_infix_boolean("|", "%OR%"),
+      `||` = mssql_infix_boolean("|", "%OR%"),
 
       `[` = function(x, i) {
         i <- with_mssql_bool(i)
         glue_sql2(sql_current_con(), "CASE WHEN ({i}) THEN ({x}) END")
       },
 
-      bitwShiftL     = sql_not_supported("bitwShiftL"),
-      bitwShiftR     = sql_not_supported("bitwShiftR"),
+      bitwShiftL = sql_not_supported("bitwShiftL"),
+      bitwShiftR = sql_not_supported("bitwShiftR"),
 
-      `if`           = function(condition, true, false = NULL, missing = NULL) {
-        mssql_sql_if(enquo(condition), enquo(true), enquo(false), enquo(missing))
+      `if` = function(condition, true, false = NULL, missing = NULL) {
+        mssql_sql_if(
+          enquo(condition),
+          enquo(true),
+          enquo(false),
+          enquo(missing)
+        )
       },
-      if_else        = function(condition, true, false, missing = NULL) {
-        mssql_sql_if(enquo(condition), enquo(true), enquo(false), enquo(missing))
+      if_else = function(condition, true, false, missing = NULL) {
+        mssql_sql_if(
+          enquo(condition),
+          enquo(true),
+          enquo(false),
+          enquo(missing)
+        )
       },
-      ifelse         = function(test, yes, no) {
+      ifelse = function(test, yes, no) {
         mssql_sql_if(enquo(test), enquo(yes), enquo(no))
       },
-      case_when      = mssql_case_when,
-      between        = function(x, left, right) {
+      case_when = mssql_case_when,
+      between = function(x, left, right) {
         context <- sql_current_context()
         if (context$clause == "WHERE") {
           sql_expr(!!x %BETWEEN% !!left %AND% !!right)
@@ -280,23 +307,19 @@ simulate_mssql <- function(version = "15.0") {
         }
       },
 
-      as.logical    = sql_cast("BIT"),
+      as.logical = sql_cast("BIT"),
 
-      as.Date       = sql_cast("DATE"),
-      as.numeric    = sql_cast("FLOAT"),
-      as.double     = sql_cast("FLOAT"),
-      as.character  = sql_cast("VARCHAR(MAX)"),
-      log           = sql_prefix("LOG"),
-      atan2         = sql_prefix("ATN2"),
-      ceil          = sql_prefix("CEILING"),
-      ceiling       = sql_prefix("CEILING"),
+      as.Date = sql_cast("DATE"),
+      as.numeric = sql_cast("FLOAT"),
+      as.double = sql_cast("FLOAT"),
+      as.character = sql_cast("VARCHAR(MAX)"),
+      log = sql_prefix("LOG"),
+      atan2 = sql_prefix("ATN2"),
+      ceil = sql_prefix("CEILING"),
+      ceiling = sql_prefix("CEILING"),
 
-      # https://dba.stackexchange.com/questions/187090
-      pmin          = sql_not_supported("pmin"),
-      pmax          = sql_not_supported("pmax"),
-
-      is.null       = mssql_is_null,
-      is.na         = mssql_is_null,
+      is.null = mssql_is_null,
+      is.na = mssql_is_null,
 
       runif = function(n = n(), min = 0, max = 1) {
         sql_runif(RAND(), n = {{ n }}, min = min, max = max)
@@ -304,14 +327,20 @@ simulate_mssql <- function(version = "15.0") {
 
       # string functions ------------------------------------------------
       nchar = sql_prefix("LEN"),
-      paste = sql_paste_infix(" ", "+", function(x) sql_expr(cast(!!x %as% text))),
-      paste0 = sql_paste_infix("", "+", function(x) sql_expr(cast(!!x %as% text))),
+      paste = sql_paste_infix(" ", "+", function(x) {
+        sql_expr(cast(!!x %as% text))
+      }),
+      paste0 = sql_paste_infix("", "+", function(x) {
+        sql_expr(cast(!!x %as% text))
+      }),
       substr = sql_substr("SUBSTRING"),
       substring = sql_substr("SUBSTRING"),
 
       # stringr functions
       str_length = sql_prefix("LEN"),
-      str_c = sql_paste_infix("", "+", function(x) sql_expr(cast(!!x %as% text))),
+      str_c = sql_paste_infix("", "+", function(x) {
+        sql_expr(cast(!!x %as% text))
+      }),
       # no built in function: https://stackoverflow.com/questions/230138
       str_to_title = sql_not_supported("str_to_title"),
       # https://docs.microsoft.com/en-us/sql/t-sql/functions/substring-transact-sql?view=sql-server-ver15
@@ -380,7 +409,7 @@ simulate_mssql <- function(version = "15.0") {
       get_day = function(x) {
         sql_expr(DATEPART(DAY, !!x))
       },
-      date_count_between = function(start, end, precision, ..., n = 1L){
+      date_count_between = function(start, end, precision, ..., n = 1L) {
         check_dots_empty()
         check_unsupported_arg(precision, allowed = "day")
         check_unsupported_arg(n, allowed = 1L)
@@ -396,7 +425,8 @@ simulate_mssql <- function(version = "15.0") {
       }
     )
 
-  if (mssql_version(con) >= "11.0") { # MSSQL 2012
+  if (mssql_version(con) >= "11.0") {
+    # MSSQL 2012
     mssql_scalar <- sql_translator(
       .parent = mssql_scalar,
       as.logical = sql_try_cast("BIT"),
@@ -424,19 +454,25 @@ simulate_mssql <- function(version = "15.0") {
 
   sql_variant(
     mssql_scalar,
-    sql_translator(.parent = base_odbc_agg,
-      sd            = sql_aggregate("STDEV", "sd"),
-      var           = sql_aggregate("VAR", "var"),
-      str_flatten = function(x, collapse = "") sql_expr(string_agg(!!x, !!collapse)),
+    sql_translator(
+      .parent = base_odbc_agg,
+      # https://learn.microsoft.com/en-us/sql/t-sql/functions/count-big-transact-sql?view=sql-server-ver17
+      n = function() sql("COUNT_BIG(*)"),
+      sd = sql_aggregate("STDEV", "sd"),
+      var = sql_aggregate("VAR", "var"),
+      str_flatten = function(x, collapse = "") {
+        sql_expr(string_agg(!!x, !!collapse))
+      },
 
       median = sql_agg_not_supported("median", "SQL Server"),
       quantile = sql_agg_not_supported("quantile", "SQL Server"),
       all = mssql_bit_int_bit(sql_aggregate("MIN")),
       any = mssql_bit_int_bit(sql_aggregate("MAX"))
     ),
-    sql_translator(.parent = base_odbc_win,
-      sd            = win_aggregate("STDEV"),
-      var           = win_aggregate("VAR"),
+    sql_translator(
+      .parent = base_odbc_win,
+      sd = win_aggregate("STDEV"),
+      var = win_aggregate("VAR"),
       str_flatten = function(x, collapse = "") {
         win_over(
           sql_expr(string_agg(!!x, !!collapse)),
@@ -486,8 +522,8 @@ simulate_mssql <- function(version = "15.0") {
         )
       }
     )
-
-  )}
+  )
+}
 
 mssql_version <- function(con) {
   if (inherits(con, "TestConnection")) {
@@ -518,7 +554,12 @@ mssql_version <- function(con) {
 # temporary table names with #
 # <https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms177399%28v%3dsql.105%29#temporary-tables>
 #' @export
-`db_table_temporary.Microsoft SQL Server` <- function(con, table, temporary, ...) {
+`db_table_temporary.Microsoft SQL Server` <- function(
+  con,
+  table,
+  temporary,
+  ...
+) {
   list(
     table = add_temporary_prefix(con, table, temporary = temporary),
     temporary = FALSE
@@ -527,12 +568,13 @@ mssql_version <- function(con) {
 
 
 #' @export
-`sql_query_save.Microsoft SQL Server` <- function(con,
-                                                  sql,
-                                                  name,
-                                                  temporary = TRUE,
-                                                  ...) {
-
+`sql_query_save.Microsoft SQL Server` <- function(
+  con,
+  sql,
+  name,
+  temporary = TRUE,
+  ...
+) {
   # https://stackoverflow.com/q/16683758/946850
   glue_sql2(con, "SELECT * INTO {.tbl name} FROM (\n  {sql}\n) AS temp")
 }
@@ -569,7 +611,7 @@ mssql_as_bit <- function(x) {
 }
 
 mssql_is_null <- function(x) {
-  mssql_as_bit(sql_is_null({{x}}))
+  mssql_as_bit(sql_is_null({{ x }}))
 }
 
 mssql_infix_comparison <- function(f) {
@@ -633,7 +675,13 @@ mssql_bit_int_bit <- function(f) {
 }
 
 #' @export
-`db_sql_render.Microsoft SQL Server` <- function(con, sql, ..., cte = FALSE, use_star = TRUE) {
+`db_sql_render.Microsoft SQL Server` <- function(
+  con,
+  sql,
+  ...,
+  cte = FALSE,
+  use_star = TRUE
+) {
   # Post-process WHERE to cast logicals from BIT to BOOLEAN
   sql$lazy_query <- purrr::modify_tree(
     sql$lazy_query,
@@ -668,4 +716,36 @@ bit_to_boolean <- function(x_expr) {
   }
 }
 
-utils::globalVariables(c("BIT", "CAST", "%AS%", "%is%", "convert", "DATE", "DATEADD", "DATEFROMPARTS", "DATEDIFF", "DATENAME", "DATEPART", "IIF", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX", "SYSDATETIME", "SECOND", "MINUTE", "HOUR", "DAY", "DAYOFWEEK", "DAYOFYEAR", "MONTH", "QUARTER", "YEAR", "BIGINT", "INT", "%AND%", "%BETWEEN%"))
+utils::globalVariables(c(
+  "BIT",
+  "CAST",
+  "%AS%",
+  "%is%",
+  "convert",
+  "DATE",
+  "DATEADD",
+  "DATEFROMPARTS",
+  "DATEDIFF",
+  "DATENAME",
+  "DATEPART",
+  "IIF",
+  "NOT",
+  "SUBSTRING",
+  "LTRIM",
+  "RTRIM",
+  "CHARINDEX",
+  "SYSDATETIME",
+  "SECOND",
+  "MINUTE",
+  "HOUR",
+  "DAY",
+  "DAYOFWEEK",
+  "DAYOFYEAR",
+  "MONTH",
+  "QUARTER",
+  "YEAR",
+  "BIGINT",
+  "INT",
+  "%AND%",
+  "%BETWEEN%"
+))

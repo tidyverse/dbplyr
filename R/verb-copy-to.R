@@ -48,17 +48,19 @@
 #' # in the join functions
 #' db %>% left_join(df2, copy = TRUE)
 #' @importFrom dplyr copy_to
-copy_to.src_sql <- function(dest,
-                            df,
-                            name = deparse(substitute(df)),
-                            overwrite = FALSE,
-                            types = NULL,
-                            temporary = TRUE,
-                            unique_indexes = NULL,
-                            indexes = NULL,
-                            analyze = TRUE,
-                            ...,
-                            in_transaction = TRUE) {
+copy_to.src_sql <- function(
+  dest,
+  df,
+  name = deparse(substitute(df)),
+  overwrite = FALSE,
+  types = NULL,
+  temporary = TRUE,
+  unique_indexes = NULL,
+  indexes = NULL,
+  analyze = TRUE,
+  ...,
+  in_transaction = TRUE
+) {
   check_bool(temporary)
 
   if (!is.data.frame(df) && !inherits(df, "tbl_sql")) {
@@ -68,7 +70,8 @@ copy_to.src_sql <- function(dest,
   name <- as_table_path(name, dest$con)
 
   if (inherits(df, "tbl_sql") && same_src(df$src, dest)) {
-    out <- compute(df,
+    out <- compute(
+      df,
       name = name,
       temporary = temporary,
       overwrite = overwrite,
@@ -81,7 +84,10 @@ copy_to.src_sql <- function(dest,
     # avoid S4 dispatch problem in dbSendPreparedQuery
     df <- as.data.frame(collect(df))
 
-    name <- db_copy_to(dest$con, name, df,
+    name <- db_copy_to(
+      dest$con,
+      name,
+      df,
       overwrite = overwrite,
       types = types,
       temporary = temporary,
@@ -175,12 +181,14 @@ sql_build.lazy_values_query <- function(op, con, ..., sql_options = NULL) {
 }
 
 #' @export
-sql_render.values_query <- function(query,
-                                    con = query$src$con,
-                                    ...,
-                                    sql_options = NULL,
-                                    subquery = FALSE,
-                                    lvl = 0) {
+sql_render.values_query <- function(
+  query,
+  con = query$src$con,
+  ...,
+  sql_options = NULL,
+  subquery = FALSE,
+  lvl = 0
+) {
   sql_values_subquery(con, query$x, types = query$col_types, lvl = lvl)
 }
 
@@ -267,10 +275,20 @@ sql_values_subquery_column_alias <- function(con, df, types, lvl, ...) {
   rows_clauses <- sql_values_clause(con, df, row = FALSE)
   rows_query <- sql_format_clauses(rows_clauses, lvl = lvl + 1, con = con)
 
-  table_alias_sql <- sql(paste0("drvd(", escape(ident(colnames(df)), con = con), ")"))
+  table_alias_sql <- sql(paste0(
+    "drvd(",
+    escape(ident(colnames(df)), con = con),
+    ")"
+  ))
 
   if (grepl("\\n", rows_query)) {
-    rows_query <- sql(paste0("(\n", rows_query, "\n", indent_lvl(") AS ", lvl), table_alias_sql))
+    rows_query <- sql(paste0(
+      "(\n",
+      rows_query,
+      "\n",
+      indent_lvl(") AS ", lvl),
+      table_alias_sql
+    ))
   } else {
     # indent is not perfect but okay
     rows_query <- sql(paste0("(", rows_query, ") AS ", table_alias_sql))
@@ -313,7 +331,13 @@ sql_values_subquery_union <- function(con, df, types, lvl, row, from = NULL) {
   )
   null_row_query <- sql_format_clauses(clauses, lvl + 1, con)
 
-  escaped_values <- purrr::map(df, escape, con = con, collapse = NULL, parens = FALSE)
+  escaped_values <- purrr::map(
+    df,
+    escape,
+    con = con,
+    collapse = NULL,
+    parens = FALSE
+  )
 
   rows <- rlang::exec(paste, !!!escaped_values, sep = ", ")
   select_kw <- style_kw("SELECT ")
@@ -339,7 +363,13 @@ sql_values_subquery_union <- function(con, df, types, lvl, row, from = NULL) {
 }
 
 sql_values_clause <- function(con, df, row = FALSE) {
-  escaped_values <- purrr::map(df, escape, con = con, collapse = NULL, parens = FALSE)
+  escaped_values <- purrr::map(
+    df,
+    escape,
+    con = con,
+    collapse = NULL,
+    parens = FALSE
+  )
   rows <- rlang::exec(paste, !!!escaped_values, sep = ", ")
   rows_sql <- sql(paste0(if (row) "ROW", "(", rows, ")"))
 
@@ -364,7 +394,8 @@ sql_values_zero_rows <- function(con, df, types, lvl, from = NULL) {
 sql_values_cast_clauses <- function(con, df, types, na) {
   if (is_null(types)) {
     typed_cols <- purrr::map2_chr(
-      df, colnames(df),
+      df,
+      colnames(df),
       ~ {
         val <- if (na) NA else ident(.y)
         cast_expr <- call2(sql_cast_dispatch(.x), val)

@@ -26,10 +26,17 @@ sql_case_match <- function(.x, ..., .default = NULL, .ptype = NULL) {
     env <- environment(f)
 
     query[[i]] <- sql_case_match_clause(f, .x, con)
-    value[[i]] <- escape(enpar(quo(!!f[[3]]), tidy = FALSE, env = env), con = con)
+    value[[i]] <- escape(
+      enpar(quo(!!f[[3]]), tidy = FALSE, env = env),
+      con = con
+    )
   }
 
-  clauses <- purrr::map2_chr(query, value, ~ paste0("WHEN (", .x, ") THEN ", .y))
+  clauses <- purrr::map2_chr(
+    query,
+    value,
+    ~ paste0("WHEN (", .x, ") THEN ", .y)
+  )
   if (!is_null(.default)) {
     .default <- escape(enpar(quo(.default), tidy = FALSE, env = env), con = con)
     clauses[[n + 1]] <- paste0("ELSE ", .default)
@@ -60,7 +67,11 @@ sql_case_match_clause <- function(f, x, con) {
     }
   }
 
-  f_query <- purrr::map_if(f_query, ~ !is_vector(.x), ~ translate_sql(!!.x, con = con))
+  f_query <- purrr::map_if(
+    f_query,
+    ~ !is_vector(.x),
+    ~ translate_sql(!!.x, con = con)
+  )
   missing_loc <- purrr::map_lgl(f_query, ~ is.null(.x) || is.na(.x))
 
   f_query <- vctrs::vec_slice(f_query, !missing_loc)
@@ -119,11 +130,13 @@ sql_if <- function(cond, if_true, if_false = quo(NULL), missing = quo(NULL)) {
   glue_sql2(con, out, " END")
 }
 
-sql_case_when <- function(...,
-                          .default = NULL,
-                          .ptype = NULL,
-                          .size = NULL,
-                          error_call = caller_env()) {
+sql_case_when <- function(
+  ...,
+  .default = NULL,
+  .ptype = NULL,
+  .size = NULL,
+  error_call = caller_env()
+) {
   # TODO: switch to dplyr::case_when_prepare when available
   check_unsupported_arg(.ptype, call = error_call)
   check_unsupported_arg(.size, call = error_call)
@@ -143,8 +156,14 @@ sql_case_when <- function(...,
     f <- formulas[[i]]
 
     env <- environment(f)
-    query[[i]] <- escape(enpar(quo(!!f[[2]]), tidy = FALSE, env = env), con = con)
-    value[[i]] <- escape(enpar(quo(!!f[[3]]), tidy = FALSE, env = env), con = con)
+    query[[i]] <- escape(
+      enpar(quo(!!f[[2]]), tidy = FALSE, env = env),
+      con = con
+    )
+    value[[i]] <- escape(
+      enpar(quo(!!f[[3]]), tidy = FALSE, env = env),
+      con = con
+    )
   }
 
   clauses <- purrr::map2_chr(query, value, ~ paste0("WHEN ", .x, " THEN ", .y))

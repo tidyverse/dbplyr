@@ -13,7 +13,10 @@ test_that("glue_sql() interpolates .tbl correctly", {
   tbl <- in_schema("schema", "table")
   expect_equal(glue_sql2("{.tbl tbl}", .con = con), sql("`schema`.`table`"))
   tbl <- in_catalog("catalog", "schema", "table")
-  expect_equal(glue_sql2("{.tbl tbl}", .con = con), sql("`catalog`.`schema`.`table`"))
+  expect_equal(
+    glue_sql2("{.tbl tbl}", .con = con),
+    sql("`catalog`.`schema`.`table`")
+  )
 })
 
 test_that("glue_sql() interpolates .from correctly", {
@@ -26,16 +29,25 @@ test_that("glue_sql() interpolates .from correctly", {
   tbl <- in_schema("schema", "table")
   expect_equal(glue_sql2("{.from tbl}", .con = con), sql("`schema`.`table`"))
   tbl <- in_catalog("catalog", "schema", "table")
-  expect_equal(glue_sql2("{.from tbl}", .con = con), sql("`catalog`.`schema`.`table`"))
+  expect_equal(
+    glue_sql2("{.from tbl}", .con = con),
+    sql("`catalog`.`schema`.`table`")
+  )
 
-  expect_equal(glue_sql2("{.from sql('(SELECT * FROM df_x)')}", .con = con), sql("(SELECT * FROM df_x)"))
+  expect_equal(
+    glue_sql2("{.from sql('(SELECT * FROM df_x)')}", .con = con),
+    sql("(SELECT * FROM df_x)")
+  )
 })
 
 test_that("glue_sql() interpolates .name correctly", {
   con <- simulate_dbi()
   expect_equal(glue_sql2("{.name 'table'}", .con = con), sql("`table`"))
   expect_equal(glue_sql2("{.name ident('table')}", .con = con), sql("`table`"))
-  expect_equal(glue_sql2("{.name ident_q('ta ble')}", .con = con), sql("ta ble"))
+  expect_equal(
+    glue_sql2("{.name ident_q('ta ble')}", .con = con),
+    sql("ta ble")
+  )
 })
 
 test_that("glue_sql() interpolates .col correctly", {
@@ -49,7 +61,10 @@ test_that("glue_sql() interpolates .kw correctly", {
   local_reproducible_output(crayon = TRUE)
   withr::local_options(dbplyr_highlight = cli::combine_ansi_styles("blue"))
   con <- simulate_dbi()
-  expect_equal(glue_sql2("{.kw 'FROM'}", .con = con), sql("\033[34mFROM\033[39m"))
+  expect_equal(
+    glue_sql2("{.kw 'FROM'}", .con = con),
+    sql("\033[34mFROM\033[39m")
+  )
 })
 
 test_that("glue_sql() checks size", {

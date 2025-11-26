@@ -1,10 +1,6 @@
 #' @export
 #' @rdname sql_build
-lazy_set_op_query <- function(x,
-                              y,
-                              type,
-                              all,
-                              call = caller_env()) {
+lazy_set_op_query <- function(x, y, type, all, call = caller_env()) {
   check_lazy_query(x, call = call)
   check_lazy_query(y, call = call)
   check_string(type, call = call)
@@ -48,9 +44,7 @@ sql_build.lazy_set_op_query <- function(op, con, ..., sql_options = NULL) {
 
 #' @export
 #' @rdname sql_build
-lazy_union_query <- function(x,
-                             unions,
-                             call = caller_env()) {
+lazy_union_query <- function(x, unions, call = caller_env()) {
   check_lazy_query(x, call = call)
 
   lazy_query(
@@ -73,7 +67,11 @@ print.lazy_union_query <- function(x, ...) {
 
 #' @export
 op_vars.lazy_union_query <- function(op) {
-  purrr::reduce(op$unions$table, ~ union(.x, op_vars(.y$lazy_query)), .init = op_vars(op$x))
+  purrr::reduce(
+    op$unions$table,
+    ~ union(.x, op_vars(.y$lazy_query)),
+    .init = op_vars(op$x)
+  )
 }
 
 #' @export

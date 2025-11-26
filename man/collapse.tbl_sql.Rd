@@ -54,8 +54,8 @@ Use common table expressions in the generated SQL?}
 \item{warn_incomplete}{Warn if \code{n} is less than the number of result rows?}
 }
 \description{
-These are methods for the dplyr generics \code{\link[=collapse]{collapse()}}, \code{\link[=compute]{compute()}},
-and \code{\link[=collect]{collect()}}. \code{collapse()} creates a subquery, \code{compute()} stores
+These are methods for the dplyr generics \code{\link[dplyr:compute]{dplyr::collapse()}}, \code{\link[dplyr:compute]{dplyr::compute()}},
+and \code{\link[dplyr:compute]{dplyr::collect()}}. \code{collapse()} creates a subquery, \code{compute()} stores
 the results in a remote table, and \code{collect()} executes the query and
 downloads the data into R.
 }

@@ -70,9 +70,17 @@ sql_translation.Snowflake <- function(con) {
         # Snowflake needs backslashes escaped, so we must increase the level of escaping
         pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
         if (negate) {
-          translate_sql(REGEXP_INSTR(!!string, !!pattern, 1L, 1L, 1L) != LENGTH(!!string) + 1L, con = con)
+          translate_sql(
+            REGEXP_INSTR(!!string, !!pattern, 1L, 1L, 1L) !=
+              LENGTH(!!string) + 1L,
+            con = con
+          )
         } else {
-          translate_sql(REGEXP_INSTR(!!string, !!pattern, 1L, 1L, 1L) == LENGTH(!!string) + 1L, con = con)
+          translate_sql(
+            REGEXP_INSTR(!!string, !!pattern, 1L, 1L, 1L) ==
+              LENGTH(!!string) + 1L,
+            con = con
+          )
         }
       },
       # On Snowflake, REGEXP_REPLACE is used like this:
@@ -105,7 +113,6 @@ sql_translation.Snowflake <- function(con) {
         sql_expr(regexp_replace(trim(!!string), "\\\\s+", " "))
       },
 
-
       # lubridate functions
       # https://docs.snowflake.com/en/sql-reference/functions-date-time.html
       day = function(x) {
@@ -126,13 +133,20 @@ sql_translation.Snowflake <- function(con) {
           sql_expr(
             DECODE(
               EXTRACT("dayofweek", !!x),
-              1, "Monday",
-              2, "Tuesday",
-              3, "Wednesday",
-              4, "Thursday",
-              5, "Friday",
-              6, "Saturday",
-              0, "Sunday"
+              1,
+              "Monday",
+              2,
+              "Tuesday",
+              3,
+              "Wednesday",
+              4,
+              "Thursday",
+              5,
+              "Friday",
+              6,
+              "Saturday",
+              0,
+              "Sunday"
             )
           )
         } else if (label && abbr) {
@@ -158,18 +172,30 @@ sql_translation.Snowflake <- function(con) {
             sql_expr(
               DECODE(
                 EXTRACT("month", !!x),
-                1, "January",
-                2, "February",
-                3, "March",
-                4, "April",
-                5, "May",
-                6, "June",
-                7, "July",
-                8, "August",
-                9, "September",
-                10, "October",
-                11, "November",
-                12, "December"
+                1,
+                "January",
+                2,
+                "February",
+                3,
+                "March",
+                4,
+                "April",
+                5,
+                "May",
+                6,
+                "June",
+                7,
+                "July",
+                8,
+                "August",
+                9,
+                "September",
+                10,
+                "October",
+                11,
+                "November",
+                12,
+                "December"
               )
             )
           }
@@ -214,8 +240,22 @@ sql_translation.Snowflake <- function(con) {
         unit <- arg_match(
           unit,
           c(
-            "second", "minute", "hour", "day", "week", "month", "quarter", "year",
-            "seconds", "minutes", "hours", "days", "weeks", "months", "quarters", "years"
+            "second",
+            "minute",
+            "hour",
+            "day",
+            "week",
+            "month",
+            "quarter",
+            "year",
+            "seconds",
+            "minutes",
+            "hours",
+            "days",
+            "weeks",
+            "months",
+            "quarters",
+            "years"
           )
         )
         sql_expr(DATE_TRUNC(!!unit, !!x))
@@ -244,8 +284,7 @@ sql_translation.Snowflake <- function(con) {
       get_day = function(x) {
         sql_expr(DATE_PART(DAY, !!x))
       },
-      date_count_between = function(start, end, precision, ..., n = 1L){
-
+      date_count_between = function(start, end, precision, ..., n = 1L) {
         check_dots_empty()
         check_unsupported_arg(precision, allowed = "day")
         check_unsupported_arg(n, allowed = 1L)
@@ -276,6 +315,13 @@ sql_translation.Snowflake <- function(con) {
           snowflake_pmin_pmax_sql_expression(dots = dots, comparison = ">=")
         } else {
           glue_sql2(sql_current_con(), "GREATEST({.val dots*})")
+        }
+      },
+      `$` = function(x, name) {
+        if (is.sql(x)) {
+          glue_sql2(sql_current_con(), "{x}:{.col name}")
+        } else {
+          eval(bquote(`$`(x, .(substitute(name)))))
         }
       }
     ),
@@ -319,12 +365,14 @@ simulate_snowflake <- function() simulate_dbi("Snowflake")
 #' @export
 sql_table_analyze.Snowflake <- function(con, table, ...) {}
 
-snowflake_grepl <- function(pattern,
-                            x,
-                            ignore.case = FALSE,
-                            perl = FALSE,
-                            fixed = FALSE,
-                            useBytes = FALSE) {
+snowflake_grepl <- function(
+  pattern,
+  x,
+  ignore.case = FALSE,
+  perl = FALSE,
+  fixed = FALSE,
+  useBytes = FALSE
+) {
   con <- sql_current_con()
 
   check_unsupported_arg(perl, FALSE, backend = "Snowflake")
@@ -334,10 +382,15 @@ snowflake_grepl <- function(pattern,
   # https://docs.snowflake.com/en/sql-reference/functions/regexp_instr.html
   # REGEXP_INSTR optional parameters: position, occurrance, option, regex_parameters
   regexp_parameters <- "c"
-  if(ignore.case) { regexp_parameters <- "i" }
+  if (ignore.case) {
+    regexp_parameters <- "i"
+  }
   # Snowflake needs backslashes escaped, so we must increase the level of escaping
   pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
-  translate_sql(REGEXP_INSTR(!!x, !!pattern, 1L, 1L, 0L, !!regexp_parameters) != 0L, con = con)
+  translate_sql(
+    REGEXP_INSTR(!!x, !!pattern, 1L, 1L, 0L, !!regexp_parameters) != 0L,
+    con = con
+  )
 }
 
 snowflake_round <- function(x, digits = 0L) {
@@ -352,21 +405,42 @@ snowflake_paste <- function(default_sep) {
     check_collapse(collapse)
     sql_call2(
       "ARRAY_TO_STRING",
-      sql_call2("ARRAY_CONSTRUCT_COMPACT", ...), sep
+      sql_call2("ARRAY_CONSTRUCT_COMPACT", ...),
+      sep
     )
   }
 }
 
-snowflake_pmin_pmax_sql_expression <- function(dots, comparison){
+snowflake_pmin_pmax_sql_expression <- function(dots, comparison) {
   dot_combined <- dots[[1]]
-  for (i in 2:length(dots)){
-    dot_combined <- snowflake_pmin_pmax_builder(dots[i], dot_combined, comparison)
+  for (i in 2:length(dots)) {
+    dot_combined <- snowflake_pmin_pmax_builder(
+      dots[i],
+      dot_combined,
+      comparison
+    )
   }
   dot_combined
 }
 
-snowflake_pmin_pmax_builder <- function(dot_1, dot_2, comparison){
-  glue_sql2(sql_current_con(), glue("COALESCE(IFF({dot_2} {comparison} {dot_1}, {dot_2}, {dot_1}), {dot_2}, {dot_1})"))
+snowflake_pmin_pmax_builder <- function(dot_1, dot_2, comparison) {
+  glue_sql2(
+    sql_current_con(),
+    glue(
+      "COALESCE(IFF({dot_2} {comparison} {dot_1}, {dot_2}, {dot_1}), {dot_2}, {dot_1})"
+    )
+  )
 }
 
-utils::globalVariables(c("%REGEXP%", "DAYNAME", "DECODE", "FLOAT", "MONTHNAME", "POSITION", "trim", "LENGTH", "DATE_FROM_PARTS", "DATE_PART"))
+utils::globalVariables(c(
+  "%REGEXP%",
+  "DAYNAME",
+  "DECODE",
+  "FLOAT",
+  "MONTHNAME",
+  "POSITION",
+  "trim",
+  "LENGTH",
+  "DATE_FROM_PARTS",
+  "DATE_PART"
+))

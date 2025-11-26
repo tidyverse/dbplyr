@@ -34,12 +34,12 @@ the option "dplyr.summarise.inform" is set to \code{FALSE},
 or when \code{summarise()} is called from a function in a package.}
 }
 \value{
-Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
+Another \code{tbl_lazy}. Use \code{\link[dplyr:explain]{dplyr::show_query()}} to see the generated
 query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
 \description{
-This is a method for the dplyr \code{\link[=summarise]{summarise()}} generic. It generates the
+This is a method for the dplyr \code{\link[dplyr:summarise]{dplyr::summarise()}} generic. It generates the
 \code{SELECT} clause of the SQL query, and generally needs to be combined with
 \code{group_by()}.
 }

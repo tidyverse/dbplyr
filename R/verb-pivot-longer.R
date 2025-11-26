@@ -60,28 +60,32 @@
 #' ) %>%
 #'   tidyr::pivot_longer(-id)
 #' @exportS3Method tidyr::pivot_longer
-pivot_longer.tbl_lazy <- function(data,
-                                  cols,
-                                  ...,
-                                  cols_vary,
-                                  names_to = "name",
-                                  names_prefix = NULL,
-                                  names_sep = NULL,
-                                  names_pattern = NULL,
-                                  names_ptypes = NULL,
-                                  names_transform = NULL,
-                                  names_repair = "check_unique",
-                                  values_to = "value",
-                                  values_drop_na = FALSE,
-                                  values_ptypes,
-                                  values_transform = NULL) {
+pivot_longer.tbl_lazy <- function(
+  data,
+  cols,
+  ...,
+  cols_vary,
+  names_to = "name",
+  names_prefix = NULL,
+  names_sep = NULL,
+  names_pattern = NULL,
+  names_ptypes = NULL,
+  names_transform = NULL,
+  names_repair = "check_unique",
+  values_to = "value",
+  values_drop_na = FALSE,
+  values_ptypes,
+  values_transform = NULL
+) {
   check_unsupported_arg(cols_vary)
   check_unsupported_arg(values_ptypes)
 
   rlang::check_dots_empty()
 
   cols <- enquo(cols)
-  spec <- tidyr::build_longer_spec(tidyselect_data_proxy(data), !!cols,
+  spec <- tidyr::build_longer_spec(
+    tidyselect_data_proxy(data),
+    !!cols,
     names_to = names_to,
     values_to = values_to,
     names_prefix = names_prefix,
@@ -92,18 +96,22 @@ pivot_longer.tbl_lazy <- function(data,
     error_call = current_env()
   )
 
-  dbplyr_pivot_longer_spec(data, spec,
+  dbplyr_pivot_longer_spec(
+    data,
+    spec,
     names_repair = names_repair,
     values_drop_na = values_drop_na,
     values_transform = values_transform
   )
 }
 
-dbplyr_pivot_longer_spec <- function(data,
-                                     spec,
-                                     names_repair = "check_unique",
-                                     values_drop_na = FALSE,
-                                     values_transform = NULL) {
+dbplyr_pivot_longer_spec <- function(
+  data,
+  spec,
+  names_repair = "check_unique",
+  values_drop_na = FALSE,
+  values_transform = NULL
+) {
   spec <- tidyr::check_pivot_spec(spec)
   # .seq col needed if different input columns are mapped to the same output
   # column
@@ -118,7 +126,11 @@ dbplyr_pivot_longer_spec <- function(data,
 
   call <- current_env()
   value_names <- unique(spec$.value)
-  values_transform <- check_list_of_functions(values_transform, value_names, call = call)
+  values_transform <- check_list_of_functions(
+    values_transform,
+    value_names,
+    call = call
+  )
 
   nms_map <- tibble(
     name = colnames(spec_split$key),
@@ -154,7 +166,6 @@ dbplyr_pivot_longer_spec <- function(data,
   )
 
   data_long <- purrr::reduce(data_long_list, union_all)
-
 
   if (values_drop_na) {
     value_cols <- unique(spec$.value)
@@ -267,7 +278,12 @@ check_unique_names <- function(x, arg = caller_arg(x), call = caller_env()) {
   }
 }
 
-check_list_of_functions <- function(x, names, arg = caller_arg(x), call = caller_env()) {
+check_list_of_functions <- function(
+  x,
+  names,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   # mostly COPIED FROM tidyr
   if (is.null(x)) {
     x <- set_names(list(), character())
@@ -287,7 +303,6 @@ check_list_of_functions <- function(x, names, arg = caller_arg(x), call = caller
   x <- x[intersect(x_names, names)]
 
   x
-
 }
 # nocov end
 
