@@ -2,6 +2,11 @@
 
 ## dbplyr (development version)
 
+- Corrected translation of
+  [`stringr::str_like()`](https://stringr.tidyverse.org/reference/str_like.html)
+  to use case-sensitive `LIKE` when argument `ignore_case` is set as
+  `FALSE` ([@edward-burn](https://github.com/edward-burn),
+  [\#1488](https://github.com/tidyverse/dbplyr/issues/1488)).
 - Fixed overwrite flag in
   [`copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html) to
   work when source is in the same DB as destination
