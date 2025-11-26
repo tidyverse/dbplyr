@@ -1,7 +1,6 @@
 # dbplyr (development version)
 
 * Corrected translation of `stringr::str_like()` to use case-sensitive `LIKE` when argument `ignore_case` is set as `FALSE` (@edward-burn, #1488).
-* `clock::add_years()` translates to correct SQL on Spark (@ablack3, #1510).
 * Fixed overwrite flag in `copy_to()` to work when source is in the same DB as destination (@liudvikasakelis, #1535)
 * Snowflake correctly translates `$` to `:` (@jsowder, #1608)
 * `dbplyr_uncount()` now works with Redshift (@owenjonesuob, #1601).
