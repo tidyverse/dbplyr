@@ -2,6 +2,9 @@
 
 ## dbplyr (development version)
 
+- Snowflake correctly translates `$` to `:`
+  ([@jsowder](https://github.com/jsowder),
+  [\#1608](https://github.com/tidyverse/dbplyr/issues/1608))
 - [`dbplyr_uncount()`](https://dbplyr.tidyverse.org/dev/reference/dbplyr_uncount.md)
   now works with Redshift
   ([@owenjonesuob](https://github.com/owenjonesuob),
