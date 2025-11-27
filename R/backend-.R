@@ -27,7 +27,7 @@ sql_translation.DBIConnection <- function(con) {
 #' @rdname sql_variant
 #' @format NULL
 base_scalar <- sql_translator(
-  `+`    = function(x, y = NULL) {
+  `+` = function(x, y = NULL) {
     x <- escape_infix_expr(enexpr(x), x, escape_unary_minus = TRUE)
     if (is.null(y)) {
       if (is.numeric(x)) {
@@ -41,12 +41,12 @@ base_scalar <- sql_translator(
       sql_expr(!!x + !!y)
     }
   },
-  `*`    = sql_infix("*"),
-  `/`    = sql_infix("/"),
-  `%/%`  = sql_not_supported("%/%"),
-  `%%`   = sql_infix("%"),
-  `^`    = sql_prefix("POWER", 2),
-  `-`    = function(x, y = NULL) {
+  `*` = sql_infix("*"),
+  `/` = sql_infix("/"),
+  `%/%` = sql_not_supported("%/%"),
+  `%%` = sql_infix("%"),
+  `^` = sql_prefix("POWER", 2),
+  `-` = function(x, y = NULL) {
     x <- escape_infix_expr(enexpr(x), x, escape_unary_minus = TRUE)
     if (is.null(y)) {
       if (is.numeric(x)) {
@@ -61,7 +61,7 @@ base_scalar <- sql_translator(
     }
   },
 
-  `$`   = function(x, name) {
+  `$` = function(x, name) {
     if (is.sql(x)) {
       glue_sql2(sql_current_con(), "{x}.{.col name}")
     } else {
@@ -69,7 +69,7 @@ base_scalar <- sql_translator(
     }
   },
 
-  `[[`   = function(x, i) {
+  `[[` = function(x, i) {
     # `x` can be a table, column or even an expression (e.g. for json)
     i <- enexpr(i)
     if (is.character(i)) {
@@ -85,12 +85,12 @@ base_scalar <- sql_translator(
     glue_sql2(sql_current_con(), "CASE WHEN ({i}) THEN ({x}) END")
   },
 
-  `!=`    = sql_infix("!="),
-  `==`    = sql_infix("="),
-  `<`     = sql_infix("<"),
-  `<=`    = sql_infix("<="),
-  `>`     = sql_infix(">"),
-  `>=`    = sql_infix(">="),
+  `!=` = sql_infix("!="),
+  `==` = sql_infix("="),
+  `<` = sql_infix("<"),
+  `<=` = sql_infix("<="),
+  `>` = sql_infix(">"),
+  `>=` = sql_infix(">="),
 
   `%in%` = function(x, table) {
     if (is.sql(table) || length(table) > 1) {
@@ -102,12 +102,12 @@ base_scalar <- sql_translator(
     }
   },
 
-  `!`     = sql_prefix("NOT"),
-  `&`     = sql_infix("AND"),
-  `&&`    = sql_infix("AND"),
-  `|`     = sql_infix("OR"),
-  `||`    = sql_infix("OR"),
-  xor     = function(x, y) {
+  `!` = sql_prefix("NOT"),
+  `&` = sql_infix("AND"),
+  `&&` = sql_infix("AND"),
+  `|` = sql_infix("OR"),
+  `||` = sql_infix("OR"),
+  xor = function(x, y) {
     sql_expr(!!x %OR% !!y %AND NOT% (!!x %AND% !!y))
   },
 
@@ -121,52 +121,55 @@ base_scalar <- sql_translator(
   #   Oracle: https://docs.oracle.com/cd/E19253-01/817-6223/chp-typeopexpr-7/index.html
   #   SQLite: https://www.tutorialspoint.com/sqlite/sqlite_bitwise_operators.htm
   #   Teradata: https://docs.teradata.com/reader/1DcoER_KpnGTfgPinRAFUw/h3CS4MuKL1LCMQmnubeSRQ
-  bitwNot    = function(x) sql_expr(~ ((!!x))),
-  bitwAnd    = sql_infix("&"),
-  bitwOr     = sql_infix("|"),
-  bitwXor    = sql_infix("^"),
+  bitwNot = function(x) sql_expr(~ ((!!x))),
+  bitwAnd = sql_infix("&"),
+  bitwOr = sql_infix("|"),
+  bitwXor = sql_infix("^"),
   bitwShiftL = sql_infix("<<"),
   bitwShiftR = sql_infix(">>"),
 
-  abs     = sql_prefix("ABS", 1),
-  acos    = sql_prefix("ACOS", 1),
-  asin    = sql_prefix("ASIN", 1),
-  atan    = sql_prefix("ATAN", 1),
-  atan2   = sql_prefix("ATAN2", 2),
-  ceil    = sql_prefix("CEIL", 1),
+  abs = sql_prefix("ABS", 1),
+  acos = sql_prefix("ACOS", 1),
+  asin = sql_prefix("ASIN", 1),
+  atan = sql_prefix("ATAN", 1),
+  atan2 = sql_prefix("ATAN2", 2),
+  ceil = sql_prefix("CEIL", 1),
   ceiling = sql_prefix("CEIL", 1),
-  cos     = sql_prefix("COS", 1),
-  cot     = sql_prefix("COT", 1),
-  exp     = sql_prefix("EXP", 1),
-  floor   = sql_prefix("FLOOR", 1),
-  log     = function(x, base = exp(1)) {
+  cos = sql_prefix("COS", 1),
+  cot = sql_prefix("COT", 1),
+  exp = sql_prefix("EXP", 1),
+  floor = sql_prefix("FLOOR", 1),
+  log = function(x, base = exp(1)) {
     if (isTRUE(all.equal(base, exp(1)))) {
       sql_expr(ln(!!x))
     } else {
       sql_expr(log(!!base, !!x))
     }
   },
-  log10   = sql_prefix("LOG10", 1),
+  log10 = sql_prefix("LOG10", 1),
   round = function(x, digits = 0L) {
     sql_expr(ROUND(!!x, !!as.integer(digits)))
   },
-  sign    = sql_prefix("SIGN", 1),
-  sin     = sql_prefix("SIN", 1),
-  sqrt    = sql_prefix("SQRT", 1),
-  tan     = sql_prefix("TAN", 1),
+  sign = sql_prefix("SIGN", 1),
+  sin = sql_prefix("SIN", 1),
+  sqrt = sql_prefix("SQRT", 1),
+  tan = sql_prefix("TAN", 1),
   # cosh, sinh, coth and tanh calculations are based on this article
   # https://en.wikipedia.org/wiki/Hyperbolic_function
-  cosh     = function(x) sql_expr((!!sql_exp(1, x) + !!sql_exp(-1, x)) / 2L),
-  sinh     = function(x) sql_expr((!!sql_exp(1, x) - !!sql_exp(-1, x)) / 2L),
-  tanh     = function(x) sql_expr((!!sql_exp(2, x) - 1L) / (!!sql_exp(2, x) + 1L)),
-  coth     = function(x) sql_expr((!!sql_exp(2, x) + 1L) / (!!sql_exp(2, x) - 1L)),
+  cosh = function(x) sql_expr((!!sql_exp(1, x) + !!sql_exp(-1, x)) / 2L),
+  sinh = function(x) sql_expr((!!sql_exp(1, x) - !!sql_exp(-1, x)) / 2L),
+  tanh = function(x) sql_expr((!!sql_exp(2, x) - 1L) / (!!sql_exp(2, x) + 1L)),
+  coth = function(x) sql_expr((!!sql_exp(2, x) + 1L) / (!!sql_exp(2, x) - 1L)),
 
   `if` = function(cond, if_true, if_false = NULL) {
     sql_if(enquo(cond), enquo(if_true), enquo(if_false))
   },
   if_else = function(condition, true, false, missing = NULL) {
     sql_if(
-      enquo(condition), enquo(true), enquo(false), enquo(missing)
+      enquo(condition),
+      enquo(true),
+      enquo(false),
+      enquo(missing)
     )
   },
   ifelse = function(test, yes, no) sql_if(enquo(test), enquo(yes), enquo(no)),
@@ -203,7 +206,7 @@ base_scalar <- sql_translator(
   # Hive - https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-IntegralTypes(TINYINT,SMALLINT,INT/INTEGER,BIGINT)
   # Postgres - https://www.postgresql.org/docs/8.4/static/datatype-numeric.html
   # Impala - https://impala.apache.org/docs/build/html/topics/impala_bigint.html
-  as.integer64  = sql_cast("BIGINT"),
+  as.integer64 = sql_cast("BIGINT"),
 
   c = function(...) {
     c(...)
@@ -252,6 +255,7 @@ base_scalar <- sql_translator(
   # base R
   nchar = sql_prefix("LENGTH", 1),
   nzchar = function(x, keepNA = FALSE) {
+    check_bool(keepNA)
     if (keepNA) {
       exp <- expr(!!x != "")
       translate_sql(!!exp, con = sql_current_con())
@@ -280,11 +284,16 @@ base_scalar <- sql_translator(
   str_trim = sql_str_trim,
   str_c = sql_paste(""),
   str_sub = sql_str_sub("SUBSTR"),
-  str_like = function(string, pattern, ignore_case = TRUE) {
+  # https://docs.getdbt.com/sql-reference/like is typically case sensitive (#1490)
+  str_like = function(string, pattern, ignore_case = FALSE) {
     if (isTRUE(ignore_case)) {
-      sql_expr(!!string %LIKE% !!pattern)
+      cli_abort(c(
+        "Backend does not support case insensitive {.fn str_like}.",
+        i = "Set {.code ignore_case = FALSE} for case sensitive match.",
+        i = "Use {.fn tolower} on both arguments to achieve a case insensitive match."
+      ))
     } else {
-      cli::cli_abort("Backend only supports case insensitve {.fn str_like}.")
+      sql_expr(!!string %LIKE% !!pattern)
     }
   },
 
@@ -371,20 +380,20 @@ sql_exp <- function(a, x) {
 base_agg <- sql_translator(
   # SQL-92 aggregates
   # http://db.apache.org/derby/docs/10.7/ref/rrefsqlj33923.html
-  n          = function() sql("COUNT(*)"),
-  mean       = sql_aggregate("AVG", "mean"),
-  sum        = sql_aggregate("SUM"),
-  min        = sql_aggregate("MIN"),
-  max        = sql_aggregate("MAX"),
+  n = function() sql("COUNT(*)"),
+  mean = sql_aggregate("AVG", "mean"),
+  sum = sql_aggregate("SUM"),
+  min = sql_aggregate("MIN"),
+  max = sql_aggregate("MAX"),
 
   # https://blog.jooq.org/a-true-sql-gem-you-didnt-know-yet-the-every-aggregate-function/#comment-344695
-  all        = sql_aggregate("MIN"),
-  any        = sql_aggregate("MAX"),
+  all = sql_aggregate("MIN"),
+  any = sql_aggregate("MAX"),
 
-  sd         = sql_not_supported("sd"),
-  var        = sql_not_supported("var"),
-  cor        = sql_not_supported("cor"),
-  cov        = sql_not_supported("cov"),
+  sd = sql_not_supported("sd"),
+  var = sql_not_supported("var"),
+  cor = sql_not_supported("cor"),
+  cov = sql_not_supported("cov"),
 
   # Ordered set functions
   quantile = sql_quantile("PERCENTILE_CONT", "ordered"),
@@ -408,13 +417,13 @@ base_agg <- sql_translator(
 #' @format NULL
 base_win <- sql_translator(
   # rank functions have a single order argument that overrides the default
-  row_number   = win_rank("ROW_NUMBER"),
-  min_rank     = win_rank("RANK"),
-  rank         = win_rank("RANK"),
-  dense_rank   = win_rank("DENSE_RANK"),
+  row_number = win_rank("ROW_NUMBER"),
+  min_rank = win_rank("RANK"),
+  rank = win_rank("RANK"),
+  dense_rank = win_rank("DENSE_RANK"),
   percent_rank = win_rank("PERCENT_RANK"),
-  cume_dist    = win_rank("CUME_DIST"),
-  ntile        = function(x, n) {
+  cume_dist = win_rank("CUME_DIST"),
+  ntile = function(x, n) {
     win_over(
       sql_expr(NTILE(!!as.integer(n))),
       win_current_group(),
@@ -469,25 +478,25 @@ base_win <- sql_translator(
   },
   # Recycled aggregate fuctions take single argument, don't need order and
   # include entire partition in frame.
-  mean  = win_aggregate("AVG"),
-  sum   = win_aggregate("SUM"),
-  min   = win_aggregate("MIN"),
-  max   = win_aggregate("MAX"),
+  mean = win_aggregate("AVG"),
+  sum = win_aggregate("SUM"),
+  min = win_aggregate("MIN"),
+  max = win_aggregate("MAX"),
 
-  all   = win_aggregate("MIN"),
-  any   = win_aggregate("MAX"),
+  all = win_aggregate("MIN"),
+  any = win_aggregate("MAX"),
 
-  sd    = sql_not_supported("sd"),
-  var   = sql_not_supported("var"),
-  cor   = sql_not_supported("cor"),
-  cov   = sql_not_supported("cov"),
+  sd = sql_not_supported("sd"),
+  var = sql_not_supported("var"),
+  cor = sql_not_supported("cor"),
+  cov = sql_not_supported("cov"),
 
   # Ordered set functions
   quantile = sql_quantile("PERCENTILE_CONT", "ordered", window = TRUE),
   median = sql_median("PERCENTILE_CONT", "ordered", window = TRUE),
 
   # Counts
-  n     = function() {
+  n = function() {
     frame <- win_current_frame()
     win_over(
       sql("COUNT(*)"),
@@ -497,15 +506,18 @@ base_win <- sql_translator(
     )
   },
   n_distinct = function(x) {
-    win_over(glue_sql2(sql_current_con(), "COUNT(DISTINCT {x})"), win_current_group())
+    win_over(
+      glue_sql2(sql_current_con(), "COUNT(DISTINCT {x})"),
+      win_current_group()
+    )
   },
 
   # Cumulative function are like recycled aggregates except that R names
   # have cum prefix, order_by is inherited and frame goes from -Inf to 0.
   cummean = win_cumulative("AVG"),
-  cumsum  = win_cumulative("SUM"),
-  cummin  = win_cumulative("MIN"),
-  cummax  = win_cumulative("MAX"),
+  cumsum = win_cumulative("SUM"),
+  cummin = win_cumulative("MIN"),
+  cummax = win_cumulative("MAX"),
 
   # Manually override other parameters --------------------------------------
   order_by = function(order_by, expr) {
@@ -520,39 +532,39 @@ base_win <- sql_translator(
 #' @rdname sql_variant
 #' @format NULL
 base_no_win <- sql_translator(
-  row_number   = win_absent("row_number"),
-  min_rank     = win_absent("min_rank"),
-  rank         = win_absent("rank"),
-  dense_rank   = win_absent("dense_rank"),
+  row_number = win_absent("row_number"),
+  min_rank = win_absent("min_rank"),
+  rank = win_absent("rank"),
+  dense_rank = win_absent("dense_rank"),
   percent_rank = win_absent("percent_rank"),
-  cume_dist    = win_absent("cume_dist"),
-  ntile        = win_absent("ntile"),
-  mean         = win_absent("mean"),
-  sd           = win_absent("sd"),
-  var          = win_absent("var"),
-  cov          = win_absent("cov"),
-  cor          = win_absent("cor"),
-  sum          = win_absent("sum"),
-  min          = win_absent("min"),
-  max          = win_absent("max"),
-  all          = win_absent("all"),
-  any          = win_absent("any"),
-  median       = win_absent("median"),
-  quantile     = win_absent("quantile"),
-  n            = win_absent("n"),
-  n_distinct   = win_absent("n_distinct"),
-  cummean      = win_absent("cummean"),
-  cumsum       = win_absent("cumsum"),
-  cummin       = win_absent("cummin"),
-  cummax       = win_absent("cummax"),
-  nth          = win_absent("nth"),
-  first        = win_absent("first"),
-  last         = win_absent("last"),
-  lead         = win_absent("lead"),
-  lag          = win_absent("lad"),
-  order_by     = win_absent("order_by"),
-  str_flatten  = win_absent("str_flatten"),
-  count        = win_absent("count")
+  cume_dist = win_absent("cume_dist"),
+  ntile = win_absent("ntile"),
+  mean = win_absent("mean"),
+  sd = win_absent("sd"),
+  var = win_absent("var"),
+  cov = win_absent("cov"),
+  cor = win_absent("cor"),
+  sum = win_absent("sum"),
+  min = win_absent("min"),
+  max = win_absent("max"),
+  all = win_absent("all"),
+  any = win_absent("any"),
+  median = win_absent("median"),
+  quantile = win_absent("quantile"),
+  n = win_absent("n"),
+  n_distinct = win_absent("n_distinct"),
+  cummean = win_absent("cummean"),
+  cumsum = win_absent("cumsum"),
+  cummin = win_absent("cummin"),
+  cummax = win_absent("cummax"),
+  nth = win_absent("nth"),
+  first = win_absent("first"),
+  last = win_absent("last"),
+  lead = win_absent("lead"),
+  lag = win_absent("lad"),
+  order_by = win_absent("order_by"),
+  str_flatten = win_absent("str_flatten"),
+  count = win_absent("count")
 )
 
 utils::globalVariables(c("RANDOM", "%LIKE%"))

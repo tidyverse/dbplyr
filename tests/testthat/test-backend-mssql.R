@@ -3,23 +3,34 @@
 test_that("custom scalar translated correctly", {
   local_con(simulate_mssql())
 
-  expect_equal(test_translate_sql(as.logical(x)),   sql("TRY_CAST(`x` AS BIT)"))
-  expect_equal(test_translate_sql(as.numeric(x)),   sql("TRY_CAST(`x` AS FLOAT)"))
-  expect_equal(test_translate_sql(as.integer(x)),   sql("TRY_CAST(TRY_CAST(`x` AS NUMERIC) AS INT)"))
-  expect_equal(test_translate_sql(as.integer64(x)), sql("TRY_CAST(TRY_CAST(`x` AS NUMERIC(38, 0)) AS BIGINT)"))
-  expect_equal(test_translate_sql(as.double(x)),    sql("TRY_CAST(`x` AS FLOAT)"))
-  expect_equal(test_translate_sql(as.character(x)), sql("TRY_CAST(`x` AS VARCHAR(MAX))"))
-  expect_equal(test_translate_sql(log(x)),          sql("LOG(`x`)"))
-  expect_equal(test_translate_sql(nchar(x)),        sql("LEN(`x`)"))
-  expect_equal(test_translate_sql(atan2(x)),        sql("ATN2(`x`)"))
-  expect_equal(test_translate_sql(ceiling(x)),      sql("CEILING(`x`)"))
-  expect_equal(test_translate_sql(ceil(x)),         sql("CEILING(`x`)"))
+  expect_equal(test_translate_sql(as.logical(x)), sql("TRY_CAST(`x` AS BIT)"))
+  expect_equal(test_translate_sql(as.numeric(x)), sql("TRY_CAST(`x` AS FLOAT)"))
+  expect_equal(
+    test_translate_sql(as.integer(x)),
+    sql("TRY_CAST(TRY_CAST(`x` AS NUMERIC) AS INT)")
+  )
+  expect_equal(
+    test_translate_sql(as.integer64(x)),
+    sql("TRY_CAST(TRY_CAST(`x` AS NUMERIC(38, 0)) AS BIGINT)")
+  )
+  expect_equal(test_translate_sql(as.double(x)), sql("TRY_CAST(`x` AS FLOAT)"))
+  expect_equal(
+    test_translate_sql(as.character(x)),
+    sql("TRY_CAST(`x` AS VARCHAR(MAX))")
+  )
+  expect_equal(test_translate_sql(log(x)), sql("LOG(`x`)"))
+  expect_equal(test_translate_sql(nchar(x)), sql("LEN(`x`)"))
+  expect_equal(test_translate_sql(atan2(x)), sql("ATN2(`x`)"))
+  expect_equal(test_translate_sql(ceiling(x)), sql("CEILING(`x`)"))
+  expect_equal(test_translate_sql(ceil(x)), sql("CEILING(`x`)"))
   expect_equal(test_translate_sql(substr(x, 1, 2)), sql("SUBSTRING(`x`, 1, 2)"))
-  expect_equal(test_translate_sql(trimws(x)),       sql("LTRIM(RTRIM(`x`))"))
-  expect_equal(test_translate_sql(paste(x, y)),     sql("`x` + ' ' + `y`"))
+  expect_equal(test_translate_sql(trimws(x)), sql("LTRIM(RTRIM(`x`))"))
+  expect_equal(test_translate_sql(paste(x, y)), sql("`x` + ' ' + `y`"))
   expect_equal(
     test_translate_sql(if_else(x, "true", "false", "missing")),
-    sql("CASE WHEN `x` THEN 'true' WHEN NOT `x` THEN 'false' WHEN (`x` IS NULL) THEN 'missing' END")
+    sql(
+      "CASE WHEN `x` THEN 'true' WHEN NOT `x` THEN 'false' WHEN (`x` IS NULL) THEN 'missing' END"
+    )
   )
   expect_equal(
     test_translate_sql(ifelse(x, "true", "false")),
@@ -30,37 +41,61 @@ test_that("custom scalar translated correctly", {
     sql("IIF(`x`, 'true', NULL)")
   )
   expect_equal(
-    test_translate_sql(if(x) "true" else "false"),
+    test_translate_sql(if (x) "true" else "false"),
     sql("IIF(`x`, 'true', 'false')")
   )
 
-  expect_error(test_translate_sql(bitwShiftL(x, 2L)), sql("not available"))
-  expect_error(test_translate_sql(bitwShiftR(x, 2L)), sql("not available"))
+  expect_error(
+    test_translate_sql(bitwShiftL(x, 2L)),
+    class = "dbplyr_error_unsupported_fn"
+  )
+  expect_error(
+    test_translate_sql(bitwShiftR(x, 2L)),
+    class = "dbplyr_error_unsupported_fn"
+  )
 })
 
 test_that("contents of [ have bool context", {
   local_con(simulate_mssql())
   local_context(list(clause = "SELECT"))
 
-  expect_equal(test_translate_sql(x[x > y]), sql("CASE WHEN (`x` > `y`) THEN (`x`) END"))
+  expect_equal(
+    test_translate_sql(x[x > y]),
+    sql("CASE WHEN (`x` > `y`) THEN (`x`) END")
+  )
 })
 
 test_that("custom stringr functions translated correctly", {
   local_con(simulate_mssql())
 
-  expect_equal(test_translate_sql(str_length(x)),     sql("LEN(`x`)"))
+  expect_equal(test_translate_sql(str_length(x)), sql("LEN(`x`)"))
 })
 
 test_that("custom aggregators translated correctly", {
   local_con(simulate_mssql())
 
-  expect_equal(test_translate_sql(sd(x, na.rm = TRUE), window = FALSE),  sql("STDEV(`x`)"))
-  expect_equal(test_translate_sql(var(x, na.rm = TRUE), window = FALSE), sql("VAR(`x`)"))
+  expect_equal(
+    test_translate_sql(sd(x, na.rm = TRUE), window = FALSE),
+    sql("STDEV(`x`)")
+  )
+  expect_equal(
+    test_translate_sql(var(x, na.rm = TRUE), window = FALSE),
+    sql("VAR(`x`)")
+  )
 
-  expect_error(test_translate_sql(cor(x), window = FALSE), "not available")
-  expect_error(test_translate_sql(cov(x), window = FALSE), "not available")
+  expect_error(
+    test_translate_sql(cor(x), window = FALSE),
+    class = "dbplyr_error_unsupported_fn"
+  )
+  expect_error(
+    test_translate_sql(cov(x), window = FALSE),
+    class = "dbplyr_error_unsupported_fn"
+  )
 
-  expect_equal(test_translate_sql(str_flatten(x), window = FALSE), sql("STRING_AGG(`x`, '')"))
+  expect_equal(
+    test_translate_sql(str_flatten(x), window = FALSE),
+    sql("STRING_AGG(`x`, '')")
+  )
   expect_snapshot(error = TRUE, {
     test_translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE)
     test_translate_sql(median(x, na.rm = TRUE), window = FALSE)
@@ -79,10 +114,19 @@ test_that("custom aggregators translated correctly", {
 test_that("custom window functions translated correctly", {
   local_con(simulate_mssql())
 
-  expect_equal(test_translate_sql(sd(x, na.rm = TRUE)),  sql("STDEV(`x`) OVER ()"))
-  expect_equal(test_translate_sql(var(x, na.rm = TRUE)), sql("VAR(`x`) OVER ()"))
+  expect_equal(
+    test_translate_sql(sd(x, na.rm = TRUE)),
+    sql("STDEV(`x`) OVER ()")
+  )
+  expect_equal(
+    test_translate_sql(var(x, na.rm = TRUE)),
+    sql("VAR(`x`) OVER ()")
+  )
 
-  expect_equal(test_translate_sql(str_flatten(x)), sql("STRING_AGG(`x`, '') OVER ()"))
+  expect_equal(
+    test_translate_sql(str_flatten(x)),
+    sql("STRING_AGG(`x`, '') OVER ()")
+  )
 
   expect_equal(
     test_translate_sql(quantile(x, 0.3, na.rm = TRUE), window = TRUE),
@@ -110,51 +154,126 @@ test_that("custom window functions translated correctly", {
 
 test_that("custom lubridate functions translated correctly", {
   local_con(simulate_mssql())
-  expect_equal(test_translate_sql(as_date(x)),     sql("TRY_CAST(`x` AS DATE)"))
-  expect_equal(test_translate_sql(as_datetime(x)), sql("TRY_CAST(`x` AS DATETIME2)"))
-  expect_equal(test_translate_sql(today()),   sql("CAST(SYSDATETIME() AS DATE)"))
-  expect_equal(test_translate_sql(year(x)),   sql("DATEPART(YEAR, `x`)"))
-  expect_equal(test_translate_sql(day(x)),    sql("DATEPART(DAY, `x`)"))
-  expect_equal(test_translate_sql(mday(x)),   sql("DATEPART(DAY, `x`)"))
-  expect_equal(test_translate_sql(yday(x)),   sql("DATEPART(DAYOFYEAR, `x`)"))
-  expect_equal(test_translate_sql(hour(x)),   sql("DATEPART(HOUR, `x`)"))
+  expect_equal(test_translate_sql(as_date(x)), sql("TRY_CAST(`x` AS DATE)"))
+  expect_equal(
+    test_translate_sql(as_datetime(x)),
+    sql("TRY_CAST(`x` AS DATETIME2)")
+  )
+  expect_equal(test_translate_sql(today()), sql("CAST(SYSDATETIME() AS DATE)"))
+  expect_equal(test_translate_sql(year(x)), sql("DATEPART(YEAR, `x`)"))
+  expect_equal(test_translate_sql(day(x)), sql("DATEPART(DAY, `x`)"))
+  expect_equal(test_translate_sql(mday(x)), sql("DATEPART(DAY, `x`)"))
+  expect_equal(test_translate_sql(yday(x)), sql("DATEPART(DAYOFYEAR, `x`)"))
+  expect_equal(test_translate_sql(hour(x)), sql("DATEPART(HOUR, `x`)"))
   expect_equal(test_translate_sql(minute(x)), sql("DATEPART(MINUTE, `x`)"))
   expect_equal(test_translate_sql(second(x)), sql("DATEPART(SECOND, `x`)"))
   expect_equal(test_translate_sql(month(x)), sql("DATEPART(MONTH, `x`)"))
-  expect_equal(test_translate_sql(month(x, label = TRUE, abbr = FALSE)), sql("DATENAME(MONTH, `x`)"))
-  expect_snapshot(error = TRUE, test_translate_sql(month(x, label = TRUE, abbr = TRUE)))
+  expect_equal(
+    test_translate_sql(month(x, label = TRUE, abbr = FALSE)),
+    sql("DATENAME(MONTH, `x`)")
+  )
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(month(x, label = TRUE, abbr = TRUE))
+  )
 
   expect_equal(test_translate_sql(quarter(x)), sql("DATEPART(QUARTER, `x`)"))
-  expect_equal(test_translate_sql(quarter(x, with_year = TRUE)), sql("(DATENAME(YEAR, `x`) + '.' + DATENAME(QUARTER, `x`))"))
-  expect_error(test_translate_sql(quarter(x, fiscal_start = 5)))
+  expect_equal(
+    test_translate_sql(quarter(x, with_year = TRUE)),
+    sql("(DATENAME(YEAR, `x`) + '.' + DATENAME(QUARTER, `x`))")
+  )
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(quarter(x, fiscal_start = 5))
+  )
 })
 
 test_that("custom clock functions translated correctly", {
   local_con(simulate_mssql())
-  expect_equal(test_translate_sql(add_years(x, 1)), sql("DATEADD(YEAR, 1.0, `x`)"))
-  expect_equal(test_translate_sql(add_days(x, 1)), sql("DATEADD(DAY, 1.0, `x`)"))
-  expect_error(test_translate_sql(add_days(x, 1, "dots", "must", "be empty")))
-  expect_equal(test_translate_sql(date_build(2020, 1, 1)), sql("DATEFROMPARTS(2020.0, 1.0, 1.0)"))
-  expect_equal(test_translate_sql(date_build(year_column, 1L, 1L)), sql("DATEFROMPARTS(`year_column`, 1, 1)"))
-  expect_equal(test_translate_sql(get_year(date_column)), sql("DATEPART(YEAR, `date_column`)"))
-  expect_equal(test_translate_sql(get_month(date_column)), sql("DATEPART(MONTH, `date_column`)"))
-  expect_equal(test_translate_sql(get_day(date_column)), sql("DATEPART(DAY, `date_column`)"))
+  expect_equal(
+    test_translate_sql(add_years(x, 1)),
+    sql("DATEADD(YEAR, 1.0, `x`)")
+  )
+  expect_equal(
+    test_translate_sql(add_days(x, 1)),
+    sql("DATEADD(DAY, 1.0, `x`)")
+  )
+  expect_error(
+    test_translate_sql(add_days(x, 1, "dots", "must", "be empty")),
+    class = "rlib_error_dots_nonempty"
+  )
+  expect_equal(
+    test_translate_sql(date_build(2020, 1, 1)),
+    sql("DATEFROMPARTS(2020.0, 1.0, 1.0)")
+  )
+  expect_equal(
+    test_translate_sql(date_build(year_column, 1L, 1L)),
+    sql("DATEFROMPARTS(`year_column`, 1, 1)")
+  )
+  expect_equal(
+    test_translate_sql(get_year(date_column)),
+    sql("DATEPART(YEAR, `date_column`)")
+  )
+  expect_equal(
+    test_translate_sql(get_month(date_column)),
+    sql("DATEPART(MONTH, `date_column`)")
+  )
+  expect_equal(
+    test_translate_sql(get_day(date_column)),
+    sql("DATEPART(DAY, `date_column`)")
+  )
+  expect_equal(
+    test_translate_sql(date_count_between(date_column_1, date_column_2, "day")),
+    sql("DATEDIFF(DAY, `date_column_1`, `date_column_2`)")
+  )
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(date_count_between(date_column_1, date_column_2, "year"))
+  )
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(date_count_between(
+      date_column_1,
+      date_column_2,
+      "day",
+      n = 5
+    ))
+  )
 })
 
 test_that("difftime is translated correctly", {
   local_con(simulate_mssql())
-  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("DATEDIFF(DAY, `start_date`, `end_date`)"))
-  expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("DATEDIFF(DAY, `start_date`, `end_date`)"))
+  expect_equal(
+    test_translate_sql(difftime(start_date, end_date, units = "days")),
+    sql("DATEDIFF(DAY, `end_date`, `start_date`)")
+  )
+  expect_equal(
+    test_translate_sql(difftime(start_date, end_date)),
+    sql("DATEDIFF(DAY, `end_date`, `start_date`)")
+  )
 
-  expect_error(test_translate_sql(difftime(start_date, end_date, units = "auto")))
-  expect_error(test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days")))
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(difftime(start_date, end_date, units = "auto"))
+  )
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(difftime(
+      start_date,
+      end_date,
+      tz = "UTC",
+      units = "days"
+    ))
+  )
 })
 
 test_that("last_value_sql() translated correctly", {
   con <- simulate_mssql()
   expect_equal(
     translate_sql(last(x, na_rm = TRUE), vars_order = "a", con = con),
-    sql("LAST_VALUE(`x`) IGNORE NULLS OVER (ORDER BY `a` ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)")
+    sql(
+      "LAST_VALUE(`x`) IGNORE NULLS OVER (ORDER BY `a` ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)"
+    )
   )
 })
 
@@ -162,9 +281,15 @@ test_that("between translation respects context", {
   local_con(simulate_mssql())
 
   local_context(list(clause = "WHERE"))
-  expect_equal(test_translate_sql(between(a, 1L, 2L)), sql("`a` BETWEEN 1 AND 2"))
+  expect_equal(
+    test_translate_sql(between(a, 1L, 2L)),
+    sql("`a` BETWEEN 1 AND 2")
+  )
   local_context(list(clause = "SELECT"))
-  expect_equal(test_translate_sql(between(a, 1L, 2L)), sql("IIF(`a` BETWEEN 1 AND 2, 1, 0)"))
+  expect_equal(
+    test_translate_sql(between(a, 1L, 2L)),
+    sql("IIF(`a` BETWEEN 1 AND 2, 1, 0)")
+  )
 })
 
 # verb translation --------------------------------------------------------
@@ -189,13 +314,25 @@ test_that("convert between bit and boolean as needed", {
 
 test_that("handles ORDER BY in subqueries", {
   expect_snapshot(
-    sql_query_select(simulate_mssql(), ident("x"), ident("y"), order_by = "z", subquery = TRUE)
+    sql_query_select(
+      simulate_mssql(),
+      ident("x"),
+      ident("y"),
+      order_by = "z",
+      subquery = TRUE
+    )
   )
 })
 
 test_that("custom limit translation", {
   expect_snapshot(
-    sql_query_select(simulate_mssql(), ident("x"), ident("y"), order_by = ident("z"), limit = 10)
+    sql_query_select(
+      simulate_mssql(),
+      ident("x"),
+      ident("y"),
+      order_by = ident("z"),
+      limit = 10
+    )
   )
 })
 
@@ -232,20 +369,34 @@ test_that("generates custom sql", {
 
   # Creates the same SQL since there's no temporary CLAUSE
   # Automatic renaming is handled upstream by db_collect()/db_copy_to()
-  expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl")))
-  expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"), temporary = FALSE))
+  expect_snapshot(sql_query_save(
+    con,
+    sql("SELECT * FROM foo"),
+    in_schema("schema", "tbl")
+  ))
+  expect_snapshot(sql_query_save(
+    con,
+    sql("SELECT * FROM foo"),
+    in_schema("schema", "tbl"),
+    temporary = FALSE
+  ))
 
   lf <- lazy_frame(x = 1:3, con = simulate_mssql())
   expect_snapshot(lf %>% slice_sample(n = 1))
 
-  expect_snapshot(copy_inline(con, tibble(x = 1:2, y = letters[1:2])) %>% remote_query())
+  expect_snapshot(
+    copy_inline(con, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
+  )
   expect_snapshot(copy_inline(con, trees) %>% remote_query())
 })
 
 test_that("`sql_query_insert()` is correct", {
   con <- simulate_mssql()
   df_y <- lazy_frame(
-    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    a = 2:3,
+    b = c(12L, 13L),
+    c = -(2:3),
+    d = c("y", "z"),
     con = con,
     .name = "df_y"
   ) %>%
@@ -267,7 +418,10 @@ test_that("`sql_query_insert()` is correct", {
 test_that("`sql_query_append()` is correct", {
   con <- simulate_mssql()
   df_y <- lazy_frame(
-    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    a = 2:3,
+    b = c(12L, 13L),
+    c = -(2:3),
+    d = c("y", "z"),
     con = con,
     .name = "df_y"
   ) %>%
@@ -287,7 +441,10 @@ test_that("`sql_query_append()` is correct", {
 test_that("`sql_query_update_from()` is correct", {
   con <- simulate_mssql()
   df_y <- lazy_frame(
-    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    a = 2:3,
+    b = c(12L, 13L),
+    c = -(2:3),
+    d = c("y", "z"),
     con = con,
     .name = "df_y"
   ) %>%
@@ -310,7 +467,10 @@ test_that("`sql_query_update_from()` is correct", {
 
 test_that("`sql_query_delete()` is correct", {
   df_y <- lazy_frame(
-    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    a = 2:3,
+    b = c(12L, 13L),
+    c = -(2:3),
+    d = c("y", "z"),
     con = simulate_mssql(),
     .name = "df_y"
   ) %>%
@@ -330,7 +490,10 @@ test_that("`sql_query_delete()` is correct", {
 test_that("`sql_query_upsert()` is correct", {
   con <- simulate_mssql()
   df_y <- lazy_frame(
-    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    a = 2:3,
+    b = c(12L, 13L),
+    c = -(2:3),
+    d = c("y", "z"),
     con = con,
     .name = "df_y"
   ) %>%
@@ -367,6 +530,11 @@ test_that("row_number() with and without group_by() and arrange(): unordered def
   expect_snapshot(mf %>% mutate(rown = row_number()))
   expect_snapshot(mf %>% group_by(y) %>% mutate(rown = row_number()))
   expect_snapshot(mf %>% arrange(y) %>% mutate(rown = row_number()))
+})
+
+test_that("count_big", {
+  mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_mssql())
+  expect_snapshot(count(mf))
 })
 
 # Live database -----------------------------------------------------------
@@ -418,7 +586,6 @@ test_that("bit conversion works for important cases", {
   # expect_equal(db %>% mutate(z = x) %>% pull(), c(TRUE, FALSE, FALSE))
   # expect_equal(db %>% mutate(z = !x) %>% pull(), c(FALSE, TRUE, TRUE))
   # expect_equal(db %>% mutate(z = x & y) %>% pull(), c(TRUE, FALSE, FALSE))
-
 })
 
 test_that("as.integer and as.integer64 translations if parsing failures", {
@@ -449,7 +616,8 @@ test_that("can insert", {
 
   expect_equal(
     rows_insert(
-      x, y,
+      x,
+      y,
       by = c("a", "b"),
       in_place = TRUE,
       conflict = "ignore"
@@ -475,7 +643,8 @@ test_that("can insert with returning", {
 
   expect_equal(
     rows_insert(
-      x, y,
+      x,
+      y,
       by = c("a", "b"),
       in_place = TRUE,
       conflict = "ignore",
@@ -502,7 +671,8 @@ test_that("can append", {
 
   expect_equal(
     rows_append(
-      x, y,
+      x,
+      y,
       in_place = TRUE
     ) %>%
       collect(),
@@ -526,7 +696,8 @@ test_that("can append with returning", {
 
   expect_equal(
     rows_append(
-      x, y,
+      x,
+      y,
       in_place = TRUE,
       returning = everything()
     ) %>%
@@ -551,7 +722,8 @@ test_that("can update", {
 
   expect_equal(
     rows_update(
-      x, y,
+      x,
+      y,
       by = c("a", "b"),
       in_place = TRUE,
       unmatched = "ignore"
@@ -577,7 +749,8 @@ test_that("can update with returning", {
 
   expect_equal(
     rows_update(
-      x, y,
+      x,
+      y,
       by = c("a", "b"),
       in_place = TRUE,
       unmatched = "ignore",
@@ -604,7 +777,8 @@ test_that("can upsert", {
 
   expect_equal(
     rows_upsert(
-      x, y,
+      x,
+      y,
       by = c("a", "b"),
       in_place = TRUE
     ) %>%
@@ -629,7 +803,8 @@ test_that("can upsert with returning", {
 
   expect_equal(
     rows_upsert(
-      x, y,
+      x,
+      y,
       by = c("a", "b"),
       in_place = TRUE,
       returning = everything()
@@ -655,7 +830,8 @@ test_that("can delete", {
 
   expect_equal(
     rows_delete(
-      x, y,
+      x,
+      y,
       by = c("a", "b"),
       in_place = TRUE,
       unmatched = "ignore"
@@ -680,7 +856,8 @@ test_that("can delete with returning", {
 
   expect_equal(
     rows_delete(
-      x, y,
+      x,
+      y,
       by = c("a", "b"),
       in_place = TRUE,
       unmatched = "ignore",

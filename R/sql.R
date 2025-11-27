@@ -21,7 +21,9 @@ sql <- function(...) {
 c.sql <- function(..., drop_null = FALSE, con = simulate_dbi()) {
   input <- list(...)
 
-  if (drop_null) input <- purrr::compact(input) # nocov
+  if (drop_null) {
+    input <- purrr::compact(input)
+  } # nocov
 
   out <- unlist(lapply(input, escape, collapse = NULL, con = con))
   sql(out)

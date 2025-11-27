@@ -71,10 +71,7 @@ replace_expr <- function(x, con) {
     } else {
       paste0(fun, "(", paste0(args, collapse = ", "), ")")
     }
-
   } else {
     x # nocov
   }
-
 }
-

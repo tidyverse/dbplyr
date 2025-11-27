@@ -66,12 +66,14 @@
 #' # and vars_order controls ordering for those functions that need it
 #' translate_sql(cumsum(mpg), con = con)
 #' translate_sql(cumsum(mpg), vars_order = "mpg", con = con)
-translate_sql <- function(...,
-                          con,
-                          vars_group = NULL,
-                          vars_order = NULL,
-                          vars_frame = NULL,
-                          window = TRUE) {
+translate_sql <- function(
+  ...,
+  con,
+  vars_group = NULL,
+  vars_order = NULL,
+  vars_frame = NULL,
+  window = TRUE
+) {
   translate_sql_(
     quos(...),
     con = con,
@@ -82,12 +84,14 @@ translate_sql <- function(...,
   )
 }
 
-test_translate_sql <- function(...,
-                          con = NULL,
-                          vars_group = NULL,
-                          vars_order = NULL,
-                          vars_frame = NULL,
-                          window = TRUE) {
+test_translate_sql <- function(
+  ...,
+  con = NULL,
+  vars_group = NULL,
+  vars_order = NULL,
+  vars_frame = NULL,
+  window = TRUE
+) {
   translate_sql(
     ...,
     con = con %||% sql_current_con(),
@@ -100,13 +104,15 @@ test_translate_sql <- function(...,
 
 #' @export
 #' @rdname translate_sql
-translate_sql_ <- function(dots,
-                           con,
-                           vars_group = NULL,
-                           vars_order = NULL,
-                           vars_frame = NULL,
-                           window = TRUE,
-                           context = list()) {
+translate_sql_ <- function(
+  dots,
+  con,
+  vars_group = NULL,
+  vars_order = NULL,
+  vars_frame = NULL,
+  window = TRUE,
+  context = list()
+) {
   check_con(con)
 
   if (length(dots) == 0) {
@@ -153,11 +159,13 @@ translate_sql_ <- function(dots,
   sql(unlist(pieces))
 }
 
-sql_data_mask <- function(expr,
-                          variant,
-                          con,
-                          window = FALSE,
-                          strict = getOption("dplyr.strict_sql", FALSE)) {
+sql_data_mask <- function(
+  expr,
+  variant,
+  con,
+  window = FALSE,
+  strict = getOption("dplyr.strict_sql", FALSE)
+) {
   stopifnot(is.sql_variant(variant))
 
   # Default for unknown functions
@@ -185,7 +193,10 @@ sql_data_mask <- function(expr,
     if (env_has(special_calls2, name) || env_has(special_calls, name)) {
       env_get(special_calls2, name, inherit = TRUE)
     } else {
-      cli_abort("No known SQL translation", call = call2(call2("::", sym(pkg), sym(name))))
+      cli_abort(
+        "No known SQL translation",
+        call = call2(call2("::", sym(pkg), sym(name)))
+      )
     }
   }
 
@@ -210,8 +221,31 @@ sql_data_mask <- function(expr,
 }
 
 is_infix_base <- function(x) {
-  x %in% c("::", "$", "@", "^", "*", "/", "+", "-", ">", ">=", "<", "<=",
-    "==", "!=", "!", "&", "&&", "|", "||", "~", "<-", "<<-")
+  x %in%
+    c(
+      "::",
+      "$",
+      "@",
+      "^",
+      "*",
+      "/",
+      "+",
+      "-",
+      ">",
+      ">=",
+      "<",
+      "<=",
+      "==",
+      "!=",
+      "!",
+      "&",
+      "&&",
+      "|",
+      "||",
+      "~",
+      "<-",
+      "<<-"
+    )
 }
 is_infix_user <- function(x) {
   grepl("^%.*%$", x)
@@ -252,24 +286,36 @@ missing_op <- function(x, env) {
 }
 
 all_calls <- function(x) {
-  if (is_quosure(x)) return(all_calls(quo_get_expr(x)))
-  if (!is.call(x)) return(NULL)
+  if (is_quosure(x)) {
+    return(all_calls(quo_get_expr(x)))
+  }
+  if (!is.call(x)) {
+    return(NULL)
+  }
 
   fname <- as.character(x[[1]])
   unique(c(fname, unlist(lapply(x[-1], all_calls), use.names = FALSE)))
 }
 
 all_names <- function(x) {
-  if (is.name(x)) return(as.character(x))
-  if (is_quosure(x)) return(all_names(quo_get_expr(x)))
-  if (!is.call(x)) return(NULL)
+  if (is.name(x)) {
+    return(as.character(x))
+  }
+  if (is_quosure(x)) {
+    return(all_names(quo_get_expr(x)))
+  }
+  if (!is.call(x)) {
+    return(NULL)
+  }
 
   unique(unlist(lapply(x[-1], all_names), use.names = FALSE))
 }
 
 # character vector -> environment
 ceply <- function(x, f, ..., parent = parent.frame()) {
-  if (length(x) == 0) return(new.env(parent = parent))
+  if (length(x) == 0) {
+    return(new.env(parent = parent))
+  }
   l <- lapply(x, f, ...)
   names(l) <- x
   list2env(l, parent = parent)

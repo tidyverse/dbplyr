@@ -62,10 +62,19 @@ add_filter <- function(.data, dots) {
     } else {
       exprs <- lazy_query$select$expr
       nms <- lazy_query$select$name
-      projection <- purrr::map2_lgl(exprs, nms, ~ is_symbol(.x) && !identical(.x, sym(.y)))
+      projection <- purrr::map2_lgl(
+        exprs,
+        nms,
+        ~ is_symbol(.x) && !identical(.x, sym(.y))
+      )
 
       if (any(projection)) {
-        dots <- purrr::map(dots, replace_sym, nms[projection], exprs[projection])
+        dots <- purrr::map(
+          dots,
+          replace_sym,
+          nms[projection],
+          exprs[projection]
+        )
       }
 
       lazy_query$where <- c(lazy_query$where, dots)
@@ -73,7 +82,10 @@ add_filter <- function(.data, dots) {
     }
   } else {
     # Do partial evaluation, then extract out window functions
-    where <- translate_window_where_all(dots, ls_all(dbplyr_sql_translation(con)$window))
+    where <- translate_window_where_all(
+      dots,
+      ls_all(dbplyr_sql_translation(con)$window)
+    )
 
     # Add extracted window expressions as columns
     mutated <- mutate(.data, !!!where$comp)
@@ -152,11 +164,14 @@ check_filter <- function(...) {
     # Unlike in `dplyr` named logical vectors do not make sense so they are
     # also not allowed
     expr <- quo_get_expr(quo)
-    cli_abort(c(
-      "Problem with {.fun filter} input `..{i}`.",
-      x = "Input `..{i}` is named.",
-      i = "This usually means that you've used {.code =} instead of {.code ==}.",
-      i = "Did you mean `{names(dots)[i]} == {as_label(expr)}`?"
-    ), call = caller_env())
+    cli_abort(
+      c(
+        "Problem with {.fun filter} input `..{i}`.",
+        x = "Input `..{i}` is named.",
+        i = "This usually means that you've used {.code =} instead of {.code ==}.",
+        i = "Did you mean `{names(dots)[i]} == {as_label(expr)}`?"
+      ),
+      call = caller_env()
+    )
   }
 }

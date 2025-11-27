@@ -22,16 +22,16 @@ also use \code{\link[=in_schema]{in_schema()}}/\code{\link[=in_catalog]{in_catal
 \description{
 All data manipulation on SQL tbls are lazy: they will not actually
 run the query or retrieve the data unless you ask for it: they all return
-a new \code{tbl_dbi} object. Use \code{\link[=compute]{compute()}} to run the query and save the
-results in a temporary in the database, or use \code{\link[=collect]{collect()}} to retrieve the
-results to R. You can see the query with \code{\link[=show_query]{show_query()}}.
+a new \code{tbl_dbi} object. Use \code{\link[dplyr:compute]{dplyr::compute()}} to run the query and save the
+results in a temporary table in the database, or use \code{\link[dplyr:compute]{dplyr::collect()}} to retrieve the
+results to R. You can see the query with \code{\link[dplyr:explain]{dplyr::show_query()}}.
 }
 \details{
 For best performance, the database should have an index on the variables
-that you are grouping by. Use \code{\link[=explain]{explain()}} to check that the database is using
+that you are grouping by. Use \code{\link[dplyr:explain]{dplyr::explain()}} to check that the database is using
 the indexes that you expect.
 
-There is one verb that is not lazy: \code{\link[=do]{do()}} is eager because it must pull
+There is one verb that is not lazy: \code{\link[dplyr:do]{dplyr::do()}} is eager because it must pull
 the data into R.
 }
 \examples{

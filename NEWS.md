@@ -1,8 +1,33 @@
 # dbplyr (development version)
 
+* SQL server: `slice_sample()` returns different results each run (@thomashulst, #1503)
+* Corrected translation of `stringr::str_like()` to use case-sensitive `LIKE` when argument `ignore_case` is set as `FALSE` (@edward-burn, #1488).
+* Corrected translation of `stringr::str_like()` to use case-sensitive `LIKE` when argument `ignore_case` is set as `FALSE` (@edward-burn, #1488).
+* Fixed overwrite flag in `copy_to()` to work when source is in the same DB as destination (@liudvikasakelis, #1535)
+* Snowflake correctly translates `$` to `:` (@jsowder, #1608)
+* `dbplyr_uncount()` now works with Redshift (@owenjonesuob, #1601).
+
+# dbplyr 2.5.1
+
+* Improved translations:
+  * SQL Server, Redshift, Snowflake, and Postgres now correctly translate
+    `difftime()` (the sign is now correct)  (@edward-burn, #1532). 
+  * SQL server, Redshift, Snowflake, Postgres, and Spark now
+    translate `date_count_between()` (@edward-burn, #1495).
+  * SQL Server now supports `pmin()` and `pmax()` (@edward-burn, #1602). 
+  * SQL server uses `COUNT_BIG` instead of `COUNT` so `tally()` and
+    `count()` work regardless of data size (@edward-burn, #1498).
+  * Spark correctly translates `clock::add_years()` (@ablack3, #1510).
+  * Teradata now supports `as.double()` and `as.character()` (@rplsmn, #1545).
+
+* Tightened argument checks for SQL translations. These changes should 
+  result in more informative errors in cases where code already failed, possibly
+  silently; if you see errors with code that used to run correctly, please report 
+  them to the package authors (@simonpcouch, #1554, #1555).
+
 * `across(everything())` doesn't select grouping columns created via `.by` in
   `summarise()` (@mgirlich, #1493).
-  
+
 * Spark SQL backend now supports persisting tables with
   `compute(x, name = I("x.y.z"), temporary = FALSE)` (@zacdav-db, #1502).
 

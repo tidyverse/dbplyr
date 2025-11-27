@@ -137,3 +137,19 @@
         SELECT 1, '{1,2,3}' FROM DUAL
       ) `values_table`
 
+# difftime is translated correctly
+
+    Code
+      test_translate_sql(difftime(start_date, end_date, units = "auto"))
+    Condition
+      Error in `difftime()`:
+      ! The only supported value for `units` on SQL backends is "days"
+
+---
+
+    Code
+      test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days"))
+    Condition
+      Error in `difftime()`:
+      ! The `tz` argument is not supported for SQL backends.
+

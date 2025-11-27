@@ -34,11 +34,15 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
 
   escape_expr <- function(x, con) {
     # If it's a string, leave it as is
-    if (is.character(x)) return(x)
+    if (is.character(x)) {
+      return(x)
+    }
 
     val <- eval_bare(x, .env)
     # Skip nulls, so you can use if statements like in paste
-    if (is.null(val)) return("")
+    if (is.null(val)) {
+      return("")
+    }
 
     escape(val, con = con)
   }
@@ -78,17 +82,19 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
 #' @examples
 #' glue_sql2(con, "COLLECT STATISTICS {.tbl table}")
 #' glue_sql2(con, "{f}({.val x}, {.val y})")
-glue_sql2 <- function(.con,
-                      ...,
-                      .sep = "",
-                      .envir = parent.frame(),
-                      .open = "{",
-                      .close = "}",
-                      .na = DBI::SQL("NULL"),
-                      .null = "",
-                      .comment = "#",
-                      .literal = FALSE,
-                      .trim = TRUE) {
+glue_sql2 <- function(
+  .con,
+  ...,
+  .sep = "",
+  .envir = parent.frame(),
+  .open = "{",
+  .close = "}",
+  .na = DBI::SQL("NULL"),
+  .null = "",
+  .comment = "#",
+  .literal = FALSE,
+  .trim = TRUE
+) {
   sql(glue(
     ...,
     .sep = .sep,
@@ -155,7 +161,12 @@ sql_quote_transformer <- function(connection) {
 
     if (type == "val") {
       if (should_collapse) {
-        value <- escape(value, collapse = ", ", parens = FALSE, con = connection)
+        value <- escape(
+          value,
+          collapse = ", ",
+          parens = FALSE,
+          con = connection
+        )
       } else {
         value <- escape(value, con = connection)
       }
@@ -181,6 +192,8 @@ glue_check_collapse <- function(type, collapse) {
   }
 
   if (collapse) {
-    cli_abort("Collapsing is only allowed for {.val col} and {.val val}, not for {.val {type}}.")
+    cli_abort(
+      "Collapsing is only allowed for {.val col} and {.val val}, not for {.val {type}}."
+    )
   }
 }

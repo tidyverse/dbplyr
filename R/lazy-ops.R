@@ -73,12 +73,14 @@ sql_build.lazy_base_local_query <- function(op, con, ...) {
 }
 
 #' @export
-sql_render.base_query <- function(query,
-                                  con = NULL,
-                                  ...,
-                                  sql_options = NULL,
-                                  subquery = FALSE,
-                                  lvl = 0) {
+sql_render.base_query <- function(
+  query,
+  con = NULL,
+  ...,
+  sql_options = NULL,
+  subquery = FALSE,
+  lvl = 0
+) {
   from <- query$from
   if (subquery || is.sql(from)) {
     from

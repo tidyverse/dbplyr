@@ -1,7 +1,8 @@
 #' @importFrom R6 R6Class
 NULL
 
-Query <- R6::R6Class("Query",
+Query <- R6::R6Class(
+  "Query",
   private = list(
     .vars = NULL
   ),
