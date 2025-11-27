@@ -68,14 +68,16 @@ slice_tail.tbl_lazy <- function(.data, ..., n, prop, by = NULL) {
 #' @rdname dbplyr-slice
 #' @importFrom dplyr slice_min
 #' @export
-slice_min.tbl_lazy <- function(.data,
-                               order_by,
-                               ...,
-                               n,
-                               prop,
-                               by = NULL,
-                               with_ties = TRUE,
-                               na_rm = TRUE) {
+slice_min.tbl_lazy <- function(
+  .data,
+  order_by,
+  ...,
+  n,
+  prop,
+  by = NULL,
+  with_ties = TRUE,
+  na_rm = TRUE
+) {
   size <- check_slice_size(n, prop)
   check_unsupported_arg(na_rm, allowed = TRUE)
   order_by <- unwrap_order_expr({{ order_by }}, f = "slice_min")
@@ -91,14 +93,16 @@ slice_min.tbl_lazy <- function(.data,
 #' @rdname dbplyr-slice
 #' @importFrom dplyr slice_max
 #' @export
-slice_max.tbl_lazy <- function(.data,
-                               order_by,
-                               ...,
-                               n,
-                               by = NULL,
-                               prop,
-                               with_ties = TRUE,
-                               na_rm = TRUE) {
+slice_max.tbl_lazy <- function(
+  .data,
+  order_by,
+  ...,
+  n,
+  by = NULL,
+  prop,
+  with_ties = TRUE,
+  na_rm = TRUE
+) {
   size <- check_slice_size(n, prop)
   check_unsupported_arg(na_rm, allowed = TRUE)
   order_by <- unwrap_order_expr({{ order_by }}, f = "slice_max")
@@ -115,13 +119,15 @@ slice_max.tbl_lazy <- function(.data,
 #' @rdname dbplyr-slice
 #' @importFrom dplyr slice_sample
 #' @export
-slice_sample.tbl_lazy <- function(.data,
-                                  ...,
-                                  n,
-                                  prop,
-                                  by = NULL,
-                                  weight_by = NULL,
-                                  replace = FALSE) {
+slice_sample.tbl_lazy <- function(
+  .data,
+  ...,
+  n,
+  prop,
+  by = NULL,
+  weight_by = NULL,
+  replace = FALSE
+) {
   size <- check_slice_size(n, prop)
   weight_by <- enquo(weight_by)
   if (size$type == "prop") {
@@ -154,12 +160,14 @@ slice_by <- function(.data, order_by, size, .by, with_ties = FALSE) {
   old_frame <- op_sort(.data)
 
   if (with_ties) {
-    window_fun <- switch(size$type,
+    window_fun <- switch(
+      size$type,
       n = expr(min_rank() <= !!size$n),
       prop = expr(cume_dist() <= !!size$prop)
     )
   } else {
-    window_fun <- switch(size$type,
+    window_fun <- switch(
+      size$type,
       n = expr(row_number() <= !!size$n),
       prop = cli_abort("Can only use {.arg prop} when {.code with_ties = TRUE}")
     )
@@ -191,7 +199,10 @@ check_slice_size <- function(n, prop) {
       cli_abort("{.arg n} must be a single number.", call = caller_env())
     }
     if (is.na(n) || n < 0) {
-      cli_abort("{.arg n} must be a non-missing positive number.", call = caller_env())
+      cli_abort(
+        "{.arg n} must be a non-missing positive number.",
+        call = caller_env()
+      )
     }
 
     list(type = "n", n = as.integer(n))
@@ -200,12 +211,24 @@ check_slice_size <- function(n, prop) {
       cli_abort("{.arg prop} must be a single number", call = caller_env())
     }
     if (is.na(prop) || prop < 0) {
-      cli_abort("{.arg prop} must be a non-missing positive number.", call = caller_env())
+      cli_abort(
+        "{.arg prop} must be a non-missing positive number.",
+        call = caller_env()
+      )
     }
     list(type = "prop", prop = prop)
   } else {
-    cli_abort("Must supply exactly one of {.arg n} and {.arg prop} arguments.", call = caller_env())
+    cli_abort(
+      "Must supply exactly one of {.arg n} and {.arg prop} arguments.",
+      call = caller_env()
+    )
   }
 }
 
-utils::globalVariables(c("min_rank", "cume_dist", "row_number", "desc", "runif"))
+utils::globalVariables(c(
+  "min_rank",
+  "cume_dist",
+  "row_number",
+  "desc",
+  "runif"
+))

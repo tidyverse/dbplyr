@@ -14,7 +14,9 @@ test_that("remote_table returns name when it makes sense", {
   )
 
   # produces name after compute()
-  expect_false(is_null(mf %>% mutate(x = x + 1) %>% compute() %>% remote_table()))
+  expect_false(is_null(
+    mf %>% mutate(x = x + 1) %>% compute() %>% remote_table()
+  ))
 })
 
 test_that("remote_table returns null for computed tables", {
@@ -35,11 +37,17 @@ test_that("remote_table returns null for computed tables", {
 
   lf <- lazy_frame(x = 1)
   expect_equal(lf %>% remote_table(null_if_local = FALSE), table_path("`df`"))
-  expect_equal(lf %>% group_by(x) %>% remote_table(null_if_local = FALSE), table_path("`df`"))
+  expect_equal(
+    lf %>% group_by(x) %>% remote_table(null_if_local = FALSE),
+    table_path("`df`")
+  )
 })
 
 test_that("remote_name and remote_table can handle different table identifiers", {
-  test_remote_table <- function(x, exp_tbl = as_table_path(x, simulate_sqlite())) {
+  test_remote_table <- function(
+    x,
+    exp_tbl = as_table_path(x, simulate_sqlite())
+  ) {
     lf <- lazy_frame(x = 1, .name = x)
     expect_equal(remote_table(lf, null_if_local = FALSE), exp_tbl)
     expect_equal(remote_name(lf, null_if_local = FALSE), "tbl")
@@ -49,7 +57,11 @@ test_that("remote_name and remote_table can handle different table identifiers",
   test_remote_table(ident("tbl"))
   test_remote_table(in_schema("schema", "tbl"))
   test_remote_table(in_catalog("catalog", "schema", "tbl"))
-  test_remote_table(DBI::Id(catalog = "catalog", schema = "schema", table = "tbl"))
+  test_remote_table(DBI::Id(
+    catalog = "catalog",
+    schema = "schema",
+    table = "tbl"
+  ))
   test_remote_table(ident_q("schema.tbl"))
   test_remote_table(I("schema.tbl"))
 })

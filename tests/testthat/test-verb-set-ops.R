@@ -112,7 +112,7 @@ test_that("other backends can combine with a limit", {
 
   ignore <- c(
     "sqlite", # only allows limit at top level
-    "mssql"   # unusual execution order gives unintuitive result
+    "mssql" # unusual execution order gives unintuitive result
   )
   tbls_full <- test_load(df, ignore = ignore)
   tbls_head <- lapply(test_load(df, ignore = ignore), head, n = 1)

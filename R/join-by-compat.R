@@ -1,8 +1,10 @@
-new_join_by <- function(exprs = list(),
-                        condition = character(),
-                        filter = character(),
-                        x = character(),
-                        y = character()) {
+new_join_by <- function(
+  exprs = list(),
+  condition = character(),
+  filter = character(),
+  x = character(),
+  y = character()
+) {
   out <- list(
     exprs = exprs,
     condition = condition,
@@ -86,10 +88,7 @@ finalise_equi_join_by <- function(x_names, y_names) {
 
 # ------------------------------------------------------------------------------
 
-join_by_common <- function(x_names,
-                           y_names,
-                           ...,
-                           error_call = caller_env()) {
+join_by_common <- function(x_names, y_names, ..., error_call = caller_env()) {
   check_dots_empty0(...)
 
   by <- intersect(x_names, y_names)

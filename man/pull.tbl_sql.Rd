@@ -34,7 +34,7 @@ order.}
 A vector of data.
 }
 \description{
-This is a method for the dplyr \code{\link[=pull]{pull()}} generic. It evaluates the query
+This is a method for the dplyr \code{\link[dplyr:pull]{dplyr::pull()}} generic. It evaluates the query
 retrieving just the specified column.
 }
 \examples{

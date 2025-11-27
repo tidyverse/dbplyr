@@ -129,7 +129,12 @@ table_path_components.default <- function(x, con) {
 }
 
 #' @export
-escape.dbplyr_table_path <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
+escape.dbplyr_table_path <- function(
+  x,
+  parens = FALSE,
+  collapse = ", ",
+  con = NULL
+) {
   # names are always already escaped
   alias <- names2(x)
   table_path <- as_table_path(table_path_name(x, con), con)
@@ -163,9 +168,11 @@ is_table_id <- function(x) {
 
 #' @export
 #' @rdname is_table_path
-check_table_path <- function(x,
-                             error_arg = caller_arg(x),
-                             error_call = caller_env()) {
+check_table_path <- function(
+  x,
+  error_arg = caller_arg(x),
+  error_call = caller_env()
+) {
   if (!is_table_path(x)) {
     cli::cli_abort(
       "{.arg {error_arg}} must be a <table_path>, not {.obj_type_friendly x}.",
@@ -177,10 +184,12 @@ check_table_path <- function(x,
 
 #' @export
 #' @rdname is_table_path
-as_table_path <- function(x,
-                          con,
-                          error_arg = caller_arg(x),
-                          error_call = caller_env()) {
+as_table_path <- function(
+  x,
+  con,
+  error_arg = caller_arg(x),
+  error_call = caller_env()
+) {
   check_required(con)
 
   if (is_table_path(x)) {
@@ -204,7 +213,12 @@ as_table_path <- function(x,
   } else if (inherits(x, "dbplyr_schema")) {
     make_table_path(list(x$schema, x$table), con)
   } else if (inherits(x, "AsIs")) {
-    check_string(unclass(x), allow_empty = FALSE, arg = error_arg, call = error_call)
+    check_string(
+      unclass(x),
+      allow_empty = FALSE,
+      arg = error_arg,
+      call = error_call
+    )
     table_path(unclass(x))
   } else if (is.character(x)) {
     check_string(x, allow_empty = FALSE, arg = error_arg, call = error_call)
@@ -220,7 +234,13 @@ as_table_path <- function(x,
 # table source ------------------------------------------------------------
 
 # Returns either SQL (representing a custom query) or a table name
-as_table_source <- function(x, con, ..., error_arg = caller_arg(x), error_call = caller_env()) {
+as_table_source <- function(
+  x,
+  con,
+  ...,
+  error_arg = caller_arg(x),
+  error_call = caller_env()
+) {
   if (is.sql(x)) {
     x
   } else if (is_table_id(x)) {
@@ -235,4 +255,3 @@ check_table_source <- function(x, arg = caller_arg(x), call = caller_env()) {
     stop_input_type(x, "a table source (SQL or a table identifier)")
   }
 }
-

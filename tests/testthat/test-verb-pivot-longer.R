@@ -49,9 +49,9 @@ test_that("can drop missing values", {
 
 test_that("can handle missing combinations", {
   df <- tibble::tribble(
-    ~id, ~x_1, ~x_2, ~y_2,
-    "A",    1,    2,  "a",
-    "B",    3,    4,  "b",
+    ~id , ~x_1 , ~x_2 , ~y_2 ,
+    "A" ,    1 ,    2 , "a"  ,
+    "B" ,    3 ,    4 , "b"  ,
   )
 
   df_db <- memdb_frame(!!!df)
@@ -87,7 +87,10 @@ test_that("can override default output column type", {
 test_that("values_transform can be a formula", {
   expect_snapshot(
     lazy_frame(x = 1) %>%
-      tidyr::pivot_longer(x, values_transform = list(value = ~ as.character(.x)))
+      tidyr::pivot_longer(
+        x,
+        values_transform = list(value = ~ as.character(.x))
+      )
   )
 })
 
@@ -148,9 +151,9 @@ test_that("`values_transform` is validated", {
 test_that("can pivot to multiple measure cols", {
   df <- lazy_frame(x = "x", y = 1)
   sp <- tibble::tribble(
-    ~.name, ~.value, ~row,
-    "x", "X", 1,
-    "y", "Y", 1,
+    ~.name , ~.value , ~row ,
+    "x"    , "X"     ,    1 ,
+    "y"    , "Y"     ,    1 ,
   )
 
   pv <- dbplyr_pivot_longer_spec(df, sp)
@@ -160,9 +163,9 @@ test_that("can pivot to multiple measure cols", {
 
 test_that("original col order is preserved", {
   df <- tibble::tribble(
-    ~id, ~z_1, ~y_1, ~x_1, ~z_2,  ~y_2, ~x_2,
-    "A",    1,    2,    3,     4,    5,    6,
-    "B",    7,    8,    9,    10,   11,   12,
+    ~id , ~z_1 , ~y_1 , ~x_1 , ~z_2 , ~y_2 , ~x_2 ,
+    "A" ,    1 ,    2 ,    3 ,    4 ,    5 ,    6 ,
+    "B" ,    7 ,    8 ,    9 ,   10 ,   11 ,   12 ,
   ) %>%
     tbl_lazy()
 
@@ -184,20 +187,27 @@ test_that(".value can be at any position in `names_to`", {
   )
 
   value_first <- tidyr::pivot_longer(
-    lazy_frame(!!!samp), -i,
-    names_to = c(".value", "time"), names_sep = "_"
+    lazy_frame(!!!samp),
+    -i,
+    names_to = c(".value", "time"),
+    names_sep = "_"
   )
 
   expect_snapshot(value_first)
 
-  samp2 <- dplyr::rename(samp, t1_y = y_t1,
-                               t2_y = y_t2,
-                               t1_z = z_t1,
-                               t2_z = z_t2)
+  samp2 <- dplyr::rename(
+    samp,
+    t1_y = y_t1,
+    t2_y = y_t2,
+    t1_z = z_t1,
+    t2_z = z_t2
+  )
 
   value_second <- tidyr::pivot_longer(
-    lazy_frame(!!!samp2), -i,
-    names_to = c("time", ".value"), names_sep = "_"
+    lazy_frame(!!!samp2),
+    -i,
+    names_to = c("time", ".value"),
+    names_sep = "_"
   )
 
   expect_snapshot(value_second)
@@ -232,8 +242,13 @@ test_that("can pivot column with name equal to `names_to`", {
 test_that("can repair names", {
   df <- memdb_frame(id = 1, x = "a", y = "r", name = "nm", value = "val")
 
-  expect_snapshot(out <- df %>% tidyr::pivot_longer(c(x, y), names_repair = "unique"))
-  expect_equal(colnames(out), c("id", "name...2", "value...3", "name...4", "value...5"))
+  expect_snapshot(
+    out <- df %>% tidyr::pivot_longer(c(x, y), names_repair = "unique")
+  )
+  expect_equal(
+    colnames(out),
+    c("id", "name...2", "value...3", "name...4", "value...5")
+  )
 
   expect_equal(
     collect(out),

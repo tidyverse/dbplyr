@@ -44,7 +44,6 @@ db_connection_describe.DBIConnection <- function(con, ...) {
 }
 # nocov end
 
-
 #' @rdname db-misc
 #' @export
 sql_join_suffix <- function(con, suffix, ...) {
@@ -80,7 +79,13 @@ db_sql_render <- function(con, sql, ..., cte = FALSE, sql_options = NULL) {
   UseMethod("db_sql_render")
 }
 #' @export
-db_sql_render.DBIConnection <- function(con, sql, ..., cte = FALSE, sql_options = NULL) {
+db_sql_render.DBIConnection <- function(
+  con,
+  sql,
+  ...,
+  cte = FALSE,
+  sql_options = NULL
+) {
   sql_render(sql, con = con, ..., sql_options = sql_options)
 }
 
@@ -134,7 +139,11 @@ db_col_types.default <- function(con, table, call) {
 #' show_query(result)
 #' sql_options <- sql_options(cte = TRUE, qualify_all_columns = TRUE)
 #' show_query(result, sql_options = sql_options)
-sql_options <- function(cte = FALSE, use_star = TRUE, qualify_all_columns = FALSE) {
+sql_options <- function(
+  cte = FALSE,
+  use_star = TRUE,
+  qualify_all_columns = FALSE
+) {
   check_bool(cte)
   check_bool(use_star)
   check_bool(qualify_all_columns)
@@ -148,7 +157,11 @@ sql_options <- function(cte = FALSE, use_star = TRUE, qualify_all_columns = FALS
   data
 }
 
-as_sql_options <- function(x, error_arg = caller_arg(x), error_call = caller_env()) {
+as_sql_options <- function(
+  x,
+  error_arg = caller_arg(x),
+  error_call = caller_env()
+) {
   if (is.null(x)) {
     x <- sql_options()
     return(x)

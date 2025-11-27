@@ -24,10 +24,10 @@ cast_number_whole <- function(x, arg = caller_arg(x), call = caller_env()) {
 #' @export
 #' @rdname sql_variant
 sql_str_sub <- function(
-                        subset_f = "SUBSTR",
-                        length_f = "LENGTH",
-                        optional_length = TRUE
-  ) {
+  subset_f = "SUBSTR",
+  length_f = "LENGTH",
+  optional_length = TRUE
+) {
   function(string, start = 1L, end = -1L) {
     start <- cast_number_whole(start)
     end <- cast_number_whole(end)
@@ -39,7 +39,7 @@ sql_str_sub <- function(
     } else {
       if (end == 0L) {
         length_sql <- 0L
-      } else if(start > 0 && end < 0) {
+      } else if (start > 0 && end < 0) {
         n <- start - end - 2L
         if (n == 0) {
           length_sql <- sql_call2(length_f, string)
@@ -66,7 +66,8 @@ start_pos <- function(string, start, length_f) {
 
 sql_str_trim <- function(string, side = c("both", "left", "right")) {
   side <- match.arg(side)
-  switch(side,
+  switch(
+    side,
     left = sql_expr(ltrim(!!string)),
     right = sql_expr(rtrim(!!string)),
     both = sql_expr(ltrim(rtrim(!!string))),
@@ -74,21 +75,26 @@ sql_str_trim <- function(string, side = c("both", "left", "right")) {
 }
 
 
-
-sql_str_pattern_switch <- function(string,
-                                   pattern,
-                                   negate = FALSE,
-                                   f_fixed = NULL,
-                                   f_regex = NULL,
-                                   error_call = caller_env()) {
+sql_str_pattern_switch <- function(
+  string,
+  pattern,
+  negate = FALSE,
+  f_fixed = NULL,
+  f_regex = NULL,
+  error_call = caller_env()
+) {
   pattern_quo <- enquo(pattern)
-  is_fixed <- quo_is_call(pattern_quo, "fixed") || inherits(pattern, "stringr_fixed")
+  is_fixed <- quo_is_call(pattern_quo, "fixed") ||
+    inherits(pattern, "stringr_fixed")
 
   if (is_fixed) {
     f_fixed(string, pattern, negate)
   } else {
     if (is_null(f_regex)) {
-      cli_abort("Only fixed patterns are supported on database backends.", call = error_call)
+      cli_abort(
+        "Only fixed patterns are supported on database backends.",
+        call = error_call
+      )
     } else {
       f_regex(string, pattern, negate)
     }
@@ -115,16 +121,24 @@ sql_str_detect_fixed_instr <- function(type = c("detect", "start", "end")) {
     index_sql <- glue_sql2(con, "INSTR({.val string}, {.val pattern})")
 
     if (negate) {
-      switch(type,
+      switch(
+        type,
         detect = translate_sql(!!index_sql == 0L, con = con),
         start = translate_sql(!!index_sql != 1L, con = con),
-        end = translate_sql(!!index_sql != nchar(!!string) - nchar(!!pattern) + 1L, con = con)
+        end = translate_sql(
+          !!index_sql != nchar(!!string) - nchar(!!pattern) + 1L,
+          con = con
+        )
       )
     } else {
-      switch(type,
+      switch(
+        type,
         detect = translate_sql(!!index_sql > 0L, con = con),
         start = translate_sql(!!index_sql == 1L, con = con),
-        end = translate_sql(!!index_sql == nchar(!!string) - nchar(!!pattern) + 1L, con = con)
+        end = translate_sql(
+          !!index_sql == nchar(!!string) - nchar(!!pattern) + 1L,
+          con = con
+        )
       )
     }
   }
@@ -139,16 +153,24 @@ sql_str_detect_fixed_position <- function(type = c("detect", "start", "end")) {
     index_sql <- glue_sql2(con, "POSITION({.val pattern} in {.val string})")
 
     if (negate) {
-      switch(type,
+      switch(
+        type,
         detect = translate_sql(!!index_sql == 0L, con = con),
         start = translate_sql(!!index_sql != 1L, con = con),
-        end = translate_sql(!!index_sql != nchar(!!string) - nchar(!!pattern) + 1L, con = con)
+        end = translate_sql(
+          !!index_sql != nchar(!!string) - nchar(!!pattern) + 1L,
+          con = con
+        )
       )
     } else {
-      switch(type,
+      switch(
+        type,
         detect = translate_sql(!!index_sql > 0L, con = con),
         start = translate_sql(!!index_sql == 1L, con = con),
-        end = translate_sql(!!index_sql == nchar(!!string) - nchar(!!pattern) + 1L, con = con)
+        end = translate_sql(
+          !!index_sql == nchar(!!string) - nchar(!!pattern) + 1L,
+          con = con
+        )
       )
     }
   }

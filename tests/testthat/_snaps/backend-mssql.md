@@ -275,7 +275,7 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY RAND()) AS `col01`
+        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY RAND(CHECKSUM(NEWID()))) AS `col01`
         FROM `df`
       ) AS `q01`
       WHERE (`col01` <= 1)
@@ -496,6 +496,15 @@
       SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY `y`) AS `rown`
       FROM `df`
       ORDER BY `y`
+
+# count_big
+
+    Code
+      count(mf)
+    Output
+      <SQL>
+      SELECT COUNT_BIG(*) AS `n`
+      FROM `df`
 
 # add prefix to temporary table
 
