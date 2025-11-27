@@ -74,6 +74,7 @@ copy_to.src_sql <- function(
       df,
       name = name,
       temporary = temporary,
+      overwrite = overwrite,
       unique_indexes = unique_indexes,
       indexes = indexes,
       analyze = analyze,

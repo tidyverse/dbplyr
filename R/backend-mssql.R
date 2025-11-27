@@ -322,7 +322,8 @@ simulate_mssql <- function(version = "15.0") {
       is.na = mssql_is_null,
 
       runif = function(n = n(), min = 0, max = 1) {
-        sql_runif(RAND(), n = {{ n }}, min = min, max = max)
+        # https://stackoverflow.com/a/9039661
+        sql_runif(RAND(CHECKSUM(NEWID())), n = {{ n }}, min = min, max = max)
       },
 
       # string functions ------------------------------------------------
@@ -747,5 +748,7 @@ utils::globalVariables(c(
   "BIGINT",
   "INT",
   "%AND%",
-  "%BETWEEN%"
+  "%BETWEEN%",
+  "CHECKSUM",
+  "NEWID"
 ))

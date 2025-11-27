@@ -1,5 +1,10 @@
 # dbplyr (development version)
 
+* SQL server: `slice_sample()` returns different results each run (@thomashulst, #1503)
+* Corrected translation of `stringr::str_like()` to use case-sensitive `LIKE` when argument `ignore_case` is set as `FALSE` (@edward-burn, #1488).
+* Corrected translation of `stringr::str_like()` to use case-sensitive `LIKE` when argument `ignore_case` is set as `FALSE` (@edward-burn, #1488).
+* Fixed overwrite flag in `copy_to()` to work when source is in the same DB as destination (@liudvikasakelis, #1535)
+* Snowflake correctly translates `$` to `:` (@jsowder, #1608)
 * `dbplyr_uncount()` now works with Redshift (@owenjonesuob, #1601).
 
 # dbplyr 2.5.1
@@ -46,7 +51,7 @@
     (#1416). Additionally, thanks to changes to the DBI package, you no 
     longer need to name each argument.
   
-  * If you accidentally pass a named vector to any of the database identifer
+  * If you accidentally pass a named vector to any of the database identifier
     functions, those names will be automatically stripped (#1404).
     
   * `tbl_sql(check_from)` is now deprecated.
@@ -204,7 +209,7 @@
   * The `na_matches` argument of `semi_join()` and `anti_join()` works again
     (@mgirlich, #1211).
     
-  * A `semi/anti_join()` on fitlered `y` is inlined when possible (@mgirlich, #884).
+  * A `semi/anti_join()` on filtered `y` is inlined when possible (@mgirlich, #884).
 
   * Joins now work again for Pool and Oracle connections (@mgirlich, #1177, #1181).
 

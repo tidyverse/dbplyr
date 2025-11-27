@@ -316,6 +316,13 @@ sql_translation.Snowflake <- function(con) {
         } else {
           glue_sql2(sql_current_con(), "GREATEST({.val dots*})")
         }
+      },
+      `$` = function(x, name) {
+        if (is.sql(x)) {
+          glue_sql2(sql_current_con(), "{x}:{.col name}")
+        } else {
+          eval(bquote(`$`(x, .(substitute(name)))))
+        }
       }
     ),
     sql_translator(
@@ -373,7 +380,7 @@ snowflake_grepl <- function(
   check_unsupported_arg(useBytes, FALSE, backend = "Snowflake")
 
   # https://docs.snowflake.com/en/sql-reference/functions/regexp_instr.html
-  # REGEXP_INSTR optional parameters: position, occurrance, option, regex_parameters
+  # REGEXP_INSTR optional parameters: position, occurrence, option, regex_parameters
   regexp_parameters <- "c"
   if (ignore.case) {
     regexp_parameters <- "i"

@@ -369,3 +369,8 @@ test_that("row_number() with and without group_by() and arrange(): unordered def
   expect_snapshot(mf %>% group_by(y) %>% mutate(rown = row_number()))
   expect_snapshot(mf %>% arrange(y) %>% mutate(rown = row_number()))
 })
+
+test_that("correctly translates $", {
+  local_con(simulate_snowflake())
+  expect_equal(test_translate_sql(x$y), sql("`x`:`y`"))
+})
