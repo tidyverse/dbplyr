@@ -4,7 +4,7 @@
 \alias{show_query}
 \alias{show_query.tbl_lazy}
 \alias{explain.tbl_sql}
-\title{Show query details}
+\title{Show generated SQL and query plan}
 \usage{
 \method{show_query}{tbl_lazy}(x, ..., use_colour = TRUE, cte = FALSE, sql_options = NULL)
 
