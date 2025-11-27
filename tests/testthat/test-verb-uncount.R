@@ -7,7 +7,8 @@ test_that("symbols weights are dropped in output", {
     transform = function(lines) {
       lines_to_transform <- grepl("INNER JOIN", lines)
       lines[lines_to_transform] <- gsub(
-        "`dbplyr_\\d+`", "`dbplyr_table`",
+        "`dbplyr_\\d+`",
+        "`dbplyr_table`",
         lines[lines_to_transform]
       )
 
@@ -65,7 +66,7 @@ test_that("grouping variable are removed", {
 })
 
 test_that("must evaluate to integer", {
-  df <- memdb_frame(x = 1, w = 1/2)
+  df <- memdb_frame(x = 1, w = 1 / 2)
   expect_error(dbplyr_uncount(df, w), class = "vctrs_error_cast_lossy")
 
   expect_error(dbplyr_uncount(df, "W"), class = "vctrs_error_incompatible_type")

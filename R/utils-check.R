@@ -1,7 +1,12 @@
-
 # Vectors -----------------------------------------------------------------
 
-check_list <- function(x, ..., allow_null = FALSE, arg = caller_arg(x), call = caller_env()) {
+check_list <- function(
+  x,
+  ...,
+  allow_null = FALSE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   if (vctrs::vec_is_list(x)) {
     return()
   }
@@ -16,11 +21,13 @@ check_list <- function(x, ..., allow_null = FALSE, arg = caller_arg(x), call = c
   )
 }
 
-check_integer <- function(x,
-                          ...,
-                          allow_null = FALSE,
-                          arg = caller_arg(x),
-                          call = caller_env()) {
+check_integer <- function(
+  x,
+  ...,
+  allow_null = FALSE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   if (!missing(x)) {
     if (is.integer(x)) {
       return(invisible(NULL))
@@ -40,11 +47,13 @@ check_integer <- function(x,
   )
 }
 
-check_logical <- function(x,
-                          ...,
-                          allow_null = FALSE,
-                          arg = caller_arg(x),
-                          call = caller_env()) {
+check_logical <- function(
+  x,
+  ...,
+  allow_null = FALSE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   if (!missing(x)) {
     if (is.logical(x)) {
       return(invisible(NULL))
@@ -85,10 +94,7 @@ check_lazy_query <- function(x, ..., arg = caller_arg(x), call = caller_env()) {
   }
 }
 
-check_scalar_sql <- function(x,
-                             ...,
-                             arg = caller_arg(x),
-                             call = caller_env()) {
+check_scalar_sql <- function(x, ..., arg = caller_arg(x), call = caller_env()) {
   if ((is.sql(x) || is_string(x)) && length(x) == 1L) {
     return()
   }
@@ -104,13 +110,15 @@ check_scalar_sql <- function(x,
 
 # Other checks ------------------------------------------------------------
 
-check_unsupported_arg <- function(x,
-                                  allowed = NULL,
-                                  allow_null = FALSE,
-                                  ...,
-                                  backend = NULL,
-                                  arg = caller_arg(x),
-                                  call = caller_env()) {
+check_unsupported_arg <- function(
+  x,
+  allowed = NULL,
+  allow_null = FALSE,
+  ...,
+  backend = NULL,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   if (is_missing(x)) {
     return()
   }
@@ -144,14 +152,22 @@ check_unsupported_arg <- function(x,
 
     msg <- c(msg, i = allow_msg)
   }
-  cli_abort(msg, call = call)
+  cli_abort(msg, call = call, class = "dbplyr_error_unsupported_arg")
 }
 
-stop_unsupported_function <- function(f, ..., with = NULL, call = caller_env()) {
-  cli_abort(c(
-    "{.fun {f}} is not supported on database backends.",
-    i = if (!is_null(with)) "Please use {.fun {with}} instead."
-  ), call = call)
+stop_unsupported_function <- function(
+  f,
+  ...,
+  with = NULL,
+  call = caller_env()
+) {
+  cli_abort(
+    c(
+      "{.fun {f}} is not supported on database backends.",
+      i = if (!is_null(with)) "Please use {.fun {with}} instead."
+    ),
+    call = call
+  )
 }
 
 check_named <- function(x, ..., arg = caller_arg(x), call = caller_env()) {
@@ -164,7 +180,13 @@ check_named <- function(x, ..., arg = caller_arg(x), call = caller_env()) {
   }
 }
 
-check_has_names <- function(x, names, ..., arg = caller_arg(x), call = caller_env()) {
+check_has_names <- function(
+  x,
+  names,
+  ...,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   if (is.data.frame(x)) {
     x_nms <- colnames(x)
   } else {
@@ -177,16 +199,24 @@ check_has_names <- function(x, names, ..., arg = caller_arg(x), call = caller_en
   cli_abort("{.arg {arg}} must have fields {.val {names}}", .internal = TRUE)
 }
 
-with_indexed_errors <- function(expr,
-                                message,
-                                ...,
-                                .error_call = caller_env(),
-                                .frame = caller_env()) {
+with_indexed_errors <- function(
+  expr,
+  message,
+  ...,
+  .error_call = caller_env(),
+  .frame = caller_env()
+) {
   withCallingHandlers(
     expr,
     purrr_error_indexed = function(cnd) {
       message <- message(cnd)
-      abort(message, ..., call = .error_call, parent = cnd$parent, .frame = .frame)
+      abort(
+        message,
+        ...,
+        call = .error_call,
+        parent = cnd$parent,
+        .frame = .frame
+      )
     }
   )
 }

@@ -13,12 +13,14 @@
 #'   Mainly useful for better performance when creating
 #'   multiple `tbl` objects.
 #' @param check_from `r lifecycle::badge("deprecated")`
-tbl_sql <- function(subclass,
-                    src,
-                    from,
-                    ...,
-                    vars = NULL,
-                    check_from = deprecated()) {
+tbl_sql <- function(
+  subclass,
+  src,
+  from,
+  ...,
+  vars = NULL,
+  check_from = deprecated()
+) {
   # Can't use check_dots_used(), #1429
   check_character(vars, allow_null = TRUE)
   if (lifecycle::is_present(check_from)) {
@@ -31,7 +33,9 @@ tbl_sql <- function(subclass,
   withCallingHandlers(
     vars <- vars %||% dbplyr_query_fields(src$con, source),
     error = function(err) {
-      if (!is_suspicious) return()
+      if (!is_suspicious) {
+        return()
+      }
 
       cli::cli_abort(
         c(
@@ -70,7 +74,9 @@ group_size.tbl_sql <- function(x) {
 #' @importFrom dplyr n_groups
 #' @export
 n_groups.tbl_sql <- function(x) {
-  if (length(groups(x)) == 0) return(1L)
+  if (length(groups(x)) == 0) {
+    return(1L)
+  }
 
   df <- x %>%
     summarise() %>%
@@ -89,11 +95,13 @@ print.tbl_sql <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
 }
 
 #' @export
-as.data.frame.tbl_sql <- function(x,
-                                  row.names = NULL,
-                                  optional = NULL,
-                                  ...,
-                                  n = Inf) {
+as.data.frame.tbl_sql <- function(
+  x,
+  row.names = NULL,
+  optional = NULL,
+  ...,
+  n = Inf
+) {
   as.data.frame(collect(x, n = n))
 }
 

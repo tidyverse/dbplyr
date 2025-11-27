@@ -19,6 +19,8 @@ more details.}
 \item \code{"check_unique"}: (default value), no name repair, but check they are
 \code{unique},
 \item \code{"universal"}: Make the names \code{unique} and syntactic
+\item \code{"unique_quiet"}: Same as \code{"unique"}, but "quiet"
+\item \code{"universal_quiet"}: Same as \code{"universal"}, but "quiet"
 \item a function: apply custom name repair (e.g., \code{.name_repair = make.names}
 for names in the style of base R).
 \item A purrr-style anonymous function, see \code{\link[rlang:as_function]{rlang::as_function()}}
@@ -29,7 +31,7 @@ See there for more details on these terms and the strategies used
 to enforce them.}
 }
 \value{
-Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
+Another \code{tbl_lazy}. Use \code{\link[dplyr:explain]{dplyr::show_query()}} to see the generated
 query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
@@ -39,7 +41,7 @@ result explicitly, so the order might be different to what \code{expand()}
 returns for data frames.
 }
 \examples{
-\dontshow{if (rlang::is_installed("tidyr", version = "1.0.0")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("tidyr", version = "1.0.0")) withAutoprint(\{ # examplesIf}
 fruits <- memdb_frame(
   type   = c("apple", "orange", "apple", "orange", "orange", "orange"),
   year   = c(2010, 2010, 2012, 2010, 2010, 2012),

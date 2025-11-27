@@ -2,7 +2,7 @@
 # test partial_eval_across() indirectly via SQL generation
 
 test_that("across() translates NULL", {
-  lf <- lazy_frame(a = 1,  b = 2)
+  lf <- lazy_frame(a = 1, b = 2)
   expect_equal(
     capture_across(lf, across(a:b)),
     list(a = expr(a), b = expr(b))
@@ -24,7 +24,7 @@ test_that("across() drops groups", {
 
 
 test_that("across() translates functions", {
-  lf <- lazy_frame(a = 1,  b = 2)
+  lf <- lazy_frame(a = 1, b = 2)
 
   expect_equal(
     capture_across(lf, across(a:b, log)),
@@ -38,7 +38,7 @@ test_that("across() translates functions", {
 })
 
 test_that("across() translates functions in namespace #1231", {
-  lf <- lazy_frame(a = 1,  b = 2)
+  lf <- lazy_frame(a = 1, b = 2)
 
   expect_equal(
     capture_across(lf, across(a:b, dplyr::dense_rank)),
@@ -55,16 +55,18 @@ test_that("across() captures anonymous functions", {
   )
 
   expect_snapshot(
-    (expect_error(capture_across(lf, across(a, function(x) {
-      x <- x + 2
-      log(x)
-      }
-    ))))
+    (expect_error(capture_across(
+      lf,
+      across(a, function(x) {
+        x <- x + 2
+        log(x)
+      })
+    )))
   )
 })
 
 test_that("across() translates formulas", {
-  lf <- lazy_frame(a = 1,  b = 2)
+  lf <- lazy_frame(a = 1, b = 2)
 
   expect_equal(
     capture_across(lf, across(a:b, ~ log(.x))),
@@ -77,7 +79,7 @@ test_that("across() translates formulas", {
   )
 
   expect_equal(
-    capture_across(lf, across(a:b, list(~log(.x)))),
+    capture_across(lf, across(a:b, list(~ log(.x)))),
     exprs(a_1 = log(a), b_1 = log(b))
   )
 })
@@ -97,7 +99,7 @@ test_that("across() translates evaluated functions", {
 })
 
 test_that("across() gives informative errors", {
-  lf <- lazy_frame(a = 1,  b = 2)
+  lf <- lazy_frame(a = 1, b = 2)
   expect_snapshot(error = TRUE, {
     capture_across(lf, across(a, 1))
     capture_across(lf, across(a, list(1)))
@@ -135,15 +137,22 @@ test_that("across() can use named selections", {
   expect_equal(
     capture_across(lf, across(c(a = x, b = y), list(mean, nm = sum))),
     list(
-      a_1 = quote(mean(x)), a_nm = quote(sum(x)),
-      b_1 = quote(mean(y)), b_nm = quote(sum(y))
+      a_1 = quote(mean(x)),
+      a_nm = quote(sum(x)),
+      b_1 = quote(mean(y)),
+      b_nm = quote(sum(y))
     )
   )
   expect_equal(
-    capture_across(lf, across(all_of(c(a = "x", b = "y")), list(mean, nm = sum))),
+    capture_across(
+      lf,
+      across(all_of(c(a = "x", b = "y")), list(mean, nm = sum))
+    ),
     list(
-      a_1 = quote(mean(x)), a_nm = quote(sum(x)),
-      b_1 = quote(mean(y)), b_nm = quote(sum(y))
+      a_1 = quote(mean(x)),
+      a_nm = quote(sum(x)),
+      b_1 = quote(mean(y)),
+      b_nm = quote(sum(y))
     )
   )
 })
@@ -172,7 +181,11 @@ test_that("across() correctly names output columns", {
     c("x", "y_mean", "y_sum", "z_mean", "z_sum")
   )
   expect_equal(
-    summarise(gf, across(1:2, list(mean = mean, sum = sum), .names = "{.fn}_{.col}")) %>% op_vars(),
+    summarise(
+      gf,
+      across(1:2, list(mean = mean, sum = sum), .names = "{.fn}_{.col}")
+    ) %>%
+      op_vars(),
     c("x", "mean_y", "sum_y", "mean_z", "sum_z")
   )
 
@@ -194,7 +207,11 @@ test_that("across(.names=) can use local variables in addition to {col} and {fn}
   res <- local({
     prefix <- "MEAN"
     lazy_frame(x = 42) %>%
-      summarise(across(everything(), ~ mean(.x, na.rm = TRUE), .names = "{prefix}_{.col}"))
+      summarise(across(
+        everything(),
+        ~ mean(.x, na.rm = TRUE),
+        .names = "{prefix}_{.col}"
+      ))
   })
   expect_equal(op_vars(res), "MEAN_x")
 })
@@ -393,7 +410,7 @@ test_that("where() isn't suppored", {
 # if_all ------------------------------------------------------------------
 
 test_that("if_all() translates functions", {
-  lf <- lazy_frame(a = 1,  b = 2)
+  lf <- lazy_frame(a = 1, b = 2)
 
   expect_equal(
     capture_if_all(lf, if_all(a:b, log)),
@@ -407,7 +424,7 @@ test_that("if_all() translates functions", {
 })
 
 test_that("if_all() translates formulas", {
-  lf <- lazy_frame(a = 1,  b = 2)
+  lf <- lazy_frame(a = 1, b = 2)
 
   expect_equal(
     capture_if_all(lf, if_all(a:b, ~ log(.x))),
@@ -420,13 +437,13 @@ test_that("if_all() translates formulas", {
   )
 
   expect_equal(
-    capture_if_all(lf, if_all(a:b, list(~log(.x)))),
+    capture_if_all(lf, if_all(a:b, list(~ log(.x)))),
     expr(log(a) & log(b))
   )
 })
 
 test_that("if_all() gives informative errors", {
-  lf <- lazy_frame(a = 1,  b = 2)
+  lf <- lazy_frame(a = 1, b = 2)
   expect_snapshot(error = TRUE, {
     capture_if_all(lf, if_all(a, 1))
     capture_if_all(lf, if_all(a, list(1)))
@@ -434,7 +451,7 @@ test_that("if_all() gives informative errors", {
 })
 
 test_that("if_all collapses multiple expressions", {
-  lf <- lazy_frame(a = 1,  b = 2)
+  lf <- lazy_frame(a = 1, b = 2)
   expect_equal(
     capture_if_all(lf, if_all(everything(), is.na)),
     expr(is.na(a) & is.na(b))
@@ -442,14 +459,14 @@ test_that("if_all collapses multiple expressions", {
 })
 
 test_that("if_all/any works in filter()", {
-  lf <- lazy_frame(a = 1,  b = 2)
+  lf <- lazy_frame(a = 1, b = 2)
 
   expect_snapshot(lf %>% filter(if_all(a:b, ~ . > 0)))
   expect_snapshot(lf %>% filter(if_any(a:b, ~ . > 0)))
 })
 
 test_that("if_all/any is wrapped in parentheses #1153", {
-  lf <- lazy_frame(a = 1,  b = 2, c = 3)
+  lf <- lazy_frame(a = 1, b = 2, c = 3)
 
   expect_equal(
     lf %>% filter(if_any(c(a, b)) & c == 3) %>% remote_query(),
@@ -458,7 +475,7 @@ test_that("if_all/any is wrapped in parentheses #1153", {
 })
 
 test_that("if_all/any works in mutate()", {
-  lf <- lazy_frame(a = 1,  b = 2)
+  lf <- lazy_frame(a = 1, b = 2)
 
   expect_snapshot(lf %>% mutate(c = if_all(a:b, ~ . > 0)))
   expect_snapshot(lf %>% mutate(c = if_any(a:b, ~ . > 0)))
@@ -496,11 +513,11 @@ test_that("if_any() and if_all() expansions deal with single inputs", {
 
   # Single inputs
   expect_equal(
-    filter(d, if_any(x, ~ FALSE)) %>% remote_query(),
+    filter(d, if_any(x, ~FALSE)) %>% remote_query(),
     sql("SELECT `df`.*\nFROM `df`\nWHERE ((FALSE))")
   )
   expect_equal(
-    filter(d, if_all(x, ~ FALSE)) %>% remote_query(),
+    filter(d, if_all(x, ~FALSE)) %>% remote_query(),
     sql("SELECT `df`.*\nFROM `df`\nWHERE ((FALSE))")
   )
 })
@@ -538,22 +555,27 @@ test_that("across() .cols is evaluated in across()'s calling environment", {
 test_that("across(...) is deprecated", {
   lf <- lazy_frame(x = c(1, NA))
   expect_snapshot(summarise(lf, across(everything(), mean, na.rm = TRUE)))
-
 })
 
 test_that("across() does not support formulas with dots", {
   options(lifecycle_verbosity = "quiet")
-  lf <- lazy_frame(a = 1,  b = 2)
+  lf <- lazy_frame(a = 1, b = 2)
 
   expect_snapshot({
-    (expect_error(capture_across(lf, across(a:b, ~log(.x, base = .y), base = 2))))
-    (expect_error(capture_across(lf, across(a:b, list(~log(.x, base = .y)), base = 2))))
+    (expect_error(capture_across(
+      lf,
+      across(a:b, ~ log(.x, base = .y), base = 2)
+    )))
+    (expect_error(capture_across(
+      lf,
+      across(a:b, list(~ log(.x, base = .y)), base = 2)
+    )))
   })
 })
 
 test_that("across() translates functions", {
   options(lifecycle_verbosity = "quiet")
-  lf <- lazy_frame(a = 1,  b = 2)
+  lf <- lazy_frame(a = 1, b = 2)
 
   expect_equal(
     capture_across(lf, across(a:b, log, base = 2)),
@@ -574,7 +596,7 @@ test_that("dots are translated too", {
 
 test_that("if_all() translates functions", {
   options(lifecycle_verbosity = "quiet")
-  lf <- lazy_frame(a = 1,  b = 2)
+  lf <- lazy_frame(a = 1, b = 2)
 
   expect_equal(
     capture_if_all(lf, if_all(a:b, log)),
@@ -665,4 +687,3 @@ test_that("`pick()` can be used inside `group_by()` wrappers", {
     group_by(df, a, c)
   )
 })
-
