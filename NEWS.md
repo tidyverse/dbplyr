@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* SQL server: `slice_sample()` returns different results each run (@thomashulst, #1503)
+* Corrected translation of `stringr::str_like()` to use case-sensitive `LIKE` when argument `ignore_case` is set as `FALSE` (@edward-burn, #1488).
 * Corrected translation of `stringr::str_like()` to use case-sensitive `LIKE` when argument `ignore_case` is set as `FALSE` (@edward-burn, #1488).
 * Fixed overwrite flag in `copy_to()` to work when source is in the same DB as destination (@liudvikasakelis, #1535)
 * Snowflake correctly translates `$` to `:` (@jsowder, #1608)
