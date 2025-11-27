@@ -1,4 +1,4 @@
-# Show query details
+# Show generated SQL and query plan
 
 `show_sql()` displays the SQL query that will be dispatched to the
 database;
