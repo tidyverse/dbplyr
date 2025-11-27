@@ -190,7 +190,7 @@ sql_multi_join_vars <- function(
   use_star,
   qualify_all_columns
 ) {
-  all_vars <- tolower(unlist(table_vars))
+  all_vars <- tolower(unlist(table_vars, use.names = FALSE))
   if (qualify_all_columns) {
     duplicated_vars <- unique(all_vars)
   } else {
