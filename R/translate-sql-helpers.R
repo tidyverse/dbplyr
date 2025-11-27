@@ -66,7 +66,7 @@ sql_variant <- function(
   check_environment(window)
 
   # Need to check that every function in aggregate also occurs in window
-  missing <- setdiff(ls(aggregate), ls(window))
+  missing <- setdiff(ls_all(aggregate), ls_all(window))
   if (length(missing) > 0) {
     warn(paste0(
       "Translator is missing window variants of the following aggregate functions:\n",
@@ -74,10 +74,10 @@ sql_variant <- function(
     ))
   }
 
-  aggregate_fns <- ls(envir = aggregate)
+  aggregate_fns <- ls_all(envir = aggregate)
 
   # An ensure that every window function is flagged in aggregate context
-  missing <- setdiff(ls(window), ls(aggregate))
+  missing <- setdiff(ls_all(window), ls_all(aggregate))
   missing_funs <- lapply(missing, sql_aggregate_win)
   env_bind(aggregate, !!!set_names(missing_funs, missing))
 
@@ -97,7 +97,7 @@ is.sql_variant <- function(x) inherits(x, "sql_variant")
 #' @export
 print.sql_variant <- function(x, ...) {
   wrap_ls <- function(x, ...) {
-    vars <- sort(ls(envir = x))
+    vars <- sort(ls_all(envir = x))
     wrapped <- strwrap(paste0(vars, collapse = ", "), ...)
     if (identical(wrapped, "")) {
       return()
@@ -122,7 +122,11 @@ print.sql_variant <- function(x, ...) {
 
 #' @export
 names.sql_variant <- function(x) {
-  c(ls(envir = x$scalar), ls(envir = x$aggregate), ls(envir = x$window))
+  c(
+    ls_all(envir = x$scalar),
+    ls_all(envir = x$aggregate),
+    ls_all(envir = x$window)
+  )
 }
 
 #' @export

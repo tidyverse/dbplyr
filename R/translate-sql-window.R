@@ -387,7 +387,7 @@ uses_window_fun <- function(x, con, lq) {
   check_list(x)
 
   calls <- unlist(lapply(x, all_calls))
-  win_f <- ls(envir = dbplyr_sql_translation(con)$window)
+  win_f <- ls_all(envir = dbplyr_sql_translation(con)$window)
   any(calls %in% win_f)
 }
 
@@ -414,7 +414,7 @@ is_aggregating <- function(x, non_group_cols, agg_f) {
 }
 
 common_window_funs <- function() {
-  ls(dbplyr_sql_translation(NULL)$window) # nocov
+  ls_all(dbplyr_sql_translation(NULL)$window) # nocov
 }
 
 #' @noRd
