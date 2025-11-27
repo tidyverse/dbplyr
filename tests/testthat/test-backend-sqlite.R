@@ -14,8 +14,14 @@ test_that("vectorised translations", {
 test_that("pmin and max become MIN and MAX", {
   local_con(simulate_sqlite())
 
-  expect_equal(test_translate_sql(pmin(x, y, na.rm = TRUE)), sql('MIN(`x`, `y`)'))
-  expect_equal(test_translate_sql(pmax(x, y, na.rm = TRUE)), sql('MAX(`x`, `y`)'))
+  expect_equal(
+    test_translate_sql(pmin(x, y, na.rm = TRUE)),
+    sql('MIN(`x`, `y`)')
+  )
+  expect_equal(
+    test_translate_sql(pmax(x, y, na.rm = TRUE)),
+    sql('MAX(`x`, `y`)')
+  )
 })
 
 test_that("sqlite mimics two argument log", {
@@ -35,8 +41,14 @@ test_that("date-time", {
 test_that("custom aggregates translated", {
   local_con(simulate_sqlite())
 
-  expect_equal(test_translate_sql(median(x, na.rm = TRUE), window = FALSE), sql('MEDIAN(`x`)'))
-  expect_equal(test_translate_sql(sd(x, na.rm = TRUE), window = FALSE), sql('STDEV(`x`)'))
+  expect_equal(
+    test_translate_sql(median(x, na.rm = TRUE), window = FALSE),
+    sql('MEDIAN(`x`)')
+  )
+  expect_equal(
+    test_translate_sql(sd(x, na.rm = TRUE), window = FALSE),
+    sql('STDEV(`x`)')
+  )
   expect_error(
     test_translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE),
     class = "dbplyr_error_unsupported_fn"
@@ -62,7 +74,7 @@ test_that("case_when translates correctly to ELSE when TRUE ~ is used", {
       case_when(
         x == 1L ~ "yes",
         x == 0L ~ "no",
-        TRUE    ~ "undefined"
+        TRUE ~ "undefined"
       ),
       con = simulate_sqlite()
     )
@@ -82,25 +94,31 @@ test_that("as.numeric()/as.double() get custom translation", {
 
 test_that("date extraction agrees with R", {
   db <- memdb_frame(x = "2000-01-02 03:40:50.5")
-  out <- db %>% transmute(
-    year = year(x),
-    month = month(x),
-    day = day(x),
-    hour = hour(x),
-    minute = minute(x),
-    second = second(x),
-    yday = yday(x),
-  ) %>% collect() %>% as.list()
+  out <- db %>%
+    transmute(
+      year = year(x),
+      month = month(x),
+      day = day(x),
+      hour = hour(x),
+      minute = minute(x),
+      second = second(x),
+      yday = yday(x),
+    ) %>%
+    collect() %>%
+    as.list()
 
-  expect_equal(out, list(
-    year = 2000,
-    month = 1,
-    day = 2,
-    hour = 3,
-    minute = 40,
-    second = 50.5,
-    yday = 2
-  ))
+  expect_equal(
+    out,
+    list(
+      year = 2000,
+      month = 1,
+      day = 2,
+      hour = 3,
+      minute = 40,
+      second = 50.5,
+      yday = 2
+    )
+  )
 })
 
 test_that("can explain a query", {

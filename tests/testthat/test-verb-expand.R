@@ -60,7 +60,8 @@ test_that("expand() errors when expected", {
 })
 
 test_that("nesting() respects .name_repair", {
-  expect_snapshot(error = TRUE, 
+  expect_snapshot(
+    error = TRUE,
     tidyr::expand(
       memdb_frame(x = 1, y = 1),
       nesting(x, x = x + 1)
@@ -81,7 +82,13 @@ test_that("nesting() respects .name_repair", {
 test_that("expand respect .name_repair", {
   vars <- suppressMessages(
     memdb_frame(x = integer(), z = integer()) %>%
-      tidyr::expand(x, z = x, nesting(x), nesting(z), .name_repair = "unique") %>%
+      tidyr::expand(
+        x,
+        z = x,
+        nesting(x),
+        nesting(z),
+        .name_repair = "unique"
+      ) %>%
       op_vars()
   )
 
@@ -120,7 +127,9 @@ test_that("complete completes missing combinations", {
   )
 
   expect_equal(
-    memdb_frame(!!!df) %>% tidyr::complete(x, y, fill = list(z = "c")) %>% collect(),
+    memdb_frame(!!!df) %>%
+      tidyr::complete(x, y, fill = list(z = "c")) %>%
+      collect(),
     tibble(
       x = c(1, 1, 2, 2),
       y = c(1, 2, 1, 2),

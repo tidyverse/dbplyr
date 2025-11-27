@@ -49,7 +49,8 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
   out_names_list <- vctrs::vec_split(out_names_repaired, indices)$val
 
   distinct_tables <- purrr::map2(
-    distinct_tbl_vars, out_names_list,
+    distinct_tbl_vars,
+    out_names_list,
     ~ {
       args <- set_names(.x, .y)
       distinct(data, !!!args)

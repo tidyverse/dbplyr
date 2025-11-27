@@ -17,7 +17,8 @@ test_that("case_when translates correctly to ELSE when TRUE ~ is used 2", {
       case_when(
         x == 1L ~ "yes",
         x == 0L ~ "no",
-        TRUE    ~ "undefined")
+        TRUE ~ "undefined"
+      )
     )
   )
 })
@@ -60,7 +61,10 @@ test_that("case_when uses the .default arg", {
 test_that("case_when does not support .ptype and .size", {
   local_con(simulate_dbi())
   expect_snapshot({
-    (expect_error(test_translate_sql(case_when(x == 1L ~ "yes", .ptype = character()))))
+    (expect_error(test_translate_sql(case_when(
+      x == 1L ~ "yes",
+      .ptype = character()
+    ))))
     (expect_error(test_translate_sql(case_when(x == 1L ~ "yes", .size = 1))))
   })
 })
@@ -72,7 +76,8 @@ test_that("long case_when is on multiple lines", {
       case_when(
         x == 1L ~ "this is long",
         x == 0L ~ "so it should",
-        TRUE    ~ "be wrapped")
+        TRUE ~ "be wrapped"
+      )
     )
   )
 })
@@ -113,20 +118,32 @@ test_that("if translation adds parens", {
 
   expect_equal(
     test_translate_sql(if (x > 1L) y + 1L else z + 1L),
-    sql("CASE WHEN (`x` > 1) THEN (`y` + 1) WHEN NOT (`x` > 1) THEN (`z` + 1) END")
+    sql(
+      "CASE WHEN (`x` > 1) THEN (`y` + 1) WHEN NOT (`x` > 1) THEN (`z` + 1) END"
+    )
   )
 })
 
-test_that("if and ifelse use correctly named arguments",{
+test_that("if and ifelse use correctly named arguments", {
   local_con(simulate_dbi())
   exp <- test_translate_sql(if (x) 1 else 2)
 
   expect_equal(test_translate_sql(ifelse(test = x, yes = 1, no = 2)), exp)
-  expect_equal(test_translate_sql(if_else(condition = x, true = 1, false = 2)), exp)
+  expect_equal(
+    test_translate_sql(if_else(condition = x, true = 1, false = 2)),
+    exp
+  )
 
   expect_equal(
-    test_translate_sql(if_else(condition = x, true = 1, false = 2, missing = 3)),
-    sql("CASE WHEN `x` THEN 1.0 WHEN NOT `x` THEN 2.0 WHEN (`x` IS NULL) THEN 3.0 END")
+    test_translate_sql(if_else(
+      condition = x,
+      true = 1,
+      false = 2,
+      missing = 3
+    )),
+    sql(
+      "CASE WHEN `x` THEN 1.0 WHEN NOT `x` THEN 2.0 WHEN (`x` IS NULL) THEN 3.0 END"
+    )
   )
 })
 
@@ -274,7 +291,9 @@ test_that("can handle multiple cases", {
   # also with .default
   expect_equal(
     test_translate_sql(case_match(z, 1L ~ "a", 2L ~ "b", .default = "default")),
-    sql("CASE WHEN (`z` IN (1)) THEN 'a' WHEN (`z` IN (2)) THEN 'b' ELSE 'default' END")
+    sql(
+      "CASE WHEN (`z` IN (1)) THEN 'a' WHEN (`z` IN (2)) THEN 'b' ELSE 'default' END"
+    )
   )
 })
 

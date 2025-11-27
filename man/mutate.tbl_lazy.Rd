@@ -45,12 +45,12 @@ should appear (the default is to add to the right hand side). See
 \code{\link[dplyr:relocate]{relocate()}} for more details.}
 }
 \value{
-Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
+Another \code{tbl_lazy}. Use \code{\link[dplyr:explain]{dplyr::show_query()}} to see the generated
 query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
 \description{
-These are methods for the dplyr \code{\link[=mutate]{mutate()}} and \code{\link[=transmute]{transmute()}} generics.
+These are methods for the dplyr \code{\link[dplyr:mutate]{dplyr::mutate()}} and \code{\link[dplyr:transmute]{dplyr::transmute()}} generics.
 They are translated to computed expressions in the \code{SELECT} clause of
 the SQL query.
 }

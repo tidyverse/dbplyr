@@ -2,14 +2,16 @@
 
 #' @export
 #' @rdname sql_build
-join_query <- function(x,
-                       y,
-                       select,
-                       ...,
-                       type = "inner",
-                       by = NULL,
-                       suffix = c(".x", ".y"),
-                       na_matches = FALSE) {
+join_query <- function(
+  x,
+  y,
+  select,
+  ...,
+  type = "inner",
+  by = NULL,
+  suffix = c(".x", ".y"),
+  na_matches = FALSE
+) {
   structure(
     list(
       x = x,
@@ -68,16 +70,21 @@ print.multi_join_query <- function(x, ...) {
 }
 
 #' @export
-sql_render.join_query <- function(query,
-                                  con = NULL,
-                                  ...,
-                                  sql_options = NULL,
-                                  subquery = FALSE,
-                                  lvl = 0) {
+sql_render.join_query <- function(
+  query,
+  con = NULL,
+  ...,
+  sql_options = NULL,
+  subquery = FALSE,
+  lvl = 0
+) {
   from_x <- sql_render(query$x, con, ..., subquery = TRUE, lvl = lvl + 1)
   from_y <- sql_render(query$y, con, ..., subquery = TRUE, lvl = lvl + 1)
 
-  dbplyr_query_join(con, from_x, from_y,
+  dbplyr_query_join(
+    con,
+    from_x,
+    from_y,
     vars = query$vars,
     type = query$type,
     by = query$by,
@@ -88,12 +95,14 @@ sql_render.join_query <- function(query,
 }
 
 #' @export
-sql_render.multi_join_query <- function(query,
-                                        con = NULL,
-                                        ...,
-                                        sql_options = NULL,
-                                        subquery = FALSE,
-                                        lvl = 0) {
+sql_render.multi_join_query <- function(
+  query,
+  con = NULL,
+  ...,
+  sql_options = NULL,
+  subquery = FALSE,
+  lvl = 0
+) {
   x <- sql_render(query$x, con, ..., subquery = TRUE, lvl = lvl + 1)
   query$joins$table <- purrr::map(
     query$joins$table,
@@ -174,7 +183,13 @@ flatten_query.multi_join_query <- function(qry, query_list, con) {
 #' )
 #'
 #' # Full and right join are handled via `sql_rf_join_vars`
-sql_multi_join_vars <- function(con, vars, table_vars, use_star, qualify_all_columns) {
+sql_multi_join_vars <- function(
+  con,
+  vars,
+  table_vars,
+  use_star,
+  qualify_all_columns
+) {
   all_vars <- tolower(unlist(table_vars, use.names = FALSE))
   if (qualify_all_columns) {
     duplicated_vars <- unique(all_vars)
@@ -192,16 +207,19 @@ sql_multi_join_vars <- function(con, vars, table_vars, use_star, qualify_all_col
     used_vars_i <- vars$var[vars_idx_i]
     out_vars_i <- vars$name[vars_idx_i]
 
-    if (use_star && join_can_use_star(all_vars_i, used_vars_i, out_vars_i, vars_idx_i)) {
+    if (
+      use_star &&
+        join_can_use_star(all_vars_i, used_vars_i, out_vars_i, vars_idx_i)
+    ) {
       id <- vars_idx_i[[1]]
       out[[id]] <- sql_star(con, table_paths[i])
       names(out)[id] <- ""
     } else {
       out[vars_idx_i] <- purrr::map2(
-        used_vars_i, i,
+        used_vars_i,
+        i,
         ~ sql_multi_join_var(con, .x, .y, table_paths, duplicated_vars)
       )
-
     }
   }
 
@@ -228,7 +246,13 @@ join_can_use_star <- function(all_vars, used_vars, out_vars, idx) {
   all(diff(idx) == 1)
 }
 
-sql_multi_join_var <- function(con, var, table_id, table_names, duplicated_vars) {
+sql_multi_join_var <- function(
+  con,
+  var,
+  table_id,
+  table_names,
+  duplicated_vars
+) {
   if (length(table_id) > 1) {
     # TODO use `vec_check_size()` after vctrs 0.6 release
     cli_abort("{.arg table_id} must have size 1", .internal = TRUE)
@@ -241,13 +265,15 @@ sql_multi_join_var <- function(con, var, table_id, table_names, duplicated_vars)
   }
 }
 
-sql_rf_join_vars <- function(con,
-                             type,
-                             vars,
-                             x_as = "LHS",
-                             y_as = "RHS",
-                             use_star,
-                             qualify_all_columns) {
+sql_rf_join_vars <- function(
+  con,
+  type,
+  vars,
+  x_as = "LHS",
+  y_as = "RHS",
+  use_star,
+  qualify_all_columns
+) {
   type <- arg_match0(type, c("right", "full"))
 
   check_table_path(x_as)
@@ -257,7 +283,8 @@ sql_rf_join_vars <- function(con,
   if (type == "full") {
     duplicated_vars <- intersect(tolower(vars$all_x), tolower(vars$all_y))
     out <- purrr::map2(
-      vars$x, vars$y,
+      vars$x,
+      vars$y,
       ~ {
         if (!is.na(.x) && !is.na(.y)) {
           out <- sql_expr(
@@ -284,7 +311,8 @@ sql_rf_join_vars <- function(con,
   }
 
   multi_join_vars <- purrr::map2_dfr(
-    vars$x, vars$y,
+    vars$x,
+    vars$y,
     ~ {
       if (!is.na(.x)) {
         table <- 1L

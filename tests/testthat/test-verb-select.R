@@ -45,7 +45,11 @@ test_that("select after arrange produces subquery, if needed", {
 
   inner_query <- out$lazy_query$x
   expect_s3_class(inner_query, "lazy_select_query")
-  expect_equal(inner_query$order_by, list(quo(x), quo(z)), ignore_formula_env = TRUE)
+  expect_equal(
+    inner_query$order_by,
+    list(quo(x), quo(z)),
+    ignore_formula_env = TRUE
+  )
   expect_equal(
     op_vars(inner_query),
     c("x", "z")
@@ -128,9 +132,15 @@ test_that("select handles order vars", {
   lf <- lazy_frame(x = 1, y = 1, z = 1)
   # can drop order vars
   expect_equal(lf %>% window_order(y) %>% select(-y) %>% op_sort(), list())
-  expect_equal(lf %>% window_order(desc(y)) %>% select(-y) %>% op_sort(), list())
+  expect_equal(
+    lf %>% window_order(desc(y)) %>% select(-y) %>% op_sort(),
+    list()
+  )
   # can rename order vars
-  expect_equal(lf %>% window_order(y) %>% select(y2 = y) %>% op_sort(), list(expr(y2)))
+  expect_equal(
+    lf %>% window_order(y) %>% select(y2 = y) %>% op_sort(),
+    list(expr(y2))
+  )
   expect_equal(
     lf %>% window_order(desc(y)) %>% select(y2 = y) %>% op_sort(),
     list(expr(desc(y2)))
@@ -195,7 +205,7 @@ test_that("select() after left_join() is inlined", {
   expect_equal(out$lazy_query$vars$table, c(2L, 1L, 1L))
 
   out <- left_join(lf1, lf2, by = "x") %>%
-      transmute(b, x = x + 1)
+    transmute(b, x = x + 1)
   expect_s3_class(out$lazy_query, "lazy_select_query")
 })
 
@@ -216,7 +226,7 @@ test_that("select() after semi_join() is inlined", {
   expect_equal(op_vars(out), c("a", "x"))
 
   out <- semi_join(lf1, lf2, by = "x") %>%
-      transmute(a, x = x + 1)
+    transmute(a, x = x + 1)
   expect_s3_class(out$lazy_query, "lazy_select_query")
 })
 
@@ -319,7 +329,7 @@ test_that("arranged computed columns are not inlined away", {
 
   inner_query <- out$lazy_query$x
   expect_snapshot({
-      lf %>% mutate(z = 1) %>% arrange(x, z) %>% select(x)
+    lf %>% mutate(z = 1) %>% arrange(x, z) %>% select(x)
   })
   expect_s3_class(inner_query, "lazy_select_query")
   expect_equal(
@@ -330,9 +340,9 @@ test_that("arranged computed columns are not inlined away", {
   expect_equal(op_vars(inner_query), c("x", "z"))
   expect_equal(op_vars(out$lazy_query), "x")
   expect_equal(
-      # order vars in a subquery are dropped
-      inner_query[setdiff(names(inner_query), "order_vars")],
-      out2$lazy_query[setdiff(names(out2$lazy_query), "order_vars")]
+    # order vars in a subquery are dropped
+    inner_query[setdiff(names(inner_query), "order_vars")],
+    out2$lazy_query[setdiff(names(out2$lazy_query), "order_vars")]
   )
 })
 

@@ -35,15 +35,22 @@ dbplyr_edition.HDB <- function(con) {
 #' @export
 sql_translation.HDB <- function(con) {
   sql_variant(
-    sql_translator(.parent = base_scalar,
+    sql_translator(
+      .parent = base_scalar,
       as.character = sql_cast("VARCHAR"),
       as.numeric = sql_cast("DOUBLE"),
       as.double = sql_cast("DOUBLE"),
 
       # string functions ------------------------------------------------
-      paste = sql_paste_infix(" ", "||", function(x) sql_expr(cast(!!x %as% text))),
-      paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
-      str_c = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
+      paste = sql_paste_infix(" ", "||", function(x) {
+        sql_expr(cast(!!x %as% text))
+      }),
+      paste0 = sql_paste_infix("", "||", function(x) {
+        sql_expr(cast(!!x %as% text))
+      }),
+      str_c = sql_paste_infix("", "||", function(x) {
+        sql_expr(cast(!!x %as% text))
+      }),
 
       # https://help.sap.com/viewer/7c78579ce9b14a669c1f3295b0d8ca16/Cloud/en-US/20e8341275191014a4cfdcd3c830fc98.html
       substr = sql_substr("SUBSTRING"),

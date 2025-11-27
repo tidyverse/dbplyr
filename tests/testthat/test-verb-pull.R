@@ -50,4 +50,3 @@ test_that("ungroup() produces nice error messages", {
     memdb_frame(x = 1) %>% pull(x, "name_non_existent")
   })
 })
-
