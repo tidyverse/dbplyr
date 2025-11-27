@@ -2,6 +2,16 @@
 
 ## dbplyr (development version)
 
+- SQL server:
+  [`slice_sample()`](https://dplyr.tidyverse.org/reference/slice.html)
+  returns different results each run
+  ([@thomashulst](https://github.com/thomashulst),
+  [\#1503](https://github.com/tidyverse/dbplyr/issues/1503))
+- Corrected translation of
+  [`stringr::str_like()`](https://stringr.tidyverse.org/reference/str_like.html)
+  to use case-sensitive `LIKE` when argument `ignore_case` is set as
+  `FALSE` ([@edward-burn](https://github.com/edward-burn),
+  [\#1488](https://github.com/tidyverse/dbplyr/issues/1488)).
 - Corrected translation of
   [`stringr::str_like()`](https://stringr.tidyverse.org/reference/str_like.html)
   to use case-sensitive `LIKE` when argument `ignore_case` is set as
