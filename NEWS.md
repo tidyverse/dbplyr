@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Defunct functions have been removed:
+  * `src_sql()` deprecated in 1.4.0 (2019-04-23)
 * `show_query()` gains `use_colour` argument (#1590).
 * SQL server: `slice_sample()` returns different results each run (@thomashulst, #1503)
 * Corrected translation of `stringr::str_like()` to use case-sensitive `LIKE` when argument `ignore_case` is set as `FALSE` (@edward-burn, #1488).
