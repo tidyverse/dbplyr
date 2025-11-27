@@ -158,8 +158,12 @@ is_select_identity <- function(select, vars_prev) {
 
 #' @export
 print.lazy_select_query <- function(x, ...) {
-  cat_line("<SQL SELECT", if (!isFALSE(x$distinct)) " DISTINCT",
-           if (!is.logical(x$distinct)) " ON", ">")
+  cat_line(
+    "<SQL SELECT",
+    if (!isFALSE(x$distinct)) " DISTINCT",
+    if (!is.logical(x$distinct)) " ON",
+    ">"
+  )
   cat_line("From:")
   cat_line(indent_print(sql_build(x$x, simulate_dbi())))
 

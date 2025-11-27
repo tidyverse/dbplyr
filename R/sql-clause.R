@@ -54,7 +54,7 @@ sql_clause_select <- function(
   }
 
   sql_distinct <-
-    if(isTRUE(distinct)) {
+    if (isTRUE(distinct)) {
       " DISTINCT"
     } else if (isFALSE(distinct)) {
       ""

@@ -18,7 +18,9 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
   grps <- syms(op_grps(.data))
   empty_dots <- dots_n(...) == 0
   can_use_distinct <-
-    !.keep_all || (empty_dots && is_empty(grps)) || supports_distinct_on(.data$src$con)
+    !.keep_all ||
+    (empty_dots && is_empty(grps)) ||
+    supports_distinct_on(.data$src$con)
 
   if (can_use_distinct) {
     if (empty_dots) {
@@ -34,7 +36,10 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
       out$lazy_query <- add_distinct(out, distinct = TRUE)
     } else {
       out <- prep$data
-      out$lazy_query <- add_distinct(out, distinct = set_names(names(quos_auto_name(dots))))
+      out$lazy_query <- add_distinct(
+        out,
+        distinct = set_names(names(quos_auto_name(dots)))
+      )
     }
   } else {
     needs_dummy_order <- is.null(op_sort(.data))
