@@ -136,4 +136,3 @@ test_that("sorting preserved across compute and collapse", {
   df3 <- collapse(df1)
   expect_equal(get_expr(op_sort(df3)[[1]]), quote(x))
 })
-

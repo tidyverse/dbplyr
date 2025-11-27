@@ -35,6 +35,16 @@ test_that("only overwrite existing table if explicitly requested", {
   expect_silent(copy_to(con, data.frame(x = 1), name = "df", overwrite = TRUE))
 })
 
+test_that("overwrite flag works when copying *within* db sources", {
+  con <- local_sqlite_connection()
+  df <- copy_to(con, tibble(x = 1), "df", temporary = FALSE)
+  copy_to(con, df, "df2", temporary = FALSE)
+
+  df2 <- tibble(x = 2)
+  out <- copy_to(con, df2, name = "df2", temporary = FALSE, overwrite = TRUE)
+  expect_equal(collect(out), df2)
+})
+
 test_that("can create a new table in non-default schema", {
   con <- local_sqlite_con_with_aux()
 
@@ -45,7 +55,13 @@ test_that("can create a new table in non-default schema", {
   expect_equal(collect(db1), df1)
 
   # And can overwrite
-  db2 <- copy_to(con, df2, in_schema("aux", "df"), temporary = FALSE, overwrite = TRUE)
+  db2 <- copy_to(
+    con,
+    df2,
+    in_schema("aux", "df"),
+    temporary = FALSE,
+    overwrite = TRUE
+  )
   expect_equal(collect(db2), df2)
 })
 
@@ -83,7 +99,10 @@ test_that("can translate a table", {
   )
 
   expect_equal(
-    copy_inline(con, tibble(date = as.Date(c("2020-01-01", "2020-01-02"), tz = "UTC"))) %>%
+    copy_inline(
+      con,
+      tibble(date = as.Date(c("2020-01-01", "2020-01-02"), tz = "UTC"))
+    ) %>%
       collect(),
     tibble(date = c("2020-01-01", "2020-01-02"))
   )

@@ -13,7 +13,9 @@ test_that("basic prefix operation", {
 test_that("basic infix operation", {
   local_con(simulate_dbi())
 
-  paste <- sql_paste_infix("", "&&", function(x) sql_expr(cast((!!x) %as% text)))
+  paste <- sql_paste_infix("", "&&", function(x) {
+    sql_expr(cast((!!x) %as% text))
+  })
   x <- ident("x")
   y <- ident("y")
 

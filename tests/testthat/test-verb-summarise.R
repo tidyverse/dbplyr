@@ -29,12 +29,24 @@ test_that("can't refer to freshly created variables", {
 
     # works for variables created in `across()`
     # mentions `a_sum`
-    (expect_error(summarise(lf1, across(c(a, b), list(sum = sum)), issue_col = sum(a_sum))))
+    (expect_error(summarise(
+      lf1,
+      across(c(a, b), list(sum = sum)),
+      issue_col = sum(a_sum)
+    )))
     # mentions `b_sum`
-    (expect_error(summarise(lf1, across(c(a, b), list(sum = sum)), issue_col = sum(b_sum))))
+    (expect_error(summarise(
+      lf1,
+      across(c(a, b), list(sum = sum)),
+      issue_col = sum(b_sum)
+    )))
 
     # mentions `across()`
-    (expect_error(summarise(lf1, a_sum = sum(a), issue_col = across(a_sum, sum))))
+    (expect_error(summarise(
+      lf1,
+      a_sum = sum(a),
+      issue_col = across(a_sum, sum)
+    )))
   })
 })
 
@@ -44,17 +56,32 @@ test_that("summarise(.groups=)", {
   # the `dplyr::` prefix is needed for `check()`
   # should produce a message when called directly by user
   expect_message(eval_bare(
-    expr(lazy_frame(x = 1, y = 2) %>% dplyr::group_by(x, y) %>% dplyr::summarise() %>% remote_query()),
+    expr(
+      lazy_frame(x = 1, y = 2) %>%
+        dplyr::group_by(x, y) %>%
+        dplyr::summarise() %>%
+        remote_query()
+    ),
     env(global_env())
   ))
   expect_snapshot(eval_bare(
-    expr(lazy_frame(x = 1, y = 2) %>% dplyr::group_by(x, y) %>% dplyr::summarise() %>% remote_query()),
+    expr(
+      lazy_frame(x = 1, y = 2) %>%
+        dplyr::group_by(x, y) %>%
+        dplyr::summarise() %>%
+        remote_query()
+    ),
     env(global_env())
   ))
 
   # should be silent when called in another package
   expect_silent(eval_bare(
-    expr(lazy_frame(x = 1, y = 2) %>% dplyr::group_by(x, y) %>% dplyr::summarise() %>% remote_query()),
+    expr(
+      lazy_frame(x = 1, y = 2) %>%
+        dplyr::group_by(x, y) %>%
+        dplyr::summarise() %>%
+        remote_query()
+    ),
     asNamespace("testthat")
   ))
 
@@ -71,7 +98,9 @@ test_that("summarise can modify grouping variables", {
 
   expect_snapshot((result1 <- lf %>% group_by(g) %>% summarise(g = g + 1)))
   expect_equal(op_vars(result1), "g")
-  expect_snapshot((result2 <- lf %>% group_by(g) %>% summarise(x = x + 1, g = g + 1)))
+  expect_snapshot(
+    (result2 <- lf %>% group_by(g) %>% summarise(x = x + 1, g = g + 1))
+  )
   expect_equal(op_vars(result2), c("g", "x"))
 })
 
@@ -79,7 +108,7 @@ test_that("across() does not select grouping variables", {
   df <- lazy_frame(g = 1, x = 1)
 
   # SELECT `g`, 0.0 AS `x`
-  expect_snapshot(df %>% group_by(g) %>% summarise(across(.fns = ~ 0)))
+  expect_snapshot(df %>% group_by(g) %>% summarise(across(.fns = ~0)))
 })
 
 test_that("summarise() after select() works #985", {

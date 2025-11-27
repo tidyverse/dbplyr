@@ -15,7 +15,10 @@ test_that("slice_min handles arguments", {
   expect_equal(db %>% slice_min(id, prop = 0.5) %>% pull(), 1)
 
   expect_snapshot(error = TRUE, db %>% slice_min())
-  expect_snapshot(error = TRUE, db %>% slice_min(id, prop = 0.5, with_ties = FALSE))
+  expect_snapshot(
+    error = TRUE,
+    db %>% slice_min(id, prop = 0.5, with_ties = FALSE)
+  )
   expect_snapshot(error = TRUE, db %>% slice_min(id, n = 1, na_rm = FALSE))
 })
 
@@ -85,7 +88,10 @@ test_that("slice_min/max() work with `by`", {
   out <- slice_min(df, x, by = g) %>% arrange(g) %>% collect()
   expect_identical(out, tibble(g = c(1, 2), x = 1))
   expect_equal(group_vars(out), character())
-  expect_identical(slice_max(df, x, by = g) %>% arrange(g) %>% collect(), tibble(g = c(1, 2), x = c(3, 2)))
+  expect_identical(
+    slice_max(df, x, by = g) %>% arrange(g) %>% collect(),
+    tibble(g = c(1, 2), x = c(3, 2))
+  )
 })
 
 test_that("slice_sample() works with `by`", {

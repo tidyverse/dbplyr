@@ -17,12 +17,12 @@ order.}
 grouped data frames only.}
 }
 \value{
-Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
+Another \code{tbl_lazy}. Use \code{\link[dplyr:explain]{dplyr::show_query()}} to see the generated
 query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
 \description{
-This is an method for the dplyr \code{\link[=arrange]{arrange()}} generic. It generates
+This is an method for the dplyr \code{\link[dplyr:arrange]{dplyr::arrange()}} generic. It generates
 the \verb{ORDER BY} clause of the SQL query. It also affects the
 \code{\link[=window_order]{window_order()}} of windowed expressions in \code{\link[=mutate.tbl_lazy]{mutate.tbl_lazy()}}.
 

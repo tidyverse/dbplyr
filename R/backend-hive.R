@@ -34,11 +34,12 @@ dbplyr_edition.Hive <- function(con) {
 #' @export
 sql_translation.Hive <- function(con) {
   sql_variant(
-    sql_translator(.parent = base_odbc_scalar,
-      bitwShiftL    = sql_prefix("SHIFTLEFT", 2),
-      bitwShiftR    = sql_prefix("SHIFTRIGHT", 2),
+    sql_translator(
+      .parent = base_odbc_scalar,
+      bitwShiftL = sql_prefix("SHIFTLEFT", 2),
+      bitwShiftR = sql_prefix("SHIFTRIGHT", 2),
 
-      cot = function(x){
+      cot = function(x) {
         sql_expr(1 / tan(!!x))
       },
 
@@ -46,12 +47,14 @@ sql_translation.Hive <- function(con) {
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
       }
     ),
-    sql_translator(.parent = base_odbc_agg,
+    sql_translator(
+      .parent = base_odbc_agg,
       var = sql_aggregate("VARIANCE", "var"),
       quantile = sql_quantile("PERCENTILE"),
       median = sql_median("PERCENTILE")
     ),
-    sql_translator(.parent = base_odbc_win,
+    sql_translator(
+      .parent = base_odbc_win,
       var = win_aggregate("VARIANCE"),
       quantile = sql_quantile("PERCENTILE", window = TRUE),
       median = sql_median("PERCENTILE", window = TRUE),
@@ -93,7 +96,15 @@ sql_table_analyze.Hive <- function(con, table, ...) {
 }
 
 #' @export
-sql_query_set_op.Hive <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
+sql_query_set_op.Hive <- function(
+  con,
+  x,
+  y,
+  method,
+  ...,
+  all = FALSE,
+  lvl = 0
+) {
   check_bool(all)
   # parentheses are not allowed
   method <- paste0(method, if (all) " ALL")
@@ -101,7 +112,8 @@ sql_query_set_op.Hive <- function(con, x, y, method, ..., all = FALSE, lvl = 0) 
     con,
     "\n", # dummy line to protect indent
     "{x}\n",
-    lvl_indent(lvl), "{.kw method}\n",
+    lvl_indent(lvl),
+    "{.kw method}\n",
     y
   )
 }

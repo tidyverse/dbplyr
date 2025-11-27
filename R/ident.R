@@ -44,4 +44,3 @@ format.ident <- function(x, ...) {
 #' @rdname ident
 #' @export
 is.ident <- function(x) inherits(x, "ident")
-
