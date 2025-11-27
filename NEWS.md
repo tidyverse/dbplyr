@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* Custom translations of functions starting with `.` work (@MichaelChirico, #1529).
 * SQL server: `slice_sample()` returns different results each run (@thomashulst, #1503)
 * Corrected translation of `stringr::str_like()` to use case-sensitive `LIKE` when argument `ignore_case` is set as `FALSE` (@edward-burn, #1488).
 * Corrected translation of `stringr::str_like()` to use case-sensitive `LIKE` when argument `ignore_case` is set as `FALSE` (@edward-burn, #1488).
@@ -31,7 +32,6 @@
 * Spark SQL backend now supports persisting tables with
   `compute(x, name = I("x.y.z"), temporary = FALSE)` (@zacdav-db, #1502).
 
-* Custom translations of functions starting with `.` work (@MichaelChirico, #1529).
 
 # dbplyr 2.5.0
 
