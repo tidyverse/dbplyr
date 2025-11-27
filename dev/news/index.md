@@ -123,7 +123,7 @@ CRAN release: 2024-03-19
     need to name each argument.
 
   - If you accidentally pass a named vector to any of the database
-    identifer functions, those names will be automatically stripped
+    identifier functions, those names will be automatically stripped
     ([\#1404](https://github.com/tidyverse/dbplyr/issues/1404)).
 
   - `tbl_sql(check_from)` is now deprecated.
@@ -372,7 +372,7 @@ CRAN release: 2023-10-26
     works again ([@mgirlich](https://github.com/mgirlich),
     [\#1211](https://github.com/tidyverse/dbplyr/issues/1211)).
 
-  - A `semi/anti_join()` on fitlered `y` is inlined when possible
+  - A `semi/anti_join()` on filtered `y` is inlined when possible
     ([@mgirlich](https://github.com/mgirlich),
     [\#884](https://github.com/tidyverse/dbplyr/issues/884)).
 

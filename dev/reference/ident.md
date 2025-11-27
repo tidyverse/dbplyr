@@ -1,7 +1,7 @@
 # Flag a character vector as SQL identifiers
 
 `ident()` takes strings and turns them as database identifiers (e.g.
-table or column names) quoting them using the identifer rules for your
+table or column names) quoting them using the identifier rules for your
 database.
 [`ident_q()`](https://dbplyr.tidyverse.org/dev/reference/ident_q.md)
 does the same, but assumes the names have already been quoted,
