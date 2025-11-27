@@ -8,7 +8,7 @@ to run the query and save the results in a temporary table in the
 database, or use
 [`dplyr::collect()`](https://dplyr.tidyverse.org/reference/compute.html)
 to retrieve the results to R. You can see the query with
-[`dplyr::show_query()`](https://dplyr.tidyverse.org/reference/explain.html).
+[`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md).
 
 ## Usage
 

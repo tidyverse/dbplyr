@@ -37,7 +37,7 @@ head(x, n = 6L, ...)
 ## Value
 
 Another `tbl_lazy`. Use
-[`dplyr::show_query()`](https://dplyr.tidyverse.org/reference/explain.html)
+[`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
 to see the generated query, and use
 [`collect()`](https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.md)
 to execute the query and return data to R.

@@ -16,6 +16,9 @@
   : Compute results of a query
 - [`pull(`*`<tbl_sql>`*`)`](https://dbplyr.tidyverse.org/dev/reference/pull.tbl_sql.md)
   : Extract a single column
+- [`show_query(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
+  [`explain(`*`<tbl_sql>`*`)`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
+  : Show query details
 
 ### Verbs that affect rows
 

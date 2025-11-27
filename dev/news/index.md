@@ -2,6 +2,9 @@
 
 ## dbplyr (development version)
 
+- [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
+  gains `use_colour` argument
+  ([\#1590](https://github.com/tidyverse/dbplyr/issues/1590)).
 - SQL server:
   [`slice_sample()`](https://dplyr.tidyverse.org/reference/slice.html)
   returns different results each run
@@ -458,7 +461,7 @@ CRAN release: 2023-10-26
   ([@ejneer](https://github.com/ejneer),
   [\#1240](https://github.com/tidyverse/dbplyr/issues/1240)).
 
-- [`show_query()`](https://dplyr.tidyverse.org/reference/explain.html)
+- [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
   and
   [`remote_query()`](https://dbplyr.tidyverse.org/dev/reference/remote_name.md)
   gain the argument `sql_options` that allows to control how the SQL is
@@ -473,7 +476,7 @@ CRAN release: 2023-10-26
     [\#1146](https://github.com/tidyverse/dbplyr/issues/1146)).
 
   Consequently the `cte` argument of
-  [`show_query()`](https://dplyr.tidyverse.org/reference/explain.html)
+  [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
   and
   [`remote_query()`](https://dbplyr.tidyverse.org/dev/reference/remote_name.md)
   has been deprecated ([@mgirlich](https://github.com/mgirlich),
@@ -1131,7 +1134,7 @@ CRAN release: 2022-06-05
 
 - SQL formatting has been considerably improved with new wrapping and
   indenting.
-  [`show_query()`](https://dplyr.tidyverse.org/reference/explain.html)
+  [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
   creates more readable queries by printing the keywords in blue
   ([@mgirlich](https://github.com/mgirlich),
   [\#644](https://github.com/tidyverse/dbplyr/issues/644)). When
@@ -1156,7 +1159,7 @@ CRAN release: 2022-06-05
   [\#628](https://github.com/tidyverse/dbplyr/issues/628)).
 
 - [`remote_query()`](https://dbplyr.tidyverse.org/dev/reference/remote_name.md),
-  [`show_query()`](https://dplyr.tidyverse.org/reference/explain.html),
+  [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md),
   [`compute()`](https://dplyr.tidyverse.org/reference/compute.html) and
   [`collect()`](https://dplyr.tidyverse.org/reference/compute.html) have
   an experimental `cte` argument. If `TRUE` the SQL query will use
@@ -2277,7 +2280,7 @@ testing and generating reprexes.
   [`sql_expr()`](https://dbplyr.tidyverse.org/dev/reference/sql_expr.md)
   is to [`rlang::expr()`](https://rlang.r-lib.org/reference/expr.html).
 
-- [`show_query()`](https://dplyr.tidyverse.org/reference/explain.html)
+- [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
   and [`explain()`](https://dplyr.tidyverse.org/reference/explain.html)
   use [`cat()`](https://rdrr.io/r/base/cat.html) rather than message.
 
@@ -2984,7 +2987,7 @@ CRAN release: 2017-06-09
   ([\#1912](https://github.com/tidyverse/dbplyr/issues/1912))
 
 - [`explain()`](https://dplyr.tidyverse.org/reference/explain.html) and
-  [`show_query()`](https://dplyr.tidyverse.org/reference/explain.html)
+  [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
   now invisibly return the first argument, making them easier to use
   inside a pipeline.
 

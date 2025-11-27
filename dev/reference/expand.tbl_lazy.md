@@ -55,7 +55,7 @@ expand(data, ..., .name_repair = "check_unique")
 ## Value
 
 Another `tbl_lazy`. Use
-[`dplyr::show_query()`](https://dplyr.tidyverse.org/reference/explain.html)
+[`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
 to see the generated query, and use
 [`collect()`](https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.md)
 to execute the query and return data to R.

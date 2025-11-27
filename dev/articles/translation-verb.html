@@ -119,7 +119,7 @@ demonstrate we’ll make a temporary database with a couple of tables</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">flights</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"delay"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## &lt;SQL&gt;</span></span>
 <span><span class="co">## <span style="color: #0000BB;">SELECT</span> `dep_delay`, `arr_delay`</span></span>
 <span><span class="co">## <span style="color: #0000BB;">FROM</span> `nycflights13::flights`</span></span></code></pre>
@@ -127,7 +127,7 @@ demonstrate we’ll make a temporary database with a couple of tables</p>
 <code class="sourceCode R"><span><span class="va">flights</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">distance</span>, <span class="va">air_time</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>  </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>speed <span class="op">=</span> <span class="va">distance</span> <span class="op">/</span> <span class="op">(</span><span class="va">air_time</span> <span class="op">/</span> <span class="fl">60</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## &lt;SQL&gt;</span></span>
 <span><span class="co">## <span style="color: #0000BB;">SELECT</span> `distance`, `air_time`, `distance` / (`air_time` / 60.0)<span style="color: #0000BB;"> AS </span>`speed`</span></span>
 <span><span class="co">## <span style="color: #0000BB;">FROM</span> `nycflights13::flights`</span></span></code></pre>
@@ -137,7 +137,7 @@ demonstrate we’ll make a temporary database with a couple of tables</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">flights</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op">==</span> <span class="fl">1</span>, <span class="va">day</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## &lt;SQL&gt;</span></span>
 <span><span class="co">## <span style="color: #0000BB;">SELECT</span> `nycflights13::flights`.*</span></span>
 <span><span class="co">## <span style="color: #0000BB;">FROM</span> `nycflights13::flights`</span></span>
@@ -149,7 +149,7 @@ clause:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">flights</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">carrier</span>, <span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">arr_delay</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## &lt;SQL&gt;</span></span>
 <span><span class="co">## <span style="color: #0000BB;">SELECT</span> `nycflights13::flights`.*</span></span>
 <span><span class="co">## <span style="color: #0000BB;">FROM</span> `nycflights13::flights`</span></span>
@@ -162,7 +162,7 @@ together to generate a <code>GROUP BY</code> clause:</p>
 <code class="sourceCode R"><span><span class="va">flights</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">month</span>, <span class="va">day</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>delay <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">dep_delay</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## `summarise()` has grouped output by <span style="color: #0000BB;">"month"</span>. You can override using</span></span>
 <span><span class="co">## the `.groups` argument.</span></span></code></pre>
 <pre><code><span><span class="co">## &lt;SQL&gt;</span></span>

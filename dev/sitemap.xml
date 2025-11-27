@@ -74,6 +74,7 @@
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/replace_na.tbl_lazy.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/rows-db.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/select.tbl_lazy.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/show_query.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/simulate_dbi.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_build.html</loc></url>

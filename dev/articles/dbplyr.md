@@ -290,7 +290,7 @@ tailnum_delay_db
 
 Behind the scenes, dplyr is translating your R code into SQL. You can
 see the SQL it’s generating with
-[`show_query()`](https://dplyr.tidyverse.org/reference/explain.html):
+[`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md):
 
 ``` r
 tailnum_delay_db %>% show_query()
