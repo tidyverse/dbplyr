@@ -8,7 +8,6 @@
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::group_by
 #' @param .drop Not supported by this method.
-#' @param add Deprecated. Please use `.add` instead.
 #' @export
 #' @importFrom dplyr group_by
 #' @examples
@@ -28,14 +27,9 @@ group_by.tbl_lazy <- function(
   .data,
   ...,
   .add = FALSE,
-  add = deprecated(),
   .drop = TRUE
 ) {
   dots <- partial_eval_dots(.data, ..., .named = FALSE)
-
-  if (lifecycle::is_present(add)) {
-    lifecycle::deprecate_stop("1.0.0", "dplyr::group_by(add)", "group_by(.add)")
-  }
 
   check_unsupported_arg(.drop, TRUE)
   groups <- dplyr::group_by_prepare(
