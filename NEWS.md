@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* `show_query()` gains `use_colour` argument (#1590).
 * SQL server: `slice_sample()` returns different results each run (@thomashulst, #1503)
 * Corrected translation of `stringr::str_like()` to use case-sensitive `LIKE` when argument `ignore_case` is set as `FALSE` (@edward-burn, #1488).
 * Corrected translation of `stringr::str_like()` to use case-sensitive `LIKE` when argument `ignore_case` is set as `FALSE` (@edward-burn, #1488).

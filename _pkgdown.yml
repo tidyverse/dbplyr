@@ -25,6 +25,7 @@ reference:
   - copy_inline
   - collapse.tbl_sql
   - pull.tbl_sql
+  - show_query
 
 - subtitle: Verbs that affect rows
   contents:
