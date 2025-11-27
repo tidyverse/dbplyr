@@ -122,7 +122,11 @@ print.sql_variant <- function(x, ...) {
 
 #' @export
 names.sql_variant <- function(x) {
-  c(ls_all(envir = x$scalar), ls_all(envir = x$aggregate), ls_all(envir = x$window))
+  c(
+    ls_all(envir = x$scalar),
+    ls_all(envir = x$aggregate),
+    ls_all(envir = x$window)
+  )
 }
 
 #' @export
