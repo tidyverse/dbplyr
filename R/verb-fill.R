@@ -33,7 +33,11 @@
 #'     n_squirrels2,
 #'   )
 #' @exportS3Method tidyr::fill
-fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up", "updown", "downup")) {
+fill.tbl_lazy <- function(
+  .data,
+  ...,
+  .direction = c("down", "up", "updown", "downup")
+) {
   cols_to_fill <- tidyselect::eval_select(expr(c(...)), .data)
   cols_to_fill <- syms(names(cols_to_fill))
   order_by_cols <- op_sort(.data)
@@ -82,11 +86,13 @@ dbplyr_fill0 <- function(.con, .data, cols_to_fill, order_by_cols, .direction) {
 # * redshift: https://docs.aws.amazon.com/redshift/latest/dg/r_WF_first_value.html
 # * teradata: https://docs.teradata.com/r/756LNiPSFdY~4JcCCcR5Cw/V~t1FC7orR6KCff~6EUeDQ
 #' @export
-dbplyr_fill0.DBIConnection <- function(.con,
-                                       .data,
-                                       cols_to_fill,
-                                       order_by_cols,
-                                       .direction) {
+dbplyr_fill0.DBIConnection <- function(
+  .con,
+  .data,
+  cols_to_fill,
+  order_by_cols,
+  .direction
+) {
   # strategy:
   # 1. construct a window
   # * from the first row to the current row
@@ -127,11 +133,13 @@ dbplyr_fill0.DBIConnection <- function(.con,
 # * mssql: https://docs.microsoft.com/en-us/sql/t-sql/functions/first-value-transact-sql?view=sql-server-ver15
 #   -> `IGNORE NULLS` only in Azure SQL Edge
 #' @export
-dbplyr_fill0.SQLiteConnection <- function(.con,
-                                          .data,
-                                          cols_to_fill,
-                                          order_by_cols,
-                                          .direction) {
+dbplyr_fill0.SQLiteConnection <- function(
+  .con,
+  .data,
+  cols_to_fill,
+  order_by_cols,
+  .direction
+) {
   # this strategy is used for databases that don't support `IGNORE NULLS` in
   # `LAST_VALUE()`.
   #
@@ -158,7 +166,8 @@ dbplyr_fill0.SQLiteConnection <- function(.con,
     mutate(!!!partition_sql)
 
   fill_sql <- purrr::map2(
-    cols_to_fill, names(partition_sql),
+    cols_to_fill,
+    names(partition_sql),
     ~ translate_sql(
       max(!!.x, na.rm = TRUE),
       con = .con,

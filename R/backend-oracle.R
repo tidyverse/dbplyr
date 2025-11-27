@@ -39,30 +39,32 @@ dbplyr_edition.Oracle <- function(con) {
 }
 
 #' @export
-sql_query_select.Oracle <- function(con,
-                                    select,
-                                    from,
-                                    where = NULL,
-                                    group_by = NULL,
-                                    having = NULL,
-                                    window = NULL,
-                                    order_by = NULL,
-                                    limit = NULL,
-                                    distinct = FALSE,
-                                    ...,
-                                    subquery = FALSE,
-                                    lvl = 0) {
-
-  sql_select_clauses(con,
-    select    = sql_clause_select(con, select, distinct),
-    from      = sql_clause_from(from),
-    where     = sql_clause_where(where),
-    group_by  = sql_clause_group_by(group_by),
-    having    = sql_clause_having(having),
-    window    = sql_clause_window(window),
-    order_by  = sql_clause_order_by(order_by, subquery, limit),
+sql_query_select.Oracle <- function(
+  con,
+  select,
+  from,
+  where = NULL,
+  group_by = NULL,
+  having = NULL,
+  window = NULL,
+  order_by = NULL,
+  limit = NULL,
+  distinct = FALSE,
+  ...,
+  subquery = FALSE,
+  lvl = 0
+) {
+  sql_select_clauses(
+    con,
+    select = sql_clause_select(con, select, distinct),
+    from = sql_clause_from(from),
+    where = sql_clause_where(where),
+    group_by = sql_clause_group_by(group_by),
+    having = sql_clause_having(having),
+    window = sql_clause_window(window),
+    order_by = sql_clause_order_by(order_by, subquery, limit),
     # Requires Oracle 12c, released in 2013
-    limit =   if (!is.null(limit)) {
+    limit = if (!is.null(limit)) {
       limit <- format(as.integer(limit))
       glue_sql2(con, "FETCH FIRST {limit} ROWS ONLY")
     },
@@ -71,14 +73,16 @@ sql_query_select.Oracle <- function(con,
 }
 
 #' @export
-sql_query_upsert.Oracle <- function(con,
-                                    table,
-                                    from,
-                                    by,
-                                    update_cols,
-                                    ...,
-                                    returning_cols = NULL,
-                                    method = NULL) {
+sql_query_upsert.Oracle <- function(
+  con,
+  table,
+  from,
+  by,
+  update_cols,
+  ...,
+  returning_cols = NULL,
+  method = NULL
+) {
   method <- method %||% "merge"
   arg_match(method, c("merge", "cte_update"), error_arg = "method")
   if (method == "cte_update") {
@@ -113,20 +117,21 @@ sql_query_upsert.Oracle <- function(con,
 #' @export
 sql_translation.Oracle <- function(con) {
   sql_variant(
-    sql_translator(.parent = base_odbc_scalar,
+    sql_translator(
+      .parent = base_odbc_scalar,
       # Data type conversions are mostly based on this article
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements001.htm
 
       # https://stackoverflow.com/questions/1171196
-      as.character  = sql_cast("VARCHAR2(255)"),
+      as.character = sql_cast("VARCHAR2(255)"),
       # https://oracle-base.com/articles/misc/oracle-dates-timestamps-and-intervals
       as.Date = function(x) glue_sql2(sql_current_con(), "DATE {.val x}"),
       # bit64::as.integer64 can translate to BIGINT for some
       # vendors, which is equivalent to NUMBER(19) in Oracle
       # https://docs.oracle.com/cd/B19306_01/gateways.102/b14270/apa.htm
-      as.integer64  = sql_cast("NUMBER(19)"),
-      as.numeric    = sql_cast("NUMBER"),
-      as.double     = sql_cast("NUMBER"),
+      as.integer64 = sql_cast("NUMBER(19)"),
+      as.numeric = sql_cast("NUMBER"),
+      as.double = sql_cast("NUMBER"),
 
       runif = function(n = n(), min = 0, max = 1) {
         sql_runif(dbms_random.VALUE(), n = {{ n }}, min = min, max = max)
@@ -134,17 +139,23 @@ sql_translation.Oracle <- function(con) {
 
       # string -----------------------------------------------------------------
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/operators003.htm#i997789
-      paste = sql_paste_infix(" ", "||", function(x) sql_expr(cast(!!x %as% text))),
-      paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
-      str_c = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
+      paste = sql_paste_infix(" ", "||", function(x) {
+        sql_expr(cast(!!x %as% text))
+      }),
+      paste0 = sql_paste_infix("", "||", function(x) {
+        sql_expr(cast(!!x %as% text))
+      }),
+      str_c = sql_paste_infix("", "||", function(x) {
+        sql_expr(cast(!!x %as% text))
+      }),
 
       # https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/REGEXP_REPLACE.html
       # 4th argument is starting position (default: 1 => first char of string)
       # 5th argument is occurrence (default: 0 => match all occurrences)
-      str_replace = function(string, pattern, replacement){
+      str_replace = function(string, pattern, replacement) {
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement, 1L, 1L))
       },
-      str_replace_all = function(string, pattern, replacement){
+      str_replace_all = function(string, pattern, replacement) {
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
       },
 
@@ -163,18 +174,20 @@ sql_translation.Oracle <- function(con) {
       },
 
       difftime = function(time1, time2, tz, units = "days") {
-
         if (!missing(tz)) {
-          cli::cli_abort("The {.arg tz} argument is not supported for SQL backends.")
+          cli::cli_abort(
+            "The {.arg tz} argument is not supported for SQL backends."
+          )
         }
 
         if (units[1] != "days") {
-          cli::cli_abort('The only supported value for {.arg units} on SQL backends is "days"')
+          cli::cli_abort(
+            'The only supported value for {.arg units} on SQL backends is "days"'
+          )
         }
 
         sql_expr(CEIL(CAST(!!time2 %AS% DATE) - CAST(!!time1 %AS% DATE)))
       }
-
     ),
     base_odbc_agg,
     base_odbc_win
@@ -183,7 +196,6 @@ sql_translation.Oracle <- function(con) {
 
 #' @export
 sql_query_explain.Oracle <- function(con, sql, ...) {
-
   # https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/generating-and-displaying-execution-plans.html
   c(
     glue_sql2(con, "EXPLAIN PLAN FOR {sql}"),
@@ -199,7 +211,7 @@ sql_table_analyze.Oracle <- function(con, table, ...) {
 
 #' @export
 sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
-  type <- if (temporary)  "GLOBAL TEMPORARY " else ""
+  type <- if (temporary) "GLOBAL TEMPORARY " else ""
   glue_sql2(con, "CREATE {type}TABLE {.tbl name} AS\n{sql}")
 }
 
@@ -277,4 +289,12 @@ db_explain.OraConnection <- db_explain.Oracle
 #' @export
 db_supports_table_alias_with_as.OraConnection <- db_supports_table_alias_with_as.Oracle
 
-utils::globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC", "dbms_random.VALUE", "DATEDIFF", "CEIL", "NUMTODSINTERVAL"))
+utils::globalVariables(c(
+  "DATE",
+  "CURRENT_TIMESTAMP",
+  "TRUNC",
+  "dbms_random.VALUE",
+  "DATEDIFF",
+  "CEIL",
+  "NUMTODSINTERVAL"
+))

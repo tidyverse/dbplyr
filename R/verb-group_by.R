@@ -24,7 +24,13 @@
 #'   group_by(g) %>%
 #'   mutate(x2 = x / sum(x, na.rm = TRUE)) %>%
 #'   show_query()
-group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = deprecated(), .drop = TRUE) {
+group_by.tbl_lazy <- function(
+  .data,
+  ...,
+  .add = FALSE,
+  add = deprecated(),
+  .drop = TRUE
+) {
   dots <- partial_eval_dots(.data, ..., .named = FALSE)
 
   if (lifecycle::is_present(add)) {
@@ -32,7 +38,12 @@ group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = deprecated(), .dro
   }
 
   check_unsupported_arg(.drop, TRUE)
-  groups <- dplyr::group_by_prepare(.data, !!!dots, .add = .add, error_call = current_call())
+  groups <- dplyr::group_by_prepare(
+    .data,
+    !!!dots,
+    .add = .add,
+    error_call = current_call()
+  )
   names <- purrr::map_chr(groups$groups, as_string)
 
   same_groups <- setequal(groups$group_names, group_vars(.data))

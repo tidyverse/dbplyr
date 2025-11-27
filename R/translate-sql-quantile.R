@@ -1,6 +1,4 @@
-sql_quantile <- function(f,
-                         style = c("infix", "ordered"),
-                         window = FALSE) {
+sql_quantile <- function(f, style = c("infix", "ordered"), window = FALSE) {
   force(f)
   style <- match.arg(style)
   force(window)
@@ -9,16 +7,19 @@ sql_quantile <- function(f,
     check_probs(probs)
     check_na_rm(na.rm)
 
-    sql <- switch(style,
+    sql <- switch(
+      style,
       infix = sql_call2(f, x, probs),
       ordered = glue_sql2(
         sql_current_con(),
-        sql_call2(f, probs), " WITHIN GROUP (ORDER BY {x})"
+        sql_call2(f, probs),
+        " WITHIN GROUP (ORDER BY {x})"
       )
     )
 
     if (window) {
-      sql <- win_over(sql,
+      sql <- win_over(
+        sql,
         partition = win_current_group(),
         frame = win_current_frame()
       )
@@ -27,9 +28,7 @@ sql_quantile <- function(f,
   }
 }
 
-sql_median <- function(f,
-                       style = c("infix", "ordered"),
-                       window = FALSE) {
+sql_median <- function(f, style = c("infix", "ordered"), window = FALSE) {
   quantile <- sql_quantile(f, style = style, window = window)
   function(x, na.rm = FALSE) {
     quantile(x, 0.5, na.rm = na.rm)

@@ -1,15 +1,17 @@
 #' @export
 #' @rdname sql_build
-select_query <- function(from,
-                         select = sql("*"),
-                         where = character(),
-                         group_by = character(),
-                         having = character(),
-                         window = character(),
-                         order_by = character(),
-                         limit = NULL,
-                         distinct = FALSE,
-                         from_alias = NULL) {
+select_query <- function(
+  from,
+  select = sql("*"),
+  where = character(),
+  group_by = character(),
+  having = character(),
+  window = character(),
+  order_by = character(),
+  limit = NULL,
+  distinct = FALSE,
+  from_alias = NULL
+) {
   check_character(select)
   check_character(where)
   check_character(group_by)
@@ -39,19 +41,37 @@ select_query <- function(from,
 
 #' @export
 print.select_query <- function(x, ...) {
-  cat_line("<SQL SELECT", if (!isFALSE(x$distinct)) " DISTINCT",
-           if (!is.logical(x$distinct)) " ON", ">")
+  cat_line(
+    "<SQL SELECT",
+    if (!isFALSE(x$distinct)) " DISTINCT",
+    if (!is.logical(x$distinct)) " ON",
+    ">"
+  )
   cat_line("From:")
   cat_line(indent_print(x$from))
 
-  if (!is.logical(x$distinct)) cat_line("Dist On:  ", named_commas(x$distinct))
-  if (length(x$select))   cat_line("Select:   ", named_commas(x$select))
-  if (length(x$where))    cat_line("Where:    ", named_commas(x$where))
-  if (length(x$group_by)) cat_line("Group by: ", named_commas(x$group_by))
-  if (length(x$window))   cat_line("Window:   ", named_commas(x$window))
-  if (length(x$order_by)) cat_line("Order by: ", named_commas(x$order_by))
-  if (length(x$having))   cat_line("Having:   ", named_commas(x$having)) # nocov
-  if (length(x$limit))    cat_line("Limit:    ", x$limit)
+  if (!is.logical(x$distinct)) {
+    cat_line("Dist On:  ", named_commas(x$distinct))
+  }
+  if (length(x$select)) {
+    cat_line("Select:   ", named_commas(x$select))
+  }
+  if (length(x$where)) {
+    cat_line("Where:    ", named_commas(x$where))
+  }
+  if (length(x$group_by)) {
+    cat_line("Group by: ", named_commas(x$group_by))
+  }
+  if (length(x$window)) {
+    cat_line("Window:   ", named_commas(x$window))
+  }
+  if (length(x$order_by)) {
+    cat_line("Order by: ", named_commas(x$order_by))
+  }
+  if (length(x$having)) {
+    cat_line("Having:   ", named_commas(x$having))
+  } # nocov
+  if (length(x$limit)) cat_line("Limit:    ", x$limit)
 }
 
 #' @export
@@ -67,7 +87,9 @@ sql_optimise.select_query <- function(x, con = NULL, ..., subquery = FALSE) {
   outer <- select_query_clauses(x, subquery = subquery)
   inner <- select_query_clauses(from, subquery = TRUE)
 
-  can_squash <- length(outer) == 0 || length(inner) == 0 || min(outer) > max(inner)
+  can_squash <- length(outer) == 0 ||
+    length(inner) == 0 ||
+    min(outer) > max(inner)
 
   if (can_squash) {
     # Have we optimised away an ORDER BY
@@ -91,38 +113,39 @@ sql_optimise.select_query <- function(x, con = NULL, ..., subquery = FALSE) {
 # List clauses used by a query, in the order they are executed in
 select_query_clauses <- function(x, subquery = FALSE) {
   present <- c(
-    where    = length(x$where) > 0,
+    where = length(x$where) > 0,
     group_by = length(x$group_by) > 0,
-    having   = length(x$having) > 0,
-    select   = !identical(unname(x$select), sql("*")),
-    distinct = if (is.logical(x$distinct)) {
-                 x$distinct
-               } else {
-                 !identical(unname(x$distinct), sql("*"))
-               },
-    window   = length(x$window) > 0,
+    having = length(x$having) > 0,
+    select = !identical(unname(x$select), sql("*")),
+    distinct = x$distinct,
+    window = length(x$window) > 0,
     order_by = (!subquery || !is.null(x$limit)) && length(x$order_by) > 0,
-    limit    = !is.null(x$limit)
+    limit = !is.null(x$limit)
   )
 
   ordered(names(present)[present], levels = names(present))
 }
 
 #' @export
-sql_render.select_query <- function(query,
-                                    con,
-                                    ...,
-                                    sql_options = NULL,
-                                    subquery = FALSE,
-                                    lvl = 0) {
-  from <- dbplyr_sql_subquery(con,
+sql_render.select_query <- function(
+  query,
+  con,
+  ...,
+  sql_options = NULL,
+  subquery = FALSE,
+  lvl = 0
+) {
+  from <- dbplyr_sql_subquery(
+    con,
     sql_render(query$from, con, ..., subquery = TRUE, lvl = lvl + 1),
     name = query$from_alias,
     lvl = lvl
   )
 
   dbplyr_query_select(
-    con, query$select, from,
+    con,
+    query$select,
+    from,
     where = query$where,
     group_by = query$group_by,
     having = query$having,

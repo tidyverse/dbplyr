@@ -1,4 +1,3 @@
-
 compare_tbl <- function(x, y, label = NULL, expected.label = NULL) {
   testthat::expect_equal(
     arrange(collect(x), dplyr::across(everything())),
@@ -33,7 +32,8 @@ expect_equal_tbls <- function(results, ref = NULL, ...) {
 
   for (i in seq_along(rest)) {
     compare_tbl(
-      rest[[i]], ref,
+      rest[[i]],
+      ref,
       label = names(rest)[[i]],
       expected.label = ref_name
     )

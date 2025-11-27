@@ -60,13 +60,14 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
 
 # copied from dplyr with minor changes (names -> colnames)
 # https://github.com/tidyverse/dplyr/blob/main/R/distinct.R
-distinct_prepare_compat <- function(.data,
-                             vars,
-                             group_vars = character(),
-                             .keep_all = FALSE,
-                             caller_env = caller_env(2),
-                             error_call = caller_env()
-                             ) {
+distinct_prepare_compat <- function(
+  .data,
+  vars,
+  group_vars = character(),
+  .keep_all = FALSE,
+  caller_env = caller_env(2),
+  error_call = caller_env()
+) {
   stopifnot(is_quosures(vars), is.character(group_vars))
 
   # If no input, keep all variables
@@ -89,7 +90,10 @@ distinct_prepare_compat <- function(.data,
   if (length(missing_vars) > 0) {
     bullets <- c(
       "Must use existing variables.",
-      set_names(glue("`{missing_vars}` not found in `.data`."), rep("x", length(missing_vars)))
+      set_names(
+        glue("`{missing_vars}` not found in `.data`."),
+        rep("x", length(missing_vars))
+      )
     )
     abort(bullets, call = error_call)
   }
@@ -110,9 +114,7 @@ distinct_prepare_compat <- function(.data,
 
 # copied from dplyr
 # https://github.com/tidyverse/dplyr/blob/main/R/group-by.R#L243
-add_computed_columns <- function(.data,
-                                 vars,
-                                 error_call = caller_env()) {
+add_computed_columns <- function(.data, vars, error_call = caller_env()) {
   is_symbol <- purrr::map_lgl(vars, quo_is_variable_reference)
   needs_mutate <- have_name(vars) | !is_symbol
 

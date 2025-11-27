@@ -49,7 +49,10 @@ test_that("can distinguish 'schema.table' from 'schema'.'table'", {
   DBI::dbExecute(con, "CREATE TABLE aux.t1 (x, y, z)")
   DBI::dbExecute(con, "CREATE TABLE 'aux.t1' (a, b, c)")
 
-  expect_equal(as.character(tbl_vars(tbl(con, in_schema("aux", "t1")))), c("x", "y", "z"))
+  expect_equal(
+    as.character(tbl_vars(tbl(con, in_schema("aux", "t1")))),
+    c("x", "y", "z")
+  )
   df <- tbl(con, ident("aux.t1"))
   expect_equal(as.character(tbl_vars(df)), c("a", "b", "c"))
 })

@@ -39,7 +39,8 @@ sql_translation.RedshiftConnection <- function(con) {
   postgres <- sql_translation.PostgreSQL(con)
 
   sql_variant(
-    sql_translator(.parent = postgres$scalar,
+    sql_translator(
+      .parent = postgres$scalar,
 
       # https://docs.aws.amazon.com/redshift/latest/dg/r_Numeric_types201.html#r_Numeric_types201-floating-point-types
       as.numeric = sql_cast("FLOAT"),
@@ -47,7 +48,7 @@ sql_translation.RedshiftConnection <- function(con) {
       round = redshift_round,
 
       # https://stackoverflow.com/questions/56708136
-      paste  = sql_paste_redshift(" "),
+      paste = sql_paste_redshift(" "),
       paste0 = sql_paste_redshift(""),
       str_c = sql_paste_redshift(""),
 
@@ -73,7 +74,10 @@ sql_translation.RedshiftConnection <- function(con) {
       },
       date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
         check_unsupported_arg(invalid, allow_null = TRUE)
-        glue_sql2(sql_current_con(), "TO_DATE(CAST({.val year} AS TEXT) || '-' CAST({.val month} AS TEXT) || '-' || CAST({.val day} AS TEXT)), 'YYYY-MM-DD')")
+        glue_sql2(
+          sql_current_con(),
+          "TO_DATE(CAST({.val year} AS TEXT) || '-' CAST({.val month} AS TEXT) || '-' || CAST({.val day} AS TEXT)), 'YYYY-MM-DD')"
+        )
       },
       get_year = function(x) {
         sql_expr(DATE_PART('year', !!x))
@@ -84,7 +88,7 @@ sql_translation.RedshiftConnection <- function(con) {
       get_day = function(x) {
         sql_expr(DATE_PART('day', !!x))
       },
-      date_count_between = function(start, end, precision, ..., n = 1L){
+      date_count_between = function(start, end, precision, ..., n = 1L) {
         check_dots_empty()
         check_unsupported_arg(precision, allowed = "day")
         check_unsupported_arg(n, allowed = 1L)
@@ -99,13 +103,15 @@ sql_translation.RedshiftConnection <- function(con) {
         sql_expr(DATEDIFF(DAY, !!time2, !!time1))
       }
     ),
-    sql_translator(.parent = postgres$aggregate,
+    sql_translator(
+      .parent = postgres$aggregate,
       # https://docs.aws.amazon.com/redshift/latest/dg/r_LISTAGG.html
       str_flatten = function(x, collapse = "") {
         sql_expr(LISTAGG(!!x, !!collapse))
       }
     ),
-    sql_translator(.parent = postgres$window,
+    sql_translator(
+      .parent = postgres$window,
       # https://docs.aws.amazon.com/redshift/latest/dg/r_WF_LAG.html
       lag = function(x, n = 1L, order_by = NULL) {
         win_over(
@@ -129,7 +135,7 @@ sql_translation.RedshiftConnection <- function(con) {
         order <- win_current_order()
         listagg_sql <- sql_expr(LISTAGG(!!x, !!collapse))
 
-        if(length(order) > 0){
+        if (length(order) > 0) {
           sql <- glue_sql2(
             sql_current_con(),
             "{listagg_sql} WITHIN GROUP (ORDER BY {order})"
@@ -181,4 +187,12 @@ supports_window_clause.Redshift <- function(con) {
 #' @export
 supports_window_clause.RedshiftConnection <- supports_window_clause.Redshift
 
-utils::globalVariables(c("REGEXP_REPLACE", "LAG", "LEAD", "LISTAGG", "float", "text", "DATE_PART"))
+utils::globalVariables(c(
+  "REGEXP_REPLACE",
+  "LAG",
+  "LEAD",
+  "LISTAGG",
+  "float",
+  "text",
+  "DATE_PART"
+))

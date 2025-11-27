@@ -1,7 +1,10 @@
 test_that("window functions without group have empty over", {
   local_con(simulate_dbi())
   expect_equal(test_translate_sql(n()), sql("COUNT(*) OVER ()"))
-  expect_equal(test_translate_sql(sum(x, na.rm = TRUE)), sql("SUM(`x`) OVER ()"))
+  expect_equal(
+    test_translate_sql(sum(x, na.rm = TRUE)),
+    sql("SUM(`x`) OVER ()")
+  )
 })
 
 test_that("aggregating window functions ignore order_by", {
@@ -71,11 +74,15 @@ test_that("first, last, and nth translated to _value", {
   # `last()` must default to unbounded preceding and following
   expect_equal(
     test_translate_sql(last(x), vars_order = "a"),
-    sql("LAST_VALUE(`x`) OVER (ORDER BY `a` ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)")
+    sql(
+      "LAST_VALUE(`x`) OVER (ORDER BY `a` ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)"
+    )
   )
   expect_equal(
     test_translate_sql(last(x), vars_order = "a", vars_frame = c(0, Inf)),
-    sql("LAST_VALUE(`x`) OVER (ORDER BY `a` ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)")
+    sql(
+      "LAST_VALUE(`x`) OVER (ORDER BY `a` ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)"
+    )
   )
   expect_equal(
     test_translate_sql(nth(x, 3), vars_order = "a", vars_frame = c(-Inf, 0)),
@@ -92,7 +99,11 @@ test_that("first, last, and nth translated to _value", {
 test_that("can override frame of recycled functions", {
   local_con(simulate_dbi())
   expect_equal(
-    test_translate_sql(sum(x, na.rm = TRUE), vars_frame = c(-1, 0), vars_order = "y"),
+    test_translate_sql(
+      sum(x, na.rm = TRUE),
+      vars_frame = c(-1, 0),
+      vars_order = "y"
+    ),
     sql("SUM(`x`) OVER (ORDER BY `y` ROWS 1 PRECEDING)")
   )
 })
@@ -110,9 +121,11 @@ test_that("win_rank works", {
   sql_row_number <- win_rank("ROW_NUMBER")
   expect_equal(
     test_translate_sql(row_number(x)),
-    sql("CASE
+    sql(
+      "CASE
 WHEN (NOT((`x` IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN ((`x` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `x`)
-END")
+END"
+    )
   )
 })
 
@@ -120,9 +133,11 @@ test_that("win_rank(desc(x)) works", {
   local_con(simulate_dbi())
   expect_equal(
     test_translate_sql(row_number(desc(x))),
-    sql("CASE
+    sql(
+      "CASE
 WHEN (NOT((`x` IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN ((`x` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `x` DESC)
-END")
+END"
+    )
   )
 })
 
@@ -140,9 +155,11 @@ test_that("win_rank(tibble()) works", {
 
   expect_equal(
     test_translate_sql(row_number(tibble(x, desc(y)))),
-    sql("CASE
+    sql(
+      "CASE
 WHEN (NOT((`x` IS NULL)) AND NOT((`y` IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN ((`x` IS NULL) OR (`y` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `x`, `y` DESC)
-END")
+END"
+    )
   )
 })
 
@@ -157,7 +174,9 @@ test_that("row_number() with and without group_by() and arrange()", {
   mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_dbi())
   expect_snapshot(mf %>% mutate(rown = row_number()))
   expect_snapshot(mf %>% group_by(y) %>% mutate(rown = row_number()))
-  expect_snapshot(mf %>% group_by(y) %>% arrange(y) %>% mutate(rown = row_number()))
+  expect_snapshot(
+    mf %>% group_by(y) %>% arrange(y) %>% mutate(rown = row_number())
+  )
   expect_snapshot(mf %>% arrange(y) %>% mutate(rown = row_number()))
 })
 
@@ -349,7 +368,9 @@ test_that("only name windows if they appear multiple times", {
       part = ident("part"),
       col1 = sql("SUM(`col1`) OVER `win1`"),
       col2 = sql("SUM(`col2`) OVER `win1`"),
-      col3 = sql("SUM(`col3`) OVER (PARTITION BY `part` ORDER BY `ord` DESC ROWS UNBOUNDED PRECEDING)")
+      col3 = sql(
+        "SUM(`col3`) OVER (PARTITION BY `part` ORDER BY `ord` DESC ROWS UNBOUNDED PRECEDING)"
+      )
     )
   )
 })
