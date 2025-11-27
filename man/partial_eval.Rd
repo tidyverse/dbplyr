@@ -4,7 +4,7 @@
 \alias{partial_eval}
 \title{Partially evaluate an expression.}
 \usage{
-partial_eval(call, data, env = caller_env(), vars = deprecated(), error_call)
+partial_eval(call, data, env = caller_env(), error_call = caller_env())
 }
 \arguments{
 \item{call}{an unevaluated expression, as produced by \code{\link[=quote]{quote()}}}
@@ -12,9 +12,6 @@ partial_eval(call, data, env = caller_env(), vars = deprecated(), error_call)
 \item{data}{A lazy data frame backed by a database query.}
 
 \item{env}{environment in which to search for local values}
-
-\item{vars}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}: Pass a lazy frame to \code{data}
-instead.}
 }
 \description{
 This function partially evaluates an expression, using information from
