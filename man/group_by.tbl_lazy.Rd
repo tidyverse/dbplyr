@@ -4,7 +4,7 @@
 \alias{group_by.tbl_lazy}
 \title{Group by one or more variables}
 \usage{
-\method{group_by}{tbl_lazy}(.data, ..., .add = FALSE, add = deprecated(), .drop = TRUE)
+\method{group_by}{tbl_lazy}(.data, ..., .add = FALSE, .drop = TRUE)
 }
 \arguments{
 \item{.data}{A lazy data frame backed by a database query.}
@@ -20,8 +20,6 @@ override existing groups. To add to the existing groups, use
 This argument was previously called \code{add}, but that prevented
 creating a new grouping variable called \code{add}, and conflicts with
 our naming conventions.}
-
-\item{add}{Deprecated. Please use \code{.add} instead.}
 
 \item{.drop}{Not supported by this method.}
 }

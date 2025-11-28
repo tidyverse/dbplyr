@@ -57,7 +57,7 @@ tbl_sql <- function(
 #' @importFrom dplyr same_src
 #' @export
 same_src.tbl_sql <- function(x, y) {
-  inherits(y, "tbl_sql") && same_src(x$src, y$src)
+  inherits(y, "tbl_sql") && identical(x$src$con, y$src$con)
 }
 
 # Grouping methods -------------------------------------------------------------

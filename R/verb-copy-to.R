@@ -69,7 +69,7 @@ copy_to.src_sql <- function(
 
   name <- as_table_path(name, dest$con)
 
-  if (inherits(df, "tbl_sql") && same_src(df$src, dest)) {
+  if (inherits(df, "tbl_sql") && same_src(df, dest)) {
     out <- compute(
       df,
       name = name,

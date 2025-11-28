@@ -25,8 +25,6 @@
 #' @param call an unevaluated expression, as produced by [quote()]
 #' @param data A lazy data frame backed by a database query.
 #' @param env environment in which to search for local values
-#' @param vars `r lifecycle::badge("deprecated")`: Pass a lazy frame to `data`
-#'   instead.
 #' @export
 #' @keywords internal
 #' @examples
@@ -55,17 +53,10 @@ partial_eval <- function(
   call,
   data,
   env = caller_env(),
-  vars = deprecated(),
-  error_call
+  error_call = caller_env()
 ) {
-  if (lifecycle::is_present(vars)) {
-    lifecycle::deprecate_stop("2.1.2", "partial_eval(vars)")
-  }
-  if (is.character(data)) {
-    lifecycle::deprecate_stop(
-      "2.1.2",
-      "partial_eval(data = 'must be a lazy frame')",
-    )
+  if (!inherits(data, "tbl_lazy")) {
+    cli::cli_abort("`data` must be a lazy data frame", call = error_call)
   }
 
   if (is_sql_literal(call)) {
