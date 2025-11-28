@@ -9,7 +9,7 @@ incorporated into the expression.
 ## Usage
 
 ``` r
-partial_eval(call, data, env = caller_env(), vars = deprecated(), error_call)
+partial_eval(call, data, env = caller_env(), error_call = caller_env())
 ```
 
 ## Arguments
@@ -26,10 +26,6 @@ partial_eval(call, data, env = caller_env(), vars = deprecated(), error_call)
 - env:
 
   environment in which to search for local values
-
-- vars:
-
-  **\[deprecated\]**: Pass a lazy frame to `data` instead.
 
 ## Symbol substitution
 

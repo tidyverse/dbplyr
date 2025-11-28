@@ -58,7 +58,15 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
+<ul><li>Defunct functions have been removed:
 <ul><li>
+<code>src_sql()</code> deprecated in 1.4.0 (2019-04-23)</li>
+<li>
+<code>partial_eval(var)</code> deprecated in 2.2.0 (2022-06-05).</li>
+<li>
+<code>group_by(add = )</code> deprecated in dplyr 1.1.0 (2020-06-01).</li>
+</ul></li>
+<li>
 <code><a href="../reference/show_query.html">show_query()</a></code> gains <code>use_colour</code> argument (<a href="https://github.com/tidyverse/dbplyr/issues/1590" class="external-link">#1590</a>).</li>
 <li>SQL server: <code><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample()</a></code> returns different results each run (<a href="https://github.com/thomashulst" class="external-link">@thomashulst</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1503" class="external-link">#1503</a>)</li>
 <li>Corrected translation of <code><a href="https://stringr.tidyverse.org/reference/str_like.html" class="external-link">stringr::str_like()</a></code> to use case-sensitive <code>LIKE</code> when argument <code>ignore_case</code> is set as <code>FALSE</code> (<a href="https://github.com/edward-burn" class="external-link">@edward-burn</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1488" class="external-link">#1488</a>).</li>
@@ -135,7 +143,7 @@
 </ul></div>
 <div class="section level3">
 <h3 id="minor-improvements-and-bug-fixes-2-5-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-2-5-0"></a></h3>
-<ul><li><p>Deprecation status of functions deprecated in previous versions (at least 2 years old) have been advanced. In particular, <code><a href="../reference/src_sql.html">src_sql()</a></code> is now defunct, as is the use of <code><a href="../reference/partial_eval.html">partial_eval()</a></code> with character <code>data</code>.</p></li>
+<ul><li><p>Deprecation status of functions deprecated in previous versions (at least 2 years old) have been advanced. In particular, <code>src_sql()</code> is now defunct, as is the use of <code><a href="../reference/partial_eval.html">partial_eval()</a></code> with character <code>data</code>.</p></li>
 <li><p>Database errors now show the generated SQL, which hopefully will make it faster to track down problems (<a href="https://github.com/tidyverse/dbplyr/issues/1401" class="external-link">#1401</a>).</p></li>
 <li><p>When dbplyr creates an index on a table in a schema (e.g. <code>schema.table</code>), it now only includes the table name in the index name, not the schema name.</p></li>
 <li><p>The class of remote sources now includes all S4 class names, not just the first (<a href="https://github.com/tidyverse/dbplyr/issues/918" class="external-link">#918</a>).</p></li>

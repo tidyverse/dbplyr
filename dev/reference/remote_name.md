@@ -65,16 +65,7 @@ mf <- memdb_frame(x = 1:5, y = 5:1, .name = "blorp")
 remote_name(mf)
 #> [1] "blorp"
 remote_src(mf)
-#> src:  sqlite 3.51.0 [:memory:]
-#> tbls: blorp, dbplyr_00si8liN6h, dbplyr_1N7gYBNlcp, dbplyr_258RgjzX6J,
-#>   dbplyr_3TKpjGw3nP, dbplyr_71neMYlWKq, dbplyr_74y8jQEZ1U,
-#>   dbplyr_7gFZ2RIqws, dbplyr_9IdGwG0v58, dbplyr_AbgKY9eIba,
-#>   dbplyr_BVkzIbwPcL, dbplyr_EmJho1LAQi, dbplyr_FwkzgfuPO1,
-#>   dbplyr_GrnDDOhsrA, dbplyr_JacgWfAlMk, dbplyr_P8gLIJILJj,
-#>   dbplyr_aByGT89T45, dbplyr_bOGqaBG4XI, dbplyr_crUoBF7QxM,
-#>   dbplyr_fLBw8zKN1y, dbplyr_lKLUUEdLie, dbplyr_lRwSZtds9u,
-#>   dbplyr_rKPRds3Z4q, df, dplyr::band_instruments, dplyr::band_members,
-#>   mtcars, sqlite_stat1, sqlite_stat4, squirrels
+#> <S4 class ‘SQLiteConnection’ [package “RSQLite”] with 8 slots>NULL
 remote_con(mf)
 #> <SQLiteConnection>
 #>   Path: :memory:
@@ -87,16 +78,7 @@ mf2 <- dplyr::filter(mf, x > 3)
 remote_name(mf2)
 #> NULL
 remote_src(mf2)
-#> src:  sqlite 3.51.0 [:memory:]
-#> tbls: blorp, dbplyr_00si8liN6h, dbplyr_1N7gYBNlcp, dbplyr_258RgjzX6J,
-#>   dbplyr_3TKpjGw3nP, dbplyr_71neMYlWKq, dbplyr_74y8jQEZ1U,
-#>   dbplyr_7gFZ2RIqws, dbplyr_9IdGwG0v58, dbplyr_AbgKY9eIba,
-#>   dbplyr_BVkzIbwPcL, dbplyr_EmJho1LAQi, dbplyr_FwkzgfuPO1,
-#>   dbplyr_GrnDDOhsrA, dbplyr_JacgWfAlMk, dbplyr_P8gLIJILJj,
-#>   dbplyr_aByGT89T45, dbplyr_bOGqaBG4XI, dbplyr_crUoBF7QxM,
-#>   dbplyr_fLBw8zKN1y, dbplyr_lKLUUEdLie, dbplyr_lRwSZtds9u,
-#>   dbplyr_rKPRds3Z4q, df, dplyr::band_instruments, dplyr::band_members,
-#>   mtcars, sqlite_stat1, sqlite_stat4, squirrels
+#> <S4 class ‘SQLiteConnection’ [package “RSQLite”] with 8 slots>NULL
 remote_con(mf2)
 #> <SQLiteConnection>
 #>   Path: :memory:

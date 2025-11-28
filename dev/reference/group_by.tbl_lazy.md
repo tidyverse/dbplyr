@@ -12,7 +12,7 @@ and to the `PARTITION BY` clause of window functions when used with
 
 ``` r
 # S3 method for class 'tbl_lazy'
-group_by(.data, ..., .add = FALSE, add = deprecated(), .drop = TRUE)
+group_by(.data, ..., .add = FALSE, .drop = TRUE)
 ```
 
 ## Arguments
@@ -38,10 +38,6 @@ group_by(.data, ..., .add = FALSE, add = deprecated(), .drop = TRUE)
   This argument was previously called `add`, but that prevented creating
   a new grouping variable called `add`, and conflicts with our naming
   conventions.
-
-- add:
-
-  Deprecated. Please use `.add` instead.
 
 - .drop:
 

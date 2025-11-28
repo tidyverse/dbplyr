@@ -2,6 +2,10 @@
 
 ## dbplyr (development version)
 
+- Defunct functions have been removed:
+  - `src_sql()` deprecated in 1.4.0 (2019-04-23)
+  - `partial_eval(var)` deprecated in 2.2.0 (2022-06-05).
+  - `group_by(add = )` deprecated in dplyr 1.1.0 (2020-06-01).
 - [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
   gains `use_colour` argument
   ([\#1590](https://github.com/tidyverse/dbplyr/issues/1590)).
@@ -237,9 +241,8 @@ CRAN release: 2024-03-19
 ### Minor improvements and bug fixes
 
 - Deprecation status of functions deprecated in previous versions (at
-  least 2 years old) have been advanced. In particular,
-  [`src_sql()`](https://dbplyr.tidyverse.org/dev/reference/src_sql.md)
-  is now defunct, as is the use of
+  least 2 years old) have been advanced. In particular, `src_sql()` is
+  now defunct, as is the use of
   [`partial_eval()`](https://dbplyr.tidyverse.org/dev/reference/partial_eval.md)
   with character `data`.
 

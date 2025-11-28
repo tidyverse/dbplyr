@@ -75,7 +75,7 @@ is incorporated into the expression.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">partial_eval</span><span class="op">(</span><span class="va">call</span>, <span class="va">data</span>, env <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span>, vars <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>, <span class="va">error_call</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">partial_eval</span><span class="op">(</span><span class="va">call</span>, <span class="va">data</span>, env <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span>, error_call <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -92,11 +92,6 @@ is incorporated into the expression.</p>
 
 <dt id="arg-env">env<a class="anchor" aria-label="anchor" href="#arg-env"></a></dt>
 <dd><p>environment in which to search for local values</p></dd>
-
-
-<dt id="arg-vars">vars<a class="anchor" aria-label="anchor" href="#arg-vars"></a></dt>
-<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a>: Pass a lazy frame to <code>data</code>
-instead.</p></dd>
 
 </dl></div>
     <div class="section level2">
