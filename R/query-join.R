@@ -106,7 +106,7 @@ sql_render.multi_join_query <- function(
   x <- sql_render(query$x, con, ..., subquery = TRUE, lvl = lvl + 1)
   query$joins$table <- purrr::map(
     query$joins$table,
-    function(table) sql_render(table, con, ..., subquery = TRUE, lvl = lvl + 1)
+    \(table) sql_render(table, con, ..., subquery = TRUE, lvl = lvl + 1)
   )
 
   sql_query_multi_join(
@@ -348,7 +348,7 @@ sql_join_tbls <- function(con, by, na_matches) {
     rhs <- sql_table_prefix(con, by$y, by$y_as %||% "RHS")
 
     if (na_matches == "na") {
-      compare <- purrr::map_chr(seq_along(lhs), function(i) {
+      compare <- purrr::map_chr(seq_along(lhs), \(i) {
         sql_expr_matches(sql(lhs[[i]]), sql(rhs[[i]]), con = con)
       })
     } else {

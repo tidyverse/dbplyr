@@ -28,7 +28,7 @@ test_that("missing window functions create a warning", {
 
 test_that("duplicates throw an error", {
   expect_snapshot(error = TRUE, {
-    sql_translator(round = function(x) x, round = function(y) y)
+    sql_translator(round = \(x) x, round = \(y) y)
   })
 })
 
@@ -36,7 +36,7 @@ test_that("missing aggregate functions filled in", {
   local_con(simulate_dbi())
   sim_scalar <- sql_translator()
   sim_agg <- sql_translator()
-  sim_win <- sql_translator(mean = function() {})
+  sim_win <- sql_translator(mean = \() {})
 
   trans <- sql_variant(sim_scalar, sim_agg, sim_win)
   expect_error(trans$aggregate$mean(), "only available in a window")

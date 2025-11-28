@@ -21,7 +21,7 @@ sql_translation.Snowflake <- function(con) {
   sql_variant(
     sql_translator(
       .parent = base_odbc_scalar,
-      log10 = function(x) sql_expr(log(10, !!x)),
+      log10 = \(x) sql_expr(log(10, !!x)),
       grepl = snowflake_grepl,
       round = snowflake_round,
       paste = snowflake_paste(" "),
@@ -155,11 +155,11 @@ sql_translation.Snowflake <- function(con) {
           abort("Unrecognized arguments to `wday`")
         }
       },
-      yday = function(x) sql_expr(EXTRACT("dayofyear", !!x)),
+      yday = \(x) sql_expr(EXTRACT("dayofyear", !!x)),
       week = function(x) {
         sql_expr(FLOOR((EXTRACT("dayofyear", !!x) - 1L) / 7L) + 1L)
       },
-      isoweek = function(x) sql_expr(EXTRACT("weekiso", !!x)),
+      isoweek = \(x) sql_expr(EXTRACT("weekiso", !!x)),
       month = function(x, label = FALSE, abbr = TRUE) {
         check_bool(label)
         check_bool(abbr)

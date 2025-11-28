@@ -198,7 +198,7 @@ sql_switch <- function(x, ...) {
 
   named <- names2(input) != ""
 
-  clauses <- purrr::map2_chr(names(input)[named], input[named], function(x, y) {
+  clauses <- purrr::map2_chr(names(input)[named], input[named], \(x, y) {
     glue_sql2(con, "WHEN ({.val x}) THEN ({.val y})")
   })
 

@@ -98,7 +98,7 @@ sql_render.union_query <- function(
   unions <- list()
   unions$table <- purrr::map(
     query$unions$table,
-    function(table) sql_render(table, con, ..., subquery = FALSE, lvl = lvl)
+    \(table) sql_render(table, con, ..., subquery = FALSE, lvl = lvl)
   )
   unions$all <- query$unions$all
 

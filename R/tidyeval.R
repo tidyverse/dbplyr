@@ -148,7 +148,7 @@ partial_eval_quo <- function(x, data, error_call, dot_name, was_named) {
       get_env(x),
       error_call = error_call
     ),
-    error = function(cnd) {
+    error = \(cnd) {
       label <- expr_as_label(x, dot_name)
       msg <- c(i = "In argument: {.code {label}}")
       cli_abort(msg, call = error_call, parent = cnd)
