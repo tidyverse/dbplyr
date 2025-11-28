@@ -69,7 +69,7 @@ print.lazy_union_query <- function(x, ...) {
 op_vars.lazy_union_query <- function(op) {
   purrr::reduce(
     op$unions$table,
-    ~ union(.x, op_vars(.y$lazy_query)),
+    \(acc, table) union(acc, op_vars(table$lazy_query)),
     .init = op_vars(op$x)
   )
 }
@@ -80,7 +80,9 @@ sql_build.lazy_union_query <- function(op, con, ..., sql_options = NULL) {
   unions <- list(
     table = purrr::map(
       op$unions$table,
-      ~ sql_optimise(sql_build(.x, con, sql_options = sql_options), con)
+      \(table) {
+        sql_optimise(sql_build(table, con, sql_options = sql_options), con)
+      }
     ),
     all = op$unions$all
   )

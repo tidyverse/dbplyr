@@ -147,12 +147,14 @@ win_rank <- function(f, empty_order = FALSE) {
 
       order_symbols <- purrr::map_if(
         order,
-        ~ quo_is_call(.x, "desc", n = 1L),
-        ~ call_args(.x)[[1L]]
+        \(x) quo_is_call(x, "desc", n = 1L),
+        \(x) call_args(x)[[1L]]
       )
 
-      is_na_exprs <- purrr::map(order_symbols, ~ expr(is.na(!!.x)))
-      any_na_expr <- purrr::reduce(is_na_exprs, ~ call2("|", .x, .y))
+      is_na_exprs <- purrr::map(order_symbols, \(sym) expr(is.na(!!sym)))
+      any_na_expr <- purrr::reduce(is_na_exprs, \(lhs, rhs) {
+        call2("|", lhs, rhs)
+      })
 
       cond <- translate_sql(
         (case_when(!!any_na_expr ~ 1L, TRUE ~ 0L)),
@@ -160,8 +162,10 @@ win_rank <- function(f, empty_order = FALSE) {
       )
       group <- sql(group, cond)
 
-      not_is_na_exprs <- purrr::map(order_symbols, ~ expr(!is.na(!!.x)))
-      no_na_expr <- purrr::reduce(not_is_na_exprs, ~ call2("&", .x, .y))
+      not_is_na_exprs <- purrr::map(order_symbols, \(sym) expr(!is.na(!!sym)))
+      no_na_expr <- purrr::reduce(not_is_na_exprs, \(lhs, rhs) {
+        call2("&", lhs, rhs)
+      })
     } else {
       order_over <- win_current_order()
       if (empty_order & is_empty(order_over)) {

@@ -65,7 +65,7 @@ add_filter <- function(.data, dots) {
       projection <- purrr::map2_lgl(
         exprs,
         nms,
-        ~ is_symbol(.x) && !identical(.x, sym(.y))
+        \(expr, name) is_symbol(expr) && !identical(expr, sym(name))
       )
 
       if (any(projection)) {

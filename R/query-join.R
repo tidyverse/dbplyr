@@ -218,7 +218,9 @@ sql_multi_join_vars <- function(
       out[vars_idx_i] <- purrr::map2(
         used_vars_i,
         i,
-        ~ sql_multi_join_var(con, .x, .y, table_paths, duplicated_vars)
+        \(var, table_idx) {
+          sql_multi_join_var(con, var, table_idx, table_paths, duplicated_vars)
+        }
       )
     }
   }
