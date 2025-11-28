@@ -152,7 +152,7 @@ win_rank <- function(f, empty_order = FALSE) {
       )
 
       is_na_exprs <- purrr::map(order_symbols, \(sym) expr(is.na(!!sym)))
-      any_na_expr <- purrr::reduce(is_na_exprs, \(lhs, rhs) {
+      any_na_expr <- purrr::reduce(is_na_exprs, function(lhs, rhs) {
         call2("|", lhs, rhs)
       })
 
@@ -163,7 +163,7 @@ win_rank <- function(f, empty_order = FALSE) {
       group <- sql(group, cond)
 
       not_is_na_exprs <- purrr::map(order_symbols, \(sym) expr(!is.na(!!sym)))
-      no_na_expr <- purrr::reduce(not_is_na_exprs, \(lhs, rhs) {
+      no_na_expr <- purrr::reduce(not_is_na_exprs, function(lhs, rhs) {
         call2("&", lhs, rhs)
       })
     } else {

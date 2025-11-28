@@ -89,7 +89,7 @@ sql_translation.SQLiteConnection <- function(con) {
       },
 
       # lubridate,
-      today = \() {
+      today = function() {
         date <- \(x) {} # suppress R CMD check note
         sql_expr(date("now"))
       },

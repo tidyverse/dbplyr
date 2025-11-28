@@ -72,7 +72,7 @@ sql_case_match_clause <- function(f, x, con) {
     \(clause) !is_vector(clause),
     \(clause) translate_sql(!!clause, con = con)
   )
-  missing_loc <- purrr::map_lgl(f_query, \(clause) {
+  missing_loc <- purrr::map_lgl(f_query, function(clause) {
     is.null(clause) || is.na(clause)
   })
 
@@ -168,7 +168,7 @@ sql_case_when <- function(
     )
   }
 
-  clauses <- purrr::map2_chr(query, value, \(cond, val) {
+  clauses <- purrr::map2_chr(query, value, function(cond, val) {
     paste0("WHEN ", cond, " THEN ", val)
   })
   # if a formula like TRUE ~ "other" is at the end of a sequence, use ELSE statement
@@ -198,7 +198,7 @@ sql_switch <- function(x, ...) {
 
   named <- names2(input) != ""
 
-  clauses <- purrr::map2_chr(names(input)[named], input[named], \(x, y) {
+  clauses <- purrr::map2_chr(names(input)[named], input[named], function(x, y) {
     glue_sql2(con, "WHEN ({.val x}) THEN ({.val y})")
   })
 

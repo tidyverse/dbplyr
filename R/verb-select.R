@@ -163,7 +163,7 @@ rename_order <- function(lazy_query, vars) {
 
   is_desc <- purrr::map_lgl(
     order,
-    \(x) {
+    function(x) {
       if (is_quosure(x)) {
         quo_is_call(x, "desc", n = 1L)
       } else {

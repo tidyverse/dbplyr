@@ -106,7 +106,7 @@ dbplyr_fill0.DBIConnection <- function(
 
   fill_sql <- purrr::map(
     cols_to_fill,
-    \(col) {
+    function(col) {
       translate_sql(
         last(!!col, na_rm = TRUE),
         vars_group = op_grps(.data),
@@ -155,7 +155,7 @@ dbplyr_fill0.SQLiteConnection <- function(
   # 3. remove the helper column again.
   partition_sql <- purrr::map(
     cols_to_fill,
-    \(col) {
+    function(col) {
       translate_sql(
         cumsum(case_when(is.na(!!col) ~ 0L, TRUE ~ 1L)),
         con = .con,
@@ -172,7 +172,7 @@ dbplyr_fill0.SQLiteConnection <- function(
   fill_sql <- purrr::map2(
     cols_to_fill,
     names(partition_sql),
-    \(col, partition_name) {
+    function(col, partition_name) {
       translate_sql(
         max(!!col, na.rm = TRUE),
         con = .con,

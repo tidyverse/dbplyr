@@ -80,7 +80,7 @@ sql_build.lazy_union_query <- function(op, con, ..., sql_options = NULL) {
   unions <- list(
     table = purrr::map(
       op$unions$table,
-      \(table) {
+      function(table) {
         sql_optimise(sql_build(table, con, sql_options = sql_options), con)
       }
     ),

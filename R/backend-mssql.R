@@ -401,13 +401,13 @@ simulate_mssql <- function(version = "15.0") {
         check_unsupported_arg(invalid, allow_null = TRUE)
         sql_expr(DATEFROMPARTS(!!year, !!month, !!day))
       },
-      get_year = \(x) {
+      get_year = function(x) {
         sql_expr(DATEPART(YEAR, !!x))
       },
-      get_month = \(x) {
+      get_month = function(x) {
         sql_expr(DATEPART(MONTH, !!x))
       },
-      get_day = \(x) {
+      get_day = function(x) {
         sql_expr(DATEPART(DAY, !!x))
       },
       date_count_between = function(start, end, precision, ..., n = 1L) {

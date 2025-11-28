@@ -138,7 +138,7 @@ across_funs <- function(funs, env, dots, names_spec, fn, evaluated = FALSE) {
       is_call(funs, "~") ||
       is_call(funs, "function")
   ) {
-    is_local_list <- \(funs) {
+    is_local_list <- function(funs) {
       if (!is_symbol(funs)) {
         return(FALSE)
       }
@@ -280,7 +280,7 @@ across_setup <- function(data, call, env, allow_rename, fn, error_call) {
         env = env,
         error_call = error_call
       ),
-      error = \(cnd) {
+      error = function(cnd) {
         label <- expr_as_label(dot, names2(call$...)[[i]])
         msg <- "Problem while evaluating {.code {label}}."
         cli_abort(msg, call = call(fn), parent = cnd)

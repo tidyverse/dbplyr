@@ -218,7 +218,7 @@ sql_multi_join_vars <- function(
       out[vars_idx_i] <- purrr::map2(
         used_vars_i,
         i,
-        \(var, table_idx) {
+        function(var, table_idx) {
           sql_multi_join_var(con, var, table_idx, table_paths, duplicated_vars)
         }
       )
@@ -348,7 +348,7 @@ sql_join_tbls <- function(con, by, na_matches) {
     rhs <- sql_table_prefix(con, by$y, by$y_as %||% "RHS")
 
     if (na_matches == "na") {
-      compare <- purrr::map_chr(seq_along(lhs), \(i) {
+      compare <- purrr::map_chr(seq_along(lhs), function(i) {
         sql_expr_matches(sql(lhs[[i]]), sql(rhs[[i]]), con = con)
       })
     } else {
