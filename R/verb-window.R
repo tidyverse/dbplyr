@@ -10,16 +10,16 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(g = rep(1:2, each = 5), y = runif(10), z = 1:10)
-#' db %>%
-#'   window_order(y) %>%
-#'   mutate(z = cumsum(y)) %>%
+#' db |>
+#'   window_order(y) |>
+#'   mutate(z = cumsum(y)) |>
 #'   show_query()
 #'
-#' db %>%
-#'   group_by(g) %>%
-#'   window_frame(-3, 0) %>%
-#'   window_order(z) %>%
-#'   mutate(z = sum(y)) %>%
+#' db |>
+#'   group_by(g) |>
+#'   window_frame(-3, 0) |>
+#'   window_order(z) |>
+#'   mutate(z = sum(y)) |>
 #'   show_query()
 window_order <- function(.data, ...) {
   if (!is_tbl_lazy(.data)) {

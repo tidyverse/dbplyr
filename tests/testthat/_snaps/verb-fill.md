@@ -1,7 +1,7 @@
 # up-direction works
 
     Code
-      df_lazy_ns %>% window_order(id) %>% tidyr::fill(n1, .direction = "up")
+      tidyr::fill(window_order(df_lazy_ns, id), n1, .direction = "up")
     Output
       <SQL>
       SELECT
@@ -18,7 +18,7 @@
 ---
 
     Code
-      df_lazy_std %>% window_order(id) %>% tidyr::fill(n1, .direction = "up")
+      tidyr::fill(window_order(df_lazy_std, id), n1, .direction = "up")
     Output
       <SQL>
       SELECT
@@ -30,7 +30,7 @@
 ---
 
     Code
-      df_lazy_std %>% window_order(id) %>% tidyr::fill(n1, .direction = "updown")
+      tidyr::fill(window_order(df_lazy_std, id), n1, .direction = "updown")
     Output
       <SQL>
       SELECT
@@ -48,7 +48,7 @@
 ---
 
     Code
-      df_lazy_std %>% window_order(id) %>% tidyr::fill(n1, .direction = "downup")
+      tidyr::fill(window_order(df_lazy_std, id), n1, .direction = "downup")
     Output
       <SQL>
       SELECT
@@ -66,7 +66,7 @@
 # up-direction works with descending
 
     Code
-      df_lazy_ns %>% window_order(desc(id)) %>% tidyr::fill(n1, .direction = "up")
+      tidyr::fill(window_order(df_lazy_ns, desc(id)), n1, .direction = "up")
     Output
       <SQL>
       SELECT
@@ -83,7 +83,7 @@
 ---
 
     Code
-      df_lazy_std %>% window_order(desc(id)) %>% tidyr::fill(n1, .direction = "up")
+      tidyr::fill(window_order(df_lazy_std, desc(id)), n1, .direction = "up")
     Output
       <SQL>
       SELECT
@@ -95,7 +95,7 @@
 # groups are respected
 
     Code
-      group_by(df_lazy_ns, group) %>% window_order(id) %>% tidyr::fill(n1)
+      tidyr::fill(window_order(group_by(df_lazy_ns, group), id), n1)
     Output
       <SQL>
       SELECT
@@ -112,7 +112,7 @@
 ---
 
     Code
-      group_by(df_lazy_std, group) %>% window_order(id) %>% tidyr::fill(n1)
+      tidyr::fill(window_order(group_by(df_lazy_std, group), id), n1)
     Output
       <SQL>
       SELECT
@@ -124,7 +124,7 @@
 # fill errors on unsorted data
 
     Code
-      (expect_error(df_db %>% tidyr::fill(n1)))
+      (expect_error(tidyr::fill(df_db, n1)))
     Output
       <error/rlang_error>
       Error in `tidyr::fill()`:
@@ -134,7 +134,7 @@
 # fill() produces nice error messages
 
     Code
-      lazy_frame(x = 1) %>% tidyr::fill(non_existent)
+      tidyr::fill(lazy_frame(x = 1), non_existent)
     Condition
       Error in `tidyr::fill()`:
       ! Can't select columns that don't exist.

@@ -46,7 +46,7 @@
 #' df2 <- data.frame(y = c("a", "d"), fruit = c("apple", "date"))
 #' # copy_to() is called automatically if you set copy = TRUE
 #' # in the join functions
-#' db %>% left_join(df2, copy = TRUE)
+#' db |> left_join(df2, copy = TRUE)
 #' @importFrom dplyr copy_to
 copy_to.src_sql <- function(
   dest,
@@ -134,7 +134,7 @@ auto_copy.tbl_sql <- function(x, y, copy = FALSE, ...) {
 #'
 #' copy_inline(con, df)
 #'
-#' copy_inline(con, df) %>% dplyr::show_query()
+#' copy_inline(con, df) |> dplyr::show_query()
 copy_inline <- function(con, df, types = NULL) {
   if (!inherits(df, "data.frame")) {
     cli_abort("{.var df} needs to be a data.frame.")

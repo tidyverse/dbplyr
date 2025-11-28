@@ -1,5 +1,5 @@
 test_that("ungrouped data collected first", {
-  out <- memdb_frame(x = 1:2) %>% do(head(.))
+  out <- memdb_frame(x = 1:2) |> do(head(.))
   expect_equal(out, tibble(x = 1:2))
 })
 
@@ -7,10 +7,10 @@ test_that("named argument become list columns", {
   mf <- memdb_frame(
     g = rep(1:3, 1:3),
     x = 1:6
-  ) %>%
+  ) |>
     group_by(g)
 
-  out <- mf %>% do(nrow = nrow(.), ncol = ncol(.))
+  out <- mf |> do(nrow = nrow(.), ncol = ncol(.))
   expect_equal(out$nrow, list(1, 2, 3))
   expect_equal(out$ncol, list(2, 2, 2))
 })
@@ -19,10 +19,10 @@ test_that("unnamed results bound together by row", {
   mf <- memdb_frame(
     g = c(1, 1, 2, 2),
     x = c(3, 9, 4, 9)
-  ) %>%
+  ) |>
     group_by(g)
 
-  first <- mf %>% do(head(., 1)) %>% ungroup()
+  first <- mf |> do(head(., 1)) |> ungroup()
   compare_tbl(first, tibble(g = c(1, 2), x = c(3, 4)))
 })
 
@@ -30,10 +30,10 @@ test_that("unnamed results must be data frames", {
   mf <- memdb_frame(
     g = c(1, 1, 2, 2),
     x = c(3, 9, 4, 9)
-  ) %>%
+  ) |>
     group_by(g)
 
-  expect_snapshot(error = TRUE, mf %>% do(nrow(.)))
+  expect_snapshot(error = TRUE, mf |> do(nrow(.)))
 })
 
 test_that("Results respect select", {
@@ -42,10 +42,10 @@ test_that("Results respect select", {
     x = c(3, 9, 4, 9),
     y = 1:4,
     z = 4:1
-  ) %>%
+  ) |>
     group_by(g)
 
-  expect_message(out <- mf %>% select(x) %>% do(ncol = ncol(.)))
+  expect_message(out <- mf |> select(x) |> do(ncol = ncol(.)))
   expect_equal(out$g, c(1, 2))
   expect_equal(out$ncol, list(2L, 2L))
 })
@@ -54,7 +54,7 @@ test_that("results independent of chunk_size", {
   mf <- memdb_frame(
     g = rep(1:3, 1:3),
     x = 1:6
-  ) %>%
+  ) |>
     group_by(g)
 
   nrows <- function(group, n) {
@@ -70,15 +70,15 @@ test_that("named argument become list columns", {
   mf <- memdb_frame(
     g = rep(1:3, 1:3),
     x = 1:6
-  ) %>%
+  ) |>
     group_by(g)
 
   # mix named and unnamed
-  expect_snapshot(error = TRUE, mf %>% do(nrow = nrow(.), ncol(.)))
+  expect_snapshot(error = TRUE, mf |> do(nrow = nrow(.), ncol(.)))
 
   # multiple unnamed
-  expect_snapshot(error = TRUE, mf %>% do(nrow(.), ncol(.)))
+  expect_snapshot(error = TRUE, mf |> do(nrow(.), ncol(.)))
 
   # old syntax
-  expect_snapshot(error = TRUE, mf %>% do(.f = nrow))
+  expect_snapshot(error = TRUE, mf |> do(.f = nrow))
 })

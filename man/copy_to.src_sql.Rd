@@ -81,7 +81,7 @@ db
 df2 <- data.frame(y = c("a", "d"), fruit = c("apple", "date"))
 # copy_to() is called automatically if you set copy = TRUE
 # in the join functions
-db \%>\% left_join(df2, copy = TRUE)
+db |> left_join(df2, copy = TRUE)
 }
 \seealso{
 \code{\link[=copy_inline]{copy_inline()}} to use small data in an SQL query without actually

@@ -27,7 +27,7 @@
 # can explain a query
 
     Code
-      db %>% filter(x > 2) %>% explain()
+      explain(filter(db, x > 2))
     Output
       <SQL>
       SELECT `test`.*

@@ -18,7 +18,7 @@
 # compute can handle schema
 
     Code
-      df %>% compute(name = in_schema("main", "db1"), temporary = FALSE)
+      compute(df, name = in_schema("main", "db1"), temporary = FALSE)
     Condition
       Error in `db_compute()`:
       ! Can't copy query to table `main`.`db1`.
@@ -31,7 +31,7 @@
 # collect() handles DBI error
 
     Code
-      (expect_error(mf %>% mutate(a = sql("invalid sql")) %>% collect()))
+      (expect_error(collect(mutate(mf, a = sql("invalid sql")))))
     Output
       <error/rlang_error>
       Error in `collect()`:

@@ -15,9 +15,9 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(x = 1, y = 2, z = 3)
-#' db %>% select(-y) %>% show_query()
-#' db %>% relocate(z) %>% show_query()
-#' db %>% rename(first = x, last = z) %>% show_query()
+#' db |> select(-y) |> show_query()
+#' db |> relocate(z) |> show_query()
+#' db |> rename(first = x, last = z) |> show_query()
 select.tbl_lazy <- function(.data, ...) {
   loc <- tidyselect::eval_select(expr(c(...)), .data)
   loc <- ensure_group_vars(loc, .data, notify = TRUE)

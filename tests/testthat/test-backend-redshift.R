@@ -67,12 +67,12 @@ test_that("copy_inline uses UNION ALL", {
 
   types <- c(id = "bigint", arr = "integer[]")
   expect_snapshot({
-    copy_inline(con, y %>% slice(0)) %>% remote_query()
-    copy_inline(con, y) %>% remote_query()
+    copy_inline(con, y |> slice(0)) |> remote_query()
+    copy_inline(con, y) |> remote_query()
 
     # with `types`
-    copy_inline(con, y %>% slice(0), types = types) %>% remote_query()
-    copy_inline(con, y, types = types) %>% remote_query()
+    copy_inline(con, y |> slice(0), types = types) |> remote_query()
+    copy_inline(con, y, types = types) |> remote_query()
   })
 })
 

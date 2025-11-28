@@ -93,11 +93,11 @@ test_that("ungrouped output", {
   expect_equal(out1[["Source"]], "table<`tbl_sum_test`> [?? x 2]")
   expect_match(out1[["Database"]], "sqlite (.*) \\[:memory:\\]")
 
-  out2 <- tbl_sum(mf %>% group_by(x, y))
+  out2 <- tbl_sum(mf |> group_by(x, y))
   expect_named(out2, c("Source", "Database", "Groups"))
   expect_equal(out2[["Groups"]], c("x, y"))
 
-  out3 <- tbl_sum(mf %>% arrange(x))
+  out3 <- tbl_sum(mf |> arrange(x))
   expect_named(out3, c("Source", "Database", "Ordered by"))
   expect_equal(out3[["Ordered by"]], c("x"))
 })

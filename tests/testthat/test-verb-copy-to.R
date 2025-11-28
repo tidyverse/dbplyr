@@ -84,10 +84,10 @@ test_that("can translate a table", {
     dtt = as.POSIXct("2020-01-01 01:23:45", tz = "UTC")
   )
 
-  expect_snapshot(copy_inline(con, df) %>% remote_query())
+  expect_snapshot(copy_inline(con, df) |> remote_query())
 
   expect_equal(
-    copy_inline(con, df) %>% collect(),
+    copy_inline(con, df) |> collect(),
     tibble(
       lgl = 1L,
       int = 1L,
@@ -102,7 +102,7 @@ test_that("can translate a table", {
     copy_inline(
       con,
       tibble(date = as.Date(c("2020-01-01", "2020-01-02"), tz = "UTC"))
-    ) %>%
+    ) |>
       collect(),
     tibble(date = c("2020-01-01", "2020-01-02"))
   )
@@ -111,7 +111,7 @@ test_that("can translate a table", {
 test_that("can translate 1-column tables", {
   con <- local_sqlite_connection()
   expect_snapshot(
-    copy_inline(con, tibble(dbl = 1.5)) %>%
+    copy_inline(con, tibble(dbl = 1.5)) |>
       remote_query()
   )
 })
@@ -119,12 +119,12 @@ test_that("can translate 1-column tables", {
 test_that("zero row table works", {
   con <- local_sqlite_connection()
   expect_snapshot(
-    copy_inline(con, tibble(dbl = numeric(), chr = character())) %>%
+    copy_inline(con, tibble(dbl = numeric(), chr = character())) |>
       remote_query()
   )
 
   expect_snapshot(
-    copy_inline(con, tibble(dbl = numeric())) %>%
+    copy_inline(con, tibble(dbl = numeric())) |>
       remote_query()
   )
 })
@@ -133,10 +133,10 @@ test_that("types argument works", {
   con <- local_sqlite_connection()
 
   df <- tibble(x = "1", y = 2L)
-  expect_equal(copy_inline(con, df) %>% collect(), df)
+  expect_equal(copy_inline(con, df) |> collect(), df)
 
   expect_equal(
-    copy_inline(con, df, types = c(x = "INTEGER", y = "TEXT")) %>% collect(),
+    copy_inline(con, df, types = c(x = "INTEGER", y = "TEXT")) |> collect(),
     tibble(x = 1L, y = "2")
   )
 })

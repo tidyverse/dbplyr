@@ -54,13 +54,13 @@ from time to time.
 library(dplyr, warn.conflicts = FALSE)
 
 lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_mssql())
-lf \%>\% head()
-lf \%>\% transmute(x = paste(b, c, d))
+lf |> head()
+lf |> transmute(x = paste(b, c, d))
 
 # Can use boolean as is:
-lf \%>\% filter(c > d)
+lf |> filter(c > d)
 # Need to convert from boolean to bit:
-lf \%>\% transmute(x = c > d)
+lf |> transmute(x = c > d)
 # Can use boolean as is:
-lf \%>\% transmute(x = ifelse(c > d, "c", "d"))
+lf |> transmute(x = ifelse(c > d, "c", "d"))
 }

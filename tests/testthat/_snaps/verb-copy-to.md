@@ -9,7 +9,7 @@
 # can translate a table
 
     Code
-      copy_inline(con, df) %>% remote_query()
+      remote_query(copy_inline(con, df))
     Output
       <SQL> SELECT
         CAST(`lgl` AS BOOLEAN) AS `lgl`,
@@ -36,7 +36,7 @@
 # can translate 1-column tables
 
     Code
-      copy_inline(con, tibble(dbl = 1.5)) %>% remote_query()
+      remote_query(copy_inline(con, tibble(dbl = 1.5)))
     Output
       <SQL> SELECT CAST(`dbl` AS REAL) AS `dbl`
       FROM (
@@ -51,7 +51,7 @@
 # zero row table works
 
     Code
-      copy_inline(con, tibble(dbl = numeric(), chr = character())) %>% remote_query()
+      remote_query(copy_inline(con, tibble(dbl = numeric(), chr = character())))
     Output
       <SQL> SELECT CAST(NULL AS REAL) AS `dbl`, CAST(NULL AS TEXT) AS `chr`
       WHERE (0 = 1)
@@ -59,7 +59,7 @@
 ---
 
     Code
-      copy_inline(con, tibble(dbl = numeric())) %>% remote_query()
+      remote_query(copy_inline(con, tibble(dbl = numeric())))
     Output
       <SQL> SELECT CAST(NULL AS REAL) AS `dbl`
       WHERE (0 = 1)

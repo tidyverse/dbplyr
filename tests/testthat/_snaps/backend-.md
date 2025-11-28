@@ -22,7 +22,7 @@
 # $ doesn't evaluate second argument
 
     Code
-      lazy_frame(x = 1, y = 1) %>% filter(x == y$id)
+      filter(lazy_frame(x = 1, y = 1), x == y$id)
     Output
       <SQL>
       SELECT `df`.*
@@ -32,7 +32,7 @@
 ---
 
     Code
-      lazy_frame(x = 1) %>% filter(x == y$id)
+      filter(lazy_frame(x = 1), x == y$id)
     Output
       <SQL>
       SELECT `df`.*
@@ -42,7 +42,7 @@
 # useful error if $ used with inlined value
 
     Code
-      lazy_frame(x = 1) %>% filter(x == y$id)
+      filter(lazy_frame(x = 1), x == y$id)
     Condition
       Error in `x$id`:
       ! $ operator is invalid for atomic vectors
@@ -60,7 +60,7 @@
 # default raw escapes translated correctly
 
     Code
-      mf %>% filter(x == a)
+      filter(mf, x == a)
     Output
       <SQL>
       SELECT `df`.*
@@ -70,7 +70,7 @@
 ---
 
     Code
-      mf %>% filter(x %in% L)
+      filter(mf, x %in% L)
     Output
       <SQL>
       SELECT `df`.*

@@ -82,9 +82,9 @@ dbplyr_uncount <- function(data, weights, .remove = TRUE, .id = NULL) {
     grps <- setdiff(grps, weights_col)
   }
 
-  data_uncounted %>%
-    ungroup() %>%
-    select(-all_of(cols_to_remove)) %>%
+  data_uncounted |>
+    ungroup() |>
+    select(-all_of(cols_to_remove)) |>
     group_by(!!!syms(grps))
 }
 

@@ -30,6 +30,6 @@ This is a method for the dplyr \code{\link[dplyr:distinct]{dplyr::distinct()}} g
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(x = c(1, 1, 2, 2), y = c(1, 2, 1, 1))
-db \%>\% distinct() \%>\% show_query()
-db \%>\% distinct(x) \%>\% show_query()
+db |> distinct() |> show_query()
+db |> distinct(x) |> show_query()
 }

@@ -20,11 +20,11 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(x = 1:100)
-#' db %>% head() %>% show_query()
+#' db |> head() |> show_query()
 #'
 #' # Pretend we have data in a SQL server database
 #' db2 <- lazy_frame(x = 1:100, con = simulate_mssql())
-#' db2 %>% head() %>% show_query()
+#' db2 |> head() |> show_query()
 head.tbl_lazy <- function(x, n = 6L, ...) {
   if (!is.numeric(n) || length(n) != 1L || n < 0) {
     cli_abort("{.arg n} must be a non-negative integer")

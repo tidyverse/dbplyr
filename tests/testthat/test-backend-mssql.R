@@ -298,18 +298,18 @@ test_that("convert between bit and boolean as needed", {
   mf <- lazy_frame(x = 1, con = simulate_mssql())
 
   # No conversion
-  expect_snapshot(mf %>% filter(is.na(x)))
-  expect_snapshot(mf %>% filter(!is.na(x)))
-  expect_snapshot(mf %>% filter(x == 1L || x == 2L))
-  expect_snapshot(mf %>% mutate(z = ifelse(x == 1L, 1L, 2L)))
-  expect_snapshot(mf %>% mutate(z = case_when(x == 1L ~ 1L)))
+  expect_snapshot(mf |> filter(is.na(x)))
+  expect_snapshot(mf |> filter(!is.na(x)))
+  expect_snapshot(mf |> filter(x == 1L || x == 2L))
+  expect_snapshot(mf |> mutate(z = ifelse(x == 1L, 1L, 2L)))
+  expect_snapshot(mf |> mutate(z = case_when(x == 1L ~ 1L)))
 
   # Single conversion on outer layer
-  expect_snapshot(mf %>% mutate(z = !is.na(x)))
-  expect_snapshot(mf %>% mutate(x = x == 1L))
-  expect_snapshot(mf %>% mutate(x = x == 1L || x == 2L))
-  expect_snapshot(mf %>% mutate(x = x == 1L || x == 2L || x == 3L))
-  expect_snapshot(mf %>% mutate(x = !(x == 1L || x == 2L || x == 3L)))
+  expect_snapshot(mf |> mutate(z = !is.na(x)))
+  expect_snapshot(mf |> mutate(x = x == 1L))
+  expect_snapshot(mf |> mutate(x = x == 1L || x == 2L))
+  expect_snapshot(mf |> mutate(x = x == 1L || x == 2L || x == 3L))
+  expect_snapshot(mf |> mutate(x = !(x == 1L || x == 2L || x == 3L)))
 })
 
 test_that("handles ORDER BY in subqueries", {
@@ -343,18 +343,18 @@ test_that("custom escapes translated correctly", {
   b <- blob::as_blob(as.raw(c(0x01, 0x02)))
   L <- c(a, b)
 
-  expect_snapshot(mf %>% filter(x == a))
-  expect_snapshot(mf %>% filter(x %in% L))
+  expect_snapshot(mf |> filter(x == a))
+  expect_snapshot(mf |> filter(x %in% L))
 
   # expect_snapshot() also uses !!
-  qry <- mf %>% filter(x %in% !!L)
+  qry <- mf |> filter(x %in% !!L)
   expect_snapshot(qry)
 })
 
 test_that("logical escaping to 0/1 for both filter() and mutate()", {
   mf <- lazy_frame(x = "abc", con = simulate_mssql())
-  expect_snapshot(mf %>% filter(x == TRUE))
-  expect_snapshot(mf %>% mutate(x = TRUE))
+  expect_snapshot(mf |> filter(x == TRUE))
+  expect_snapshot(mf |> mutate(x = TRUE))
 })
 
 test_that("sql_escape_raw handles NULLs", {
@@ -382,12 +382,12 @@ test_that("generates custom sql", {
   ))
 
   lf <- lazy_frame(x = 1:3, con = simulate_mssql())
-  expect_snapshot(lf %>% slice_sample(n = 1))
+  expect_snapshot(lf |> slice_sample(n = 1))
 
   expect_snapshot(
-    copy_inline(con, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
+    copy_inline(con, tibble(x = 1:2, y = letters[1:2])) |> remote_query()
   )
-  expect_snapshot(copy_inline(con, trees) %>% remote_query())
+  expect_snapshot(copy_inline(con, trees) |> remote_query())
 })
 
 test_that("`sql_query_insert()` is correct", {
@@ -399,7 +399,7 @@ test_that("`sql_query_insert()` is correct", {
     d = c("y", "z"),
     con = con,
     .name = "df_y"
-  ) %>%
+  ) |>
     mutate(c = c + 1)
 
   expect_snapshot(
@@ -424,7 +424,7 @@ test_that("`sql_query_append()` is correct", {
     d = c("y", "z"),
     con = con,
     .name = "df_y"
-  ) %>%
+  ) |>
     mutate(c = c + 1)
 
   expect_snapshot(
@@ -447,7 +447,7 @@ test_that("`sql_query_update_from()` is correct", {
     d = c("y", "z"),
     con = con,
     .name = "df_y"
-  ) %>%
+  ) |>
     mutate(c = c + 1)
 
   expect_snapshot(
@@ -473,7 +473,7 @@ test_that("`sql_query_delete()` is correct", {
     d = c("y", "z"),
     con = simulate_mssql(),
     .name = "df_y"
-  ) %>%
+  ) |>
     mutate(c = c + 1)
 
   expect_snapshot(
@@ -496,7 +496,7 @@ test_that("`sql_query_upsert()` is correct", {
     d = c("y", "z"),
     con = con,
     .name = "df_y"
-  ) %>%
+  ) |>
     mutate(c = c + 1)
 
   expect_snapshot(
@@ -515,21 +515,21 @@ test_that("atoms and symbols are cast to bit in `filter`", {
   mf <- lazy_frame(x = TRUE, con = simulate_mssql())
 
   # as simple symbol and atom
-  expect_snapshot(mf %>% filter(x))
-  expect_snapshot(mf %>% filter(TRUE))
+  expect_snapshot(mf |> filter(x))
+  expect_snapshot(mf |> filter(TRUE))
 
   # when involved in a (perhaps nested) logical expression
-  expect_snapshot(mf %>% filter((!x) | FALSE))
+  expect_snapshot(mf |> filter((!x) | FALSE))
 
   # in a subquery
-  expect_snapshot(mf %>% filter(x) %>% inner_join(mf, by = "x"))
+  expect_snapshot(mf |> filter(x) |> inner_join(mf, by = "x"))
 })
 
 test_that("row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per empty_order)", {
   mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_mssql())
-  expect_snapshot(mf %>% mutate(rown = row_number()))
-  expect_snapshot(mf %>% group_by(y) %>% mutate(rown = row_number()))
-  expect_snapshot(mf %>% arrange(y) %>% mutate(rown = row_number()))
+  expect_snapshot(mf |> mutate(rown = row_number()))
+  expect_snapshot(mf |> group_by(y) |> mutate(rown = row_number()))
+  expect_snapshot(mf |> arrange(y) |> mutate(rown = row_number()))
 })
 
 test_that("count_big", {
@@ -548,13 +548,13 @@ test_that("can copy_to() and compute() with temporary tables (#438)", {
     db <- copy_to(con, df, name = unique_table_name(), temporary = TRUE),
     transform = snap_transform_dbi
   )
-  expect_equal(db %>% pull(), 1:3)
+  expect_equal(db |> pull(), 1:3)
 
   expect_snapshot(
-    db2 <- db %>% mutate(y = x + 1) %>% compute(),
+    db2 <- db |> mutate(y = x + 1) |> compute(),
     transform = snap_transform_dbi
   )
-  expect_equal(db2 %>% pull(), 2:4)
+  expect_equal(db2 |> pull(), 2:4)
 })
 
 test_that("add prefix to temporary table", {
@@ -573,31 +573,31 @@ test_that("add prefix to temporary table", {
 test_that("bit conversion works for important cases", {
   df <- tibble(x = 1:3, y = 3:1)
   db <- copy_to(src_test("mssql"), df, name = unique_table_name("#"))
-  expect_equal(db %>% mutate(z = x == y) %>% pull(), c(FALSE, TRUE, FALSE))
-  expect_equal(db %>% filter(x == y) %>% pull(), 2)
+  expect_equal(db |> mutate(z = x == y) |> pull(), c(FALSE, TRUE, FALSE))
+  expect_equal(db |> filter(x == y) |> pull(), 2)
 
   df <- tibble(x = c(TRUE, FALSE, FALSE), y = c(TRUE, FALSE, TRUE))
   db <- copy_to(src_test("mssql"), df, name = unique_table_name("#"))
-  expect_equal(db %>% filter(x == 1) %>% pull(), TRUE)
-  expect_equal(db %>% mutate(z = TRUE) %>% pull(), c(1, 1, 1))
+  expect_equal(db |> filter(x == 1) |> pull(), TRUE)
+  expect_equal(db |> mutate(z = TRUE) |> pull(), c(1, 1, 1))
 
   # Currently not supported: would need to determine that we have a bit
   # vector in a boolean context, and convert to boolean with x == 1.
-  # expect_equal(db %>% mutate(z = x) %>% pull(), c(TRUE, FALSE, FALSE))
-  # expect_equal(db %>% mutate(z = !x) %>% pull(), c(FALSE, TRUE, TRUE))
-  # expect_equal(db %>% mutate(z = x & y) %>% pull(), c(TRUE, FALSE, FALSE))
+  # expect_equal(db |> mutate(z = x) |> pull(), c(TRUE, FALSE, FALSE))
+  # expect_equal(db |> mutate(z = !x) |> pull(), c(FALSE, TRUE, TRUE))
+  # expect_equal(db |> mutate(z = x & y) |> pull(), c(TRUE, FALSE, FALSE))
 })
 
 test_that("as.integer and as.integer64 translations if parsing failures", {
   df <- data.frame(x = c("1.3", "2x"))
   db <- copy_to(src_test("mssql"), df, name = unique_table_name("#"))
 
-  out <- db %>%
+  out <- db |>
     mutate(
       integer = as.integer(x),
       integer64 = as.integer64(x),
       numeric = as.numeric(x),
-    ) %>%
+    ) |>
     collect()
 
   expect_identical(out$integer, c(1L, NA))
@@ -611,7 +611,7 @@ test_that("can insert", {
   df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
   x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
-  y <- local_db_table(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+  y <- local_db_table(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) |>
     mutate(c = c + 1)
 
   expect_equal(
@@ -621,7 +621,7 @@ test_that("can insert", {
       by = c("a", "b"),
       in_place = TRUE,
       conflict = "ignore"
-    ) %>%
+    ) |>
       collect(),
     tibble(
       a = 1:3,
@@ -638,7 +638,7 @@ test_that("can insert with returning", {
   df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
   x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
-  y <- local_db_table(con, df_y, "df_y") %>%
+  y <- local_db_table(con, df_y, "df_y") |>
     mutate(c = c + 1)
 
   expect_equal(
@@ -649,7 +649,7 @@ test_that("can insert with returning", {
       in_place = TRUE,
       conflict = "ignore",
       returning = everything()
-    ) %>%
+    ) |>
       get_returned_rows(),
     tibble(
       a = 2:3,
@@ -666,7 +666,7 @@ test_that("can append", {
   df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
   x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 1:3, b = 11:13, c = -(2:4), d = c("y", "z", "w"))
-  y <- local_db_table(con, df_y, "df_y") %>%
+  y <- local_db_table(con, df_y, "df_y") |>
     mutate(c = c + 1)
 
   expect_equal(
@@ -674,7 +674,7 @@ test_that("can append", {
       x,
       y,
       in_place = TRUE
-    ) %>%
+    ) |>
       collect(),
     tibble(
       a = c(1L, 1:3),
@@ -691,7 +691,7 @@ test_that("can append with returning", {
   df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
   x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 1:3, b = 11:13, c = -(2:4), d = c("y", "z", "w"))
-  y <- local_db_table(con, df_y, "df_y") %>%
+  y <- local_db_table(con, df_y, "df_y") |>
     mutate(c = c + 1)
 
   expect_equal(
@@ -700,7 +700,7 @@ test_that("can append with returning", {
       y,
       in_place = TRUE,
       returning = everything()
-    ) %>%
+    ) |>
       get_returned_rows(),
     tibble(
       a = 1:3,
@@ -717,7 +717,7 @@ test_that("can update", {
   df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
   x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
-  y <- local_db_table(con, df_y, "df_y") %>%
+  y <- local_db_table(con, df_y, "df_y") |>
     mutate(c = c + 1)
 
   expect_equal(
@@ -727,7 +727,7 @@ test_that("can update", {
       by = c("a", "b"),
       in_place = TRUE,
       unmatched = "ignore"
-    ) %>%
+    ) |>
       collect(),
     tibble(
       a = 1:3,
@@ -744,7 +744,7 @@ test_that("can update with returning", {
   df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
   x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
-  y <- local_db_table(con, df_y, "df_y") %>%
+  y <- local_db_table(con, df_y, "df_y") |>
     mutate(c = c + 1)
 
   expect_equal(
@@ -755,7 +755,7 @@ test_that("can update with returning", {
       in_place = TRUE,
       unmatched = "ignore",
       returning = everything()
-    ) %>%
+    ) |>
       get_returned_rows(),
     tibble(
       a = 2:3,
@@ -772,7 +772,7 @@ test_that("can upsert", {
   df_x <- tibble(a = 1:2, b = 11:12, c = 1:2, d = c("a", "b"))
   x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
-  y <- local_db_table(con, df_y, "df_y") %>%
+  y <- local_db_table(con, df_y, "df_y") |>
     mutate(c = c + 1)
 
   expect_equal(
@@ -781,7 +781,7 @@ test_that("can upsert", {
       y,
       by = c("a", "b"),
       in_place = TRUE
-    ) %>%
+    ) |>
       collect(),
     tibble(
       a = 1:3,
@@ -798,7 +798,7 @@ test_that("can upsert with returning", {
   df_x <- tibble(a = 1:2, b = 11:12, c = 1:2, d = c("a", "b"))
   x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
-  y <- local_db_table(con, df_y, "df_y") %>%
+  y <- local_db_table(con, df_y, "df_y") |>
     mutate(c = c + 1)
 
   expect_equal(
@@ -808,8 +808,8 @@ test_that("can upsert with returning", {
       by = c("a", "b"),
       in_place = TRUE,
       returning = everything()
-    ) %>%
-      get_returned_rows() %>%
+    ) |>
+      get_returned_rows() |>
       arrange(a),
     tibble(
       a = 2:3,
@@ -835,7 +835,7 @@ test_that("can delete", {
       by = c("a", "b"),
       in_place = TRUE,
       unmatched = "ignore"
-    ) %>%
+    ) |>
       collect(),
     tibble(
       a = 1L,
@@ -862,7 +862,7 @@ test_that("can delete with returning", {
       in_place = TRUE,
       unmatched = "ignore",
       returning = everything()
-    ) %>%
+    ) |>
       get_returned_rows(),
     tibble(
       a = 2:3,

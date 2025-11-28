@@ -22,7 +22,7 @@
 ---
 
     Code
-      lazy_frame(x = 1, y = 1) %>% select()
+      select(lazy_frame(x = 1, y = 1))
     Condition
       Error in `sql_clause_select()`:
       ! Query contains no columns

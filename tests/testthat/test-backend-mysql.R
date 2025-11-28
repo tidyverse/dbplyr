@@ -77,12 +77,12 @@ test_that("generates custom sql", {
   expect_snapshot(slice_sample(lf, n = 1))
 
   expect_snapshot(
-    copy_inline(con_maria, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
+    copy_inline(con_maria, tibble(x = 1:2, y = letters[1:2])) |> remote_query()
   )
 
   con_mysql <- simulate_mysql()
   expect_snapshot(
-    copy_inline(con_mysql, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
+    copy_inline(con_mysql, tibble(x = 1:2, y = letters[1:2])) |> remote_query()
   )
 })
 
@@ -95,7 +95,7 @@ test_that("`sql_query_update_from()` is correct", {
     d = c("y", "z"),
     con = con,
     .name = "df_y"
-  ) %>%
+  ) |>
     mutate(c = c + 1)
 
   expect_snapshot(
@@ -130,12 +130,12 @@ test_that("`sql_query_update_from()` is correct", {
 
 test_that("logicals converted to integer correctly", {
   db <- copy_to_test("MariaDB", data.frame(x = c(TRUE, FALSE, NA)))
-  expect_identical(db %>% pull(), c(1L, 0L, NA))
+  expect_identical(db |> pull(), c(1L, 0L, NA))
 })
 
 test_that("can explain", {
   db <- copy_to_test("MariaDB", data.frame(x = 1:3))
-  expect_snapshot(db %>% mutate(y = x + 1) %>% explain())
+  expect_snapshot(db |> mutate(y = x + 1) |> explain())
 })
 
 test_that("can overwrite temp tables", {
@@ -155,7 +155,7 @@ test_that("can update", {
   df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
   x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
-  y <- local_db_table(con, df_y, "df_y") %>%
+  y <- local_db_table(con, df_y, "df_y") |>
     mutate(c = c + 1)
 
   # `RETURNING` in an `UPDATE` clause is not (yet) supported for MariaDB
@@ -167,7 +167,7 @@ test_that("can update", {
       by = c("a", "b"),
       unmatched = "ignore",
       in_place = TRUE
-    ) %>%
+    ) |>
       collect(),
     tibble(
       a = 1:3,
@@ -206,7 +206,7 @@ test_that("casts `y` column for local df", {
       y,
       copy = TRUE,
       in_place = FALSE
-    ) %>%
+    ) |>
       collect(),
     out
   )
@@ -218,7 +218,7 @@ test_that("casts `y` column for local df", {
     in_place = TRUE
   )
 
-  expect_equal(tbl(con, "df_x") %>% collect(), out)
+  expect_equal(tbl(con, "df_x") |> collect(), out)
 
   types_expected <- c(id = "bigint(20)", val = "bigint(20)", ltext = "longtext")
   expect_equal(db_col_types(con, table2), types_expected)

@@ -41,7 +41,7 @@ library(dplyr, warn.conflicts = FALSE)
 copy_to(con, iris, "df", temporary = FALSE)
 copy_to(con, mtcars, I("aux.df"), temporary = FALSE)
 
-con \%>\% tbl("df")
-con \%>\% tbl(I("aux.df"))
+con |> tbl("df")
+con |> tbl(I("aux.df"))
 }
 \keyword{internal}

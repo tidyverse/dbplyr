@@ -1,7 +1,7 @@
 # can pivot all cols to wide
 
     Code
-      lazy_frame(key = c("x", "y", "z"), val = 1:3) %>% dbplyr_pivot_wider_spec(spec)
+      dbplyr_pivot_wider_spec(lazy_frame(key = c("x", "y", "z"), val = 1:3), spec)
     Output
       <SQL>
       SELECT
@@ -13,8 +13,7 @@
 # implicit missings turn into explicit missings
 
     Code
-      lazy_frame(a = 1:2, key = c("x", "y"), val = 1:2) %>% dbplyr_pivot_wider_spec(
-        spec)
+      dbplyr_pivot_wider_spec(lazy_frame(a = 1:2, key = c("x", "y"), val = 1:2), spec)
     Output
       <SQL>
       SELECT

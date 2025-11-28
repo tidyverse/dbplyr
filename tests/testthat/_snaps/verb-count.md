@@ -1,7 +1,7 @@
 # generates expected SQL for common situations
 
     Code
-      db %>% count(g)
+      count(db, g)
     Output
       <SQL>
       SELECT `g`, COUNT(*) AS `n`
@@ -11,7 +11,7 @@
 ---
 
     Code
-      db %>% count(g, wt = x)
+      count(db, g, wt = x)
     Output
       <SQL>
       SELECT `g`, SUM(`x`) AS `n`
@@ -21,7 +21,7 @@
 ---
 
     Code
-      db %>% count(g, sort = TRUE)
+      count(db, g, sort = TRUE)
     Output
       <SQL>
       SELECT `g`, COUNT(*) AS `n`
@@ -32,7 +32,7 @@
 ---
 
     Code
-      db %>% add_count(g, sort = TRUE)
+      add_count(db, g, sort = TRUE)
     Output
       <SQL>
       SELECT `df`.*, COUNT(*) OVER (PARTITION BY `g`) AS `n`
@@ -42,7 +42,7 @@
 ---
 
     Code
-      db %>% group_by(g) %>% add_count()
+      add_count(group_by(db, g))
     Output
       <SQL>
       SELECT `df`.*, COUNT(*) OVER (PARTITION BY `g`) AS `n`
@@ -51,7 +51,7 @@
 # .drop is not supported
 
     Code
-      lazy_frame(g = 1) %>% add_count(.drop = TRUE)
+      add_count(lazy_frame(g = 1), .drop = TRUE)
     Condition
       Error in `add_count()`:
       ! Argument `.drop` isn't supported on database backends.

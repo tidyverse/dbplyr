@@ -36,13 +36,13 @@
 # copy_inline uses UNION ALL
 
     Code
-      copy_inline(con, y %>% slice(0)) %>% remote_query()
+      remote_query(copy_inline(con, slice(y, 0)))
     Output
       <SQL> SELECT CAST(NULL AS INTEGER) AS `id`, CAST(NULL AS VARCHAR) AS `arr`
       FROM `DUMMY`
       WHERE (0 = 1)
     Code
-      copy_inline(con, y) %>% remote_query()
+      remote_query(copy_inline(con, y))
     Output
       <SQL> SELECT CAST(`id` AS INTEGER) AS `id`, CAST(`arr` AS VARCHAR) AS `arr`
       FROM (
@@ -55,13 +55,13 @@
         SELECT 1, '{1,2,3}' FROM DUMMY
       ) AS `values_table`
     Code
-      copy_inline(con, y %>% slice(0), types = types) %>% remote_query()
+      remote_query(copy_inline(con, slice(y, 0), types = types))
     Output
       <SQL> SELECT CAST(NULL AS bigint) AS `id`, CAST(NULL AS integer[]) AS `arr`
       FROM `DUMMY`
       WHERE (0 = 1)
     Code
-      copy_inline(con, y, types = types) %>% remote_query()
+      remote_query(copy_inline(con, y, types = types))
     Output
       <SQL> SELECT CAST(`id` AS bigint) AS `id`, CAST(`arr` AS integer[]) AS `arr`
       FROM (

@@ -33,7 +33,7 @@ con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
 
 copy_inline(con, df)
 
-copy_inline(con, df) \%>\% dplyr::show_query()
+copy_inline(con, df) |> dplyr::show_query()
 }
 \seealso{
 \code{\link[dplyr:copy_to]{dplyr::copy_to()}} to copy the data into a new database table.

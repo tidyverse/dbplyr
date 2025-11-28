@@ -25,6 +25,6 @@ This is a method for the \code{\link[tidyr:replace_na]{tidyr::replace_na()}} gen
 \examples{
 \dontshow{if (rlang::is_installed("tidyr", version = "1.0.0")) withAutoprint(\{ # examplesIf}
 df <- memdb_frame(x = c(1, 2, NA), y = c("a", NA, "b"))
-df \%>\% tidyr::replace_na(list(x = 0, y = "unknown"))
+df |> tidyr::replace_na(list(x = 0, y = "unknown"))
 \dontshow{\}) # examplesIf}
 }

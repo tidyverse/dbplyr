@@ -4,8 +4,8 @@ test_that("print method doesn't change unexpectedly", {
   lf3 <- lazy_frame(x = 1, z = 2, .name = "lf3")
 
   expect_snapshot(
-    left_join(lf1, lf2, by = "x") %>%
-      left_join(lf3, by = "x") %>%
+    left_join(lf1, lf2, by = "x") |>
+      left_join(lf3, by = "x") |>
       sql_build()
   )
 })

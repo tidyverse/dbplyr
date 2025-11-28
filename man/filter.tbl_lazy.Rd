@@ -34,6 +34,6 @@ This is a method for the dplyr \code{\link[dplyr:filter]{dplyr::filter()}} gener
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(x = c(2, NA, 5, NA, 10), y = 1:5)
-db \%>\% filter(x < 5) \%>\% show_query()
-db \%>\% filter(is.na(x)) \%>\% show_query()
+db |> filter(x < 5) |> show_query()
+db |> filter(is.na(x)) |> show_query()
 }

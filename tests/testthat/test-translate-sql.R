@@ -23,9 +23,9 @@ test_that("namespace calls are translated", {
   lz <- lazy_frame(x = 1)
   # Also test full pipeline to ensure that they make it through partial_eval
   expect_snapshot(error = TRUE, {
-    lz %>% mutate(x = NOSUCHPACKAGE::foo())
-    lz %>% mutate(x = dbplyr::NOSUCHFUNCTION())
-    lz %>% mutate(x = base::abbreviate(x))
+    lz |> mutate(x = NOSUCHPACKAGE::foo())
+    lz |> mutate(x = dbplyr::NOSUCHFUNCTION())
+    lz |> mutate(x = base::abbreviate(x))
   })
 })
 
@@ -92,7 +92,7 @@ test_that("connection affects quoting character", {
 test_that("magrittr pipe is translated", {
   local_con(simulate_dbi())
   expect_identical(
-    test_translate_sql(1 %>% is.na()),
+    test_translate_sql(1 |> is.na()),
     test_translate_sql(is.na(1))
   )
 })
@@ -122,10 +122,10 @@ test_that("sql() evaluates input locally in across()", {
   lf <- lazy_frame(x = 1, y = 2)
 
   expect_equal(
-    lf %>%
+    lf |>
       summarise(
         across(x, ~ sql(gsub("x", "y", cur_column())))
-      ) %>%
+      ) |>
       remote_query(),
     sql("SELECT y AS `x`\nFROM `df`")
   )

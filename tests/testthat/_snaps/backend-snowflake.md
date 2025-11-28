@@ -24,7 +24,7 @@
 # row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per empty_order)
 
     Code
-      mf %>% mutate(rown = row_number())
+      mutate(mf, rown = row_number())
     Output
       <SQL>
       SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS `rown`
@@ -33,7 +33,7 @@
 ---
 
     Code
-      mf %>% group_by(y) %>% mutate(rown = row_number())
+      mutate(group_by(mf, y), rown = row_number())
     Output
       <SQL>
       SELECT
@@ -44,7 +44,7 @@
 ---
 
     Code
-      mf %>% arrange(y) %>% mutate(rown = row_number())
+      mutate(arrange(mf, y), rown = row_number())
     Output
       <SQL>
       SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY `y`) AS `rown`

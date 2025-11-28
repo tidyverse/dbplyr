@@ -28,11 +28,11 @@ mf <- memdb_frame(x = 1, y = 2)
 One simple nicety of dplyr is that it will automatically generate subqueries if you want to use a freshly created variable in `mutate()`: 
 
 ```{r}
-mf %>% 
+mf |> 
   mutate(
     a = y * x, 
     b = a ^ 2,
-  ) %>% 
+  ) |> 
   show_query()
 ```
 
@@ -45,24 +45,24 @@ dbplyr aims to translate the most common R functions to their SQL equivalents, a
 Any function that dbplyr doesn't know about will be left as is:
 
 ```{r}
-mf %>% 
-  mutate(z = foofify(x, y)) %>% 
+mf |> 
+  mutate(z = foofify(x, y)) |> 
   show_query()
 
-mf %>% 
-  filter(x %LIKE% "%foo%") %>% 
+mf |> 
+  filter(x %LIKE% "%foo%") |> 
   show_query()
 ```
 
 SQL functions tend to have a greater variety of syntax than R. That means there are a number of expressions that can't be translated directly from R code. To insert these in your own queries, you can use literal SQL inside `sql()`:
 
 ```{r}
-mf %>% 
-  transmute(factorial = sql("x!")) %>% 
+mf |> 
+  transmute(factorial = sql("x!")) |> 
   show_query()
 
-mf %>% 
-  transmute(factorial = sql("CAST(x AS FLOAT)")) %>% 
+mf |> 
+  transmute(factorial = sql("CAST(x AS FLOAT)")) |> 
   show_query()
 ```
 

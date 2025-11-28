@@ -132,9 +132,9 @@ rows_insert.tbl_lazy <- function(
 
     if (!is_empty(returning_cols)) {
       # Need to `union_all()` with `x` so that all columns of `x` exist in the result
-      returned_rows <- anti_join(y, x, by = by) %>%
-        union_all(x %>% filter(0 == 1)) %>%
-        select(!!!returning_cols) %>%
+      returned_rows <- anti_join(y, x, by = by) |>
+        union_all(x |> filter(0 == 1)) |>
+        select(!!!returning_cols) |>
         collect()
       out <- set_returned_rows(out, returned_rows)
     }
@@ -181,8 +181,8 @@ rows_append.tbl_lazy <- function(
 
     if (!is_empty(returning_cols)) {
       # Need to `union_all()` with `x` so that all columns of `x` exist in the result
-      returned_rows <- union_all(y, x %>% filter(0 == 1)) %>%
-        select(!!!returning_cols) %>%
+      returned_rows <- union_all(y, x |> filter(0 == 1)) |>
+        select(!!!returning_cols) |>
         collect()
       out <- set_returned_rows(out, returned_rows)
     }
@@ -250,8 +250,8 @@ rows_update.tbl_lazy <- function(
     rows_get_or_execute(x, sql, returning_cols)
   } else {
     existing_columns <- setdiff(colnames(x), new_columns)
-    updated <- x %>%
-      select(!!!existing_columns) %>%
+    updated <- x |>
+      select(!!!existing_columns) |>
       inner_join(y, by = by)
 
     if (is_empty(new_columns)) {
@@ -262,8 +262,8 @@ rows_update.tbl_lazy <- function(
     }
 
     if (!is_empty(returning_cols)) {
-      returned_rows <- updated %>%
-        select(!!!returning_cols) %>%
+      returned_rows <- updated |>
+        select(!!!returning_cols) |>
         collect()
       out <- set_returned_rows(out, returned_rows)
     }
@@ -346,22 +346,22 @@ rows_patch.tbl_lazy <- function(
         function(.x) {
           quo(coalesce(!!sym(new_columns[.x]), !!sym(patch_columns_y[.x])))
         }
-      ) %>%
+      ) |>
       rlang::set_names(new_columns)
     if (is_empty(new_columns)) {
       patched <- to_patch
       out <- x
     } else {
-      patched <- to_patch %>%
-        mutate(!!!patch_quos) %>%
+      patched <- to_patch |>
+        mutate(!!!patch_quos) |>
         select(-all_of(patch_columns_y))
       unchanged <- anti_join(x, y, by = by)
       out <- union_all(unchanged, patched)
     }
 
     if (!is_empty(returning_cols)) {
-      returned_rows <- patched %>%
-        select(!!!returning_cols) %>%
+      returned_rows <- patched |>
+        select(!!!returning_cols) |>
         collect()
       out <- set_returned_rows(out, returned_rows)
     }
@@ -428,8 +428,8 @@ rows_upsert.tbl_lazy <- function(
     } else {
       unchanged <- anti_join(x, y, by = by)
       existing_columns <- setdiff(colnames(x), new_columns)
-      updated <- x %>%
-        select(!!!existing_columns) %>%
+      updated <- x |>
+        select(!!!existing_columns) |>
         inner_join(y, by = by)
       upserted <- union_all(updated, inserted)
     }
@@ -437,8 +437,8 @@ rows_upsert.tbl_lazy <- function(
     out <- union_all(unchanged, upserted)
 
     if (!is_empty(returning_cols)) {
-      returned_rows <- upserted %>%
-        select(!!!returning_cols) %>%
+      returned_rows <- upserted |>
+        select(!!!returning_cols) |>
         collect()
       out <- set_returned_rows(out, returned_rows)
     }
@@ -502,8 +502,8 @@ rows_delete.tbl_lazy <- function(
     out <- anti_join(x, y, by = by)
 
     if (!is_empty(returning_cols)) {
-      returned_rows <- semi_join(x, y, by = by) %>%
-        select(!!!returning_cols) %>%
+      returned_rows <- semi_join(x, y, by = by) |>
+        select(!!!returning_cols) |>
         collect()
       out <- set_returned_rows(out, returned_rows)
     }

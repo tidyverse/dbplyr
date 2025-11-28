@@ -313,7 +313,7 @@ sql_agg_not_supported <- function(f, backend) {
     msg <- c(
       msg,
       i = "Use a combination of {.fun distinct} and {.fun mutate} for the same result:",
-      " " = "{.code mutate(<col> = {f_call_str}) %>% distinct(<col>)}"
+      " " = "{.code mutate(<col> = {f_call_str}) |> distinct(<col>)}"
     )
     cli_abort(msg)
   }
@@ -336,7 +336,7 @@ sql_win_not_supported <- function(f, backend) {
     msg <- c(
       msg,
       i = "Use a combination of {.fun summarise} and {.fun left_join} instead:",
-      " " = "{.code df %>% left_join(summarise(<col> = {f_call_str}))}."
+      " " = "{.code df |> left_join(summarise(<col> = {f_call_str}))}."
     )
     cli_abort(msg)
   }

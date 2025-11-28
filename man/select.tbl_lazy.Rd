@@ -43,7 +43,7 @@ not use \code{where(is.numeric)} to select all numeric variables.
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(x = 1, y = 2, z = 3)
-db \%>\% select(-y) \%>\% show_query()
-db \%>\% relocate(z) \%>\% show_query()
-db \%>\% rename(first = x, last = z) \%>\% show_query()
+db |> select(-y) |> show_query()
+db |> relocate(z) |> show_query()
+db |> rename(first = x, last = z) |> show_query()
 }

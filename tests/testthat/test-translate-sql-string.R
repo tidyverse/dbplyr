@@ -55,17 +55,17 @@ test_that("sql_str_sub can require length parameter", {
 test_that("str_sub() returns consistent results", {
   mf <- memdb_frame(t = "abcde")
 
-  expect_equal(mf %>% transmute(str_sub(t, -3, -1)) %>% pull(1), "cde")
-  expect_equal(mf %>% transmute(str_sub(t, 0, -1)) %>% pull(1), "abcde")
-  expect_equal(mf %>% transmute(str_sub(t, 1, -3)) %>% pull(1), "abc")
+  expect_equal(mf |> transmute(str_sub(t, -3, -1)) |> pull(1), "cde")
+  expect_equal(mf |> transmute(str_sub(t, 0, -1)) |> pull(1), "abcde")
+  expect_equal(mf |> transmute(str_sub(t, 1, -3)) |> pull(1), "abc")
 
-  expect_equal(mf %>% transmute(str_sub(t, -3, 0)) %>% pull(1), "")
-  expect_equal(mf %>% transmute(str_sub(t, 0, 0)) %>% pull(1), "")
-  expect_equal(mf %>% transmute(str_sub(t, 1, 0)) %>% pull(1), "")
+  expect_equal(mf |> transmute(str_sub(t, -3, 0)) |> pull(1), "")
+  expect_equal(mf |> transmute(str_sub(t, 0, 0)) |> pull(1), "")
+  expect_equal(mf |> transmute(str_sub(t, 1, 0)) |> pull(1), "")
 
-  expect_equal(mf %>% transmute(str_sub(t, -3, 5)) %>% pull(1), "cde")
-  expect_equal(mf %>% transmute(str_sub(t, 0, 1)) %>% pull(1), "a")
-  expect_equal(mf %>% transmute(str_sub(t, 1, 3)) %>% pull(1), "abc")
+  expect_equal(mf |> transmute(str_sub(t, -3, 5)) |> pull(1), "cde")
+  expect_equal(mf |> transmute(str_sub(t, 0, 1)) |> pull(1), "a")
+  expect_equal(mf |> transmute(str_sub(t, 1, 3)) |> pull(1), "abc")
 })
 
 test_that("str_detect(), str_starts(), str_ends() support fixed patterns", {
@@ -73,29 +73,29 @@ test_that("str_detect(), str_starts(), str_ends() support fixed patterns", {
 
   # detects fixed pattern
   expect_equal(
-    mf %>% transmute(str_starts(x, fixed("%0"))) %>% pull(1),
+    mf |> transmute(str_starts(x, fixed("%0"))) |> pull(1),
     c(1, 0, 0, 0, NA)
   )
   # hack to avoid check complaining about not declared imports
   pattern <- rlang::parse_expr("stringr::fixed('%0')")
   expect_equal(
-    mf %>% transmute(str_starts(x, !!pattern)) %>% pull(1),
+    mf |> transmute(str_starts(x, !!pattern)) |> pull(1),
     c(1, 0, 0, 0, NA)
   )
 
   # also works with ends and detect
   expect_equal(
-    mf %>% transmute(str_ends(x, fixed("%0"))) %>% pull(1),
+    mf |> transmute(str_ends(x, fixed("%0"))) |> pull(1),
     c(0, 1, 0, 0, NA)
   )
   expect_equal(
-    mf %>% transmute(str_detect(x, fixed("%0"))) %>% pull(1),
+    mf |> transmute(str_detect(x, fixed("%0"))) |> pull(1),
     c(1, 1, 1, 0, NA)
   )
 
   # negate works
   expect_equal(
-    mf %>% transmute(str_detect(x, fixed("%0"), negate = TRUE)) %>% pull(1),
+    mf |> transmute(str_detect(x, fixed("%0"), negate = TRUE)) |> pull(1),
     c(0, 0, 0, 1, NA)
   )
 

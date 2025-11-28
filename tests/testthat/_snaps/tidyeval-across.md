@@ -38,7 +38,7 @@
 # across() defaults to everything()
 
     Code
-      lazy_frame(x = 1, y = 1) %>% summarise(across(.fns = ~ . + 1))
+      summarise(lazy_frame(x = 1, y = 1), across(.fns = ~ . + 1))
     Output
       <SQL>
       SELECT `x` + 1.0 AS `x`, `y` + 1.0 AS `y`
@@ -47,7 +47,7 @@
 # untranslatable functions are preserved
 
     Code
-      lf %>% summarise(across(a:b, SQL_LOG))
+      summarise(lf, across(a:b, SQL_LOG))
     Output
       <SQL>
       SELECT SQL_LOG(`a`) AS `a`, SQL_LOG(`b`) AS `b`
@@ -56,7 +56,7 @@
 # old _at functions continue to work
 
     Code
-      lf %>% dplyr::summarise_at(dplyr::vars(a:b), "sum")
+      dplyr::summarise_at(lf, dplyr::vars(a:b), "sum")
     Condition
       Warning:
       Missing values are always removed in SQL aggregation functions.
@@ -70,7 +70,7 @@
 ---
 
     Code
-      lf %>% dplyr::summarise_at(dplyr::vars(a:b), sum)
+      dplyr::summarise_at(lf, dplyr::vars(a:b), sum)
     Output
       <SQL>
       SELECT SUM(`a`) AS `a`, SUM(`b`) AS `b`
@@ -79,7 +79,7 @@
 ---
 
     Code
-      lf %>% dplyr::summarise_at(dplyr::vars(a:b), ~ sum(.))
+      dplyr::summarise_at(lf, dplyr::vars(a:b), ~ sum(.))
     Output
       <SQL>
       SELECT SUM(`a`) AS `a`, SUM(`b`) AS `b`
@@ -105,7 +105,7 @@
 # across() throws error if unpack = TRUE
 
     Code
-      (expect_error(lf %>% mutate(across(x, .unpack = TRUE))))
+      (expect_error(mutate(lf, across(x, .unpack = TRUE))))
     Output
       <error/rlang_error>
       Error in `mutate()`:
@@ -139,7 +139,7 @@
 # if_all/any works in filter()
 
     Code
-      lf %>% filter(if_all(a:b, ~ . > 0))
+      filter(lf, if_all(a:b, ~ . > 0))
     Output
       <SQL>
       SELECT `df`.*
@@ -149,7 +149,7 @@
 ---
 
     Code
-      lf %>% filter(if_any(a:b, ~ . > 0))
+      filter(lf, if_any(a:b, ~ . > 0))
     Output
       <SQL>
       SELECT `df`.*
@@ -159,7 +159,7 @@
 # if_all/any works in mutate()
 
     Code
-      lf %>% mutate(c = if_all(a:b, ~ . > 0))
+      mutate(lf, c = if_all(a:b, ~ . > 0))
     Output
       <SQL>
       SELECT `df`.*, (`a` > 0.0 AND `b` > 0.0) AS `c`
@@ -168,7 +168,7 @@
 ---
 
     Code
-      lf %>% mutate(c = if_any(a:b, ~ . > 0))
+      mutate(lf, c = if_any(a:b, ~ . > 0))
     Output
       <SQL>
       SELECT `df`.*, (`a` > 0.0 OR `b` > 0.0) AS `c`
@@ -177,7 +177,7 @@
 # if_all/any uses every column as default
 
     Code
-      lf %>% filter(if_all(.fns = ~ . > 0))
+      filter(lf, if_all(.fns = ~ . > 0))
     Output
       <SQL>
       SELECT `df`.*
@@ -187,7 +187,7 @@
 ---
 
     Code
-      lf %>% filter(if_any(.fns = ~ . > 0))
+      filter(lf, if_any(.fns = ~ . > 0))
     Output
       <SQL>
       SELECT `df`.*
@@ -197,7 +197,7 @@
 # if_all/any works without `.fns` argument
 
     Code
-      lf %>% filter(if_all(a:b))
+      filter(lf, if_all(a:b))
     Output
       <SQL>
       SELECT `df`.*
@@ -207,7 +207,7 @@
 ---
 
     Code
-      lf %>% filter(if_any(a:b))
+      filter(lf, if_any(a:b))
     Output
       <SQL>
       SELECT `df`.*

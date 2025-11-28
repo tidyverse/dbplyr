@@ -46,7 +46,7 @@ wrap up \code{\link[=group_by.tbl_lazy]{group_by.tbl_lazy()}}, \code{\link[=summ
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(g = c(1, 1, 1, 2, 2), x = c(4, 3, 6, 9, 2))
-db \%>\% count(g) \%>\% show_query()
-db \%>\% count(g, wt = x) \%>\% show_query()
-db \%>\% count(g, wt = x, sort = TRUE) \%>\% show_query()
+db |> count(g) |> show_query()
+db |> count(g, wt = x) |> show_query()
+db |> count(g, wt = x, sort = TRUE) |> show_query()
 }
