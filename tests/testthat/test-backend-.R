@@ -8,6 +8,7 @@ test_that("base_no_win includes all aggregates and window functions", {
 
 test_that("can translate both pipes", {
   local_con(simulate_dbi())
+  local_mocked_bindings(check_na_rm = function(na.rm) {})
 
   expect_equal(
     test_translate_sql(x %>% mean() %>% sum(), window = FALSE),
