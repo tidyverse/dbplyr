@@ -70,20 +70,239 @@ Next, check that `copy_to()`, `collapse()`, `compute()`, and `collect()` work:
 *   If `compute()` fails, your database has a non-standard way of saving queries
     in temporary tables. Add a method for `db_save_query()`.
 
-## SQL translation
+## SQL translation: verbs
 
-Make sure you've read `vignette("translation-verb")` so you have the lay of the land. 
-
-### Verbs
-
-Check that SQL translation for the key verbs work:
+Make sure you've read `vignette("translation-verb")` so you have the lay of the land. First check that SQL translation for the key verbs work:
 
 * `summarise()`, `mutate()`, `filter()` etc: powered by `sql_query_select()`
 * `left_join()`, `inner_join()`: powered by `sql_query_join()`
 * `semi_join()`, `anti_join()`: powered by `sql_query_semi_join()`
 * `union()`, `intersect()`, `setdiff()`: powered by `sql_query_set_op()`
 
-### Vectors
+## SQL translation: vectors
 
-Finally, you may have to provide custom R -> SQL translation at the vector level by providing a method for `sql_translate_env()`. This function should return an object created by `sql_variant()`. See existing methods for examples.
+Finally, you may have to provide custom R -> SQL translation at the vector level by providing a method for `sql_translation()`. This function should return an object created by `sql_variant()`.
 
+The `sql_variant()` function creates a container for three types of function translations:
+
+```{r, eval = FALSE}
+sql_translation.myConnectionClass <- function(con) {
+  sql_variant(
+    scalar = sql_translator(...), # Functions in SELECT (non-aggregated)
+    aggregate = sql_translator(...), # Aggregation functions (mean, sum, etc.)
+    window = sql_translator(...) # Window functions (lead, lag, rank, etc.)
+  )
+}
+```
+
+Each translator typically inherits from a base translator and overrides only what's different for your backend:
+
+```{r, eval = FALSE}
+sql_translator(
+  .parent = base_scalar, # Inherit most translations
+  # Override specific functions for your backend
+  `+` = sql_infix("+"),
+  mean = sql_aggregate("AVG", "mean")
+)
+```
+
+### Translation helper functions
+
+dbplyr provides several helper functions to make it easier to translate R functions to SQL:
+
+*   **`sql_prefix(f, n = NULL)`**: For standard SQL functions. The `n` argument
+    optionally specifies the number of arguments.
+
+    ```{r, eval = FALSE}
+scalar = sql_translator(
+  .parent = base_scalar,
+  cos = sql_prefix("COS", 1),
+  round = sql_prefix("ROUND", 2)
+)
+    ```
+
+*   **`sql_infix(f)`**: For infix operators.
+
+    ```{r, eval = FALSE}
+scalar = sql_translator(
+  .parent = base_scalar,
+  `+` = sql_infix("+"),
+  `*` = sql_infix("*"),
+  `==` = sql_infix("=") # Note: R's == becomes SQL's =
+)
+    ```
+
+*   **`sql_aggregate(f, f_r = f)`**: For single-argument SQL aggregate
+    functions. The `f_r` argument gives the name of the R function.
+
+    ```{r, eval = FALSE}
+aggregate = sql_translator(
+  .parent = base_agg,
+  mean = sql_aggregate("AVG", "mean"),
+  var = sql_aggregate("VAR_SAMP", "var")
+)
+    ```
+
+*   **`sql_aggregate_2(f)`**: For two-argument SQL aggregate functions.
+
+    ```{r, eval = FALSE}
+aggregate = sql_translator(
+  .parent = base_agg,
+  cov = sql_aggregate_2("COVAR_SAMP")
+)
+    ```
+
+*   **`sql_aggregate_n(f, f_r = f)`**: For variadic SQL aggregate functions.
+
+    ```{r, eval = FALSE}
+aggregate = sql_translator(
+  .parent = base_agg,
+  pmin = sql_aggregate_n("LEAST", "pmin"),
+  pmax = sql_aggregate_n("GREATEST", "pmax")
+)
+    ```
+
+*   **`sql_cast(type)`**: For type casting functions.
+
+    ```{r, eval = FALSE}
+scalar = sql_translator(
+  .parent = base_scalar,
+  as.numeric = sql_cast("NUMERIC"),
+  as.character = sql_cast("VARCHAR")
+)
+    ```
+
+*   **`sql_not_supported(f)`**: For functions with no SQL translation.
+
+    ```{r, eval = FALSE}
+aggregate = sql_translator(
+  .parent = base_agg,
+  median = sql_not_supported("median")
+)
+    ```
+
+### Window function helpers
+
+Window functions have their own set of helpers:
+
+*   **`win_rank(f)`**: For ranking functions.
+
+    ```{r, eval = FALSE}
+window = sql_translator(
+  .parent = base_win,
+  row_number = win_rank("ROW_NUMBER"),
+  rank = win_rank("RANK"),
+  dense_rank = win_rank("DENSE_RANK")
+)
+    ```
+
+*   **`win_aggregate(f)`**: For aggregate functions used as window functions.
+
+    ```{r, eval = FALSE}
+window = sql_translator(
+  .parent = base_win,
+  mean = win_aggregate("AVG"),
+  sum = win_aggregate("SUM")
+)
+    ```
+
+*   **`win_cumulative(f)`**: For cumulative functions.
+
+    ```{r, eval = FALSE}
+window = sql_translator(
+  .parent = base_win,
+  cumsum = win_cumulative("SUM")
+)
+    ```
+
+*   **`win_absent(f)`**: For backends that don't support certain window
+    functions.
+
+    ```{r, eval = FALSE}
+window = sql_translator(
+  .parent = base_win,
+  mean = win_absent("mean")
+)
+    ```
+
+### Custom translation functions
+
+For more complex translations, you can write custom functions that return SQL expressions using `sql_expr()`:
+
+```{r, eval = FALSE}
+scalar = sql_translator(
+  .parent = base_scalar,
+
+  # Custom log function with change of base
+  log = function(x, base = exp(1)) {
+    if (isTRUE(all.equal(base, exp(1)))) {
+      sql_expr(ln(!!x))
+    } else {
+      sql_expr(log(!!x) / log(!!base))
+    }
+  },
+
+  # Custom paste function using CONCAT
+  paste = function(..., sep = " ") {
+    args <- list(...)
+    sql_expr(CONCAT_WS(!!sep, !!!args))
+  }
+)
+```
+
+The `!!` operator injects R values into SQL expressions, while `!!!` splices a list of values.
+
+### Complete example
+
+Here's a complete example for a fictional database backend:
+
+```{r, eval = FALSE}
+#' @importFrom dbplyr sql_translation sql_variant sql_translator
+#' @importFrom dbplyr base_scalar base_agg base_win
+#' @importFrom dbplyr sql_prefix sql_infix sql_aggregate sql_cast
+#' @importFrom dbplyr win_rank win_aggregate
+#' @export
+sql_translation.myConnectionClass <- function(con) {
+  sql_variant(
+    scalar = sql_translator(
+      .parent = base_scalar,
+
+      # Operators
+      `%%` = sql_infix("MOD"),
+
+      # Math functions
+      log10 = sql_prefix("LOG10", 1),
+      cot = function(x) sql_expr(1 / tan(!!x)),
+
+      # Type casts (backend uses INT instead of INTEGER)
+      as.integer = sql_cast("INT"),
+      as.numeric = sql_cast("FLOAT"),
+
+      # String functions (backend uses UPPER/LOWER)
+      toupper = sql_prefix("UPPER", 1),
+      tolower = sql_prefix("LOWER", 1)
+    ),
+
+    aggregate = sql_translator(
+      .parent = base_agg,
+
+      # Standard deviation (backend uses STDEV)
+      sd = sql_aggregate("STDEV", "sd"),
+      var = sql_aggregate("VARIANCE", "var"),
+
+      # String aggregation (backend uses STRING_AGG)
+      str_flatten = function(x, collapse = "") {
+        sql_expr(STRING_AGG(!!x, !!collapse))
+      }
+    ),
+
+    window = sql_translator(
+      .parent = base_win,
+
+      # Window aggregates
+      sd = win_aggregate("STDEV"),
+      var = win_aggregate("VARIANCE")
+    )
+  )
+}
+```
