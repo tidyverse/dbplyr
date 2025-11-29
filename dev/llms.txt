@@ -76,13 +76,13 @@ to the database when you request the data.
 
 ``` r
 # lazily generates query
-summary <- mtcars2 %>% 
-  group_by(cyl) %>% 
-  summarise(mpg = mean(mpg, na.rm = TRUE)) %>% 
+summary <- mtcars2 |> 
+  group_by(cyl) |> 
+  summarise(mpg = mean(mpg, na.rm = TRUE)) |> 
   arrange(desc(mpg))
 
 # see query
-summary %>% show_query()
+summary |> show_query()
 #> <SQL>
 #> SELECT `cyl`, AVG(`mpg`) AS `mpg`
 #> FROM `mtcars`
@@ -90,7 +90,7 @@ summary %>% show_query()
 #> ORDER BY `mpg` DESC
 
 # execute query and retrieve results
-summary %>% collect()
+summary |> collect()
 #> # A tibble: 3 × 2
 #>     cyl   mpg
 #>   <dbl> <dbl>

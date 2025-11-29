@@ -49,18 +49,18 @@ group_by(.data, ..., .add = FALSE, .drop = TRUE)
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(g = c(1, 1, 1, 2, 2), x = c(4, 3, 6, 9, 2))
-db %>%
-  group_by(g) %>%
-  summarise(n()) %>%
+db |>
+  group_by(g) |>
+  summarise(n()) |>
   show_query()
 #> <SQL>
 #> SELECT `g`, COUNT(*) AS `n()`
 #> FROM `dbplyr_bOGqaBG4XI`
 #> GROUP BY `g`
 
-db %>%
-  group_by(g) %>%
-  mutate(x2 = x / sum(x, na.rm = TRUE)) %>%
+db |>
+  group_by(g) |>
+  mutate(x2 = x / sum(x, na.rm = TRUE)) |>
   show_query()
 #> <SQL>
 #> SELECT `dbplyr_bOGqaBG4XI`.*, `x` / SUM(`x`) OVER (PARTITION BY `g`) AS `x2`

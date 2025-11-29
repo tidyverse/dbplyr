@@ -27,21 +27,21 @@ library(dplyr, warn.conflicts = FALSE)
 
 lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = simulate_spark_sql())
 
-lf %>% summarise(x = median(d, na.rm = TRUE))
+lf |> summarise(x = median(d, na.rm = TRUE))
 #> <SQL>
 #> SELECT MEDIAN(`d`) AS `x`
 #> FROM `df`
-lf %>% summarise(x = var(c, na.rm = TRUE), .by = d)
+lf |> summarise(x = var(c, na.rm = TRUE), .by = d)
 #> <SQL>
 #> SELECT `d`, VARIANCE(`c`) AS `x`
 #> FROM `df`
 #> GROUP BY `d`
 
-lf %>% mutate(x = first(c))
+lf |> mutate(x = first(c))
 #> <SQL>
 #> SELECT `df`.*, FIRST_VALUE(`c`) OVER () AS `x`
 #> FROM `df`
-lf %>% mutate(x = first(c), .by = d)
+lf |> mutate(x = first(c), .by = d)
 #> <SQL>
 #> SELECT `df`.*, FIRST_VALUE(`c`) OVER (PARTITION BY `d`) AS `x`
 #> FROM `df`

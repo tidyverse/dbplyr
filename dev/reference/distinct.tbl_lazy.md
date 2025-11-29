@@ -43,11 +43,11 @@ to execute the query and return data to R.
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(x = c(1, 1, 2, 2), y = c(1, 2, 1, 1))
-db %>% distinct() %>% show_query()
+db |> distinct() |> show_query()
 #> <SQL>
 #> SELECT DISTINCT `dbplyr_crUoBF7QxM`.*
 #> FROM `dbplyr_crUoBF7QxM`
-db %>% distinct(x) %>% show_query()
+db |> distinct(x) |> show_query()
 #> <SQL>
 #> SELECT DISTINCT `x`
 #> FROM `dbplyr_crUoBF7QxM`

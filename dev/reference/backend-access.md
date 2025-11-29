@@ -33,15 +33,15 @@ simulate_access()
 library(dplyr, warn.conflicts = FALSE)
 lf <- lazy_frame(x = 1, y = 2, z = "a", con = simulate_access())
 
-lf %>% head()
+lf |> head()
 #> <SQL>
 #> SELECT TOP 6 `df`.*
 #> FROM `df`
-lf %>% mutate(y = as.numeric(y), z = sqrt(x^2 + 10))
+lf |> mutate(y = as.numeric(y), z = sqrt(x^2 + 10))
 #> <SQL>
 #> SELECT `x`, CDBL(`y`) AS `y`, SQR((`x` ^ 2.0) + 10.0) AS `z`
 #> FROM `df`
-lf %>% mutate(a = paste0(z, " times"))
+lf |> mutate(a = paste0(z, " times"))
 #> <SQL>
 #> SELECT `df`.*, `z` & ' times' AS `a`
 #> FROM `df`

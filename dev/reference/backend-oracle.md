@@ -39,11 +39,11 @@ simulate_oracle()
 library(dplyr, warn.conflicts = FALSE)
 
 lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_oracle())
-lf %>% transmute(x = paste0(c, " times"))
+lf |> transmute(x = paste0(c, " times"))
 #> <SQL>
 #> SELECT `c` || ' times' AS `x`
 #> FROM `df`
-lf %>% setdiff(lf)
+lf |> setdiff(lf)
 #> <SQL>
 #> (
 #>   SELECT *

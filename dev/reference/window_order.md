@@ -31,19 +31,19 @@ window_frame(.data, from = -Inf, to = Inf)
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(g = rep(1:2, each = 5), y = runif(10), z = 1:10)
-db %>%
-  window_order(y) %>%
-  mutate(z = cumsum(y)) %>%
+db |>
+  window_order(y) |>
+  mutate(z = cumsum(y)) |>
   show_query()
 #> <SQL>
 #> SELECT `g`, `y`, SUM(`y`) OVER (ORDER BY `y` ROWS UNBOUNDED PRECEDING) AS `z`
 #> FROM `dbplyr_VCGwVVqkZW`
 
-db %>%
-  group_by(g) %>%
-  window_frame(-3, 0) %>%
-  window_order(z) %>%
-  mutate(z = sum(y)) %>%
+db |>
+  group_by(g) |>
+  window_frame(-3, 0) |>
+  window_order(z) |>
+  mutate(z = sum(y)) |>
   show_query()
 #> <SQL>
 #> SELECT

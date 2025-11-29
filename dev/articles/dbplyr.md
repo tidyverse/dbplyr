@@ -182,7 +182,7 @@ Most of the time you don’t need to know anything about SQL, and you can
 continue to use the dplyr verbs that you’re already familiar with:
 
 ``` r
-flights_db %>% select(year:day, dep_delay, arr_delay)
+flights_db |> select(year:day, dep_delay, arr_delay)
 #> # Source:   SQL [?? x 5]
 #> # Database: sqlite 3.51.0 [:memory:]
 #>    year month   day dep_delay arr_delay
@@ -195,7 +195,7 @@ flights_db %>% select(year:day, dep_delay, arr_delay)
 #> 6  2013     1     1        -4        12
 #> # ℹ more rows
 
-flights_db %>% filter(dep_delay > 240)
+flights_db |> filter(dep_delay > 240)
 #> # Source:   SQL [?? x 19]
 #> # Database: sqlite 3.51.0 [:memory:]
 #>    year month   day dep_time sched_dep_time dep_delay arr_time
@@ -212,8 +212,8 @@ flights_db %>% filter(dep_delay > 240)
 #> #   dest <chr>, air_time <dbl>, distance <dbl>, hour <dbl>,
 #> #   minute <dbl>, time_hour <dbl>
 
-flights_db %>% 
-  group_by(dest) %>%
+flights_db |> 
+  group_by(dest) |>
   summarise(delay = mean(dep_delay))
 #> Warning: Missing values are always removed in SQL aggregation functions.
 #> Use `na.rm = TRUE` to silence this warning
@@ -256,13 +256,13 @@ When working with databases, dplyr tries to be as lazy as possible:
 For example, take the following code:
 
 ``` r
-tailnum_delay_db <- flights_db %>% 
-  group_by(tailnum) %>%
+tailnum_delay_db <- flights_db |> 
+  group_by(tailnum) |>
   summarise(
     delay = mean(arr_delay),
     n = n()
-  ) %>% 
-  arrange(desc(delay)) %>%
+  ) |> 
+  arrange(desc(delay)) |>
   filter(n > 100)
 ```
 
@@ -293,7 +293,7 @@ see the SQL it’s generating with
 [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md):
 
 ``` r
-tailnum_delay_db %>% show_query()
+tailnum_delay_db |> show_query()
 #> <SQL>
 #> SELECT `tailnum`, AVG(`arr_delay`) AS `delay`, COUNT(*) AS `n`
 #> FROM `flights`
@@ -315,7 +315,7 @@ you need from the database. Once you’ve figured it out, use
 pull all the data down into a local tibble:
 
 ``` r
-tailnum_delay <- tailnum_delay_db %>% collect()
+tailnum_delay <- tailnum_delay_db |> collect()
 tailnum_delay
 #> # A tibble: 1,201 × 3
 #>   tailnum delay     n

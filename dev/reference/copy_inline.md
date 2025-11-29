@@ -56,7 +56,7 @@ copy_inline(con, df)
 #> 2     2 b    
 #> 3     3 c    
 
-copy_inline(con, df) %>% dplyr::show_query()
+copy_inline(con, df) |> dplyr::show_query()
 #> <SQL>
 #> SELECT CAST(`x` AS INTEGER) AS `x`, CAST(`y` AS TEXT) AS `y`
 #> FROM (

@@ -23,24 +23,24 @@ simulate_hive()
 library(dplyr, warn.conflicts = FALSE)
 
 lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = simulate_hive())
-lf %>% transmute(x = cot(b))
+lf |> transmute(x = cot(b))
 #> <SQL>
 #> SELECT 1.0 / TAN(`b`) AS `x`
 #> FROM `df`
-lf %>% transmute(x = bitwShiftL(c, 1L))
+lf |> transmute(x = bitwShiftL(c, 1L))
 #> <SQL>
 #> SELECT SHIFTLEFT(`c`, 1) AS `x`
 #> FROM `df`
-lf %>% transmute(x = str_replace_all(c, "a", "b"))
+lf |> transmute(x = str_replace_all(c, "a", "b"))
 #> <SQL>
 #> SELECT REGEXP_REPLACE(`c`, 'a', 'b') AS `x`
 #> FROM `df`
 
-lf %>% summarise(x = median(d, na.rm = TRUE))
+lf |> summarise(x = median(d, na.rm = TRUE))
 #> <SQL>
 #> SELECT PERCENTILE(`d`, 0.5) AS `x`
 #> FROM `df`
-lf %>% summarise(x = var(c, na.rm = TRUE))
+lf |> summarise(x = var(c, na.rm = TRUE))
 #> <SQL>
 #> SELECT VARIANCE(`c`) AS `x`
 #> FROM `df`

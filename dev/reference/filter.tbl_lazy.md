@@ -53,12 +53,12 @@ to execute the query and return data to R.
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(x = c(2, NA, 5, NA, 10), y = 1:5)
-db %>% filter(x < 5) %>% show_query()
+db |> filter(x < 5) |> show_query()
 #> <SQL>
 #> SELECT `dbplyr_FwkzgfuPO1`.*
 #> FROM `dbplyr_FwkzgfuPO1`
 #> WHERE (`x` < 5.0)
-db %>% filter(is.na(x)) %>% show_query()
+db |> filter(is.na(x)) |> show_query()
 #> <SQL>
 #> SELECT `dbplyr_FwkzgfuPO1`.*
 #> FROM `dbplyr_FwkzgfuPO1`

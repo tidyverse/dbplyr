@@ -94,7 +94,7 @@ collect(x, ..., n = Inf, warn_incomplete = TRUE, cte = FALSE)
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(a = c(3, 4, 1, 2), b = c(5, 1, 2, NA))
-db %>% filter(a <= 2) %>% collect()
+db |> filter(a <= 2) |> collect()
 #> # A tibble: 2 × 2
 #>       a     b
 #>   <dbl> <dbl>

@@ -22,7 +22,7 @@ simulate_snowflake()
 library(dplyr, warn.conflicts = FALSE)
 
 lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_snowflake())
-lf %>% transmute(x = paste0(d, " times"))
+lf |> transmute(x = paste0(d, " times"))
 #> <SQL>
 #> SELECT ARRAY_TO_STRING(ARRAY_CONSTRUCT_COMPACT(`d`, ' times'), '') AS `x`
 #> FROM `df`

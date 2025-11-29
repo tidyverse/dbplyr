@@ -66,7 +66,7 @@ DBI::dbListTables(con)
 #> [1] "mtcars"       "sqlite_stat1" "sqlite_stat4"
 
 # To retrieve a single table from a source, use `tbl()`
-con %>% tbl("mtcars")
+con |> tbl("mtcars")
 #> # Source:   table<`mtcars`> [?? x 11]
 #> # Database: sqlite 3.51.0 [:memory:]
 #>      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
@@ -84,7 +84,7 @@ con %>% tbl("mtcars")
 #> # ℹ more rows
 
 # Use `I()` for qualified table names
-con %>% tbl(I("temp.mtcars")) %>% head(1)
+con |> tbl(I("temp.mtcars")) |> head(1)
 #> # Source:   SQL [?? x 11]
 #> # Database: sqlite 3.51.0 [:memory:]
 #>     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
@@ -92,7 +92,7 @@ con %>% tbl(I("temp.mtcars")) %>% head(1)
 #> 1    21     6   160   110   3.9  2.62  16.5     0     1     4     4
 
 # You can also use pass raw SQL if you want a more sophisticated query
-con %>% tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))
+con |> tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))
 #> # Source:   SQL [?? x 11]
 #> # Database: sqlite 3.51.0 [:memory:]
 #>      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
@@ -124,15 +124,15 @@ batting <- copy_to(con, Lahman::Batting)
 batting
 
 # Basic data manipulation verbs work in the same way as with a tibble
-batting %>% filter(yearID > 2005, G > 130)
-batting %>% select(playerID:lgID)
-batting %>% arrange(playerID, desc(yearID))
-batting %>% summarise(G = mean(G), n = n())
+batting |> filter(yearID > 2005, G > 130)
+batting |> select(playerID:lgID)
+batting |> arrange(playerID, desc(yearID))
+batting |> summarise(G = mean(G), n = n())
 
 # There are a few exceptions. For example, databases give integer results
 # when dividing one integer by another. Multiply by 1 to fix the problem
-batting %>%
-  select(playerID:lgID, AB, R, G) %>%
+batting |>
+  select(playerID:lgID, AB, R, G) |>
   mutate(
    R_per_game1 = R / G,
    R_per_game2 = R * 1.0 / G
@@ -145,10 +145,10 @@ system.time(recent <- filter(batting, yearID > 2010))
 system.time(collect(recent))
 
 # You can see the query that dplyr creates with show_query()
-batting %>%
-  filter(G > 0) %>%
-  group_by(playerID) %>%
-  summarise(n = n()) %>%
+batting |>
+  filter(G > 0) |>
+  group_by(playerID) |>
+  summarise(n = n()) |>
   show_query()
 }
 #> <SQL>

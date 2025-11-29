@@ -48,7 +48,7 @@ df <- memdb_frame(
   value2 = 4:6
 )
 
-df %>% tidyr::complete(group, nesting(item_id, item_name))
+df |> tidyr::complete(group, nesting(item_id, item_name))
 #> # Source:   SQL [?? x 5]
 #> # Database: sqlite 3.51.0 [:memory:]
 #>   group item_id item_name value1 value2
@@ -59,7 +59,7 @@ df %>% tidyr::complete(group, nesting(item_id, item_name))
 #> 4     2       2 b              2      5
 
 # You can also choose to fill in missing values
-df %>% tidyr::complete(group, nesting(item_id, item_name), fill = list(value1 = 0))
+df |> tidyr::complete(group, nesting(item_id, item_name), fill = list(value1 = 0))
 #> # Source:   SQL [?? x 5]
 #> # Database: sqlite 3.51.0 [:memory:]
 #>   group item_id item_name value1 value2

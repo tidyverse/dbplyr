@@ -67,28 +67,28 @@ conversions from time to time.
 library(dplyr, warn.conflicts = FALSE)
 
 lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_mssql())
-lf %>% head()
+lf |> head()
 #> <SQL>
 #> SELECT TOP 6 `df`.*
 #> FROM `df`
-lf %>% transmute(x = paste(b, c, d))
+lf |> transmute(x = paste(b, c, d))
 #> <SQL>
 #> SELECT `b` + ' ' + `c` + ' ' + `d` AS `x`
 #> FROM `df`
 
 # Can use boolean as is:
-lf %>% filter(c > d)
+lf |> filter(c > d)
 #> <SQL>
 #> SELECT `df`.*
 #> FROM `df`
 #> WHERE (`c` > `d`)
 # Need to convert from boolean to bit:
-lf %>% transmute(x = c > d)
+lf |> transmute(x = c > d)
 #> <SQL>
 #> SELECT CAST(IIF(`c` > `d`, 1, 0) AS BIT) AS `x`
 #> FROM `df`
 # Can use boolean as is:
-lf %>% transmute(x = ifelse(c > d, "c", "d"))
+lf |> transmute(x = ifelse(c > d, "c", "d"))
 #> <SQL>
 #> SELECT IIF(`c` > `d`, 'c', 'd') AS `x`
 #> FROM `df`

@@ -57,14 +57,14 @@ override this behaviour by explicitly sorting on `is.na(x)`.
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(a = c(3, 4, 1, 2), b = c(5, 1, 2, NA))
-db %>% arrange(a) %>% show_query()
+db |> arrange(a) |> show_query()
 #> <SQL>
 #> SELECT `dbplyr_lKLUUEdLie`.*
 #> FROM `dbplyr_lKLUUEdLie`
 #> ORDER BY `a`
 
 # Note that NAs are sorted first
-db %>% arrange(b)
+db |> arrange(b)
 #> # Source:     SQL [?? x 2]
 #> # Database:   sqlite 3.51.0 [:memory:]
 #> # Ordered by: b
@@ -75,7 +75,7 @@ db %>% arrange(b)
 #> 3     1     2
 #> 4     3     5
 # override by sorting on is.na() first
-db %>% arrange(is.na(b), b)
+db |> arrange(is.na(b), b)
 #> # Source:     SQL [?? x 2]
 #> # Database:   sqlite 3.51.0 [:memory:]
 #> # Ordered by: is.na(b), b

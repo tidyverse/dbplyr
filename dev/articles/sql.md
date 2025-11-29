@@ -18,11 +18,11 @@ subqueries if you want to use a freshly created variable in
 [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html):
 
 ``` r
-mf %>% 
+mf |> 
   mutate(
     a = y * x, 
     b = a ^ 2,
-  ) %>% 
+  ) |> 
   show_query()
 #> <SQL>
 #> SELECT `q01`.*, POWER(`a`, 2.0) AS `b`
@@ -51,15 +51,15 @@ cases, you’ll need to write SQL code directly.
 Any function that dbplyr doesn’t know about will be left as is:
 
 ``` r
-mf %>% 
-  mutate(z = foofify(x, y)) %>% 
+mf |> 
+  mutate(z = foofify(x, y)) |> 
   show_query()
 #> <SQL>
 #> SELECT `dbplyr_SwlKLUUEdL`.*, foofify(`x`, `y`) AS `z`
 #> FROM `dbplyr_SwlKLUUEdL`
 
-mf %>% 
-  filter(x %LIKE% "%foo%") %>% 
+mf |> 
+  filter(x %LIKE% "%foo%") |> 
   show_query()
 #> <SQL>
 #> SELECT `dbplyr_SwlKLUUEdL`.*
@@ -74,15 +74,15 @@ literal SQL inside
 [`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md):
 
 ``` r
-mf %>% 
-  transmute(factorial = sql("x!")) %>% 
+mf |> 
+  transmute(factorial = sql("x!")) |> 
   show_query()
 #> <SQL>
 #> SELECT x! AS `factorial`
 #> FROM `dbplyr_SwlKLUUEdL`
 
-mf %>% 
-  transmute(factorial = sql("CAST(x AS FLOAT)")) %>% 
+mf |> 
+  transmute(factorial = sql("CAST(x AS FLOAT)")) |> 
   show_query()
 #> <SQL>
 #> SELECT CAST(x AS FLOAT) AS `factorial`

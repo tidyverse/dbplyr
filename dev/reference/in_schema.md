@@ -52,7 +52,7 @@ library(dplyr, warn.conflicts = FALSE)
 copy_to(con, iris, "df", temporary = FALSE)
 copy_to(con, mtcars, I("aux.df"), temporary = FALSE)
 
-con %>% tbl("df")
+con |> tbl("df")
 #> # Source:   table<`df`> [?? x 5]
 #> # Database: sqlite 3.51.0 [:memory:]
 #>    Sepal.Length Sepal.Width Petal.Length Petal.Width Species
@@ -68,7 +68,7 @@ con %>% tbl("df")
 #>  9          4.4         2.9          1.4         0.2 setosa 
 #> 10          4.9         3.1          1.5         0.1 setosa 
 #> # ℹ more rows
-con %>% tbl(I("aux.df"))
+con |> tbl(I("aux.df"))
 #> # Source:   table<aux.df> [?? x 11]
 #> # Database: sqlite 3.51.0 [:memory:]
 #>      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb

@@ -29,11 +29,11 @@ simulate_postgres()
 library(dplyr, warn.conflicts = FALSE)
 
 lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_postgres())
-lf %>% summarise(x = sd(b, na.rm = TRUE))
+lf |> summarise(x = sd(b, na.rm = TRUE))
 #> <SQL>
 #> SELECT STDDEV_SAMP(`b`) AS `x`
 #> FROM `df`
-lf %>% summarise(y = cor(b, c), z = cov(b, c))
+lf |> summarise(y = cor(b, c), z = cov(b, c))
 #> <SQL>
 #> SELECT CORR(`b`, `c`) AS `y`, COVAR_SAMP(`b`, `c`) AS `z`
 #> FROM `df`

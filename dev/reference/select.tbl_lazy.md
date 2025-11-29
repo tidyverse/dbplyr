@@ -61,15 +61,15 @@ relocate(.data, ..., .before = NULL, .after = NULL)
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(x = 1, y = 2, z = 3)
-db %>% select(-y) %>% show_query()
+db |> select(-y) |> show_query()
 #> <SQL>
 #> SELECT `x`, `z`
 #> FROM `dbplyr_POYIe2ufx9`
-db %>% relocate(z) %>% show_query()
+db |> relocate(z) |> show_query()
 #> <SQL>
 #> SELECT `z`, `x`, `y`
 #> FROM `dbplyr_POYIe2ufx9`
-db %>% rename(first = x, last = z) %>% show_query()
+db |> rename(first = x, last = z) |> show_query()
 #> <SQL>
 #> SELECT `x` AS `first`, `y`, `z` AS `last`
 #> FROM `dbplyr_POYIe2ufx9`

@@ -107,8 +107,8 @@ yourself beforehand; for example replace <code>arrange(x, desc(y))</code> by
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">squirrels</span><span class="op">$</span><span class="va">id</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fl">12</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="memdb_frame.html">tbl_memdb</a></span><span class="op">(</span><span class="va">squirrels</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="window_order.html">window_order</a></span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span><span class="fu"><a href="memdb_frame.html">tbl_memdb</a></span><span class="op">(</span><span class="va">squirrels</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="window_order.html">window_order</a></span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/fill.html" class="external-link">fill</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="va">n_squirrels</span>,</span></span>
 <span class="r-in"><span>    <span class="va">n_squirrels2</span>,</span></span>

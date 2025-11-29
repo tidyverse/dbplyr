@@ -265,7 +265,7 @@ library(dplyr, warn.conflicts = FALSE)
 
 band_db <- tbl_memdb(dplyr::band_members)
 instrument_db <- tbl_memdb(dplyr::band_instruments)
-band_db %>% left_join(instrument_db) %>% show_query()
+band_db |> left_join(instrument_db) |> show_query()
 #> Joining with `by = join_by(name)`
 #> <SQL>
 #> SELECT `dplyr::band_members`.*, `plays`
@@ -274,7 +274,7 @@ band_db %>% left_join(instrument_db) %>% show_query()
 #>   ON (`dplyr::band_members`.`name` = `dplyr::band_instruments`.`name`)
 
 # Can join with local data frames by setting copy = TRUE
-band_db %>%
+band_db |>
   left_join(dplyr::band_instruments, copy = TRUE)
 #> Joining with `by = join_by(name)`
 #> # Source:   SQL [?? x 3]
@@ -288,7 +288,7 @@ band_db %>%
 # Unlike R, joins in SQL don't usually match NAs (NULLs)
 db <- memdb_frame(x = c(1, 2, NA))
 label <- memdb_frame(x = c(1, NA), label = c("one", "missing"))
-db %>% left_join(label, by = "x")
+db |> left_join(label, by = "x")
 #> # Source:   SQL [?? x 2]
 #> # Database: sqlite 3.51.0 [:memory:]
 #>       x label
@@ -297,7 +297,7 @@ db %>% left_join(label, by = "x")
 #> 2     2 NA   
 #> 3    NA NA   
 # But you can activate R's usual behaviour with the na_matches argument
-db %>% left_join(label, by = "x", na_matches = "na")
+db |> left_join(label, by = "x", na_matches = "na")
 #> # Source:   SQL [?? x 2]
 #> # Database: sqlite 3.51.0 [:memory:]
 #>       x label  
@@ -310,14 +310,14 @@ db %>% left_join(label, by = "x", na_matches = "na")
 # express richer relationships
 db1 <- memdb_frame(x = 1:5)
 db2 <- memdb_frame(x = 1:3, y = letters[1:3])
-db1 %>% left_join(db2) %>% show_query()
+db1 |> left_join(db2) |> show_query()
 #> Joining with `by = join_by(x)`
 #> <SQL>
 #> SELECT `dbplyr_GrnDDOhsrA`.`x` AS `x`, `y`
 #> FROM `dbplyr_GrnDDOhsrA`
 #> LEFT JOIN `dbplyr_7gFZ2RIqws`
 #>   ON (`dbplyr_GrnDDOhsrA`.`x` = `dbplyr_7gFZ2RIqws`.`x`)
-db1 %>% left_join(db2, sql_on = "LHS.x < RHS.x") %>% show_query()
+db1 |> left_join(db2, sql_on = "LHS.x < RHS.x") |> show_query()
 #> <SQL>
 #> SELECT `LHS`.`x` AS `x.x`, `RHS`.`x` AS `x.y`, `y`
 #> FROM `dbplyr_GrnDDOhsrA` AS `LHS`

@@ -107,7 +107,7 @@ slice_sample(.data, ..., n, prop, by = NULL, weight_by = NULL, replace = FALSE)
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(x = 1:3, y = c(1, 1, 2))
-db %>% slice_min(x) %>% show_query()
+db |> slice_min(x) |> show_query()
 #> <SQL>
 #> SELECT `x`, `y`
 #> FROM (
@@ -115,7 +115,7 @@ db %>% slice_min(x) %>% show_query()
 #>   FROM `dbplyr_1N7gYBNlcp`
 #> ) AS `q01`
 #> WHERE (`col01` <= 1)
-db %>% slice_max(x) %>% show_query()
+db |> slice_max(x) |> show_query()
 #> <SQL>
 #> SELECT `x`, `y`
 #> FROM (
@@ -123,7 +123,7 @@ db %>% slice_max(x) %>% show_query()
 #>   FROM `dbplyr_1N7gYBNlcp`
 #> ) AS `q01`
 #> WHERE (`col01` <= 1)
-db %>% slice_sample() %>% show_query()
+db |> slice_sample() |> show_query()
 #> <SQL>
 #> SELECT `x`, `y`
 #> FROM (
@@ -134,7 +134,7 @@ db %>% slice_sample() %>% show_query()
 #> ) AS `q01`
 #> WHERE (`col01` <= 1)
 
-db %>% group_by(y) %>% slice_min(x) %>% show_query()
+db |> group_by(y) |> slice_min(x) |> show_query()
 #> <SQL>
 #> SELECT `x`, `y`
 #> FROM (
@@ -147,14 +147,14 @@ db %>% group_by(y) %>% slice_min(x) %>% show_query()
 
 # By default, ties are includes so you may get more rows
 # than you expect
-db %>% slice_min(y, n = 1)
+db |> slice_min(y, n = 1)
 #> # Source:   SQL [?? x 2]
 #> # Database: sqlite 3.51.0 [:memory:]
 #>       x     y
 #>   <int> <dbl>
 #> 1     1     1
 #> 2     2     1
-db %>% slice_min(y, n = 1, with_ties = FALSE)
+db |> slice_min(y, n = 1, with_ties = FALSE)
 #> # Source:   SQL [?? x 2]
 #> # Database: sqlite 3.51.0 [:memory:]
 #>       x     y
@@ -162,7 +162,7 @@ db %>% slice_min(y, n = 1, with_ties = FALSE)
 #> 1     1     1
 
 # Non-integer group sizes are rounded down
-db %>% slice_min(x, prop = 0.5)
+db |> slice_min(x, prop = 0.5)
 #> # Source:   SQL [?? x 2]
 #> # Database: sqlite 3.51.0 [:memory:]
 #>       x     y

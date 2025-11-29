@@ -56,8 +56,8 @@ A vector of data.
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(x = 1:5, y = 5:1)
-db %>%
-  mutate(z = x + y * 2) %>%
+db |>
+  mutate(z = x + y * 2) |>
   pull()
 #> [1] 11 10  9  8  7
 ```

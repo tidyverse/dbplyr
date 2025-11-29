@@ -52,7 +52,7 @@ src_memdb()
 ``` r
 library(dplyr)
 df <- memdb_frame(x = runif(100), y = runif(100))
-df %>% arrange(x)
+df |> arrange(x)
 #> # Source:     SQL [?? x 2]
 #> # Database:   sqlite 3.51.0 [:memory:]
 #> # Ordered by: x
@@ -69,14 +69,14 @@ df %>% arrange(x)
 #>  9 0.100  0.502 
 #> 10 0.150  0.918 
 #> # ℹ more rows
-df %>% arrange(x) %>% show_query()
+df |> arrange(x) |> show_query()
 #> <SQL>
 #> SELECT `dbplyr_aByGT89T45`.*
 #> FROM `dbplyr_aByGT89T45`
 #> ORDER BY `x`
 
 mtcars_db <- tbl_memdb(mtcars)
-mtcars_db %>% group_by(cyl) %>% summarise(n = n()) %>% show_query()
+mtcars_db |> group_by(cyl) |> summarise(n = n()) |> show_query()
 #> <SQL>
 #> SELECT `cyl`, COUNT(*) AS `n`
 #> FROM `mtcars`

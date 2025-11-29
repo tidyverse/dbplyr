@@ -214,7 +214,7 @@ memdb_frame(
   id = 1,
   key = c("x", "y"),
   value = 1:2
-) %>%
+) |>
   tidyr::pivot_wider(
     id_cols = id,
     names_from = key,

@@ -126,7 +126,7 @@ db
 df2 <- data.frame(y = c("a", "d"), fruit = c("apple", "date"))
 # copy_to() is called automatically if you set copy = TRUE
 # in the join functions
-db %>% left_join(df2, copy = TRUE)
+db |> left_join(df2, copy = TRUE)
 #> Joining with `by = join_by(y)`
 #> # Source:   SQL [?? x 3]
 #> # Database: sqlite 3.51.0 [:memory:]

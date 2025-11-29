@@ -48,7 +48,7 @@ to execute the query and return data to R.
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(x = 1:100)
-db %>% head() %>% show_query()
+db |> head() |> show_query()
 #> <SQL>
 #> SELECT `dbplyr_P8gLIJILJj`.*
 #> FROM `dbplyr_P8gLIJILJj`
@@ -56,7 +56,7 @@ db %>% head() %>% show_query()
 
 # Pretend we have data in a SQL server database
 db2 <- lazy_frame(x = 1:100, con = simulate_mssql())
-db2 %>% head() %>% show_query()
+db2 |> head() |> show_query()
 #> <SQL>
 #> SELECT TOP 6 `df`.*
 #> FROM `df`

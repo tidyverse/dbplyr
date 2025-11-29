@@ -134,7 +134,7 @@ memdb_frame(
   id = c("a", "b"),
   x = 1:2,
   y = 3:4
-) %>%
+) |>
   tidyr::pivot_longer(-id)
 #> # Source:   SQL [?? x 3]
 #> # Database: sqlite 3.51.0 [:memory:]

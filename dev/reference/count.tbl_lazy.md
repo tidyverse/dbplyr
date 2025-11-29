@@ -67,17 +67,17 @@ tally(x, wt = NULL, sort = FALSE, name = NULL)
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(g = c(1, 1, 1, 2, 2), x = c(4, 3, 6, 9, 2))
-db %>% count(g) %>% show_query()
+db |> count(g) |> show_query()
 #> <SQL>
 #> SELECT `g`, COUNT(*) AS `n`
 #> FROM `dbplyr_rKPRds3Z4q`
 #> GROUP BY `g`
-db %>% count(g, wt = x) %>% show_query()
+db |> count(g, wt = x) |> show_query()
 #> <SQL>
 #> SELECT `g`, SUM(`x`) AS `n`
 #> FROM `dbplyr_rKPRds3Z4q`
 #> GROUP BY `g`
-db %>% count(g, wt = x, sort = TRUE) %>% show_query()
+db |> count(g, wt = x, sort = TRUE) |> show_query()
 #> <SQL>
 #> SELECT `g`, SUM(`x`) AS `n`
 #> FROM `dbplyr_rKPRds3Z4q`

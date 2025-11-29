@@ -31,11 +31,11 @@ simulate_sqlite()
 library(dplyr, warn.conflicts = FALSE)
 
 lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_sqlite())
-lf %>% transmute(x = paste(c, " times"))
+lf |> transmute(x = paste(c, " times"))
 #> <SQL>
 #> SELECT `c` || ' ' || ' times' AS `x`
 #> FROM `df`
-lf %>% transmute(x = log(b), y = log(b, base = 2))
+lf |> transmute(x = log(b), y = log(b, base = 2))
 #> <SQL>
 #> SELECT LOG(`b`) AS `x`, LOG(`b`) / LOG(2.0) AS `y`
 #> FROM `df`

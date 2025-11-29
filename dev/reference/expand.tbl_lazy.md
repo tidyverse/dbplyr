@@ -71,14 +71,14 @@ fruits <- memdb_frame(
 )
 
 # All possible combinations ---------------------------------------
-fruits %>% tidyr::expand(type)
+fruits |> tidyr::expand(type)
 #> # Source:   SQL [?? x 1]
 #> # Database: sqlite 3.51.0 [:memory:]
 #>   type  
 #>   <chr> 
 #> 1 apple 
 #> 2 orange
-fruits %>% tidyr::expand(type, size)
+fruits |> tidyr::expand(type, size)
 #> # Source:   SQL [?? x 2]
 #> # Database: sqlite 3.51.0 [:memory:]
 #>   type   size 
@@ -91,7 +91,7 @@ fruits %>% tidyr::expand(type, size)
 #> 6 orange M    
 
 # Only combinations that already appear in the data ---------------
-fruits %>% tidyr::expand(nesting(type, size))
+fruits |> tidyr::expand(nesting(type, size))
 #> # Source:   SQL [?? x 2]
 #> # Database: sqlite 3.51.0 [:memory:]
 #>   type   size 

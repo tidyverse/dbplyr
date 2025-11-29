@@ -138,7 +138,7 @@ df <- tibble(
 )
 mf <- tbl_memdb(df)
 
-df %>% mutate(x %% y)
+df |> mutate(x %% y)
 #> # A tibble: 4 × 3
 #>       x     y `x%%y`
 #>   <int> <int>  <int>
@@ -146,7 +146,7 @@ df %>% mutate(x %% y)
 #> 2    10    -3     -2
 #> 3   -10     3      2
 #> 4   -10    -3     -1
-mf %>% mutate(x %% y)
+mf |> mutate(x %% y)
 #> # Source:   SQL [?? x 3]
 #> # Database: sqlite 3.51.0 [:memory:]
 #>       x     y `x%%y`
@@ -286,15 +286,15 @@ This gives you a lot of freedom to generate the SQL you need:
 ``` r
 mf <- memdb_frame(x = 1, y = 2)
 
-mf %>% 
-  transmute(factorial = sql("x!")) %>% 
+mf |> 
+  transmute(factorial = sql("x!")) |> 
   show_query()
 #> <SQL>
 #> SELECT x! AS `factorial`
 #> FROM `dbplyr_uR8HfdVHIy`
 
-mf %>% 
-  transmute(factorial = sql("CAST(x AS FLOAT)")) %>% 
+mf |> 
+  transmute(factorial = sql("CAST(x AS FLOAT)")) |> 
   show_query()
 #> <SQL>
 #> SELECT CAST(x AS FLOAT) AS `factorial`

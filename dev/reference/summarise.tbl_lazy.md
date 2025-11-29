@@ -70,16 +70,16 @@ to execute the query and return data to R.
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(g = c(1, 1, 1, 2, 2), x = c(4, 3, 6, 9, 2))
-db %>%
-  summarise(n()) %>%
+db |>
+  summarise(n()) |>
   show_query()
 #> <SQL>
 #> SELECT COUNT(*) AS `n()`
 #> FROM `dbplyr_N9PgDPOtnO`
 
-db %>%
-  group_by(g) %>%
-  summarise(n()) %>%
+db |>
+  group_by(g) |>
+  summarise(n()) |>
   show_query()
 #> <SQL>
 #> SELECT `g`, COUNT(*) AS `n()`

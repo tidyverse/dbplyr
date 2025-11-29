@@ -36,7 +36,7 @@ library(dplyr, warn.conflicts = FALSE)
 lf1 <- lazy_frame(key = 1, a = 1, b = 2)
 lf2 <- lazy_frame(key = 1, a = 1, c = 3)
 
-result <- left_join(lf1, lf2, by = "key") %>%
+result <- left_join(lf1, lf2, by = "key") |>
   filter(c >= 3)
 
 show_query(result)

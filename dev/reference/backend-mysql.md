@@ -32,7 +32,7 @@ simulate_mariadb()
 library(dplyr, warn.conflicts = FALSE)
 
 lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_mysql())
-lf %>% transmute(x = paste0(d, " times"))
+lf |> transmute(x = paste0(d, " times"))
 #> <SQL>
 #> SELECT CONCAT_WS('', `d`, ' times') AS `x`
 #> FROM `df`

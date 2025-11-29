@@ -52,8 +52,8 @@ mf
 #> 4     2     4     2
 #> 5     2     5     1
 
-mf %>% 
-  group_by(g) %>% 
+mf |> 
+  group_by(g) |> 
   summarise_all(mean, na.rm = TRUE)
 #> # Source:   SQL [?? x 3]
 #> # Database: sqlite 3.51.0 [:memory:]
@@ -69,9 +69,9 @@ but if you do want to use an existing data frame you can use
 
 ``` r
 mtcars_db <- tbl_memdb(mtcars)
-mtcars_db %>% 
-  group_by(cyl) %>% 
-  summarise(n = n()) %>% 
+mtcars_db |> 
+  group_by(cyl) |> 
+  summarise(n = n()) |> 
   show_query()
 #> <SQL>
 #> SELECT `cyl`, COUNT(*) AS `n`
@@ -94,16 +94,16 @@ etc.
 ``` r
 x <- c("abc", "def", "ghif")
 
-lazy_frame(x = x, con = simulate_postgres()) %>% 
-  head(5) %>% 
+lazy_frame(x = x, con = simulate_postgres()) |> 
+  head(5) |> 
   show_query()
 #> <SQL>
 #> SELECT `df`.*
 #> FROM `df`
 #> LIMIT 5
 
-lazy_frame(x = x, con = simulate_mssql()) %>% 
-  head(5) %>% 
+lazy_frame(x = x, con = simulate_mssql()) |> 
+  head(5) |> 
   show_query()
 #> <SQL>
 #> SELECT TOP 5 `df`.*
