@@ -18,7 +18,7 @@ test_that("first edition works", {
   con <- structure(list(), class = c("Test", "DBIConnection"))
 
   local_methods(
-    sql_escape_ident.Test = function(con, x) sql_quote(x, "`")
+    sql_escape_ident.Test = \(con, x) sql_quote(x, "`")
   )
   lf <- lazy_frame(x = 1, con = con)
 

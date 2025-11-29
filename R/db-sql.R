@@ -589,7 +589,7 @@ sql_query_multi_join.DBIConnection <- function(
   join_clauses <- purrr::map2(
     types,
     join_table_queries,
-    function(join_kw, from) sql_clause(join_kw, from)
+    \(join_kw, from) sql_clause(join_kw, from)
   )
 
   on_clauses <- purrr::map(

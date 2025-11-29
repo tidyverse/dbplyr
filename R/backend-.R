@@ -121,7 +121,7 @@ base_scalar <- sql_translator(
   #   Oracle: https://docs.oracle.com/cd/E19253-01/817-6223/chp-typeopexpr-7/index.html
   #   SQLite: https://www.tutorialspoint.com/sqlite/sqlite_bitwise_operators.htm
   #   Teradata: https://docs.teradata.com/reader/1DcoER_KpnGTfgPinRAFUw/h3CS4MuKL1LCMQmnubeSRQ
-  bitwNot = function(x) sql_expr(~ ((!!x))),
+  bitwNot = \(x) sql_expr(~ ((!!x))),
   bitwAnd = sql_infix("&"),
   bitwOr = sql_infix("|"),
   bitwXor = sql_infix("^"),
@@ -156,10 +156,10 @@ base_scalar <- sql_translator(
   tan = sql_prefix("TAN", 1),
   # cosh, sinh, coth and tanh calculations are based on this article
   # https://en.wikipedia.org/wiki/Hyperbolic_function
-  cosh = function(x) sql_expr((!!sql_exp(1, x) + !!sql_exp(-1, x)) / 2L),
-  sinh = function(x) sql_expr((!!sql_exp(1, x) - !!sql_exp(-1, x)) / 2L),
-  tanh = function(x) sql_expr((!!sql_exp(2, x) - 1L) / (!!sql_exp(2, x) + 1L)),
-  coth = function(x) sql_expr((!!sql_exp(2, x) + 1L) / (!!sql_exp(2, x) - 1L)),
+  cosh = \(x) sql_expr((!!sql_exp(1, x) + !!sql_exp(-1, x)) / 2L),
+  sinh = \(x) sql_expr((!!sql_exp(1, x) - !!sql_exp(-1, x)) / 2L),
+  tanh = \(x) sql_expr((!!sql_exp(2, x) - 1L) / (!!sql_exp(2, x) + 1L)),
+  coth = \(x) sql_expr((!!sql_exp(2, x) + 1L) / (!!sql_exp(2, x) - 1L)),
 
   `if` = function(cond, if_true, if_false = NULL) {
     sql_if(enquo(cond), enquo(if_true), enquo(if_false))
@@ -172,9 +172,9 @@ base_scalar <- sql_translator(
       enquo(missing)
     )
   },
-  ifelse = function(test, yes, no) sql_if(enquo(test), enquo(yes), enquo(no)),
+  ifelse = \(test, yes, no) sql_if(enquo(test), enquo(yes), enquo(no)),
 
-  switch = function(x, ...) sql_switch(x, ...),
+  switch = \(x, ...) sql_switch(x, ...),
   case_when = function(..., .default = NULL, .ptype = NULL, .size = NULL) {
     sql_case_when(..., .default = .default, .ptype = .ptype, .size = .size)
   },
@@ -211,7 +211,7 @@ base_scalar <- sql_translator(
   c = function(...) {
     c(...)
   },
-  `:` = function(from, to) from:to,
+  `:` = \(from, to) from:to,
 
   between = function(x, left, right) {
     sql_expr(!!x %BETWEEN% !!left %AND% !!right)
@@ -228,20 +228,20 @@ base_scalar <- sql_translator(
   as_date = sql_cast("DATE"),
   as_datetime = sql_cast("TIMESTAMP"),
 
-  today = function() sql_expr(CURRENT_DATE),
-  now = function() sql_expr(CURRENT_TIMESTAMP),
+  today = \() sql_expr(CURRENT_DATE),
+  now = \() sql_expr(CURRENT_TIMESTAMP),
 
   # https://modern-sql.com/feature/extract
-  year = function(x) sql_expr(EXTRACT(year %from% !!x)),
-  month = function(x) sql_expr(EXTRACT(month %from% !!x)),
-  day = function(x) sql_expr(EXTRACT(day %from% !!x)),
-  mday = function(x) sql_expr(EXTRACT(day %from% !!x)),
+  year = \(x) sql_expr(EXTRACT(year %from% !!x)),
+  month = \(x) sql_expr(EXTRACT(month %from% !!x)),
+  day = \(x) sql_expr(EXTRACT(day %from% !!x)),
+  mday = \(x) sql_expr(EXTRACT(day %from% !!x)),
   yday = sql_not_supported("yday"),
   qday = sql_not_supported("qday"),
   wday = sql_not_supported("wday"),
-  hour = function(x) sql_expr(EXTRACT(hour %from% !!x)),
-  minute = function(x) sql_expr(EXTRACT(minute %from% !!x)),
-  second = function(x) sql_expr(EXTRACT(second %from% !!x)),
+  hour = \(x) sql_expr(EXTRACT(hour %from% !!x)),
+  minute = \(x) sql_expr(EXTRACT(minute %from% !!x)),
+  second = \(x) sql_expr(EXTRACT(second %from% !!x)),
 
   # String functions ------------------------------------------------------
   # SQL Syntax reference links:
@@ -266,7 +266,7 @@ base_scalar <- sql_translator(
   },
   tolower = sql_prefix("LOWER", 1),
   toupper = sql_prefix("UPPER", 1),
-  trimws = function(x, which = "both") sql_str_trim(x, side = which),
+  trimws = \(x, which = "both") sql_str_trim(x, side = which),
   paste = sql_paste(" "),
   paste0 = sql_paste(""),
   substr = sql_substr("SUBSTR"),
@@ -380,7 +380,7 @@ sql_exp <- function(a, x) {
 base_agg <- sql_translator(
   # SQL-92 aggregates
   # http://db.apache.org/derby/docs/10.7/ref/rrefsqlj33923.html
-  n = function() sql("COUNT(*)"),
+  n = \() sql("COUNT(*)"),
   mean = sql_aggregate("AVG", "mean"),
   sum = sql_aggregate("SUM"),
   min = sql_aggregate("MIN"),
