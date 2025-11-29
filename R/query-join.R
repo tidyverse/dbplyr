@@ -106,7 +106,7 @@ sql_render.multi_join_query <- function(
   x <- sql_render(query$x, con, ..., subquery = TRUE, lvl = lvl + 1)
   query$joins$table <- purrr::map(
     query$joins$table,
-    function(table) sql_render(table, con, ..., subquery = TRUE, lvl = lvl + 1)
+    \(table) sql_render(table, con, ..., subquery = TRUE, lvl = lvl + 1)
   )
 
   sql_query_multi_join(
@@ -218,7 +218,9 @@ sql_multi_join_vars <- function(
       out[vars_idx_i] <- purrr::map2(
         used_vars_i,
         i,
-        ~ sql_multi_join_var(con, .x, .y, table_paths, duplicated_vars)
+        function(var, table_idx) {
+          sql_multi_join_var(con, var, table_idx, table_paths, duplicated_vars)
+        }
       )
     }
   }

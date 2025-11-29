@@ -73,7 +73,7 @@ finalise_equi_join_by <- function(x_names, y_names) {
     )
   }
 
-  exprs <- purrr::map2(x_names, y_names, function(x, y) expr(!!x == !!y))
+  exprs <- purrr::map2(x_names, y_names, \(x, y) expr(!!x == !!y))
   condition <- vctrs::vec_rep("==", times = n)
   filter <- vctrs::vec_rep("none", times = n)
 

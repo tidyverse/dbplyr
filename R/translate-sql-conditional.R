@@ -35,7 +35,7 @@ sql_case_match <- function(.x, ..., .default = NULL, .ptype = NULL) {
   clauses <- purrr::map2_chr(
     query,
     value,
-    ~ paste0("WHEN (", .x, ") THEN ", .y)
+    \(lhs, rhs) paste0("WHEN (", lhs, ") THEN ", rhs)
   )
   if (!is_null(.default)) {
     .default <- escape(enpar(quo(.default), tidy = FALSE, env = env), con = con)
@@ -69,10 +69,12 @@ sql_case_match_clause <- function(f, x, con) {
 
   f_query <- purrr::map_if(
     f_query,
-    ~ !is_vector(.x),
-    ~ translate_sql(!!.x, con = con)
+    \(clause) !is_vector(clause),
+    \(clause) translate_sql(!!clause, con = con)
   )
-  missing_loc <- purrr::map_lgl(f_query, ~ is.null(.x) || is.na(.x))
+  missing_loc <- purrr::map_lgl(f_query, function(clause) {
+    is.null(clause) || is.na(clause)
+  })
 
   f_query <- vctrs::vec_slice(f_query, !missing_loc)
   has_na <- any(missing_loc)
@@ -166,7 +168,9 @@ sql_case_when <- function(
     )
   }
 
-  clauses <- purrr::map2_chr(query, value, ~ paste0("WHEN ", .x, " THEN ", .y))
+  clauses <- purrr::map2_chr(query, value, function(cond, val) {
+    paste0("WHEN ", cond, " THEN ", val)
+  })
   # if a formula like TRUE ~ "other" is at the end of a sequence, use ELSE statement
   # TRUE has precedence over `.default`
   if (is_true(formulas[[n]][[2]])) {

@@ -95,7 +95,7 @@ sql_translation.PqConnection <- function(con) {
     sql_translator(
       .parent = base_scalar,
       bitwXor = sql_infix("#"),
-      log10 = function(x) sql_expr(log(!!x)),
+      log10 = \(x) sql_expr(log(!!x)),
       log = sql_log(),
       cot = sql_cot(),
       round = postgres_round,
@@ -193,7 +193,7 @@ sql_translation.PqConnection <- function(con) {
           cli_abort("Unrecognized arguments to {.arg wday}")
         }
       },
-      yday = function(x) sql_expr(EXTRACT(DOY %FROM% !!x)),
+      yday = \(x) sql_expr(EXTRACT(DOY %FROM% !!x)),
       week = function(x) {
         sql_expr(FLOOR((EXTRACT(DOY %FROM% !!x) - 1L) / 7L) + 1L)
       },

@@ -106,13 +106,15 @@ dbplyr_fill0.DBIConnection <- function(
 
   fill_sql <- purrr::map(
     cols_to_fill,
-    ~ translate_sql(
-      last(!!.x, na_rm = TRUE),
-      vars_group = op_grps(.data),
-      vars_order = translate_sql(!!!order_by_cols, con = .con),
-      vars_frame = c(-Inf, 0),
-      con = .con
-    )
+    function(col) {
+      translate_sql(
+        last(!!col, na_rm = TRUE),
+        vars_group = op_grps(.data),
+        vars_order = translate_sql(!!!order_by_cols, con = .con),
+        vars_frame = c(-Inf, 0),
+        con = .con
+      )
+    }
   ) %>%
     set_names(as.character(cols_to_fill))
 
@@ -153,12 +155,14 @@ dbplyr_fill0.SQLiteConnection <- function(
   # 3. remove the helper column again.
   partition_sql <- purrr::map(
     cols_to_fill,
-    ~ translate_sql(
-      cumsum(case_when(is.na(!!.x) ~ 0L, TRUE ~ 1L)),
-      con = .con,
-      vars_order = translate_sql(!!!order_by_cols, con = .con),
-      vars_group = op_grps(.data),
-    )
+    function(col) {
+      translate_sql(
+        cumsum(case_when(is.na(!!col) ~ 0L, TRUE ~ 1L)),
+        con = .con,
+        vars_order = translate_sql(!!!order_by_cols, con = .con),
+        vars_group = op_grps(.data),
+      )
+    }
   ) %>%
     set_names(paste0("..dbplyr_partition_", seq_along(cols_to_fill)))
 
@@ -168,11 +172,13 @@ dbplyr_fill0.SQLiteConnection <- function(
   fill_sql <- purrr::map2(
     cols_to_fill,
     names(partition_sql),
-    ~ translate_sql(
-      max(!!.x, na.rm = TRUE),
-      con = .con,
-      vars_group = c(op_grps(.data), .y),
-    )
+    function(col, partition_name) {
+      translate_sql(
+        max(!!col, na.rm = TRUE),
+        con = .con,
+        vars_group = c(op_grps(.data), partition_name),
+      )
+    }
   ) %>%
     set_names(purrr::map_chr(cols_to_fill, as_name))
 

@@ -83,7 +83,7 @@ partial_eval_if <- function(
   if (is_empty(conditions)) {
     return(TRUE)
   }
-  Reduce(function(x, y) call2(reduce, x, y), conditions)
+  Reduce(\(x, y) call2(reduce, x, y), conditions)
 }
 
 deprecate_across_dots <- function(call, env, user_env) {
@@ -112,7 +112,7 @@ deprecate_across_dots <- function(call, env, user_env) {
 
 across_funs <- function(funs, env, dots, names_spec, fn, evaluated = FALSE) {
   if (is.null(funs)) {
-    fns <- list(`1` = function(x, ...) x)
+    fns <- list(`1` = \(x, ...) x)
     names_spec <- names_spec %||% "{.col}"
   } else if (is_quosure(funs)) {
     return(across_funs(
@@ -193,11 +193,11 @@ across_fun <- function(fun, env, dots, fn) {
   if (is_function(fun)) {
     fn_name <- find_fun(fun)
     if (!is_null(fn_name)) {
-      return(function(x, cur_col) call2(fn_name, x, !!!dots))
+      return(\(x, cur_col) call2(fn_name, x, !!!dots))
     }
     partial_eval_fun(fun, env, fn)
   } else if (is_symbol(fun) || is_string(fun)) {
-    function(x, cur_col) call2(fun, x, !!!dots)
+    \(x, cur_col) call2(fun, x, !!!dots)
   } else if (is_call(fun, "~")) {
     if (!is_empty(dots)) {
       cli_abort(
@@ -361,8 +361,8 @@ across_glue_mask <- function(.col, .fn, .caller_env) {
   # TODO: we can make these bindings louder later
   env_bind_active(
     glue_mask,
-    col = function() glue_mask$.col,
-    fn = function() glue_mask$.fn
+    col = \() glue_mask$.col,
+    fn = \() glue_mask$.fn
   )
   glue_mask
 }

@@ -90,19 +90,19 @@ sql_translation.SQLiteConnection <- function(con) {
 
       # lubridate,
       today = function() {
-        date <- function(x) {} # suppress R CMD check note
+        date <- \(x) {} # suppress R CMD check note
         sql_expr(date("now"))
       },
-      now = function() sql_expr(datetime("now")),
+      now = \() sql_expr(datetime("now")),
       # https://modern-sql.com/feature/extract#proprietary-strftime
-      year = function(x) sql_expr(cast(strftime("%Y", !!x) %as% NUMERIC)),
-      month = function(x) sql_expr(cast(strftime("%m", !!x) %as% NUMERIC)),
-      mday = function(x) sql_expr(cast(strftime("%d", !!x) %as% NUMERIC)),
-      day = function(x) sql_expr(cast(strftime("%d", !!x) %as% NUMERIC)),
-      hour = function(x) sql_expr(cast(strftime("%H", !!x) %as% NUMERIC)),
-      minute = function(x) sql_expr(cast(strftime("%M", !!x) %as% NUMERIC)),
-      second = function(x) sql_expr(cast(strftime("%f", !!x) %as% REAL)),
-      yday = function(x) sql_expr(cast(strftime("%j", !!x) %as% NUMERIC)),
+      year = \(x) sql_expr(cast(strftime("%Y", !!x) %as% NUMERIC)),
+      month = \(x) sql_expr(cast(strftime("%m", !!x) %as% NUMERIC)),
+      mday = \(x) sql_expr(cast(strftime("%d", !!x) %as% NUMERIC)),
+      day = \(x) sql_expr(cast(strftime("%d", !!x) %as% NUMERIC)),
+      hour = \(x) sql_expr(cast(strftime("%H", !!x) %as% NUMERIC)),
+      minute = \(x) sql_expr(cast(strftime("%M", !!x) %as% NUMERIC)),
+      second = \(x) sql_expr(cast(strftime("%f", !!x) %as% REAL)),
+      yday = \(x) sql_expr(cast(strftime("%j", !!x) %as% NUMERIC)),
     ),
     sql_translator(
       .parent = base_agg,
@@ -140,12 +140,12 @@ sql_expr_matches.SQLiteConnection <- function(con, x, y, ...) {
 values_prepare.SQLiteConnection <- function(con, df) {
   needs_escape <- purrr::map_lgl(
     df,
-    ~ methods::is(.x, "Date") || inherits(.x, "POSIXct")
+    \(col) methods::is(col, "Date") || inherits(col, "POSIXct")
   )
   purrr::modify_if(
     df,
     needs_escape,
-    ~ escape(.x, con = con, parens = FALSE, collapse = NULL)
+    \(col) escape(col, con = con, parens = FALSE, collapse = NULL)
   )
 }
 

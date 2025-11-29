@@ -23,11 +23,11 @@ sql_cut <- function(
 
   cases <- purrr::map(
     seq2(1, n - 2L),
-    ~ {
+    function(i) {
       if (right) {
-        expr(!!x <= !!breaks[[.x + 1]] ~ !!labels[[.x]])
+        expr(!!x <= !!breaks[[i + 1]] ~ !!labels[[i]])
       } else {
-        expr(!!x < !!breaks[[.x + 1]] ~ !!labels[[.x]])
+        expr(!!x < !!breaks[[i + 1]] ~ !!labels[[i]])
       }
     }
   )

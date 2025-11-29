@@ -356,16 +356,16 @@ simulate_mssql <- function(version = "15.0") {
       # https://docs.microsoft.com/en-us/sql/t-sql/data-types/datetime-transact-sql?view=sql-server-2017
       as_datetime = sql_cast("DATETIME2"),
 
-      today = function() sql_expr(CAST(SYSDATETIME() %AS% DATE)),
+      today = \() sql_expr(CAST(SYSDATETIME() %AS% DATE)),
 
       # https://docs.microsoft.com/en-us/sql/t-sql/functions/datepart-transact-sql?view=sql-server-2017
-      year = function(x) sql_expr(DATEPART(YEAR, !!x)),
-      day = function(x) sql_expr(DATEPART(DAY, !!x)),
-      mday = function(x) sql_expr(DATEPART(DAY, !!x)),
-      yday = function(x) sql_expr(DATEPART(DAYOFYEAR, !!x)),
-      hour = function(x) sql_expr(DATEPART(HOUR, !!x)),
-      minute = function(x) sql_expr(DATEPART(MINUTE, !!x)),
-      second = function(x) sql_expr(DATEPART(SECOND, !!x)),
+      year = \(x) sql_expr(DATEPART(YEAR, !!x)),
+      day = \(x) sql_expr(DATEPART(DAY, !!x)),
+      mday = \(x) sql_expr(DATEPART(DAY, !!x)),
+      yday = \(x) sql_expr(DATEPART(DAYOFYEAR, !!x)),
+      hour = \(x) sql_expr(DATEPART(HOUR, !!x)),
+      minute = \(x) sql_expr(DATEPART(MINUTE, !!x)),
+      second = \(x) sql_expr(DATEPART(SECOND, !!x)),
 
       month = function(x, label = FALSE, abbr = TRUE) {
         check_bool(label)
@@ -458,7 +458,7 @@ simulate_mssql <- function(version = "15.0") {
     sql_translator(
       .parent = base_odbc_agg,
       # https://learn.microsoft.com/en-us/sql/t-sql/functions/count-big-transact-sql?view=sql-server-ver17
-      n = function() sql("COUNT_BIG(*)"),
+      n = \() sql("COUNT_BIG(*)"),
       sd = sql_aggregate("STDEV", "sd"),
       var = sql_aggregate("VAR", "var"),
       str_flatten = function(x, collapse = "") {
@@ -686,7 +686,7 @@ mssql_bit_int_bit <- function(f) {
   # Post-process WHERE to cast logicals from BIT to BOOLEAN
   sql$lazy_query <- purrr::modify_tree(
     sql$lazy_query,
-    is_node = function(x) inherits(x, "lazy_query"),
+    is_node = \(x) inherits(x, "lazy_query"),
     post = mssql_update_where_clause
   )
 
@@ -700,7 +700,7 @@ mssql_update_where_clause <- function(qry) {
 
   qry$where <- lapply(
     qry$where,
-    function(x) set_expr(x, bit_to_boolean(get_expr(x)))
+    \(x) set_expr(x, bit_to_boolean(get_expr(x)))
   )
   qry
 }

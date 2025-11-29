@@ -6,7 +6,9 @@
       "Bash(Rscript:*)",
       "Bash(rm:*)",
       "Bash(air format:*)",
-      "Edit(/**)",
+      "Edit(R/**)",
+      "Edit(tests/**)",
+      "Edit(vignettes/**)",
       "WebSearch",
       "WebFetch"
     ],
