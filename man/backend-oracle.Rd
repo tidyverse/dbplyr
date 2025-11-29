@@ -30,6 +30,6 @@ converting to live access database.
 library(dplyr, warn.conflicts = FALSE)
 
 lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_oracle())
-lf \%>\% transmute(x = paste0(c, " times"))
-lf \%>\% setdiff(lf)
+lf |> transmute(x = paste0(c, " times"))
+lf |> setdiff(lf)
 }

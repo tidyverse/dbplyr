@@ -59,7 +59,7 @@
       Error in `quantile()`:
       ! Translation of `quantile()` in `mutate()` is not supported for PostgreSQL.
       i Use a combination of `summarise()` and `left_join()` instead:
-        `df %>% left_join(summarise(<col> = quantile(x, 0.3, na.rm = TRUE)))`.
+        `df |> left_join(summarise(<col> = quantile(x, 0.3, na.rm = TRUE)))`.
 
 ---
 
@@ -69,7 +69,7 @@
       Error in `median()`:
       ! Translation of `median()` in `mutate()` is not supported for PostgreSQL.
       i Use a combination of `summarise()` and `left_join()` instead:
-        `df %>% left_join(summarise(<col> = median(x, na.rm = TRUE)))`.
+        `df |> left_join(summarise(<col> = median(x, na.rm = TRUE)))`.
 
 # custom SQL translation
 
@@ -85,7 +85,7 @@
 ---
 
     Code
-      copy_inline(con, tibble(x = integer(), y = character())) %>% remote_query()
+      remote_query(copy_inline(con, tibble(x = integer(), y = character())))
     Output
       <SQL> SELECT CAST(NULL AS INTEGER) AS `x`, CAST(NULL AS TEXT) AS `y`
       WHERE (0 = 1)
@@ -93,7 +93,7 @@
 ---
 
     Code
-      copy_inline(con, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
+      remote_query(copy_inline(con, tibble(x = 1:2, y = letters[1:2])))
     Output
       <SQL> SELECT CAST(`x` AS INTEGER) AS `x`, CAST(`y` AS TEXT) AS `y`
       FROM (  VALUES (1, 'a'), (2, 'b')) AS drvd(`x`, `y`)
@@ -148,7 +148,7 @@
 # can explain
 
     Code
-      db %>% mutate(y = x + 1) %>% explain()
+      explain(mutate(db, y = x + 1))
     Output
       <SQL>
       SELECT "test".*, "x" + 1.0 AS "y"
@@ -161,7 +161,7 @@
 ---
 
     Code
-      db %>% mutate(y = x + 1) %>% explain(format = "json")
+      explain(mutate(db, y = x + 1), format = "json")
     Output
       <SQL>
       SELECT "test".*, "x" + 1.0 AS "y"

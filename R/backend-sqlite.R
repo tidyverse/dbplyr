@@ -19,8 +19,8 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_sqlite())
-#' lf %>% transmute(x = paste(c, " times"))
-#' lf %>% transmute(x = log(b), y = log(b, base = 2))
+#' lf |> transmute(x = paste(c, " times"))
+#' lf |> transmute(x = log(b), y = log(b, base = 2))
 NULL
 
 #' @export

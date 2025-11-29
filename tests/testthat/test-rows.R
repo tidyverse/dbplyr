@@ -32,14 +32,14 @@ test_that("rows_insert() checks arguments", {
   df <- memdb_frame(x = 1)
   expect_snapshot(
     error = TRUE,
-    (df %>%
-      mutate(x = x + 1) %>%
+    (df |>
+      mutate(x = x + 1) |>
       rows_insert(df, by = "x", conflict = "ignore", in_place = TRUE))
   )
 
   expect_snapshot(
     error = TRUE,
-    (df %>%
+    (df |>
       rows_insert(df, by = "x", conflict = "ignore", returning = c(y)))
   )
 })
@@ -91,12 +91,12 @@ test_that("`rows_insert()` works with `in_place = FALSE`", {
       by = "x",
       conflict = "ignore",
       in_place = FALSE
-    ) %>%
+    ) |>
       collect(),
     tibble(x = 1:4, y = c(11:13, 24))
   )
 
-  expect_equal(df %>% collect(), tibble(x = 1:3, y = 11:13))
+  expect_equal(df |> collect(), tibble(x = 1:3, y = 11:13))
 })
 
 test_that("`rows_insert()` works with `in_place = FALSE` and `returning`", {
@@ -108,7 +108,7 @@ test_that("`rows_insert()` works with `in_place = FALSE` and `returning`", {
       conflict = "ignore",
       in_place = FALSE,
       returning = everything()
-    ) %>%
+    ) |>
       get_returned_rows(),
     tibble(x = 4, y = 24)
   )
@@ -122,7 +122,7 @@ test_that("`rows_insert()` works with `in_place = FALSE` and `returning`", {
       conflict = "ignore",
       in_place = FALSE,
       returning = everything()
-    ) %>%
+    ) |>
       get_returned_rows(),
     tibble(x = 4, y = NA)
   )
@@ -147,7 +147,7 @@ test_that("`rows_insert()` works with `in_place = TRUE`", {
     conflict = "ignore",
     in_place = TRUE
   )
-  expect_equal(df %>% collect(), tibble(x = 1:4, y = c(11:13, 24)))
+  expect_equal(df |> collect(), tibble(x = 1:4, y = c(11:13, 24)))
 })
 
 test_that("`rows_insert()` with `in_place = TRUE` and `returning`", {
@@ -165,7 +165,7 @@ test_that("`rows_insert()` with `in_place = TRUE` and `returning`", {
 
   expect_equal(get_returned_rows(df_inserted), tibble(x = 4L, y = 24L))
 
-  expect_equal(df_inserted %>% collect(), tibble(x = 1:4, y = c(11:13, 24L)))
+  expect_equal(df_inserted |> collect(), tibble(x = 1:4, y = c(11:13, 24L)))
 })
 
 test_that("rows_get_or_execute() gives error context", {
@@ -207,7 +207,7 @@ test_that("`sql_query_insert()` works", {
     d = c("y", "z"),
     con = con,
     .name = "df_y"
-  ) %>%
+  ) |>
     mutate(c = c + 1)
 
   expect_snapshot(
@@ -241,8 +241,8 @@ test_that("`sql_query_insert()` works", {
 test_that("rows_append() checks arguments", {
   lf <- lazy_frame(x = 1:3, y = 11:13, .name = "df_x")
   expect_snapshot(error = TRUE, {
-    (lf %>% rows_append(df, by = "x"))
-    (lf %>% rows_append(df, conflict = "error"))
+    (lf |> rows_append(df, by = "x"))
+    (lf |> rows_append(df, conflict = "error"))
   })
 })
 
@@ -262,12 +262,12 @@ test_that("`rows_append()` works with `in_place = FALSE`", {
       df,
       memdb_frame(x = 3:4, y = 23:24),
       in_place = FALSE
-    ) %>%
+    ) |>
       collect(),
     tibble(x = c(1:3, 3:4), y = c(11:13, 23:24))
   )
 
-  expect_equal(df %>% collect(), tibble(x = 1:3, y = 11:13))
+  expect_equal(df |> collect(), tibble(x = 1:3, y = 11:13))
 })
 
 test_that("`rows_append()` works with `in_place = FALSE` and `returning`", {
@@ -277,7 +277,7 @@ test_that("`rows_append()` works with `in_place = FALSE` and `returning`", {
       memdb_frame(x = 3:4, y = 23:24),
       in_place = FALSE,
       returning = everything()
-    ) %>%
+    ) |>
       get_returned_rows(),
     tibble(x = 3:4, y = 23:24)
   )
@@ -289,7 +289,7 @@ test_that("`rows_append()` works with `in_place = FALSE` and `returning`", {
       memdb_frame(x = 3:4),
       in_place = FALSE,
       returning = everything()
-    ) %>%
+    ) |>
       get_returned_rows(),
     tibble(x = 3:4, y = NA)
   )
@@ -311,7 +311,7 @@ test_that("`rows_append()` works with `in_place = TRUE`", {
     memdb_frame(x = 3:4, y = 23:24),
     in_place = TRUE
   )
-  expect_equal(df %>% collect(), tibble(x = c(1:3, 3:4), y = c(11:13, 23:24)))
+  expect_equal(df |> collect(), tibble(x = c(1:3, 3:4), y = c(11:13, 23:24)))
 })
 
 test_that("`rows_append()` with `in_place = TRUE` and `returning`", {
@@ -328,7 +328,7 @@ test_that("`rows_append()` with `in_place = TRUE` and `returning`", {
   expect_equal(get_returned_rows(df_inserted), tibble(x = 3:4, y = 23:24))
 
   expect_equal(
-    df_inserted %>% collect(),
+    df_inserted |> collect(),
     tibble(x = c(1:3, 3:4), y = c(11:13, 23:24))
   )
 })
@@ -342,7 +342,7 @@ test_that("`sql_query_append()` works", {
     d = c("y", "z"),
     con = con,
     .name = "df_y"
-  ) %>%
+  ) |>
     mutate(c = c + 1)
 
   expect_snapshot(
@@ -365,7 +365,7 @@ test_that("sql_query_append supports old interface works", {
     d = c("y", "z"),
     con = con,
     .name = "df_y"
-  ) %>%
+  ) |>
     mutate(c = c + 1)
 
   expect_snapshot(
@@ -427,8 +427,8 @@ test_that("arguments are checked", {
   df <- memdb_frame(x = 1)
   expect_snapshot(
     error = TRUE,
-    (df %>%
-      mutate(x = x + 1) %>%
+    (df |>
+      mutate(x = x + 1) |>
       rows_update(df, by = "x", unmatched = "ignore", in_place = TRUE))
   )
 })
@@ -454,7 +454,7 @@ test_that("`rows_update()` returns early if no column to update", {
       by = "x",
       unmatched = "ignore",
       in_place = FALSE
-    ) %>%
+    ) |>
       collect(),
     collect(db)
   )
@@ -466,7 +466,7 @@ test_that("`rows_update()` returns early if no column to update", {
       by = "x",
       unmatched = "ignore",
       in_place = TRUE
-    ) %>%
+    ) |>
       collect(),
     collect(db)
   )
@@ -503,12 +503,12 @@ test_that("`rows_update()` works with `in_place = FALSE`", {
       by = "x",
       unmatched = "ignore",
       in_place = FALSE
-    ) %>%
+    ) |>
       collect(),
     tibble(x = 1:3, y = c(11L, 22:23))
   )
 
-  expect_equal(df %>% collect(), tibble(x = 1:3, y = 11:13))
+  expect_equal(df |> collect(), tibble(x = 1:3, y = 11:13))
 })
 
 test_that("`rows_update()` works with `in_place = FALSE` and `returning`", {
@@ -520,7 +520,7 @@ test_that("`rows_update()` works with `in_place = FALSE` and `returning`", {
       unmatched = "ignore",
       in_place = FALSE,
       returning = everything()
-    ) %>%
+    ) |>
       get_returned_rows(),
     tibble(x = 2:3, y = 22:23)
   )
@@ -547,7 +547,7 @@ test_that("`rows_update()` works with `in_place = TRUE`", {
     in_place = TRUE
   )
 
-  expect_equal(df %>% collect(), tibble(x = 1:3, y = c(11L, 22:23)))
+  expect_equal(df |> collect(), tibble(x = 1:3, y = c(11L, 22:23)))
 })
 
 test_that("`rows_update()` with `in_place = TRUE` and `returning`", {
@@ -565,7 +565,7 @@ test_that("`rows_update()` with `in_place = TRUE` and `returning`", {
 
   expect_equal(get_returned_rows(df_updated), tibble(x = 2:3, y = 22:23))
 
-  expect_equal(df_updated %>% collect(), tibble(x = 1:3, y = c(11L, 22:23)))
+  expect_equal(df_updated |> collect(), tibble(x = 1:3, y = c(11L, 22:23)))
 })
 
 test_that("`sql_query_update_from()` works", {
@@ -577,7 +577,7 @@ test_that("`sql_query_update_from()` works", {
     d = c("y", "z"),
     con = con,
     .name = "df_y"
-  ) %>%
+  ) |>
     mutate(c = c + 1)
 
   expect_snapshot(
@@ -615,7 +615,7 @@ test_that("`rows_patch()` returns early if no column to update", {
       by = "x",
       unmatched = "ignore",
       in_place = FALSE
-    ) %>%
+    ) |>
       collect(),
     tibble(x = 1:3, y = c(11, 12, NA))
   )
@@ -627,7 +627,7 @@ test_that("`rows_patch()` returns early if no column to update", {
       by = "x",
       unmatched = "ignore",
       in_place = TRUE
-    ) %>%
+    ) |>
       collect(),
     tibble(x = 1:3, y = c(11, 12, NA))
   )
@@ -664,12 +664,12 @@ test_that("`rows_patch()` works with `in_place = FALSE`", {
       by = "x",
       unmatched = "ignore",
       in_place = FALSE
-    ) %>%
+    ) |>
       collect(),
     tibble(x = 1:3, y = c(11, 12, 23))
   )
 
-  expect_equal(df %>% collect(), tibble(x = 1:3, y = c(11, 12, NA)))
+  expect_equal(df |> collect(), tibble(x = 1:3, y = c(11, 12, NA)))
 })
 
 test_that("`rows_patch()` works with multiple columns to update", {
@@ -691,13 +691,13 @@ test_that("`rows_patch()` works with multiple columns to update", {
       by = "x",
       unmatched = "ignore",
       in_place = FALSE
-    ) %>%
+    ) |>
       collect(),
     tibble(x = 1:3, y = c(11, 12, 23), z = c(31, 42, 33))
   )
 
   expect_equal(
-    df %>% collect(),
+    df |> collect(),
     tibble(x = 1:3, y = c(11, 12, NA), z = c(31, NA, 33))
   )
 })
@@ -711,7 +711,7 @@ test_that("`rows_patch()` works with `in_place = FALSE` and `returning`", {
       unmatched = "ignore",
       in_place = FALSE,
       returning = everything()
-    ) %>%
+    ) |>
       get_returned_rows(),
     tibble(x = 2:3, y = c(12, 23))
   )
@@ -738,7 +738,7 @@ test_that("`rows_patch()` works with `in_place = TRUE`", {
     in_place = TRUE
   )
 
-  expect_equal(df %>% collect(), tibble(x = 1:3, y = c(11, 12, 23)))
+  expect_equal(df |> collect(), tibble(x = 1:3, y = c(11, 12, 23)))
 })
 
 test_that("`rows_patch()` works with `in_place = TRUE` and `returning`", {
@@ -756,7 +756,7 @@ test_that("`rows_patch()` works with `in_place = TRUE` and `returning`", {
 
   expect_equal(get_returned_rows(df_patched), tibble(x = 2:3, y = c(12, 23)))
 
-  expect_equal(df_patched %>% collect(), tibble(x = 1:3, y = c(11, 12, 23)))
+  expect_equal(df_patched |> collect(), tibble(x = 1:3, y = c(11, 12, 23)))
 })
 
 
@@ -778,7 +778,7 @@ test_that("`rows_upsert()` returns early if no column to update", {
       memdb_frame(x = 2:4),
       by = "x",
       in_place = FALSE
-    ) %>%
+    ) |>
       collect(),
     tibble(x = 1:4, y = c(11:13, NA))
   )
@@ -789,7 +789,7 @@ test_that("`rows_upsert()` returns early if no column to update", {
       memdb_frame(x = 2:4),
       by = "x",
       in_place = TRUE
-    ) %>%
+    ) |>
       collect(),
     tibble(x = 1:3, y = 11:13)
   )
@@ -823,12 +823,12 @@ test_that("`rows_upsert()` works with `in_place = FALSE`", {
       memdb_frame(x = 2:4, y = 22:24),
       by = "x",
       in_place = FALSE
-    ) %>%
+    ) |>
       collect(),
     tibble(x = 1:4, y = c(11L, 22:24))
   )
 
-  expect_equal(df %>% collect(), tibble(x = 1:3, y = 11:13))
+  expect_equal(df |> collect(), tibble(x = 1:3, y = 11:13))
 })
 
 test_that("`rows_upsert()` works with `in_place = FALSE` and `returning`", {
@@ -839,7 +839,7 @@ test_that("`rows_upsert()` works with `in_place = FALSE` and `returning`", {
       by = "x",
       in_place = FALSE,
       returning = everything()
-    ) %>%
+    ) |>
       get_returned_rows(),
     tibble(x = 2:4, y = 22:24)
   )
@@ -874,7 +874,7 @@ test_that("`rows_upsert()` works with `in_place = TRUE`", {
     in_place = TRUE
   )
 
-  expect_equal(x %>% collect(), tibble(x = 1:4, y = c(11L, 22:24)))
+  expect_equal(x |> collect(), tibble(x = 1:4, y = c(11L, 22:24)))
 })
 
 test_that("`rows_upsert()` works with `in_place = TRUE` and `returning`", {
@@ -903,7 +903,7 @@ test_that("`rows_upsert()` works with `in_place = TRUE` and `returning`", {
     expect_equal(get_returned_rows(df_upserted), tibble(x = 4, y = 24))
   }
 
-  expect_equal(df_upserted %>% collect(), tibble(x = 1:4, y = c(11L, 22:24)))
+  expect_equal(df_upserted |> collect(), tibble(x = 1:4, y = c(11L, 22:24)))
 })
 
 test_that("`sql_query_upsert()` is correct", {
@@ -915,7 +915,7 @@ test_that("`sql_query_upsert()` is correct", {
     d = c("y", "z"),
     con = con,
     .name = "df_y"
-  ) %>%
+  ) |>
     mutate(c = c + 1)
 
   expect_snapshot(
@@ -976,12 +976,12 @@ test_that("`rows_delete()` works with `in_place = FALSE`", {
       by = "x",
       unmatched = "ignore",
       in_place = FALSE
-    ) %>%
+    ) |>
       collect(),
     tibble(x = 1, y = 11)
   )
 
-  expect_equal(df %>% collect(), tibble(x = 1:3, y = c(11, 12, NA)))
+  expect_equal(df |> collect(), tibble(x = 1:3, y = c(11, 12, NA)))
 })
 
 test_that("`rows_delete()` works with `in_place = FALSE` with `returning`", {
@@ -993,7 +993,7 @@ test_that("`rows_delete()` works with `in_place = FALSE` with `returning`", {
       unmatched = "ignore",
       in_place = FALSE,
       returning = everything()
-    ) %>%
+    ) |>
       get_returned_rows(),
     tibble(x = 2:3, y = 12:13)
   )
@@ -1020,7 +1020,7 @@ test_that("`rows_delete()` works with `in_place = TRUE`", {
     in_place = TRUE
   )
 
-  expect_equal(df %>% collect(), tibble(x = 1L, y = 11L))
+  expect_equal(df |> collect(), tibble(x = 1L, y = 11L))
 })
 
 test_that("`rows_delete()` works with `in_place = TRUE` and `returning`", {
@@ -1038,7 +1038,7 @@ test_that("`rows_delete()` works with `in_place = TRUE` and `returning`", {
 
   expect_equal(get_returned_rows(df_deleted), tibble(x = 2:3, y = 12:13))
 
-  expect_equal(df_deleted %>% collect(), tibble(x = 1L, y = 11L))
+  expect_equal(df_deleted |> collect(), tibble(x = 1L, y = 11L))
 })
 
 test_that("`sql_query_delete()` is correct", {
@@ -1049,7 +1049,7 @@ test_that("`sql_query_delete()` is correct", {
     d = c("y", "z"),
     con = simulate_dbi(),
     .name = "df_y"
-  ) %>%
+  ) |>
     mutate(c = c + 1)
 
   expect_snapshot(

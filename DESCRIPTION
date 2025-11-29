@@ -17,7 +17,7 @@ License: MIT + file LICENSE
 URL: https://dbplyr.tidyverse.org/, https://github.com/tidyverse/dbplyr
 BugReports: https://github.com/tidyverse/dbplyr/issues
 Depends: 
-    R (>= 3.6)
+    R (>= 4.1)
 Imports: 
     blob (>= 1.2.0),
     cli (>= 3.6.1),

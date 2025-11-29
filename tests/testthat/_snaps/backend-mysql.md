@@ -47,7 +47,7 @@
 ---
 
     Code
-      copy_inline(con_maria, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
+      remote_query(copy_inline(con_maria, tibble(x = 1:2, y = letters[1:2])))
     Output
       <SQL> SELECT CAST(`x` AS INTEGER) AS `x`, CAST(`y` AS CHAR) AS `y`
       FROM (
@@ -62,7 +62,7 @@
 ---
 
     Code
-      copy_inline(con_mysql, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
+      remote_query(copy_inline(con_mysql, tibble(x = 1:2, y = letters[1:2])))
     Output
       <SQL> SELECT TRUNCATE(CAST(`x` AS DOUBLE), 0) AS `x`, CAST(`y` AS CHAR) AS `y`
       FROM (
@@ -92,17 +92,4 @@
 ---
 
     Argument `returning_cols` isn't supported in MariaDB translation.
-
-# can explain
-
-    Code
-      db %>% mutate(y = x + 1) %>% explain()
-    Output
-      <SQL>
-      SELECT `test`.*, `x` + 1.0 AS `y`
-      FROM `test`
-      
-      <PLAN>
-        id select_type table type possible_keys  key key_len  ref rows Extra
-      1  1      SIMPLE  test  ALL          <NA> <NA>    <NA> <NA>    3      
 

@@ -101,17 +101,17 @@ test_that("generates custom sql", {
 
 test_that("head translated to TOP", {
   mf <- lazy_frame(x = 1, con = simulate_teradata())
-  expect_snapshot(mf %>% head() %>% sql_render())
+  expect_snapshot(mf |> head() |> sql_render())
 })
 
 test_that("lead, lag work", {
   mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_teradata())
 
   expect_snapshot(
-    mf %>% group_by(y) %>% mutate(val2 = lead(x, order_by = x)) %>% sql_render()
+    mf |> group_by(y) |> mutate(val2 = lead(x, order_by = x)) |> sql_render()
   )
   expect_snapshot(
-    mf %>% group_by(y) %>% mutate(val2 = lag(x, order_by = x)) %>% sql_render()
+    mf |> group_by(y) |> mutate(val2 = lag(x, order_by = x)) |> sql_render()
   )
 })
 
@@ -119,17 +119,17 @@ test_that("lead, lag work", {
 test_that("weighted.mean", {
   mf <- lazy_frame(x = c(1:5), y = c(6:10), con = simulate_teradata())
 
-  expect_snapshot(mf %>% summarise(wt_mean = weighted.mean(x, y)))
+  expect_snapshot(mf |> summarise(wt_mean = weighted.mean(x, y)))
 })
 
 test_that("row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per empty_order)", {
   mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_teradata())
-  expect_snapshot(mf %>% mutate(rown = row_number()))
-  expect_snapshot(mf %>% group_by(y) %>% mutate(rown = row_number()))
-  expect_snapshot(mf %>% arrange(y) %>% mutate(rown = row_number()))
+  expect_snapshot(mf |> mutate(rown = row_number()))
+  expect_snapshot(mf |> group_by(y) |> mutate(rown = row_number()))
+  expect_snapshot(mf |> arrange(y) |> mutate(rown = row_number()))
 })
 
 test_that("head after distinct() produces subquery", {
   lf <- lazy_frame(x = 1, y = 2, con = simulate_teradata())
-  expect_snapshot(lf %>% distinct() %>% head())
+  expect_snapshot(lf |> distinct() |> head())
 })

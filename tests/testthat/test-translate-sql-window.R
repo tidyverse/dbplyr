@@ -172,12 +172,12 @@ test_that("win_rank(c()) gives an informative error", {
 
 test_that("row_number() with and without group_by() and arrange()", {
   mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_dbi())
-  expect_snapshot(mf %>% mutate(rown = row_number()))
-  expect_snapshot(mf %>% group_by(y) %>% mutate(rown = row_number()))
+  expect_snapshot(mf |> mutate(rown = row_number()))
+  expect_snapshot(mf |> group_by(y) |> mutate(rown = row_number()))
   expect_snapshot(
-    mf %>% group_by(y) %>% arrange(y) %>% mutate(rown = row_number())
+    mf |> group_by(y) |> arrange(y) |> mutate(rown = row_number())
   )
-  expect_snapshot(mf %>% arrange(y) %>% mutate(rown = row_number()))
+  expect_snapshot(mf |> arrange(y) |> mutate(rown = row_number()))
 })
 
 test_that("win_cumulative works", {
@@ -192,7 +192,7 @@ test_that("win_cumulative works", {
   # NA values results in NA rank
   db <- memdb_frame(x = c(1, 2, NA, 3))
   expect_equal(
-    db %>% mutate(rank = dense_rank(x)) %>% collect() %>% arrange(x),
+    db |> mutate(rank = dense_rank(x)) |> collect() |> arrange(x),
     tibble(x = c(1:3, NA), rank = c(1:3, NA))
   )
 })
@@ -226,18 +226,18 @@ test_that("window_frame()", {
   lf <- lazy_frame(x = runif(10), y = 1:10)
 
   expect_snapshot(
-    lf %>%
-      window_frame(-3, 0) %>%
-      window_order(x) %>%
-      mutate(z = sum(y, na.rm = TRUE)) %>%
+    lf |>
+      window_frame(-3, 0) |>
+      window_order(x) |>
+      mutate(z = sum(y, na.rm = TRUE)) |>
       show_query()
   )
 
   expect_snapshot(
-    lf %>%
-      window_frame(-3) %>%
-      window_order(x) %>%
-      mutate(z = sum(y, na.rm = TRUE)) %>%
+    lf |>
+      window_frame(-3) |>
+      window_order(x) |>
+      mutate(z = sum(y, na.rm = TRUE)) |>
       show_query()
   )
 })
@@ -265,11 +265,11 @@ test_that("names windows automatically", {
     part = c("a", "a", "b"),
     ord = 3:1,
     con = simulate_sqlite()
-  ) %>%
-    group_by(part) %>%
+  ) |>
+    group_by(part) |>
     window_order(ord)
 
-  lf1 <- lf %>%
+  lf1 <- lf |>
     transmute(
       across(c(col1, col2), ~ sum(.x, na.rm = TRUE)),
       across(c(col3, col4), ~ order_by(desc(ord), cumsum(.x)))
@@ -302,7 +302,7 @@ test_that("names windows automatically", {
   )
 
   # Different order does not confuse naming of windows
-  lf2 <- lf %>%
+  lf2 <- lf |>
     transmute(
       col1 = sum(col1, na.rm = TRUE),
       col3 = order_by(desc(ord), cumsum(col3)),
@@ -345,9 +345,9 @@ test_that("only name windows if they appear multiple times", {
     part = c("a", "a", "b"),
     ord = 3:1,
     con = simulate_sqlite()
-  ) %>%
-    group_by(part) %>%
-    window_order(ord) %>%
+  ) |>
+    group_by(part) |>
+    window_order(ord) |>
     transmute(
       across(c(col1, col2), ~ sum(.x, na.rm = TRUE)),
       across(c(col3), ~ order_by(desc(ord), cumsum(.x)))
@@ -381,8 +381,8 @@ test_that("name windows only if supported", {
     col2 = runif(3),
     part = c("a", "a", "b"),
     con = simulate_hana()
-  ) %>%
-    group_by(part) %>%
+  ) |>
+    group_by(part) |>
     transmute(
       across(c(col1, col2), ~ sum(.x, na.rm = TRUE))
     )

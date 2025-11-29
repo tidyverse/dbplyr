@@ -65,8 +65,8 @@ same_src.tbl_sql <- function(x, y) {
 #' @importFrom dplyr group_size
 #' @export
 group_size.tbl_sql <- function(x) {
-  df <- x %>%
-    summarise(n = n()) %>%
+  df <- x |>
+    summarise(n = n()) |>
     collect()
   df$n
 }
@@ -78,10 +78,10 @@ n_groups.tbl_sql <- function(x) {
     return(1L)
   }
 
-  df <- x %>%
-    summarise() %>%
-    ungroup() %>%
-    summarise(n = n()) %>%
+  df <- x |>
+    summarise() |>
+    ungroup() |>
+    summarise(n = n()) |>
     collect()
   df$n
 }

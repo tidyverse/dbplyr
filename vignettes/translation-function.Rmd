@@ -91,8 +91,8 @@ df <- tibble(
 )
 mf <- tbl_memdb(df)
 
-df %>% mutate(x %% y)
-mf %>% mutate(x %% y)
+df |> mutate(x %% y)
+mf |> mutate(x %% y)
 ```
 
 dbplyr no longer translates `%/%` because there's no robust cross-database translation available.
@@ -179,12 +179,12 @@ This gives you a lot of freedom to generate the SQL you need:
 ```{r}
 mf <- memdb_frame(x = 1, y = 2)
 
-mf %>% 
-  transmute(factorial = sql("x!")) %>% 
+mf |> 
+  transmute(factorial = sql("x!")) |> 
   show_query()
 
-mf %>% 
-  transmute(factorial = sql("CAST(x AS FLOAT)")) %>% 
+mf |> 
+  transmute(factorial = sql("CAST(x AS FLOAT)")) |> 
   show_query()
 ```
 

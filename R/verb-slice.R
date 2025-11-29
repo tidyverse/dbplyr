@@ -32,19 +32,19 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(x = 1:3, y = c(1, 1, 2))
-#' db %>% slice_min(x) %>% show_query()
-#' db %>% slice_max(x) %>% show_query()
-#' db %>% slice_sample() %>% show_query()
+#' db |> slice_min(x) |> show_query()
+#' db |> slice_max(x) |> show_query()
+#' db |> slice_sample() |> show_query()
 #'
-#' db %>% group_by(y) %>% slice_min(x) %>% show_query()
+#' db |> group_by(y) |> slice_min(x) |> show_query()
 #'
 #' # By default, ties are includes so you may get more rows
 #' # than you expect
-#' db %>% slice_min(y, n = 1)
-#' db %>% slice_min(y, n = 1, with_ties = FALSE)
+#' db |> slice_min(y, n = 1)
+#' db |> slice_min(y, n = 1, with_ties = FALSE)
 #'
 #' # Non-integer group sizes are rounded down
-#' db %>% slice_min(x, prop = 0.5)
+#' db |> slice_min(x, prop = 0.5)
 NULL
 
 #' @importFrom dplyr slice
@@ -178,7 +178,7 @@ slice_by <- function(.data, order_by, size, .by, with_ties = FALSE) {
   dots <- partial_eval_dots(.data, !!!order_by, .named = FALSE)
   .data$lazy_query <- add_order(.data, dots)
 
-  out <- filter(.data, !!window_fun) %>%
+  out <- filter(.data, !!window_fun) |>
     window_order(!!!old_frame)
 
   if (by$from_by) {

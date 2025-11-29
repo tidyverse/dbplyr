@@ -32,17 +32,17 @@
 ---
 
     Code
-      lz %>% mutate(x = NOSUCHPACKAGE::foo())
+      mutate(lz, x = NOSUCHPACKAGE::foo())
     Condition
       Error:
       ! There is no package called NOSUCHPACKAGE
     Code
-      lz %>% mutate(x = dbplyr::NOSUCHFUNCTION())
+      mutate(lz, x = dbplyr::NOSUCHFUNCTION())
     Condition
       Error:
       ! "NOSUCHFUNCTION" is not an exported object from dbplyr
     Code
-      lz %>% mutate(x = base::abbreviate(x))
+      mutate(lz, x = base::abbreviate(x))
     Condition
       Error in `base::abbreviate()`:
       ! No known SQL translation

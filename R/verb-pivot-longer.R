@@ -57,7 +57,7 @@
 #'   id = c("a", "b"),
 #'   x = 1:2,
 #'   y = 3:4
-#' ) %>%
+#' ) |>
 #'   tidyr::pivot_longer(-id)
 #' @exportS3Method tidyr::pivot_longer
 pivot_longer.tbl_lazy <- function(
@@ -177,7 +177,7 @@ dbplyr_pivot_longer_spec <- function(
     )
   }
 
-  data_long %>%
+  data_long |>
     rename(!!!tibble::deframe(nms_map))
 }
 
@@ -208,7 +208,7 @@ apply_name_repair_pivot_longer <- function(id_cols, spec, names_repair) {
     tibble(from = "id_cols", name = as.character(id_cols)),
     tibble(from = "measure_cols", name = colnames(spec)[-(1:2)]),
     tibble(from = "value_cols", name = unique(spec[[".value"]]))
-  ) %>%
+  ) |>
     mutate(name_rep = vctrs::vec_as_names(name, repair = names_repair))
   nms_map <- split(nms_map_df, nms_map_df$from)
 

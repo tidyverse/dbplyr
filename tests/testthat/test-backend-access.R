@@ -96,5 +96,5 @@ test_that("custom escaping works as expected", {
 
 test_that("queries translate correctly", {
   mf <- lazy_frame(x = 1, con = simulate_access())
-  expect_snapshot(mf %>% head())
+  expect_snapshot(mf |> head())
 })

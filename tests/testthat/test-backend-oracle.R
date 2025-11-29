@@ -37,7 +37,7 @@ test_that("string functions translate correctly", {
 
 test_that("queries translate correctly", {
   mf <- lazy_frame(x = 1, con = simulate_oracle())
-  expect_snapshot(mf %>% head())
+  expect_snapshot(mf |> head())
 })
 
 test_that("`sql_query_upsert()` is correct", {
@@ -49,7 +49,7 @@ test_that("`sql_query_upsert()` is correct", {
     d = c("y", "z"),
     con = con,
     .name = "df_y"
-  ) %>%
+  ) |>
     mutate(c = c + 1)
 
   expect_snapshot(
@@ -95,12 +95,12 @@ test_that("copy_inline uses UNION ALL", {
 
   types <- c(id = "bigint", arr = "integer[]")
   expect_snapshot({
-    copy_inline(con, y %>% slice(0)) %>% remote_query()
-    copy_inline(con, y) %>% remote_query()
+    copy_inline(con, y |> slice(0)) |> remote_query()
+    copy_inline(con, y) |> remote_query()
 
     # with `types`
-    copy_inline(con, y %>% slice(0), types = types) %>% remote_query()
-    copy_inline(con, y, types = types) %>% remote_query()
+    copy_inline(con, y |> slice(0), types = types) |> remote_query()
+    copy_inline(con, y, types = types) |> remote_query()
   })
 })
 

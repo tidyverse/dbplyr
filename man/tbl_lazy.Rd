@@ -19,6 +19,6 @@ library(dplyr)
 df <- data.frame(x = 1, y = 2)
 
 df_sqlite <- tbl_lazy(df, con = simulate_sqlite())
-df_sqlite \%>\% summarise(x = sd(x, na.rm = TRUE)) \%>\% show_query()
+df_sqlite |> summarise(x = sd(x, na.rm = TRUE)) |> show_query()
 }
 \keyword{internal}

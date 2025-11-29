@@ -23,7 +23,7 @@
 # join works with in_schema
 
     Code
-      left_join(df1, df2, by = "x") %>% remote_query()
+      remote_query(left_join(df1, df2, by = "x"))
     Output
       <SQL> SELECT `df`.*, `z`
       FROM `foo`.`df`
@@ -33,7 +33,7 @@
 ---
 
     Code
-      left_join(df1, df3, by = "x") %>% remote_query()
+      remote_query(left_join(df1, df3, by = "x"))
     Output
       <SQL> SELECT `df_LHS`.*, `z`
       FROM `foo`.`df` AS `df_LHS`
@@ -43,7 +43,7 @@
 ---
 
     Code
-      left_join(df4, df5, by = "x") %>% remote_query()
+      remote_query(left_join(df4, df5, by = "x"))
     Output
       <SQL> SELECT `df_LHS`.*, `z`
       FROM foo.df AS `df_LHS`
@@ -53,7 +53,7 @@
 # alias truncates long table names at database limit
 
     Code
-      self_join2 %>% remote_query()
+      remote_query(self_join2)
     Output
       <SQL> SELECT "a01234567890123456789012345678901234567890123456789012345678901".*
       FROM "a01234567890123456789012345678901234567890123456789012345678901"
@@ -66,7 +66,7 @@
 ---
 
     Code
-      self_join3 %>% remote_query()
+      remote_query(self_join3)
     Output
       <SQL> SELECT
         "a01234567890123456789012345678901234567890123456789012345678901"."x" AS "x",
@@ -139,7 +139,7 @@
 # can combine full_join with other joins #1178
 
     Code
-      full_join(lf1, lf2, by = "x") %>% left_join(lf3, by = "x")
+      left_join(full_join(lf1, lf2, by = "x"), lf3, by = "x")
     Output
       <SQL>
       SELECT `LHS`.*, `z`
@@ -155,7 +155,7 @@
 ---
 
     Code
-      left_join(lf1, lf2, by = "x") %>% full_join(lf3, by = "x")
+      full_join(left_join(lf1, lf2, by = "x"), lf3, by = "x")
     Output
       <SQL>
       SELECT COALESCE(`LHS`.`x`, `df`.`x`) AS `x`, `y`, `z`
@@ -171,7 +171,7 @@
 ---
 
     Code
-      full_join(lf1, lf2, by = "x") %>% full_join(lf3, by = "x")
+      full_join(full_join(lf1, lf2, by = "x"), lf3, by = "x")
     Output
       <SQL>
       SELECT COALESCE(`LHS`.`x`, `df`.`x`) AS `x`, `y`, `z`
@@ -414,7 +414,7 @@
 # joins reuse queries in cte mode
 
     Code
-      left_join(lf, lf) %>% remote_query(sql_options = sql_options(cte = TRUE))
+      remote_query(left_join(lf, lf), sql_options = sql_options(cte = TRUE))
     Message
       Joining with `by = join_by(x)`
     Output

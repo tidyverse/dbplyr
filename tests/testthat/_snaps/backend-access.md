@@ -10,7 +10,7 @@
 # queries translate correctly
 
     Code
-      mf %>% head()
+      head(mf)
     Output
       <SQL>
       SELECT TOP 6 `df`.*

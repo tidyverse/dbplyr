@@ -113,12 +113,12 @@ To interact with a database you usually use SQL, the Structured Query Language. 
 Most of the time you don't need to know anything about SQL, and you can continue to use the dplyr verbs that you're already familiar with:
 
 ```{r}
-flights_db %>% select(year:day, dep_delay, arr_delay)
+flights_db |> select(year:day, dep_delay, arr_delay)
 
-flights_db %>% filter(dep_delay > 240)
+flights_db |> filter(dep_delay > 240)
 
-flights_db %>% 
-  group_by(dest) %>%
+flights_db |> 
+  group_by(dest) |>
   summarise(delay = mean(dep_delay))
 ```
 
@@ -134,13 +134,13 @@ The most important difference between ordinary data frames and remote database q
 For example, take the following code:
 
 ```{r}
-tailnum_delay_db <- flights_db %>% 
-  group_by(tailnum) %>%
+tailnum_delay_db <- flights_db |> 
+  group_by(tailnum) |>
   summarise(
     delay = mean(arr_delay),
     n = n()
-  ) %>% 
-  arrange(desc(delay)) %>%
+  ) |> 
+  arrange(desc(delay)) |>
   filter(n > 100)
 ```
 
@@ -153,7 +153,7 @@ tailnum_delay_db
 Behind the scenes, dplyr is translating your R code into SQL. You can see the SQL it's generating with `show_query()`:
 
 ```{r}
-tailnum_delay_db %>% show_query()
+tailnum_delay_db |> show_query()
 ```
 
 If you're familiar with SQL, this probably isn't exactly what you'd write by hand, but it does the job. You can learn more about the SQL translation in `vignette("translation-verb")` and `vignette("translation-function")`.
@@ -161,7 +161,7 @@ If you're familiar with SQL, this probably isn't exactly what you'd write by han
 Typically, you'll iterate a few times before you figure out what data you need from the database. Once you've figured it out, use `collect()` to pull all the data down into a local tibble:
 
 ```{r}
-tailnum_delay <- tailnum_delay_db %>% collect()
+tailnum_delay <- tailnum_delay_db |> collect()
 tailnum_delay
 ```
 

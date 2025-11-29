@@ -25,13 +25,13 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(g = c(1, 1, 1, 2, 2), x = c(4, 3, 6, 9, 2))
-#' db %>%
-#'   summarise(n()) %>%
+#' db |>
+#'   summarise(n()) |>
 #'   show_query()
 #'
-#' db %>%
-#'   group_by(g) %>%
-#'   summarise(n()) %>%
+#' db |>
+#'   group_by(g) |>
+#'   summarise(n()) |>
 #'   show_query()
 summarise.tbl_lazy <- function(.data, ..., .by = NULL, .groups = NULL) {
   check_groups(.groups)

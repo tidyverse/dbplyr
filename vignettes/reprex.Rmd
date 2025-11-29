@@ -40,8 +40,8 @@ You can easily create a SQLite in-memory database table using `memdb_frame()`:
 mf <- memdb_frame(g = c(1, 1, 2, 2, 2), x = 1:5, y = 5:1)
 mf
 
-mf %>% 
-  group_by(g) %>% 
+mf |> 
+  group_by(g) |> 
   summarise_all(mean, na.rm = TRUE)
 ```
 
@@ -49,9 +49,9 @@ Reprexes are easiest to understand if you create very small custom data, but if 
 
 ```{r}
 mtcars_db <- tbl_memdb(mtcars)
-mtcars_db %>% 
-  group_by(cyl) %>% 
-  summarise(n = n()) %>% 
+mtcars_db |> 
+  group_by(cyl) |> 
+  summarise(n = n()) |> 
   show_query()
 ```
 
@@ -62,12 +62,12 @@ Many problems with dbplyr come down to incorrect SQL generation. Fortunately, it
 ```{r}
 x <- c("abc", "def", "ghif")
 
-lazy_frame(x = x, con = simulate_postgres()) %>% 
-  head(5) %>% 
+lazy_frame(x = x, con = simulate_postgres()) |> 
+  head(5) |> 
   show_query()
 
-lazy_frame(x = x, con = simulate_mssql()) %>% 
-  head(5) %>% 
+lazy_frame(x = x, con = simulate_mssql()) |> 
+  head(5) |> 
   show_query()
 ```
 

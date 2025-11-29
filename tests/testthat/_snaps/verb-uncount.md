@@ -1,7 +1,7 @@
 # symbols weights are dropped in output
 
     Code
-      dbplyr_uncount(df, w) %>% show_query()
+      show_query(dbplyr_uncount(df, w))
     Output
       <SQL>
       SELECT `x`
@@ -22,7 +22,7 @@
 ---
 
     Code
-      df %>% mutate(w = w + 1) %>% dbplyr_uncount(w) %>% show_query()
+      show_query(dbplyr_uncount(mutate(df, w = w + 1), w))
     Output
       <SQL>
       SELECT `x`

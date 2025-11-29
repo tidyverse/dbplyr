@@ -158,47 +158,47 @@ test_that("across() can use named selections", {
 })
 
 test_that("across() correctly names output columns", {
-  gf <- lazy_frame(x = 1, y = 2, z = 3, s = "") %>% group_by(x)
+  gf <- lazy_frame(x = 1, y = 2, z = 3, s = "") |> group_by(x)
 
   expect_equal(
-    summarise(gf, across()) %>% op_vars(),
+    summarise(gf, across()) |> op_vars(),
     c("x", "y", "z", "s")
   )
   expect_equal(
-    summarise(gf, across(.names = "id_{.col}")) %>% op_vars(),
+    summarise(gf, across(.names = "id_{.col}")) |> op_vars(),
     c("x", "id_y", "id_z", "id_s")
   )
   expect_equal(
-    summarise(gf, across(1:2, mean)) %>% op_vars(),
+    summarise(gf, across(1:2, mean)) |> op_vars(),
     c("x", "y", "z")
   )
   expect_equal(
-    summarise(gf, across(1:2, mean, .names = "mean_{.col}")) %>% op_vars(),
+    summarise(gf, across(1:2, mean, .names = "mean_{.col}")) |> op_vars(),
     c("x", "mean_y", "mean_z")
   )
   expect_equal(
-    summarise(gf, across(1:2, list(mean = mean, sum = sum))) %>% op_vars(),
+    summarise(gf, across(1:2, list(mean = mean, sum = sum))) |> op_vars(),
     c("x", "y_mean", "y_sum", "z_mean", "z_sum")
   )
   expect_equal(
     summarise(
       gf,
       across(1:2, list(mean = mean, sum = sum), .names = "{.fn}_{.col}")
-    ) %>%
+    ) |>
       op_vars(),
     c("x", "mean_y", "sum_y", "mean_z", "sum_z")
   )
 
   expect_equal(
-    summarise(gf, across(1:2, list(mean = mean, sum))) %>% op_vars(),
+    summarise(gf, across(1:2, list(mean = mean, sum))) |> op_vars(),
     c("x", "y_mean", "y_2", "z_mean", "z_2")
   )
   expect_equal(
-    summarise(gf, across(1:2, list(mean, sum = sum))) %>% op_vars(),
+    summarise(gf, across(1:2, list(mean, sum = sum))) |> op_vars(),
     c("x", "y_1", "y_sum", "z_1", "z_sum")
   )
   expect_equal(
-    summarise(gf, across(1:2, list(mean, sum))) %>% op_vars(),
+    summarise(gf, across(1:2, list(mean, sum))) |> op_vars(),
     c("x", "y_1", "y_2", "z_1", "z_2")
   )
 })
@@ -206,7 +206,7 @@ test_that("across() correctly names output columns", {
 test_that("across(.names=) can use local variables in addition to {col} and {fn}", {
   res <- local({
     prefix <- "MEAN"
-    lazy_frame(x = 42) %>%
+    lazy_frame(x = 42) |>
       summarise(across(
         everything(),
         ~ mean(.x, na.rm = TRUE),
@@ -229,7 +229,7 @@ test_that("across() can handle empty selection", {
   lf <- lazy_frame(x = 1, y = 2)
 
   expect_equal(
-    lf %>% mutate(across(character(), c)) %>% remote_query(),
+    lf |> mutate(across(character(), c)) |> remote_query(),
     sql("SELECT *\nFROM `df`")
   )
 })
@@ -237,13 +237,13 @@ test_that("across() can handle empty selection", {
 test_that("across() defaults to everything()", {
   # SELECT `x` + 1.0 AS `x`, `y` + 1.0 AS `y`
   expect_snapshot(
-    lazy_frame(x = 1, y = 1) %>% summarise(across(.fns = ~ . + 1))
+    lazy_frame(x = 1, y = 1) |> summarise(across(.fns = ~ . + 1))
   )
 })
 
 test_that("untranslatable functions are preserved", {
   lf <- lazy_frame(a = 1, b = 2)
-  expect_snapshot(lf %>% summarise(across(a:b, SQL_LOG)))
+  expect_snapshot(lf |> summarise(across(a:b, SQL_LOG)))
 })
 
 test_that("old _at functions continue to work", {
@@ -251,9 +251,9 @@ test_that("old _at functions continue to work", {
   reset_warning_verbosity("dbplyr_check_na_rm")
   lf <- lazy_frame(a = 1, b = 2)
 
-  expect_snapshot(lf %>% dplyr::summarise_at(dplyr::vars(a:b), "sum"))
-  expect_snapshot(lf %>% dplyr::summarise_at(dplyr::vars(a:b), sum))
-  expect_snapshot(lf %>% dplyr::summarise_at(dplyr::vars(a:b), ~ sum(.)))
+  expect_snapshot(lf |> dplyr::summarise_at(dplyr::vars(a:b), "sum"))
+  expect_snapshot(lf |> dplyr::summarise_at(dplyr::vars(a:b), sum))
+  expect_snapshot(lf |> dplyr::summarise_at(dplyr::vars(a:b), ~ sum(.)))
 })
 
 test_that("across() uses environment from the current quosure (dplyr#5460)", {
@@ -289,25 +289,25 @@ test_that("lambdas in across() can use columns", {
   skip("not yet correctly supported")
   # dplyr uses the old value of `y` for division
   df <- tibble(x = 2, y = 4, z = 8)
-  df %>% mutate(across(everything(), ~ .x / .data$y))
+  df |> mutate(across(everything(), ~ .x / .data$y))
   # so this is the equivalent
-  df %>% mutate(data.frame(x = x / y, y = y / y, z = z / y))
+  df |> mutate(data.frame(x = x / y, y = y / y, z = z / y))
   # dbplyr uses the new value of `y`
-  lf %>% mutate(across(everything(), ~ .x / .data$y))
+  lf |> mutate(across(everything(), ~ .x / .data$y))
 
   # so this is the dbplyr equivalent
-  df %>% mutate(x = x / y, y = y / y, z = z / y)
+  df |> mutate(x = x / y, y = y / y, z = z / y)
 })
 
 test_that("can pass quosure through `across()`", {
   summarise_mean <- function(data, vars) {
-    data %>% summarise(across({{ vars }}, ~ mean(.x, na.rm = TRUE)))
+    data |> summarise(across({{ vars }}, ~ mean(.x, na.rm = TRUE)))
   }
-  gdf <- lazy_frame(g = c(1, 1, 2), x = 1:3) %>% group_by(g)
+  gdf <- lazy_frame(g = c(1, 1, 2), x = 1:3) |> group_by(g)
 
   expect_equal(
-    gdf %>% summarise_mean(x) %>% remote_query(),
-    summarise(gdf, x = mean(x, na.rm = TRUE)) %>% remote_query()
+    gdf |> summarise_mean(x) |> remote_query(),
+    summarise(gdf, x = mean(x, na.rm = TRUE)) |> remote_query()
   )
 })
 
@@ -395,7 +395,7 @@ test_that("across() throws error if unpack = TRUE", {
   lf <- lazy_frame(x = 1, y = 2)
 
   expect_snapshot(
-    (expect_error(lf %>% mutate(across(x, .unpack = TRUE))))
+    (expect_error(lf |> mutate(across(x, .unpack = TRUE))))
   )
 })
 
@@ -461,15 +461,15 @@ test_that("if_all collapses multiple expressions", {
 test_that("if_all/any works in filter()", {
   lf <- lazy_frame(a = 1, b = 2)
 
-  expect_snapshot(lf %>% filter(if_all(a:b, ~ . > 0)))
-  expect_snapshot(lf %>% filter(if_any(a:b, ~ . > 0)))
+  expect_snapshot(lf |> filter(if_all(a:b, ~ . > 0)))
+  expect_snapshot(lf |> filter(if_any(a:b, ~ . > 0)))
 })
 
 test_that("if_all/any is wrapped in parentheses #1153", {
   lf <- lazy_frame(a = 1, b = 2, c = 3)
 
   expect_equal(
-    lf %>% filter(if_any(c(a, b)) & c == 3) %>% remote_query(),
+    lf |> filter(if_any(c(a, b)) & c == 3) |> remote_query(),
     sql("SELECT `df`.*\nFROM `df`\nWHERE ((`a` OR `b`) AND `c` = 3.0)")
   )
 })
@@ -477,22 +477,22 @@ test_that("if_all/any is wrapped in parentheses #1153", {
 test_that("if_all/any works in mutate()", {
   lf <- lazy_frame(a = 1, b = 2)
 
-  expect_snapshot(lf %>% mutate(c = if_all(a:b, ~ . > 0)))
-  expect_snapshot(lf %>% mutate(c = if_any(a:b, ~ . > 0)))
+  expect_snapshot(lf |> mutate(c = if_all(a:b, ~ . > 0)))
+  expect_snapshot(lf |> mutate(c = if_any(a:b, ~ . > 0)))
 })
 
 test_that("if_all/any uses every column as default", {
   lf <- lazy_frame(a = 1, b = 2)
 
-  expect_snapshot(lf %>% filter(if_all(.fns = ~ . > 0)))
-  expect_snapshot(lf %>% filter(if_any(.fns = ~ . > 0)))
+  expect_snapshot(lf |> filter(if_all(.fns = ~ . > 0)))
+  expect_snapshot(lf |> filter(if_any(.fns = ~ . > 0)))
 })
 
 test_that("if_all/any works without `.fns` argument", {
   lf <- lazy_frame(a = 1, b = 2)
 
-  expect_snapshot(lf %>% filter(if_all(a:b)))
-  expect_snapshot(lf %>% filter(if_any(a:b)))
+  expect_snapshot(lf |> filter(if_all(a:b)))
+  expect_snapshot(lf |> filter(if_any(a:b)))
 })
 
 test_that("if_all() drops groups", {
@@ -513,11 +513,11 @@ test_that("if_any() and if_all() expansions deal with single inputs", {
 
   # Single inputs
   expect_equal(
-    filter(d, if_any(x, ~FALSE)) %>% remote_query(),
+    filter(d, if_any(x, ~FALSE)) |> remote_query(),
     sql("SELECT `df`.*\nFROM `df`\nWHERE ((FALSE))")
   )
   expect_equal(
-    filter(d, if_all(x, ~FALSE)) %>% remote_query(),
+    filter(d, if_all(x, ~FALSE)) |> remote_query(),
     sql("SELECT `df`.*\nFROM `df`\nWHERE ((FALSE))")
   )
 })
@@ -634,12 +634,12 @@ test_that("can `arrange()` with `pick()` selection", {
   df <- lazy_frame(x = c(2, 2, 1), y = c(3, 1, 3))
 
   expect_identical(
-    arrange(df, pick(x, y)) %>% remote_query(),
+    arrange(df, pick(x, y)) |> remote_query(),
     sql("SELECT `df`.*\nFROM `df`\nORDER BY `x`, `y`")
   )
 
   expect_identical(
-    arrange(df, pick(x), y) %>% remote_query(),
+    arrange(df, pick(x), y) |> remote_query(),
     sql("SELECT `df`.*\nFROM `df`\nORDER BY `x`, `y`")
   )
 })

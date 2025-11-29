@@ -1,7 +1,7 @@
 # mutate() isn't inlined after distinct() #1119
 
     Code
-      lf %>% distinct(x) %>% mutate(x = 0)
+      mutate(distinct(lf, x), x = 0)
     Output
       <SQL>
       SELECT 0.0 AS `x`
@@ -13,7 +13,7 @@
 # can use window function after summarise and pure projection #1104
 
     Code
-      (expect_no_error(lf %>% mutate(r = row_number())))
+      (expect_no_error(mutate(lf, r = row_number())))
     Output
       <SQL>
       SELECT `q01`.*, ROW_NUMBER() OVER () AS `r`
@@ -53,7 +53,7 @@
 # across() does not select grouping variables
 
     Code
-      df %>% group_by(g) %>% mutate(across(.fns = ~0))
+      mutate(group_by(df, g), across(.fns = ~0))
     Output
       <SQL>
       SELECT `g`, 0.0 AS `x`
@@ -62,7 +62,7 @@
 ---
 
     Code
-      df %>% group_by(g) %>% transmute(across(.fns = ~0))
+      transmute(group_by(df, g), across(.fns = ~0))
     Output
       <SQL>
       SELECT `g`, 0.0 AS `x`
@@ -82,7 +82,7 @@
 # across() uses original column rather than overridden one
 
     Code
-      lf %>% mutate(x = -x, across(everything(), ~ .x / x), y = y + x)
+      mutate(lf, x = -x, across(everything(), ~ .x / x), y = y + x)
     Output
       <SQL>
       SELECT `x`, `y` + `x` AS `y`, `z`
@@ -108,14 +108,14 @@
 # mutate() produces nice error messages
 
     Code
-      lazy_frame(x = 1) %>% mutate(z = non_existent + 1)
+      mutate(lazy_frame(x = 1), z = non_existent + 1)
     Condition
       Error in `mutate()`:
       i In argument: `z = non_existent + 1`
       Caused by error:
       ! Object `non_existent` not found.
     Code
-      lazy_frame(x = 1) %>% mutate(across(x, mean, na.rm = z))
+      mutate(lazy_frame(x = 1), across(x, mean, na.rm = z))
     Condition
       Error in `mutate()`:
       i In argument: `across(x, mean, na.rm = z)`
@@ -124,7 +124,7 @@
       Caused by error:
       ! Object `z` not found.
     Code
-      lazy_frame(x = 1) %>% mutate(across(x, .fns = "a"))
+      mutate(lazy_frame(x = 1), across(x, .fns = "a"))
     Condition
       Error in `mutate()`:
       i In argument: `across(x, .fns = "a")`
@@ -134,7 +134,7 @@
 # mutate generates subqueries as needed
 
     Code
-      lf %>% mutate(x = x + 1, x = x + 1)
+      mutate(lf, x = x + 1, x = x + 1)
     Output
       <SQL>
       SELECT `x` + 1.0 AS `x`
@@ -146,7 +146,7 @@
 ---
 
     Code
-      lf %>% mutate(x1 = x + 1, x2 = x1 + 1)
+      mutate(lf, x1 = x + 1, x2 = x1 + 1)
     Output
       <SQL>
       SELECT `q01`.*, `x1` + 1.0 AS `x2`
@@ -158,7 +158,7 @@
 # mutate collapses over nested select
 
     Code
-      lf %>% select(x:y) %>% mutate(x = x * 2, y = y * 2)
+      mutate(select(lf, x:y), x = x * 2, y = y * 2)
     Output
       <SQL>
       SELECT `x` * 2.0 AS `x`, `y` * 2.0 AS `y`
@@ -167,7 +167,7 @@
 ---
 
     Code
-      lf %>% select(y:x) %>% mutate(x = x * 2, y = y * 2)
+      mutate(select(lf, y:x), x = x * 2, y = y * 2)
     Output
       <SQL>
       SELECT `y` * 2.0 AS `y`, `x` * 2.0 AS `x`

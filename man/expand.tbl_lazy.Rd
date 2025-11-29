@@ -50,10 +50,10 @@ fruits <- memdb_frame(
 )
 
 # All possible combinations ---------------------------------------
-fruits \%>\% tidyr::expand(type)
-fruits \%>\% tidyr::expand(type, size)
+fruits |> tidyr::expand(type)
+fruits |> tidyr::expand(type, size)
 
 # Only combinations that already appear in the data ---------------
-fruits \%>\% tidyr::expand(nesting(type, size))
+fruits |> tidyr::expand(nesting(type, size))
 \dontshow{\}) # examplesIf}
 }

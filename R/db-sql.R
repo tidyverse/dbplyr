@@ -551,7 +551,7 @@ sql_query_multi_join <- function(
 #' df2 <- lazy_frame(x = 1, z = 1)
 #' df3 <- lazy_frame(x = 1, z2 = 1)
 #'
-#' tmp <- left_join(df1, df2, by = "x") %>%
+#' tmp <- left_join(df1, df2, by = "x") |>
 #'   left_join(df3, by = c("x", z = "z2"))
 #' tibble(
 #'   table = list(df1, df2),

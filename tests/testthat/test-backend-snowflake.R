@@ -365,9 +365,9 @@ test_that("pmin() and pmax() respect na.rm", {
 
 test_that("row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per empty_order)", {
   mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_snowflake())
-  expect_snapshot(mf %>% mutate(rown = row_number()))
-  expect_snapshot(mf %>% group_by(y) %>% mutate(rown = row_number()))
-  expect_snapshot(mf %>% arrange(y) %>% mutate(rown = row_number()))
+  expect_snapshot(mf |> mutate(rown = row_number()))
+  expect_snapshot(mf |> group_by(y) |> mutate(rown = row_number()))
+  expect_snapshot(mf |> arrange(y) |> mutate(rown = row_number()))
 })
 
 test_that("correctly translates $", {

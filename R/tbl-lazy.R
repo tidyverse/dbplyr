@@ -11,7 +11,7 @@
 #' df <- data.frame(x = 1, y = 2)
 #'
 #' df_sqlite <- tbl_lazy(df, con = simulate_sqlite())
-#' df_sqlite %>% summarise(x = sd(x, na.rm = TRUE)) %>% show_query()
+#' df_sqlite |> summarise(x = sd(x, na.rm = TRUE)) |> show_query()
 tbl_lazy <- function(df, con = NULL, ..., name = "df") {
   check_dots_empty0(...)
   con <- con %||% sql_current_con() %||% simulate_dbi()

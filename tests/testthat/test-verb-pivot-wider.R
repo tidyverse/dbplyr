@@ -8,8 +8,8 @@ spec1 <- tibble(.name = "x", .value = "val", key = "x")
 
 test_that("can pivot all cols to wide", {
   expect_equal(
-    memdb_frame(key = c("x", "y", "z"), val = 1:3) %>%
-      tidyr::pivot_wider(names_from = key, values_from = val) %>%
+    memdb_frame(key = c("x", "y", "z"), val = 1:3) |>
+      tidyr::pivot_wider(names_from = key, values_from = val) |>
       collect(),
     tibble(x = 1, y = 2, z = 3)
   )
@@ -21,7 +21,7 @@ test_that("can pivot all cols to wide", {
   )
 
   expect_snapshot(
-    lazy_frame(key = c("x", "y", "z"), val = 1:3) %>%
+    lazy_frame(key = c("x", "y", "z"), val = 1:3) |>
       dbplyr_pivot_wider_spec(spec)
   )
 })
@@ -30,7 +30,7 @@ test_that("non-pivoted cols are preserved", {
   df <- lazy_frame(a = 1, key = c("x", "y"), val = 1:2)
 
   expect_equal(
-    dbplyr_pivot_wider_spec(df, spec) %>% op_vars(),
+    dbplyr_pivot_wider_spec(df, spec) |> op_vars(),
     c("a", "x", "y")
   )
 })
@@ -39,14 +39,14 @@ test_that("implicit missings turn into explicit missings", {
   df <- memdb_frame(a = 1:2, key = c("x", "y"), val = 1:2)
 
   expect_equal(
-    memdb_frame(a = 1:2, key = c("x", "y"), val = 1:2) %>%
-      tidyr::pivot_wider(names_from = key, values_from = val) %>%
+    memdb_frame(a = 1:2, key = c("x", "y"), val = 1:2) |>
+      tidyr::pivot_wider(names_from = key, values_from = val) |>
       collect(),
     tibble(a = 1:2, x = c(1, NA), y = c(NA, 2))
   )
 
   expect_snapshot(
-    lazy_frame(a = 1:2, key = c("x", "y"), val = 1:2) %>%
+    lazy_frame(a = 1:2, key = c("x", "y"), val = 1:2) |>
       dbplyr_pivot_wider_spec(spec)
   )
 })
@@ -70,7 +70,7 @@ test_that("`names_repair` happens after spec column reorganization (#1107)", {
     value = c(1, 2)
   )
 
-  out <- tidyr::pivot_wider(df, names_repair = ~ make.unique(.x)) %>%
+  out <- tidyr::pivot_wider(df, names_repair = ~ make.unique(.x)) |>
     collect()
 
   expect_identical(out$test, c("a", "b"))
@@ -87,7 +87,7 @@ test_that("minimal `names_repair` doesn't overwrite a value column that collides
     value = c(1, 2)
   )
 
-  out <- tidyr::pivot_wider(df, names_repair = "minimal") %>%
+  out <- tidyr::pivot_wider(df, names_repair = "minimal") |>
     collect()
 
   expect_identical(out[[1]], c("a", "b"))
@@ -99,9 +99,9 @@ test_that("grouping is preserved", {
   df <- lazy_frame(a = 1, key = "x", val = 2)
 
   expect_equal(
-    df %>%
-      dplyr::group_by(a) %>%
-      dbplyr_pivot_wider_spec(spec1) %>%
+    df |>
+      dplyr::group_by(a) |>
+      dbplyr_pivot_wider_spec(spec1) |>
       group_vars(),
     "a"
   )
@@ -110,7 +110,7 @@ test_that("grouping is preserved", {
 # https://github.com/tidyverse/tidyr/issues/804
 test_that("column with `...j` name can be used as `names_from`", {
   df <- memdb_frame(...8 = c("x", "y", "z"), val = 1:3)
-  pv <- tidyr::pivot_wider(df, names_from = ...8, values_from = val) %>%
+  pv <- tidyr::pivot_wider(df, names_from = ...8, values_from = val) |>
     collect()
   expect_named(pv, c("x", "y", "z"))
 })
@@ -146,8 +146,8 @@ test_that("pivot_wider handles NA column names consistent with tidyr", {
   )
 
   expect_equal(
-    df %>% tidyr::pivot_wider(names_from = y, values_from = x) %>% collect(),
-    df %>% collect() %>% tidyr::pivot_wider(names_from = y, values_from = x)
+    df |> tidyr::pivot_wider(names_from = y, values_from = x) |> collect(),
+    df |> collect() |> tidyr::pivot_wider(names_from = y, values_from = x)
   )
 })
 
@@ -164,12 +164,12 @@ test_that("can override default keys", {
   df_db <- memdb_frame(!!!df)
 
   expect_equal(
-    df_db %>%
+    df_db |>
       tidyr::pivot_wider(
         id_cols = name,
         names_from = var,
         values_from = value
-      ) %>%
+      ) |>
       collect(),
     tibble::tribble(
       ~name , ~age , ~height ,
@@ -183,14 +183,14 @@ test_that("`id_cols = everything()` excludes `names_from` and `values_from`", {
   df <- memdb_frame(key = "x", name = "a", value = 1L)
 
   expect_identical(
-    tidyr::pivot_wider(df, id_cols = everything()) %>% collect(),
+    tidyr::pivot_wider(df, id_cols = everything()) |> collect(),
     tibble(key = "x", a = 1L)
   )
 
   spec <- dbplyr_build_wider_spec(df)
 
   expect_identical(
-    dbplyr_pivot_wider_spec(df, spec, id_cols = everything()) %>% collect(),
+    dbplyr_pivot_wider_spec(df, spec, id_cols = everything()) |> collect(),
     tibble(key = "x", a = 1L)
   )
 })
@@ -199,7 +199,7 @@ test_that("pivoting a zero row data frame drops `names_from` and `values_from` (
   df <- memdb_frame(key = character(), name = character(), value = integer())
 
   expect_identical(
-    tidyr::pivot_wider(df, names_from = name, values_from = value) %>%
+    tidyr::pivot_wider(df, names_from = name, values_from = value) |>
       collect(),
     tibble(key = character())
   )
@@ -217,20 +217,20 @@ test_that("known bug - building a wider spec with a zero row data frame loses `v
 
   # So pivoting with this spec accidentally keeps `value` around
   expect_identical(
-    dbplyr_pivot_wider_spec(df, spec) %>% collect(),
+    dbplyr_pivot_wider_spec(df, spec) |> collect(),
     tibble(key = character(), value = integer())
   )
 
   # If you specify `id_cols` to be the `key` column, it works right
   expect_identical(
-    dbplyr_pivot_wider_spec(df, spec, id_cols = key) %>% collect(),
+    dbplyr_pivot_wider_spec(df, spec, id_cols = key) |> collect(),
     tibble(key = character())
   )
 
   # But `id_cols = everything()` won't work as intended, because we can't know
   # to remove `value` from `names(data)` before computing the tidy-selection
   expect_identical(
-    dbplyr_pivot_wider_spec(df, spec, id_cols = everything()) %>% collect(),
+    dbplyr_pivot_wider_spec(df, spec, id_cols = everything()) |> collect(),
     tibble(key = character(), value = integer())
   )
 })
@@ -312,7 +312,7 @@ test_that("`unused_fn` can summarize unused columns (#990)", {
       df,
       id_cols = id,
       unused_fn = list(unused1 = max)
-    ) %>%
+    ) |>
       collect()
   )
   expect_equal(colnames(res), c("id", "a", "b", "unused1"))
@@ -320,7 +320,7 @@ test_that("`unused_fn` can summarize unused columns (#990)", {
 
   # Globally
   suppressWarnings(
-    res <- tidyr::pivot_wider(df, id_cols = id, unused_fn = min) %>%
+    res <- tidyr::pivot_wider(df, id_cols = id, unused_fn = min) |>
       collect()
   )
   expect_equal(colnames(res), c("id", "a", "b", "unused1", "unused2"))
@@ -340,7 +340,7 @@ test_that("`unused_fn` works with anonymous functions", {
     df,
     id_cols = id,
     unused_fn = ~ mean(.x, na.rm = TRUE)
-  ) %>%
+  ) |>
     collect()
   expect_identical(res$unused, c(1, 3.5))
 })
@@ -364,13 +364,13 @@ test_that("can fill in missing cells", {
   df <- memdb_frame(g = c(1, 2), name = c("x", "y"), value = c(1, 2))
   df_lazy <- lazy_frame(g = c(1, 2), name = c("x", "y"), value = c(1, 2))
 
-  expect_equal(tidyr::pivot_wider(df) %>% pull(x), c(1, NA))
+  expect_equal(tidyr::pivot_wider(df) |> pull(x), c(1, NA))
 
-  expect_equal(tidyr::pivot_wider(df, values_fill = 0) %>% pull(x), c(1, 0))
+  expect_equal(tidyr::pivot_wider(df, values_fill = 0) |> pull(x), c(1, 0))
   expect_snapshot(dbplyr_pivot_wider_spec(df_lazy, spec, values_fill = 0))
 
   expect_equal(
-    tidyr::pivot_wider(df, values_fill = list(value = 0)) %>%
+    tidyr::pivot_wider(df, values_fill = list(value = 0)) |>
       pull(x),
     c(1, 0)
   )
@@ -386,7 +386,7 @@ test_that("can fill in missing cells", {
 test_that("values_fill only affects missing cells", {
   df <- memdb_frame(g = c(1, 2), name = c("x", "y"), value = c(1, NA))
   dbplyr_build_wider_spec(df)
-  out <- tidyr::pivot_wider(df, values_fill = 0) %>%
+  out <- tidyr::pivot_wider(df, values_fill = 0) |>
     collect()
   expect_equal(out$y, c(0, NA))
 })
@@ -408,7 +408,7 @@ test_that("values_fill is checked", {
 
 test_that("can pivot from multiple measure cols", {
   df <- memdb_frame(row = 1, var = c("x", "y"), a = 1:2, b = 3:4)
-  pv <- tidyr::pivot_wider(df, names_from = var, values_from = c(a, b)) %>%
+  pv <- tidyr::pivot_wider(df, names_from = var, values_from = c(a, b)) |>
     collect()
 
   expect_named(pv, c("row", "a_x", "a_y", "b_x", "b_y"))
@@ -433,7 +433,7 @@ test_that("column order in output matches spec", {
   )
 
   pv <- dbplyr_pivot_wider_spec(lazy_frame(!!!df), sp)
-  expect_equal(pv %>% op_vars(), c("name", sp$.name))
+  expect_equal(pv |> op_vars(), c("name", sp$.name))
 })
 
 test_that("cannot pivot lazy frames", {
@@ -453,11 +453,11 @@ test_that("can pivot multiple from multiple names", {
   )
 
   expect_equal(
-    memdb_frame(x) %>%
+    memdb_frame(x) |>
       tidyr::pivot_wider(
         names_from = c(name, seq),
         values_from = value
-      ) %>%
+      ) |>
       collect(),
     tibble(id_1 = "01", name_1 = "curie", id_2 = "02", name_2 = "arrhenius")
   )

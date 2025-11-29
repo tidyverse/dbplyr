@@ -32,8 +32,8 @@
 #' copy_to(con, iris, "df", temporary = FALSE)
 #' copy_to(con, mtcars, I("aux.df"), temporary = FALSE)
 #'
-#' con %>% tbl("df")
-#' con %>% tbl(I("aux.df"))
+#' con |> tbl("df")
+#' con |> tbl(I("aux.df"))
 in_schema <- function(schema, table) {
   structure(
     list(

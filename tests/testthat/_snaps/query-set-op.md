@@ -1,7 +1,7 @@
 # print method doesn't change unexpectedly
 
     Code
-      sql_build(union(lf1, lf2) %>% union_all(lf3))
+      sql_build(union_all(union(lf1, lf2), lf3))
     Output
         <SQL SELECT>
         From:

@@ -17,25 +17,25 @@
 # other objects get informative error
 
     Code
-      lf %>% filter(x == input)
+      filter(lf, x == input)
     Condition
       Error:
       ! Cannot translate shiny inputs to SQL.
       i Do you want to force evaluation in R with (e.g.) `!!input$x` or `local(input$x)`?
     Code
-      lf %>% filter(x == x())
+      filter(lf, x == x())
     Condition
       Error:
       ! Cannot translate a shiny reactive to SQL.
       i Do you want to force evaluation in R with (e.g.) `!!foo()` or `local(foo())`?
     Code
-      lf %>% filter(x == df)
+      filter(lf, x == df)
     Condition
       Error:
       ! Cannot translate a data.frame to SQL.
       i Do you want to force evaluation in R with (e.g.) `!!df$x` or `local(df$x)`?
     Code
-      lf %>% filter(x == mean)
+      filter(lf, x == mean)
     Condition
       Error:
       ! Cannot translate a function to SQL.

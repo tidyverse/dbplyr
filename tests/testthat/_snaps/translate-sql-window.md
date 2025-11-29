@@ -21,7 +21,7 @@
 # row_number() with and without group_by() and arrange()
 
     Code
-      mf %>% mutate(rown = row_number())
+      mutate(mf, rown = row_number())
     Output
       <SQL>
       SELECT `df`.*, ROW_NUMBER() OVER () AS `rown`
@@ -30,7 +30,7 @@
 ---
 
     Code
-      mf %>% group_by(y) %>% mutate(rown = row_number())
+      mutate(group_by(mf, y), rown = row_number())
     Output
       <SQL>
       SELECT `df`.*, ROW_NUMBER() OVER (PARTITION BY `y`) AS `rown`
@@ -39,7 +39,7 @@
 ---
 
     Code
-      mf %>% group_by(y) %>% arrange(y) %>% mutate(rown = row_number())
+      mutate(arrange(group_by(mf, y), y), rown = row_number())
     Output
       <SQL>
       SELECT `df`.*, ROW_NUMBER() OVER (PARTITION BY `y` ORDER BY `y`) AS `rown`
@@ -49,7 +49,7 @@
 ---
 
     Code
-      mf %>% arrange(y) %>% mutate(rown = row_number())
+      mutate(arrange(mf, y), rown = row_number())
     Output
       <SQL>
       SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY `y`) AS `rown`
@@ -59,8 +59,7 @@
 # window_frame()
 
     Code
-      lf %>% window_frame(-3, 0) %>% window_order(x) %>% mutate(z = sum(y, na.rm = TRUE)) %>%
-        show_query()
+      show_query(mutate(window_order(window_frame(lf, -3, 0), x), z = sum(y, na.rm = TRUE)))
     Output
       <SQL>
       SELECT `df`.*, SUM(`y`) OVER (ORDER BY `x` ROWS 3 PRECEDING) AS `z`
@@ -69,8 +68,7 @@
 ---
 
     Code
-      lf %>% window_frame(-3) %>% window_order(x) %>% mutate(z = sum(y, na.rm = TRUE)) %>%
-        show_query()
+      show_query(mutate(window_order(window_frame(lf, -3), x), z = sum(y, na.rm = TRUE)))
     Output
       <SQL>
       SELECT

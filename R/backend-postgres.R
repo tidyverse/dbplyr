@@ -18,8 +18,8 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_postgres())
-#' lf %>% summarise(x = sd(b, na.rm = TRUE))
-#' lf %>% summarise(y = cor(b, c), z = cov(b, c))
+#' lf |> summarise(x = sd(b, na.rm = TRUE))
+#' lf |> summarise(y = cor(b, c), z = cov(b, c))
 NULL
 
 #' @include verb-copy-to.R

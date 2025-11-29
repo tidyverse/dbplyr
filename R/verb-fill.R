@@ -26,8 +26,8 @@
 #' )
 #' squirrels$id <- 1:12
 #'
-#' tbl_memdb(squirrels) %>%
-#'   window_order(id) %>%
+#' tbl_memdb(squirrels) |>
+#'   window_order(id) |>
 #'   tidyr::fill(
 #'     n_squirrels,
 #'     n_squirrels2,
@@ -115,10 +115,10 @@ dbplyr_fill0.DBIConnection <- function(
         con = .con
       )
     }
-  ) %>%
+  ) |>
     set_names(as.character(cols_to_fill))
 
-  .data %>%
+  .data |>
     transmute(
       !!!syms(colnames(.data)),
       !!!fill_sql
@@ -163,10 +163,10 @@ dbplyr_fill0.SQLiteConnection <- function(
         vars_group = op_grps(.data),
       )
     }
-  ) %>%
+  ) |>
     set_names(paste0("..dbplyr_partition_", seq_along(cols_to_fill)))
 
-  dp <- .data %>%
+  dp <- .data |>
     mutate(!!!partition_sql)
 
   fill_sql <- purrr::map2(
@@ -179,14 +179,14 @@ dbplyr_fill0.SQLiteConnection <- function(
         vars_group = c(op_grps(.data), partition_name),
       )
     }
-  ) %>%
+  ) |>
     set_names(purrr::map_chr(cols_to_fill, as_name))
 
-  dp %>%
+  dp |>
     transmute(
       !!!syms(colnames(.data)),
       !!!fill_sql
-    ) %>%
+    ) |>
     select(!!!colnames(.data))
 }
 

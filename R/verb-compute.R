@@ -12,12 +12,12 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(a = c(3, 4, 1, 2), b = c(5, 1, 2, NA))
-#' db %>% filter(a <= 2) %>% collect()
+#' db |> filter(a <= 2) |> collect()
 collapse.tbl_sql <- function(x, ...) {
   sql <- db_sql_render(x$src$con, x)
 
-  tbl_src_dbi(x$src, sql, colnames(x)) %>%
-    group_by(!!!syms(op_grps(x))) %>%
+  tbl_src_dbi(x$src, sql, colnames(x)) |>
+    group_by(!!!syms(op_grps(x))) |>
     arrange.tbl_lazy(!!!op_sort(x))
 }
 
@@ -75,8 +75,8 @@ compute.tbl_sql <- function(
     ...
   )
 
-  tbl_src_dbi(x$src, name, colnames(x)) %>%
-    group_by(!!!syms(op_grps(x))) %>%
+  tbl_src_dbi(x$src, name, colnames(x)) |>
+    group_by(!!!syms(op_grps(x))) |>
     window_order(!!!op_sort(x))
 }
 

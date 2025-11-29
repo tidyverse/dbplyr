@@ -1,7 +1,7 @@
 # two filters equivalent to one
 
     Code
-      lf1 %>% remote_query()
+      remote_query(lf1)
     Output
       <SQL> SELECT `df`.*
       FROM `df`
@@ -10,7 +10,7 @@
 ---
 
     Code
-      lf1 %>% remote_query()
+      remote_query(lf1)
     Output
       <SQL> SELECT `x`, `y`
       FROM (
@@ -44,7 +44,7 @@
 # .preserve is not supported
 
     Code
-      lf %>% filter(x == 1, .preserve = TRUE)
+      filter(lf, x == 1, .preserve = TRUE)
     Condition
       Error in `filter()`:
       ! `.preserve = TRUE` isn't supported on database backends.
@@ -61,7 +61,7 @@
 # filter() can use window function and external vector - #1048
 
     Code
-      lazy_frame(x = 1L) %>% filter(x == max(x, na.rm = T), x %in% to_filter)
+      filter(lazy_frame(x = 1L), x == max(x, na.rm = T), x %in% to_filter)
     Output
       <SQL>
       SELECT `x`
@@ -74,7 +74,7 @@
 # filter() after summarise() uses `HAVING`
 
     Code
-      (out <- lf %>% filter(g == 1))
+      (out <- filter(lf, g == 1))
     Output
       <SQL>
       SELECT `g`, `h`, AVG(`x`) AS `x_mean`
@@ -85,7 +85,7 @@
 ---
 
     Code
-      (out <- lf %>% filter(x_mean > 1))
+      (out <- filter(lf, x_mean > 1))
     Output
       <SQL>
       SELECT `g`, `h`, AVG(`x`) AS `x_mean`
@@ -96,7 +96,7 @@
 ---
 
     Code
-      (out <- lf %>% filter(g == 1) %>% filter(g == 2))
+      (out <- filter(filter(lf, g == 1), g == 2))
     Output
       <SQL>
       SELECT `g`, `h`, AVG(`x`) AS `x_mean`
@@ -107,7 +107,7 @@
 ---
 
     Code
-      (out <- lf %>% filter(g == 1) %>% filter(h == 2))
+      (out <- filter(filter(lf, g == 1), h == 2))
     Output
       <SQL>
       SELECT `g`, `h`, AVG(`x`) AS `x_mean`
@@ -118,7 +118,7 @@
 # `HAVING` supports expressions #1128
 
     Code
-      lf %>% summarise(x_sum = sum(x, na.rm = TRUE)) %>% filter(!is.na(x_sum))
+      filter(summarise(lf, x_sum = sum(x, na.rm = TRUE)), !is.na(x_sum))
     Output
       <SQL>
       SELECT SUM(`x`) AS `x_sum`
@@ -128,7 +128,7 @@
 # filter() after mutate() does not use `HAVING`
 
     Code
-      (out <- lf %>% filter(x_mean > 1))
+      (out <- filter(lf, x_mean > 1))
     Output
       <SQL>
       SELECT `q01`.*
@@ -141,7 +141,7 @@
 # filter() using a window function after summarise() does not use `HAVING`
 
     Code
-      (out <- lf %>% filter(cumsum(x_mean) == 1))
+      (out <- filter(lf, cumsum(x_mean) == 1))
     Condition
       Warning:
       Windowed expression `SUM(`x_mean`)` does not have explicit order.

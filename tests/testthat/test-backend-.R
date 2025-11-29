@@ -6,6 +6,20 @@ test_that("base_no_win includes all aggregates and window functions", {
   expect_equal(setdiff(names(base_win), names(base_no_win)), character())
 })
 
+test_that("can translate both pipes", {
+  local_con(simulate_dbi())
+  local_mocked_bindings(check_na_rm = function(na.rm) {})
+
+  expect_equal(
+    test_translate_sql(x %>% mean() %>% sum(), window = FALSE),
+    sql("SUM(AVG(`x`))")
+  )
+  expect_equal(
+    test_translate_sql(x |> mean() |> sum(), window = FALSE),
+    sql("SUM(AVG(`x`))")
+  )
+})
+
 # mathematics --------------------------------------------------------
 
 test_that("basic arithmetic is correct", {
@@ -87,13 +101,13 @@ test_that("can translate subsetting", {
 test_that("$ doesn't evaluate second argument", {
   y <- list(id = 1)
 
-  expect_snapshot(lazy_frame(x = 1, y = 1) %>% filter(x == y$id))
-  expect_snapshot(lazy_frame(x = 1) %>% filter(x == y$id))
+  expect_snapshot(lazy_frame(x = 1, y = 1) |> filter(x == y$id))
+  expect_snapshot(lazy_frame(x = 1) |> filter(x == y$id))
 })
 
 test_that("useful error if $ used with inlined value", {
   y <- 1
-  expect_snapshot(lazy_frame(x = 1) %>% filter(x == y$id), error = TRUE)
+  expect_snapshot(lazy_frame(x = 1) |> filter(x == y$id), error = TRUE)
 })
 
 # window ------------------------------------------------------------------
@@ -140,29 +154,29 @@ test_that("can translate nzchar", {
 test_that("all and any translated correctly", {
   db <- memdb_frame(g = c(1, 1, 2, 2, 3, 3), x = c(0, 0, 0, 1, 1, 1))
 
-  sum_all_g <- db %>%
-    group_by(g) %>%
-    summarise(all = all(x == 1, na.rm = TRUE)) %>%
-    filter(all) %>%
+  sum_all_g <- db |>
+    group_by(g) |>
+    summarise(all = all(x == 1, na.rm = TRUE)) |>
+    filter(all) |>
     pull(g)
   expect_equal(sum_all_g, 3)
 
-  sum_any_g <- db %>%
-    group_by(g) %>%
-    summarise(any = any(x == 1, na.rm = TRUE)) %>%
-    filter(any) %>%
+  sum_any_g <- db |>
+    group_by(g) |>
+    summarise(any = any(x == 1, na.rm = TRUE)) |>
+    filter(any) |>
     pull(g)
   expect_equal(sum_any_g, c(2, 3))
 
-  win_all_g <- db %>%
-    group_by(g) %>%
-    filter(all(x == 1, na.rm = TRUE)) %>%
+  win_all_g <- db |>
+    group_by(g) |>
+    filter(all(x == 1, na.rm = TRUE)) |>
     pull(g)
   expect_equal(win_all_g, c(3, 3))
 
-  win_any_g <- db %>%
-    group_by(g) %>%
-    filter(any(x == 1, na.rm = TRUE)) %>%
+  win_any_g <- db |>
+    group_by(g) |>
+    filter(any(x == 1, na.rm = TRUE)) |>
     pull(g)
   expect_equal(win_any_g, c(2, 2, 3, 3))
 })
@@ -186,10 +200,10 @@ test_that("default raw escapes translated correctly", {
   b <- blob::as_blob(as.raw(c(0x01, 0x02)))
   L <- c(a, b)
 
-  expect_snapshot(mf %>% filter(x == a))
-  expect_snapshot(mf %>% filter(x %in% L))
+  expect_snapshot(mf |> filter(x == a))
+  expect_snapshot(mf |> filter(x %in% L))
 
-  qry <- mf %>% filter(x %in% !!L)
+  qry <- mf |> filter(x %in% !!L)
   expect_snapshot(qry)
 })
 

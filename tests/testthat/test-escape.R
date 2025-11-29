@@ -140,10 +140,10 @@ test_that("other objects get informative error", {
 
   expect_snapshot(
     {
-      lf %>% filter(x == input)
-      lf %>% filter(x == x())
-      lf %>% filter(x == df)
-      lf %>% filter(x == mean)
+      lf |> filter(x == input)
+      lf |> filter(x == x())
+      lf |> filter(x == df)
+      lf |> filter(x == mean)
     },
     error = TRUE
   )

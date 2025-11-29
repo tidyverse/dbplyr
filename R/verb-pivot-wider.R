@@ -100,7 +100,7 @@
 #'   id = 1,
 #'   key = c("x", "y"),
 #'   value = 1:2
-#' ) %>%
+#' ) |>
 #'   tidyr::pivot_wider(
 #'     id_cols = id,
 #'     names_from = key,
@@ -187,14 +187,14 @@ dbplyr_build_wider_spec <- function(
   # prepare a minimal local tibble we can pass to `tidyr::build_wider_spec`
   # 1. create a tibble with unique values in the `names_from` column
   # row_ids <- vec_unique(data[names_from])
-  names_from <- tidyselect::eval_select(enquo(names_from), data) %>% names()
+  names_from <- tidyselect::eval_select(enquo(names_from), data) |> names()
   if (is_empty(names_from)) {
     cli_abort("{.arg names_from} must select at least one column.")
   }
   distinct_data <- collect(distinct(data, !!!syms(names_from)))
 
   # 2. add `values_from` column
-  values_from <- tidyselect::eval_select(enquo(values_from), data) %>% names()
+  values_from <- tidyselect::eval_select(enquo(values_from), data) |> names()
   if (is_empty(values_from)) {
     cli_abort("{.arg values_from} must select at least one column.")
   }
@@ -326,12 +326,12 @@ dbplyr_pivot_wider_spec <- function(
   }
   pivot_exprs <- set_names(pivot_exprs, out_nms_repaired)
 
-  data_grouped %>%
+  data_grouped |>
     summarise(
       !!!pivot_exprs,
       !!!unused_col_expr,
       .groups = "drop"
-    ) %>%
+    ) |>
     group_by(!!!syms(group_vars(data)))
 }
 

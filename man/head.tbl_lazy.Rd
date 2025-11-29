@@ -33,9 +33,9 @@ supported at all because the situation is even murkier for the "last" rows.
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(x = 1:100)
-db \%>\% head() \%>\% show_query()
+db |> head() |> show_query()
 
 # Pretend we have data in a SQL server database
 db2 <- lazy_frame(x = 1:100, con = simulate_mssql())
-db2 \%>\% head() \%>\% show_query()
+db2 |> head() |> show_query()
 }

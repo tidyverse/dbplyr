@@ -261,10 +261,10 @@ test_that("custom SQL translation", {
 
   con <- simulate_postgres()
   expect_snapshot(
-    copy_inline(con, tibble(x = integer(), y = character())) %>% remote_query()
+    copy_inline(con, tibble(x = integer(), y = character())) |> remote_query()
   )
   expect_snapshot(
-    copy_inline(con, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
+    copy_inline(con, tibble(x = 1:2, y = letters[1:2])) |> remote_query()
   )
 })
 
@@ -277,7 +277,7 @@ test_that("`sql_query_insert()` works", {
     d = c("y", "z"),
     con = con,
     .name = "df_y"
-  ) %>%
+  ) |>
     mutate(c = c + 1)
 
   expect_snapshot(
@@ -315,7 +315,7 @@ test_that("`sql_query_upsert()` with method = 'on_conflict' is correct", {
     d = c("y", "z"),
     con = con,
     .name = "df_y"
-  ) %>%
+  ) |>
     mutate(c = c + 1)
 
   expect_snapshot(
@@ -336,10 +336,10 @@ test_that("`sql_query_upsert()` with method = 'on_conflict' is correct", {
 
 test_that("can explain", {
   db <- copy_to_test("postgres", data.frame(x = 1:3))
-  expect_snapshot(db %>% mutate(y = x + 1) %>% explain())
+  expect_snapshot(db |> mutate(y = x + 1) |> explain())
 
   # `explain()` passes `...` to methods
-  expect_snapshot(db %>% mutate(y = x + 1) %>% explain(format = "json"))
+  expect_snapshot(db |> mutate(y = x + 1) |> explain(format = "json"))
 })
 
 test_that("can overwrite temp tables", {
@@ -360,7 +360,7 @@ test_that("copy_inline works", {
     dtt = as.POSIXct("2020-01-01 01:23:45", tz = "UTC")
   )
 
-  expect_equal(copy_inline(src, df) %>% collect(), df)
+  expect_equal(copy_inline(src, df) |> collect(), df)
 })
 
 test_that("can insert with returning", {
@@ -370,7 +370,7 @@ test_that("can insert with returning", {
   x <- local_db_table(con, df_x, "df_x")
 
   df_y <- tibble(a = 1:3, b = 11:13, c = -(1:3), d = c("x", "y", "z"))
-  y <- local_db_table(con, df_y, "df_y") %>%
+  y <- local_db_table(con, df_y, "df_y") |>
     mutate(c = c + 1)
 
   # This errors because there is no unique constraint on (`a`, `b`)
@@ -414,7 +414,7 @@ test_that("can insert with returning", {
       conflict = "ignore",
       returning = everything(),
       method = "on_conflict"
-    ) %>%
+    ) |>
       get_returned_rows(),
     tibble(
       a = 2:3,
@@ -474,7 +474,7 @@ test_that("casts `y` column for local df", {
       y,
       copy = TRUE,
       in_place = FALSE
-    ) %>%
+    ) |>
       collect(),
     out
   )
@@ -494,7 +494,7 @@ test_that("casts `y` column for local df", {
     in_place = TRUE
   )
 
-  expect_equal(tbl(con, "df_x") %>% collect(), out)
+  expect_equal(tbl(con, "df_x") |> collect(), out)
 
   types_expected <- c(id = "int8", val = "int8", arr = "_int4")
   expect_equal(db_col_types(con, table2), types_expected)
@@ -508,7 +508,7 @@ test_that("can upsert with returning", {
   x <- local_db_table(con, df_x, "df_x")
 
   df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
-  y <- local_db_table(con, df_y, "df_y") %>%
+  y <- local_db_table(con, df_y, "df_y") |>
     mutate(c = c + 1)
 
   # Errors because there is no unique index
@@ -550,8 +550,8 @@ test_that("can upsert with returning", {
       in_place = TRUE,
       returning = everything(),
       method = "on_conflict"
-    ) %>%
-      get_returned_rows() %>%
+    ) |>
+      get_returned_rows() |>
       arrange(a),
     tibble(
       a = 2:3,

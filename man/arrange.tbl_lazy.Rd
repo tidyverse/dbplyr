@@ -39,10 +39,10 @@ can override this behaviour by explicitly sorting on \code{is.na(x)}.
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(a = c(3, 4, 1, 2), b = c(5, 1, 2, NA))
-db \%>\% arrange(a) \%>\% show_query()
+db |> arrange(a) |> show_query()
 
 # Note that NAs are sorted first
-db \%>\% arrange(b)
+db |> arrange(b)
 # override by sorting on is.na() first
-db \%>\% arrange(is.na(b), b)
+db |> arrange(is.na(b), b)
 }

@@ -39,8 +39,8 @@ squirrels <- tibble::tribble(
 )
 squirrels$id <- 1:12
 
-tbl_memdb(squirrels) \%>\%
-  window_order(id) \%>\%
+tbl_memdb(squirrels) |>
+  window_order(id) |>
   tidyr::fill(
     n_squirrels,
     n_squirrels2,

@@ -25,7 +25,7 @@ converting to live access database.
 library(dplyr, warn.conflicts = FALSE)
 lf <- lazy_frame(x = 1, y = 2, z = "a", con = simulate_access())
 
-lf \%>\% head()
-lf \%>\% mutate(y = as.numeric(y), z = sqrt(x^2 + 10))
-lf \%>\% mutate(a = paste0(z, " times"))
+lf |> head()
+lf |> mutate(y = as.numeric(y), z = sqrt(x^2 + 10))
+lf |> mutate(a = paste0(z, " times"))
 }

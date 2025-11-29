@@ -6,14 +6,14 @@
       Error in `quantile()`:
       ! Translation of `quantile()` in `summarise()` is not supported for SQL Server.
       i Use a combination of `distinct()` and `mutate()` for the same result:
-        `mutate(<col> = quantile(x, 0.5, na.rm = TRUE)) %>% distinct(<col>)`
+        `mutate(<col> = quantile(x, 0.5, na.rm = TRUE)) |> distinct(<col>)`
     Code
       test_translate_sql(median(x, na.rm = TRUE), window = FALSE)
     Condition
       Error in `median()`:
       ! Translation of `median()` in `summarise()` is not supported for SQL Server.
       i Use a combination of `distinct()` and `mutate()` for the same result:
-        `mutate(<col> = median(x, na.rm = TRUE)) %>% distinct(<col>)`
+        `mutate(<col> = median(x, na.rm = TRUE)) |> distinct(<col>)`
 
 # custom window functions translated correctly
 
@@ -79,7 +79,7 @@
 # convert between bit and boolean as needed
 
     Code
-      mf %>% filter(is.na(x))
+      filter(mf, is.na(x))
     Output
       <SQL>
       SELECT `df`.*
@@ -89,7 +89,7 @@
 ---
 
     Code
-      mf %>% filter(!is.na(x))
+      filter(mf, !is.na(x))
     Output
       <SQL>
       SELECT `df`.*
@@ -99,7 +99,7 @@
 ---
 
     Code
-      mf %>% filter(x == 1L || x == 2L)
+      filter(mf, x == 1L || x == 2L)
     Output
       <SQL>
       SELECT `df`.*
@@ -109,7 +109,7 @@
 ---
 
     Code
-      mf %>% mutate(z = ifelse(x == 1L, 1L, 2L))
+      mutate(mf, z = ifelse(x == 1L, 1L, 2L))
     Output
       <SQL>
       SELECT `df`.*, IIF(`x` = 1, 1, 2) AS `z`
@@ -118,7 +118,7 @@
 ---
 
     Code
-      mf %>% mutate(z = case_when(x == 1L ~ 1L))
+      mutate(mf, z = case_when(x == 1L ~ 1L))
     Output
       <SQL>
       SELECT `df`.*, CASE WHEN (`x` = 1) THEN 1 END AS `z`
@@ -127,7 +127,7 @@
 ---
 
     Code
-      mf %>% mutate(z = !is.na(x))
+      mutate(mf, z = !is.na(x))
     Output
       <SQL>
       SELECT `df`.*, ~CAST(IIF((`x` IS NULL), 1, 0) AS BIT) AS `z`
@@ -136,7 +136,7 @@
 ---
 
     Code
-      mf %>% mutate(x = x == 1L)
+      mutate(mf, x = x == 1L)
     Output
       <SQL>
       SELECT CAST(IIF(`x` = 1, 1, 0) AS BIT) AS `x`
@@ -145,7 +145,7 @@
 ---
 
     Code
-      mf %>% mutate(x = x == 1L || x == 2L)
+      mutate(mf, x = x == 1L || x == 2L)
     Output
       <SQL>
       SELECT CAST(IIF(`x` = 1 OR `x` = 2, 1, 0) AS BIT) AS `x`
@@ -154,7 +154,7 @@
 ---
 
     Code
-      mf %>% mutate(x = x == 1L || x == 2L || x == 3L)
+      mutate(mf, x = x == 1L || x == 2L || x == 3L)
     Output
       <SQL>
       SELECT CAST(IIF(`x` = 1 OR `x` = 2 OR `x` = 3, 1, 0) AS BIT) AS `x`
@@ -163,7 +163,7 @@
 ---
 
     Code
-      mf %>% mutate(x = !(x == 1L || x == 2L || x == 3L))
+      mutate(mf, x = !(x == 1L || x == 2L || x == 3L))
     Output
       <SQL>
       SELECT ~CAST(IIF((`x` = 1 OR `x` = 2 OR `x` = 3), 1, 0) AS BIT) AS `x`
@@ -195,7 +195,7 @@
 # custom escapes translated correctly
 
     Code
-      mf %>% filter(x == a)
+      filter(mf, x == a)
     Output
       <SQL>
       SELECT `df`.*
@@ -205,7 +205,7 @@
 ---
 
     Code
-      mf %>% filter(x %in% L)
+      filter(mf, x %in% L)
     Output
       <SQL>
       SELECT `df`.*
@@ -225,7 +225,7 @@
 # logical escaping to 0/1 for both filter() and mutate()
 
     Code
-      mf %>% filter(x == TRUE)
+      filter(mf, x == TRUE)
     Output
       <SQL>
       SELECT `df`.*
@@ -235,7 +235,7 @@
 ---
 
     Code
-      mf %>% mutate(x = TRUE)
+      mutate(mf, x = TRUE)
     Output
       <SQL>
       SELECT 1 AS `x`
@@ -270,7 +270,7 @@
 ---
 
     Code
-      lf %>% slice_sample(n = 1)
+      slice_sample(lf, n = 1)
     Output
       <SQL>
       SELECT `x`
@@ -283,7 +283,7 @@
 ---
 
     Code
-      copy_inline(con, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
+      remote_query(copy_inline(con, tibble(x = 1:2, y = letters[1:2])))
     Output
       <SQL> SELECT
         TRY_CAST(TRY_CAST(`x` AS NUMERIC) AS INT) AS `x`,
@@ -293,7 +293,7 @@
 ---
 
     Code
-      copy_inline(con, trees) %>% remote_query()
+      remote_query(copy_inline(con, trees))
     Output
       <SQL> SELECT
         TRY_CAST(`Girth` AS FLOAT) AS `Girth`,
@@ -425,7 +425,7 @@
 # atoms and symbols are cast to bit in `filter`
 
     Code
-      mf %>% filter(x)
+      filter(mf, x)
     Output
       <SQL>
       SELECT `df`.*
@@ -435,7 +435,7 @@
 ---
 
     Code
-      mf %>% filter(TRUE)
+      filter(mf, TRUE)
     Output
       <SQL>
       SELECT `df`.*
@@ -445,7 +445,7 @@
 ---
 
     Code
-      mf %>% filter((!x) | FALSE)
+      filter(mf, (!x) | FALSE)
     Output
       <SQL>
       SELECT `df`.*
@@ -455,7 +455,7 @@
 ---
 
     Code
-      mf %>% filter(x) %>% inner_join(mf, by = "x")
+      inner_join(filter(mf, x), mf, by = "x")
     Output
       <SQL>
       SELECT `LHS`.`x` AS `x`
@@ -470,7 +470,7 @@
 # row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per empty_order)
 
     Code
-      mf %>% mutate(rown = row_number())
+      mutate(mf, rown = row_number())
     Output
       <SQL>
       SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS `rown`
@@ -479,7 +479,7 @@
 ---
 
     Code
-      mf %>% group_by(y) %>% mutate(rown = row_number())
+      mutate(group_by(mf, y), rown = row_number())
     Output
       <SQL>
       SELECT
@@ -490,7 +490,7 @@
 ---
 
     Code
-      mf %>% arrange(y) %>% mutate(rown = row_number())
+      mutate(arrange(mf, y), rown = row_number())
     Output
       <SQL>
       SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY `y`) AS `rown`

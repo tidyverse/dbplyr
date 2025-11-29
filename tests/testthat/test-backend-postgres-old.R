@@ -18,6 +18,6 @@ test_that("RPostgreSQL backend", {
 
   expect_identical(colnames(tbl(src, "mtcars")), colnames(mtcars))
 
-  src_cyl <- tbl(src, "mtcars") %>% select(cyl) %>% collect()
+  src_cyl <- tbl(src, "mtcars") |> select(cyl) |> collect()
   expect_identical(src_cyl$cyl, mtcars$cyl)
 })

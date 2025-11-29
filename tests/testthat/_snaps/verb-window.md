@@ -27,8 +27,8 @@
 # window order works afer renaming variable
 
     Code
-      lazy_frame(x = 1, y = 1) %>% window_order(y) %>% rename(y2 = y) %>% mutate(
-        x_cum = cumsum(x))
+      mutate(rename(window_order(lazy_frame(x = 1, y = 1), y), y2 = y), x_cum = cumsum(
+        x))
     Output
       <SQL>
       SELECT
@@ -39,8 +39,8 @@
         FROM `df`
       ) AS `q01`
     Code
-      lazy_frame(x = 1, y = 1) %>% rename(y2 = y) %>% window_order(y2) %>% mutate(
-        x_cum = cumsum(x))
+      mutate(window_order(rename(lazy_frame(x = 1, y = 1), y2 = y), y2), x_cum = cumsum(
+        x))
     Output
       <SQL>
       SELECT

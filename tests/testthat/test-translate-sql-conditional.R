@@ -4,8 +4,8 @@ test_that("case_when converted to CASE WHEN", {
 })
 
 test_that("even inside mutate", {
-  out <- lazy_frame(x = 1:5) %>%
-    mutate(y = case_when(x > 1L ~ "a")) %>%
+  out <- lazy_frame(x = 1:5) |>
+    mutate(y = case_when(x > 1L ~ "a")) |>
     sql_build()
   expect_snapshot(out$select[[2]])
 })
@@ -172,7 +172,7 @@ test_that("is.na and is.null are equivalent", {
 test_that("magrittr pipe is translated in conditionals", {
   local_con(simulate_dbi())
   expect_equal(
-    test_translate_sql(x %>% ifelse(1L, 2L)),
+    test_translate_sql(x |> ifelse(1L, 2L)),
     sql("CASE WHEN `x` THEN 1 WHEN NOT `x` THEN 2 END")
   )
 })
