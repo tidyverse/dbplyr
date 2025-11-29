@@ -81,28 +81,26 @@ Make sure you've read `vignette("translation-verb")` so you have the lay of the 
 
 ## SQL translation: vectors
 
-Finally, you may have to provide custom R -> SQL translation at the vector level by providing a method for `sql_translation()`. This function should return an object created by `sql_variant()`.
-
-The `sql_variant()` function creates a container for three types of function translations:
+Finally, you may have to provide custom R -> SQL translation for functions that work with vectors within verbs. You can do with by providing a method for `sql_translation()`, which return an object created by `sql_variant()`. The `sql_variant()` function creates a container for three types of function translations:
 
 ```{r, eval = FALSE}
 sql_translation.myConnectionClass <- function(con) {
   sql_variant(
-    scalar = sql_translator(...), # Functions in SELECT (non-aggregated)
-    aggregate = sql_translator(...), # Aggregation functions (mean, sum, etc.)
-    window = sql_translator(...) # Window functions (lead, lag, rank, etc.)
+    scalar = sql_translator(base_scalar, ...), # Functions in SELECT (non-aggregated)
+    aggregate = sql_translator(base_aggregate, ...), # Aggregation functions (mean, sum, etc.)
+    window = sql_translator(base_win, ...) # Window functions (lead, lag, rank, etc.)
   )
 }
 ```
 
-Each translator typically inherits from a base translator and overrides only what's different for your backend:
+Each translator will inherits from the base (ANSI SQL) translator and overrides only what's different for your backend:
 
 ```{r, eval = FALSE}
 sql_translator(
   .parent = base_scalar, # Inherit most translations
   # Override specific functions for your backend
   `+` = sql_infix("+"),
-  mean = sql_aggregate("AVG", "mean")
+  mean = sql_aggregate("AVERAGE", "mean")
 )
 ```
 
@@ -113,73 +111,54 @@ dbplyr provides several helper functions to make it easier to translate R functi
 *   **`sql_prefix(f, n = NULL)`**: For standard SQL functions. The `n` argument
     optionally specifies the number of arguments.
 
-    ```{r, eval = FALSE}
-scalar = sql_translator(
-  .parent = base_scalar,
-  cos = sql_prefix("COS", 1),
-  round = sql_prefix("ROUND", 2)
-)
-    ```
-
-*   **`sql_infix(f)`**: For infix operators.
-
-    ```{r, eval = FALSE}
-scalar = sql_translator(
-  .parent = base_scalar,
-  `+` = sql_infix("+"),
-  `*` = sql_infix("*"),
-  `==` = sql_infix("=") # Note: R's == becomes SQL's =
-)
-    ```
+*   **`sql_infix(f)`**: For infix operators like `+`, `*`, or `==`.
 
 *   **`sql_aggregate(f, f_r = f)`**: For single-argument SQL aggregate
     functions. The `f_r` argument gives the name of the R function.
 
-    ```{r, eval = FALSE}
-aggregate = sql_translator(
-  .parent = base_agg,
-  mean = sql_aggregate("AVG", "mean"),
-  var = sql_aggregate("VAR_SAMP", "var")
-)
-    ```
-
 *   **`sql_aggregate_2(f)`**: For two-argument SQL aggregate functions.
-
-    ```{r, eval = FALSE}
-aggregate = sql_translator(
-  .parent = base_agg,
-  cov = sql_aggregate_2("COVAR_SAMP")
-)
-    ```
 
 *   **`sql_aggregate_n(f, f_r = f)`**: For variadic SQL aggregate functions.
 
-    ```{r, eval = FALSE}
-aggregate = sql_translator(
-  .parent = base_agg,
-  pmin = sql_aggregate_n("LEAST", "pmin"),
-  pmax = sql_aggregate_n("GREATEST", "pmax")
-)
-    ```
-
 *   **`sql_cast(type)`**: For type casting functions.
-
-    ```{r, eval = FALSE}
-scalar = sql_translator(
-  .parent = base_scalar,
-  as.numeric = sql_cast("NUMERIC"),
-  as.character = sql_cast("VARCHAR")
-)
-    ```
 
 *   **`sql_not_supported(f)`**: For functions with no SQL translation.
 
-    ```{r, eval = FALSE}
-aggregate = sql_translator(
-  .parent = base_agg,
-  median = sql_not_supported("median")
-)
-    ```
+Here's an example showing all of these helpers in use:
+
+```{r, eval = FALSE}
+sql_translation.myConnectionClass <- function(con) {
+  sql_variant(
+    scalar = sql_translator(
+      .parent = base_scalar,
+      # Standard SQL functions
+      cos = sql_prefix("COS", 1),
+      round = sql_prefix("ROUND", 2),
+      # Infix operators
+      `+` = sql_infix("+"),
+      `*` = sql_infix("*"),
+      `==` = sql_infix("="), # Note: R's == becomes SQL's =
+      # Type casting
+      as.numeric = sql_cast("NUMERIC"),
+      as.character = sql_cast("VARCHAR")
+    ),
+    aggregate = sql_translator(
+      .parent = base_agg,
+      # Single-argument aggregates
+      mean = sql_aggregate("AVG", "mean"),
+      var = sql_aggregate("VAR_SAMP", "var"),
+      # Two-argument aggregates
+      cov = sql_aggregate_2("COVAR_SAMP"),
+      # Variadic aggregates
+      pmin = sql_aggregate_n("LEAST", "pmin"),
+      pmax = sql_aggregate_n("GREATEST", "pmax"),
+      # Unsupported functions
+      median = sql_not_supported("median")
+    ),
+    window = sql_translator(.parent = base_win)
+  )
+}
+```
 
 ### Window function helpers
 
@@ -187,43 +166,31 @@ Window functions have their own set of helpers:
 
 *   **`win_rank(f)`**: For ranking functions.
 
-    ```{r, eval = FALSE}
-window = sql_translator(
-  .parent = base_win,
-  row_number = win_rank("ROW_NUMBER"),
-  rank = win_rank("RANK"),
-  dense_rank = win_rank("DENSE_RANK")
-)
-    ```
-
 *   **`win_aggregate(f)`**: For aggregate functions used as window functions.
 
-    ```{r, eval = FALSE}
-window = sql_translator(
-  .parent = base_win,
-  mean = win_aggregate("AVG"),
-  sum = win_aggregate("SUM")
-)
-    ```
-
 *   **`win_cumulative(f)`**: For cumulative functions.
-
-    ```{r, eval = FALSE}
-window = sql_translator(
-  .parent = base_win,
-  cumsum = win_cumulative("SUM")
-)
-    ```
 
 *   **`win_absent(f)`**: For backends that don't support certain window
     functions.
 
-    ```{r, eval = FALSE}
+Here's an example showing all of these helpers in use:
+
+```{r, eval = FALSE}
 window = sql_translator(
   .parent = base_win,
-  mean = win_absent("mean")
+  # Ranking functions
+  row_number = win_rank("ROW_NUMBER"),
+  rank = win_rank("RANK"),
+  dense_rank = win_rank("DENSE_RANK"),
+  # Aggregate functions as window functions
+  mean = win_aggregate("AVG"),
+  sum = win_aggregate("SUM"),
+  # Cumulative functions
+  cumsum = win_cumulative("SUM"),
+  # Absent functions
+  cume_dist = win_absent("cume_dist")
 )
-    ```
+```
 
 ### Custom translation functions
 
@@ -251,58 +218,3 @@ scalar = sql_translator(
 ```
 
 The `!!` operator injects R values into SQL expressions, while `!!!` splices a list of values.
-
-### Complete example
-
-Here's a complete example for a fictional database backend:
-
-```{r, eval = FALSE}
-#' @importFrom dbplyr sql_translation sql_variant sql_translator
-#' @importFrom dbplyr base_scalar base_agg base_win
-#' @importFrom dbplyr sql_prefix sql_infix sql_aggregate sql_cast
-#' @importFrom dbplyr win_rank win_aggregate
-#' @export
-sql_translation.myConnectionClass <- function(con) {
-  sql_variant(
-    scalar = sql_translator(
-      .parent = base_scalar,
-
-      # Operators
-      `%%` = sql_infix("MOD"),
-
-      # Math functions
-      log10 = sql_prefix("LOG10", 1),
-      cot = function(x) sql_expr(1 / tan(!!x)),
-
-      # Type casts (backend uses INT instead of INTEGER)
-      as.integer = sql_cast("INT"),
-      as.numeric = sql_cast("FLOAT"),
-
-      # String functions (backend uses UPPER/LOWER)
-      toupper = sql_prefix("UPPER", 1),
-      tolower = sql_prefix("LOWER", 1)
-    ),
-
-    aggregate = sql_translator(
-      .parent = base_agg,
-
-      # Standard deviation (backend uses STDEV)
-      sd = sql_aggregate("STDEV", "sd"),
-      var = sql_aggregate("VARIANCE", "var"),
-
-      # String aggregation (backend uses STRING_AGG)
-      str_flatten = function(x, collapse = "") {
-        sql_expr(STRING_AGG(!!x, !!collapse))
-      }
-    ),
-
-    window = sql_translator(
-      .parent = base_win,
-
-      # Window aggregates
-      sd = win_aggregate("STDEV"),
-      var = win_aggregate("VARIANCE")
-    )
-  )
-}
-```
