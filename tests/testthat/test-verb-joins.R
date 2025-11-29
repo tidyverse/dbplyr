@@ -838,29 +838,29 @@ test_that("multi joins work with x_as", {
   expect_equal(out, out2)
 
   # `x_as` provided twice with different names -> two queries
-  lq <- left_join(lf, lf2, by = "x", x_as = "lf1") |>
-    inner_join(lf3, by = "x", x_as = "lf2") |>
-    _$lazy_query
+  out <- left_join(lf, lf2, by = "x", x_as = "lf1") |>
+    inner_join(lf3, by = "x", x_as = "lf2")
+  lq <- out$lazy_query
   expect_s3_class(lq, "lazy_multi_join_query")
   expect_s3_class(lq$x, "lazy_multi_join_query")
 
   # `x_as` name already used
-  lq <- left_join(lf, lf2, by = "x", y_as = "lf2") |>
-    inner_join(lf3, by = "x", x_as = "lf2") |>
-    _$lazy_query
+  out <- left_join(lf, lf2, by = "x", y_as = "lf2") |>
+    inner_join(lf3, by = "x", x_as = "lf2")
+  lq <- out$lazy_query
   expect_s3_class(lq, "lazy_multi_join_query")
   expect_s3_class(lq$x, "lazy_multi_join_query")
 
   # `y_as` name already used
-  lq <- left_join(lf, lf2, by = "x", y_as = "lf2") |>
-    inner_join(lf3, by = "x", y_as = "lf2") |>
-    _$lazy_query
+  out <- left_join(lf, lf2, by = "x", y_as = "lf2") |>
+    inner_join(lf3, by = "x", y_as = "lf2")
+  lq <- out$lazy_query
   expect_s3_class(lq, "lazy_multi_join_query")
   expect_s3_class(lq$x, "lazy_multi_join_query")
 
-  lq <- left_join(lf, lf2, by = "x", x_as = "lf2") |>
-    inner_join(lf3, by = "x", y_as = "lf2") |>
-    _$lazy_query
+  out <- left_join(lf, lf2, by = "x", x_as = "lf2") |>
+    inner_join(lf3, by = "x", y_as = "lf2")
+  lq <- out$lazy_query
   expect_s3_class(lq, "lazy_multi_join_query")
   expect_s3_class(lq$x, "lazy_multi_join_query")
 })

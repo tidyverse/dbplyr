@@ -229,13 +229,12 @@ test_that("can handle rename", {
   out <- lf |>
     group_by(x) |>
     rename(ax = x, by = y) |>
-    summarise(mean_by = mean(by, na.rm = TRUE)) |>
-    _$lazy_query
+    summarise(mean_by = mean(by, na.rm = TRUE))
 
   expect_equal(
-    out,
+    out$lazy_query,
     lazy_select_query(
-      x = out$x,
+      x = out$lazy_query$x,
       select = list(ax = sym("ax"), mean_by = quo(mean(by, na.rm = TRUE))),
       group_by = syms("ax"),
       select_operation = "summarise",

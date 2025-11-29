@@ -450,26 +450,17 @@ test_that("select, relocate, and rename work", {
   lf <- lazy_frame(x = 1, y = 1)
 
   expect_equal(
-    lf |>
-      select(x) |>
-      _$lazy_query |>
-      _$select,
+    select(lf, x)$lazy_query$select,
     new_lazy_select(exprs(x = x))
   )
 
   expect_equal(
-    lf |>
-      relocate(y) |>
-      _$lazy_query |>
-      _$select,
+    relocate(lf, y)$lazy_query$select,
     new_lazy_select(exprs(y = y, x = x))
   )
 
   expect_equal(
-    lf |>
-      rename(b = y, a = x) |>
-      _$lazy_query |>
-      _$select,
+    rename(lf, b = y, a = x)$lazy_query$select,
     new_lazy_select(exprs(a = x, b = y))
   )
 })
@@ -488,10 +479,7 @@ test_that("renaming handles groups correctly", {
   expect_equal(result$group_vars, "ax")
   expect_equal(op_grps(result), "ax")
 
-  result <- lf |>
-    rename(x = ax) |>
-    _$lazy_query
-
+  result <- rename(lf, x = ax)$lazy_query
   expect_equal(
     result$select,
     new_lazy_select(exprs(x = x, y = y))

@@ -374,9 +374,7 @@ test_that("generates correct lazy_select_query", {
   lf <- lazy_frame(x = 1:3, y = 3:1)
 
   expect_equal(
-    lf |>
-      filter(x > 1) |>
-      _$lazy_query,
+    filter(lf, x > 1)$lazy_query,
     lazy_select_query(
       x = lf$lazy_query,
       select = syms(set_names(colnames(lf))),
@@ -386,13 +384,12 @@ test_that("generates correct lazy_select_query", {
   )
 
   out <- lf |>
-    filter(mean(x, na.rm = TRUE) > 1) |>
-    _$lazy_query
+    filter(mean(x, na.rm = TRUE) > 1)
 
   expect_equal(
-    out,
+    out$lazy_query,
     lazy_select_query(
-      x = out$x,
+      x = out$lazy_query$x,
       select = syms(set_names(colnames(lf))),
       where = list(expr(col01 > 1))
     ),
@@ -400,7 +397,7 @@ test_that("generates correct lazy_select_query", {
   )
 
   expect_equal(
-    out$x,
+    out$lazy_query$x,
     lazy_select_query(
       x = lf$lazy_query,
       select_operation = "mutate",
