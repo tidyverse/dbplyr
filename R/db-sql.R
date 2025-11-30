@@ -348,6 +348,16 @@ db_supports_table_alias_with_as.TestConnection <- function(con) {
   TRUE
 }
 
+#' @rdname db-sql
+#' @export
+supports_distinct_on <- function(con) {
+  UseMethod("supports_distinct_on")
+}
+
+#' @export
+supports_distinct_on.DBIConnection <- function(con) {
+  FALSE
+}
 
 # Query generation --------------------------------------------------------
 

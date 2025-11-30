@@ -140,7 +140,8 @@ select_can_be_inlined <- function(lazy_query, vars) {
   ordered_present <- all(intersect(computed_columns, order_vars) %in% vars)
 
   # if the projection is distinct, it must be bijective
-  is_distinct <- is_true(lazy_query$distinct)
+  is_distinct <- !is.logical(lazy_query$distinct) ||
+    is_true(lazy_query$distinct)
   is_bijective_projection <- identical(sort(unname(vars)), op_vars(lazy_query))
   distinct_is_bijective <- !is_distinct || is_bijective_projection
 

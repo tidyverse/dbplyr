@@ -17,8 +17,31 @@
 distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
   grps <- syms(op_grps(.data))
   empty_dots <- dots_n(...) == 0
-  can_use_distinct <- !.keep_all || (empty_dots && is_empty(grps))
-  if (!can_use_distinct) {
+  can_use_distinct <-
+    !.keep_all ||
+    (empty_dots && is_empty(grps)) ||
+    supports_distinct_on(.data$src$con)
+
+  if (can_use_distinct) {
+    if (empty_dots) {
+      dots <- quos(!!!syms(colnames(.data)))
+    } else {
+      dots <- partial_eval_dots(.data, ..., .named = FALSE)
+      dots <- quos(!!!dots)
+    }
+    prep <- distinct_prepare_compat(.data, dots, group_vars = group_vars(.data))
+
+    if (!.keep_all) {
+      out <- dplyr::select(prep$data, prep$keep)
+      out$lazy_query <- add_distinct(out, distinct = TRUE)
+    } else {
+      out <- prep$data
+      out$lazy_query <- add_distinct(
+        out,
+        distinct = set_names(names(quos_auto_name(dots)))
+      )
+    }
+  } else {
     needs_dummy_order <- is.null(op_sort(.data))
 
     if (needs_dummy_order) {
@@ -37,17 +60,6 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
 
     return(.data)
   }
-
-  if (empty_dots) {
-    dots <- quos(!!!syms(colnames(.data)))
-  } else {
-    dots <- partial_eval_dots(.data, ..., .named = FALSE)
-    dots <- quos(!!!dots)
-  }
-  prep <- distinct_prepare_compat(.data, dots, group_vars = group_vars(.data))
-  out <- dplyr::select(prep$data, prep$keep)
-
-  out$lazy_query <- add_distinct(out)
   out
 }
 
@@ -148,12 +160,25 @@ quo_is_variable_reference <- function(quo) {
 }
 
 
-add_distinct <- function(.data) {
+add_distinct <- function(.data, distinct) {
   lazy_query <- .data$lazy_query
+
+  distinct <-
+    if (is.logical(distinct)) {
+      distinct
+    } else {
+      # if the DISTINCT ON clause contains all columns
+      # we can fall back to a normal DISTINCT
+      if (is_identity(syms(distinct), names(distinct), colnames(.data))) {
+        TRUE
+      } else {
+        syms(distinct)
+      }
+    }
 
   out <- lazy_select_query(
     x = lazy_query,
-    distinct = TRUE
+    distinct = distinct
   )
   # TODO this could also work for joins
   if (!is_lazy_select_query(lazy_query)) {
@@ -173,6 +198,11 @@ add_distinct <- function(.data) {
     return(out)
   }
 
-  lazy_query$distinct <- TRUE
+  if (!is.logical(distinct)) {
+    lazy_query$distinct <- new_lazy_select(distinct)
+  } else {
+    lazy_query$distinct <- distinct
+  }
+
   lazy_query
 }

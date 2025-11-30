@@ -15,6 +15,7 @@
 \alias{sql_query_rows}
 \alias{supports_window_clause}
 \alias{db_supports_table_alias_with_as}
+\alias{supports_distinct_on}
 \alias{sql_query_select}
 \alias{sql_query_join}
 \alias{sql_query_multi_join}
@@ -57,6 +58,8 @@ sql_query_rows(con, sql, ...)
 supports_window_clause(con)
 
 db_supports_table_alias_with_as(con)
+
+supports_distinct_on(con)
 
 sql_query_select(
   con,
