@@ -18,7 +18,7 @@ be needed in typical use.}
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
-\code{build_sql()} is deprecated in favor of \code{glue_sql2()}.
+\code{build_sql()} is deprecated in favor of \code{\link[=glue_sql2]{glue_sql2()}}.
 
 This is a convenience function that should prevent sql injection attacks
 (which in the context of dplyr are most likely to be accidental not

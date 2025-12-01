@@ -96,6 +96,7 @@ reference:
   - db-misc
   - db-sql
   - db-quote
+  - glue_sql2
   - sql_query_insert
 
 news:

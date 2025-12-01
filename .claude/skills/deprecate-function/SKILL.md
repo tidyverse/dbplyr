@@ -245,17 +245,15 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
 #' @examples
 #' # Existing examples...
 #'
-#' # Migrate to glue_sql2():
-#'
-#' # Before:
+#' # Old:
 #' build_sql("SELECT * FROM ", ident("table"), con = con)
-#' # After:
+#' # New:
 #' glue_sql2(con, "SELECT * FROM {.tbl 'table'}")
 #'
-#' # Before:
+#' # Old:
 #' name <- "Robert"
 #' build_sql("INSERT INTO students (name) VALUES (", name, ")", con = con)
-#' # After:
+#' # New:
 #' glue_sql2(con, "INSERT INTO students (name) VALUES ({.val name})")
 ```
 

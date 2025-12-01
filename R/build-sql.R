@@ -2,7 +2,7 @@
 #'
 #' @description
 #' `r lifecycle::badge("deprecated")`
-#' `build_sql()` is deprecated in favor of `glue_sql2()`.
+#' `build_sql()` is deprecated in favor of [glue_sql2()].
 #'
 #' This is a convenience function that should prevent sql injection attacks
 #' (which in the context of dplyr are most likely to be accidental not
@@ -64,37 +64,54 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
   sql(paste0(pieces, collapse = ""))
 }
 
-#' A dbplyr specific version of glue
+#' Build SQL strings with glue syntax
 #'
-#' Similar to the inline markup of cli this function makes SQL generation easier
-#' and safer by providing a couple of types. For example
+#' @description
+#' `glue_sql2()` is a SQL string builder that uses [glue::glue()] syntax with
+#' special type markers for safe SQL generation. It replaces the deprecated
+#' [build_sql()] function with a more explicit and type-safe approach.
 #'
-#' ```
-#'   glue_sql2(
-#'      con,
-#'      "CREATE ", if (unique) "UNIQUE ", "INDEX {.name name}",
-#'      " ON {.tbl table} ({.col columns*})"
-#'    )
-#' ```
+#' Within the glue template, use type markers to specify how values should be
+#' escaped and formatted:
 #'
-#' The following types are supported:
+#' * `.tbl` - A table identifier (e.g., `DBI::Id()`, string, or `in_schema()`).
+#' * `.from` - A subquery or table identifier.
+#' * `.name` - A name for an index or subquery (string or `ident()`).
+#' * `.col` - A column name or multiple columns (use `*` suffix for multiple).
+#' * `.kw` - An SQL keyword that will be syntax-highlighted.
+#' * `.val` - Any value to be escaped (vectors, dates, SQL, etc.).
 #'
-#' * .tbl A table identifier, e.g. `DBI::Id()`. Converted via `as_table_ident()`.
-#' * .from A subquery or a table identifier. Converted via `as_from()`.
-#' * .name A name, e.g. for an index or a subquery. Can be a string or a scalar (quoted) ident.
-#' * .col A column or multiple columns if expression ends with `*`.
-#' * .kw An SQL keyword - e.g. `SELECT` or `WHERE` - that should be highlighted.
-#' * .val Any value - e.g. an integer vector, a Date, SQL - which is escaped as
-#'   usual via `escape()`.
+#' The `*` suffix after `.col` or `.val` collapses the vector into a
+#' comma-separated list.
 #'
-#' If no type is specified the value must be a string or scalar SQL and it isn't
-#' escaped or collapsed.
+#' If no type is specified, the value must be a string or scalar SQL and won't
+#' be escaped or collapsed.
 #'
-#' @noRd
-#'
+#' @param .con A database connection.
+#' @param ... SQL fragments to interpolate. These are evaluated in `.envir` and
+#'   then combined according to their type markers.
+#' @param .sep Separator to use between elements of `...`.
+#' @param .envir Environment to evaluate `...` in.
+#' @param .open,.close Opening and closing delimiters for interpolation.
+#' @param .na,.null Values to use for `NA`/`NULL` values.
+#' @param .comment Comment character to use.
+#' @param .literal Whether to treat strings literally.
+#' @param .trim Whether to trim whitespace.
+#' @return An SQL string.
+#' @export
 #' @examples
-#' glue_sql2(con, "COLLECT STATISTICS {.tbl table}")
-#' glue_sql2(con, "{f}({.val x}, {.val y})")
+#' con <- simulate_dbi()
+#'
+#' tbl <- "my_table"
+#' glue_sql2(con, "SELECT * FROM {.tbl tbl}")
+#'
+#' # Values are properly escaped
+#' name <- "Robert'); DROP TABLE students;--"
+#' glue_sql2(con, "INSERT INTO students (name) VALUES ({.val name})")
+#'
+#' # Multiple columns with collapse
+#' cols <- c("name", "age", "grade")
+#' glue_sql2(con, "SELECT {.col cols*} FROM students")
 glue_sql2 <- function(
   .con,
   ...,
@@ -165,10 +182,7 @@ sql_quote_transformer <- function(connection) {
       # keep as is
     } else if (type == "raw") {
       if (!is.sql(value) && !is_string(value)) {
-        stop_input_type(
-          value,
-          what = c("a string", "scalar SQL")
-        )
+        stop_input_type(value, what = c("a string", "scalar SQL"))
       }
     }
 
