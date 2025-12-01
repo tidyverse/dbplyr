@@ -7,9 +7,10 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-```{r, echo = FALSE, message = FALSE}
-knitr::opts_chunk$set(collapse = T, comment = "#>")
-options(tibble.print_min = 4L, tibble.print_max = 4L)
+```{r}
+#| include: false
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+options(tibble.print_min = 6L, tibble.print_max = 6L, digits = 3)
 ```
 
 This document describes how to add a new SQL backend to dbplyr. To begin:

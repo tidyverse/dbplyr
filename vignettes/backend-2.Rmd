@@ -7,11 +7,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
+```{r}
+#| include: false
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+options(tibble.print_min = 6L, tibble.print_max = 6L, digits = 3)
 ```
 
 This transition guide is aimed at backend authors.

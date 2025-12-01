@@ -7,11 +7,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
+```{r}
+#| include: false
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+options(tibble.print_min = 6L, tibble.print_max = 6L, digits = 3)
 ```
 
 This vignette discusses why you might use dbplyr instead of writing SQL yourself, and what to do when dbplyr's built-in translations can't create the SQL that you need.
