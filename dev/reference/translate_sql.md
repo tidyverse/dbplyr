@@ -43,8 +43,7 @@ translate_sql_(
 
 - con:
 
-  An optional database connection to control the details of the
-  translation. The default, `NULL`, generates ANSI SQL.
+  Database connection used to determine the SQL dialect.
 
 - vars_group, vars_order, vars_frame:
 
