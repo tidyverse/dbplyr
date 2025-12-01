@@ -2,7 +2,7 @@
 #' @include translate-sql-window.R
 #' @include translate-sql-helpers.R
 #' @include translate-sql-scalar.R
-#' @include translate-sql-agg.R
+#' @include translate-sql-aggregate.R
 #' @include translate-sql-string.R
 #' @include translate-sql-quantile.R
 #' @include translate-sql-cut.R

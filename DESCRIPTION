@@ -70,7 +70,7 @@ Collate:
     'translate-sql-cut.R'
     'translate-sql-quantile.R'
     'translate-sql-string.R'
-    'translate-sql-agg.R'
+    'translate-sql-aggregate.R'
     'translate-sql-scalar.R'
     'translate-sql-helpers.R'
     'translate-sql-window.R'
