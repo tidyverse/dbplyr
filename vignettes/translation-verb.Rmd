@@ -13,6 +13,7 @@ There are two parts to dbplyr SQL translation: translating dplyr verbs, and tran
 All dplyr verbs generate a `SELECT` statement. To demonstrate we'll make a temporary database with a couple of tables
 
 ```{r, message = FALSE}
+library(dbplyr)
 library(dplyr)
 
 con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
