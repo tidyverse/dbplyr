@@ -14,8 +14,8 @@
 #'   through R in one pass, so it is only suitable for transferring small
 #'   amounts of data.
 #' @param name Name of new remote table. Use a string to create the table
-#'   in the current catalog/schema. Use `I()` if you want to create it
-#'   in a specific catalog/schema, e.g. `I("schema.table")`.
+#'   in the current catalog/schema. Use `I()` to create the table in a specific
+#'   catalog/schema, e.g. `I("schema.table")`.
 #' @param types a character vector giving variable types to use for the columns.
 #'    See <https://www.sqlite.org/datatype3.html> for available types.
 #' @param temporary if `TRUE`, will create a temporary table that is

@@ -138,6 +138,8 @@ Collate:
     'translate-sql.R'
     'utils-format.R'
     'verb-arrange.R'
+    'verb-collapse.R'
+    'verb-collect.R'
     'verb-compute.R'
     'verb-count.R'
     'verb-distinct.R'

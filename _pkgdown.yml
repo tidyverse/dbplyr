@@ -21,9 +21,11 @@ reference:
 - subtitle: Connecting, copying, and retrieving data
   contents:
   - tbl.src_dbi
+  - collapse.tbl_sql
+  - collect.tbl_sql
+  - compute.tbl_sql
   - copy_to.src_sql
   - copy_inline
-  - collapse.tbl_sql
   - pull.tbl_sql
   - show_query
 

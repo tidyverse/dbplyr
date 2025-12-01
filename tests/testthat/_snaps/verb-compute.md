@@ -28,17 +28,6 @@
       Caused by error:
       ! dummy DBI error
 
-# collect() handles DBI error
-
-    Code
-      (expect_error(collect(mutate(mf, a = sql("invalid sql")))))
-    Output
-      <error/rlang_error>
-      Error in `collect()`:
-      ! Failed to collect lazy table.
-      Caused by error:
-      ! dummy DBI error
-
 # compute(temporary = FALSE) without a name is deprecated
 
     The `name` argument of `compute()` must be provided when `temporary = FALSE` as of dbplyr 2.3.3.

@@ -1,24 +1,3 @@
-test_that("collect equivalent to as.data.frame/as_tibble", {
-  mf <- memdb_frame(letters)
-
-  expect_equal(as.data.frame(mf), data.frame(letters, stringsAsFactors = FALSE))
-  expect_equal(as_tibble(mf), tibble(letters))
-  expect_equal(collect(mf), tibble(letters))
-})
-
-test_that("explicit collection returns all data", {
-  n <- 1e5 + 10 # previous default was 1e5
-  big <- memdb_frame(x = seq_len(n))
-
-  nrow1 <- big |> as.data.frame() |> nrow()
-  nrow2 <- big |> as_tibble() |> nrow()
-  nrow3 <- big |> collect() |> nrow()
-
-  expect_equal(nrow1, n)
-  expect_equal(nrow2, n)
-  expect_equal(nrow3, n)
-})
-
 test_that("compute doesn't change representation", {
   mf1 <- memdb_frame(x = 5:1, y = 1:5, z = "a")
   compare_tbl(mf1, mf1 |> compute())
@@ -113,28 +92,15 @@ test_that("compute can handle schema", {
   )
 })
 
-test_that("collect() handles DBI error", {
-  mf <- memdb_frame(x = 1)
-  expect_snapshot(
-    (expect_error(mf |> mutate(a = sql("invalid sql")) |> collect())),
-    transform = snap_transform_dbi
-  )
-})
-
 test_that("compute(temporary = FALSE) without a name is deprecated", {
   df <- memdb_frame(x = 1:10)
 
   expect_snapshot_warning(df |> compute(temporary = FALSE))
 })
 
-# ops ---------------------------------------------------------------------
-
-test_that("sorting preserved across compute and collapse", {
+test_that("sorting preserved across compute", {
   df1 <- memdb_frame(x = sample(10)) |> arrange(x)
 
   df2 <- compute(df1)
   expect_equal(get_expr(op_sort(df2)[[1]]), quote(x))
-
-  df3 <- collapse(df1)
-  expect_equal(get_expr(op_sort(df3)[[1]]), quote(x))
 })

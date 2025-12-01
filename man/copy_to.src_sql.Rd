@@ -27,8 +27,8 @@ through R in one pass, so it is only suitable for transferring small
 amounts of data.}
 
 \item{name}{Name of new remote table. Use a string to create the table
-in the current catalog/schema. Use \code{I()} if you want to create it
-in a specific catalog/schema, e.g. \code{I("schema.table")}.}
+in the current catalog/schema. Use \code{I()} to create the table in a specific
+catalog/schema, e.g. \code{I("schema.table")}.}
 
 \item{overwrite}{If \code{TRUE}, will overwrite an existing table with
 name \code{name}. If \code{FALSE}, will throw an error if \code{name} already
