@@ -297,6 +297,7 @@ base_scalar <- sql_translator(
     }
   },
 
+  str_ilike = sql_not_supported("str_ilike"),
   str_conv = sql_not_supported("str_conv"),
   str_count = sql_not_supported("str_count"),
 

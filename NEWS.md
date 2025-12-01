@@ -14,6 +14,7 @@
 * Fixed overwrite flag in `copy_to()` to work when source is in the same DB as destination (@liudvikasakelis, #1535)
 * Snowflake correctly translates `$` to `:` (@jsowder, #1608)
 * `dbplyr_uncount()` now works with Redshift (@owenjonesuob, #1601).
+* New translations for stringr function `str_ilike()` for Postgres, Redshift, and Snowflake (@edward-burn, #1628).
 
 # dbplyr 2.5.1
 

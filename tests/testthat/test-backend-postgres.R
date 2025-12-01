@@ -31,6 +31,7 @@ test_that("custom stringr functions translated correctly", {
   )
   expect_equal(test_translate_sql(str_like(x, y)), sql("`x` ILIKE `y`"))
   expect_equal(test_translate_sql(str_like(x, y, FALSE)), sql("`x` LIKE `y`"))
+  expect_equal(test_translate_sql(str_ilike(x, y)), sql("`x` ILIKE `y`"))
   expect_equal(
     test_translate_sql(str_replace(x, y, z)),
     sql("REGEXP_REPLACE(`x`, `y`, `z`)")

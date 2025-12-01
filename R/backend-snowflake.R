@@ -36,6 +36,9 @@ sql_translation.Snowflake <- function(con) {
         }
         sql_call2("CONCAT_WS", sep, ...)
       },
+      str_ilike = function(string, pattern) {
+        sql_expr(!!string %ILIKE% !!pattern)
+      },
       str_locate = function(string, pattern) {
         sql_expr(POSITION(!!pattern, !!string))
       },

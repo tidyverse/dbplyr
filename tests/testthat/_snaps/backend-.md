@@ -57,6 +57,14 @@
       i Set `ignore_case = FALSE` for case sensitive match.
       i Use `tolower()` on both arguments to achieve a case insensitive match.
 
+---
+
+    Code
+      test_translate_sql(str_ilike(x, "abc", ignore_case = TRUE))
+    Condition
+      Error in `str_ilike()`:
+      ! `str_ilike()` is not available in this SQL variant.
+
 # default raw escapes translated correctly
 
     Code

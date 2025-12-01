@@ -138,6 +138,10 @@ test_that("can only translate case sensitive str_like", {
     test_translate_sql(str_like(x, "abc", ignore_case = TRUE)),
     error = TRUE
   )
+  expect_snapshot(
+    test_translate_sql(str_ilike(x, "abc", ignore_case = TRUE)),
+    error = TRUE
+  )
 })
 
 test_that("can translate nzchar", {

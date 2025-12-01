@@ -145,6 +145,9 @@ sql_translation.PqConnection <- function(con) {
           sql_expr(!!string %LIKE% !!pattern)
         }
       },
+      str_ilike = function(string, pattern) {
+          sql_expr(!!string %ILIKE% !!pattern)
+      },
       str_replace = function(string, pattern, replacement) {
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
       },
