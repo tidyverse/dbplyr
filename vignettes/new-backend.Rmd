@@ -97,51 +97,60 @@ Each translator will inherits from the base (ANSI SQL) translator and overrides 
 
 ```{r, eval = FALSE}
 sql_translator(
-  .parent = base_scalar, # Inherit most translations
+  base_scalar, # Inherit most translations
   # Override specific functions for your backend
   `+` = sql_infix("+"),
   mean = sql_aggregate("AVERAGE", "mean")
 )
 ```
 
-### Translation helper functions
+### Scalar function helpers
 
 dbplyr provides several helper functions to make it easier to translate R functions to SQL:
 
 *   **`sql_prefix(f, n = NULL)`**: For standard SQL functions. The `n` argument
     optionally specifies the number of arguments.
-
 *   **`sql_infix(f)`**: For infix operators like `+`, `*`, or `==`.
-
-*   **`sql_aggregate(f, f_r = f)`**: For single-argument SQL aggregate
-    functions. The `f_r` argument gives the name of the R function.
-
-*   **`sql_aggregate_2(f)`**: For two-argument SQL aggregate functions.
-
-*   **`sql_aggregate_n(f, f_r = f)`**: For variadic SQL aggregate functions.
-
 *   **`sql_cast(type)`**: For type casting functions.
-
 *   **`sql_not_supported(f)`**: For functions with no SQL translation.
 
 Here's an example showing all of these helpers in use:
 
-```{r, eval = FALSE}
+```{r}
+#| eval: false
 sql_translation.myConnectionClass <- function(con) {
   sql_variant(
     scalar = sql_translator(
-      .parent = base_scalar,
+      base_scalar,
       # Standard SQL functions
       cos = sql_prefix("COS", 1),
       round = sql_prefix("ROUND", 2),
       # Infix operators
       `+` = sql_infix("+"),
       `*` = sql_infix("*"),
-      `==` = sql_infix("="), # Note: R's == becomes SQL's =
+      `==` = sql_infix("="),
       # Type casting
       as.numeric = sql_cast("NUMERIC"),
       as.character = sql_cast("VARCHAR")
     ),
+    aggregate = sql_translator(base_agg),
+    window = sql_translator(base_win)
+  )
+}
+```
+
+### Aggregation function helpers
+
+*   **`sql_aggregate(f, f_r = f)`**: For single-argument SQL aggregate
+    functions. The `f_r` argument gives the name of the R function.
+*   **`sql_aggregate_2(f)`**: For two-argument SQL aggregate functions.
+*   **`sql_aggregate_n(f, f_r = f)`**: For variadic SQL aggregate functions.
+
+```{r}
+#| eval: false
+sql_translation.myConnectionClass <- function(con) {
+  sql_variant(
+    scalar = sql_translator(base_scalar),
     aggregate = sql_translator(
       .parent = base_agg,
       # Single-argument aggregates
@@ -155,7 +164,7 @@ sql_translation.myConnectionClass <- function(con) {
       # Unsupported functions
       median = sql_not_supported("median")
     ),
-    window = sql_translator(.parent = base_win)
+    window = sql_translator(base_win)
   )
 }
 ```
@@ -165,11 +174,8 @@ sql_translation.myConnectionClass <- function(con) {
 Window functions have their own set of helpers:
 
 *   **`win_rank(f)`**: For ranking functions.
-
 *   **`win_aggregate(f)`**: For aggregate functions used as window functions.
-
 *   **`win_cumulative(f)`**: For cumulative functions.
-
 *   **`win_absent(f)`**: For backends that don't support certain window
     functions.
 
@@ -177,7 +183,7 @@ Here's an example showing all of these helpers in use:
 
 ```{r, eval = FALSE}
 window = sql_translator(
-  .parent = base_win,
+  base_win,
   # Ranking functions
   row_number = win_rank("ROW_NUMBER"),
   rank = win_rank("RANK"),
@@ -194,11 +200,11 @@ window = sql_translator(
 
 ### Custom translation functions
 
-For more complex translations, you can write custom functions that return SQL expressions using `sql_expr()`:
+For more complex translations, you can write custom functions that return SQL expressions using `sql_expr()`. This is a tidy-evaluation function that allows you to use `!!` operator to in inject a single value into SQL expressions or `!!!` to splice a list of values.
 
 ```{r, eval = FALSE}
 scalar = sql_translator(
-  .parent = base_scalar,
+  base_scalar,
 
   # Custom log function with change of base
   log = function(x, base = exp(1)) {
@@ -216,5 +222,3 @@ scalar = sql_translator(
   }
 )
 ```
-
-The `!!` operator injects R values into SQL expressions, while `!!!` splices a list of values.

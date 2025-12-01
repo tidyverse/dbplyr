@@ -3,3 +3,6 @@
 figure
 *.md
 rsconnect
+
+/.quarto/
+**/*.quarto_ipynb
