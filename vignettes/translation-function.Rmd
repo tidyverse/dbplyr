@@ -8,10 +8,9 @@ vignette: >
 ---
 
 ```{r}
-#| label = "setup",
-#| include = FALSE
+#| include: false
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-options(tibble.print_min = 4L, tibble.print_max = 4L)
+options(tibble.print_min = 6L, tibble.print_max = 6L, digits = 3)
 ```
 
 There are two parts to dbplyr SQL translation: translating dplyr verbs, and translating expressions within those verbs. This vignette describes how individual expressions (function calls) are translated; `vignette("translation-verb")` describes how entire verbs are translated.
@@ -298,4 +297,3 @@ mutate(players,
 ```
 
 Currently there is no way to order by multiple variables, except by setting the default ordering with `arrange()`. This will be added in a future release. 
-
