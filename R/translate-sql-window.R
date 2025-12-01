@@ -12,8 +12,9 @@
 #' @param frame A numeric vector of length two defining the frame.
 #' @param f The name of an sql function as a string
 #' @param empty_order A logical value indicating whether to order by NULL if `order` is not specified
+#' @param con Database connection.
+#' @family SQL translation helpers
 #' @export
-#' @keywords internal
 #' @examples
 #' con <- simulate_dbi()
 #'

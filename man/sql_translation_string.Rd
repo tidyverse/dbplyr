@@ -36,9 +36,6 @@ substring function.}
 These functions help you create custom string SQL translations when
 implementing a new backend. They are typically used within \code{\link[=sql_translator]{sql_translator()}}
 to define how R string functions should be translated to SQL.
-}
-\section{Helper functions}{
-
 \itemize{
 \item \code{sql_substr()} creates a SQL substring function translator that converts
 R's \code{substr(x, start, stop)} to SQL's \code{SUBSTR(x, start, length)}.
@@ -49,11 +46,10 @@ stringr's \code{str_sub()} with support for negative indices.
 like \code{||}.
 }
 }
-
 \seealso{
-\itemize{
-\item \code{\link[=sql_translator]{sql_translator()}} for creating SQL translators.
-\item \link{sql_translation_scalar} for scalar function helpers.
-\item \link{sql_translation_agg} for aggregation function helpers.
+Other SQL translation helpers: 
+\code{\link{sql_translation_agg}},
+\code{\link{sql_translation_scalar}},
+\code{\link{win_over}()}
 }
-}
+\concept{SQL translation helpers}

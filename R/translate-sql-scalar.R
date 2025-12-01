@@ -1,18 +1,9 @@
 #' SQL helpers for scalar functions
 #'
+#' @description
 #' These functions help you create custom scalar SQL translations when
 #' implementing a new backend. They are typically used within [sql_translator()]
 #' to define how R functions should be translated to SQL.
-#'
-#' @param f The name of the SQL function as a string.
-#' @param pad If `TRUE`, the default, pad the infix operator with spaces.
-#' @param n For `sql_prefix()`, an optional number of arguments to expect.
-#'   Will signal error if not correct.
-#' @param type SQL type name as a string.
-#' @param rand_expr A SQL expression that generates random numbers.
-#' @param min,max Range of random values.
-#'
-#' @section Helper functions:
 #'
 #' * `sql_infix()` creates SQL infix operators like `+`, `-`, `*`, `/`.
 #' * `sql_prefix()` creates SQL prefix functions like `ABS()`, `SQRT()`.
@@ -23,11 +14,14 @@
 #' * `sql_runif()` creates a SQL expression for generating uniform random
 #'   numbers.
 #'
-#' @seealso
-#' * [sql_translator()] for creating SQL translators.
-#' * [sql_translation_string] for string manipulation helpers.
-#' * [sql_translation_agg] for aggregation function helpers.
-#'
+#' @param f The name of the SQL function as a string.
+#' @param pad If `TRUE`, the default, pad the infix operator with spaces.
+#' @param n For `sql_prefix()`, an optional number of arguments to expect.
+#'   Will signal error if not correct.
+#' @param type SQL type name as a string.
+#' @param rand_expr A SQL expression that generates random numbers.
+#' @param min,max Range of random values.
+#' @family SQL translation helpers
 #' @name sql_translation_scalar
 NULL
 

@@ -69,4 +69,10 @@ win_over(sql("avg(x)"), order = "y", con = con)
 win_over(sql("avg(x)"), order = c("x", "y"), con = con)
 win_over(sql("avg(x)"), frame = c(-Inf, 0), order = "y", con = con)
 }
-\keyword{internal}
+\seealso{
+Other SQL translation helpers: 
+\code{\link{sql_translation_agg}},
+\code{\link{sql_translation_scalar}},
+\code{\link{sql_translation_string}}
+}
+\concept{SQL translation helpers}

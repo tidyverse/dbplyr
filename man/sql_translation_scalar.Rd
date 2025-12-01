@@ -43,9 +43,6 @@ Will signal error if not correct.}
 These functions help you create custom scalar SQL translations when
 implementing a new backend. They are typically used within \code{\link[=sql_translator]{sql_translator()}}
 to define how R functions should be translated to SQL.
-}
-\section{Helper functions}{
-
 \itemize{
 \item \code{sql_infix()} creates SQL infix operators like \code{+}, \code{-}, \code{*}, \code{/}.
 \item \code{sql_prefix()} creates SQL prefix functions like \code{ABS()}, \code{SQRT()}.
@@ -57,11 +54,10 @@ to define how R functions should be translated to SQL.
 numbers.
 }
 }
-
 \seealso{
-\itemize{
-\item \code{\link[=sql_translator]{sql_translator()}} for creating SQL translators.
-\item \link{sql_translation_string} for string manipulation helpers.
-\item \link{sql_translation_agg} for aggregation function helpers.
+Other SQL translation helpers: 
+\code{\link{sql_translation_agg}},
+\code{\link{sql_translation_string}},
+\code{\link{win_over}()}
 }
-}
+\concept{SQL translation helpers}

@@ -101,6 +101,7 @@ reference:
   - sql_translation_scalar
   - sql_translation_string
   - sql_translation_agg
+  - win_over
 
 news:
   releases:

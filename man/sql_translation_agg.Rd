@@ -25,9 +25,6 @@ sql_not_supported(f)
 These functions help you create custom aggregate SQL translations when
 implementing a new backend. They are typically used within \code{\link[=sql_translator]{sql_translator()}}
 to define how R aggregate functions should be translated to SQL.
-}
-\section{Helper functions}{
-
 \itemize{
 \item \code{sql_aggregate()} creates a SQL aggregate function translator for functions
 with a single argument and an optional \code{na.rm} parameter (e.g., \code{SUM()},
@@ -41,11 +38,10 @@ functions with any number of arguments and an optional \code{na.rm} parameter
 when a function is not supported in SQL.
 }
 }
-
 \seealso{
-\itemize{
-\item \code{\link[=sql_translator]{sql_translator()}} for creating SQL translators.
-\item \link{sql_translation_scalar} for scalar function helpers.
-\item \link{sql_translation_string} for string manipulation helpers.
+Other SQL translation helpers: 
+\code{\link{sql_translation_scalar}},
+\code{\link{sql_translation_string}},
+\code{\link{win_over}()}
 }
-}
+\concept{SQL translation helpers}

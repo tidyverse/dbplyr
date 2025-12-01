@@ -1,13 +1,9 @@
 #' SQL helpers for aggregate functions
 #'
+#' @description
 #' These functions help you create custom aggregate SQL translations when
 #' implementing a new backend. They are typically used within [sql_translator()]
 #' to define how R aggregate functions should be translated to SQL.
-#'
-#' @param f The name of the SQL function as a string.
-#' @param f_r The name of the R function being translated as a string.
-#'
-#' @section Helper functions:
 #'
 #' * `sql_aggregate()` creates a SQL aggregate function translator for functions
 #'   with a single argument and an optional `na.rm` parameter (e.g., `SUM()`,
@@ -20,11 +16,9 @@
 #' * `sql_not_supported()` creates a function that throws an informative error
 #'   when a function is not supported in SQL.
 #'
-#' @seealso
-#' * [sql_translator()] for creating SQL translators.
-#' * [sql_translation_scalar] for scalar function helpers.
-#' * [sql_translation_string] for string manipulation helpers.
-#'
+#' @param f The name of the SQL function as a string.
+#' @param f_r The name of the R function being translated as a string.
+#' @family SQL translation helpers
 #' @name sql_translation_agg
 NULL
 

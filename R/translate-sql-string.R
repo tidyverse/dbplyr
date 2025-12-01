@@ -1,8 +1,17 @@
 #' SQL helpers for string functions
 #'
+#' @description
 #' These functions help you create custom string SQL translations when
 #' implementing a new backend. They are typically used within [sql_translator()]
 #' to define how R string functions should be translated to SQL.
+#'
+#' * `sql_substr()` creates a SQL substring function translator that converts
+#'   R's `substr(x, start, stop)` to SQL's `SUBSTR(x, start, length)`.
+#' * `sql_str_sub()` creates a SQL substring function translator that handles
+#'   stringr's `str_sub()` with support for negative indices.
+#' * `sql_paste()` creates a SQL paste function using `CONCAT_WS()` or similar.
+#' * `sql_paste_infix()` creates a SQL paste function using an infix operator
+#'   like `||`.
 #'
 #' @param f The name of the SQL function as a string.
 #' @param subset_f The name of the SQL substring function.
@@ -13,29 +22,16 @@
 #' @param op The SQL operator to use for infix paste operations.
 #' @param cast A function to cast values to strings.
 #'
-#' @section Helper functions:
-#'
-#' * `sql_substr()` creates a SQL substring function translator that converts
-#'   R's `substr(x, start, stop)` to SQL's `SUBSTR(x, start, length)`.
-#' * `sql_str_sub()` creates a SQL substring function translator that handles
-#'   stringr's `str_sub()` with support for negative indices.
-#' * `sql_paste()` creates a SQL paste function using `CONCAT_WS()` or similar.
-#' * `sql_paste_infix()` creates a SQL paste function using an infix operator
-#'   like `||`.
-#'
-#' @seealso
-#' * [sql_translator()] for creating SQL translators.
-#' * [sql_translation_scalar] for scalar function helpers.
-#' * [sql_translation_agg] for aggregation function helpers.
-#'
+#' @family SQL translation helpers
 #' @name sql_translation_string
-#'
-# R prefers to specify start / stop or start / end
-# databases usually specify start / length
-# https://www.postgresql.org/docs/current/functions-string.html
+NULL
+
 #' @export
 #' @rdname sql_translation_string
 sql_substr <- function(f = "SUBSTR") {
+  # R prefers to specify start / stop or start / end
+  # databases usually specify start / length
+  # https://www.postgresql.org/docs/current/functions-string.html
   function(x, start, stop) {
     start <- max(cast_number_whole(start), 1L)
     stop <- max(cast_number_whole(stop), 1L)
