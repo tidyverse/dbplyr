@@ -71,6 +71,8 @@ Collate:
     'translate-sql-quantile.R'
     'translate-sql-string.R'
     'translate-sql-paste.R'
+    'translate-sql-agg.R'
+    'translate-sql-scalar.R'
     'translate-sql-helpers.R'
     'translate-sql-window.R'
     'translate-sql-conditional.R'

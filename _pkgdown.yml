@@ -96,7 +96,11 @@ reference:
   - db-misc
   - db-sql
   - db-quote
+  - sql_variant
   - sql_query_insert
+  - sql_translation_scalar
+  - sql_translation_string
+  - sql_translation_agg
 
 news:
   releases:

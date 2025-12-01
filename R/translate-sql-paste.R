@@ -1,5 +1,5 @@
 #' @export
-#' @rdname sql_variant
+#' @rdname sql_translation_string
 sql_paste <- function(default_sep, f = "CONCAT_WS") {
   function(..., sep = default_sep, collapse = NULL) {
     check_collapse(collapse)
@@ -8,7 +8,7 @@ sql_paste <- function(default_sep, f = "CONCAT_WS") {
 }
 
 #' @export
-#' @rdname sql_variant
+#' @rdname sql_translation_string
 sql_paste_infix <- function(default_sep, op, cast) {
   force(default_sep)
   op <- as.symbol(paste0("%", op, "%"))
