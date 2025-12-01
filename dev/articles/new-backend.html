@@ -218,8 +218,8 @@ overrides only what’s different for your backend:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span></span>
 <span>  <span class="va">base_scalar</span>, <span class="co"># Inherit most translations</span></span>
 <span>  <span class="co"># Override specific functions for your backend</span></span>
-<span>  `+` <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_infix</a></span><span class="op">(</span><span class="st">"+"</span><span class="op">)</span>,</span>
-<span>  mean <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_aggregate</a></span><span class="op">(</span><span class="st">"AVERAGE"</span>, <span class="st">"mean"</span><span class="op">)</span></span>
+<span>  `+` <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_scalar.html">sql_infix</a></span><span class="op">(</span><span class="st">"+"</span><span class="op">)</span>,</span>
+<span>  mean <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_agg.html">sql_aggregate</a></span><span class="op">(</span><span class="st">"AVERAGE"</span>, <span class="st">"mean"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="scalar-function-helpers">Scalar function helpers<a class="anchor" aria-label="anchor" href="#scalar-function-helpers"></a>
@@ -248,15 +248,15 @@ with no SQL translation.</li>
 <span>    scalar <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span></span>
 <span>      <span class="va">base_scalar</span>,</span>
 <span>      <span class="co"># Standard SQL functions</span></span>
-<span>      cos <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_prefix</a></span><span class="op">(</span><span class="st">"COS"</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>      round <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_prefix</a></span><span class="op">(</span><span class="st">"ROUND"</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>      cos <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_scalar.html">sql_prefix</a></span><span class="op">(</span><span class="st">"COS"</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>      round <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_scalar.html">sql_prefix</a></span><span class="op">(</span><span class="st">"ROUND"</span>, <span class="fl">2</span><span class="op">)</span>,</span>
 <span>      <span class="co"># Infix operators</span></span>
-<span>      `+` <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_infix</a></span><span class="op">(</span><span class="st">"+"</span><span class="op">)</span>,</span>
-<span>      `*` <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_infix</a></span><span class="op">(</span><span class="st">"*"</span><span class="op">)</span>,</span>
-<span>      `==` <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_infix</a></span><span class="op">(</span><span class="st">"="</span><span class="op">)</span>,</span>
+<span>      `+` <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_scalar.html">sql_infix</a></span><span class="op">(</span><span class="st">"+"</span><span class="op">)</span>,</span>
+<span>      `*` <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_scalar.html">sql_infix</a></span><span class="op">(</span><span class="st">"*"</span><span class="op">)</span>,</span>
+<span>      `==` <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_scalar.html">sql_infix</a></span><span class="op">(</span><span class="st">"="</span><span class="op">)</span>,</span>
 <span>      <span class="co"># Type casting</span></span>
-<span>      as.numeric <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_cast</a></span><span class="op">(</span><span class="st">"NUMERIC"</span><span class="op">)</span>,</span>
-<span>      as.character <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_cast</a></span><span class="op">(</span><span class="st">"VARCHAR"</span><span class="op">)</span></span>
+<span>      as.numeric <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_scalar.html">sql_cast</a></span><span class="op">(</span><span class="st">"NUMERIC"</span><span class="op">)</span>,</span>
+<span>      as.character <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_scalar.html">sql_cast</a></span><span class="op">(</span><span class="st">"VARCHAR"</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    aggregate <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span><span class="va">base_agg</span><span class="op">)</span>,</span>
 <span>    window <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span><span class="va">base_win</span><span class="op">)</span></span>
@@ -285,15 +285,15 @@ variadic SQL aggregate functions.</li>
 <span>    aggregate <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span></span>
 <span>      .parent <span class="op">=</span> <span class="va">base_agg</span>,</span>
 <span>      <span class="co"># Single-argument aggregates</span></span>
-<span>      mean <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_aggregate</a></span><span class="op">(</span><span class="st">"AVG"</span>, <span class="st">"mean"</span><span class="op">)</span>,</span>
-<span>      var <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_aggregate</a></span><span class="op">(</span><span class="st">"VAR_SAMP"</span>, <span class="st">"var"</span><span class="op">)</span>,</span>
+<span>      mean <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_agg.html">sql_aggregate</a></span><span class="op">(</span><span class="st">"AVG"</span>, <span class="st">"mean"</span><span class="op">)</span>,</span>
+<span>      var <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_agg.html">sql_aggregate</a></span><span class="op">(</span><span class="st">"VAR_SAMP"</span>, <span class="st">"var"</span><span class="op">)</span>,</span>
 <span>      <span class="co"># Two-argument aggregates</span></span>
-<span>      cov <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_aggregate_2</a></span><span class="op">(</span><span class="st">"COVAR_SAMP"</span><span class="op">)</span>,</span>
+<span>      cov <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_agg.html">sql_aggregate_2</a></span><span class="op">(</span><span class="st">"COVAR_SAMP"</span><span class="op">)</span>,</span>
 <span>      <span class="co"># Variadic aggregates</span></span>
-<span>      pmin <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_aggregate_n</a></span><span class="op">(</span><span class="st">"LEAST"</span>, <span class="st">"pmin"</span><span class="op">)</span>,</span>
-<span>      pmax <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_aggregate_n</a></span><span class="op">(</span><span class="st">"GREATEST"</span>, <span class="st">"pmax"</span><span class="op">)</span>,</span>
+<span>      pmin <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_agg.html">sql_aggregate_n</a></span><span class="op">(</span><span class="st">"LEAST"</span>, <span class="st">"pmin"</span><span class="op">)</span>,</span>
+<span>      pmax <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_agg.html">sql_aggregate_n</a></span><span class="op">(</span><span class="st">"GREATEST"</span>, <span class="st">"pmax"</span><span class="op">)</span>,</span>
 <span>      <span class="co"># Unsupported functions</span></span>
-<span>      median <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_not_supported</a></span><span class="op">(</span><span class="st">"median"</span><span class="op">)</span></span>
+<span>      median <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_agg.html">sql_not_supported</a></span><span class="op">(</span><span class="st">"median"</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    window <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span><span class="va">base_win</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
@@ -322,16 +322,16 @@ support certain window functions.</li>
 <code class="sourceCode R"><span><span class="va">window</span> <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span></span>
 <span>  <span class="va">base_win</span>,</span>
 <span>  <span class="co"># Ranking functions</span></span>
-<span>  row_number <span class="op">=</span> <span class="fu"><a href="../reference/win_over.html">win_rank</a></span><span class="op">(</span><span class="st">"ROW_NUMBER"</span><span class="op">)</span>,</span>
-<span>  rank <span class="op">=</span> <span class="fu"><a href="../reference/win_over.html">win_rank</a></span><span class="op">(</span><span class="st">"RANK"</span><span class="op">)</span>,</span>
-<span>  dense_rank <span class="op">=</span> <span class="fu"><a href="../reference/win_over.html">win_rank</a></span><span class="op">(</span><span class="st">"DENSE_RANK"</span><span class="op">)</span>,</span>
+<span>  row_number <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_window.html">win_rank</a></span><span class="op">(</span><span class="st">"ROW_NUMBER"</span><span class="op">)</span>,</span>
+<span>  rank <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_window.html">win_rank</a></span><span class="op">(</span><span class="st">"RANK"</span><span class="op">)</span>,</span>
+<span>  dense_rank <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_window.html">win_rank</a></span><span class="op">(</span><span class="st">"DENSE_RANK"</span><span class="op">)</span>,</span>
 <span>  <span class="co"># Aggregate functions as window functions</span></span>
-<span>  mean <span class="op">=</span> <span class="fu"><a href="../reference/win_over.html">win_aggregate</a></span><span class="op">(</span><span class="st">"AVG"</span><span class="op">)</span>,</span>
-<span>  sum <span class="op">=</span> <span class="fu"><a href="../reference/win_over.html">win_aggregate</a></span><span class="op">(</span><span class="st">"SUM"</span><span class="op">)</span>,</span>
+<span>  mean <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_window.html">win_aggregate</a></span><span class="op">(</span><span class="st">"AVG"</span><span class="op">)</span>,</span>
+<span>  sum <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_window.html">win_aggregate</a></span><span class="op">(</span><span class="st">"SUM"</span><span class="op">)</span>,</span>
 <span>  <span class="co"># Cumulative functions</span></span>
-<span>  cumsum <span class="op">=</span> <span class="fu"><a href="../reference/win_over.html">win_cumulative</a></span><span class="op">(</span><span class="st">"SUM"</span><span class="op">)</span>,</span>
+<span>  cumsum <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_window.html">win_cumulative</a></span><span class="op">(</span><span class="st">"SUM"</span><span class="op">)</span>,</span>
 <span>  <span class="co"># Absent functions</span></span>
-<span>  cume_dist <span class="op">=</span> <span class="fu"><a href="../reference/win_over.html">win_absent</a></span><span class="op">(</span><span class="st">"cume_dist"</span><span class="op">)</span></span>
+<span>  cume_dist <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_window.html">win_absent</a></span><span class="op">(</span><span class="st">"cume_dist"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">

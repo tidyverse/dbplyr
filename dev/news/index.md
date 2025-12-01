@@ -2,6 +2,7 @@
 
 ## dbplyr (development version)
 
+- Deprecated `win_rank_tdata()` has been removed.
 - [`compute()`](https://dplyr.tidyverse.org/reference/compute.html),
   [`collect()`](https://dplyr.tidyverse.org/reference/compute.html), and
   [`collapse()`](https://dplyr.tidyverse.org/reference/compute.html) now
@@ -313,7 +314,7 @@ CRAN release: 2023-10-26
   ([@mgirllich](https://github.com/mgirllich),
   [\#1199](https://github.com/tidyverse/dbplyr/issues/1199)).
 
-- [`sql_not_supported()`](https://dbplyr.tidyverse.org/dev/reference/sql_variant.md)
+- [`sql_not_supported()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_agg.md)
   now expects a function name without parentheses.
 
 - [`sql_query_append()`](https://dbplyr.tidyverse.org/dev/reference/sql_query_insert.md),
@@ -2242,7 +2243,7 @@ testing and generating reprexes.
   no longer accept `con = NULL` as a shortcut for
   `con = simulate_dbi()`. This made it too easy to forget to pass `con`
   along, introducing extremely subtle escaping bugs.
-  [`win_over()`](https://dbplyr.tidyverse.org/dev/reference/win_over.md)
+  [`win_over()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_window.md)
   gains a `con` argument for the same reason.
 
 - New
@@ -2260,17 +2261,17 @@ testing and generating reprexes.
   `df %>% summarise_all(~ mean(.))`, `df %>% summarise_all(list(mean))`
   ([\#134](https://github.com/tidyverse/dbplyr/issues/134)).
 
-- [`sql_aggregate()`](https://dbplyr.tidyverse.org/dev/reference/sql_variant.md)
+- [`sql_aggregate()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_agg.md)
   now takes an optional argument `f_r` for passing to `check_na_rm()`.
   This allows the warning to show the R function name rather than the
   SQL function name ([@sverchkov](https://github.com/sverchkov),
   [\#153](https://github.com/tidyverse/dbplyr/issues/153)).
 
-- [`sql_infix()`](https://dbplyr.tidyverse.org/dev/reference/sql_variant.md)
+- [`sql_infix()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_scalar.md)
   gains a `pad` argument for the rare operator that doesn’t need to be
   surrounded by spaces.
 
-- [`sql_prefix()`](https://dbplyr.tidyverse.org/dev/reference/sql_variant.md)
+- [`sql_prefix()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_scalar.md)
   no longer turns SQL functions into uppercase, allowing for correct
   translation of case-sensitive SQL functions
   ([\#181](https://github.com/tidyverse/dbplyr/issues/181),
@@ -2475,15 +2476,15 @@ CRAN release: 2018-01-03
   ([\#3169](https://github.com/tidyverse/dbplyr/issues/3169)).
 
 - New
-  [`sql_aggregate()`](https://dbplyr.tidyverse.org/dev/reference/sql_variant.md)
+  [`sql_aggregate()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_agg.md)
   and
-  [`win_aggregate()`](https://dbplyr.tidyverse.org/dev/reference/win_over.md)
+  [`win_aggregate()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_window.md)
   for generating SQL and windowed SQL functions for aggregates. These
   take one argument, `x`, and warn if `na.rm` is not `TRUE`
   ([\#3155](https://github.com/tidyverse/dbplyr/issues/3155)).
-  [`win_recycled()`](https://dbplyr.tidyverse.org/dev/reference/win_over.md)
+  [`win_recycled()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_window.md)
   is equivalent to
-  [`win_aggregate()`](https://dbplyr.tidyverse.org/dev/reference/win_over.md)
+  [`win_aggregate()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_window.md)
   and has been soft-deprecated.
 
 - `db_write_table` now needs to return the table name
@@ -2875,7 +2876,7 @@ CRAN release: 2017-06-09
   the length of the string
   ([\#2536](https://github.com/tidyverse/dbplyr/issues/2536)).
 
-- [`win_over()`](https://dbplyr.tidyverse.org/dev/reference/win_over.md)
+- [`win_over()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_window.md)
   escapes expression using current database rules.
 
 ### Backends
@@ -2915,13 +2916,13 @@ CRAN release: 2017-06-09
   and now dispatches on the connection, eliminating the last method that
   required dispatch on the class of the src.
 
-- [`win_over()`](https://dbplyr.tidyverse.org/dev/reference/win_over.md),
-  [`win_rank()`](https://dbplyr.tidyverse.org/dev/reference/win_over.md),
-  [`win_recycled()`](https://dbplyr.tidyverse.org/dev/reference/win_over.md),
-  [`win_cumulative()`](https://dbplyr.tidyverse.org/dev/reference/win_over.md),
-  [`win_current_group()`](https://dbplyr.tidyverse.org/dev/reference/win_over.md)
+- [`win_over()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_window.md),
+  [`win_rank()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_window.md),
+  [`win_recycled()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_window.md),
+  [`win_cumulative()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_window.md),
+  [`win_current_group()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_window.md)
   and
-  [`win_current_order()`](https://dbplyr.tidyverse.org/dev/reference/win_over.md)
+  [`win_current_order()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_window.md)
   are now exported. This should make it easier to provide customised SQL
   for window functions
   ([\#2051](https://github.com/tidyverse/dbplyr/issues/2051),

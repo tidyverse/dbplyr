@@ -1,20 +1,14 @@
-# Create an sql translator
+# Create an SQL translator
 
-When creating a package that maps to a new SQL based src, you'll often
-want to provide some additional mappings from common R commands to the
-commands that your tbl provides. These three functions make that easy.
+`sql_variant()` creates a SQL variant, a list of translators for scalar,
+aggregate, and window functions. `sql_translator()` creates a
+translator, an environment containing R to SQL translations. When
+creating a backend, you'll use these functions to customize how R
+functions are converted to SQL.
 
 ## Usage
 
 ``` r
-sql_substr(f = "SUBSTR")
-
-sql_str_sub(subset_f = "SUBSTR", length_f = "LENGTH", optional_length = TRUE)
-
-sql_paste(default_sep, f = "CONCAT_WS")
-
-sql_paste_infix(default_sep, op, cast)
-
 sql_variant(
   scalar = sql_translator(),
   aggregate = sql_translator(),
@@ -22,28 +16,6 @@ sql_variant(
 )
 
 sql_translator(..., .funs = list(), .parent = new.env(parent = emptyenv()))
-
-sql_infix(f, pad = TRUE)
-
-sql_prefix(f, n = NULL)
-
-sql_aggregate(f, f_r = f)
-
-sql_aggregate_2(f)
-
-sql_aggregate_n(f, f_r = f)
-
-sql_not_supported(f)
-
-sql_cast(type)
-
-sql_try_cast(type)
-
-sql_log()
-
-sql_cot()
-
-sql_runif(rand_expr, n = n(), min = 0, max = 1)
 
 base_scalar
 
@@ -62,53 +34,42 @@ base_odbc_win
 
 ## Arguments
 
-- f:
-
-  the name of the sql function as a string
-
 - scalar, aggregate, window:
 
-  The three families of functions than an SQL variant can supply.
+  The three families of functions that an SQL variant can supply.
 
 - ..., .funs:
 
-  named functions, used to add custom converters from standard R
-  functions to sql functions. Specify individually in `...`, or provide
-  a list of `.funs`
+  Named functions, used to add custom converters from standard R
+  functions to SQL functions. Specify individually in `...`, or provide
+  a list of `.funs`.
 
 - .parent:
 
-  the sql variant that this variant should inherit from. Defaults to
+  The SQL variant that this variant should inherit from. Defaults to
   `base_agg` which provides a standard set of mappings for the most
   common operators and functions.
 
-- pad:
+## Base translators
 
-  If `TRUE`, the default, pad the infix operator with spaces.
+dbplyr provides the following base translators that implement standard
+SQL semantics:
 
-- n:
+- `base_scalar` - scalar functions and operators
 
-  for `sql_infix()`, an optional number of arguments to expect. Will
-  signal error if not correct.
+- `base_agg` - aggregate functions
 
-- f_r:
+- `base_win` - window functions
 
-  the name of the r function being translated as a string
-
-## Helper functions
-
-`sql_infix()` and `sql_prefix()` create default SQL infix and prefix
-functions given the name of the SQL function. They don't perform any
-input checking, but do correctly escape their input, and are useful for
-quickly providing default wrappers for a new SQL variant.
+- `base_no_win` - versions of window functions that throw errors
 
 ## See also
 
-[`win_over()`](https://dbplyr.tidyverse.org/dev/reference/win_over.md)
-for helper functions for window functions.
-
-[`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md) for an
-example of a more customised sql conversion function.
+Other SQL translation helpers:
+[`sql_translation_agg`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_agg.md),
+[`sql_translation_scalar`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_scalar.md),
+[`sql_translation_string`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_string.md),
+[`sql_translation_window`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_window.md)
 
 ## Examples
 

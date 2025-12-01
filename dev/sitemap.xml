@@ -83,6 +83,10 @@
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_options.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_query_insert.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_quote.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_translation_agg.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_translation_scalar.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_translation_string.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_translation_window.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_variant.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/src_dbi.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/summarise.tbl_lazy.html</loc></url>
@@ -91,7 +95,6 @@
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/tbl_sql.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/testing.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/translate_sql.html</loc></url>
-<url><loc>https://dbplyr.tidyverse.org/dev/reference/win_over.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/window_order.html</loc></url>
 </urlset>
 
