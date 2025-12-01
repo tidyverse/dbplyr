@@ -125,6 +125,15 @@ dbplyr_fill0.DBIConnection <- function(
     )
 }
 
+# Define function & avoid R CMD CHECK note
+last <- function(x, na_rm = TRUE) {
+  if (na_rm) {
+    x <- x[!is.na(x)]
+  }
+  x[[length(x)]]
+}
+
+
 # databases without support for `IGNORE NULLS`
 # * sqlite
 # * access: https://www.techonthenet.com/access/functions/
