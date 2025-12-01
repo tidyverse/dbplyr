@@ -76,7 +76,7 @@ mutate(
 Another `tbl_lazy`. Use
 [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
 to see the generated query, and use
-[`collect()`](https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.md)
+[`collect()`](https://dbplyr.tidyverse.org/dev/reference/collect.tbl_sql.md)
 to execute the query and return data to R.
 
 ## Examples
@@ -90,10 +90,10 @@ db |>
   show_query()
 #> <SQL>
 #> SELECT
-#>   `dbplyr_fLBw8zKN1y`.*,
+#>   `dbplyr_8U3eI6Ojtg`.*,
 #>   (`x` + `y`) / 2.0 AS `a`,
 #>   SQRT((POWER(`x`, 2)) + POWER(`y`, 2)) AS `b`
-#> FROM `dbplyr_fLBw8zKN1y`
+#> FROM `dbplyr_8U3eI6Ojtg`
 
 # dbplyr automatically creates subqueries as needed
 db |>
@@ -102,7 +102,7 @@ db |>
 #> <SQL>
 #> SELECT `q01`.*, `x1` * 2.0 AS `x2`
 #> FROM (
-#>   SELECT `dbplyr_fLBw8zKN1y`.*, `x` + 1.0 AS `x1`
-#>   FROM `dbplyr_fLBw8zKN1y`
+#>   SELECT `dbplyr_8U3eI6Ojtg`.*, `x` + 1.0 AS `x1`
+#>   FROM `dbplyr_8U3eI6Ojtg`
 #> ) AS `q01`
 ```

@@ -113,14 +113,16 @@ contributing to this project, you agree to abide by its terms.
 
 - [`tbl(`*`<src_dbi>`*`)`](https://dbplyr.tidyverse.org/dev/reference/tbl.src_dbi.md)
   : Use dplyr verbs with a remote database table
+- [`collapse(`*`<tbl_sql>`*`)`](https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.md)
+  : Collapse a query into a subquery
+- [`collect(`*`<tbl_sql>`*`)`](https://dbplyr.tidyverse.org/dev/reference/collect.tbl_sql.md)
+  : Collect results into a local data frame
+- [`compute(`*`<tbl_sql>`*`)`](https://dbplyr.tidyverse.org/dev/reference/compute.tbl_sql.md)
+  : Save results into a new remote table
 - [`copy_to(`*`<src_sql>`*`)`](https://dbplyr.tidyverse.org/dev/reference/copy_to.src_sql.md)
   : Copy a local data frame to a remote database
 - [`copy_inline()`](https://dbplyr.tidyverse.org/dev/reference/copy_inline.md)
   : Use a local data frame in a dbplyr query
-- [`collapse(`*`<tbl_sql>`*`)`](https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.md)
-  [`compute(`*`<tbl_sql>`*`)`](https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.md)
-  [`collect(`*`<tbl_sql>`*`)`](https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.md)
-  : Compute results of a query
 - [`pull(`*`<tbl_sql>`*`)`](https://dbplyr.tidyverse.org/dev/reference/pull.tbl_sql.md)
   : Extract a single column
 - [`show_query(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)

@@ -39,7 +39,7 @@ head(x, n = 6L, ...)
 Another `tbl_lazy`. Use
 [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
 to see the generated query, and use
-[`collect()`](https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.md)
+[`collect()`](https://dbplyr.tidyverse.org/dev/reference/collect.tbl_sql.md)
 to execute the query and return data to R.
 
 ## Examples
@@ -50,8 +50,8 @@ library(dplyr, warn.conflicts = FALSE)
 db <- memdb_frame(x = 1:100)
 db |> head() |> show_query()
 #> <SQL>
-#> SELECT `dbplyr_P8gLIJILJj`.*
-#> FROM `dbplyr_P8gLIJILJj`
+#> SELECT `dbplyr_yvCzqTiZvf`.*
+#> FROM `dbplyr_yvCzqTiZvf`
 #> LIMIT 6
 
 # Pretend we have data in a SQL server database

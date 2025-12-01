@@ -102,10 +102,10 @@ special handling of temporary tables.</p><ul><li><p><code>db_copy_to()</code> im
 <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_write_table()</a></code> (which calls <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">DBI::dbWriteTable()</a></code>) to transfer the
 data, then optionally adds indexes (via <code><a href="db-sql.html">sql_table_index()</a></code>) and
 analyses (via <code><a href="db-sql.html">sql_table_analyze()</a></code>).</p></li>
-<li><p><code>db_compute()</code> implements <code><a href="collapse.tbl_sql.html">compute.tbl_sql()</a></code> by calling
+<li><p><code>db_compute()</code> implements <code><a href="compute.tbl_sql.html">compute.tbl_sql()</a></code> by calling
 <code><a href="db-sql.html">sql_query_save()</a></code> to create the table, then optionally adds indexes
 (via <code><a href="db-sql.html">sql_table_index()</a></code>) and analyses (via <code><a href="db-sql.html">sql_table_analyze()</a></code>).</p></li>
-<li><p><code>db_collect()</code> implements <code><a href="collapse.tbl_sql.html">collect.tbl_sql()</a></code> using <code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">DBI::dbSendQuery()</a></code>
+<li><p><code>db_collect()</code> implements <code><a href="collect.tbl_sql.html">collect.tbl_sql()</a></code> using <code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">DBI::dbSendQuery()</a></code>
 and <code><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">DBI::dbFetch()</a></code>.</p></li>
 <li><p><code>db_table_temporary()</code> is used for databases that have special naming
 schemes for temporary tables (e.g. SQL server and SAP HANA require

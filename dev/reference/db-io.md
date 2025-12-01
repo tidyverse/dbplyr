@@ -18,7 +18,7 @@ backend has special handling of temporary tables.
   [`sql_table_analyze()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)).
 
 - `db_compute()` implements
-  [`compute.tbl_sql()`](https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.md)
+  [`compute.tbl_sql()`](https://dbplyr.tidyverse.org/dev/reference/compute.tbl_sql.md)
   by calling
   [`sql_query_save()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
   to create the table, then optionally adds indexes (via
@@ -27,7 +27,7 @@ backend has special handling of temporary tables.
   [`sql_table_analyze()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)).
 
 - `db_collect()` implements
-  [`collect.tbl_sql()`](https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.md)
+  [`collect.tbl_sql()`](https://dbplyr.tidyverse.org/dev/reference/collect.tbl_sql.md)
   using
   [`DBI::dbSendQuery()`](https://dbi.r-dbi.org/reference/dbSendQuery.html)
   and [`DBI::dbFetch()`](https://dbi.r-dbi.org/reference/dbFetch.html).

@@ -111,16 +111,16 @@ db |> slice_min(x) |> show_query()
 #> <SQL>
 #> SELECT `x`, `y`
 #> FROM (
-#>   SELECT `dbplyr_1N7gYBNlcp`.*, RANK() OVER (ORDER BY `x`) AS `col01`
-#>   FROM `dbplyr_1N7gYBNlcp`
+#>   SELECT `dbplyr_pYJGCySHwm`.*, RANK() OVER (ORDER BY `x`) AS `col01`
+#>   FROM `dbplyr_pYJGCySHwm`
 #> ) AS `q01`
 #> WHERE (`col01` <= 1)
 db |> slice_max(x) |> show_query()
 #> <SQL>
 #> SELECT `x`, `y`
 #> FROM (
-#>   SELECT `dbplyr_1N7gYBNlcp`.*, RANK() OVER (ORDER BY `x` DESC) AS `col01`
-#>   FROM `dbplyr_1N7gYBNlcp`
+#>   SELECT `dbplyr_pYJGCySHwm`.*, RANK() OVER (ORDER BY `x` DESC) AS `col01`
+#>   FROM `dbplyr_pYJGCySHwm`
 #> ) AS `q01`
 #> WHERE (`col01` <= 1)
 db |> slice_sample() |> show_query()
@@ -128,9 +128,9 @@ db |> slice_sample() |> show_query()
 #> SELECT `x`, `y`
 #> FROM (
 #>   SELECT
-#>     `dbplyr_1N7gYBNlcp`.*,
+#>     `dbplyr_pYJGCySHwm`.*,
 #>     ROW_NUMBER() OVER (ORDER BY (0.5 + RANDOM() / 18446744073709551616.0)) AS `col01`
-#>   FROM `dbplyr_1N7gYBNlcp`
+#>   FROM `dbplyr_pYJGCySHwm`
 #> ) AS `q01`
 #> WHERE (`col01` <= 1)
 
@@ -139,9 +139,9 @@ db |> group_by(y) |> slice_min(x) |> show_query()
 #> SELECT `x`, `y`
 #> FROM (
 #>   SELECT
-#>     `dbplyr_1N7gYBNlcp`.*,
+#>     `dbplyr_pYJGCySHwm`.*,
 #>     RANK() OVER (PARTITION BY `y` ORDER BY `x`) AS `col01`
-#>   FROM `dbplyr_1N7gYBNlcp`
+#>   FROM `dbplyr_pYJGCySHwm`
 #> ) AS `q01`
 #> WHERE (`col01` <= 1)
 

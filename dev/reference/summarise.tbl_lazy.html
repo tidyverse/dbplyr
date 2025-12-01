@@ -109,7 +109,7 @@ or when <code><a href="https://dplyr.tidyverse.org/reference/summarise.html" cla
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Another <code>tbl_lazy</code>. Use <code><a href="show_query.html">show_query()</a></code> to see the generated
-query, and use <code><a href="collapse.tbl_sql.html">collect()</a></code> to execute the query
+query, and use <code><a href="collect.tbl_sql.html">collect()</a></code> to execute the query
 and return data to R.</p>
     </div>
 
@@ -123,7 +123,7 @@ and return data to R.</p>
 <span class="r-in"><span>  <span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> COUNT(*)<span style="color: #0000BB;"> AS </span>`n()`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_N9PgDPOtnO`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_t6iZiVCGwV`</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">db</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
@@ -131,7 +131,7 @@ and return data to R.</p>
 <span class="r-in"><span>  <span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `g`, COUNT(*)<span style="color: #0000BB;"> AS </span>`n()`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_N9PgDPOtnO`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_t6iZiVCGwV`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">GROUP BY</span> `g`</span>
 </code></pre></div>
     </div>

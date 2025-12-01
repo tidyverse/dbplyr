@@ -124,7 +124,7 @@ should appear (the default is to add to the right hand side). See
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Another <code>tbl_lazy</code>. Use <code><a href="show_query.html">show_query()</a></code> to see the generated
-query, and use <code><a href="collapse.tbl_sql.html">collect()</a></code> to execute the query
+query, and use <code><a href="collect.tbl_sql.html">collect()</a></code> to execute the query
 and return data to R.</p>
     </div>
 
@@ -138,10 +138,10 @@ and return data to R.</p>
 <span class="r-in"><span>  <span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   `dbplyr_fLBw8zKN1y`.*,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   `dbplyr_8U3eI6Ojtg`.*,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   (`x` + `y`) / 2.0<span style="color: #0000BB;"> AS </span>`a`,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   SQRT((POWER(`x`, 2)) + POWER(`y`, 2))<span style="color: #0000BB;"> AS </span>`b`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_fLBw8zKN1y`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_8U3eI6Ojtg`</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># dbplyr automatically creates subqueries as needed</span></span></span>
 <span class="r-in"><span><span class="va">db</span> <span class="op">|&gt;</span></span></span>
@@ -150,8 +150,8 @@ and return data to R.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `q01`.*, `x1` * 2.0<span style="color: #0000BB;"> AS </span>`x2`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> (</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span> `dbplyr_fLBw8zKN1y`.*, `x` + 1.0<span style="color: #0000BB;"> AS </span>`x1`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_fLBw8zKN1y`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span> `dbplyr_8U3eI6Ojtg`.*, `x` + 1.0<span style="color: #0000BB;"> AS </span>`x1`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_8U3eI6Ojtg`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )<span style="color: #0000BB;"> AS </span>`q01`</span>
 </code></pre></div>
     </div>

@@ -108,8 +108,8 @@ amounts of data.</p></dd>
 
 <dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
 <dd><p>Name of new remote table. Use a string to create the table
-in the current catalog/schema. Use <code><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I()</a></code> if you want to create it
-in a specific catalog/schema, e.g. <code>I("schema.table")</code>.</p></dd>
+in the current catalog/schema. Use <code><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I()</a></code> to create the table in a specific
+catalog/schema, e.g. <code>I("schema.table")</code>.</p></dd>
 
 
 <dt id="arg-overwrite">overwrite<a class="anchor" aria-label="anchor" href="#arg-overwrite"></a></dt>
@@ -159,7 +159,7 @@ higher up (and your database doesn't support nested transactions.)</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Another <code>tbl_lazy</code>. Use <code><a href="show_query.html">show_query()</a></code> to see the generated
-query, and use <code><a href="collapse.tbl_sql.html">collect()</a></code> to execute the query
+query, and use <code><a href="collect.tbl_sql.html">collect()</a></code> to execute the query
 and return data to R.</p>
     </div>
     <div class="section level2">

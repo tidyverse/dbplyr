@@ -32,7 +32,9 @@
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-teradata.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/build_sql.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/collect.tbl_sql.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/complete.tbl_lazy.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/compute.tbl_sql.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/copy_inline.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/copy_to.src_sql.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/count.tbl_lazy.html</loc></url>

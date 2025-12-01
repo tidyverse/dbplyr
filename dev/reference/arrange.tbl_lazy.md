@@ -43,7 +43,7 @@ arrange(.data, ..., .by_group = FALSE)
 Another `tbl_lazy`. Use
 [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
 to see the generated query, and use
-[`collect()`](https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.md)
+[`collect()`](https://dbplyr.tidyverse.org/dev/reference/collect.tbl_sql.md)
 to execute the query and return data to R.
 
 ## Missing values

@@ -34,7 +34,7 @@ distinct(.data, ..., .keep_all = FALSE)
 Another `tbl_lazy`. Use
 [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
 to see the generated query, and use
-[`collect()`](https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.md)
+[`collect()`](https://dbplyr.tidyverse.org/dev/reference/collect.tbl_sql.md)
 to execute the query and return data to R.
 
 ## Examples
@@ -45,10 +45,10 @@ library(dplyr, warn.conflicts = FALSE)
 db <- memdb_frame(x = c(1, 1, 2, 2), y = c(1, 2, 1, 1))
 db |> distinct() |> show_query()
 #> <SQL>
-#> SELECT DISTINCT `dbplyr_crUoBF7QxM`.*
-#> FROM `dbplyr_crUoBF7QxM`
+#> SELECT DISTINCT `dbplyr_1qeoeBlLyC`.*
+#> FROM `dbplyr_1qeoeBlLyC`
 db |> distinct(x) |> show_query()
 #> <SQL>
 #> SELECT DISTINCT `x`
-#> FROM `dbplyr_crUoBF7QxM`
+#> FROM `dbplyr_1qeoeBlLyC`
 ```

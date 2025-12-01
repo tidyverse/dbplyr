@@ -2,6 +2,10 @@
 
 ## dbplyr (development version)
 
+- [`compute()`](https://dplyr.tidyverse.org/reference/compute.html),
+  [`collect()`](https://dplyr.tidyverse.org/reference/compute.html), and
+  [`collapse()`](https://dplyr.tidyverse.org/reference/compute.html) now
+  have their own documentation pages.
 - dbplyr now uses the base pipe
   ([\#1626](https://github.com/tidyverse/dbplyr/issues/1626)).
 - Defunct functions have been removed:

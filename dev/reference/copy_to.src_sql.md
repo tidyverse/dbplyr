@@ -46,7 +46,7 @@ copy_to(
 
   Name of new remote table. Use a string to create the table in the
   current catalog/schema. Use [`I()`](https://rdrr.io/r/base/AsIs.html)
-  if you want to create it in a specific catalog/schema, e.g.
+  to create the table in a specific catalog/schema, e.g.
   `I("schema.table")`.
 
 - overwrite:
@@ -97,7 +97,7 @@ copy_to(
 Another `tbl_lazy`. Use
 [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
 to see the generated query, and use
-[`collect()`](https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.md)
+[`collect()`](https://dbplyr.tidyverse.org/dev/reference/collect.tbl_sql.md)
 to execute the query and return data to R.
 
 ## See also

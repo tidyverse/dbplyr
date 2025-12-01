@@ -44,7 +44,7 @@ filter(.data, ..., .by = NULL, .preserve = FALSE)
 Another `tbl_lazy`. Use
 [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
 to see the generated query, and use
-[`collect()`](https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.md)
+[`collect()`](https://dbplyr.tidyverse.org/dev/reference/collect.tbl_sql.md)
 to execute the query and return data to R.
 
 ## Examples
@@ -55,12 +55,12 @@ library(dplyr, warn.conflicts = FALSE)
 db <- memdb_frame(x = c(2, NA, 5, NA, 10), y = 1:5)
 db |> filter(x < 5) |> show_query()
 #> <SQL>
-#> SELECT `dbplyr_FwkzgfuPO1`.*
-#> FROM `dbplyr_FwkzgfuPO1`
+#> SELECT `dbplyr_Vmyiq6RTXY`.*
+#> FROM `dbplyr_Vmyiq6RTXY`
 #> WHERE (`x` < 5.0)
 db |> filter(is.na(x)) |> show_query()
 #> <SQL>
-#> SELECT `dbplyr_FwkzgfuPO1`.*
-#> FROM `dbplyr_FwkzgfuPO1`
+#> SELECT `dbplyr_Vmyiq6RTXY`.*
+#> FROM `dbplyr_Vmyiq6RTXY`
 #> WHERE ((`x` IS NULL))
 ```

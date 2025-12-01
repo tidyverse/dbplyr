@@ -107,7 +107,7 @@ supported at all because the situation is even murkier for the "last" rows.</p>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Another <code>tbl_lazy</code>. Use <code><a href="show_query.html">show_query()</a></code> to see the generated
-query, and use <code><a href="collapse.tbl_sql.html">collect()</a></code> to execute the query
+query, and use <code><a href="collect.tbl_sql.html">collect()</a></code> to execute the query
 and return data to R.</p>
     </div>
 
@@ -118,8 +118,8 @@ and return data to R.</p>
 <span class="r-in"><span><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu"><a href="memdb_frame.html">memdb_frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">100</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">db</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `dbplyr_P8gLIJILJj`.*</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_P8gLIJILJj`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `dbplyr_yvCzqTiZvf`.*</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_yvCzqTiZvf`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">LIMIT</span> 6</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Pretend we have data in a SQL server database</span></span></span>
