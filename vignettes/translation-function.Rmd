@@ -10,7 +10,7 @@ vignette: >
 ```{r}
 #| label = "setup",
 #| include = FALSE
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+knitr::opts_chunk$set(collapse = TRUE, comment = "# ")
 options(tibble.print_min = 4L, tibble.print_max = 4L)
 ```
 
@@ -44,23 +44,10 @@ If you're interested in how `translate_sql()` is implemented, the basic techniqu
 
 ## Basic differences
 
-The following examples work through some of the basic differences between R and SQL.
+There are two fundamental differences between R and SQL:
 
-*   `"` and `'` mean different things
-
-    ```{r}
-    # In SQLite variable names are escaped by double quotes:
-    translate_sql(x, con = con)
-    # And strings are escaped by single quotes
-    translate_sql("x", con = con)
-    ```
-    
-*   And some functions have different argument orders:
-    
-    ```{r}
-    translate_sql(substr(x, 5, 10), con = con)
-    translate_sql(log(x, 10), con = con)
-    ```
+*   `"` and `'` mean different things. 
+    R can use either `"` or `'` for strings, but in ANSI SQL, `"` is used for names and only `'` can be used for strings.
 
 *   R and SQL have different defaults for integers and reals. 
     In R, 1 is a real, and 1L is an integer. In SQL, 1 is an integer, and 1.0 is a real.
@@ -298,4 +285,3 @@ mutate(players,
 ```
 
 Currently there is no way to order by multiple variables, except by setting the default ordering with `arrange()`. This will be added in a future release. 
-
