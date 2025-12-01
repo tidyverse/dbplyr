@@ -24,7 +24,7 @@ lazy_select_query <- function(
   # distinct = FALSE     -> no distinct
   # distinct = TRUE      -> distinct over all columns
   # distinct = columns   -> DISTINCT ON (...)
-  stopifnot(is.logical(distinct) || is_lazy_sql_part(distinct))
+  stopifnot(is_bool(distinct) || is_lazy_sql_part(distinct))
 
   select <- select %||% syms(set_names(op_vars(x)))
   select_operation <- arg_match0(
@@ -48,9 +48,6 @@ lazy_select_query <- function(
     )
   } else {
     select <- new_lazy_select(select)
-    if (!is.logical(distinct)) {
-      distinct <- new_lazy_select(distinct)
-    }
   }
 
   lazy_query(
@@ -161,7 +158,7 @@ print.lazy_select_query <- function(x, ...) {
   cat_line(
     "<SQL SELECT",
     if (!isFALSE(x$distinct)) " DISTINCT",
-    if (!is.logical(x$distinct)) " ON",
+    if (is_lazy_sql_part(x$distinct)) " ON",
     ">"
   )
   cat_line("From:")
@@ -207,11 +204,9 @@ sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
   alias <- remote_name(op$x, null_if_local = FALSE) %||% unique_subquery_name()
   from <- sql_build(op$x, con, sql_options = sql_options)
 
-  selects <- op$select
-
-  if (!is.logical(op$distinct)) {
+  if (is_lazy_sql_part(op$distinct)) {
     distinct <- get_select_sql(
-      select = op$distinct,
+      select = new_lazy_select(op$distinct),
       select_operation = op$select_operation,
       in_vars = op_vars(op$x),
       table_alias = alias,
@@ -223,7 +218,7 @@ sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
   }
 
   select_sql_list <- get_select_sql(
-    select = selects,
+    select = op$select,
     select_operation = op$select_operation,
     in_vars = op_vars(op$x),
     table_alias = alias,

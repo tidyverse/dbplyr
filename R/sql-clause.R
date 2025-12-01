@@ -53,23 +53,24 @@ sql_clause_select <- function(
     top <- as.integer(top)
   }
 
-  sql_distinct <-
-    if (isTRUE(distinct)) {
-      " DISTINCT"
-    } else if (isFALSE(distinct)) {
-      ""
-    } else {
-      glue_sql2(con, " DISTINCT ON ({.col distinct})")
-    }
-
   clause <- glue_sql2(
     con,
     "SELECT",
-    sql_distinct,
+    sql_distinct(con, distinct),
     if (!is.null(top)) " TOP {.val top}"
   )
 
   sql_clause(clause, select)
+}
+
+sql_distinct <- function(con, distinct) {
+  if (isTRUE(distinct)) {
+    " DISTINCT"
+  } else if (isFALSE(distinct)) {
+    ""
+  } else {
+    glue_sql2(con, " DISTINCT ON ({.col distinct})")
+  }
 }
 
 sql_clause_from <- function(from, lvl = 0) {

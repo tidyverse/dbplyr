@@ -49,16 +49,14 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
       .data <- .data %>% window_order(!!sym(dummy_order_vars))
     }
 
-    .data <- .data %>%
+    out <- .data %>%
       group_by(..., .add = TRUE) %>%
       filter(row_number() == 1L) %>%
       group_by(!!!grps)
 
     if (needs_dummy_order) {
-      .data <- .data %>% window_order()
+      out <- out %>% window_order()
     }
-
-    return(.data)
   }
   out
 }
@@ -163,18 +161,9 @@ quo_is_variable_reference <- function(quo) {
 add_distinct <- function(.data, distinct) {
   lazy_query <- .data$lazy_query
 
-  distinct <-
-    if (is.logical(distinct)) {
-      distinct
-    } else {
-      # if the DISTINCT ON clause contains all columns
-      # we can fall back to a normal DISTINCT
-      if (is_identity(syms(distinct), names(distinct), colnames(.data))) {
-        TRUE
-      } else {
-        syms(distinct)
-      }
-    }
+  if (!is_bool(distinct)) {
+    distinct <- syms(distinct)
+  }
 
   out <- lazy_select_query(
     x = lazy_query,
@@ -198,11 +187,7 @@ add_distinct <- function(.data, distinct) {
     return(out)
   }
 
-  if (!is.logical(distinct)) {
-    lazy_query$distinct <- new_lazy_select(distinct)
-  } else {
-    lazy_query$distinct <- distinct
-  }
+  lazy_query$distinct <- distinct
 
   lazy_query
 }

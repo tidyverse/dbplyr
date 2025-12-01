@@ -19,7 +19,7 @@ select_query <- function(
   check_character(window)
   check_character(order_by)
   check_number_whole(limit, allow_infinite = TRUE, allow_null = TRUE)
-  stopifnot(is.logical(distinct) || is.character(distinct))
+  stopifnot(is_bool(distinct) || is.character(distinct))
   check_string(from_alias, allow_null = TRUE)
 
   structure(
