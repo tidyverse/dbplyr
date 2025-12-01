@@ -21,7 +21,7 @@ automatically.
 
 ``` r
 translate_sql((x + y) / 2, con = con)
-#> <SQL> (`x` + `y`) / 2.0
+#  <SQL> (`x` + `y`) / 2.0
 ```
 
 [`translate_sql()`](https://dbplyr.tidyverse.org/dev/reference/translate_sql.md)
@@ -37,11 +37,11 @@ translations used by different backends:
 
 ``` r
 translate_sql(x ^ 2L, con = con)
-#> <SQL> POWER(`x`, 2)
+#  <SQL> POWER(`x`, 2)
 translate_sql(x ^ 2L, con = simulate_sqlite())
-#> <SQL> POWER(`x`, 2)
+#  <SQL> POWER(`x`, 2)
 translate_sql(x ^ 2L, con = simulate_access())
-#> <SQL> `x` ^ 2
+#  <SQL> `x` ^ 2
 ```
 
 Perfect translation is not possible because databases don’t have all the
@@ -65,28 +65,11 @@ R”](https://adv-r.hadley.nz/translation.html).
 
 ## Basic differences
 
-The following examples work through some of the basic differences
-between R and SQL.
+There are two fundamental differences between R and SQL:
 
-- `"` and `'` mean different things
-
-  ``` r
-  # In SQLite variable names are escaped by double quotes:
-  translate_sql(x, con = con)
-  #> <SQL> `x`
-  # And strings are escaped by single quotes
-  translate_sql("x", con = con)
-  #> <SQL> 'x'
-  ```
-
-- And some functions have different argument orders:
-
-  ``` r
-  translate_sql(substr(x, 5, 10), con = con)
-  #> <SQL> SUBSTR(`x`, 5, 6)
-  translate_sql(log(x, 10), con = con)
-  #> <SQL> LOG(10.0, `x`)
-  ```
+- `"` and `'` mean different things. R can use either `"` or `'` for
+  strings, but in ANSI SQL, `"` is used for names and only `'` can be
+  used for strings.
 
 - R and SQL have different defaults for integers and reals. In R, 1 is a
   real, and 1L is an integer. In SQL, 1 is an integer, and 1.0 is a
@@ -94,9 +77,9 @@ between R and SQL.
 
   ``` r
   translate_sql(1, con = con)
-  #> <SQL> 1.0
+  #  <SQL> 1.0
   translate_sql(1L, con = con)
-  #> <SQL> 1
+  #  <SQL> 1
   ```
 
 ## Known functions
@@ -139,22 +122,22 @@ df <- tibble(
 mf <- tbl_memdb(df)
 
 df |> mutate(x %% y)
-#> # A tibble: 4 × 3
-#>       x     y `x%%y`
-#>   <int> <int>  <int>
-#> 1    10     3      1
-#> 2    10    -3     -2
-#> 3   -10     3      2
-#> 4   -10    -3     -1
+#  # A tibble: 4 × 3
+#        x     y `x%%y`
+#    <int> <int>  <int>
+#  1    10     3      1
+#  2    10    -3     -2
+#  3   -10     3      2
+#  4   -10    -3     -1
 mf |> mutate(x %% y)
-#> # Source:   SQL [?? x 3]
-#> # Database: sqlite 3.51.0 [:memory:]
-#>       x     y `x%%y`
-#>   <int> <int>  <int>
-#> 1    10     3      1
-#> 2    10    -3      1
-#> 3   -10     3     -1
-#> 4   -10    -3     -1
+#  # Source:   SQL [?? x 3]
+#  # Database: sqlite 3.51.0 [:memory:]
+#        x     y `x%%y`
+#    <int> <int>  <int>
+#  1    10     3      1
+#  2    10    -3      1
+#  3   -10     3     -1
+#  4   -10    -3     -1
 ```
 
 dbplyr no longer translates `%/%` because there’s no robust
@@ -181,12 +164,12 @@ difference:
 
 ``` r
 translate_sql(mean(x), con = con)
-#> Warning: Missing values are always removed in SQL aggregation functions.
-#> Use `na.rm = TRUE` to silence this warning
-#> This warning is displayed once every 8 hours.
-#> <SQL> AVG(`x`) OVER ()
+#  Warning: Missing values are always removed in SQL aggregation functions.
+#  Use `na.rm = TRUE` to silence this warning
+#  This warning is displayed once every 8 hours.
+#  <SQL> AVG(`x`) OVER ()
 translate_sql(mean(x, na.rm = TRUE), con = con)
-#> <SQL> AVG(`x`) OVER ()
+#  <SQL> AVG(`x`) OVER ()
 ```
 
 Note that, by default, `translate()` assumes that the call is inside a
@@ -198,7 +181,7 @@ translation, use `window = FALSE`:
 
 ``` r
 translate_sql(mean(x, na.rm = TRUE), window = FALSE, con = con)
-#> <SQL> AVG(`x`)
+#  <SQL> AVG(`x`)
 ```
 
 ### Conditional evaluation
@@ -208,9 +191,9 @@ to `CASE WHEN`:
 
 ``` r
 translate_sql(if (x > 5) "big" else "small", con = con)
-#> <SQL> CASE WHEN (`x` > 5.0) THEN 'big' WHEN NOT (`x` > 5.0) THEN 'small' END
+#  <SQL> CASE WHEN (`x` > 5.0) THEN 'big' WHEN NOT (`x` > 5.0) THEN 'small' END
 translate_sql(switch(x, a = 1L, b = 2L, 3L), con = con)
-#> <SQL> CASE `x` WHEN ('a') THEN (1) WHEN ('b') THEN (2) ELSE (3) END
+#  <SQL> CASE `x` WHEN ('a') THEN (1) WHEN ('b') THEN (2) ELSE (3) END
 ```
 
 ### String manipulation
@@ -233,7 +216,7 @@ Any function that dbplyr doesn’t know about will be left as is:
 
 ``` r
 translate_sql(foofify(x, y), con = con)
-#> <SQL> foofify(`x`, `y`)
+#  <SQL> foofify(`x`, `y`)
 ```
 
 Because SQL functions are generally case insensitive, I recommend using
@@ -242,7 +225,7 @@ easier to spot that you’re doing something unusual:
 
 ``` r
 translate_sql(FOOFIFY(x, y), con = con)
-#> <SQL> FOOFIFY(`x`, `y`)
+#  <SQL> FOOFIFY(`x`, `y`)
 ```
 
 ### Infix functions
@@ -254,7 +237,7 @@ matching:
 
 ``` r
 translate_sql(x %LIKE% "%foo%", con = con)
-#> <SQL> `x` LIKE '%foo%'
+#  <SQL> `x` LIKE '%foo%'
 ```
 
 Or use `||` for string concatenation (although most backends will
@@ -263,7 +246,7 @@ translate [`paste()`](https://rdrr.io/r/base/paste.html) and
 
 ``` r
 translate_sql(x %||% y, con = con)
-#> <SQL> `x` || `y`
+#  <SQL> `x` || `y`
 ```
 
 ### Special forms
@@ -276,9 +259,9 @@ literal SQL inside
 
 ``` r
 translate_sql(sql("x!"), con = con)
-#> <SQL> x!
+#  <SQL> x!
 translate_sql(x == sql("ANY VALUES(1, 2, 3)"), con = con)
-#> <SQL> `x` = ANY VALUES(1, 2, 3)
+#  <SQL> `x` = ANY VALUES(1, 2, 3)
 ```
 
 This gives you a lot of freedom to generate the SQL you need:
@@ -289,16 +272,16 @@ mf <- memdb_frame(x = 1, y = 2)
 mf |> 
   transmute(factorial = sql("x!")) |> 
   show_query()
-#> <SQL>
-#> SELECT x! AS `factorial`
-#> FROM `dbplyr_uR8HfdVHIy`
+#  <SQL>
+#  SELECT x! AS `factorial`
+#  FROM `dbplyr_uR8HfdVHIy`
 
 mf |> 
   transmute(factorial = sql("CAST(x AS FLOAT)")) |> 
   show_query()
-#> <SQL>
-#> SELECT CAST(x AS FLOAT) AS `factorial`
-#> FROM `dbplyr_uR8HfdVHIy`
+#  <SQL>
+#  SELECT CAST(x AS FLOAT) AS `factorial`
+#  FROM `dbplyr_uR8HfdVHIy`
 ```
 
 ### Error for unknown translations
@@ -309,8 +292,8 @@ dbplyr to error if it doesn’t know how to translate a function:
 ``` r
 options(dplyr.strict_sql = TRUE)
 translate_sql(glob(x, y), con = con)
-#> Error in `glob()`:
-#> ! Don't know how to translate `glob()`
+#  Error in `glob()`:
+#  ! Don't know how to translate `glob()`
 ```
 
 ## Window functions
@@ -379,15 +362,15 @@ again use
 
 ``` r
 translate_sql(mean(G), con = con)
-#> <SQL> AVG(`G`) OVER ()
+#  <SQL> AVG(`G`) OVER ()
 translate_sql(rank(G), con = con)
-#> <SQL> CASE
-#> WHEN (NOT((`G` IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN ((`G` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `G`)
-#> END
+#  <SQL> CASE
+#  WHEN (NOT((`G` IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN ((`G` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `G`)
+#  END
 translate_sql(ntile(G, 2), con = con)
-#> <SQL> NTILE(2) OVER (ORDER BY `G`)
+#  <SQL> NTILE(2) OVER (ORDER BY `G`)
 translate_sql(lag(G), con = con)
-#> <SQL> LAG(`G`, 1, NULL) OVER ()
+#  <SQL> LAG(`G`, 1, NULL) OVER ()
 ```
 
 If the tbl has been grouped or arranged previously in the pipeline, then
@@ -398,9 +381,9 @@ setting the `vars_group` and `vars_order` arguments to
 
 ``` r
 translate_sql(cummean(G), vars_order = "year", con = con)
-#> <SQL> AVG(`G`) OVER (ORDER BY `year` ROWS UNBOUNDED PRECEDING)
+#  <SQL> AVG(`G`) OVER (ORDER BY `year` ROWS UNBOUNDED PRECEDING)
 translate_sql(rank(), vars_group = "ID", con = con)
-#> <SQL> RANK() OVER (PARTITION BY `ID`)
+#  <SQL> RANK() OVER (PARTITION BY `ID`)
 ```
 
 There are some challenges when translating window functions between R
