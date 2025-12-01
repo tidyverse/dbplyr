@@ -168,6 +168,9 @@ print.lazy_select_query <- function(x, ...) {
   if (length(select)) {
     cat_line("Select:   ", named_commas(select))
   }
+  if (is_lazy_sql_part(x$distinct)) {
+    cat_line("Dist on:  ", named_commas(x$distinct))
+  }
   if (length(x$where)) {
     cat_line("Where:    ", named_commas(x$where))
   }
