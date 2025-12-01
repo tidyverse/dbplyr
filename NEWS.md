@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* `compute()`, `collect()`, and `collapse()` now have their own documentation pages.
 * dbplyr now uses the base pipe (#1626).
 * Defunct functions have been removed:
   * `src_sql()` deprecated in 1.4.0 (2019-04-23)
