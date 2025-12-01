@@ -28,22 +28,18 @@ airports <- copy_to(con, nycflights13::airports)
   flights |>
     select(contains("delay")) |>
     show_query()
-  ```
+  #> <SQL>
+  #> SELECT `dep_delay`, `arr_delay`
+  #> FROM `nycflights13::flights`
 
-      ## <SQL>
-      ## SELECT `dep_delay`, `arr_delay`
-      ## FROM `nycflights13::flights`
-
-  ``` r
   flights |>
     select(distance, air_time) |>  
     mutate(speed = distance / (air_time / 60)) |>
     show_query()
+  #> <SQL>
+  #> SELECT `distance`, `air_time`, `distance` / (`air_time` / 60.0) AS `speed`
+  #> FROM `nycflights13::flights`
   ```
-
-      ## <SQL>
-      ## SELECT `distance`, `air_time`, `distance` / (`air_time` / 60.0) AS `speed`
-      ## FROM `nycflights13::flights`
 
 - [`filter()`](https://dplyr.tidyverse.org/reference/filter.html)
   generates a `WHERE` clause:
@@ -52,12 +48,11 @@ airports <- copy_to(con, nycflights13::airports)
   flights |> 
     filter(month == 1, day == 1) |>
     show_query()
+  #> <SQL>
+  #> SELECT `nycflights13::flights`.*
+  #> FROM `nycflights13::flights`
+  #> WHERE (`month` = 1.0) AND (`day` = 1.0)
   ```
-
-      ## <SQL>
-      ## SELECT `nycflights13::flights`.*
-      ## FROM `nycflights13::flights`
-      ## WHERE (`month` = 1.0) AND (`day` = 1.0)
 
 - [`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html)
   generates an `ORDER BY` clause:
@@ -66,12 +61,11 @@ airports <- copy_to(con, nycflights13::airports)
   flights |> 
     arrange(carrier, desc(arr_delay)) |>
     show_query()
+  #> <SQL>
+  #> SELECT `nycflights13::flights`.*
+  #> FROM `nycflights13::flights`
+  #> ORDER BY `carrier`, `arr_delay` DESC
   ```
-
-      ## <SQL>
-      ## SELECT `nycflights13::flights`.*
-      ## FROM `nycflights13::flights`
-      ## ORDER BY `carrier`, `arr_delay` DESC
 
 - [`summarise()`](https://dplyr.tidyverse.org/reference/summarise.html)
   and
@@ -83,15 +77,13 @@ airports <- copy_to(con, nycflights13::airports)
     group_by(month, day) |>
     summarise(delay = mean(dep_delay, na.rm = TRUE)) |>
     show_query()
+  #> `summarise()` has grouped output by "month". You can override using
+  #> the `.groups` argument.
+  #> <SQL>
+  #> SELECT `month`, `day`, AVG(`dep_delay`) AS `delay`
+  #> FROM `nycflights13::flights`
+  #> GROUP BY `month`, `day`
   ```
-
-      ## `summarise()` has grouped output by "month". You can override using
-      ## the `.groups` argument.
-
-      ## <SQL>
-      ## SELECT `month`, `day`, AVG(`dep_delay`) AS `delay`
-      ## FROM `nycflights13::flights`
-      ## GROUP BY `month`, `day`
 
 ## Subqueries
 
@@ -107,14 +99,13 @@ flights |>
     air_time_h = air_time / 60,
     speed = distance / air_time_h) |>
   show_query()
+#> <SQL>
+#> SELECT `q01`.*, `distance` / `air_time_h` AS `speed`
+#> FROM (
+#>   SELECT `distance`, `air_time`, `air_time` / 60.0 AS `air_time_h`
+#>   FROM `nycflights13::flights`
+#> ) AS `q01`
 ```
-
-    ## <SQL>
-    ## SELECT `q01`.*, `distance` / `air_time_h` AS `speed`
-    ## FROM (
-    ##   SELECT `distance`, `air_time`, `air_time` / 60.0 AS `air_time_h`
-    ##   FROM `nycflights13::flights`
-    ## ) AS `q01`
 
 It’s also possible to use a CTE if you so desire:
 
@@ -125,15 +116,14 @@ flights |>
     air_time_h = air_time / 60,
     speed = distance / air_time_h) |>
   show_query(sql_options = sql_options(cte = TRUE))
+#> <SQL>
+#> WITH `q01` AS (
+#>   SELECT `distance`, `air_time`, `air_time` / 60.0 AS `air_time_h`
+#>   FROM `nycflights13::flights`
+#> )
+#> SELECT `q01`.*, `distance` / `air_time_h` AS `speed`
+#> FROM `q01`
 ```
-
-    ## <SQL>
-    ## WITH `q01` AS (
-    ##   SELECT `distance`, `air_time`, `air_time` / 60.0 AS `air_time_h`
-    ##   FROM `nycflights13::flights`
-    ## )
-    ## SELECT `q01`.*, `distance` / `air_time_h` AS `speed`
-    ## FROM `q01`
 
 Sometimes dbplyr will create a subquery where it’s not strictly
 necessary. We strive to avoid this as much as possible, but our analysis
