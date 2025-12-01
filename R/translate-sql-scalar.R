@@ -15,17 +15,12 @@
 #'   numbers.
 #'
 #' @param f The name of the SQL function as a string.
-#' @param pad If `TRUE`, the default, pad the infix operator with spaces.
-#' @param n For `sql_prefix()`, an optional number of arguments to expect.
-#'   Will signal error if not correct.
-#' @param type SQL type name as a string.
-#' @param rand_expr A SQL expression that generates random numbers.
-#' @param min,max Range of random values.
 #' @family SQL translation helpers
 #' @name sql_translation_scalar
 NULL
 
 #' @rdname sql_translation_scalar
+#' @param pad If `TRUE`, the default, pad the infix operator with spaces.
 #' @export
 sql_infix <- function(f, pad = TRUE) {
   # Unquoting involving infix operators easily create abstract syntax trees
@@ -78,6 +73,8 @@ escape_infix_expr <- function(xq, x, escape_unary_minus = FALSE) {
 }
 
 #' @rdname sql_translation_scalar
+#' @param n For `sql_prefix()`, an optional number of arguments to expect.
+#'   Will signal error if not correct.
 #' @export
 sql_prefix <- function(f, n = NULL) {
   check_string(f)
@@ -98,6 +95,7 @@ sql_prefix <- function(f, n = NULL) {
 }
 
 #' @rdname sql_translation_scalar
+#' @param type SQL type name as a string.
 #' @export
 sql_cast <- function(type) {
   type <- sql(type)
@@ -138,6 +136,8 @@ sql_cot <- function() {
 }
 
 #' @rdname sql_translation_scalar
+#' @param rand_expr A SQL expression that generates random numbers.
+#' @param min,max Range of random values.
 #' @export
 sql_runif <- function(rand_expr, n = n(), min = 0, max = 1) {
   n_expr <- quo_get_expr(enquo(n))

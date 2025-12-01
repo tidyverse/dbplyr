@@ -97,11 +97,11 @@ translate_sql(sd(income / years), con = con, window = FALSE)
 translate_sql(regr_intercept(y, x), con = con)
 }
 \seealso{
-\itemize{
-\item \link{sql_translation_scalar}, \link{sql_translation_string},
-\link{sql_translation_agg} for helpers to create custom translations.
-\item \code{\link[=win_over]{win_over()}} for helper functions for window functions.
-\item \code{\link[=sql]{sql()}} for an example of a more customised SQL conversion function.
+Other SQL translation helpers: 
+\code{\link{sql_translation_agg}},
+\code{\link{sql_translation_scalar}},
+\code{\link{sql_translation_string}},
+\code{\link{sql_translation_window}}
 }
-}
+\concept{SQL translation helpers}
 \keyword{datasets}

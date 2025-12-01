@@ -25,11 +25,7 @@
 #' * `base_win` - window functions
 #' * `base_no_win` - versions of window functions that throw errors
 #'
-#' @seealso
-#' * [sql_translation_scalar], [sql_translation_string],
-#'   [sql_translation_agg] for helpers to create custom translations.
-#' * [win_over()] for helper functions for window functions.
-#' * [sql()] for an example of a more customised SQL conversion function.
+#' @family SQL translation helpers
 #' @export
 #' @examples
 #' # An example of adding some mappings for the statistical functions that

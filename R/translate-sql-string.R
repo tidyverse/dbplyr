@@ -14,14 +14,6 @@
 #'   like `||`.
 #'
 #' @param f The name of the SQL function as a string.
-#' @param subset_f The name of the SQL substring function.
-#' @param length_f The name of the SQL string length function.
-#' @param optional_length Whether the length argument is optional in the SQL
-#'   substring function.
-#' @param default_sep The default separator for paste operations.
-#' @param op The SQL operator to use for infix paste operations.
-#' @param cast A function to cast values to strings.
-#'
 #' @family SQL translation helpers
 #' @name sql_translation_string
 NULL
@@ -51,6 +43,10 @@ cast_number_whole <- function(x, arg = caller_arg(x), call = caller_env()) {
 
 #' @export
 #' @rdname sql_translation_string
+#' @param subset_f The name of the SQL substring function.
+#' @param length_f The name of the SQL string length function.
+#' @param optional_length Whether the length argument is optional in the SQL
+#'   substring function.
 sql_str_sub <- function(
   subset_f = "SUBSTR",
   length_f = "LENGTH",

@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* Deprecated `win_rank_tdata()` has been removed.
 * `compute()`, `collect()`, and `collapse()` now have their own documentation pages.
 * dbplyr now uses the base pipe (#1626).
 * Defunct functions have been removed:
