@@ -91,15 +91,12 @@ Next, check that
   temporary tables. Add a method for
   [`db_save_query()`](https://dplyr.tidyverse.org/reference/backend_dbplyr.html).
 
-## SQL translation
+## SQL translation: verbs
 
 Make sure you’ve read
 [`vignette("translation-verb")`](https://dbplyr.tidyverse.org/dev/articles/translation-verb.md)
-so you have the lay of the land.
-
-### Verbs
-
-Check that SQL translation for the key verbs work:
+so you have the lay of the land. First check that SQL translation for
+the key verbs work:
 
 - [`summarise()`](https://dplyr.tidyverse.org/reference/summarise.html),
   [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html),
@@ -120,11 +117,161 @@ Check that SQL translation for the key verbs work:
   powered by
   [`sql_query_set_op()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
 
-### Vectors
+## SQL translation: vectors
 
-Finally, you may have to provide custom R -\> SQL translation at the
-vector level by providing a method for
-[`sql_translate_env()`](https://dplyr.tidyverse.org/reference/backend_dbplyr.html).
-This function should return an object created by
+Finally, you may have to provide custom R -\> SQL translation for
+functions that work with vectors within verbs. You can do with by
+providing a method for
+[`sql_translation()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md),
+which return an object created by
 [`sql_variant()`](https://dbplyr.tidyverse.org/dev/reference/sql_variant.md).
-See existing methods for examples.
+The
+[`sql_variant()`](https://dbplyr.tidyverse.org/dev/reference/sql_variant.md)
+function creates a container for three types of function translations:
+
+``` r
+sql_translation.myConnectionClass <- function(con) {
+  sql_variant(
+    scalar = sql_translator(base_scalar, ...), # Functions in SELECT (non-aggregated)
+    aggregate = sql_translator(base_aggregate, ...), # Aggregation functions (mean, sum, etc.)
+    window = sql_translator(base_win, ...) # Window functions (lead, lag, rank, etc.)
+  )
+}
+```
+
+Each translator will inherits from the base (ANSI SQL) translator and
+overrides only what’s different for your backend:
+
+``` r
+sql_translator(
+  base_scalar, # Inherit most translations
+  # Override specific functions for your backend
+  `+` = sql_infix("+"),
+  mean = sql_aggregate("AVERAGE", "mean")
+)
+```
+
+### Scalar function helpers
+
+dbplyr provides several helper functions to make it easier to translate
+R functions to SQL:
+
+- **`sql_prefix(f, n = NULL)`**: For standard SQL functions. The `n`
+  argument optionally specifies the number of arguments.
+- **`sql_infix(f)`**: For infix operators like `+`, `*`, or `==`.
+- **`sql_cast(type)`**: For type casting functions.
+- **`sql_not_supported(f)`**: For functions with no SQL translation.
+
+Here’s an example showing all of these helpers in use:
+
+``` r
+sql_translation.myConnectionClass <- function(con) {
+  sql_variant(
+    scalar = sql_translator(
+      base_scalar,
+      # Standard SQL functions
+      cos = sql_prefix("COS", 1),
+      round = sql_prefix("ROUND", 2),
+      # Infix operators
+      `+` = sql_infix("+"),
+      `*` = sql_infix("*"),
+      `==` = sql_infix("="),
+      # Type casting
+      as.numeric = sql_cast("NUMERIC"),
+      as.character = sql_cast("VARCHAR")
+    ),
+    aggregate = sql_translator(base_agg),
+    window = sql_translator(base_win)
+  )
+}
+```
+
+### Aggregation function helpers
+
+- **`sql_aggregate(f, f_r = f)`**: For single-argument SQL aggregate
+  functions. The `f_r` argument gives the name of the R function.
+- **`sql_aggregate_2(f)`**: For two-argument SQL aggregate functions.
+- **`sql_aggregate_n(f, f_r = f)`**: For variadic SQL aggregate
+  functions.
+
+``` r
+sql_translation.myConnectionClass <- function(con) {
+  sql_variant(
+    scalar = sql_translator(base_scalar),
+    aggregate = sql_translator(
+      .parent = base_agg,
+      # Single-argument aggregates
+      mean = sql_aggregate("AVG", "mean"),
+      var = sql_aggregate("VAR_SAMP", "var"),
+      # Two-argument aggregates
+      cov = sql_aggregate_2("COVAR_SAMP"),
+      # Variadic aggregates
+      pmin = sql_aggregate_n("LEAST", "pmin"),
+      pmax = sql_aggregate_n("GREATEST", "pmax"),
+      # Unsupported functions
+      median = sql_not_supported("median")
+    ),
+    window = sql_translator(base_win)
+  )
+}
+```
+
+### Window function helpers
+
+Window functions have their own set of helpers:
+
+- **`win_rank(f)`**: For ranking functions.
+- **`win_aggregate(f)`**: For aggregate functions used as window
+  functions.
+- **`win_cumulative(f)`**: For cumulative functions.
+- **`win_absent(f)`**: For backends that don’t support certain window
+  functions.
+
+Here’s an example showing all of these helpers in use:
+
+``` r
+window = sql_translator(
+  base_win,
+  # Ranking functions
+  row_number = win_rank("ROW_NUMBER"),
+  rank = win_rank("RANK"),
+  dense_rank = win_rank("DENSE_RANK"),
+  # Aggregate functions as window functions
+  mean = win_aggregate("AVG"),
+  sum = win_aggregate("SUM"),
+  # Cumulative functions
+  cumsum = win_cumulative("SUM"),
+  # Absent functions
+  cume_dist = win_absent("cume_dist")
+)
+```
+
+### Custom translation functions
+
+For more complex translations, you can write custom functions that
+return SQL expressions using
+[`sql_expr()`](https://dbplyr.tidyverse.org/dev/reference/sql_expr.md).
+This is a tidy-evaluation function that allows you to use `!!` operator
+to in inject a single value into SQL expressions or `!!!` to splice a
+list of values.
+
+``` r
+scalar = sql_translator(
+  base_scalar,
+
+  # Custom log function with change of base
+  log = function(x, base = exp(1)) {
+    if (isTRUE(all.equal(base, exp(1)))) {
+      sql_expr(ln(!!x))
+    } else {
+      sql_expr(log(!!x) / log(!!base))
+    }
+  },
+
+  # Custom paste function using CONCAT
+  paste = function(..., sep = " ") {
+    args <- list(...)
+    sql_expr(CONCAT_WS(!!sep, !!!args))
+  }
+)
+```

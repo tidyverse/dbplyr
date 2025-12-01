@@ -168,14 +168,11 @@ way of saving queries in temporary tables. Add a method for
 </ul>
 </div>
 <div class="section level2">
-<h2 id="sql-translation">SQL translation<a class="anchor" aria-label="anchor" href="#sql-translation"></a>
+<h2 id="sql-translation-verbs">SQL translation: verbs<a class="anchor" aria-label="anchor" href="#sql-translation-verbs"></a>
 </h2>
 <p>Make sure you’ve read <code><a href="../articles/translation-verb.html">vignette("translation-verb")</a></code> so
-you have the lay of the land.</p>
-<div class="section level3">
-<h3 id="verbs">Verbs<a class="anchor" aria-label="anchor" href="#verbs"></a>
-</h3>
-<p>Check that SQL translation for the key verbs work:</p>
+you have the lay of the land. First check that SQL translation for the
+key verbs work:</p>
 <ul>
 <li>
 <code><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code>,
@@ -196,14 +193,172 @@ you have the lay of the land.</p>
 </li>
 </ul>
 </div>
+<div class="section level2">
+<h2 id="sql-translation-vectors">SQL translation: vectors<a class="anchor" aria-label="anchor" href="#sql-translation-vectors"></a>
+</h2>
+<p>Finally, you may have to provide custom R -&gt; SQL translation for
+functions that work with vectors within verbs. You can do with by
+providing a method for <code><a href="../reference/db-sql.html">sql_translation()</a></code>, which return an
+object created by <code><a href="../reference/sql_variant.html">sql_variant()</a></code>. The
+<code><a href="../reference/sql_variant.html">sql_variant()</a></code> function creates a container for three types
+of function translations:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sql_translation.myConnectionClass</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">con</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="../reference/sql_variant.html">sql_variant</a></span><span class="op">(</span></span>
+<span>    scalar <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span><span class="va">base_scalar</span>, <span class="va">...</span><span class="op">)</span>, <span class="co"># Functions in SELECT (non-aggregated)</span></span>
+<span>    aggregate <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span><span class="va">base_aggregate</span>, <span class="va">...</span><span class="op">)</span>, <span class="co"># Aggregation functions (mean, sum, etc.)</span></span>
+<span>    window <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span><span class="va">base_win</span>, <span class="va">...</span><span class="op">)</span> <span class="co"># Window functions (lead, lag, rank, etc.)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>Each translator will inherits from the base (ANSI SQL) translator and
+overrides only what’s different for your backend:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span></span>
+<span>  <span class="va">base_scalar</span>, <span class="co"># Inherit most translations</span></span>
+<span>  <span class="co"># Override specific functions for your backend</span></span>
+<span>  `+` <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_infix</a></span><span class="op">(</span><span class="st">"+"</span><span class="op">)</span>,</span>
+<span>  mean <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_aggregate</a></span><span class="op">(</span><span class="st">"AVERAGE"</span>, <span class="st">"mean"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
-<h3 id="vectors">Vectors<a class="anchor" aria-label="anchor" href="#vectors"></a>
+<h3 id="scalar-function-helpers">Scalar function helpers<a class="anchor" aria-label="anchor" href="#scalar-function-helpers"></a>
 </h3>
-<p>Finally, you may have to provide custom R -&gt; SQL translation at
-the vector level by providing a method for
-<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">sql_translate_env()</a></code>. This function should return an object
-created by <code><a href="../reference/sql_variant.html">sql_variant()</a></code>. See existing methods for
-examples.</p>
+<p>dbplyr provides several helper functions to make it easier to
+translate R functions to SQL:</p>
+<ul>
+<li>
+<strong><code>sql_prefix(f, n = NULL)</code></strong>: For standard
+SQL functions. The <code>n</code> argument optionally specifies the
+number of arguments.</li>
+<li>
+<strong><code>sql_infix(f)</code></strong>: For infix operators like
+<code>+</code>, <code>*</code>, or <code>==</code>.</li>
+<li>
+<strong><code>sql_cast(type)</code></strong>: For type casting
+functions.</li>
+<li>
+<strong><code>sql_not_supported(f)</code></strong>: For functions
+with no SQL translation.</li>
+</ul>
+<p>Here’s an example showing all of these helpers in use:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sql_translation.myConnectionClass</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">con</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="../reference/sql_variant.html">sql_variant</a></span><span class="op">(</span></span>
+<span>    scalar <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span></span>
+<span>      <span class="va">base_scalar</span>,</span>
+<span>      <span class="co"># Standard SQL functions</span></span>
+<span>      cos <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_prefix</a></span><span class="op">(</span><span class="st">"COS"</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>      round <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_prefix</a></span><span class="op">(</span><span class="st">"ROUND"</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>      <span class="co"># Infix operators</span></span>
+<span>      `+` <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_infix</a></span><span class="op">(</span><span class="st">"+"</span><span class="op">)</span>,</span>
+<span>      `*` <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_infix</a></span><span class="op">(</span><span class="st">"*"</span><span class="op">)</span>,</span>
+<span>      `==` <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_infix</a></span><span class="op">(</span><span class="st">"="</span><span class="op">)</span>,</span>
+<span>      <span class="co"># Type casting</span></span>
+<span>      as.numeric <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_cast</a></span><span class="op">(</span><span class="st">"NUMERIC"</span><span class="op">)</span>,</span>
+<span>      as.character <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_cast</a></span><span class="op">(</span><span class="st">"VARCHAR"</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    aggregate <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span><span class="va">base_agg</span><span class="op">)</span>,</span>
+<span>    window <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span><span class="va">base_win</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="aggregation-function-helpers">Aggregation function helpers<a class="anchor" aria-label="anchor" href="#aggregation-function-helpers"></a>
+</h3>
+<ul>
+<li>
+<strong><code>sql_aggregate(f, f_r = f)</code></strong>: For
+single-argument SQL aggregate functions. The <code>f_r</code> argument
+gives the name of the R function.</li>
+<li>
+<strong><code>sql_aggregate_2(f)</code></strong>: For two-argument
+SQL aggregate functions.</li>
+<li>
+<strong><code>sql_aggregate_n(f, f_r = f)</code></strong>: For
+variadic SQL aggregate functions.</li>
+</ul>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sql_translation.myConnectionClass</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">con</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="../reference/sql_variant.html">sql_variant</a></span><span class="op">(</span></span>
+<span>    scalar <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span><span class="va">base_scalar</span><span class="op">)</span>,</span>
+<span>    aggregate <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span></span>
+<span>      .parent <span class="op">=</span> <span class="va">base_agg</span>,</span>
+<span>      <span class="co"># Single-argument aggregates</span></span>
+<span>      mean <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_aggregate</a></span><span class="op">(</span><span class="st">"AVG"</span>, <span class="st">"mean"</span><span class="op">)</span>,</span>
+<span>      var <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_aggregate</a></span><span class="op">(</span><span class="st">"VAR_SAMP"</span>, <span class="st">"var"</span><span class="op">)</span>,</span>
+<span>      <span class="co"># Two-argument aggregates</span></span>
+<span>      cov <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_aggregate_2</a></span><span class="op">(</span><span class="st">"COVAR_SAMP"</span><span class="op">)</span>,</span>
+<span>      <span class="co"># Variadic aggregates</span></span>
+<span>      pmin <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_aggregate_n</a></span><span class="op">(</span><span class="st">"LEAST"</span>, <span class="st">"pmin"</span><span class="op">)</span>,</span>
+<span>      pmax <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_aggregate_n</a></span><span class="op">(</span><span class="st">"GREATEST"</span>, <span class="st">"pmax"</span><span class="op">)</span>,</span>
+<span>      <span class="co"># Unsupported functions</span></span>
+<span>      median <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_not_supported</a></span><span class="op">(</span><span class="st">"median"</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    window <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span><span class="va">base_win</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="window-function-helpers">Window function helpers<a class="anchor" aria-label="anchor" href="#window-function-helpers"></a>
+</h3>
+<p>Window functions have their own set of helpers:</p>
+<ul>
+<li>
+<strong><code>win_rank(f)</code></strong>: For ranking
+functions.</li>
+<li>
+<strong><code>win_aggregate(f)</code></strong>: For aggregate
+functions used as window functions.</li>
+<li>
+<strong><code>win_cumulative(f)</code></strong>: For cumulative
+functions.</li>
+<li>
+<strong><code>win_absent(f)</code></strong>: For backends that don’t
+support certain window functions.</li>
+</ul>
+<p>Here’s an example showing all of these helpers in use:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">window</span> <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span></span>
+<span>  <span class="va">base_win</span>,</span>
+<span>  <span class="co"># Ranking functions</span></span>
+<span>  row_number <span class="op">=</span> <span class="fu"><a href="../reference/win_over.html">win_rank</a></span><span class="op">(</span><span class="st">"ROW_NUMBER"</span><span class="op">)</span>,</span>
+<span>  rank <span class="op">=</span> <span class="fu"><a href="../reference/win_over.html">win_rank</a></span><span class="op">(</span><span class="st">"RANK"</span><span class="op">)</span>,</span>
+<span>  dense_rank <span class="op">=</span> <span class="fu"><a href="../reference/win_over.html">win_rank</a></span><span class="op">(</span><span class="st">"DENSE_RANK"</span><span class="op">)</span>,</span>
+<span>  <span class="co"># Aggregate functions as window functions</span></span>
+<span>  mean <span class="op">=</span> <span class="fu"><a href="../reference/win_over.html">win_aggregate</a></span><span class="op">(</span><span class="st">"AVG"</span><span class="op">)</span>,</span>
+<span>  sum <span class="op">=</span> <span class="fu"><a href="../reference/win_over.html">win_aggregate</a></span><span class="op">(</span><span class="st">"SUM"</span><span class="op">)</span>,</span>
+<span>  <span class="co"># Cumulative functions</span></span>
+<span>  cumsum <span class="op">=</span> <span class="fu"><a href="../reference/win_over.html">win_cumulative</a></span><span class="op">(</span><span class="st">"SUM"</span><span class="op">)</span>,</span>
+<span>  <span class="co"># Absent functions</span></span>
+<span>  cume_dist <span class="op">=</span> <span class="fu"><a href="../reference/win_over.html">win_absent</a></span><span class="op">(</span><span class="st">"cume_dist"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="custom-translation-functions">Custom translation functions<a class="anchor" aria-label="anchor" href="#custom-translation-functions"></a>
+</h3>
+<p>For more complex translations, you can write custom functions that
+return SQL expressions using <code><a href="../reference/sql_expr.html">sql_expr()</a></code>. This is a
+tidy-evaluation function that allows you to use <code>!!</code> operator
+to in inject a single value into SQL expressions or <code>!!!</code> to
+splice a list of values.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">scalar</span> <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span></span>
+<span>  <span class="va">base_scalar</span>,</span>
+<span></span>
+<span>  <span class="co"># Custom log function with change of base</span></span>
+<span>  log <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">base</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">base</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="fu"><a href="../reference/sql_expr.html">sql_expr</a></span><span class="op">(</span><span class="fu">ln</span><span class="op">(</span><span class="op">!</span><span class="op">!</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>      <span class="fu"><a href="../reference/sql_expr.html">sql_expr</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="op">!</span><span class="op">!</span><span class="va">x</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="op">!</span><span class="op">!</span><span class="va">base</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">}</span>,</span>
+<span></span>
+<span>  <span class="co"># Custom paste function using CONCAT</span></span>
+<span>  paste <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span>, <span class="va">sep</span> <span class="op">=</span> <span class="st">" "</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">args</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="../reference/sql_expr.html">sql_expr</a></span><span class="op">(</span><span class="fu">CONCAT_WS</span><span class="op">(</span><span class="op">!</span><span class="op">!</span><span class="va">sep</span>, <span class="op">!</span><span class="op">!</span><span class="op">!</span><span class="va">args</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
