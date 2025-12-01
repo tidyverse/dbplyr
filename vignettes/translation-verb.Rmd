@@ -60,6 +60,32 @@ airports <- copy_to(con, nycflights13::airports)
       show_query()
     ```
 
+## Subqueries
+
+It's not always possible to translate a single dplyr verb into a single SQL query. For example, in SQL, variables in the `SELECT` clause have to come from another table; you can't refer to a variable that you just created. For that reason, dbplyr will create subqueries where needed:
+
+```{r}
+flights |>
+  select(distance, air_time) |>  
+  mutate(
+    air_time_h = air_time / 60,
+    speed = distance / air_time_h) |>
+  show_query()
+```
+
+It's also possible to use a CTE if you so desire:
+
+```{r}
+flights |>
+  select(distance, air_time) |>  
+  mutate(
+    air_time_h = air_time / 60,
+    speed = distance / air_time_h) |>
+  show_query(sql_options = sql_options(cte = TRUE))
+```
+
+Sometimes dbplyr will create a subquery where it's not strictly necessary. We strive to avoid this as much as possible, but our analysis of the generated SQL is not always complete, so we'll typically err on the side of safety (creating more subqueries) rather than performance.
+
 ## Dual table verbs
 
 | R                | SQL
