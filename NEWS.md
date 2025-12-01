@@ -2,6 +2,7 @@
 
 * `glue_sql2()` is now exported for building SQL strings with glue syntax and
   type markers. `build_sql()` is deprecated in favor of `glue_sql2()` (#1249).
+* Deprecated `win_rank_tdata()` has been removed.
 * `compute()`, `collect()`, and `collapse()` now have their own documentation pages.
 * dbplyr now uses the base pipe (#1626).
 * Defunct functions have been removed:

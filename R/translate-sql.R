@@ -12,8 +12,7 @@
 #' @param ...,dots Expressions to translate. `translate_sql()`
 #'   automatically quotes them for you.  `translate_sql_()` expects
 #'   a list of already quoted objects.
-#' @param con An optional database connection to control the details of
-#'   the translation. The default, `NULL`, generates ANSI SQL.
+#' @param con Database connection used to determine the SQL dialect.
 #' @param vars_group,vars_order,vars_frame Parameters used in the `OVER`
 #'   expression of windowed functions.
 #' @param window Use `FALSE` to suppress generation of the `OVER`

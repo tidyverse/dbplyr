@@ -97,7 +97,12 @@ reference:
   - db-sql
   - db-quote
   - glue_sql2
+  - sql_variant
   - sql_query_insert
+  - sql_translation_scalar
+  - sql_translation_string
+  - sql_translation_agg
+  - sql_translation_window
 
 news:
   releases:

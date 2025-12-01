@@ -29,8 +29,7 @@ translate_sql_(
 automatically quotes them for you.  \code{translate_sql_()} expects
 a list of already quoted objects.}
 
-\item{con}{An optional database connection to control the details of
-the translation. The default, \code{NULL}, generates ANSI SQL.}
+\item{con}{Database connection used to determine the SQL dialect.}
 
 \item{vars_group, vars_order, vars_frame}{Parameters used in the \code{OVER}
 expression of windowed functions.}
