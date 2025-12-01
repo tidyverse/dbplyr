@@ -245,28 +245,3 @@ utils::globalVariables(c(
   "VARCHAR",
   "SUM"
 ))
-
-#' @export
-#' @rdname win_over
-win_rank_tdata <- function(f) {
-  lifecycle::deprecate_warn(
-    "2.4.0",
-    what = "win_rank_tdata()",
-    with = "win_rank()"
-  )
-
-  force(f)
-  function(order_by = NULL) {
-    order_by <- order_by %||% win_current_group()
-    if (is_empty(order_by)) {
-      order_by <- sql("(SELECT NULL)")
-    }
-
-    win_over(
-      sql(glue("{f}()")),
-      partition = win_current_group(),
-      order = order_by,
-      frame = win_current_frame()
-    )
-  }
-}

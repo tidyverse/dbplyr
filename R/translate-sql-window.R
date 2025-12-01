@@ -1,19 +1,27 @@
-#' Generate SQL expression for window functions
+#' SQL helpers for window functions
 #'
-#' `win_over()` makes it easy to generate the window function specification.
-#' `win_absent()`, `win_rank()`, `win_aggregate()`, and `win_cumulative()`
-#' provide helpers for constructing common types of window functions.
-#' `win_current_group()` and `win_current_order()` allow you to access
-#' the grouping and order context set up by [group_by()] and [arrange()].
+#' @description
+#' These functions help you create custom window SQL translations when
+#' implementing a new backend. They are typically used within [sql_translator()]
+#' to define how R window functions should be translated to SQL.
 #'
-#' @param expr The window expression
-#' @param partition Variables to partition over
-#' @param order Variables to order by
+#' * `win_over()` makes it easy to generate the window function specification.
+#' * `win_absent()`, `win_rank()`, `win_aggregate()`, and `win_cumulative()`
+#'   provide helpers for constructing common types of window functions.
+#' * `win_current_group()` and `win_current_order()` allow you to access
+#'   the grouping and order context set up by [group_by()] and [arrange()].
+#'
+#' @param expr The window expression.
+#' @param partition Variables to partition over.
+#' @param order Variables to order by.
 #' @param frame A numeric vector of length two defining the frame.
-#' @param f The name of an sql function as a string
-#' @param empty_order A logical value indicating whether to order by NULL if `order` is not specified
+#' @param f The name of an SQL function as a string.
+#' @param empty_order A logical value indicating whether to order by NULL if
+#'   `order` is not specified.
+#' @param con Database connection.
+#' @family SQL translation helpers
+#' @name sql_translation_window
 #' @export
-#' @keywords internal
 #' @examples
 #' con <- simulate_dbi()
 #'
@@ -131,7 +139,7 @@ rows <- function(from = -Inf, to = 0) {
   }
 }
 
-#' @rdname win_over
+#' @rdname sql_translation_window
 #' @export
 win_rank <- function(f, empty_order = FALSE) {
   force(f)
@@ -191,7 +199,7 @@ win_rank <- function(f, empty_order = FALSE) {
   }
 }
 
-#' @rdname win_over
+#' @rdname sql_translation_window
 #' @export
 win_aggregate <- function(f) {
   force(f)
@@ -208,7 +216,7 @@ win_aggregate <- function(f) {
   }
 }
 
-#' @rdname win_over
+#' @rdname sql_translation_window
 #' @export
 win_aggregate_2 <- function(f) {
   function(x, y) {
@@ -223,13 +231,13 @@ win_aggregate_2 <- function(f) {
   }
 }
 
-#' @rdname win_over
+#' @rdname sql_translation_window
 #' @usage NULL
 #' @export
 win_recycled <- win_aggregate
 
 
-#' @rdname win_over
+#' @rdname sql_translation_window
 #' @export
 win_cumulative <- function(f) {
   force(f)
@@ -290,7 +298,7 @@ sql_nth <- function(
   )
 }
 
-#' @rdname win_over
+#' @rdname sql_translation_window
 #' @export
 win_absent <- function(f) {
   force(f)
@@ -354,15 +362,15 @@ set_win_current_frame <- function(frame) {
   invisible(old)
 }
 #' @export
-#' @rdname win_over
+#' @rdname sql_translation_window
 win_current_group <- function() sql_context$group_by
 
 #' @export
-#' @rdname win_over
+#' @rdname sql_translation_window
 win_current_order <- function() sql_context$order_by
 
 #' @export
-#' @rdname win_over
+#' @rdname sql_translation_window
 win_current_frame <- function() sql_context$frame
 
 # Not exported, because you shouldn't need it

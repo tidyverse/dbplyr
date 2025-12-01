@@ -1,9 +1,29 @@
-# R prefers to specify start / stop or start / end
-# databases usually specify start / length
-# https://www.postgresql.org/docs/current/functions-string.html
+#' SQL helpers for string functions
+#'
+#' @description
+#' These functions help you create custom string SQL translations when
+#' implementing a new backend. They are typically used within [sql_translator()]
+#' to define how R string functions should be translated to SQL.
+#'
+#' * `sql_substr()` creates a SQL substring function translator that converts
+#'   R's `substr(x, start, stop)` to SQL's `SUBSTR(x, start, length)`.
+#' * `sql_str_sub()` creates a SQL substring function translator that handles
+#'   stringr's `str_sub()` with support for negative indices.
+#' * `sql_paste()` creates a SQL paste function using `CONCAT_WS()` or similar.
+#' * `sql_paste_infix()` creates a SQL paste function using an infix operator
+#'   like `||`.
+#'
+#' @param f The name of the SQL function as a string.
+#' @family SQL translation helpers
+#' @name sql_translation_string
+NULL
+
 #' @export
-#' @rdname sql_variant
+#' @rdname sql_translation_string
 sql_substr <- function(f = "SUBSTR") {
+  # R prefers to specify start / stop or start / end
+  # databases usually specify start / length
+  # https://www.postgresql.org/docs/current/functions-string.html
   function(x, start, stop) {
     start <- max(cast_number_whole(start), 1L)
     stop <- max(cast_number_whole(stop), 1L)
@@ -22,7 +42,11 @@ cast_number_whole <- function(x, arg = caller_arg(x), call = caller_env()) {
 # SUBSTR(string, start, length) - start can be negative
 
 #' @export
-#' @rdname sql_variant
+#' @rdname sql_translation_string
+#' @param subset_f The name of the SQL substring function.
+#' @param length_f The name of the SQL string length function.
+#' @param optional_length Whether the length argument is optional in the SQL
+#'   substring function.
 sql_str_sub <- function(
   subset_f = "SUBSTR",
   length_f = "LENGTH",
@@ -174,6 +198,54 @@ sql_str_detect_fixed_position <- function(type = c("detect", "start", "end")) {
       )
     }
   }
+}
+
+#' @export
+#' @rdname sql_translation_string
+#' @param default_sep The default separator for paste operations.
+sql_paste <- function(default_sep, f = "CONCAT_WS") {
+  function(..., sep = default_sep, collapse = NULL) {
+    check_collapse(collapse)
+    sql_call2(f, sep, ...)
+  }
+}
+
+#' @export
+#' @rdname sql_translation_string
+#' @param op The SQL operator to use for infix paste operations.
+#' @param cast A function to cast values to strings.
+sql_paste_infix <- function(default_sep, op, cast) {
+  force(default_sep)
+  op <- as.symbol(paste0("%", op, "%"))
+  force(cast)
+
+  function(..., sep = default_sep, collapse = NULL) {
+    check_collapse(collapse)
+
+    args <- list(...)
+    if (length(args) == 1) {
+      return(cast(args[[1]]))
+    }
+
+    if (sep == "") {
+      infix <- function(x, y) sql_call2(op, x, y)
+    } else {
+      infix <- function(x, y) sql_call2(op, sql_call2(op, x, sep), y)
+    }
+
+    purrr::reduce(args, infix)
+  }
+}
+
+check_collapse <- function(collapse) {
+  if (is.null(collapse)) {
+    return()
+  }
+
+  cli_abort(c(
+    "{.arg collapse} not supported in DB translation of {.fun paste}.",
+    i = "Please use {.fun str_flatten} instead."
+  ))
 }
 
 utils::globalVariables(c("ltrim", "rtrim"))
