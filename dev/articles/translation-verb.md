@@ -10,6 +10,7 @@ All dplyr verbs generate a `SELECT` statement. To demonstrate we’ll make
 a temporary database with a couple of tables
 
 ``` r
+library(dbplyr)
 library(dplyr)
 
 con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
@@ -91,6 +92,53 @@ airports <- copy_to(con, nycflights13::airports)
       ## SELECT `month`, `day`, AVG(`dep_delay`) AS `delay`
       ## FROM `nycflights13::flights`
       ## GROUP BY `month`, `day`
+
+## Subqueries
+
+It’s not always possible to translate a single dplyr verb into a single
+SQL query. For example, in SQL, variables in the `SELECT` clause have to
+come from another table; you can’t refer to a variable that you just
+created. For that reason, dbplyr will create subqueries where needed:
+
+``` r
+flights |>
+  select(distance, air_time) |>  
+  mutate(
+    air_time_h = air_time / 60,
+    speed = distance / air_time_h) |>
+  show_query()
+```
+
+    ## <SQL>
+    ## SELECT `q01`.*, `distance` / `air_time_h` AS `speed`
+    ## FROM (
+    ##   SELECT `distance`, `air_time`, `air_time` / 60.0 AS `air_time_h`
+    ##   FROM `nycflights13::flights`
+    ## ) AS `q01`
+
+It’s also possible to use a CTE if you so desire:
+
+``` r
+flights |>
+  select(distance, air_time) |>  
+  mutate(
+    air_time_h = air_time / 60,
+    speed = distance / air_time_h) |>
+  show_query(sql_options = sql_options(cte = TRUE))
+```
+
+    ## <SQL>
+    ## WITH `q01` AS (
+    ##   SELECT `distance`, `air_time`, `air_time` / 60.0 AS `air_time_h`
+    ##   FROM `nycflights13::flights`
+    ## )
+    ## SELECT `q01`.*, `distance` / `air_time_h` AS `speed`
+    ## FROM `q01`
+
+Sometimes dbplyr will create a subquery where it’s not strictly
+necessary. We strive to avoid this as much as possible, but our analysis
+of the generated SQL is not always complete, so we’ll typically err on
+the side of safety (creating more subqueries) rather than performance.
 
 ## Dual table verbs
 

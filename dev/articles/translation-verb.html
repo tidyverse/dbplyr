@@ -104,7 +104,8 @@ expressions within those verbs are translated.</p>
 <p>All dplyr verbs generate a <code>SELECT</code> statement. To
 demonstrate we’ll make a temporary database with a couple of tables</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dbplyr.tidyverse.org/">dbplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">":memory:"</span><span class="op">)</span></span>
 <span><span class="va">flights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to</a></span><span class="op">(</span><span class="va">con</span>, <span class="fu">nycflights13</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nycflights13/man/flights.html" class="external-link">flights</a></span><span class="op">)</span></span>
@@ -171,6 +172,48 @@ together to generate a <code>GROUP BY</code> clause:</p>
 <span><span class="co">## <span style="color: #0000BB;">GROUP BY</span> `month`, `day`</span></span></code></pre>
 </li>
 </ul>
+</div>
+<div class="section level2">
+<h2 id="subqueries">Subqueries<a class="anchor" aria-label="anchor" href="#subqueries"></a>
+</h2>
+<p>It’s not always possible to translate a single dplyr verb into a
+single SQL query. For example, in SQL, variables in the
+<code>SELECT</code> clause have to come from another table; you can’t
+refer to a variable that you just created. For that reason, dbplyr will
+create subqueries where needed:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">flights</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">distance</span>, <span class="va">air_time</span><span class="op">)</span> <span class="op">|&gt;</span>  </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    air_time_h <span class="op">=</span> <span class="va">air_time</span> <span class="op">/</span> <span class="fl">60</span>,</span>
+<span>    speed <span class="op">=</span> <span class="va">distance</span> <span class="op">/</span> <span class="va">air_time_h</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## &lt;SQL&gt;</span></span>
+<span><span class="co">## <span style="color: #0000BB;">SELECT</span> `q01`.*, `distance` / `air_time_h`<span style="color: #0000BB;"> AS </span>`speed`</span></span>
+<span><span class="co">## <span style="color: #0000BB;">FROM</span> (</span></span>
+<span><span class="co">##   <span style="color: #0000BB;">SELECT</span> `distance`, `air_time`, `air_time` / 60.0<span style="color: #0000BB;"> AS </span>`air_time_h`</span></span>
+<span><span class="co">##   <span style="color: #0000BB;">FROM</span> `nycflights13::flights`</span></span>
+<span><span class="co">## )<span style="color: #0000BB;"> AS </span>`q01`</span></span></code></pre>
+<p>It’s also possible to use a CTE if you so desire:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">flights</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">distance</span>, <span class="va">air_time</span><span class="op">)</span> <span class="op">|&gt;</span>  </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    air_time_h <span class="op">=</span> <span class="va">air_time</span> <span class="op">/</span> <span class="fl">60</span>,</span>
+<span>    speed <span class="op">=</span> <span class="va">distance</span> <span class="op">/</span> <span class="va">air_time_h</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/show_query.html">show_query</a></span><span class="op">(</span>sql_options <span class="op">=</span> <span class="fu"><a href="../reference/sql_options.html">sql_options</a></span><span class="op">(</span>cte <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## &lt;SQL&gt;</span></span>
+<span><span class="co">## <span style="color: #0000BB;">WITH</span> `q01` <span style="color: #0000BB;">AS</span> (</span></span>
+<span><span class="co">##   <span style="color: #0000BB;">SELECT</span> `distance`, `air_time`, `air_time` / 60.0<span style="color: #0000BB;"> AS </span>`air_time_h`</span></span>
+<span><span class="co">##   <span style="color: #0000BB;">FROM</span> `nycflights13::flights`</span></span>
+<span><span class="co">## )</span></span>
+<span><span class="co">## <span style="color: #0000BB;">SELECT</span> `q01`.*, `distance` / `air_time_h`<span style="color: #0000BB;"> AS </span>`speed`</span></span>
+<span><span class="co">## <span style="color: #0000BB;">FROM</span> `q01`</span></span></code></pre>
+<p>Sometimes dbplyr will create a subquery where it’s not strictly
+necessary. We strive to avoid this as much as possible, but our analysis
+of the generated SQL is not always complete, so we’ll typically err on
+the side of safety (creating more subqueries) rather than
+performance.</p>
 </div>
 <div class="section level2">
 <h2 id="dual-table-verbs">Dual table verbs<a class="anchor" aria-label="anchor" href="#dual-table-verbs"></a>
