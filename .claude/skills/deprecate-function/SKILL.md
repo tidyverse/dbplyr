@@ -73,6 +73,34 @@ For full function deprecation, add to the description or details section:
 #' This function is deprecated. Please use [replacement_function()] instead.
 ```
 
+### Step 3b: Add migration examples to @examples
+
+When deprecating a function in favor of a replacement, add old/new examples
+to the `@examples` section to help users migrate:
+
+```r
+#' @examples
+#' # Existing examples...
+#'
+#' # Old:
+#' old_function(arg1, arg2)
+#' # New:
+#' replacement_function(arg1, arg2)
+#'
+#' # Old:
+#' x <- "value"
+#' old_function("prefix", x, "suffix")
+#' # New:
+#' replacement_function("prefix {x} suffix")
+```
+
+Key points:
+- Place migration examples at the end of the `@examples` section
+- Use "# Old:" and "# New:" comments to clearly show the transition
+- Include 2-3 practical examples covering common use cases
+- Make examples runnable and self-contained
+- Show how the new syntax differs from the old
+
 ### Step 4: Add NEWS entry
 
 Add a bullet point under the "# dbplyr (development version)" section in NEWS.md:
@@ -132,6 +160,7 @@ When deprecating a function or parameter, ensure you:
 - [ ] Read DESCRIPTION to determine deprecation version
 - [ ] Add `lifecycle::deprecate_warn()` call in the function
 - [ ] Add lifecycle badge to roxygen documentation
+- [ ] Add migration examples to `@examples` section (for function deprecation)
 - [ ] Add bullet point to NEWS.md under development version
 - [ ] Create new test for deprecation warning using `expect_snapshot()`
 - [ ] Add `withr::local_options(lifecycle_verbosity = "quiet")` to existing tests
@@ -139,7 +168,9 @@ When deprecating a function or parameter, ensure you:
 - [ ] Run `air format .` to format code
 - [ ] Run tests to verify everything works
 
-## Example
+## Examples
+
+### Example 1: Deprecating a parameter
 
 Deprecating a `check_from` parameter in `tbl_sql()`:
 
@@ -184,6 +215,68 @@ test_that("tbl_sql(check_from) is deprecated", {
 ```
 
 6. Silence in existing tests - add to any test using `check_from`:
+```r
+test_that("existing test", {
+  withr::local_options(lifecycle_verbosity = "quiet")
+  # test code
+})
+```
+
+### Example 2: Deprecating a function
+
+Deprecating `build_sql()` in favor of `glue_sql2()`:
+
+1. Version: DESCRIPTION shows `2.5.1.9000` → deprecation version is `2.6.0`
+
+2. Function code (R/build-sql.R):
+```r
+build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
+  lifecycle::deprecate_warn("2.6.0", "build_sql()", "glue_sql2()")
+  # ... rest of function
+}
+```
+
+3. Documentation (R/build-sql.R):
+```r
+#' @description
+#' `r lifecycle::badge("deprecated")`
+#' `build_sql()` is deprecated in favor of `glue_sql2()`.
+#'
+#' @examples
+#' # Existing examples...
+#'
+#' # Migrate to glue_sql2():
+#'
+#' # Before:
+#' build_sql("SELECT * FROM ", ident("table"), con = con)
+#' # After:
+#' glue_sql2(con, "SELECT * FROM {.tbl 'table'}")
+#'
+#' # Before:
+#' name <- "Robert"
+#' build_sql("INSERT INTO students (name) VALUES (", name, ")", con = con)
+#' # After:
+#' glue_sql2(con, "INSERT INTO students (name) VALUES ({.val name})")
+```
+
+4. NEWS entry:
+```markdown
+# dbplyr (development version)
+
+* `build_sql()` is deprecated. Use `glue_sql2()` instead.
+```
+
+5. Test (tests/testthat/test-build-sql.R):
+```r
+test_that("build_sql() is deprecated", {
+  con <- simulate_dbi()
+  expect_snapshot(
+    build_sql("SELECT * FROM TABLE", con = con)
+  )
+})
+```
+
+6. Silence in existing tests:
 ```r
 test_that("existing test", {
   withr::local_options(lifecycle_verbosity = "quiet")

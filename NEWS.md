@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* `build_sql()` is deprecated. Use `glue_sql2()` instead (#1249).
 * `compute()`, `collect()`, and `collapse()` now have their own documentation pages.
 * dbplyr now uses the base pipe (#1626).
 * Defunct functions have been removed:

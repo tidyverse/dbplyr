@@ -1,5 +1,9 @@
 #' Build a SQL string.
 #'
+#' @description
+#' `r lifecycle::badge("deprecated")`
+#' `build_sql()` is deprecated in favor of `glue_sql2()`.
+#'
 #' This is a convenience function that should prevent sql injection attacks
 #' (which in the context of dplyr are most likely to be accidental not
 #' deliberate) by automatically escaping all expressions in the input, while
@@ -20,16 +24,25 @@
 #' @export
 #' @examples
 #' con <- simulate_dbi()
-#' build_sql("SELECT * FROM TABLE", con = con)
-#' x <- "TABLE"
-#' build_sql("SELECT * FROM ", x, con = con)
-#' build_sql("SELECT * FROM ", ident(x), con = con)
-#' build_sql("SELECT * FROM ", sql(x), con = con)
 #'
-#' # http://xkcd.com/327/
-#' name <- "Robert'); DROP TABLE Students;--"
-#' build_sql("INSERT INTO Students (Name) VALUES (", name, ")", con = con)
+#' # Old:
+#' build_sql("SELECT * FROM ", ident("table"), con = con)
+#' # New:
+#' glue_sql2(con, "SELECT * FROM {.tbl 'table'}")
+#'
+#' # Old:
+#' name <- "Robert"
+#' build_sql("INSERT INTO students (name) VALUES (", name, ")", con = con)
+#' # New:
+#' glue_sql2(con, "INSERT INTO students (name) VALUES ({.val name})")
+#'
+#' # Old:
+#' cols <- c("x", "y")
+#' build_sql("SELECT ", ident(cols), " FROM table", con = con)
+#' # New:
+#' glue_sql2(con, "SELECT {.col cols*} FROM {.tbl 'table'}")
 build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
+  lifecycle::deprecate_warn("2.6.0", "build_sql()", "glue_sql2()")
   check_con(con)
 
   escape_expr <- function(x, con) {

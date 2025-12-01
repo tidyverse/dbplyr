@@ -1,3 +1,14 @@
+# build_sql() is deprecated
+
+    Code
+      build_sql("SELECT * FROM TABLE", con = con)
+    Condition
+      Warning:
+      `build_sql()` was deprecated in dbplyr 2.6.0.
+      i Please use `glue_sql2()` instead.
+    Output
+      <SQL> SELECT * FROM TABLE
+
 # build_sql() requires connection
 
     Code
