@@ -18,3 +18,5 @@
 ^[.]?air[.]toml$
 ^\.vscode$
 ^\.devcontainer$
+^\.claude$
+^research$
