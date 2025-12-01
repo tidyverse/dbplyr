@@ -19,7 +19,7 @@ select_query <- function(
   check_character(window)
   check_character(order_by)
   check_number_whole(limit, allow_infinite = TRUE, allow_null = TRUE)
-  check_bool(distinct)
+  stopifnot(is.logical(distinct) || is.character(distinct))
   check_string(from_alias, allow_null = TRUE)
 
   structure(
@@ -41,10 +41,18 @@ select_query <- function(
 
 #' @export
 print.select_query <- function(x, ...) {
-  cat_line("<SQL SELECT", if (x$distinct) " DISTINCT", ">")
+  cat_line(
+    "<SQL SELECT",
+    if (!isFALSE(x$distinct)) " DISTINCT",
+    if (!is.logical(x$distinct)) " ON",
+    ">"
+  )
   cat_line("From:")
   cat_line(indent_print(x$from))
 
+  if (!is.logical(x$distinct)) {
+    cat_line("Dist On:  ", named_commas(x$distinct))
+  }
   if (length(x$select)) {
     cat_line("Select:   ", named_commas(x$select))
   }
