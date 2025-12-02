@@ -289,7 +289,7 @@ base_scalar <- sql_translator(
 
     if (lifecycle::is_present(ignore_case)) {
       lifecycle::deprecate_warn(
-        when = "1.6.0",
+        when = "2.6.0",
         what = "str_like(ignore_case)",
         details = c(
           "`str_like()` is always case sensitive.",
