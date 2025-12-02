@@ -681,13 +681,6 @@ sql_query_set_op.DBIConnection <- function(
   )
   sql_format_clauses(lines, lvl, con)
 }
-# nocov start
-dbplyr_query_set_op <- function(con, x, y, method) {
-  check_2ed(con)
-  # dplyr::sql_set_op() doesn't have ...
-  sql_query_set_op(con, x, y, method)
-}
-# nocov end
 
 #' @rdname db-sql
 #' @export
