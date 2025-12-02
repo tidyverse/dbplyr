@@ -217,6 +217,22 @@ dbplyr_edition.default <- function(con) {
 
 # fallback helper ---------------------------------------------------------
 
+check_2ed <- function(con, call = caller_env()) {
+  edition <- dbplyr_edition(con)
+  if (edition >= 2) {
+    return(invisible())
+  }
+
+  class <- class(con)[[1]]
+  cli_abort(
+    c(
+      "<{class}> uses dbplyr 1e interface which is no longer supported.",
+      i = "Please contact the maintainer of the package for a solution."
+    ),
+    call = call
+  )
+}
+
 dbplyr_fallback <- function(con, .generic, ...) {
   if (dbplyr_edition(con) >= 2) {
     # Always call DBIConnection method which contains the default implementation
