@@ -29,8 +29,11 @@ test_that("custom stringr functions translated correctly", {
     test_translate_sql(str_detect(x, y, negate = TRUE)),
     sql("!(`x` ~ `y`)")
   )
-  expect_equal(test_translate_sql(str_like(x, y)), sql("`x` ILIKE `y`"))
-  expect_equal(test_translate_sql(str_like(x, y, FALSE)), sql("`x` LIKE `y`"))
+  expect_equal(test_translate_sql(str_like(x, y)), sql("`x` LIKE `y`"))
+  # ignore case argument deprecated
+  expect_warning(expect_equal(test_translate_sql(str_like(x, y, FALSE)), sql("`x` LIKE `y`")))
+  expect_warning(expect_equal(test_translate_sql(str_like(x, y, TRUE)), sql("`x` ILIKE `y`")))
+
   expect_equal(test_translate_sql(str_ilike(x, y)), sql("`x` ILIKE `y`"))
   expect_equal(
     test_translate_sql(str_replace(x, y, z)),

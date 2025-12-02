@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* New translations for stringr function `str_ilike()` for Postgres, Redshift, and Snowflake (@edward-burn, #1628).
+* Argument `ignore_case` for `str_like()` has been deprecated (@edward-burn, #1630).
 * Deprecated `win_rank_tdata()` has been removed.
 * `compute()`, `collect()`, and `collapse()` now have their own documentation pages.
 * dbplyr now uses the base pipe (#1626).
@@ -14,7 +16,6 @@
 * Fixed overwrite flag in `copy_to()` to work when source is in the same DB as destination (@liudvikasakelis, #1535)
 * Snowflake correctly translates `$` to `:` (@jsowder, #1608)
 * `dbplyr_uncount()` now works with Redshift (@owenjonesuob, #1601).
-* New translations for stringr function `str_ilike()` for Postgres, Redshift, and Snowflake (@edward-burn, #1628).
 
 # dbplyr 2.5.1
 

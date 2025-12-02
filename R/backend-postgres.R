@@ -137,16 +137,26 @@ sql_translation.PqConnection <- function(con) {
         )
       },
       # https://www.postgresql.org/docs/current/functions-matching.html
-      str_like = function(string, pattern, ignore_case = TRUE) {
-        check_bool(ignore_case)
-        if (isTRUE(ignore_case)) {
-          sql_expr(!!string %ILIKE% !!pattern)
-        } else {
-          sql_expr(!!string %LIKE% !!pattern)
+      str_like = function(string, pattern, ignore_case = deprecated()) {
+
+        if (lifecycle::is_present(ignore_case)) {
+          lifecycle::deprecate_warn(
+            when = "1.6.0",
+            what = "str_like(ignore_case)",
+            details = c(
+              "`str_like()` is always case sensitive.",
+              "Use `str_ilike()` for case insensitive string matching."
+            )
+          )
+          check_bool(ignore_case)
+          if (ignore_case) {
+            return(sql_expr(!!string %ILIKE% !!pattern))
+          }
         }
+          sql_expr(!!string %LIKE% !!pattern)
       },
       str_ilike = function(string, pattern) {
-          sql_expr(!!string %ILIKE% !!pattern)
+        sql_expr(!!string %ILIKE% !!pattern)
       },
       str_replace = function(string, pattern, replacement) {
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement))

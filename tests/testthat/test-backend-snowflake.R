@@ -101,6 +101,13 @@ test_that("custom stringr functions translated correctly", {
     test_translate_sql(str_ends(x, y, negate = TRUE)),
     sql("REGEXP_INSTR(`x`, `y`, 1, 1, 1) != (LENGTH(`x`) + 1)")
   )
+
+  # ignore case argument deprecated
+  expect_warning(expect_equal(test_translate_sql(str_like(x, y, FALSE)), sql("`x` LIKE `y`")))
+  expect_warning(expect_equal(test_translate_sql(str_like(x, y, TRUE)), sql("`x` ILIKE `y`")))
+
+  expect_equal(test_translate_sql(str_ilike(x, y)), sql("`x` ILIKE `y`"))
+
 })
 
 test_that("aggregates are translated correctly", {
