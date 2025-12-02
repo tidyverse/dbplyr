@@ -88,7 +88,7 @@ distinct_prepare_compat <- function(
         rep("x", length(missing_vars))
       )
     )
-    abort(bullets, call = error_call)
+    cli::cli_abort(bullets, call = error_call)
   }
 
   # Only keep unique vars

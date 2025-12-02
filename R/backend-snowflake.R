@@ -152,7 +152,7 @@ sql_translation.Snowflake <- function(con) {
         } else if (label && abbr) {
           sql_expr(DAYNAME(!!x))
         } else {
-          abort("Unrecognized arguments to `wday`")
+          cli::cli_abort("Unrecognized arguments", call = quote(wday()))
         }
       },
       yday = \(x) sql_expr(EXTRACT("dayofyear", !!x)),
