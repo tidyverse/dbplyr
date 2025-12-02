@@ -210,7 +210,7 @@ check_2ed <- function(con, call = caller_env()) {
   class <- class(con)[[1]]
   cli_abort(
     c(
-      "<{class}> uses dbplyr 1e interface which is no longer supported.",
+      "<{class}> uses dbplyr's 1st edition interface, which is no longer supported.",
       i = "Please contact the maintainer of the package for a solution."
     ),
     call = call
