@@ -210,7 +210,7 @@ with_indexed_errors <- function(
     expr,
     purrr_error_indexed = function(cnd) {
       message <- message(cnd)
-      abort(
+      cli::cli_abort(
         message,
         ...,
         call = .error_call,

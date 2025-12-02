@@ -285,7 +285,7 @@ mutate_keep <- function(out, keep, used, names_new, names_groups) {
       used = names(used)[used],
       unused = names(used)[!used],
       none = character(),
-      abort("Unknown `keep`.", .internal = TRUE)
+      cli::cli_abort("Unknown value of {.arg keep}.", .internal = TRUE)
     )
     names_out <- intersect(names, c(names_new, names_groups, names_keep))
   }
