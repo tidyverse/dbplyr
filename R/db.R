@@ -9,14 +9,6 @@
 #'
 #' * `db_col_types()` returns the column types of a table.
 #'
-#' @section dbplyr 2.0.0:
-#' dbplyr 2.0.0 renamed a number of generics so that they could be cleanly moved
-#' from dplyr to dbplyr. If you have an existing backend, you'll need to rename
-#' the following methods.
-#'
-#' * `dplyr::db_desc()` -> `dbplyr::db_connection_describe()` (also note that
-#'    the argument named changed from `x` to `con`).
-#'
 #' @family generic
 #' @keywords internal
 #' @name db-misc

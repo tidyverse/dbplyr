@@ -61,31 +61,6 @@
 #' * `sql_query_delete()` generates SQL for an `DELETE FROM` query
 #' * `sql_returning_cols()` generates SQL for a `RETURNING` clause
 #'
-#' @section dbplyr 2.0.0:
-#'
-#' Many `dplyr::db_*` generics have been replaced by `dbplyr::sql_*` generics.
-#' To update your backend, you'll need to extract the SQL generation out of your
-#' existing code, and place it in a new method for a dbplyr `sql_` generic.
-#'
-#' * `dplyr::db_analyze()` is replaced by `dbplyr::sql_table_analyze()`
-#' * `dplyr::db_explain()` is replaced by `dbplyr::sql_query_explain()`
-#' * `dplyr::db_create_index()` is replaced by `dbplyr::sql_table_index()`
-#' * `dplyr::db_query_fields()` is replaced by `dbplyr::sql_query_fields()`
-#' * `dplyr::db_query_rows()` is no longer used; you can delete it
-#' * `dplyr::db_save_query()` is replaced by `dbplyr::sql_query_save()`
-#'
-#' The query generating functions have also changed names. Their behaviour is
-#' unchanged, so you just need to rename the generic and import from dbplyr
-#' instead of dplyr.
-#'
-#' * `dplyr::sql_select()` is replaced by `dbplyr::sql_query_select()`
-#' * `dplyr::sql_join()` is replaced by `dbplyr::sql_query_join()`
-#' * `dplyr::sql_semi_join()` is replaced by `dbplyr::sql_query_semi_join()`
-#' * `dplyr::sql_set_op()` is replaced by `dbplyr::sql_query_set_op()`
-#' * `dplyr::sql_subquery()` is replaced by `dbplyr::sql_query_wrap()`
-#'
-#' Learn more in `vignette("backend-2.0")`
-#'
 #' @keywords internal
 #' @family generic
 #' @name db-sql
