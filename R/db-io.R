@@ -80,7 +80,7 @@ db_copy_to.DBIConnection <- function(
     in_transaction,
     "Can't copy data to table {.field {format(table, con = con)}}.",
     {
-      table <- dplyr::db_write_table(
+      table <- dbplyr_write_table(
         con,
         table,
         types = types,
@@ -187,9 +187,7 @@ db_collect.DBIConnection <- function(
 }
 
 
-#' @export
-#' @importFrom dplyr db_write_table
-db_write_table.DBIConnection <- function(
+dbplyr_write_table <- function(
   con,
   table,
   types,

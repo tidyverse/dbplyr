@@ -23,15 +23,6 @@
 #' @aliases NULL
 NULL
 
-dbplyr_connection_describe <- function(con, ...) {
-  check_2ed(con)
-  db_connection_describe(con, ...)
-}
-#' @export
-#' @importFrom dplyr db_desc
-db_desc.DBIConnection <- function(x) {
-  db_connection_describe(x)
-}
 #' @export
 #' @rdname db-misc
 db_connection_describe <- function(con, ...) {

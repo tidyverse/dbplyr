@@ -14,20 +14,3 @@ test_that("sql_query_rows() works", {
     sql("SELECT COUNT(*) FROM `abc` AS `master`")
   )
 })
-
-test_that("handles DBI error", {
-  unique_subquery_name_reset()
-  con <- local_sqlite_connection()
-
-  expect_snapshot(
-    {
-      (expect_error(db_analyze(con, "tbl")))
-      (expect_error(db_create_index(con, "tbl", "col")))
-
-      (expect_error(db_explain(con, "invalid sql")))
-      (expect_error(db_query_fields(con, "does not exist")))
-      (expect_error(db_save_query(con, "invalid sql", "tbl")))
-    },
-    transform = snap_transform_dbi
-  )
-})

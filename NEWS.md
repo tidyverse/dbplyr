@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* dbplyr 1e interfaces are now deprecated (#1197). Backend developers have had >2 years to update.
 * Deprecated `win_rank_tdata()` has been removed.
 * `compute()`, `collect()`, and `collapse()` now have their own documentation pages.
 * dbplyr now uses the base pipe (#1626).

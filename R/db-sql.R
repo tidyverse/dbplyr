@@ -116,11 +116,7 @@ sql_translation <- function(con) {
 }
 # sql_translation.DBIConnection lives in backend-.R
 dbplyr_sql_translation <- function(con) {
-  sql_translation(con)
-}
-#' @importFrom dplyr sql_translate_env
-#' @export
-sql_translate_env.DBIConnection <- function(con) {
+  check_2ed(con)
   sql_translation(con)
 }
 
@@ -429,35 +425,6 @@ dbplyr_query_select <- function(
     ...
   )
 }
-#' @importFrom dplyr sql_select
-#' @export
-sql_select.DBIConnection <- function(
-  con,
-  select,
-  from,
-  where = NULL,
-  group_by = NULL,
-  having = NULL,
-  order_by = NULL,
-  limit = NULL,
-  distinct = FALSE,
-  ...
-) {
-  # TODO should add argument `window` after tidyverse/dplyr#4663
-  # TODO should add argument `subquery` after tidyverse/dplyr#4663
-  sql_query_select(
-    con,
-    select,
-    from,
-    where = where,
-    group_by = group_by,
-    having = having,
-    order_by = order_by,
-    limit = limit,
-    distinct = distinct,
-    ...
-  )
-}
 
 #' @rdname db-sql
 #' @export
@@ -524,32 +491,6 @@ dbplyr_query_join <- function(
   lvl = 0
 ) {
   check_2ed(con)
-  sql_query_join(
-    con,
-    x,
-    y,
-    select,
-    type = type,
-    by = by,
-    na_matches = na_matches,
-    ...,
-    lvl = lvl
-  )
-}
-#' @export
-#' @importFrom dplyr sql_join
-sql_join.DBIConnection <- function(
-  con,
-  x,
-  y,
-  vars,
-  type = "inner",
-  by = NULL,
-  na_matches = FALSE,
-  ...,
-  select = NULL,
-  lvl = 0
-) {
   sql_query_join(
     con,
     x,
@@ -714,19 +655,6 @@ dbplyr_query_semi_join <- function(
   check_2ed(con)
   sql_query_semi_join(con, x, y, anti = anti, by = by, ..., lvl = lvl)
 }
-#' @export
-#' @importFrom dplyr sql_semi_join
-sql_semi_join.DBIConnection <- function(
-  con,
-  x,
-  y,
-  anti = FALSE,
-  by = NULL,
-  ...,
-  lvl = 0
-) {
-  sql_query_semi_join(con, x, y, anti = anti, by = by, ..., lvl = lvl)
-}
 
 #' @rdname db-sql
 #' @export
@@ -756,12 +684,6 @@ sql_query_set_op.DBIConnection <- function(
 # nocov start
 dbplyr_query_set_op <- function(con, x, y, method) {
   check_2ed(con)
-  # dplyr::sql_set_op() doesn't have ...
-  sql_query_set_op(con, x, y, method)
-}
-#' @importFrom dplyr sql_set_op
-#' @export
-sql_set_op.DBIConnection <- function(con, x, y, method) {
   # dplyr::sql_set_op() doesn't have ...
   sql_query_set_op(con, x, y, method)
 }
@@ -1194,11 +1116,7 @@ sql_named_cols <- function(con, cols, table = NULL) {
 
 dbplyr_analyze <- function(con, table, ...) {
   check_2ed(con)
-  db_analyze(con, table, ...)
-}
-#' @export
-#' @importFrom dplyr db_analyze
-db_analyze.DBIConnection <- function(con, table, ...) {
+
   sql <- sql_table_analyze(con, table, ...)
   if (is.null(sql)) {
     return() # nocov
@@ -1220,18 +1138,6 @@ dbplyr_create_index <- function(
   ...
 ) {
   check_2ed(con)
-  db_create_index(con, table, columns, name = name, unique = unique, ...)
-}
-#' @export
-#' @importFrom dplyr db_create_index
-db_create_index.DBIConnection <- function(
-  con,
-  table,
-  columns,
-  name = NULL,
-  unique = FALSE,
-  ...
-) {
   sql <- sql_table_index(con, table, columns, name = name, unique = unique, ...)
   db_execute(
     con,
@@ -1242,11 +1148,7 @@ db_create_index.DBIConnection <- function(
 
 dbplyr_explain <- function(con, sql, ...) {
   check_2ed(con)
-  db_explain(con, sql, ...)
-}
-#' @export
-#' @importFrom dplyr db_explain
-db_explain.DBIConnection <- function(con, sql, ...) {
+
   sql <- sql_query_explain(con, sql, ...)
   expl <- db_get_query(con, sql, "Can't explain query.")
 
@@ -1254,13 +1156,10 @@ db_explain.DBIConnection <- function(con, sql, ...) {
   paste(out, collapse = "\n")
 }
 
+
 dbplyr_query_fields <- function(con, sql, ...) {
   check_2ed(con)
-  db_query_fields(con, sql, ...)
-}
-#' @export
-#' @importFrom dplyr db_query_fields
-db_query_fields.DBIConnection <- function(con, sql, ...) {
+
   sql <- sql_query_fields(con, sql, ...)
   df <- db_get_query(con, sql, "Can't query fields.")
   names(df)
@@ -1275,25 +1174,7 @@ dbplyr_save_query <- function(
   overwrite = FALSE
 ) {
   check_2ed(con)
-  db_save_query(
-    con,
-    sql,
-    name,
-    temporary = temporary,
-    ...,
-    overwrite = overwrite
-  )
-}
-#' @export
-#' @importFrom dplyr db_save_query
-db_save_query.DBIConnection <- function(
-  con,
-  sql,
-  name,
-  temporary = TRUE,
-  ...,
-  overwrite = FALSE
-) {
+
   name <- as_table_path(name, con)
   sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
 
@@ -1321,17 +1202,6 @@ dbplyr_sql_subquery <- function(
   lvl = 0
 ) {
   check_2ed(con)
-  sql_query_wrap(con, from = from, name = name, ..., lvl = lvl)
-}
-#' @export
-#' @importFrom dplyr sql_subquery
-sql_subquery.DBIConnection <- function(
-  con,
-  from,
-  name = unique_subquery_name(),
-  ...,
-  lvl = 0
-) {
   sql_query_wrap(con, from = from, name = name, ..., lvl = lvl)
 }
 
