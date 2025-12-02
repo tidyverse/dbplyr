@@ -197,9 +197,6 @@ dbplyr_edition <- function(con) {
 dbplyr_edition.default <- function(con) {
   1L
 }
-# Needed because pool uses an object of call Pool/R6
-
-# fallback helper ---------------------------------------------------------
 
 check_2ed <- function(con, call = caller_env()) {
   edition <- dbplyr_edition(con)
