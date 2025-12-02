@@ -202,10 +202,18 @@ dbplyr_write_table <- function(
   check_bool(temporary)
   check_bool(overwrite)
 
+  if (inherits(con, "PostgreSQLConnection")) {
+    # RPostgreSQL doesn't handle `Id()` or `SQL()` correctly, so we can only pass
+    # the bare table name
+    name <- table_path_name(table, con)
+  } else {
+    name <- SQL(table)
+  }
+
   withCallingHandlers(
     dbWriteTable(
       con,
-      name = SQL(table),
+      name = name,
       value = values,
       field.types = types,
       temporary = temporary,

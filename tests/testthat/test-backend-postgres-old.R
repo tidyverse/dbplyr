@@ -1,6 +1,4 @@
-test_that("RPostgreSQL backend", {
-  skip_if_not(identical(Sys.getenv("GITHUB_POSTGRES"), "true"))
-
+test_that("works with RPostgreSQL backend", {
   src <- withr::local_db_connection(
     DBI::dbConnect(
       RPostgreSQL::PostgreSQL(),
@@ -11,12 +9,10 @@ test_that("RPostgreSQL backend", {
     )
   )
 
-  suppressWarnings(
-    copy_to(src, mtcars, "mtcars", overwrite = TRUE, temporary = FALSE)
-  )
+  mtcars_db <- copy_to(src, mtcars, "mtcars", overwrite = TRUE)
   withr::defer(DBI::dbRemoveTable(src, "mtcars"))
 
-  expect_identical(colnames(tbl(src, "mtcars")), colnames(mtcars))
+  expect_identical(colnames(mtcars_db), colnames(mtcars))
 
   src_cyl <- tbl(src, "mtcars") |> select(cyl) |> collect()
   expect_identical(src_cyl$cyl, mtcars$cyl)
