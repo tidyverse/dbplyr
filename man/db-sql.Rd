@@ -122,7 +122,9 @@ Query manipulation:
 \itemize{
 \item \code{sql_query_explain(con, sql)} generates SQL that "explains" a query,
 i.e. generates a query plan describing what indexes etc that the
-database will use.
+database will use. It can return character vector, in which case the
+first n elements are used to generate the plan and the final element
+is used to return the query plan.
 \item \code{sql_query_fields()} generates SQL for a 0-row result that is used to
 capture field names in \code{\link[=tbl_sql]{tbl_sql()}}
 \item \code{sql_query_save(con, sql)} generates SQL for saving a query into a
