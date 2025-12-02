@@ -53,7 +53,7 @@
       test_translate_sql(str_like(x, "abc", ignore_case = TRUE))
     Condition
       Warning:
-      The `ignore_case` argument of `str_like()` is deprecated as of dbplyr 1.6.0.
+      The `ignore_case` argument of `str_like()` is deprecated as of dbplyr 2.6.0.
       i `str_like()` is always case sensitive.
       i Use `str_ilike()` for case insensitive string matching.
       Error in `str_like()`:
