@@ -1,11 +1,5 @@
 test_that("2nd edition uses sql methods", {
-  reset_warning_verbosity("Test-edition")
-  local_methods(
-    db_analyze.Test = \(con, ...) abort("db_method")
-  )
-
   con <- structure(list(), class = c("Test", "DBIConnection"))
-  expect_snapshot(expect_error(dbplyr_analyze(con), "db_method"))
 
   local_methods(
     dbplyr_edition.Test = \(con) 2,

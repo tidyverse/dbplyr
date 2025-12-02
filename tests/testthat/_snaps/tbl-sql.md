@@ -19,7 +19,7 @@
       Error in `tbl_sql()`:
       ! Failed to find table `foo.bar`.
       i Did you mean `from = I("foo.bar")`?
-      Caused by error in `db_query_fields.DBIConnection()`:
+      Caused by error in `db_query_fields()`:
       ! Can't query fields.
       i Using SQL: SELECT * FROM `foo.bar` AS `q05` WHERE (0 = 1)
       Caused by error:

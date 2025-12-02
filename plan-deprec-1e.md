@@ -44,15 +44,17 @@ We'll keep `dbplyr_edition()` around to avoid breaking changes in existing backe
 
 ### 2. Simplify internal dbplyr_* functions
 
-Keep the internal `dbplyr_*()` wrapper functions but simplify them to directly call the new generic instead of using `dbplyr_fallback()`.
+Keep the internal `dbplyr_*()` wrapper functions but replace them with the implementation of the DBIConnection method. For example, if a `dbplyr_` function calls `dbplyr_fallback(con, "sql_translate_env")` then replace its body with the `sql_translate_env.DBIConnection`.
 
-In `R/db-sql.R`, replace the implementations:
+e.g.
 
 ```r
 # Before:
 dbplyr_sql_translation <- function(con) {
   dbplyr_fallback(con, "sql_translate_env")
 }
+#' @importFrom dplyr sql_translate_env
+#' @export
 sql_translate_env.DBIConnection <- function(con) {
   sql_translation(con)
 }
@@ -61,6 +63,25 @@ sql_translate_env.DBIConnection <- function(con) {
 dbplyr_sql_translation <- function(con) {
   check_2ed(con)
   sql_translation(con)
+}
+
+# Before
+dbplyr_query_set_op <- function(con, ...) {
+  dbplyr_fallback(con, "sql_set_op", ...)
+}
+#' @importFrom dplyr sql_set_op
+#' @export
+sql_set_op.DBIConnection <- function(con, x, y, method) {
+  # dplyr::sql_set_op() doesn't have ...
+  sql_query_set_op(con, x, y, method)
+}
+
+# After
+#' @importFrom dplyr sql_set_op
+dbplyr_query_set_op <- function(con, x, y, method) {
+  check_2ed(con)
+  # dplyr::sql_set_op() doesn't have ...
+  sql_query_set_op(con, x, y, method)
 }
 ```
 

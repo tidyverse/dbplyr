@@ -7,7 +7,7 @@
       <error/rlang_error>
       Error in `db_copy_to()`:
       ! Can't copy data to table `tmp2`.
-      Caused by error in `db_create_index.DBIConnection()`:
+      Caused by error in `db_create_index()`:
       ! Can't create index on table `tmp2`.
       i Using SQL: CREATE UNIQUE INDEX `tmp2_x` ON `tmp2` (`x`)
       Caused by error:

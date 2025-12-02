@@ -24,7 +24,8 @@
 NULL
 
 dbplyr_connection_describe <- function(con, ...) {
-  dbplyr_fallback(con, "db_desc", ...)
+  check_2ed(con)
+  db_connection_describe(con, ...)
 }
 #' @export
 #' @importFrom dplyr db_desc
@@ -231,23 +232,4 @@ check_2ed <- function(con, call = caller_env()) {
     ),
     call = call
   )
-}
-
-dbplyr_fallback <- function(con, .generic, ...) {
-  if (dbplyr_edition(con) >= 2) {
-    # Always call DBIConnection method which contains the default implementation
-    fun <- sym(paste0(.generic, ".DBIConnection"))
-  } else {
-    class <- class(con)[[1]]
-    warn(
-      c(
-        paste0("<", class, "> uses an old dbplyr interface"),
-        i = "Please install a newer version of the package or contact the maintainer"
-      ),
-      .frequency = "regularly",
-      .frequency_id = paste0(class, "-edition")
-    )
-    fun <- call("::", quote(dplyr), sym(.generic))
-  }
-  eval_bare(expr((!!fun)(con, ...)))
 }
