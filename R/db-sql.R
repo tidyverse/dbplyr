@@ -30,7 +30,9 @@
 #'
 #' * `sql_query_explain(con, sql)` generates SQL that "explains" a query,
 #'   i.e. generates a query plan describing what indexes etc that the
-#'   database will use.
+#'   database will use. It can return character vector, in which case the
+#'   first n elements are used to generate the plan and the final element
+#'   is used to return the query plan.
 #'
 #' * `sql_query_fields()` generates SQL for a 0-row result that is used to
 #'   capture field names in [tbl_sql()]
@@ -1118,7 +1120,11 @@ dbplyr_explain <- function(con, sql, ...) {
   check_2ed(con)
 
   sql <- sql_query_explain(con, sql, ...)
-  expl <- db_get_query(con, sql, "Can't explain query.")
+  n <- length(sql)
+  for (i in seq_len(n - 1)) {
+    db_execute(con, sql[[i]], "Can't explain query.")
+  }
+  expl <- db_get_query(con, sql[[n]], "Can't explain query.")
 
   out <- utils::capture.output(print(expl))
   paste(out, collapse = "\n")
