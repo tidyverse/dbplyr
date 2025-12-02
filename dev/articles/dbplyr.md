@@ -150,7 +150,7 @@ tibble:
 ``` r
 flights_db 
 #> # Source:   table<`flights`> [?? x 19]
-#> # Database: sqlite 3.51.0 [:memory:]
+#> # Database: sqlite 3.51.1 [:memory:]
 #>    year month   day dep_time sched_dep_time dep_delay arr_time
 #>   <int> <int> <int>    <int>          <int>     <dbl>    <int>
 #> 1  2013     1     1      517            515         2      830
@@ -184,7 +184,7 @@ continue to use the dplyr verbs that you’re already familiar with:
 ``` r
 flights_db |> select(year:day, dep_delay, arr_delay)
 #> # Source:   SQL [?? x 5]
-#> # Database: sqlite 3.51.0 [:memory:]
+#> # Database: sqlite 3.51.1 [:memory:]
 #>    year month   day dep_delay arr_delay
 #>   <int> <int> <int>     <dbl>     <dbl>
 #> 1  2013     1     1         2        11
@@ -197,7 +197,7 @@ flights_db |> select(year:day, dep_delay, arr_delay)
 
 flights_db |> filter(dep_delay > 240)
 #> # Source:   SQL [?? x 19]
-#> # Database: sqlite 3.51.0 [:memory:]
+#> # Database: sqlite 3.51.1 [:memory:]
 #>    year month   day dep_time sched_dep_time dep_delay arr_time
 #>   <int> <int> <int>    <int>          <int>     <dbl>    <int>
 #> 1  2013     1     1      848           1835       853     1001
@@ -219,7 +219,7 @@ flights_db |>
 #> Use `na.rm = TRUE` to silence this warning
 #> This warning is displayed once every 8 hours.
 #> # Source:   SQL [?? x 2]
-#> # Database: sqlite 3.51.0 [:memory:]
+#> # Database: sqlite 3.51.1 [:memory:]
 #>   dest  delay
 #>   <chr> <dbl>
 #> 1 ABQ   13.7 
@@ -275,7 +275,7 @@ a few rows.
 ``` r
 tailnum_delay_db
 #> # Source:     SQL [?? x 3]
-#> # Database:   sqlite 3.51.0 [:memory:]
+#> # Database:   sqlite 3.51.1 [:memory:]
 #> # Ordered by: desc(delay)
 #>   tailnum delay     n
 #>   <chr>   <dbl> <int>

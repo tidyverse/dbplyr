@@ -49,7 +49,7 @@ con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
 
 copy_inline(con, df)
 #> # Source:   SQL [?? x 2]
-#> # Database: sqlite 3.51.0 [:memory:]
+#> # Database: sqlite 3.51.1 [:memory:]
 #>       x y    
 #>   <int> <chr>
 #> 1     1 a    

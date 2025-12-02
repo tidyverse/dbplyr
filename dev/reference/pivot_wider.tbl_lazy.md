@@ -221,7 +221,7 @@ memdb_frame(
     values_from = value
   )
 #> # Source:   SQL [?? x 3]
-#> # Database: sqlite 3.51.0 [:memory:]
+#> # Database: sqlite 3.51.1 [:memory:]
 #>      id     x     y
 #>   <dbl> <int> <int>
 #> 1     1     1     2

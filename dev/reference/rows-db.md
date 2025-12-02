@@ -212,14 +212,14 @@ applejack <- copy_inline(con, data.frame(
 rows_insert(ponies, applejack, conflict = "ignore")
 #> Matching, by = "name"
 #> # Source:   SQL [?? x 3]
-#> # Database: sqlite 3.51.0 [:memory:]
+#> # Database: sqlite 3.51.1 [:memory:]
 #>   id    name       cutie_mark  
 #>   <lgl> <chr>      <chr>       
 #> 1 NA    Apple Jack three apples
 # And the original table is left unchanged:
 ponies
 #> # Source:   table<`Ponies`> [?? x 3]
-#> # Database: sqlite 3.51.0 [:memory:]
+#> # Database: sqlite 3.51.1 [:memory:]
 #> # ℹ 3 variables: id <int>, name <chr>, cutie_mark <chr>
 
 # You can also choose to modify the table with in_place = TRUE:
@@ -229,7 +229,7 @@ rows_insert(ponies, applejack, conflict = "ignore", in_place = TRUE)
 # data is modified
 ponies
 #> # Source:   table<`Ponies`> [?? x 3]
-#> # Database: sqlite 3.51.0 [:memory:]
+#> # Database: sqlite 3.51.1 [:memory:]
 #>      id name       cutie_mark  
 #>   <int> <chr>      <chr>       
 #> 1     1 Apple Jack three apples

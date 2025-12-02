@@ -54,7 +54,7 @@ copy_to(con, mtcars, I("aux.df"), temporary = FALSE)
 
 con |> tbl("df")
 #> # Source:   table<`df`> [?? x 5]
-#> # Database: sqlite 3.51.0 [:memory:]
+#> # Database: sqlite 3.51.1 [:memory:]
 #>    Sepal.Length Sepal.Width Petal.Length Petal.Width Species
 #>           <dbl>       <dbl>        <dbl>       <dbl> <chr>  
 #>  1          5.1         3.5          1.4         0.2 setosa 
@@ -70,7 +70,7 @@ con |> tbl("df")
 #> # ℹ more rows
 con |> tbl(I("aux.df"))
 #> # Source:   table<aux.df> [?? x 11]
-#> # Database: sqlite 3.51.0 [:memory:]
+#> # Database: sqlite 3.51.1 [:memory:]
 #>      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #>    <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
 #>  1  21       6  160    110  3.9   2.62  16.5     0     1     4     4
