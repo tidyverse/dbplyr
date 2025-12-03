@@ -70,23 +70,3 @@
       Error in `difftime()`:
       ! Argument `tz` isn't supported on database backends.
 
-# window functions with redshift specific error message
-
-    Code
-      test_translate_sql(quantile(x, 0.3, na.rm = TRUE), window = TRUE)
-    Condition
-      Error in `quantile()`:
-      ! Translation of `quantile()` in `mutate()` is not supported for Redshift.
-      i Use a combination of `summarise()` and `left_join()` instead:
-        `df |> left_join(summarise(<col> = quantile(x, 0.3, na.rm = TRUE)))`.
-
----
-
-    Code
-      test_translate_sql(median(x, na.rm = TRUE), window = TRUE)
-    Condition
-      Error in `median()`:
-      ! Translation of `median()` in `mutate()` is not supported for Redshift.
-      i Use a combination of `summarise()` and `left_join()` instead:
-        `df |> left_join(summarise(<col> = median(x, na.rm = TRUE)))`.
-
