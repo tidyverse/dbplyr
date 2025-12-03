@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* dbplyr 1e interfaces are now deprecated (#1197). Backend developers have had >2 years to update.
 * MySQL gains slightly better translation for `as.integer()` and `as.integer64()` (#1647).
 * Fixed snowflake translations that were being reported as unknown (@edward-burn, #1570). 
 * Deprecated `win_rank_tdata()` has been removed.

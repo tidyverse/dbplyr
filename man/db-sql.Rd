@@ -122,7 +122,9 @@ Query manipulation:
 \itemize{
 \item \code{sql_query_explain(con, sql)} generates SQL that "explains" a query,
 i.e. generates a query plan describing what indexes etc that the
-database will use.
+database will use. It can return character vector, in which case the
+first n elements are used to generate the plan and the final element
+is used to return the query plan.
 \item \code{sql_query_fields()} generates SQL for a 0-row result that is used to
 capture field names in \code{\link[=tbl_sql]{tbl_sql()}}
 \item \code{sql_query_save(con, sql)} generates SQL for saving a query into a
@@ -154,35 +156,6 @@ Query generation for manipulation:
 \item \code{sql_returning_cols()} generates SQL for a \code{RETURNING} clause
 }
 }
-\section{dbplyr 2.0.0}{
-
-
-Many \verb{dplyr::db_*} generics have been replaced by \verb{dbplyr::sql_*} generics.
-To update your backend, you'll need to extract the SQL generation out of your
-existing code, and place it in a new method for a dbplyr \code{sql_} generic.
-\itemize{
-\item \code{dplyr::db_analyze()} is replaced by \code{dbplyr::sql_table_analyze()}
-\item \code{dplyr::db_explain()} is replaced by \code{dbplyr::sql_query_explain()}
-\item \code{dplyr::db_create_index()} is replaced by \code{dbplyr::sql_table_index()}
-\item \code{dplyr::db_query_fields()} is replaced by \code{dbplyr::sql_query_fields()}
-\item \code{dplyr::db_query_rows()} is no longer used; you can delete it
-\item \code{dplyr::db_save_query()} is replaced by \code{dbplyr::sql_query_save()}
-}
-
-The query generating functions have also changed names. Their behaviour is
-unchanged, so you just need to rename the generic and import from dbplyr
-instead of dplyr.
-\itemize{
-\item \code{dplyr::sql_select()} is replaced by \code{dbplyr::sql_query_select()}
-\item \code{dplyr::sql_join()} is replaced by \code{dbplyr::sql_query_join()}
-\item \code{dplyr::sql_semi_join()} is replaced by \code{dbplyr::sql_query_semi_join()}
-\item \code{dplyr::sql_set_op()} is replaced by \code{dbplyr::sql_query_set_op()}
-\item \code{dplyr::sql_subquery()} is replaced by \code{dbplyr::sql_query_wrap()}
-}
-
-Learn more in \code{vignette("backend-2.0")}
-}
-
 \seealso{
 Other generic: 
 \code{\link{db_connection_describe}()},

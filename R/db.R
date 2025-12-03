@@ -9,28 +9,12 @@
 #'
 #' * `db_col_types()` returns the column types of a table.
 #'
-#' @section dbplyr 2.0.0:
-#' dbplyr 2.0.0 renamed a number of generics so that they could be cleanly moved
-#' from dplyr to dbplyr. If you have an existing backend, you'll need to rename
-#' the following methods.
-#'
-#' * `dplyr::db_desc()` -> `dbplyr::db_connection_describe()` (also note that
-#'    the argument named changed from `x` to `con`).
-#'
 #' @family generic
 #' @keywords internal
 #' @name db-misc
 #' @aliases NULL
 NULL
 
-dbplyr_connection_describe <- function(con, ...) {
-  dbplyr_fallback(con, "db_desc", ...)
-}
-#' @export
-#' @importFrom dplyr db_desc
-db_desc.DBIConnection <- function(x) {
-  db_connection_describe(x)
-}
 #' @export
 #' @rdname db-misc
 db_connection_describe <- function(con, ...) {
@@ -213,25 +197,19 @@ dbplyr_edition <- function(con) {
 dbplyr_edition.default <- function(con) {
   1L
 }
-# Needed because pool uses an object of call Pool/R6
 
-# fallback helper ---------------------------------------------------------
-
-dbplyr_fallback <- function(con, .generic, ...) {
-  if (dbplyr_edition(con) >= 2) {
-    # Always call DBIConnection method which contains the default implementation
-    fun <- sym(paste0(.generic, ".DBIConnection"))
-  } else {
-    class <- class(con)[[1]]
-    warn(
-      c(
-        paste0("<", class, "> uses an old dbplyr interface"),
-        i = "Please install a newer version of the package or contact the maintainer"
-      ),
-      .frequency = "regularly",
-      .frequency_id = paste0(class, "-edition")
-    )
-    fun <- call("::", quote(dplyr), sym(.generic))
+check_2ed <- function(con, call = caller_env()) {
+  edition <- dbplyr_edition(con)
+  if (edition >= 2) {
+    return(invisible())
   }
-  eval_bare(expr((!!fun)(con, ...)))
+
+  class <- class(con)[[1]]
+  cli_abort(
+    c(
+      "<{class}> uses dbplyr's 1st edition interface, which is no longer supported.",
+      i = "Please contact the maintainer of the package for a solution."
+    ),
+    call = call
+  )
 }
