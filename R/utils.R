@@ -23,7 +23,7 @@ commas <- function(...) paste0(..., collapse = ", ")
 unique_table_name <- function(prefix = "") {
   vals <- c(letters, LETTERS, 0:9)
   name <- paste0(sample(vals, 10, replace = TRUE), collapse = "")
-  paste0(prefix, "dbplyr_", name)
+  paste0(prefix, "dbplyr_tmp_", name)
 }
 
 unique_subquery_name <- function() {

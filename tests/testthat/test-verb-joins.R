@@ -705,7 +705,8 @@ test_that("filtered aggregates with subsequent select are not inlined away in se
     lf2 |>
       dplyr::summarize(n = n(), .by = "x") |>
       filter(n == 1) |>
-      select(x)
+      select(x),
+    by = "x"
   )
   lq <- out$lazy_query
 
@@ -1439,10 +1440,7 @@ test_that("joins reuse queries in cte mode", {
     inner_join(lf1, by = "x")
 
   expect_snapshot(
-    left_join(
-      lf,
-      lf
-    ) |>
+    left_join(lf, lf, by = "x") |>
       remote_query(sql_options = sql_options(cte = TRUE))
   )
 })

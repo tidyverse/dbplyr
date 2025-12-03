@@ -414,9 +414,7 @@
 # joins reuse queries in cte mode
 
     Code
-      remote_query(left_join(lf, lf), sql_options = sql_options(cte = TRUE))
-    Message
-      Joining with `by = join_by(x)`
+      remote_query(left_join(lf, lf, by = "x"), sql_options = sql_options(cte = TRUE))
     Output
       <SQL> WITH `q01` AS (
         SELECT `lf1_LHS`.`x` AS `x`

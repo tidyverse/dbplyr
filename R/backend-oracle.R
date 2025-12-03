@@ -235,18 +235,6 @@ sql_expr_matches.Oracle <- function(con, x, y, ...) {
 }
 
 #' @export
-db_explain.Oracle <- function(con, sql, ...) {
-  sql <- sql_query_explain(con, sql, ...)
-
-  msg <- "Can't explain query."
-  db_execute(con, sql[[1]], msg) # EXPLAIN PLAN
-  expl <- db_get_query(con, sql[[2]], msg) # DBMS_XPLAN.DISPLAY
-
-  out <- utils::capture.output(print(expl))
-  paste(out, collapse = "\n")
-}
-
-#' @export
 db_supports_table_alias_with_as.Oracle <- function(con) {
   FALSE
 }
@@ -282,9 +270,6 @@ setdiff.OraConnection <- setdiff.tbl_Oracle
 
 #' @export
 sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
-
-#' @export
-db_explain.OraConnection <- db_explain.Oracle
 
 #' @export
 db_supports_table_alias_with_as.OraConnection <- db_supports_table_alias_with_as.Oracle
