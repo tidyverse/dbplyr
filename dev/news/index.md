@@ -2,6 +2,11 @@
 
 ## dbplyr (development version)
 
+- [`window_order()`](https://dbplyr.tidyverse.org/dev/reference/window_order.md)
+  works with
+  [`dplyr::desc()`](https://dplyr.tidyverse.org/reference/desc.html)
+  (not just [`desc()`](https://dplyr.tidyverse.org/reference/desc.html))
+  ([\#1486](https://github.com/tidyverse/dbplyr/issues/1486)).
 - [`glue_sql2()`](https://dbplyr.tidyverse.org/dev/reference/glue_sql2.md)
   is now exported for building SQL strings with glue syntax and type
   markers.
