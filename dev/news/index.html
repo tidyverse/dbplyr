@@ -58,6 +58,8 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
 <ul><li>
+<code>str_flatten()</code> (<a href="https://github.com/tidyverse/dbplyr/issues/1540" class="external-link">#1540</a>) and <code><a href="https://dplyr.tidyverse.org/reference/n_distinct.html" class="external-link">n_distinct()</a></code> (<a href="https://github.com/tidyverse/dbplyr/issues/1579" class="external-link">#1579</a>) now have an <code>na.rm</code> argument, which regularly warns when it’s not <code>TRUE</code>.</li>
+<li>
 <code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">semi_join()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">anti_join()</a></code> once again work with filtered windowed values (<a href="https://github.com/tidyverse/dbplyr/issues/1534" class="external-link">#1534</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1606" class="external-link">#1606</a>).</li>
 <li>
 <code><a href="../reference/window_order.html">window_order()</a></code> works with <code><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">dplyr::desc()</a></code> (not just <code><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc()</a></code>) (<a href="https://github.com/tidyverse/dbplyr/issues/1486" class="external-link">#1486</a>).</li>

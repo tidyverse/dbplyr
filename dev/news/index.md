@@ -2,6 +2,11 @@
 
 ## dbplyr (development version)
 
+- `str_flatten()`
+  ([\#1540](https://github.com/tidyverse/dbplyr/issues/1540)) and
+  [`n_distinct()`](https://dplyr.tidyverse.org/reference/n_distinct.html)
+  ([\#1579](https://github.com/tidyverse/dbplyr/issues/1579)) now have
+  an `na.rm` argument, which regularly warns when it’s not `TRUE`.
 - [`semi_join()`](https://dplyr.tidyverse.org/reference/filter-joins.html)
   and
   [`anti_join()`](https://dplyr.tidyverse.org/reference/filter-joins.html)
