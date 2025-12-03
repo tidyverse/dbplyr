@@ -122,16 +122,14 @@ summarise_bind_error <- function(cur_data, dots, i, error_env) {
 }
 
 summarise_bind_error1 <- function(error_env, dot_name) {
-  msg <- cli::format_message(c(
+  msg <- c(
     "In {.pkg dbplyr} you cannot use a variable created in the same {.fun summarise}.",
     x = "{.var {dot_name}} was created earlier in this {.fun summarise}.",
     i = "You need an extra {.fun mutate} step to use it."
-  ))
+  )
   env_bind_lazy(
     error_env,
-    !!dot_name := {
-      abort(msg, call = NULL)
-    }
+    !!dot_name := cli::cli_abort(msg, call = NULL)
   )
 }
 

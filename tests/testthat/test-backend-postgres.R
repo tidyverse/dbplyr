@@ -403,7 +403,7 @@ test_that("can insert with returning", {
   )
 
   x <- local_db_table(con, df_x, "df_x2", overwrite = TRUE)
-  db_create_index(con, "df_x2", columns = c("a", "b"), unique = TRUE)
+  dbplyr_create_index(con, "df_x2", columns = c("a", "b"), unique = TRUE)
 
   expect_equal(
     rows_insert(
@@ -540,7 +540,7 @@ test_that("can upsert with returning", {
   )
 
   x <- local_db_table(con, df_x, "df_x2")
-  db_create_index(con, "df_x2", columns = c("a", "b"), unique = TRUE)
+  dbplyr_create_index(con, "df_x2", columns = c("a", "b"), unique = TRUE)
 
   expect_equal(
     rows_upsert(

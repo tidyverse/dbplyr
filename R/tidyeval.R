@@ -216,9 +216,9 @@ partial_eval_call <- function(call, data, env) {
   # Compound calls, apart from `::` aren't translatable
   if (is_call(fun) && !is_call(fun, "::")) {
     if (is_mask_pronoun(fun)) {
-      stop(
+      cli::cli_abort(
         "Use local() or remote() to force evaluation of functions",
-        call. = FALSE
+        call = NULL
       )
     } else {
       return(eval_bare(call, env))
