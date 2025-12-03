@@ -2,6 +2,12 @@
 
 ## dbplyr (development version)
 
+- [`semi_join()`](https://dplyr.tidyverse.org/reference/filter-joins.html)
+  and
+  [`anti_join()`](https://dplyr.tidyverse.org/reference/filter-joins.html)
+  once again work with filtered windowed values
+  ([\#1534](https://github.com/tidyverse/dbplyr/issues/1534),
+  [\#1606](https://github.com/tidyverse/dbplyr/issues/1606)).
 - [`window_order()`](https://dbplyr.tidyverse.org/dev/reference/window_order.md)
   works with
   [`dplyr::desc()`](https://dplyr.tidyverse.org/reference/desc.html)
