@@ -158,3 +158,16 @@ test_that("difftime is translated correctly", {
     ))
   )
 })
+
+test_that("window functions with redshift specific error message", {
+  local_con(simulate_redshift())
+
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(quantile(x, 0.3, na.rm = TRUE), window = TRUE)
+  )
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(median(x, na.rm = TRUE), window = TRUE)
+  )
+})

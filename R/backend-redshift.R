@@ -112,6 +112,8 @@ sql_translation.RedshiftConnection <- function(con) {
     ),
     sql_translator(
       .parent = postgres$window,
+      median = sql_win_not_supported("median", "Redshift"),
+      quantile = sql_win_not_supported("quantile", "Redshift"),
       # https://docs.aws.amazon.com/redshift/latest/dg/r_WF_LAG.html
       lag = function(x, n = 1L, order_by = NULL) {
         win_over(
