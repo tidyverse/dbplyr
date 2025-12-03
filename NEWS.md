@@ -1,6 +1,12 @@
 # dbplyr (development version)
 
 * Corrected error message for `quantile()` and `median()` in `mutate()` on Redshift (@edward-burn, #1571).
+* `str_flatten()` (#1540) and `n_distinct()` (#1579) now have an `na.rm` argument, which regularly warns when it's not `TRUE`.
+* `semi_join()` and `anti_join()` once again work with filtered windowed values (#1534, #1606).
+* `window_order()` works with `dplyr::desc()` (not just `desc()`) (#1486).
+* `sql_check_na_rm()` is now exported for use in other backends (#1483).
+* `glue_sql2()` is now exported for building SQL strings with glue syntax and
+  type markers. `build_sql()` is deprecated in favor of `glue_sql2()` (#1249).
 * dbplyr 1e interfaces are now deprecated (#1197). Backend developers have had >2 years to update.
 * MySQL gains slightly better translation for `as.integer()` and `as.integer64()` (#1647).
 * Fixed snowflake translations that were being reported as unknown (@edward-burn, #1570). 

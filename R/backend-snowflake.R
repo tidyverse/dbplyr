@@ -330,7 +330,8 @@ sql_translation.Snowflake <- function(con) {
       all = sql_aggregate("BOOLAND_AGG", "all"),
       any = sql_aggregate("BOOLOR_AGG", "any"),
       sd = sql_aggregate("STDDEV", "sd"),
-      str_flatten = function(x, collapse = "") {
+      str_flatten = function(x, collapse = "", na.rm = FALSE) {
+        sql_check_na_rm(na.rm)
         sql_expr(LISTAGG(!!x, !!collapse))
       }
     ),
@@ -341,7 +342,8 @@ sql_translation.Snowflake <- function(con) {
       all = win_aggregate("BOOLAND_AGG"),
       any = win_aggregate("BOOLOR_AGG"),
       sd = win_aggregate("STDDEV"),
-      str_flatten = function(x, collapse = "") {
+      str_flatten = function(x, collapse = "", na.rm = FALSE) {
+        sql_check_na_rm(na.rm)
         win_over(
           sql_expr(LISTAGG(!!x, !!collapse)),
           partition = win_current_group(),
@@ -439,5 +441,6 @@ utils::globalVariables(c(
   "trim",
   "LENGTH",
   "DATE_FROM_PARTS",
-  "DATE_PART"
+  "DATE_PART",
+  "%=%"
 ))

@@ -1,4 +1,12 @@
+test_that("build_sql() is deprecated", {
+  con <- simulate_dbi()
+  expect_snapshot(
+    build_sql("SELECT * FROM TABLE", con = con)
+  )
+})
+
 test_that("build_sql() requires connection", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   x <- ident("TABLE")
   expect_snapshot(error = TRUE, build_sql("SELECT * FROM ", x))
 })

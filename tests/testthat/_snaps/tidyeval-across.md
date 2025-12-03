@@ -57,11 +57,6 @@
 
     Code
       dplyr::summarise_at(lf, dplyr::vars(a:b), "sum")
-    Condition
-      Warning:
-      Missing values are always removed in SQL aggregation functions.
-      Use `na.rm = TRUE` to silence this warning
-      This warning is displayed once every 8 hours.
     Output
       <SQL>
       SELECT SUM(`a`) AS `a`, SUM(`b`) AS `b`
