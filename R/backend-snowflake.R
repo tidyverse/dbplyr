@@ -439,5 +439,6 @@ utils::globalVariables(c(
   "trim",
   "LENGTH",
   "DATE_FROM_PARTS",
-  "DATE_PART"
+  "DATE_PART",
+  "%=%"
 ))
