@@ -1264,7 +1264,7 @@ generating reprexes.
   `df %>% summarise_all(~ mean(.))`, `df %>% summarise_all(list(mean))` (#134).
 
 * `sql_aggregate()` now takes an optional argument `f_r` for passing to
-  `sql_check_na_rm()`. This allows the warning to show the R function name rather 
+  `check_na_rm()`. This allows the warning to show the R function name rather 
   than the SQL function name (@sverchkov, #153).
 
 * `sql_infix()` gains a `pad` argument for the rare operator that doesn't
