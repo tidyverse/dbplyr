@@ -80,6 +80,30 @@ Make sure you've read `vignette("translation-verb")` so you have the lay of the 
 * `semi_join()`, `anti_join()`: powered by `sql_query_semi_join()`
 * `union()`, `intersect()`, `setdiff()`: powered by `sql_query_set_op()`
 
+### Building SQL strings
+
+If you need to generate your own SQL, we recommend using `glue_sql2()`. It uses glue syntax with type markers for safe SQL generation:
+
+```{r}
+#| eval: false
+# Create an index
+glue_sql2(
+  con,
+  "CREATE INDEX {.name index_name} ON {.tbl table} ({.col columns*})"
+)
+
+# Insert values safely
+name <- "O'Brien"
+glue_sql2(con, "INSERT INTO students (name) VALUES ({.val name})")
+
+# Build a query
+table <- "my_table"
+cols <- c("id", "name", "value")
+glue_sql2(con, "SELECT {.col cols*} FROM {.tbl table}")
+```
+
+Type markers include `.tbl` (tables), `.col` (columns), `.val` (values), `.name` (names), `.from` (subqueries/tables), and `.kw` (keywords). Use `*` after `.col` or `.val` to collapse vectors into comma-separated lists.
+
 ## SQL translation: vectors
 
 Finally, you may have to provide custom R -> SQL translation for functions that work with vectors within verbs. You can do with by providing a method for `sql_translation()`, which return an object created by `sql_variant()`. The `sql_variant()` function creates a container for three types of function translations:

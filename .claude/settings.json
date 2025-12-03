@@ -9,6 +9,7 @@
       "Edit(R/**)",
       "Edit(tests/**)",
       "Edit(vignettes/**)",
+      "Edit(.claude/skills/**)",
       "WebSearch",
       "WebFetch"
     ],
