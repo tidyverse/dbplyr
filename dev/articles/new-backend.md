@@ -119,6 +119,34 @@ the key verbs work:
   powered by
   [`sql_query_set_op()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
 
+### Building SQL strings
+
+If you need to generate your own SQL, we recommend using
+[`glue_sql2()`](https://dbplyr.tidyverse.org/dev/reference/glue_sql2.md).
+It uses glue syntax with type markers for safe SQL generation:
+
+``` r
+# Create an index
+glue_sql2(
+  con,
+  "CREATE INDEX {.name index_name} ON {.tbl table} ({.col columns*})"
+)
+
+# Insert values safely
+name <- "O'Brien"
+glue_sql2(con, "INSERT INTO students (name) VALUES ({.val name})")
+
+# Build a query
+table <- "my_table"
+cols <- c("id", "name", "value")
+glue_sql2(con, "SELECT {.col cols*} FROM {.tbl table}")
+```
+
+Type markers include `.tbl` (tables), `.col` (columns), `.val` (values),
+`.name` (names), `.from` (subqueries/tables), and `.kw` (keywords). Use
+`*` after `.col` or `.val` to collapse vectors into comma-separated
+lists.
+
 ## SQL translation: vectors
 
 Finally, you may have to provide custom R -\> SQL translation for

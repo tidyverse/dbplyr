@@ -159,7 +159,7 @@
 ## SQL generation
 
 - [`build_sql()`](https://dbplyr.tidyverse.org/dev/reference/build_sql.md)
-  : Build a SQL string.
+  **\[deprecated\]** : Build a SQL string.
 - [`escape()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   [`escape_ansi()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   [`sql_vector()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
@@ -223,6 +223,8 @@ Documentation for authors of new dbplyr backends
   [`sql_escape_datetime()`](https://dbplyr.tidyverse.org/dev/reference/db-quote.md)
   [`sql_escape_raw()`](https://dbplyr.tidyverse.org/dev/reference/db-quote.md)
   : SQL escaping/quoting generics
+- [`glue_sql2()`](https://dbplyr.tidyverse.org/dev/reference/glue_sql2.md)
+  : Build SQL strings with glue syntax
 - [`sql_variant()`](https://dbplyr.tidyverse.org/dev/reference/sql_variant.md)
   [`sql_translator()`](https://dbplyr.tidyverse.org/dev/reference/sql_variant.md)
   [`base_scalar`](https://dbplyr.tidyverse.org/dev/reference/sql_variant.md)

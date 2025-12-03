@@ -51,6 +51,7 @@
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/fill.tbl_lazy.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/filter.tbl_lazy.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/get_returned_rows.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/glue_sql2.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/group_by.tbl_lazy.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/head.tbl_lazy.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/ident.html</loc></url>

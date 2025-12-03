@@ -2,6 +2,13 @@
 
 ## dbplyr (development version)
 
+- [`glue_sql2()`](https://dbplyr.tidyverse.org/dev/reference/glue_sql2.md)
+  is now exported for building SQL strings with glue syntax and type
+  markers.
+  [`build_sql()`](https://dbplyr.tidyverse.org/dev/reference/build_sql.md)
+  is deprecated in favor of
+  [`glue_sql2()`](https://dbplyr.tidyverse.org/dev/reference/glue_sql2.md)
+  ([\#1249](https://github.com/tidyverse/dbplyr/issues/1249)).
 - dbplyr 1e interfaces are now deprecated
   ([\#1197](https://github.com/tidyverse/dbplyr/issues/1197)). Backend
   developers have had \>2 years to update.

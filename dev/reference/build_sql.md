@@ -1,11 +1,19 @@
 # Build a SQL string.
 
+**\[deprecated\]** `build_sql()` is deprecated in favor of
+[`glue_sql2()`](https://dbplyr.tidyverse.org/dev/reference/glue_sql2.md).
+
 This is a convenience function that should prevent sql injection attacks
 (which in the context of dplyr are most likely to be accidental not
 deliberate) by automatically escaping all expressions in the input,
 while treating bare strings as sql. This is unlikely to prevent any
 serious attack, but should make it unlikely that you produce invalid
 sql.
+
+This function should be used only when generating `SELECT` clauses,
+other high level queries, or for other syntax that has no R equivalent.
+For individual function translations, prefer
+[`sql_expr()`](https://dbplyr.tidyverse.org/dev/reference/sql_expr.md).
 
 ## Usage
 
@@ -32,29 +40,33 @@ build_sql(..., .env = parent.frame(), con = sql_current_con())
 
   database connection; used to select correct quoting characters.
 
-## Details
-
-This function should be used only when generating `SELECT` clauses,
-other high level queries, or for other syntax that has no R equivalent.
-For individual function translations, prefer
-[`sql_expr()`](https://dbplyr.tidyverse.org/dev/reference/sql_expr.md).
-
 ## Examples
 
 ``` r
 con <- simulate_dbi()
-build_sql("SELECT * FROM TABLE", con = con)
-#> <SQL> SELECT * FROM TABLE
-x <- "TABLE"
-build_sql("SELECT * FROM ", x, con = con)
-#> <SQL> SELECT * FROM 'TABLE'
-build_sql("SELECT * FROM ", ident(x), con = con)
-#> <SQL> SELECT * FROM `TABLE`
-build_sql("SELECT * FROM ", sql(x), con = con)
-#> <SQL> SELECT * FROM TABLE
 
-# http://xkcd.com/327/
-name <- "Robert'); DROP TABLE Students;--"
-build_sql("INSERT INTO Students (Name) VALUES (", name, ")", con = con)
-#> <SQL> INSERT INTO Students (Name) VALUES ('Robert''); DROP TABLE Students;--')
+# Old:
+build_sql("SELECT * FROM ", ident("table"), con = con)
+#> Warning: `build_sql()` was deprecated in dbplyr 2.6.0.
+#> ℹ Please use `glue_sql2()` instead.
+#> <SQL> SELECT * FROM `table`
+# New:
+glue_sql2(con, "SELECT * FROM {.tbl 'table'}")
+#> <SQL> SELECT * FROM `table`
+
+# Old:
+name <- "Robert"
+build_sql("INSERT INTO students (name) VALUES (", name, ")", con = con)
+#> <SQL> INSERT INTO students (name) VALUES ('Robert')
+# New:
+glue_sql2(con, "INSERT INTO students (name) VALUES ({.val name})")
+#> <SQL> INSERT INTO students (name) VALUES ('Robert')
+
+# Old:
+cols <- c("x", "y")
+build_sql("SELECT ", ident(cols), " FROM table", con = con)
+#> <SQL> SELECT `x`, `y` FROM table
+# New:
+glue_sql2(con, "SELECT {.col cols*} FROM {.tbl 'table'}")
+#> <SQL> SELECT `x`, `y` FROM `table`
 ```
