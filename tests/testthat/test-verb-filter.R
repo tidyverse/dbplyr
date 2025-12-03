@@ -299,7 +299,7 @@ test_that("filter() after summarise() uses `HAVING`", {
     ignore_formula_env = TRUE
   )
   # TODO should the `order_vars` and the `frame` really survive `summarise()`?
-  expect_equal(lq$order_vars, list(expr(h)))
+  expect_equal(lq$order_vars, list(quo(h)))
   expect_equal(lq$frame, list(range = c(-3, Inf)))
 })
 
