@@ -140,3 +140,10 @@ local_sqlite_connection <- function(envir = parent.frame()) {
     .local_envir = envir
   )
 }
+
+local_memdb_frame <- function(name, ..., frame = parent.frame()) {
+  df <- tibble::tibble(...)
+
+  withr::defer(DBI::dbRemoveTable(src_memdb()$con, name), envir = frame)
+  copy_to(src_memdb(), df, name, temporary = TRUE)
+}

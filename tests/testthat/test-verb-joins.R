@@ -714,6 +714,17 @@ test_that("filtered aggregates with subsequent select are not inlined away in se
   expect_snapshot(out)
 })
 
+test_that("filtered window joins work in a semi_join", {
+  df1 <- local_memdb_frame("df1", id = 1:5)
+  df2 <- local_memdb_frame("df2", id = 1:5)
+
+  df2_a <- df2 |> filter(row_number() <= 3)
+  out <- anti_join(df1, df2_a, by = "id")
+  expect_snapshot(show_query(out))
+
+  expect_equal(collect(out), tibble(id = 4:5))
+})
+
 test_that("multiple joins create a single query", {
   lf <- lazy_frame(x = 1, a = 1, .name = "df1")
   lf2 <- lazy_frame(x = 1, b = 2, .name = "df2")
