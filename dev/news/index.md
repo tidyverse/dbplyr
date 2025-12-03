@@ -2,6 +2,10 @@
 
 ## dbplyr (development version)
 
+- MySQL gains slightly better translation for
+  [`as.integer()`](https://rdrr.io/r/base/integer.html) and
+  `as.integer64()`
+  ([\#1647](https://github.com/tidyverse/dbplyr/issues/1647)).
 - Fixed snowflake translations that were being reported as unknown
   ([@edward-burn](https://github.com/edward-burn),
   [\#1570](https://github.com/tidyverse/dbplyr/issues/1570)).
