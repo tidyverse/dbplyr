@@ -5,12 +5,13 @@
 #' `INTERSECT`, `UNION`, and `EXCEPT` respectively.
 #'
 #' @inheritParams left_join.tbl_lazy
-#' @param ... Not currently used; provided for future extensions.
+#' @param ... Must be empty.
 #' @param all If `TRUE`, includes all matches in output, not just unique rows.
 #' @exportS3Method dplyr::intersect
 #' @importFrom dplyr intersect
 intersect.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
-  lazy_query <- add_set_op(x, y, "INTERSECT", copy = copy, ..., all = all)
+  check_dots_empty()
+  lazy_query <- add_set_op(x, y, "INTERSECT", copy = copy, all = all)
 
   x$lazy_query <- lazy_query
   x
@@ -19,7 +20,8 @@ intersect.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
 #' @exportS3Method dplyr::union
 #' @rdname intersect.tbl_lazy
 union.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
-  lazy_query <- add_union(x, y, all = all, copy = copy, ...)
+  check_dots_empty()
+  lazy_query <- add_union(x, y, all = all, copy = copy)
 
   x$lazy_query <- lazy_query
   x
@@ -29,7 +31,8 @@ union.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
 #' @exportS3Method dplyr::union_all
 #' @rdname intersect.tbl_lazy
 union_all.tbl_lazy <- function(x, y, copy = FALSE, ...) {
-  lazy_query <- add_union(x, y, all = TRUE, copy = copy, ...)
+  check_dots_empty()
+  lazy_query <- add_union(x, y, all = TRUE, copy = copy)
 
   x$lazy_query <- lazy_query
   x
@@ -38,13 +41,14 @@ union_all.tbl_lazy <- function(x, y, copy = FALSE, ...) {
 #' @exportS3Method dplyr::setdiff
 #' @rdname intersect.tbl_lazy
 setdiff.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
-  lazy_query <- add_set_op(x, y, "EXCEPT", copy = copy, ..., all = all)
+  check_dots_empty()
+  lazy_query <- add_set_op(x, y, "EXCEPT", copy = copy, all = all)
 
   x$lazy_query <- lazy_query
   x
 }
 
-add_union <- function(x, y, all, copy = FALSE, ..., call = caller_env()) {
+add_union <- function(x, y, all, copy = FALSE, call = caller_env()) {
   y <- auto_copy(x, y, copy)
   check_set_op_sqlite(x, y, call = call)
 
@@ -86,7 +90,6 @@ add_set_op <- function(
   y,
   type,
   copy = FALSE,
-  ...,
   all = FALSE,
   call = caller_env()
 ) {
