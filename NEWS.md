@@ -1,6 +1,5 @@
 # dbplyr (development version)
 
-
 * Corrected error message for `quantile()` and `median()` in `mutate()` on Redshift (@edward-burn, #1571).
 * dbplyr 1e interfaces are now deprecated (#1197). Backend developers have had >2 years to update.
 * MySQL gains slightly better translation for `as.integer()` and `as.integer64()` (#1647).
