@@ -2,6 +2,9 @@
 
 ## dbplyr (development version)
 
+- Fixed snowflake translations that were being reported as unknown
+  ([@edward-burn](https://github.com/edward-burn),
+  [\#1570](https://github.com/tidyverse/dbplyr/issues/1570)).
 - Deprecated `win_rank_tdata()` has been removed.
 - [`compute()`](https://dplyr.tidyverse.org/reference/compute.html),
   [`collect()`](https://dplyr.tidyverse.org/reference/compute.html), and
