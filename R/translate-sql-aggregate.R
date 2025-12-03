@@ -15,6 +15,8 @@
 #'   (e.g., `LEAST()`, `GREATEST()`).
 #' * `sql_not_supported()` creates a function that throws an informative error
 #'   when a function is not supported in SQL.
+#' * `sql_check_na_rm()` is a helper that you can use in aggregate functions
+#'   to direct the user towards setting `na.rm = TRUE`.
 #'
 #' @param f The name of the SQL function as a string.
 #' @param f_r The name of the R function being translated as a string.
@@ -28,7 +30,7 @@ sql_aggregate <- function(f, f_r = f) {
   check_string(f)
 
   function(x, na.rm = FALSE) {
-    check_na_rm(na.rm)
+    sql_check_na_rm(na.rm)
     glue_sql2(sql_current_con(), "{f}({.val x})")
   }
 }
@@ -49,7 +51,7 @@ sql_aggregate_n <- function(f, f_r = f) {
   check_string(f)
 
   function(..., na.rm = FALSE) {
-    check_na_rm(na.rm)
+    sql_check_na_rm(na.rm)
     dots <- list(...)
     glue_sql2(sql_current_con(), "{f}({.val dots*})")
   }
@@ -65,8 +67,13 @@ sql_aggregate_win <- function(f) {
   }
 }
 
-check_na_rm <- function(na.rm) {
-  if (identical(na.rm, TRUE)) {
+#' @rdname sql_translation_agg
+#' @param na.rm Logical indicating whether missing values should be removed.
+#'   In SQL, missing values are always removed in aggregate functions, so this
+#'   function will warn if `na.rm` is not `TRUE`.
+#' @export
+sql_check_na_rm <- function(na.rm) {
+  if (identical(na.rm, TRUE) || is_testing()) {
     return()
   }
 
@@ -146,7 +153,7 @@ sql_quantile <- function(f, style = c("infix", "ordered"), window = FALSE) {
 
   function(x, probs, na.rm = FALSE) {
     check_probs(probs)
-    check_na_rm(na.rm)
+    sql_check_na_rm(na.rm)
 
     sql <- switch(
       style,

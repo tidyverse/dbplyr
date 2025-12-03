@@ -248,7 +248,6 @@ test_that("untranslatable functions are preserved", {
 
 test_that("old _at functions continue to work", {
   withr::local_options(lifecycle_verbosity = "quiet")
-  reset_warning_verbosity("dbplyr_check_na_rm")
   lf <- lazy_frame(a = 1, b = 2)
 
   expect_snapshot(lf |> dplyr::summarise_at(dplyr::vars(a:b), "sum"))
