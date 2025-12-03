@@ -46,9 +46,9 @@ sql_translation.Snowflake <- function(con) {
         # Snowflake needs backslashes escaped, so we must increase the level of escaping
         pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
         if (negate) {
-          translate_sql(REGEXP_INSTR(!!string, !!pattern) == 0L, con = con)
+          sql_expr(REGEXP_INSTR(!!string, !!pattern) %=% 0L)
         } else {
-          translate_sql(REGEXP_INSTR(!!string, !!pattern) != 0L, con = con)
+          sql_expr(REGEXP_INSTR(!!string, !!pattern) != 0L)
         }
       },
       str_starts = function(string, pattern, negate = FALSE) {
@@ -58,9 +58,9 @@ sql_translation.Snowflake <- function(con) {
         # Snowflake needs backslashes escaped, so we must increase the level of escaping
         pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
         if (negate) {
-          translate_sql(REGEXP_INSTR(!!string, !!pattern) != 1L, con = con)
+          sql_expr(REGEXP_INSTR(!!string, !!pattern) != 1L)
         } else {
-          translate_sql(REGEXP_INSTR(!!string, !!pattern) == 1L, con = con)
+          sql_expr(REGEXP_INSTR(!!string, !!pattern) %=% 1L)
         }
       },
       str_ends = function(string, pattern, negate = FALSE) {
@@ -70,16 +70,14 @@ sql_translation.Snowflake <- function(con) {
         # Snowflake needs backslashes escaped, so we must increase the level of escaping
         pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
         if (negate) {
-          translate_sql(
+          sql_expr(
             REGEXP_INSTR(!!string, !!pattern, 1L, 1L, 1L) !=
-              LENGTH(!!string) + 1L,
-            con = con
+              (LENGTH(!!string) + 1L)
           )
         } else {
-          translate_sql(
-            REGEXP_INSTR(!!string, !!pattern, 1L, 1L, 1L) ==
-              LENGTH(!!string) + 1L,
-            con = con
+          sql_expr(
+            REGEXP_INSTR(!!string, !!pattern, 1L, 1L, 1L) %=%
+              (LENGTH(!!string) + 1L)
           )
         }
       },
@@ -387,9 +385,8 @@ snowflake_grepl <- function(
   }
   # Snowflake needs backslashes escaped, so we must increase the level of escaping
   pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
-  translate_sql(
-    REGEXP_INSTR(!!x, !!pattern, 1L, 1L, 0L, !!regexp_parameters) != 0L,
-    con = con
+  sql_expr(
+    REGEXP_INSTR(!!x, !!pattern, 1L, 1L, 0L, !!regexp_parameters) != 0L
   )
 }
 
