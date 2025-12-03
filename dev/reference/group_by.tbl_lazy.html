@@ -25,8 +25,7 @@ window functions when used with mutate()."><meta property="og:image" content="ht
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/backend-2.html">dbplyr 2.0.0 backend API</a></li>
-    <li><a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a></li>
     <li><a class="dropdown-item" href="../articles/reprex.html">Reprexes for dbplyr</a></li>
     <li><a class="dropdown-item" href="../articles/sql.html">Writing SQL with dbplyr</a></li>
     <li><a class="dropdown-item" href="../articles/translation-function.html">Function translation</a></li>
@@ -115,7 +114,7 @@ our naming conventions.</p></dd>
 <span class="r-in"><span>  <span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `g`, COUNT(*)<span style="color: #0000BB;"> AS </span>`n()`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_au7izdkFTv`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_au7izdkFTv`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">GROUP BY</span> `g`</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">db</span> <span class="op">|&gt;</span></span></span>
@@ -123,8 +122,8 @@ our naming conventions.</p></dd>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>x2 <span class="op">=</span> <span class="va">x</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `dbplyr_au7izdkFTv`.*, `x` / SUM(`x`) OVER (PARTITION BY `g`)<span style="color: #0000BB;"> AS </span>`x2`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_au7izdkFTv`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `dbplyr_tmp_au7izdkFTv`.*, `x` / SUM(`x`) OVER (PARTITION BY `g`)<span style="color: #0000BB;"> AS </span>`x2`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_au7izdkFTv`</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

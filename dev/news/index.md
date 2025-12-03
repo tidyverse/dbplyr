@@ -2,6 +2,9 @@
 
 ## dbplyr (development version)
 
+- dbplyr 1e interfaces are now deprecated
+  ([\#1197](https://github.com/tidyverse/dbplyr/issues/1197)). Backend
+  developers have had \>2 years to update.
 - MySQL gains slightly better translation for
   [`as.integer()`](https://rdrr.io/r/base/integer.html) and
   `as.integer64()`
@@ -1756,8 +1759,7 @@ CRAN release: 2020-11-03
 ### Extensibility
 
 If you are the author of a dbplyr backend, please see
-[`vignette("backend-2")`](https://dbplyr.tidyverse.org/dev/articles/backend-2.md)
-for details.
+`vignette("backend-2")` for details.
 
 - New
   [`dbplyr_edition()`](https://dbplyr.tidyverse.org/dev/reference/db-misc.md)

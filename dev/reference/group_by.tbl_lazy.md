@@ -55,7 +55,7 @@ db |>
   show_query()
 #> <SQL>
 #> SELECT `g`, COUNT(*) AS `n()`
-#> FROM `dbplyr_au7izdkFTv`
+#> FROM `dbplyr_tmp_au7izdkFTv`
 #> GROUP BY `g`
 
 db |>
@@ -63,6 +63,6 @@ db |>
   mutate(x2 = x / sum(x, na.rm = TRUE)) |>
   show_query()
 #> <SQL>
-#> SELECT `dbplyr_au7izdkFTv`.*, `x` / SUM(`x`) OVER (PARTITION BY `g`) AS `x2`
-#> FROM `dbplyr_au7izdkFTv`
+#> SELECT `dbplyr_tmp_au7izdkFTv`.*, `x` / SUM(`x`) OVER (PARTITION BY `g`) AS `x2`
+#> FROM `dbplyr_tmp_au7izdkFTv`
 ```

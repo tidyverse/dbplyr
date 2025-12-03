@@ -2,8 +2,6 @@
 
 ### All vignettes
 
-- [dbplyr 2.0.0 backend
-  API](https://dbplyr.tidyverse.org/dev/articles/backend-2.md):
 - [Introduction to
   dbplyr](https://dbplyr.tidyverse.org/dev/articles/dbplyr.md):
 - [Adding a new DBI

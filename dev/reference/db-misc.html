@@ -31,8 +31,7 @@ from. It should be a single line, and ideally less than 60 characters wide.
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/backend-2.html">dbplyr 2.0.0 backend API</a></li>
-    <li><a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a></li>
     <li><a class="dropdown-item" href="../articles/reprex.html">Reprexes for dbplyr</a></li>
     <li><a class="dropdown-item" href="../articles/sql.html">Writing SQL with dbplyr</a></li>
     <li><a class="dropdown-item" href="../articles/translation-function.html">Function translation</a></li>
@@ -95,15 +94,6 @@ from. It should be a single line, and ideally less than 60 characters wide.</p><
 <ul><li><p><code>dbplyr_edition()</code> declares which version of the dbplyr API you want.
 See below for more details.</p></li>
 <li><p><code>db_col_types()</code> returns the column types of a table.</p></li>
-</ul></div>
-    <div class="section level2">
-    <h2 id="dbplyr-">dbplyr 2.0.0<a class="anchor" aria-label="anchor" href="#dbplyr-"></a></h2>
-
-
-<p>dbplyr 2.0.0 renamed a number of generics so that they could be cleanly moved
-from dplyr to dbplyr. If you have an existing backend, you'll need to rename
-the following methods.</p><ul><li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::db_desc()</a></code> -&gt; <code>dbplyr::db_connection_describe()</code> (also note that
-the argument named changed from <code>x</code> to <code>con</code>).</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

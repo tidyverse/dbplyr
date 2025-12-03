@@ -33,8 +33,7 @@ value of x in each group."><meta property="og:image" content="https://dbplyr.tid
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/backend-2.html">dbplyr 2.0.0 backend API</a></li>
-    <li><a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a></li>
     <li><a class="dropdown-item" href="../articles/reprex.html">Reprexes for dbplyr</a></li>
     <li><a class="dropdown-item" href="../articles/sql.html">Writing SQL with dbplyr</a></li>
     <li><a class="dropdown-item" href="../articles/translation-function.html">Function translation</a></li>
@@ -171,16 +170,16 @@ reach <code>n</code>/<code>prop</code>.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `x`, `y`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> (</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span> `dbplyr_pYJGCySHwm`.*, RANK() OVER (ORDER BY `x`)<span style="color: #0000BB;"> AS </span>`col01`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_pYJGCySHwm`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span> `dbplyr_tmp_pYJGCySHwm`.*, RANK() OVER (ORDER BY `x`)<span style="color: #0000BB;"> AS </span>`col01`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_pYJGCySHwm`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )<span style="color: #0000BB;"> AS </span>`q01`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">WHERE</span> (`col01` &lt;= 1)</span>
 <span class="r-in"><span><span class="va">db</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_max</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `x`, `y`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> (</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span> `dbplyr_pYJGCySHwm`.*, RANK() OVER (ORDER BY `x` DESC)<span style="color: #0000BB;"> AS </span>`col01`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_pYJGCySHwm`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span> `dbplyr_tmp_pYJGCySHwm`.*, RANK() OVER (ORDER BY `x` DESC)<span style="color: #0000BB;"> AS </span>`col01`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_pYJGCySHwm`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )<span style="color: #0000BB;"> AS </span>`q01`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">WHERE</span> (`col01` &lt;= 1)</span>
 <span class="r-in"><span><span class="va">db</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
@@ -188,9 +187,9 @@ reach <code>n</code>/<code>prop</code>.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `x`, `y`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> (</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     `dbplyr_pYJGCySHwm`.*,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     `dbplyr_tmp_pYJGCySHwm`.*,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     ROW_NUMBER() OVER (ORDER BY (0.5 + RANDOM() / 18446744073709551616.0))<span style="color: #0000BB;"> AS </span>`col01`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_pYJGCySHwm`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_pYJGCySHwm`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )<span style="color: #0000BB;"> AS </span>`q01`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">WHERE</span> (`col01` &lt;= 1)</span>
 <span class="r-in"><span></span></span>
@@ -199,9 +198,9 @@ reach <code>n</code>/<code>prop</code>.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `x`, `y`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> (</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     `dbplyr_pYJGCySHwm`.*,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     `dbplyr_tmp_pYJGCySHwm`.*,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     RANK() OVER (PARTITION BY `y` ORDER BY `x`)<span style="color: #0000BB;"> AS </span>`col01`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_pYJGCySHwm`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_pYJGCySHwm`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )<span style="color: #0000BB;"> AS </span>`q01`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">WHERE</span> (`col01` &lt;= 1)</span>
 <span class="r-in"><span></span></span>

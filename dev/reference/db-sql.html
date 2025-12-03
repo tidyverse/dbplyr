@@ -21,7 +21,9 @@ sql_table_index() generates SQL for adding an index to table.
 Query manipulation:
 sql_query_explain(con, sql) generates SQL that "explains" a query,
 i.e. generates a query plan describing what indexes etc that the
-database will use.
+database will use. It can return character vector, in which case the
+first n elements are used to generate the plan and the final element
+is used to return the query plan.
 sql_query_fields() generates SQL for a 0-row result that is used to
 capture field names in tbl_sql()
 sql_query_save(con, sql) generates SQL for saving a query into a
@@ -71,7 +73,9 @@ sql_table_index() generates SQL for adding an index to table.
 Query manipulation:
 sql_query_explain(con, sql) generates SQL that "explains" a query,
 i.e. generates a query plan describing what indexes etc that the
-database will use.
+database will use. It can return character vector, in which case the
+first n elements are used to generate the plan and the final element
+is used to return the query plan.
 sql_query_fields() generates SQL for a 0-row result that is used to
 capture field names in tbl_sql()
 sql_query_save(con, sql) generates SQL for saving a query into a
@@ -119,8 +123,7 @@ sql_returning_cols() generates SQL for a RETURNING clause
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/backend-2.html">dbplyr 2.0.0 backend API</a></li>
-    <li><a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a></li>
     <li><a class="dropdown-item" href="../articles/reprex.html">Reprexes for dbplyr</a></li>
     <li><a class="dropdown-item" href="../articles/sql.html">Writing SQL with dbplyr</a></li>
     <li><a class="dropdown-item" href="../articles/translation-function.html">Function translation</a></li>
@@ -173,7 +176,9 @@ planner. It called from <code><a href="https://dplyr.tidyverse.org/reference/cop
 <li><p><code>sql_table_index()</code> generates SQL for adding an index to table.</p></li>
 </ul><p>Query manipulation:</p><ul><li><p><code>sql_query_explain(con, sql)</code> generates SQL that "explains" a query,
 i.e. generates a query plan describing what indexes etc that the
-database will use.</p></li>
+database will use. It can return character vector, in which case the
+first n elements are used to generate the plan and the final element
+is used to return the query plan.</p></li>
 <li><p><code>sql_query_fields()</code> generates SQL for a 0-row result that is used to
 capture field names in <code><a href="tbl_sql.html">tbl_sql()</a></code></p></li>
 <li><p><code>sql_query_save(con, sql)</code> generates SQL for saving a query into a
@@ -268,28 +273,6 @@ queries.</p></li>
 <span><span class="fu">sql_returning_cols</span><span class="op">(</span><span class="va">con</span>, <span class="va">cols</span>, <span class="va">table</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
-    <div class="section level2">
-    <h2 id="dbplyr-">dbplyr 2.0.0<a class="anchor" aria-label="anchor" href="#dbplyr-"></a></h2>
-
-
-
-<p>Many <code>dplyr::db_*</code> generics have been replaced by <code>dbplyr::sql_*</code> generics.
-To update your backend, you'll need to extract the SQL generation out of your
-existing code, and place it in a new method for a dbplyr <code>sql_</code> generic.</p><ul><li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::db_analyze()</a></code> is replaced by <code>dbplyr::sql_table_analyze()</code></p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::db_explain()</a></code> is replaced by <code>dbplyr::sql_query_explain()</code></p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::db_create_index()</a></code> is replaced by <code>dbplyr::sql_table_index()</code></p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::db_query_fields()</a></code> is replaced by <code>dbplyr::sql_query_fields()</code></p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::db_query_rows()</a></code> is no longer used; you can delete it</p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::db_save_query()</a></code> is replaced by <code>dbplyr::sql_query_save()</code></p></li>
-</ul><p>The query generating functions have also changed names. Their behaviour is
-unchanged, so you just need to rename the generic and import from dbplyr
-instead of dplyr.</p><ul><li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::sql_select()</a></code> is replaced by <code>dbplyr::sql_query_select()</code></p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::sql_join()</a></code> is replaced by <code>dbplyr::sql_query_join()</code></p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::sql_semi_join()</a></code> is replaced by <code>dbplyr::sql_query_semi_join()</code></p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::sql_set_op()</a></code> is replaced by <code>dbplyr::sql_query_set_op()</code></p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::sql_subquery()</a></code> is replaced by <code>dbplyr::sql_query_wrap()</code></p></li>
-</ul><p>Learn more in <code>vignette("backend-2.0")</code></p>
-    </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other generic:

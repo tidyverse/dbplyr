@@ -26,16 +26,6 @@ dbplyr_edition(con)
 
 - `db_col_types()` returns the column types of a table.
 
-## dbplyr 2.0.0
-
-dbplyr 2.0.0 renamed a number of generics so that they could be cleanly
-moved from dplyr to dbplyr. If you have an existing backend, you'll need
-to rename the following methods.
-
-- [`dplyr::db_desc()`](https://dplyr.tidyverse.org/reference/backend_dbplyr.html)
-  -\> `dbplyr::db_connection_describe()` (also note that the argument
-  named changed from `x` to `con`).
-
 ## See also
 
 Other generic:

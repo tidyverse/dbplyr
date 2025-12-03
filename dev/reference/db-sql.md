@@ -33,7 +33,9 @@ Query manipulation:
 
 - `sql_query_explain(con, sql)` generates SQL that "explains" a query,
   i.e. generates a query plan describing what indexes etc that the
-  database will use.
+  database will use. It can return character vector, in which case the
+  first n elements are used to generate the plan and the final element
+  is used to return the query plan.
 
 - `sql_query_fields()` generates SQL for a 0-row result that is used to
   capture field names in
@@ -153,52 +155,6 @@ sql_query_union(con, x, unions, ..., lvl = 0)
 
 sql_returning_cols(con, cols, table, ...)
 ```
-
-## dbplyr 2.0.0
-
-Many `dplyr::db_*` generics have been replaced by `dbplyr::sql_*`
-generics. To update your backend, you'll need to extract the SQL
-generation out of your existing code, and place it in a new method for a
-dbplyr `sql_` generic.
-
-- [`dplyr::db_analyze()`](https://dplyr.tidyverse.org/reference/backend_dbplyr.html)
-  is replaced by `dbplyr::sql_table_analyze()`
-
-- [`dplyr::db_explain()`](https://dplyr.tidyverse.org/reference/backend_dbplyr.html)
-  is replaced by `dbplyr::sql_query_explain()`
-
-- [`dplyr::db_create_index()`](https://dplyr.tidyverse.org/reference/backend_dbplyr.html)
-  is replaced by `dbplyr::sql_table_index()`
-
-- [`dplyr::db_query_fields()`](https://dplyr.tidyverse.org/reference/backend_dbplyr.html)
-  is replaced by `dbplyr::sql_query_fields()`
-
-- [`dplyr::db_query_rows()`](https://dplyr.tidyverse.org/reference/backend_dbplyr.html)
-  is no longer used; you can delete it
-
-- [`dplyr::db_save_query()`](https://dplyr.tidyverse.org/reference/backend_dbplyr.html)
-  is replaced by `dbplyr::sql_query_save()`
-
-The query generating functions have also changed names. Their behaviour
-is unchanged, so you just need to rename the generic and import from
-dbplyr instead of dplyr.
-
-- [`dplyr::sql_select()`](https://dplyr.tidyverse.org/reference/backend_dbplyr.html)
-  is replaced by `dbplyr::sql_query_select()`
-
-- [`dplyr::sql_join()`](https://dplyr.tidyverse.org/reference/backend_dbplyr.html)
-  is replaced by `dbplyr::sql_query_join()`
-
-- [`dplyr::sql_semi_join()`](https://dplyr.tidyverse.org/reference/backend_dbplyr.html)
-  is replaced by `dbplyr::sql_query_semi_join()`
-
-- [`dplyr::sql_set_op()`](https://dplyr.tidyverse.org/reference/backend_dbplyr.html)
-  is replaced by `dbplyr::sql_query_set_op()`
-
-- [`dplyr::sql_subquery()`](https://dplyr.tidyverse.org/reference/backend_dbplyr.html)
-  is replaced by `dbplyr::sql_query_wrap()`
-
-Learn more in `vignette("backend-2.0")`
 
 ## See also
 

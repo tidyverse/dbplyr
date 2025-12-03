@@ -59,8 +59,8 @@ library(dplyr, warn.conflicts = FALSE)
 db <- memdb_frame(a = c(3, 4, 1, 2), b = c(5, 1, 2, NA))
 db |> arrange(a) |> show_query()
 #> <SQL>
-#> SELECT `dbplyr_lKLUUEdLie`.*
-#> FROM `dbplyr_lKLUUEdLie`
+#> SELECT `dbplyr_tmp_lKLUUEdLie`.*
+#> FROM `dbplyr_tmp_lKLUUEdLie`
 #> ORDER BY `a`
 
 # Note that NAs are sorted first

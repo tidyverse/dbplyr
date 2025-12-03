@@ -27,8 +27,8 @@ mf |>
 #> <SQL>
 #> SELECT `q01`.*, POWER(`a`, 2.0) AS `b`
 #> FROM (
-#>   SELECT `dbplyr_SwlKLUUEdL`.*, `y` * `x` AS `a`
-#>   FROM `dbplyr_SwlKLUUEdL`
+#>   SELECT `dbplyr_tmp_SwlKLUUEdL`.*, `y` * `x` AS `a`
+#>   FROM `dbplyr_tmp_SwlKLUUEdL`
 #> ) AS `q01`
 ```
 
@@ -55,15 +55,15 @@ mf |>
   mutate(z = foofify(x, y)) |> 
   show_query()
 #> <SQL>
-#> SELECT `dbplyr_SwlKLUUEdL`.*, foofify(`x`, `y`) AS `z`
-#> FROM `dbplyr_SwlKLUUEdL`
+#> SELECT `dbplyr_tmp_SwlKLUUEdL`.*, foofify(`x`, `y`) AS `z`
+#> FROM `dbplyr_tmp_SwlKLUUEdL`
 
 mf |> 
   filter(x %LIKE% "%foo%") |> 
   show_query()
 #> <SQL>
-#> SELECT `dbplyr_SwlKLUUEdL`.*
-#> FROM `dbplyr_SwlKLUUEdL`
+#> SELECT `dbplyr_tmp_SwlKLUUEdL`.*
+#> FROM `dbplyr_tmp_SwlKLUUEdL`
 #> WHERE (`x` LIKE '%foo%')
 ```
 
@@ -79,14 +79,14 @@ mf |>
   show_query()
 #> <SQL>
 #> SELECT x! AS `factorial`
-#> FROM `dbplyr_SwlKLUUEdL`
+#> FROM `dbplyr_tmp_SwlKLUUEdL`
 
 mf |> 
   transmute(factorial = sql("CAST(x AS FLOAT)")) |> 
   show_query()
 #> <SQL>
 #> SELECT CAST(x AS FLOAT) AS `factorial`
-#> FROM `dbplyr_SwlKLUUEdL`
+#> FROM `dbplyr_tmp_SwlKLUUEdL`
 ```
 
 Learn more in

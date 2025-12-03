@@ -19,8 +19,7 @@
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/backend-2.html">dbplyr 2.0.0 backend API</a></li>
-    <li><a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a></li>
     <li><a class="dropdown-item" href="../articles/reprex.html">Reprexes for dbplyr</a></li>
     <li><a class="dropdown-item" href="../articles/sql.html">Writing SQL with dbplyr</a></li>
     <li><a class="dropdown-item" href="../articles/translation-function.html">Function translation</a></li>
@@ -58,7 +57,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li>MySQL gains slightly better translation for <code><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer()</a></code> and <code>as.integer64()</code> (<a href="https://github.com/tidyverse/dbplyr/issues/1647" class="external-link">#1647</a>).</li>
+<ul><li>dbplyr 1e interfaces are now deprecated (<a href="https://github.com/tidyverse/dbplyr/issues/1197" class="external-link">#1197</a>). Backend developers have had &gt;2 years to update.</li>
+<li>MySQL gains slightly better translation for <code><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer()</a></code> and <code>as.integer64()</code> (<a href="https://github.com/tidyverse/dbplyr/issues/1647" class="external-link">#1647</a>).</li>
 <li>Fixed snowflake translations that were being reported as unknown (<a href="https://github.com/edward-burn" class="external-link">@edward-burn</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1570" class="external-link">#1570</a>).</li>
 <li>Deprecated <code>win_rank_tdata()</code> has been removed.</li>
 <li>
@@ -654,7 +654,7 @@ FROM (
 </ul></div>
 <div class="section level3">
 <h3 id="extensibility-2-0-0">Extensibility<a class="anchor" aria-label="anchor" href="#extensibility-2-0-0"></a></h3>
-<p>If you are the author of a dbplyr backend, please see <code><a href="../articles/backend-2.html">vignette("backend-2")</a></code> for details.</p>
+<p>If you are the author of a dbplyr backend, please see <code>vignette("backend-2")</code> for details.</p>
 <ul><li><p>New <code><a href="../reference/db-misc.html">dbplyr_edition()</a></code> generic allows you to opt-in to the 2nd edition of the dbplyr API.</p></li>
 <li>
 <p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_write_table()</a></code> now calls <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">DBI::dbWriteTable()</a></code> instead of nine generics that formerly each did a small part: <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_create_indexes()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_begin()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_rollback()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_commit()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_list_tables()</a></code>, <code>drop_drop_table()</code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_has_table()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_create_table()</a></code>, and <code>db_data_types()</code>. You can now delete the methods for these generics.</p>

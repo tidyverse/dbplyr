@@ -43,8 +43,7 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/backend-2.html">dbplyr 2.0.0 backend API</a></li>
-    <li><a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a></li>
+<li><a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a></li>
     <li><a class="dropdown-item" href="../articles/reprex.html">Reprexes for dbplyr</a></li>
     <li><a class="dropdown-item" href="../articles/sql.html">Writing SQL with dbplyr</a></li>
     <li><a class="dropdown-item" href="../articles/translation-function.html">Function translation</a></li>
@@ -120,8 +119,8 @@ subqueries if you want to use a freshly created variable in
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `q01`.*, POWER(`a`, 2.0)<span style="color: #0000BB;"> AS </span>`b`</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> (</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> `dbplyr_SwlKLUUEdL`.*, `y` * `x`<span style="color: #0000BB;"> AS </span>`a`</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> `dbplyr_SwlKLUUEdL`</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> `dbplyr_tmp_SwlKLUUEdL`.*, `y` * `x`<span style="color: #0000BB;"> AS </span>`a`</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_SwlKLUUEdL`</span></span>
 <span><span class="co">#&gt; )<span style="color: #0000BB;"> AS </span>`q01`</span></span></code></pre></div>
 <p>In general, it’s much easier to work iteratively in dbplyr. You can
 easily give intermediate queries names, and reuse them in multiple
@@ -145,15 +144,15 @@ cases, you’ll need to write SQL code directly.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>z <span class="op">=</span> <span class="fu">foofify</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `dbplyr_SwlKLUUEdL`.*, foofify(`x`, `y`)<span style="color: #0000BB;"> AS </span>`z`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_SwlKLUUEdL`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `dbplyr_tmp_SwlKLUUEdL`.*, foofify(`x`, `y`)<span style="color: #0000BB;"> AS </span>`z`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_SwlKLUUEdL`</span></span>
 <span></span>
 <span><span class="va">mf</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">x</span> <span class="op">%LIKE%</span> <span class="st">"%foo%"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `dbplyr_SwlKLUUEdL`.*</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_SwlKLUUEdL`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `dbplyr_tmp_SwlKLUUEdL`.*</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_SwlKLUUEdL`</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> (`x` LIKE '%foo%')</span></span></code></pre></div>
 <p>SQL functions tend to have a greater variety of syntax than R. That
 means there are a number of expressions that can’t be translated
@@ -165,14 +164,14 @@ literal SQL inside <code><a href="../reference/sql.html">sql()</a></code>:</p>
 <span>  <span class="fu"><a href="../reference/show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> x!<span style="color: #0000BB;"> AS </span>`factorial`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_SwlKLUUEdL`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_SwlKLUUEdL`</span></span>
 <span></span>
 <span><span class="va">mf</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>factorial <span class="op">=</span> <span class="fu"><a href="../reference/sql.html">sql</a></span><span class="op">(</span><span class="st">"CAST(x AS FLOAT)"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> CAST(x AS FLOAT)<span style="color: #0000BB;"> AS </span>`factorial`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_SwlKLUUEdL`</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_SwlKLUUEdL`</span></span></code></pre></div>
 <p>Learn more in <code><a href="../articles/translation-function.html">vignette("translation-function")</a></code>.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

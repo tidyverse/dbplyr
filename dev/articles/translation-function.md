@@ -274,14 +274,14 @@ mf |>
   show_query()
 #> <SQL>
 #> SELECT x! AS `factorial`
-#> FROM `dbplyr_uR8HfdVHIy`
+#> FROM `dbplyr_tmp_uR8HfdVHIy`
 
 mf |> 
   transmute(factorial = sql("CAST(x AS FLOAT)")) |> 
   show_query()
 #> <SQL>
 #> SELECT CAST(x AS FLOAT) AS `factorial`
-#> FROM `dbplyr_uR8HfdVHIy`
+#> FROM `dbplyr_tmp_uR8HfdVHIy`
 ```
 
 ### Error for unknown translations
