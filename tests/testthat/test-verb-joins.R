@@ -718,9 +718,8 @@ test_that("filtered window joins work in a semi_join", {
   df1 <- local_memdb_frame("df1", id = 1:5)
   df2 <- local_memdb_frame("df2", id = 1:5)
 
-  out <- df2 |>
-    filter(row_number() <= 3) |>
-    anti_join(df1, y = _, by = "id")
+  df2_a <- df2 |> filter(row_number() <= 3)
+  out <- anti_join(df1, df2_a, by = "id")
   expect_snapshot(show_query(out))
 
   expect_equal(collect(out), tibble(id = 4:5))
