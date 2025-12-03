@@ -81,11 +81,11 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
       quantile = sql_quantile("PERCENTILE"),
       median = sql_aggregate("MEDIAN"),
       first = function(x, na_rm = FALSE) {
-        check_na_rm(na_rm)
+        sql_check_na_rm(na_rm)
         glue_sql2(sql_current_con(), "FIRST({.val x})")
       },
       last = function(x, na_rm = FALSE) {
-        check_na_rm(na_rm)
+        sql_check_na_rm(na_rm)
         glue_sql2(sql_current_con(), "LAST({.val x})")
       },
     ),

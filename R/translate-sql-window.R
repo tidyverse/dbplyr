@@ -204,7 +204,7 @@ win_rank <- function(f, empty_order = FALSE) {
 win_aggregate <- function(f) {
   force(f)
   function(x, na.rm = FALSE) {
-    check_na_rm(na.rm)
+    sql_check_na_rm(na.rm)
     frame <- win_current_frame()
 
     win_over(
