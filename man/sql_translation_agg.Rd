@@ -5,6 +5,7 @@
 \alias{sql_aggregate}
 \alias{sql_aggregate_2}
 \alias{sql_aggregate_n}
+\alias{sql_check_na_rm}
 \alias{sql_not_supported}
 \title{SQL helpers for aggregate functions}
 \usage{
@@ -14,12 +15,18 @@ sql_aggregate_2(f)
 
 sql_aggregate_n(f, f_r = f)
 
+sql_check_na_rm(na.rm)
+
 sql_not_supported(f)
 }
 \arguments{
 \item{f}{The name of the SQL function as a string.}
 
 \item{f_r}{The name of the R function being translated as a string.}
+
+\item{na.rm}{Logical indicating whether missing values should be removed.
+In SQL, missing values are always removed in aggregate functions, so this
+function will warn if \code{na.rm} is not \code{TRUE}.}
 }
 \description{
 These functions help you create custom aggregate SQL translations when
@@ -36,6 +43,8 @@ functions with any number of arguments and an optional \code{na.rm} parameter
 (e.g., \code{LEAST()}, \code{GREATEST()}).
 \item \code{sql_not_supported()} creates a function that throws an informative error
 when a function is not supported in SQL.
+\item \code{sql_check_na_rm()} is a helper that you can use in aggregate functions
+to direct the user towards setting \code{na.rm = TRUE}.
 }
 }
 \seealso{

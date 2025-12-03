@@ -159,7 +159,6 @@ test_that("filter isn't inlined after mutate with window function #1135", {
 # .by -------------------------------------------------------------------------
 
 test_that("can group transiently using `.by`", {
-  suppressWarnings(check_na_rm(FALSE))
   df <- memdb_frame(g = c(1, 1, 2, 1, 2), x = c(5, 10, 1, 2, 3))
 
   out <- filter(df, x > mean(x), .by = g) |>

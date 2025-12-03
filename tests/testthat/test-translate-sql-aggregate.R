@@ -1,6 +1,7 @@
 test_that("aggregation functions warn once if na.rm = FALSE", {
   skip_on_cran()
-  env_unbind(ns_env("rlang")$warning_freq_env, "dbplyr_check_na_rm")
+  reset_warning_verbosity("dbplyr_check_na_rm")
+  local_mocked_bindings(is_testing = function() FALSE)
 
   local_con(simulate_dbi())
   sql_mean <- sql_aggregate("MEAN")
