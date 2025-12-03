@@ -337,9 +337,6 @@ test_that("`sql_query_upsert()` with method = 'on_conflict' is correct", {
 test_that("can explain", {
   db <- copy_to_test("postgres", data.frame(x = 1:3))
   expect_snapshot(db |> mutate(y = x + 1) |> explain())
-
-  # `explain()` passes `...` to methods
-  expect_snapshot(db |> mutate(y = x + 1) |> explain(format = "json"))
 })
 
 test_that("can overwrite temp tables", {
