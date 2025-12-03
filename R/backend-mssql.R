@@ -462,7 +462,7 @@ simulate_mssql <- function(version = "15.0") {
       sd = sql_aggregate("STDEV", "sd"),
       var = sql_aggregate("VAR", "var"),
       str_flatten = function(x, collapse = "", na.rm = FALSE) {
-        check_na_rm(na.rm)
+        sql_check_na_rm(na.rm)
         sql_expr(string_agg(!!x, !!collapse))
       },
 
@@ -476,7 +476,7 @@ simulate_mssql <- function(version = "15.0") {
       sd = win_aggregate("STDEV"),
       var = win_aggregate("VAR"),
       str_flatten = function(x, collapse = "", na.rm = FALSE) {
-        check_na_rm(na.rm)
+        sql_check_na_rm(na.rm)
         win_over(
           sql_expr(string_agg(!!x, !!collapse)),
           partition = win_current_group(),
@@ -520,7 +520,7 @@ simulate_mssql <- function(version = "15.0") {
       row_number = win_rank("ROW_NUMBER", empty_order = TRUE),
 
       n_distinct = function(x, na.rm = FALSE) {
-        check_na_rm(na.rm)
+        sql_check_na_rm(na.rm)
         cli_abort(
           "No translation available in `mutate()`/`filter()` for SQL server."
         )

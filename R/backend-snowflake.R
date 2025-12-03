@@ -331,7 +331,7 @@ sql_translation.Snowflake <- function(con) {
       any = sql_aggregate("BOOLOR_AGG", "any"),
       sd = sql_aggregate("STDDEV", "sd"),
       str_flatten = function(x, collapse = "", na.rm = FALSE) {
-        check_na_rm(na.rm)
+        sql_check_na_rm(na.rm)
         sql_expr(LISTAGG(!!x, !!collapse))
       }
     ),
@@ -343,7 +343,7 @@ sql_translation.Snowflake <- function(con) {
       any = win_aggregate("BOOLOR_AGG"),
       sd = win_aggregate("STDDEV"),
       str_flatten = function(x, collapse = "", na.rm = FALSE) {
-        check_na_rm(na.rm)
+        sql_check_na_rm(na.rm)
         win_over(
           sql_expr(LISTAGG(!!x, !!collapse)),
           partition = win_current_group(),

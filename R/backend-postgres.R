@@ -316,7 +316,7 @@ sql_translation.PqConnection <- function(con) {
       all = sql_aggregate("BOOL_AND", "all"),
       any = sql_aggregate("BOOL_OR", "any"),
       str_flatten = function(x, collapse = "", na.rm = FALSE) {
-        check_na_rm(na.rm)
+        sql_check_na_rm(na.rm)
         sql_expr(string_agg(!!x, !!collapse))
       }
     ),
@@ -329,7 +329,7 @@ sql_translation.PqConnection <- function(con) {
       all = win_aggregate("BOOL_AND"),
       any = win_aggregate("BOOL_OR"),
       str_flatten = function(x, collapse = "", na.rm = FALSE) {
-        check_na_rm(na.rm)
+        sql_check_na_rm(na.rm)
         win_over(
           sql_expr(string_agg(!!x, !!collapse)),
           partition = win_current_group(),
