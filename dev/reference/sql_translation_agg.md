@@ -19,6 +19,9 @@ to define how R aggregate functions should be translated to SQL.
 - `sql_not_supported()` creates a function that throws an informative
   error when a function is not supported in SQL.
 
+- `sql_check_na_rm()` is a helper that you can use in aggregate
+  functions to direct the user towards setting `na.rm = TRUE`.
+
 ## Usage
 
 ``` r
@@ -27,6 +30,8 @@ sql_aggregate(f, f_r = f)
 sql_aggregate_2(f)
 
 sql_aggregate_n(f, f_r = f)
+
+sql_check_na_rm(na.rm)
 
 sql_not_supported(f)
 ```
@@ -40,6 +45,12 @@ sql_not_supported(f)
 - f_r:
 
   The name of the R function being translated as a string.
+
+- na.rm:
+
+  Logical indicating whether missing values should be removed. In SQL,
+  missing values are always removed in aggregate functions, so this
+  function will warn if `na.rm` is not `TRUE`.
 
 ## See also
 

@@ -257,6 +257,7 @@ Documentation for authors of new dbplyr backends
 - [`sql_aggregate()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_agg.md)
   [`sql_aggregate_2()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_agg.md)
   [`sql_aggregate_n()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_agg.md)
+  [`sql_check_na_rm()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_agg.md)
   [`sql_not_supported()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_agg.md)
   : SQL helpers for aggregate functions
 - [`win_over()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_window.md)

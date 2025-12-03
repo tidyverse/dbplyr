@@ -13,6 +13,9 @@
   [`dplyr::desc()`](https://dplyr.tidyverse.org/reference/desc.html)
   (not just [`desc()`](https://dplyr.tidyverse.org/reference/desc.html))
   ([\#1486](https://github.com/tidyverse/dbplyr/issues/1486)).
+- [`sql_check_na_rm()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_agg.md)
+  is now exported for use in other backends
+  ([\#1483](https://github.com/tidyverse/dbplyr/issues/1483)).
 - [`glue_sql2()`](https://dbplyr.tidyverse.org/dev/reference/glue_sql2.md)
   is now exported for building SQL strings with glue syntax and type
   markers.

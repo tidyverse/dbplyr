@@ -12,6 +12,8 @@ functions with any number of arguments and an optional na.rm parameter
 (e.g., LEAST(), GREATEST()).
 sql_not_supported() creates a function that throws an informative error
 when a function is not supported in SQL.
+sql_check_na_rm() is a helper that you can use in aggregate functions
+to direct the user towards setting na.rm = TRUE.
 
 "><meta property="og:description" content="These functions help you create custom aggregate SQL translations when
 implementing a new backend. They are typically used within sql_translator()
@@ -26,6 +28,8 @@ functions with any number of arguments and an optional na.rm parameter
 (e.g., LEAST(), GREATEST()).
 sql_not_supported() creates a function that throws an informative error
 when a function is not supported in SQL.
+sql_check_na_rm() is a helper that you can use in aggregate functions
+to direct the user towards setting na.rm = TRUE.
 
 "><meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png"><meta name="robots" content="noindex"><script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js" data-max-height="43" data-light-bg="#666f76" data-light-fg="#f9f9f9"></script><script defer data-domain="dbplyr.tidyverse.org,all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script></head><body>
     <a href="#container" class="visually-hidden-focusable">Skip to content</a>
@@ -97,6 +101,8 @@ functions with any number of arguments and an optional <code>na.rm</code> parame
 (e.g., <code>LEAST()</code>, <code>GREATEST()</code>).</p></li>
 <li><p><code>sql_not_supported()</code> creates a function that throws an informative error
 when a function is not supported in SQL.</p></li>
+<li><p><code>sql_check_na_rm()</code> is a helper that you can use in aggregate functions
+to direct the user towards setting <code>na.rm = TRUE</code>.</p></li>
 </ul></div>
 
     <div class="section level2">
@@ -106,6 +112,8 @@ when a function is not supported in SQL.</p></li>
 <span><span class="fu">sql_aggregate_2</span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">sql_aggregate_n</span><span class="op">(</span><span class="va">f</span>, f_r <span class="op">=</span> <span class="va">f</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">sql_check_na_rm</span><span class="op">(</span><span class="va">na.rm</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">sql_not_supported</span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -120,6 +128,12 @@ when a function is not supported in SQL.</p></li>
 
 <dt id="arg-f-r">f_r<a class="anchor" aria-label="anchor" href="#arg-f-r"></a></dt>
 <dd><p>The name of the R function being translated as a string.</p></dd>
+
+
+<dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
+<dd><p>Logical indicating whether missing values should be removed.
+In SQL, missing values are always removed in aggregate functions, so this
+function will warn if <code>na.rm</code> is not <code>TRUE</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
