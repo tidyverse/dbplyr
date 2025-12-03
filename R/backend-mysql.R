@@ -131,7 +131,8 @@ sql_translation.MariaDBConnection <- function(con) {
       .parent = base_agg,
       sd = sql_aggregate("STDDEV_SAMP", "sd"),
       var = sql_aggregate("VAR_SAMP", "var"),
-      str_flatten = function(x, collapse = "") {
+      str_flatten = function(x, collapse = "", na.rm = FALSE) {
+        check_na_rm(na.rm)
         sql_expr(group_concat(!!x %separator% !!collapse))
       }
     ),

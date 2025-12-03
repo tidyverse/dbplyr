@@ -407,7 +407,8 @@ base_agg <- sql_translator(
   # last = sql_prefix("LAST_VALUE", 1),
   # nth = sql_prefix("NTH_VALUE", 2),
 
-  n_distinct = function(x) {
+  n_distinct = function(x, na.rm = FALSE) {
+    check_na_rm(na.rm)
     glue_sql2(sql_current_con(), "COUNT(DISTINCT {x})")
   }
 )
@@ -505,7 +506,8 @@ base_win <- sql_translator(
       frame = frame
     )
   },
-  n_distinct = function(x) {
+  n_distinct = function(x, na.rm = FALSE) {
+    check_na_rm(na.rm)
     win_over(
       glue_sql2(sql_current_con(), "COUNT(DISTINCT {x})"),
       win_current_group()
