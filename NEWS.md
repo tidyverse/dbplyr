@@ -2,6 +2,7 @@
 
 * `glue_sql2()` is now exported for building SQL strings with glue syntax and
   type markers. `build_sql()` is deprecated in favor of `glue_sql2()` (#1249).
+* `SELECT` statements that use a single table now use `*` rather than `TABLE.*` (#1485, #1577).
 * dbplyr 1e interfaces are now deprecated (#1197). Backend developers have had >2 years to update.
 * MySQL gains slightly better translation for `as.integer()` and `as.integer64()` (#1647).
 * Fixed snowflake translations that were being reported as unknown (@edward-burn, #1570). 

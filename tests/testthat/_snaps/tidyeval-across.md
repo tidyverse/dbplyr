@@ -142,7 +142,7 @@
       filter(lf, if_all(a:b, ~ . > 0))
     Output
       <SQL>
-      SELECT `df`.*
+      SELECT *
       FROM `df`
       WHERE ((`a` > 0.0 AND `b` > 0.0))
 
@@ -152,7 +152,7 @@
       filter(lf, if_any(a:b, ~ . > 0))
     Output
       <SQL>
-      SELECT `df`.*
+      SELECT *
       FROM `df`
       WHERE ((`a` > 0.0 OR `b` > 0.0))
 
@@ -162,7 +162,7 @@
       mutate(lf, c = if_all(a:b, ~ . > 0))
     Output
       <SQL>
-      SELECT `df`.*, (`a` > 0.0 AND `b` > 0.0) AS `c`
+      SELECT *, (`a` > 0.0 AND `b` > 0.0) AS `c`
       FROM `df`
 
 ---
@@ -171,7 +171,7 @@
       mutate(lf, c = if_any(a:b, ~ . > 0))
     Output
       <SQL>
-      SELECT `df`.*, (`a` > 0.0 OR `b` > 0.0) AS `c`
+      SELECT *, (`a` > 0.0 OR `b` > 0.0) AS `c`
       FROM `df`
 
 # if_all/any uses every column as default
@@ -180,7 +180,7 @@
       filter(lf, if_all(.fns = ~ . > 0))
     Output
       <SQL>
-      SELECT `df`.*
+      SELECT *
       FROM `df`
       WHERE ((`a` > 0.0 AND `b` > 0.0))
 
@@ -190,7 +190,7 @@
       filter(lf, if_any(.fns = ~ . > 0))
     Output
       <SQL>
-      SELECT `df`.*
+      SELECT *
       FROM `df`
       WHERE ((`a` > 0.0 OR `b` > 0.0))
 
@@ -200,7 +200,7 @@
       filter(lf, if_all(a:b))
     Output
       <SQL>
-      SELECT `df`.*
+      SELECT *
       FROM `df`
       WHERE ((`a` AND `b`))
 
@@ -210,7 +210,7 @@
       filter(lf, if_any(a:b))
     Output
       <SQL>
-      SELECT `df`.*
+      SELECT *
       FROM `df`
       WHERE ((`a` OR `b`))
 

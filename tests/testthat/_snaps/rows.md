@@ -407,7 +407,7 @@
       
       UNION ALL
       
-      SELECT `q01`.*, NULL AS `y`
+      SELECT *, NULL AS `y`
       FROM (
         SELECT `df_y`.*
         FROM `df_y`

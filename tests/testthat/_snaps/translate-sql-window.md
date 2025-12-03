@@ -24,7 +24,7 @@
       mutate(mf, rown = row_number())
     Output
       <SQL>
-      SELECT `df`.*, ROW_NUMBER() OVER () AS `rown`
+      SELECT *, ROW_NUMBER() OVER () AS `rown`
       FROM `df`
 
 ---
@@ -33,7 +33,7 @@
       mutate(group_by(mf, y), rown = row_number())
     Output
       <SQL>
-      SELECT `df`.*, ROW_NUMBER() OVER (PARTITION BY `y`) AS `rown`
+      SELECT *, ROW_NUMBER() OVER (PARTITION BY `y`) AS `rown`
       FROM `df`
 
 ---
@@ -42,7 +42,7 @@
       mutate(arrange(group_by(mf, y), y), rown = row_number())
     Output
       <SQL>
-      SELECT `df`.*, ROW_NUMBER() OVER (PARTITION BY `y` ORDER BY `y`) AS `rown`
+      SELECT *, ROW_NUMBER() OVER (PARTITION BY `y` ORDER BY `y`) AS `rown`
       FROM `df`
       ORDER BY `y`
 
@@ -52,7 +52,7 @@
       mutate(arrange(mf, y), rown = row_number())
     Output
       <SQL>
-      SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY `y`) AS `rown`
+      SELECT *, ROW_NUMBER() OVER (ORDER BY `y`) AS `rown`
       FROM `df`
       ORDER BY `y`
 
@@ -62,7 +62,7 @@
       show_query(mutate(window_order(window_frame(lf, -3, 0), x), z = sum(y, na.rm = TRUE)))
     Output
       <SQL>
-      SELECT `df`.*, SUM(`y`) OVER (ORDER BY `x` ROWS 3 PRECEDING) AS `z`
+      SELECT *, SUM(`y`) OVER (ORDER BY `x` ROWS 3 PRECEDING) AS `z`
       FROM `df`
 
 ---
@@ -72,7 +72,7 @@
     Output
       <SQL>
       SELECT
-        `df`.*,
+        *,
         SUM(`y`) OVER (ORDER BY `x` ROWS BETWEEN 3 PRECEDING AND UNBOUNDED FOLLOWING) AS `z`
       FROM `df`
 

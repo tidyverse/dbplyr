@@ -3,7 +3,7 @@
     Code
       remote_query(lf1)
     Output
-      <SQL> SELECT `df`.*
+      <SQL> SELECT *
       FROM `df`
       WHERE (`x` > 3.0) AND (`y` < 3.0)
 
@@ -14,7 +14,7 @@
     Output
       <SQL> SELECT `x`, `y`
       FROM (
-        SELECT `df`.*, AVG(`x`) OVER () AS `col01`
+        SELECT *, AVG(`x`) OVER () AS `col01`
         FROM `df`
       ) AS `q01`
       WHERE (`col01` > 3.0) AND (`y` < 3.0)
@@ -66,7 +66,7 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT `df`.*, MAX(`x`) OVER () AS `col01`
+        SELECT *, MAX(`x`) OVER () AS `col01`
         FROM `df`
       ) AS `q01`
       WHERE (`x` = `col01`) AND (`x` IN (1, 2))
@@ -131,9 +131,9 @@
       (out <- filter(lf, x_mean > 1))
     Output
       <SQL>
-      SELECT `q01`.*
+      SELECT *
       FROM (
-        SELECT `df`.*, AVG(`x`) OVER (PARTITION BY `g`, `h`) AS `x_mean`
+        SELECT *, AVG(`x`) OVER (PARTITION BY `g`, `h`) AS `x_mean`
         FROM `df`
       ) AS `q01`
       WHERE (`x_mean` > 1.0)
@@ -151,7 +151,7 @@
       SELECT `g`, `h`, `x_mean`
       FROM (
         SELECT
-          `q01`.*,
+          *,
           SUM(`x_mean`) OVER (PARTITION BY `g` ROWS UNBOUNDED PRECEDING) AS `col01`
         FROM (
           SELECT `g`, `h`, AVG(`x`) AS `x_mean`

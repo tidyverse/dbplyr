@@ -279,7 +279,6 @@ test_that("names windows automatically", {
     select = lf1$lazy_query$select,
     select_operation = "mutate",
     in_vars = op_vars(lf),
-    table_alias = "df",
     con = simulate_sqlite(),
     use_star = TRUE
   )
@@ -314,7 +313,6 @@ test_that("names windows automatically", {
     select = lf2$lazy_query$select,
     select_operation = "mutate",
     in_vars = op_vars(lf),
-    table_alias = "df",
     con = simulate_sqlite(),
     use_star = TRUE
   )
@@ -357,7 +355,6 @@ test_that("only name windows if they appear multiple times", {
     select = lf$lazy_query$select,
     select_operation = "mutate",
     in_vars = op_vars(lf),
-    table_alias = "df",
     con = simulate_sqlite(),
     use_star = TRUE
   )
@@ -391,7 +388,6 @@ test_that("name windows only if supported", {
     select = lf$lazy_query$select,
     select_operation = "mutate",
     in_vars = op_vars(lf),
-    table_alias = "df",
     con = simulate_hana(),
     use_star = TRUE
   )

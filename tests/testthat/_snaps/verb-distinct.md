@@ -4,9 +4,9 @@
       (out <- distinct(head(lf, 2), x, y))
     Output
       <SQL>
-      SELECT DISTINCT `q01`.*
+      SELECT DISTINCT *
       FROM (
-        SELECT `df`.*
+        SELECT *
         FROM `df`
         LIMIT 2
       ) AS `q01`
@@ -19,9 +19,7 @@
       <SQL>
       SELECT `x`, `y`
       FROM (
-        SELECT
-          `df`.*,
-          ROW_NUMBER() OVER (PARTITION BY `x` ORDER BY `y` DESC) AS `col01`
+        SELECT *, ROW_NUMBER() OVER (PARTITION BY `x` ORDER BY `y` DESC) AS `col01`
         FROM `df`
       ) AS `q01`
       WHERE (`col01` = 1)
@@ -34,7 +32,7 @@
       <SQL>
       SELECT `x`, `y`
       FROM (
-        SELECT `df`.*, ROW_NUMBER() OVER (PARTITION BY `x` ORDER BY `x`) AS `col01`
+        SELECT *, ROW_NUMBER() OVER (PARTITION BY `x` ORDER BY `x`) AS `col01`
         FROM `df`
       ) AS `q01`
       WHERE (`col01` = 1)

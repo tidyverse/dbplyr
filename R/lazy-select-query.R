@@ -199,7 +199,6 @@ sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
     select = op$select,
     select_operation = op$select_operation,
     in_vars = op_vars(op$x),
-    table_alias = alias,
     con = con,
     use_star = sql_options$use_star
   )
@@ -227,7 +226,6 @@ get_select_sql <- function(
   select,
   select_operation,
   in_vars,
-  table_alias,
   con,
   use_star
 ) {
@@ -250,13 +248,13 @@ get_select_sql <- function(
 
   if (use_star && is_select_identity(select, in_vars)) {
     out <- list(
-      select_sql = sql_star(con, table_alias),
+      select_sql = sql_star(con),
       window_sql = character()
     )
     return(out)
   }
 
-  select <- select_use_star(select, in_vars, table_alias, con, use_star)
+  select <- select_use_star(select, in_vars, con, use_star)
 
   # translate once just to register windows
   win_register_activate()
@@ -284,7 +282,7 @@ get_select_sql <- function(
   )
 }
 
-select_use_star <- function(select, vars_prev, table_alias, con, use_star) {
+select_use_star <- function(select, vars_prev, con, use_star) {
   if (!use_star) {
     return(select)
   }
@@ -308,7 +306,7 @@ select_use_star <- function(select, vars_prev, table_alias, con, use_star) {
     idx_end <- seq2(last + 1, n)
     vctrs::vec_rbind(
       vctrs::vec_slice(select, idx_start),
-      tibble(name = "", expr = list(sql_star(con, table_alias))),
+      tibble(name = "", expr = list(sql_star(con))),
       vctrs::vec_slice(select, idx_end)
     )
   } else {

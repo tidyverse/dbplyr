@@ -39,7 +39,7 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY RAND()) AS `col01`
+        SELECT *, ROW_NUMBER() OVER (ORDER BY RAND()) AS `col01`
         FROM `df`
       ) AS `q01`
       WHERE (`col01` <= 1)
@@ -99,7 +99,7 @@
       explain(mutate(db, y = x + 1))
     Output
       <SQL>
-      SELECT `test`.*, `x` + 1.0 AS `y`
+      SELECT *, `x` + 1.0 AS `y`
       FROM `test`
       
       <PLAN>

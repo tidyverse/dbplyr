@@ -47,7 +47,7 @@
       values_drop_na = TRUE)
     Output
       <SQL>
-      SELECT `q01`.*
+      SELECT *
       FROM (
         SELECT 'x' AS `name`, `x` AS `value`
         FROM `df`
@@ -65,7 +65,7 @@
       sql
     Output
       <SQL>
-      SELECT `q01`.*, NULL AS `y`
+      SELECT *, NULL AS `y`
       FROM (
         SELECT `id`, '1' AS `n`, `x_1` AS `x`
         FROM `df`
