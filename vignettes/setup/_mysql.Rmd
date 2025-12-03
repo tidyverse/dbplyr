@@ -4,28 +4,23 @@
 
 ```
 brew install mariadb
-mysql_install_db --verbose --user=hadley --basedir=/usr/local \
+
+mariadb-install-db --verbose --user=hadley --basedir=/usr/local \
   --datadir=/User/hadley/db/mariadb --tmpdir=/tmp
 
-mysqld --datadir='/Users/hadley/db/mysql'
+mysqld --datadir='/Users/hadley/db/mariadb'
 
-mysql -u root -e "CREATE DATABASE lahman;"
-mysql -u root -e "CREATE DATABASE nycflights13;"
-mysql -u root -e "CREATE DATABASE test;"
+mariadb -e "CREATE DATABASE lahman;"
+mariadb -e "CREATE DATABASE nycflights13;"
 ```
 
-## Start
-
-```
-mysqld --datadir='/Users/hadley/db/mysql'
-```
 
 ## Connect
 
 ```{r, eval = FALSE}
 install.packages("RMariaDB")
 
-con <- dbConnect(RMariaDB::MariaDB(), dbname = "lahman", username = "root", password = "")
+con <- dbConnect(RMariaDB::MariaDB(), dbname = "lahman", password = "")
 dbListTables(con)
 ```
 

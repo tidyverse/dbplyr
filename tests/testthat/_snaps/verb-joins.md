@@ -218,6 +218,22 @@
         WHERE (`df`.`x` = `RHS`.`x`)
       )
 
+# filtered window joins work in a semi_join
+
+    Code
+      show_query(out)
+    Output
+      <SQL>
+      SELECT `df1`.*
+      FROM `df1`
+      WHERE NOT EXISTS (
+        SELECT 1 FROM (
+        SELECT `df2`.*, ROW_NUMBER() OVER () AS `col01`
+        FROM `df2`
+      ) AS `RHS`
+        WHERE (`df1`.`id` = `RHS`.`id`) AND (`RHS`.`col01` <= 3.0)
+      )
+
 # multiple joins create a single query
 
     Code
@@ -414,9 +430,7 @@
 # joins reuse queries in cte mode
 
     Code
-      remote_query(left_join(lf, lf), sql_options = sql_options(cte = TRUE))
-    Message
-      Joining with `by = join_by(x)`
+      remote_query(left_join(lf, lf, by = "x"), sql_options = sql_options(cte = TRUE))
     Output
       <SQL> WITH `q01` AS (
         SELECT `lf1_LHS`.`x` AS `x`

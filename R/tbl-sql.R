@@ -113,7 +113,7 @@ tbl_sum.tbl_sql <- function(x) {
   c(
     # Can be overwritten by tbl_format_header.tbl_lazy:
     "Source" = tbl_desc(x),
-    "Database" = dbplyr_connection_describe(x$src$con),
+    "Database" = db_connection_describe(x$src$con),
     "Groups" = if (length(grps) > 0) commas(grps),
     "Ordered by" = if (length(sort) > 0) commas(deparse_all(sort))
   )

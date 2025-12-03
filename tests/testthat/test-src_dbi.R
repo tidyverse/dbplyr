@@ -6,13 +6,15 @@ test_that("tbl and src classes include connection class", {
 
 test_that("generates S3 class based on S4 class name", {
   con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  withr::defer(DBI::dbDisconnect(con))
+
   expect_equal(
     connection_s3_class(con),
     c("src_SQLiteConnection", "src_dbi", "src_sql", "src")
   )
 
-  on.exit(removeClass("Foo2"))
-  on.exit(removeClass("Foo1"))
+  withr::defer(removeClass("Foo2"))
+  withr::defer(removeClass("Foo1"))
 
   Foo1 <- setClass("Foo1", contains = "DBIConnection")
   Foo2 <- setClass("Foo2", contains = "Foo1")

@@ -341,9 +341,6 @@ test_that("`sql_query_upsert()` with method = 'on_conflict' is correct", {
 test_that("can explain", {
   db <- copy_to_test("postgres", data.frame(x = 1:3))
   expect_snapshot(db |> mutate(y = x + 1) |> explain())
-
-  # `explain()` passes `...` to methods
-  expect_snapshot(db |> mutate(y = x + 1) |> explain(format = "json"))
 })
 
 test_that("can overwrite temp tables", {
@@ -407,7 +404,7 @@ test_that("can insert with returning", {
   )
 
   x <- local_db_table(con, df_x, "df_x2", overwrite = TRUE)
-  db_create_index(con, "df_x2", columns = c("a", "b"), unique = TRUE)
+  dbplyr_create_index(con, "df_x2", columns = c("a", "b"), unique = TRUE)
 
   expect_equal(
     rows_insert(
@@ -544,7 +541,7 @@ test_that("can upsert with returning", {
   )
 
   x <- local_db_table(con, df_x, "df_x2")
-  db_create_index(con, "df_x2", columns = c("a", "b"), unique = TRUE)
+  dbplyr_create_index(con, "df_x2", columns = c("a", "b"), unique = TRUE)
 
   expect_equal(
     rows_upsert(

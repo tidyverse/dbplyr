@@ -705,12 +705,24 @@ test_that("filtered aggregates with subsequent select are not inlined away in se
     lf2 |>
       dplyr::summarize(n = n(), .by = "x") |>
       filter(n == 1) |>
-      select(x)
+      select(x),
+    by = "x"
   )
   lq <- out$lazy_query
 
   expect_equal(lq$y$having, list(quo(n() == 1)), ignore_formula_env = TRUE)
   expect_snapshot(out)
+})
+
+test_that("filtered window joins work in a semi_join", {
+  df1 <- local_memdb_frame("df1", id = 1:5)
+  df2 <- local_memdb_frame("df2", id = 1:5)
+
+  df2_a <- df2 |> filter(row_number() <= 3)
+  out <- anti_join(df1, df2_a, by = "id")
+  expect_snapshot(show_query(out))
+
+  expect_equal(collect(out), tibble(id = 4:5))
 })
 
 test_that("multiple joins create a single query", {
@@ -1439,10 +1451,7 @@ test_that("joins reuse queries in cte mode", {
     inner_join(lf1, by = "x")
 
   expect_snapshot(
-    left_join(
-      lf,
-      lf
-    ) |>
+    left_join(lf, lf, by = "x") |>
       remote_query(sql_options = sql_options(cte = TRUE))
   )
 })

@@ -23,7 +23,7 @@ commas <- function(...) paste0(..., collapse = ", ")
 unique_table_name <- function(prefix = "") {
   vals <- c(letters, LETTERS, 0:9)
   name <- paste0(sample(vals, 10, replace = TRUE), collapse = "")
-  paste0(prefix, "dbplyr_", name)
+  paste0(prefix, "dbplyr_tmp_", name)
 }
 
 unique_subquery_name <- function() {
@@ -139,4 +139,15 @@ local_sqlite_connection <- function(envir = parent.frame()) {
     DBI::dbConnect(RSQLite::SQLite(), ":memory:"),
     .local_envir = envir
   )
+}
+
+local_memdb_frame <- function(name, ..., frame = parent.frame()) {
+  df <- tibble::tibble(...)
+
+  withr::defer(DBI::dbRemoveTable(src_memdb()$con, name), envir = frame)
+  copy_to(src_memdb(), df, name, temporary = TRUE)
+}
+
+is_testing <- function() {
+  identical(Sys.getenv("TESTTHAT"), "true")
 }

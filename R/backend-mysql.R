@@ -63,7 +63,7 @@ db_connection_describe.MySQL <- db_connection_describe.MariaDBConnection
 db_connection_describe.MySQLConnection <- db_connection_describe.MariaDBConnection
 
 #' @export
-db_col_types.MariaDBConnection <- function(con, table, call) {
+db_col_types.MariaDBConnection <- function(con, table, call = caller_env()) {
   table <- as_table_path(table, con, error_call = call)
   col_info_df <- DBI::dbGetQuery(
     con,
@@ -131,7 +131,8 @@ sql_translation.MariaDBConnection <- function(con) {
       .parent = base_agg,
       sd = sql_aggregate("STDDEV_SAMP", "sd"),
       var = sql_aggregate("VAR_SAMP", "var"),
-      str_flatten = function(x, collapse = "") {
+      str_flatten = function(x, collapse = "", na.rm = FALSE) {
+        sql_check_na_rm(na.rm)
         sql_expr(group_concat(!!x %separator% !!collapse))
       }
     ),
@@ -152,13 +153,9 @@ sql_translation.MySQL <- function(con) {
   sql_variant(
     sql_translator(
       .parent = maria$scalar,
-      # MySQL doesn't support casting to INTEGER or BIGINT.
-      as.integer = function(x) {
-        sql_expr(TRUNCATE(CAST(!!x %AS% DOUBLE), 0L))
-      },
-      as.integer64 = function(x) {
-        sql_expr(TRUNCATE(CAST(!!x %AS% DOUBLE), 0L))
-      },
+      # SIGNED INTEGER is a BIGINT; no way to cast smaller
+      as.integer = sql_cast("SIGNED INTEGER"),
+      as.integer64 = sql_cast("SIGNED INTEGER"),
     ),
     maria$aggregate,
     maria$window

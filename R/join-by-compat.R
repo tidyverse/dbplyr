@@ -28,7 +28,7 @@ dbplyr_as_join_by.default <- function(x, error_call = caller_env()) {
     "`by` must be a (named) character vector, list, `join_by()` result, ",
     "or NULL, not {obj_type_friendly(x)}."
   ))
-  abort(message, call = error_call)
+  cli::cli_abort(message, call = error_call)
 }
 
 #' @export
@@ -54,10 +54,10 @@ dbplyr_as_join_by.list <- function(x, error_call = caller_env()) {
   y_names <- x[["y"]]
 
   if (!is_character(x_names)) {
-    abort("`by$x` must evaluate to a character vector.")
+    cli::cli_abort("`by$x` must evaluate to a character vector.")
   }
   if (!is_character(y_names)) {
-    abort("`by$y` must evaluate to a character vector.")
+    cli::cli_abort("`by$y` must evaluate to a character vector.")
   }
 
   finalise_equi_join_by(x_names, y_names)
@@ -67,7 +67,7 @@ finalise_equi_join_by <- function(x_names, y_names) {
   n <- length(x_names)
 
   if (n == 0L) {
-    abort(
+    cli::cli_abort(
       "Backwards compatible support for cross joins should have been caught earlier.",
       .internal = TRUE
     )
@@ -98,7 +98,7 @@ join_by_common <- function(x_names, y_names, ..., error_call = caller_env()) {
       "`by` must be supplied when `x` and `y` have no common variables.",
       i = "Use `cross_join()` to perform a cross-join."
     )
-    abort(message, call = error_call)
+    cli::cli_abort(message, call = error_call)
   }
 
   by_names <- by

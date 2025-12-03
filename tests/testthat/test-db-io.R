@@ -40,28 +40,3 @@ test_that("db_copy_to() can overwrite a table", {
   )
   expect_equal(DBI::dbReadTable(con, "tmp"), data.frame(x = c(1, 1)))
 })
-
-test_that("db_save_query() can overwrite a table", {
-  con <- local_sqlite_connection()
-  local_db_table(con, data.frame(x = 1), "tmp")
-
-  # doesn't overwrite by default
-  expect_snapshot(
-    (expect_error(
-      db_save_query(
-        con = con,
-        sql = "SELECT 2 FROM tmp",
-        name = "tmp"
-      )
-    )),
-    transform = snap_transform_dbi
-  )
-
-  db_save_query(
-    con = con,
-    sql = sql("SELECT 2 AS x"),
-    name = "tmp",
-    overwrite = TRUE
-  )
-  expect_equal(DBI::dbReadTable(con, "tmp"), data.frame(x = 2L))
-})

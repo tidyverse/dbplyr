@@ -10,7 +10,7 @@ join_cols <- function(
   check_dots_empty0(...)
 
   if (is_false(keep) && any(by$condition != "==")) {
-    abort(
+    cli::cli_abort(
       "Can't set `keep = FALSE` when using an inequality, rolling, or overlap join.",
       call = error_call
     )
@@ -100,7 +100,7 @@ check_join_vars <- function(
       "Join columns in `{input}` can't be `NA`.",
       x = "Problem at position {err_vars(na)}."
     )
-    abort(bullets, call = error_call)
+    cli::cli_abort(bullets, call = error_call)
   }
 
   # Columns are allowed to appear in more than one non-equi condition

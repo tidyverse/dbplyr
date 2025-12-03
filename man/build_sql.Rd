@@ -17,27 +17,37 @@ be needed in typical use.}
 \item{con}{database connection; used to select correct quoting characters.}
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+\code{build_sql()} is deprecated in favor of \code{\link[=glue_sql2]{glue_sql2()}}.
+
 This is a convenience function that should prevent sql injection attacks
 (which in the context of dplyr are most likely to be accidental not
 deliberate) by automatically escaping all expressions in the input, while
 treating bare strings as sql. This is unlikely to prevent any serious
 attack, but should make it unlikely that you produce invalid sql.
-}
-\details{
+
 This function should be used only when generating \code{SELECT} clauses,
 other high level queries, or for other syntax that has no R equivalent.
 For individual function translations, prefer \code{\link[=sql_expr]{sql_expr()}}.
 }
 \examples{
 con <- simulate_dbi()
-build_sql("SELECT * FROM TABLE", con = con)
-x <- "TABLE"
-build_sql("SELECT * FROM ", x, con = con)
-build_sql("SELECT * FROM ", ident(x), con = con)
-build_sql("SELECT * FROM ", sql(x), con = con)
 
-# http://xkcd.com/327/
-name <- "Robert'); DROP TABLE Students;--"
-build_sql("INSERT INTO Students (Name) VALUES (", name, ")", con = con)
+# Old:
+build_sql("SELECT * FROM ", ident("table"), con = con)
+# New:
+glue_sql2(con, "SELECT * FROM {.tbl 'table'}")
+
+# Old:
+name <- "Robert"
+build_sql("INSERT INTO students (name) VALUES (", name, ")", con = con)
+# New:
+glue_sql2(con, "INSERT INTO students (name) VALUES ({.val name})")
+
+# Old:
+cols <- c("x", "y")
+build_sql("SELECT ", ident(cols), " FROM table", con = con)
+# New:
+glue_sql2(con, "SELECT {.col cols*} FROM {.tbl 'table'}")
 }
 \keyword{internal}

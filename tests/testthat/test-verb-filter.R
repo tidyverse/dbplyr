@@ -159,7 +159,6 @@ test_that("filter isn't inlined after mutate with window function #1135", {
 # .by -------------------------------------------------------------------------
 
 test_that("can group transiently using `.by`", {
-  suppressWarnings(check_na_rm(FALSE))
   df <- memdb_frame(g = c(1, 1, 2, 1, 2), x = c(5, 10, 1, 2, 3))
 
   out <- filter(df, x > mean(x), .by = g) |>
@@ -299,7 +298,7 @@ test_that("filter() after summarise() uses `HAVING`", {
     ignore_formula_env = TRUE
   )
   # TODO should the `order_vars` and the `frame` really survive `summarise()`?
-  expect_equal(lq$order_vars, list(expr(h)))
+  expect_equal(lq$order_vars, list(quo(h)))
   expect_equal(lq$frame, list(range = c(-3, Inf)))
 })
 
