@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* MySQL gains slightly better translation for `as.integer()` and `as.integer64()` (#1647).
 * Fixed snowflake translations that were being reported as unknown (@edward-burn, #1570). 
 * Deprecated `win_rank_tdata()` has been removed.
 * `compute()`, `collect()`, and `collapse()` now have their own documentation pages.
