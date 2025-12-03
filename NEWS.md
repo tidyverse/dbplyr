@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* `str_flatten()` (#1540) and `n_distinct()` (#1579) now have an `na.rm` argument, which regularly warns when it's not `TRUE`.
 * `semi_join()` and `anti_join()` once again work with filtered windowed values (#1534, #1606).
 * `window_order()` works with `dplyr::desc()` (not just `desc()`) (#1486).
 * `sql_check_na_rm()` is now exported for use in other backends (#1483).

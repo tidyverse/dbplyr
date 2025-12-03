@@ -72,10 +72,6 @@ test_that("n_distinct(x) translated to COUNT(distinct, x)", {
     test_translate_sql(n_distinct(x), window = TRUE),
     sql("COUNT(DISTINCT `x`) OVER ()")
   )
-  expect_error(
-    test_translate_sql(n_distinct(x, y), window = FALSE),
-    "unused argument"
-  )
 })
 
 test_that("na_if is translated to NULLIF (#211)", {
