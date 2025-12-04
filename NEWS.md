@@ -2,6 +2,8 @@
 
 * New translations for stringr function `str_ilike()` for Postgres, Redshift, and Snowflake (@edward-burn, #1628).
 * Argument `ignore_case` for `str_like()` has been deprecated (@edward-burn, #1630).
+* Corrected error message for `quantile()` and `median()` in `mutate()` on Redshift (@edward-burn, #1571).
+* All set operations now error if you pass extra arguments (instead of silently ignoring then) (#1585).
 * `str_flatten()` (#1540) and `n_distinct()` (#1579) now have an `na.rm` argument, which regularly warns when it's not `TRUE`.
 * `semi_join()` and `anti_join()` once again work with filtered windowed values (#1534, #1606).
 * `window_order()` works with `dplyr::desc()` (not just `desc()`) (#1486).
