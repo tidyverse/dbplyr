@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* Corrected error message for `quantile()` and `median()` in `mutate()` on Redshift (@edward-burn, #1571).
 * All set operations now error if you pass extra arguments (instead of silently ignoring then) (#1585).
 * `str_flatten()` (#1540) and `n_distinct()` (#1579) now have an `na.rm` argument, which regularly warns when it's not `TRUE`.
 * `semi_join()` and `anti_join()` once again work with filtered windowed values (#1534, #1606).
