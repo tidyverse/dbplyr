@@ -2,6 +2,9 @@
 
 ## dbplyr (development version)
 
+- All set operations now error if you pass extra arguments (instead of
+  silently ignoring then)
+  ([\#1585](https://github.com/tidyverse/dbplyr/issues/1585)).
 - `str_flatten()`
   ([\#1540](https://github.com/tidyverse/dbplyr/issues/1540)) and
   [`n_distinct()`](https://dplyr.tidyverse.org/reference/n_distinct.html)

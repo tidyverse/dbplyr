@@ -42,7 +42,7 @@ setdiff(x, y, copy = FALSE, ..., all = FALSE)
 
 - ...:
 
-  Not currently used; provided for future extensions.
+  Must be empty.
 
 - all:
 
