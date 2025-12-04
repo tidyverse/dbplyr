@@ -50,13 +50,6 @@
 # can only translate case sensitive str_like
 
     Code
-      test_translate_sql(str_like(x, "abc"))
-    Output
-      <SQL> `x` LIKE 'abc'
-
----
-
-    Code
       test_translate_sql(str_like(x, "abc", ignore_case = FALSE))
     Condition
       Warning:
@@ -65,9 +58,6 @@
       i Use `str_ilike()` for case insensitive string matching.
     Output
       <SQL> `x` LIKE 'abc'
-
----
-
     Code
       test_translate_sql(str_like(x, "abc", ignore_case = TRUE))
     Condition
@@ -78,9 +68,6 @@
       Error in `str_like()`:
       ! Backend does not support case insensitive `str_like()`.
       i Use `tolower()` on both arguments to achieve a case insensitive match.
-
----
-
     Code
       test_translate_sql(str_ilike(x, "abc"))
     Condition
