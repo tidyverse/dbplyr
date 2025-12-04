@@ -50,12 +50,29 @@
 # can only translate case sensitive str_like
 
     Code
+      test_translate_sql(str_like(x, "abc", ignore_case = FALSE))
+    Condition
+      Warning:
+      The `ignore_case` argument of `str_like()` is deprecated as of dbplyr 2.6.0.
+      i `str_like()` is always case sensitive.
+      i Use `str_ilike()` for case insensitive string matching.
+    Output
+      <SQL> `x` LIKE 'abc'
+    Code
       test_translate_sql(str_like(x, "abc", ignore_case = TRUE))
     Condition
+      Warning:
+      The `ignore_case` argument of `str_like()` is deprecated as of dbplyr 2.6.0.
+      i `str_like()` is always case sensitive.
+      i Use `str_ilike()` for case insensitive string matching.
       Error in `str_like()`:
       ! Backend does not support case insensitive `str_like()`.
-      i Set `ignore_case = FALSE` for case sensitive match.
       i Use `tolower()` on both arguments to achieve a case insensitive match.
+    Code
+      test_translate_sql(str_ilike(x, "abc"))
+    Condition
+      Error in `str_ilike()`:
+      ! `str_ilike()` is not available in this SQL variant.
 
 # default raw escapes translated correctly
 

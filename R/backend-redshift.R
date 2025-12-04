@@ -52,6 +52,10 @@ sql_translation.RedshiftConnection <- function(con) {
       paste0 = sql_paste_redshift(""),
       str_c = sql_paste_redshift(""),
 
+      str_ilike = function(string, pattern) {
+        sql_expr(!!string %ILIKE% !!pattern)
+      },
+
       # https://docs.aws.amazon.com/redshift/latest/dg/r_SUBSTRING.html
       substr = sql_substr("SUBSTRING"),
       substring = sql_substr("SUBSTRING"),

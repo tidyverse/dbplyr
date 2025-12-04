@@ -285,11 +285,12 @@ base_scalar <- sql_translator(
   str_c = sql_paste(""),
   str_sub = sql_str_sub("SUBSTR"),
   # https://docs.getdbt.com/sql-reference/like is typically case sensitive (#1490)
-  str_like = function(string, pattern, ignore_case = FALSE) {
-    if (isTRUE(ignore_case)) {
+  str_like = function(string, pattern, ignore_case = deprecated()) {
+    ignore_case <- deprecate_ignore_case(ignore_case)
+
+    if (ignore_case) {
       cli_abort(c(
         "Backend does not support case insensitive {.fn str_like}.",
-        i = "Set {.code ignore_case = FALSE} for case sensitive match.",
         i = "Use {.fn tolower} on both arguments to achieve a case insensitive match."
       ))
     } else {
@@ -297,6 +298,7 @@ base_scalar <- sql_translator(
     }
   },
 
+  str_ilike = sql_not_supported("str_ilike"),
   str_conv = sql_not_supported("str_conv"),
   str_count = sql_not_supported("str_count"),
 

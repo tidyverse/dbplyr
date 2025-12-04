@@ -36,6 +36,17 @@ sql_translation.Snowflake <- function(con) {
         }
         sql_call2("CONCAT_WS", sep, ...)
       },
+      str_like = function(string, pattern, ignore_case = deprecated()) {
+        ignore_case <- deprecate_ignore_case(ignore_case)
+        if (ignore_case) {
+          sql_expr(!!string %ILIKE% !!pattern)
+        } else {
+          sql_expr(!!string %LIKE% !!pattern)
+        }
+      },
+      str_ilike = function(string, pattern) {
+        sql_expr(!!string %ILIKE% !!pattern)
+      },
       str_locate = function(string, pattern) {
         sql_expr(POSITION(!!pattern, !!string))
       },
