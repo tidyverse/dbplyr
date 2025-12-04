@@ -288,25 +288,26 @@ base_scalar <- sql_translator(
   str_like = function(string, pattern, ignore_case = deprecated()) {
 
     if (lifecycle::is_present(ignore_case)) {
-      lifecycle::deprecate_warn(
-        when = "2.6.0",
-        what = "str_like(ignore_case)",
-        details = c(
-          "`str_like()` is always case sensitive.",
-          "Use `str_ilike()` for case insensitive string matching."
+      if (isFALSE(ignore_case)) {
+        lifecycle::deprecate_warn(
+          when = "2.6.0",
+          what = "str_like(ignore_case)",
+          details = c(
+            "`str_like()` is always case sensitive.",
+            "Use `str_ilike()` for case insensitive string matching."
+          )
         )
-      )
+      } else {
+        cli_abort(c(
+          "Backend does not support case insensitive {.fn str_like}.",
+          i = "Set {.code ignore_case = FALSE} for case sensitive match.",
+          i = "Use {.fn tolower} on both arguments to achieve a case insensitive match."
+        ))
+      }
     }
 
-    if (isTRUE(ignore_case)) {
-      cli_abort(c(
-        "Backend does not support case insensitive {.fn str_like}.",
-        i = "Set {.code ignore_case = FALSE} for case sensitive match.",
-        i = "Use {.fn tolower} on both arguments to achieve a case insensitive match."
-      ))
-    } else {
-      sql_expr(!!string %LIKE% !!pattern)
-    }
+    sql_expr(!!string %LIKE% !!pattern)
+
   },
 
   str_ilike = sql_not_supported("str_ilike"),

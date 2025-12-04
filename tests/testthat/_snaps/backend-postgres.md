@@ -1,3 +1,34 @@
+# custom stringr functions translated correctly
+
+    Code
+      test_translate_sql(str_like(x, "abc"))
+    Output
+      <SQL> `x` LIKE 'abc'
+
+---
+
+    Code
+      test_translate_sql(str_like(x, "abc", ignore_case = TRUE))
+    Condition
+      Warning:
+      The `ignore_case` argument of `str_like()` is deprecated as of dbplyr 2.6.0.
+      i `str_like()` is always case sensitive.
+      i Use `str_ilike()` for case insensitive string matching.
+    Output
+      <SQL> `x` ILIKE 'abc'
+
+---
+
+    Code
+      test_translate_sql(str_like(x, "abc", ignore_case = FALSE))
+    Condition
+      Warning:
+      The `ignore_case` argument of `str_like()` is deprecated as of dbplyr 2.6.0.
+      i `str_like()` is always case sensitive.
+      i Use `str_ilike()` for case insensitive string matching.
+    Output
+      <SQL> `x` LIKE 'abc'
+
 # pasting translated correctly
 
     Code
@@ -144,41 +175,4 @@
       DO UPDATE
       SET `a` = `excluded`.`a`, `b` = `excluded`.`b`
       RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
-
-# can explain
-
-    Code
-      explain(mutate(db, y = x + 1))
-    Output
-      <SQL>
-      SELECT "test".*, "x" + 1.0 AS "y"
-      FROM "test"
-      
-      <PLAN>
-                                                 QUERY PLAN
-      1 Seq Scan on test  (cost=0.00..1.04 rows=3 width=36)
-
-# can insert with returning
-
-    Code
-      rows_insert(x, y, by = c("a", "b"), in_place = TRUE, conflict = "ignore",
-      returning = everything(), method = "on_conflict")
-    Condition
-      Error in `rows_insert()`:
-      ! Can't modify database table "df_x".
-      i Using SQL: INSERT INTO "df_x" ("a", "b", "c", "d") SELECT * FROM ( SELECT "a", "b", "c" + 1.0 AS "c", "d" FROM "df_y" ) AS "...y" ON CONFLICT ("a", "b") DO NOTHING RETURNING "df_x"."a", "df_x"."b", "df_x"."c", "df_x"."d"
-      Caused by error:
-      ! dummy DBI error
-
-# can upsert with returning
-
-    Code
-      rows_upsert(x, y, by = c("a", "b"), in_place = TRUE, returning = everything(),
-      method = "on_conflict")
-    Condition
-      Error in `rows_upsert()`:
-      ! Can't modify database table "df_x".
-      i Using SQL: INSERT INTO "df_x" ("a", "b", "c", "d") SELECT "a", "b", "c", "d" FROM ( SELECT "a", "b", "c" + 1.0 AS "c", "d" FROM "df_y" ) AS "...y" WHERE true ON CONFLICT ("a", "b") DO UPDATE SET "c" = "excluded"."c", "d" = "excluded"."d" RETURNING "df_x"."a", "df_x"."b", "df_x"."c", "df_x"."d"
-      Caused by error:
-      ! dummy DBI error
 
