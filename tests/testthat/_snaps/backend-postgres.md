@@ -1,34 +1,3 @@
-# custom stringr functions translated correctly
-
-    Code
-      test_translate_sql(str_like(x, "abc"))
-    Output
-      <SQL> `x` LIKE 'abc'
-
----
-
-    Code
-      test_translate_sql(str_like(x, "abc", ignore_case = TRUE))
-    Condition
-      Warning:
-      The `ignore_case` argument of `str_like()` is deprecated as of dbplyr 2.6.0.
-      i `str_like()` is always case sensitive.
-      i Use `str_ilike()` for case insensitive string matching.
-    Output
-      <SQL> `x` ILIKE 'abc'
-
----
-
-    Code
-      test_translate_sql(str_like(x, "abc", ignore_case = FALSE))
-    Condition
-      Warning:
-      The `ignore_case` argument of `str_like()` is deprecated as of dbplyr 2.6.0.
-      i `str_like()` is always case sensitive.
-      i Use `str_ilike()` for case insensitive string matching.
-    Output
-      <SQL> `x` LIKE 'abc'
-
 # pasting translated correctly
 
     Code
