@@ -2,6 +2,12 @@
 
 ## dbplyr (development version)
 
+- Corrected error message for
+  [`quantile()`](https://rdrr.io/r/stats/quantile.html) and
+  [`median()`](https://rdrr.io/r/stats/median.html) in
+  [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html) on
+  Redshift ([@edward-burn](https://github.com/edward-burn),
+  [\#1571](https://github.com/tidyverse/dbplyr/issues/1571)).
 - All set operations now error if you pass extra arguments (instead of
   silently ignoring then)
   ([\#1585](https://github.com/tidyverse/dbplyr/issues/1585)).

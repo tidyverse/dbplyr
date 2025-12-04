@@ -57,7 +57,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li>All set operations now error if you pass extra arguments (instead of silently ignoring then) (<a href="https://github.com/tidyverse/dbplyr/issues/1585" class="external-link">#1585</a>).</li>
+<ul><li>Corrected error message for <code><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile()</a></code> and <code><a href="https://rdrr.io/r/stats/median.html" class="external-link">median()</a></code> in <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code> on Redshift (<a href="https://github.com/edward-burn" class="external-link">@edward-burn</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1571" class="external-link">#1571</a>).</li>
+<li>All set operations now error if you pass extra arguments (instead of silently ignoring then) (<a href="https://github.com/tidyverse/dbplyr/issues/1585" class="external-link">#1585</a>).</li>
 <li>
 <code>str_flatten()</code> (<a href="https://github.com/tidyverse/dbplyr/issues/1540" class="external-link">#1540</a>) and <code><a href="https://dplyr.tidyverse.org/reference/n_distinct.html" class="external-link">n_distinct()</a></code> (<a href="https://github.com/tidyverse/dbplyr/issues/1579" class="external-link">#1579</a>) now have an <code>na.rm</code> argument, which regularly warns when it’s not <code>TRUE</code>.</li>
 <li>
