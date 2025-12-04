@@ -2,6 +2,13 @@
 
 ## dbplyr (development version)
 
+- New translations for stringr function `str_ilike()` for Postgres,
+  Redshift, and Snowflake
+  ([@edward-burn](https://github.com/edward-burn),
+  [\#1628](https://github.com/tidyverse/dbplyr/issues/1628)).
+- Argument `ignore_case` for `str_like()` has been deprecated
+  ([@edward-burn](https://github.com/edward-burn),
+  [\#1630](https://github.com/tidyverse/dbplyr/issues/1630)).
 - Corrected error message for
   [`quantile()`](https://rdrr.io/r/stats/quantile.html) and
   [`median()`](https://rdrr.io/r/stats/median.html) in
