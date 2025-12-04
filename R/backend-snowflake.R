@@ -37,22 +37,12 @@ sql_translation.Snowflake <- function(con) {
         sql_call2("CONCAT_WS", sep, ...)
       },
       str_like = function(string, pattern, ignore_case = deprecated()) {
-
-        if (lifecycle::is_present(ignore_case)) {
-          lifecycle::deprecate_warn(
-            when = "2.6.0",
-            what = "str_like(ignore_case)",
-            details = c(
-              "`str_like()` is always case sensitive.",
-              "Use `str_ilike()` for case insensitive string matching."
-            )
-          )
-          check_bool(ignore_case)
-          if (ignore_case) {
-            return(sql_expr(!!string %ILIKE% !!pattern))
-          }
+        ignore_case <- deprecate_ignore_case(ignore_case)
+        if (ignore_case) {
+          sql_expr(!!string %ILIKE% !!pattern)
+        } else {
+          sql_expr(!!string %LIKE% !!pattern)
         }
-        sql_expr(!!string %LIKE% !!pattern)
       },
       str_ilike = function(string, pattern) {
         sql_expr(!!string %ILIKE% !!pattern)

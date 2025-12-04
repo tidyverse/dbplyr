@@ -249,3 +249,22 @@ check_collapse <- function(collapse) {
 }
 
 utils::globalVariables(c("ltrim", "rtrim"))
+
+
+deprecate_ignore_case <- function(ignore_case, frame = caller_env()) {
+  if (lifecycle::is_present(ignore_case)) {
+    lifecycle::deprecate_warn(
+      when = "2.6.0",
+      what = "str_like(ignore_case)",
+      details = c(
+        "`str_like()` is always case sensitive.",
+        "Use `str_ilike()` for case insensitive string matching."
+      ),
+      env = frame
+    )
+    check_bool(ignore_case, call = frame)
+    ignore_case
+  } else {
+    FALSE
+  }
+}

@@ -47,11 +47,9 @@ test_that("custom stringr functions translated correctly", {
 
   expect_equal(test_translate_sql(str_c(x, y)), sql("CONCAT_WS('', `x`, `y`)"))
   expect_equal(test_translate_sql(str_detect(x, y)), sql("`x` REGEXP `y`"))
-  expect_equal(test_translate_sql(str_like(x, y)), sql("`x` LIKE `y`"))
-  expect_equal(
-    test_translate_sql(str_like(x, y, FALSE)),
-    sql("`x` LIKE BINARY `y`")
-  )
+  expect_equal(test_translate_sql(str_like(x, y)), sql("`x` LIKE BINARY `y`"))
+  expect_equal(test_translate_sql(str_ilike(x, y)), sql("`x` LIKE `y`"))
+
   expect_equal(
     test_translate_sql(str_locate(x, y)),
     sql("REGEXP_INSTR(`x`, `y`)")
