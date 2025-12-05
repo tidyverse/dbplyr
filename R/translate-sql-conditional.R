@@ -108,24 +108,16 @@ sql_if <- function(cond, if_true, if_false = quo(NULL), missing = quo(NULL)) {
   # CASE
   #   WHEN <cond> THEN `if_true`
   #   WHEN NOT <cond> THEN `if_false`
-  #   WHEN <cond> IS NULL THEN `missing`
+  #   ELSE `missing`
   # END
-  #
-  # Together these cases cover every possible case. So, if `if_false` and
-  # `missing` are identical they can be simplified to `ELSE <if_false>`
-  if (!quo_is_null(if_false) && identical(if_false, missing)) {
-    out <- glue_sql2(con, out, " ELSE {.val enpared_if_false} END")
-    return(out)
-  }
 
-  if (!quo_is_null(if_false)) {
+  if (!quo_is_null(if_false) && !identical(if_false, missing)) {
     false_sql <- " WHEN NOT {.val enpared_cond} THEN {.val enpared_if_false}"
     out <- paste0(out, false_sql)
   }
 
   if (!quo_is_null(missing)) {
-    missing_cond <- translate_sql(is.na(!!cond), con = con)
-    missing_sql <- " WHEN {.val missing_cond} THEN {.val enpared_missing}"
+    missing_sql <- " ELSE {.val enpared_missing}"
     out <- paste0(out, missing_sql)
   }
 

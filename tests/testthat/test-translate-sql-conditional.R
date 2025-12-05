@@ -91,14 +91,6 @@ test_that("all forms of if translated to case statement", {
   expect_equal(test_translate_sql(if_else(x, 1L, 2L)), expected)
 })
 
-test_that("if_else can be simplified", {
-  local_con(simulate_dbi())
-  expect_equal(
-    test_translate_sql(if_else(x, 1L, 2L, 2L)),
-    sql("CASE WHEN `x` THEN 1 ELSE 2 END")
-  )
-})
-
 test_that("if translation adds parens", {
   local_con(simulate_dbi())
   expect_equal(
@@ -124,26 +116,32 @@ test_that("if translation adds parens", {
   )
 })
 
+test_that("if_else can translate missing", {
+  local_con(simulate_dbi())
+  expect_equal(
+    test_translate_sql(if_else(x, 1L, 2L, 3L)),
+    sql("CASE WHEN `x` THEN 1 WHEN NOT `x` THEN 2 ELSE 3 END")
+  )
+})
+
+test_that("if_else is simplified if missing and false are the same", {
+  local_con(simulate_dbi())
+  expect_equal(
+    test_translate_sql(if_else(x, 1L, 2L, 2L)),
+    sql("CASE WHEN `x` THEN 1 ELSE 2 END")
+  )
+})
+
 test_that("if and ifelse use correctly named arguments", {
   local_con(simulate_dbi())
-  exp <- test_translate_sql(if (x) 1 else 2)
 
-  expect_equal(test_translate_sql(ifelse(test = x, yes = 1, no = 2)), exp)
   expect_equal(
-    test_translate_sql(if_else(condition = x, true = 1, false = 2)),
-    exp
+    names(formals(base_scalar$ifelse)),
+    c("test", "yes", "no")
   )
-
   expect_equal(
-    test_translate_sql(if_else(
-      condition = x,
-      true = 1,
-      false = 2,
-      missing = 3
-    )),
-    sql(
-      "CASE WHEN `x` THEN 1.0 WHEN NOT `x` THEN 2.0 WHEN (`x` IS NULL) THEN 3.0 END"
-    )
+    names(formals(base_scalar$if_else)),
+    c("condition", "true", "false", "missing")
   )
 })
 

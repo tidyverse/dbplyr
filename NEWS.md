@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* `if_else()` uses simpler translation for `missing` (#1573).
 * New translations for stringr function `str_ilike()` for Postgres, Redshift, and Snowflake (@edward-burn, #1628).
 * Argument `ignore_case` for `str_like()` has been deprecated (@edward-burn, #1630).
 * Corrected error message for `quantile()` and `median()` in `mutate()` on Redshift (@edward-burn, #1571).

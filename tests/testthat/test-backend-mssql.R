@@ -29,7 +29,7 @@ test_that("custom scalar translated correctly", {
   expect_equal(
     test_translate_sql(if_else(x, "true", "false", "missing")),
     sql(
-      "CASE WHEN `x` THEN 'true' WHEN NOT `x` THEN 'false' WHEN (`x` IS NULL) THEN 'missing' END"
+      "CASE WHEN `x` THEN 'true' WHEN NOT `x` THEN 'false' ELSE 'missing' END"
     )
   )
   expect_equal(
