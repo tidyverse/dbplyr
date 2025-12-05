@@ -2,6 +2,9 @@
 
 ## dbplyr (development version)
 
+- [`if_else()`](https://dplyr.tidyverse.org/reference/if_else.html) uses
+  simpler translation for `missing`
+  ([\#1573](https://github.com/tidyverse/dbplyr/issues/1573)).
 - New translations for stringr function `str_ilike()` for Postgres,
   Redshift, and Snowflake
   ([@edward-burn](https://github.com/edward-burn),
