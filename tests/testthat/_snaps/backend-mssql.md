@@ -113,7 +113,7 @@
       mutate(mf, z = ifelse(x == 1L, 1L, 2L))
     Output
       <SQL>
-      SELECT `df`.*, IIF(`x` = 1, 1, 2) AS `z`
+      SELECT `df`.*, CASE WHEN (`x` = 1) THEN 1 WHEN NOT (`x` = 1) THEN 2 END AS `z`
       FROM `df`
 
 ---
