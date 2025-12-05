@@ -1,14 +1,14 @@
 # custom aggregators translated correctly
 
     Code
-      test_translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE)
+      translate_sql(quantile(x, 0.5, na.rm = TRUE), con = con, window = FALSE)
     Condition
       Error in `quantile()`:
       ! Translation of `quantile()` in `summarise()` is not supported for SQL Server.
       i Use a combination of `distinct()` and `mutate()` for the same result:
         `mutate(<col> = quantile(x, 0.5, na.rm = TRUE)) |> distinct(<col>)`
     Code
-      test_translate_sql(median(x, na.rm = TRUE), window = FALSE)
+      translate_sql(median(x, na.rm = TRUE), con = con, window = FALSE)
     Condition
       Error in `median()`:
       ! Translation of `median()` in `summarise()` is not supported for SQL Server.
@@ -18,7 +18,7 @@
 # custom window functions translated correctly
 
     Code
-      test_translate_sql(n_distinct(x), vars_group = "x")
+      translate_sql(n_distinct(x), con = con, vars_group = "x")
     Condition
       Error in `n_distinct()`:
       ! No translation available in `mutate()`/`filter()` for SQL server.
@@ -26,7 +26,7 @@
 # custom lubridate functions translated correctly
 
     Code
-      test_translate_sql(month(x, label = TRUE, abbr = TRUE))
+      translate_sql(month(x, label = TRUE, abbr = TRUE), con = con)
     Condition
       Error in `month()`:
       ! `abbr = TRUE` isn't supported in SQL Server translation.
@@ -35,7 +35,7 @@
 ---
 
     Code
-      test_translate_sql(quarter(x, fiscal_start = 5))
+      translate_sql(quarter(x, fiscal_start = 5), con = con)
     Condition
       Error in `quarter()`:
       ! `fiscal_start = 5` isn't supported in SQL Server translation.
@@ -44,7 +44,7 @@
 # custom clock functions translated correctly
 
     Code
-      test_translate_sql(date_count_between(date_column_1, date_column_2, "year"))
+      translate_sql(date_count_between(date_column_1, date_column_2, "year"), con = con)
     Condition
       Error in `date_count_between()`:
       ! `precision = "year"` isn't supported on database backends.
@@ -53,7 +53,8 @@
 ---
 
     Code
-      test_translate_sql(date_count_between(date_column_1, date_column_2, "day", n = 5))
+      translate_sql(date_count_between(date_column_1, date_column_2, "day", n = 5),
+      con = con)
     Condition
       Error in `date_count_between()`:
       ! `n = 5` isn't supported on database backends.
@@ -62,7 +63,7 @@
 # difftime is translated correctly
 
     Code
-      test_translate_sql(difftime(start_date, end_date, units = "auto"))
+      translate_sql(difftime(start_date, end_date, units = "auto"), con = con)
     Condition
       Error in `difftime()`:
       ! `units = "auto"` isn't supported on database backends.
@@ -71,7 +72,7 @@
 ---
 
     Code
-      test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days"))
+      translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days"), con = con)
     Condition
       Error in `difftime()`:
       ! Argument `tz` isn't supported on database backends.

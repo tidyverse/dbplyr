@@ -14,6 +14,7 @@
 #'   like `||`.
 #'
 #' @param f The name of the SQL function as a string.
+#' @param con The database connection.
 #' @family SQL translation helpers
 #' @name sql_translation_string
 NULL
@@ -50,13 +51,14 @@ cast_number_whole <- function(x, arg = caller_arg(x), call = caller_env()) {
 sql_str_sub <- function(
   subset_f = "SUBSTR",
   length_f = "LENGTH",
-  optional_length = TRUE
+  optional_length = TRUE,
+  con = sql_current_con()
 ) {
   function(string, start = 1L, end = -1L) {
     start <- cast_number_whole(start)
     end <- cast_number_whole(end)
 
-    start_sql <- start_pos(string, start, length_f)
+    start_sql <- start_pos(string, start, length_f, con = con)
 
     if (optional_length && end == -1L) {
       sql_call2(subset_f, string, start_sql)
@@ -66,23 +68,23 @@ sql_str_sub <- function(
       } else if (start > 0 && end < 0) {
         n <- start - end - 2L
         if (n == 0) {
-          length_sql <- sql_call2(length_f, string)
+          length_sql <- sql_call2(length_f, string, con = con)
         } else {
           length_sql <- sql_expr(!!sql_call2(length_f, string) - !!n)
         }
       } else {
         length_sql <- pmax(end - start + 1L, 0L)
       }
-      sql_call2(subset_f, string, start_sql, length_sql)
+      sql_call2(subset_f, string, start_sql, length_sql, con = con)
     }
   }
 }
 
-start_pos <- function(string, start, length_f) {
+start_pos <- function(string, start, length_f, con = NULL) {
   if (start == -1) {
-    sql_call2(length_f, string)
+    sql_call2(length_f, string, con = con)
   } else if (start < 0) {
-    sql_expr(!!sql_call2(length_f, string) - !!abs(start + 1L))
+    sql_expr(!!sql_call2(length_f, string) - !!abs(start + 1L), con = con)
   } else {
     start
   }
@@ -214,7 +216,7 @@ sql_paste <- function(default_sep, f = "CONCAT_WS") {
 #' @rdname sql_translation_string
 #' @param op The SQL operator to use for infix paste operations.
 #' @param cast A function to cast values to strings.
-sql_paste_infix <- function(default_sep, op, cast) {
+sql_paste_infix <- function(default_sep, op, cast, con = sql_current_con()) {
   force(default_sep)
   op <- as.symbol(paste0("%", op, "%"))
   force(cast)
@@ -228,9 +230,11 @@ sql_paste_infix <- function(default_sep, op, cast) {
     }
 
     if (sep == "") {
-      infix <- function(x, y) sql_call2(op, x, y)
+      infix <- function(x, y) sql_call2(op, x, y, con = con)
     } else {
-      infix <- function(x, y) sql_call2(op, sql_call2(op, x, sep), y)
+      infix <- function(x, y) {
+        sql_call2(op, sql_call2(op, x, sep, con = con), y, con = con)
+      }
     }
 
     purrr::reduce(args, infix)

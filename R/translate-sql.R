@@ -83,24 +83,6 @@ translate_sql <- function(
   )
 }
 
-test_translate_sql <- function(
-  ...,
-  con = NULL,
-  vars_group = NULL,
-  vars_order = NULL,
-  vars_frame = NULL,
-  window = TRUE
-) {
-  translate_sql(
-    ...,
-    con = con %||% sql_current_con(),
-    vars_group = vars_group,
-    vars_order = vars_order,
-    vars_frame = vars_frame,
-    window = window
-  )
-}
-
 #' @export
 #' @rdname translate_sql
 translate_sql_ <- function(

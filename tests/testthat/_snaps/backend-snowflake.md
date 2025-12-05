@@ -1,7 +1,7 @@
 # pasting translated correctly
 
     Code
-      test_translate_sql(paste0(x, collapse = ""))
+      translate_sql(paste0(x, collapse = ""), con = con)
     Condition
       Error in `check_collapse()`:
       ! `collapse` not supported in DB translation of `paste()`.
@@ -10,14 +10,14 @@
 # pmin() and pmax() respect na.rm
 
     Code
-      test_translate_sql(pmin(x, y, z, na.rm = TRUE))
+      translate_sql(pmin(x, y, z, na.rm = TRUE), con = con)
     Output
       <SQL> COALESCE(IFF(COALESCE(IFF(`x` <= `y`, `x`, `y`), `x`, `y`) <= `z`, COALESCE(IFF(`x` <= `y`, `x`, `y`), `x`, `y`), `z`), COALESCE(IFF(`x` <= `y`, `x`, `y`), `x`, `y`), `z`)
 
 ---
 
     Code
-      test_translate_sql(pmax(x, y, z, na.rm = TRUE))
+      translate_sql(pmax(x, y, z, na.rm = TRUE), con = con)
     Output
       <SQL> COALESCE(IFF(COALESCE(IFF(`x` >= `y`, `x`, `y`), `x`, `y`) >= `z`, COALESCE(IFF(`x` >= `y`, `x`, `y`), `x`, `y`), `z`), COALESCE(IFF(`x` >= `y`, `x`, `y`), `x`, `y`), `z`)
 
