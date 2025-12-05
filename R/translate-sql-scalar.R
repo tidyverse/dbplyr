@@ -15,6 +15,7 @@
 #'   numbers.
 #'
 #' @param f The name of the SQL function as a string.
+#' @param con The database connection.
 #' @family SQL translation helpers
 #' @name sql_translation_scalar
 NULL
@@ -22,7 +23,7 @@ NULL
 #' @rdname sql_translation_scalar
 #' @param pad If `TRUE`, the default, pad the infix operator with spaces.
 #' @export
-sql_infix <- function(f, pad = TRUE) {
+sql_infix <- function(f, pad = TRUE, con = sql_current_con()) {
   # Unquoting involving infix operators easily create abstract syntax trees
   # without parentheses where they are needed for printing and translation.
   # For example `expr(!!expr(2 - 1) * x))`
@@ -53,7 +54,7 @@ sql_infix <- function(f, pad = TRUE) {
         sql <- "{.val x}{f}{.val y}"
       }
     }
-    glue_sql2(sql_current_con(), sql)
+    glue_sql2(con, sql)
   }
 }
 

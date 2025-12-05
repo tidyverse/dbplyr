@@ -1,14 +1,14 @@
 test_that("aggregation functions warn once if na.rm = FALSE", {
-  skip_on_cran()
+  con <- simulate_dbi()
   reset_warning_verbosity("dbplyr_check_na_rm")
   local_mocked_bindings(is_testing = function() FALSE)
 
-  local_con(simulate_dbi())
-  sql_mean <- sql_aggregate("MEAN")
-
-  expect_warning(sql_mean("x", na.rm = TRUE), NA)
-  expect_warning(sql_mean("x"), "Missing values")
-  expect_warning(sql_mean("x"), NA)
+  expect_no_warning(translate_sql(mean(x, na.rm = TRUE), con = con))
+  expect_warning(
+    translate_sql(mean(x, na.rm = FALSE), con = con),
+    "Missing values"
+  )
+  expect_no_warning(translate_sql(mean(x, na.rm = FALSE), con = con))
 })
 
 test_that("warns informatively with unsupported function", {
@@ -16,17 +16,27 @@ test_that("warns informatively with unsupported function", {
 })
 
 test_that("quantile and median don't change without warning", {
-  local_con(simulate_dbi())
-  expect_snapshot(test_translate_sql(
+  con <- simulate_dbi()
+  expect_snapshot(translate_sql(
     quantile(x, 0.75, na.rm = TRUE),
+    con = con,
     window = FALSE
   ))
-  expect_snapshot(test_translate_sql(
+  expect_snapshot(translate_sql(
     quantile(x, 0.75, na.rm = TRUE),
+    con = con,
     vars_group = "g"
   ))
-  expect_snapshot(test_translate_sql(median(x, na.rm = TRUE), window = FALSE))
-  expect_snapshot(test_translate_sql(median(x, na.rm = TRUE), vars_group = "g"))
+  expect_snapshot(translate_sql(
+    median(x, na.rm = TRUE),
+    con = con,
+    window = FALSE
+  ))
+  expect_snapshot(translate_sql(
+    median(x, na.rm = TRUE),
+    con = con,
+    vars_group = "g"
+  ))
 })
 
 test_that("checks for invalid probs", {

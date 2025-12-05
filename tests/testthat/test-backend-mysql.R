@@ -1,31 +1,31 @@
 # function translation ----------------------------------------------------
 
 test_that("custom scalar translated correctly", {
-  local_con(simulate_mysql())
-  expect_equal(test_translate_sql(as.logical(1L)), sql("IF(1, TRUE, FALSE)"))
+  con <- simulate_mysql()
+  expect_translation(con, as.logical(1L), "IF(1, TRUE, FALSE)")
 
-  expect_equal(
-    test_translate_sql(str_locate("abc", "b")),
-    sql("REGEXP_INSTR('abc', 'b')")
-  )
-  expect_equal(
-    test_translate_sql(str_replace_all("abc", "b", "d")),
-    sql("REGEXP_REPLACE('abc', 'b', 'd')")
+  expect_translation(con, str_locate("abc", "b"), "REGEXP_INSTR('abc', 'b')")
+  expect_translation(
+    con,
+    str_replace_all("abc", "b", "d"),
+    "REGEXP_REPLACE('abc', 'b', 'd')"
   )
 })
 
 test_that("custom aggregators translated correctly", {
-  local_con(simulate_mysql())
+  con <- simulate_mysql()
 
-  expect_equal(
-    test_translate_sql(str_flatten(y, ","), window = FALSE),
-    sql("GROUP_CONCAT(`y` SEPARATOR ',')")
+  expect_translation(
+    con,
+    str_flatten(y, ","),
+    "GROUP_CONCAT(`y` SEPARATOR ',')",
+    window = FALSE
   )
 })
 
 test_that("use CHAR type for as.character", {
-  local_con(simulate_mysql())
-  expect_equal(test_translate_sql(as.character(x)), sql("CAST(`x` AS CHAR)"))
+  con <- simulate_mysql()
+  expect_translation(con, as.character(x), "CAST(`x` AS CHAR)")
 })
 
 test_that("custom date escaping works as expected", {
@@ -43,20 +43,18 @@ test_that("custom date escaping works as expected", {
 
 
 test_that("custom stringr functions translated correctly", {
-  local_con(simulate_mysql())
+  con <- simulate_mysql()
 
-  expect_equal(test_translate_sql(str_c(x, y)), sql("CONCAT_WS('', `x`, `y`)"))
-  expect_equal(test_translate_sql(str_detect(x, y)), sql("`x` REGEXP `y`"))
-  expect_equal(test_translate_sql(str_like(x, y)), sql("`x` LIKE BINARY `y`"))
-  expect_equal(test_translate_sql(str_ilike(x, y)), sql("`x` LIKE `y`"))
+  expect_translation(con, str_c(x, y), "CONCAT_WS('', `x`, `y`)")
+  expect_translation(con, str_detect(x, y), "`x` REGEXP `y`")
+  expect_translation(con, str_like(x, y), "`x` LIKE BINARY `y`")
+  expect_translation(con, str_ilike(x, y), "`x` LIKE `y`")
 
-  expect_equal(
-    test_translate_sql(str_locate(x, y)),
-    sql("REGEXP_INSTR(`x`, `y`)")
-  )
-  expect_equal(
-    test_translate_sql(str_replace_all(x, y, z)),
-    sql("REGEXP_REPLACE(`x`, `y`, `z`)")
+  expect_translation(con, str_locate(x, y), "REGEXP_INSTR(`x`, `y`)")
+  expect_translation(
+    con,
+    str_replace_all(x, y, z),
+    "REGEXP_REPLACE(`x`, `y`, `z`)"
   )
 })
 

@@ -38,7 +38,7 @@
 # custom clock functions translated correctly
 
     Code
-      test_translate_sql(date_count_between(date_column_1, date_column_2, "year"))
+      translate_sql(date_count_between(date_column_1, date_column_2, "year"), con = con)
     Condition
       Error in `date_count_between()`:
       ! `precision = "year"` isn't supported on database backends.
@@ -47,7 +47,8 @@
 ---
 
     Code
-      test_translate_sql(date_count_between(date_column_1, date_column_2, "day", n = 5))
+      translate_sql(date_count_between(date_column_1, date_column_2, "day", n = 5),
+      con = con)
     Condition
       Error in `date_count_between()`:
       ! `n = 5` isn't supported on database backends.
@@ -56,7 +57,7 @@
 # difftime is translated correctly
 
     Code
-      test_translate_sql(difftime(start_date, end_date, units = "auto"))
+      translate_sql(difftime(start_date, end_date, units = "auto"), con = con)
     Condition
       Error in `difftime()`:
       ! `units = "auto"` isn't supported on database backends.
@@ -65,7 +66,7 @@
 ---
 
     Code
-      test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days"))
+      translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days"), con = con)
     Condition
       Error in `difftime()`:
       ! Argument `tz` isn't supported on database backends.

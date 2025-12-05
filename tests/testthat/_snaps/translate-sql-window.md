@@ -1,7 +1,7 @@
 # frame is checked
 
     Code
-      test_translate_sql(sum(x, na.rm = TRUE), vars_frame = c(1, 0))
+      translate_sql(sum(x, na.rm = TRUE), con = con, vars_frame = c(1, 0))
     Condition
       Warning:
       Windowed expression `SUM(`x`)` does not have explicit order.
@@ -12,7 +12,7 @@
 # win_rank(c()) gives an informative error
 
     Code
-      test_translate_sql(row_number(c(x)))
+      translate_sql(row_number(c(x)), con = con)
     Condition
       Error in `row_number()`:
       ! Can't use `c()` in `ROW_NUMBER()`

@@ -1,35 +1,35 @@
 # custom string translations
 
     Code
-      test_translate_sql(paste0("a", "b"))
+      translate_sql(paste0("a", "b"), con = con)
     Output
       <SQL> 'a' || 'b'
 
 ---
 
     Code
-      test_translate_sql(paste("a", "b"))
+      translate_sql(paste("a", "b"), con = con)
     Output
       <SQL> 'a' || ' ' || 'b'
 
 ---
 
     Code
-      test_translate_sql(substr(x, 2, 4))
+      translate_sql(substr(x, 2, 4), con = con)
     Output
       <SQL> SUBSTRING(`x`, 2, 3)
 
 ---
 
     Code
-      test_translate_sql(substring(x, 2, 4))
+      translate_sql(substring(x, 2, 4), con = con)
     Output
       <SQL> SUBSTRING(`x`, 2, 3)
 
 ---
 
     Code
-      test_translate_sql(str_sub(x, 2, -2))
+      translate_sql(str_sub(x, 2, -2), con = con)
     Output
       <SQL> SUBSTRING(`x`, 2, LENGTH(`x`) - 2)
 

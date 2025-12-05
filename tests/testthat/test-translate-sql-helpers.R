@@ -1,5 +1,5 @@
 test_that("missing window functions create a warning", {
-  local_con(simulate_dbi())
+  con <- simulate_dbi()
   sim_scalar <- sql_translator()
   sim_agg <- sql_translator(`+` = sql_infix("+"))
   sim_win <- sql_translator()
@@ -17,7 +17,6 @@ test_that("duplicates throw an error", {
 })
 
 test_that("missing aggregate functions filled in", {
-  local_con(simulate_dbi())
   sim_scalar <- sql_translator()
   sim_agg <- sql_translator()
   sim_win <- sql_translator(mean = \() {})

@@ -1,7 +1,7 @@
 # basic arithmetic is correct
 
     Code
-      test_translate_sql(100L %/% 3L)
+      translate_sql(100L %/% 3L, con = con)
     Condition
       Error in `100L %/% 3L`:
       ! `%/%()` is not available in this SQL variant.
@@ -9,12 +9,15 @@
 # can translate subsetting
 
     Code
-      test_translate_sql(a[[x]])
+      translate_sql(a[[x]], con = con)
     Condition
       Error in `a[[x]]`:
       ! Can only index with strings and numbers
+
+---
+
     Code
-      test_translate_sql(a[[TRUE]])
+      translate_sql(a[[TRUE]], con = con)
     Condition
       Error in `a[[TRUE]]`:
       ! Can only index with strings and numbers
@@ -50,7 +53,7 @@
 # can only translate case sensitive str_like
 
     Code
-      test_translate_sql(str_like(x, "abc", ignore_case = FALSE))
+      translate_sql(str_like(x, "abc", ignore_case = FALSE), con = con)
     Condition
       Warning:
       The `ignore_case` argument of `str_like()` is deprecated as of dbplyr 2.6.0.
@@ -58,8 +61,11 @@
       i Use `str_ilike()` for case insensitive string matching.
     Output
       <SQL> `x` LIKE 'abc'
+
+---
+
     Code
-      test_translate_sql(str_like(x, "abc", ignore_case = TRUE))
+      translate_sql(str_like(x, "abc", ignore_case = TRUE), con = con)
     Condition
       Warning:
       The `ignore_case` argument of `str_like()` is deprecated as of dbplyr 2.6.0.
@@ -68,8 +74,11 @@
       Error in `str_like()`:
       ! Backend does not support case insensitive `str_like()`.
       i Use `tolower()` on both arguments to achieve a case insensitive match.
+
+---
+
     Code
-      test_translate_sql(str_ilike(x, "abc"))
+      translate_sql(str_ilike(x, "abc"), con = con)
     Condition
       Error in `str_ilike()`:
       ! `str_ilike()` is not available in this SQL variant.

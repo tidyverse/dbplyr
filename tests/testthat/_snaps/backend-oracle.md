@@ -1,11 +1,11 @@
 # string functions translate correctly
 
     Code
-      test_translate_sql(str_replace(col, "pattern", "replacement"))
+      translate_sql(str_replace(col, "pattern", "replacement"), con = con)
     Output
       <SQL> REGEXP_REPLACE(`col`, 'pattern', 'replacement', 1, 1)
     Code
-      test_translate_sql(str_replace_all(col, "pattern", "replacement"))
+      translate_sql(str_replace_all(col, "pattern", "replacement"), con = con)
     Output
       <SQL> REGEXP_REPLACE(`col`, 'pattern', 'replacement')
 
@@ -140,7 +140,7 @@
 # difftime is translated correctly
 
     Code
-      test_translate_sql(difftime(start_date, end_date, units = "auto"))
+      translate_sql(difftime(start_date, end_date, units = "auto"), con = con)
     Condition
       Error in `difftime()`:
       ! The only supported value for `units` on SQL backends is "days"
@@ -148,7 +148,7 @@
 ---
 
     Code
-      test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days"))
+      translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days"), con = con)
     Condition
       Error in `difftime()`:
       ! The `tz` argument is not supported for SQL backends.

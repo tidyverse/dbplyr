@@ -332,12 +332,6 @@ set_current_con <- function(con) {
   invisible(old)
 }
 
-local_con <- function(con, env = parent.frame()) {
-  old <- set_current_con(con)
-  withr::defer(set_current_con(old), envir = env)
-  invisible()
-}
-
 set_win_current_group <- function(vars) {
   check_character(vars, allow_null = TRUE)
 

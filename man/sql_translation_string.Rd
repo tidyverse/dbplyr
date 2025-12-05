@@ -10,11 +10,16 @@
 \usage{
 sql_substr(f = "SUBSTR")
 
-sql_str_sub(subset_f = "SUBSTR", length_f = "LENGTH", optional_length = TRUE)
+sql_str_sub(
+  subset_f = "SUBSTR",
+  length_f = "LENGTH",
+  optional_length = TRUE,
+  con = sql_current_con()
+)
 
 sql_paste(default_sep, f = "CONCAT_WS")
 
-sql_paste_infix(default_sep, op, cast)
+sql_paste_infix(default_sep, op, cast, con = sql_current_con())
 }
 \arguments{
 \item{f}{The name of the SQL function as a string.}
@@ -25,6 +30,8 @@ sql_paste_infix(default_sep, op, cast)
 
 \item{optional_length}{Whether the length argument is optional in the SQL
 substring function.}
+
+\item{con}{The database connection.}
 
 \item{default_sep}{The default separator for paste operations.}
 
