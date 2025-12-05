@@ -95,7 +95,7 @@ numbers.</p></li>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sql_infix</span><span class="op">(</span><span class="va">f</span>, pad <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sql_infix</span><span class="op">(</span><span class="va">f</span>, pad <span class="op">=</span> <span class="cn">TRUE</span>, con <span class="op">=</span> <span class="fu">sql_current_con</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">sql_prefix</span><span class="op">(</span><span class="va">f</span>, n <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
@@ -120,6 +120,10 @@ numbers.</p></li>
 
 <dt id="arg-pad">pad<a class="anchor" aria-label="anchor" href="#arg-pad"></a></dt>
 <dd><p>If <code>TRUE</code>, the default, pad the infix operator with spaces.</p></dd>
+
+
+<dt id="arg-con">con<a class="anchor" aria-label="anchor" href="#arg-con"></a></dt>
+<dd><p>The database connection.</p></dd>
 
 
 <dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>

@@ -23,7 +23,7 @@ to define how R functions should be translated to SQL.
 ## Usage
 
 ``` r
-sql_infix(f, pad = TRUE)
+sql_infix(f, pad = TRUE, con = sql_current_con())
 
 sql_prefix(f, n = NULL)
 
@@ -47,6 +47,10 @@ sql_runif(rand_expr, n = n(), min = 0, max = 1)
 - pad:
 
   If `TRUE`, the default, pad the infix operator with spaces.
+
+- con:
+
+  The database connection.
 
 - n:
 
