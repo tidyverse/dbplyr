@@ -151,7 +151,7 @@
       explain(mutate(db, y = x + 1))
     Output
       <SQL>
-      SELECT "test".*, "x" + 1.0 AS "y"
+      SELECT *, "x" + 1.0 AS "y"
       FROM "test"
       
       <PLAN>

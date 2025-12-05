@@ -370,7 +370,11 @@ sql_table_prefix <- function(con, var, table = NULL) {
 }
 
 sql_star <- function(con, table = NULL) {
-  sql_qualify_var(con, table, SQL("*"))
+  if (is.null(table)) {
+    sql("*")
+  } else {
+    sql_qualify_var(con, table, SQL("*"))
+  }
 }
 
 sql_qualify_var <- function(con, table, var) {

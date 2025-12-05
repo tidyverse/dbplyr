@@ -82,7 +82,7 @@
       filter(mf, is.na(x))
     Output
       <SQL>
-      SELECT `df`.*
+      SELECT *
       FROM `df`
       WHERE ((`x` IS NULL))
 
@@ -92,7 +92,7 @@
       filter(mf, !is.na(x))
     Output
       <SQL>
-      SELECT `df`.*
+      SELECT *
       FROM `df`
       WHERE (NOT((`x` IS NULL)))
 
@@ -102,7 +102,7 @@
       filter(mf, x == 1L || x == 2L)
     Output
       <SQL>
-      SELECT `df`.*
+      SELECT *
       FROM `df`
       WHERE (`x` = 1 OR `x` = 2)
 
@@ -112,7 +112,7 @@
       mutate(mf, z = ifelse(x == 1L, 1L, 2L))
     Output
       <SQL>
-      SELECT `df`.*, IIF(`x` = 1, 1, 2) AS `z`
+      SELECT *, IIF(`x` = 1, 1, 2) AS `z`
       FROM `df`
 
 ---
@@ -121,7 +121,7 @@
       mutate(mf, z = case_when(x == 1L ~ 1L))
     Output
       <SQL>
-      SELECT `df`.*, CASE WHEN (`x` = 1) THEN 1 END AS `z`
+      SELECT *, CASE WHEN (`x` = 1) THEN 1 END AS `z`
       FROM `df`
 
 ---
@@ -130,7 +130,7 @@
       mutate(mf, z = !is.na(x))
     Output
       <SQL>
-      SELECT `df`.*, ~CAST(IIF((`x` IS NULL), 1, 0) AS BIT) AS `z`
+      SELECT *, ~CAST(IIF((`x` IS NULL), 1, 0) AS BIT) AS `z`
       FROM `df`
 
 ---
@@ -198,7 +198,7 @@
       filter(mf, x == a)
     Output
       <SQL>
-      SELECT `df`.*
+      SELECT *
       FROM `df`
       WHERE (`x` = 0x616263)
 
@@ -208,7 +208,7 @@
       filter(mf, x %in% L)
     Output
       <SQL>
-      SELECT `df`.*
+      SELECT *
       FROM `df`
       WHERE (`x` IN (0x616263, 0x0102))
 
@@ -218,7 +218,7 @@
       qry
     Output
       <SQL>
-      SELECT `df`.*
+      SELECT *
       FROM `df`
       WHERE (`x` IN (0x616263, 0x0102))
 
@@ -228,7 +228,7 @@
       filter(mf, x == TRUE)
     Output
       <SQL>
-      SELECT `df`.*
+      SELECT *
       FROM `df`
       WHERE (`x` = 1)
 
@@ -275,7 +275,7 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY RAND(CHECKSUM(NEWID()))) AS `col01`
+        SELECT *, ROW_NUMBER() OVER (ORDER BY RAND(CHECKSUM(NEWID()))) AS `col01`
         FROM `df`
       ) AS `q01`
       WHERE (`col01` <= 1)
@@ -428,7 +428,7 @@
       filter(mf, x)
     Output
       <SQL>
-      SELECT `df`.*
+      SELECT *
       FROM `df`
       WHERE (cast(`x` AS `BIT`) = 1)
 
@@ -438,7 +438,7 @@
       filter(mf, TRUE)
     Output
       <SQL>
-      SELECT `df`.*
+      SELECT *
       FROM `df`
       WHERE (cast(1 AS `BIT`) = 1)
 
@@ -448,7 +448,7 @@
       filter(mf, (!x) | FALSE)
     Output
       <SQL>
-      SELECT `df`.*
+      SELECT *
       FROM `df`
       WHERE ((NOT(cast(`x` AS `BIT`) = 1)) OR cast(0 AS `BIT`) = 1)
 
@@ -460,7 +460,7 @@
       <SQL>
       SELECT `LHS`.`x` AS `x`
       FROM (
-        SELECT `df`.*
+        SELECT *
         FROM `df`
         WHERE (cast(`x` AS `BIT`) = 1)
       ) AS `LHS`
@@ -473,7 +473,7 @@
       mutate(mf, rown = row_number())
     Output
       <SQL>
-      SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS `rown`
+      SELECT *, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS `rown`
       FROM `df`
 
 ---
@@ -482,9 +482,7 @@
       mutate(group_by(mf, y), rown = row_number())
     Output
       <SQL>
-      SELECT
-        `df`.*,
-        ROW_NUMBER() OVER (PARTITION BY `y` ORDER BY (SELECT NULL)) AS `rown`
+      SELECT *, ROW_NUMBER() OVER (PARTITION BY `y` ORDER BY (SELECT NULL)) AS `rown`
       FROM `df`
 
 ---
@@ -493,7 +491,7 @@
       mutate(arrange(mf, y), rown = row_number())
     Output
       <SQL>
-      SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY `y`) AS `rown`
+      SELECT *, ROW_NUMBER() OVER (ORDER BY `y`) AS `rown`
       FROM `df`
       ORDER BY `y`
 

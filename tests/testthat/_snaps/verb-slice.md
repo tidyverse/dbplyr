@@ -74,7 +74,7 @@
       <SQL>
       SELECT `x`, `id`
       FROM (
-        SELECT `df`.*, RANK() OVER (ORDER BY `x` DESC) AS `col01`
+        SELECT *, RANK() OVER (ORDER BY `x` DESC) AS `col01`
         FROM `df`
       ) AS `q01`
       WHERE (`col01` <= 1)
@@ -84,7 +84,7 @@
       <SQL>
       SELECT `x`, `id`
       FROM (
-        SELECT `df`.*, RANK() OVER (ORDER BY `x` DESC) AS `col01`
+        SELECT *, RANK() OVER (ORDER BY `x` DESC) AS `col01`
         FROM `df`
       ) AS `q01`
       WHERE (`col01` <= 1)
@@ -94,7 +94,7 @@
       <SQL>
       SELECT `x`, `id`
       FROM (
-        SELECT `df`.*, RANK() OVER (ORDER BY `x` * -1 DESC) AS `col01`
+        SELECT *, RANK() OVER (ORDER BY `x` * -1 DESC) AS `col01`
         FROM `df`
       ) AS `q01`
       WHERE (`col01` <= 1)
@@ -189,7 +189,7 @@
       <SQL>
       SELECT `x`, `y`
       FROM (
-        SELECT `df`.*, RANK() OVER (ORDER BY `x`) AS `col01`
+        SELECT *, RANK() OVER (ORDER BY `x`) AS `col01`
         FROM `df`
       ) AS `q01`
       WHERE (`col01` <= 1)
@@ -199,7 +199,7 @@
       <SQL>
       SELECT `x`, `y`
       FROM (
-        SELECT `df`.*, RANK() OVER (ORDER BY `x`, `y`) AS `col01`
+        SELECT *, RANK() OVER (ORDER BY `x`, `y`) AS `col01`
         FROM `df`
       ) AS `q01`
       WHERE (`col01` <= 1)
@@ -209,7 +209,7 @@
       <SQL>
       SELECT `x`, `y`
       FROM (
-        SELECT `df`.*, RANK() OVER (ORDER BY `y`, `x`) AS `col01`
+        SELECT *, RANK() OVER (ORDER BY `y`, `x`) AS `col01`
         FROM `df`
       ) AS `q01`
       WHERE (`col01` <= 1)
@@ -222,7 +222,7 @@
       <SQL>
       SELECT `x`, `y`
       FROM (
-        SELECT `df`.*, RANK() OVER (ORDER BY `x` DESC) AS `col01`
+        SELECT *, RANK() OVER (ORDER BY `x` DESC) AS `col01`
         FROM `df`
       ) AS `q01`
       WHERE (`col01` <= 1)
@@ -232,7 +232,7 @@
       <SQL>
       SELECT `x`, `y`
       FROM (
-        SELECT `df`.*, RANK() OVER (ORDER BY `x` DESC, `y` DESC) AS `col01`
+        SELECT *, RANK() OVER (ORDER BY `x` DESC, `y` DESC) AS `col01`
         FROM `df`
       ) AS `q01`
       WHERE (`col01` <= 1)
@@ -242,7 +242,7 @@
       <SQL>
       SELECT `x`, `y`
       FROM (
-        SELECT `df`.*, RANK() OVER (ORDER BY `y` DESC, `x` DESC) AS `col01`
+        SELECT *, RANK() OVER (ORDER BY `y` DESC, `x` DESC) AS `col01`
         FROM `df`
       ) AS `q01`
       WHERE (`col01` <= 1)

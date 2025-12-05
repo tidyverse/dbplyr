@@ -13,6 +13,6 @@
       head(mf)
     Output
       <SQL>
-      SELECT TOP 6 `df`.*
+      SELECT TOP 6 *
       FROM `df`
 

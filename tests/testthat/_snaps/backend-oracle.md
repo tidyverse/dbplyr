@@ -15,7 +15,7 @@
       head(mf)
     Output
       <SQL>
-      SELECT `df`.*
+      SELECT *
       FROM `df`
       FETCH FIRST 6 ROWS ONLY
 
@@ -91,7 +91,7 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY DBMS_RANDOM.VALUE()) AS `col01`
+        SELECT *, ROW_NUMBER() OVER (ORDER BY DBMS_RANDOM.VALUE()) AS `col01`
         FROM `df`
       ) `q01`
       WHERE (`col01` <= 1)

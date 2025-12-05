@@ -6,7 +6,7 @@
         <SQL SELECT>
         From:
           <table_path> `lf1`
-        Select:   `lf1`.*, NULL
+        Select:   *, NULL
       
         UNION
       

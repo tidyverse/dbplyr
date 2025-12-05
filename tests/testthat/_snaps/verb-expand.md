@@ -20,7 +20,7 @@
       tidyr::expand(df_lazy, nesting(x, y))
     Output
       <SQL>
-      SELECT DISTINCT `df`.*
+      SELECT DISTINCT *
       FROM `df`
 
 # expand accepts expressions
@@ -47,7 +47,7 @@
       tidyr::expand(df_lazy, tidyr::nesting(x, y))
     Output
       <SQL>
-      SELECT DISTINCT `df`.*
+      SELECT DISTINCT *
       FROM `df`
 
 # expand respects groups
@@ -73,7 +73,7 @@
       tidyr::expand(lazy_frame(x = 1), x, y = NULL)
     Output
       <SQL>
-      SELECT DISTINCT `df`.*
+      SELECT DISTINCT *
       FROM `df`
 
 # expand() errors when expected

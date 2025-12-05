@@ -30,7 +30,7 @@
       explain(filter(db, x > 2))
     Output
       <SQL>
-      SELECT `test`.*
+      SELECT *
       FROM `test`
       WHERE (`x` > 2.0)
       

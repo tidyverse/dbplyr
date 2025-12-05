@@ -6,7 +6,7 @@
       <SQL SELECT>
       From:
         <table_path> `df`
-      Select:   `df`.*
+      Select:   *
       Where:    `x` > 1
       Order by: `x`
       Limit:    10
