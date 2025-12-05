@@ -90,6 +90,6 @@ lf |> transmute(x = c > d)
 # Can use boolean as is:
 lf |> transmute(x = ifelse(c > d, "c", "d"))
 #> <SQL>
-#> SELECT IIF(`c` > `d`, 'c', 'd') AS `x`
+#> SELECT CASE WHEN (`c` > `d`) THEN 'c' WHEN NOT (`c` > `d`) THEN 'd' END AS `x`
 #> FROM `df`
 ```

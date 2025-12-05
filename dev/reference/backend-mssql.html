@@ -156,7 +156,7 @@ from time to time.</p><ul><li><p>To convert from bit to boolean use <code>x == 1
 <span class="r-in"><span><span class="co"># Can use boolean as is:</span></span></span>
 <span class="r-in"><span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">c</span> <span class="op">&gt;</span> <span class="va">d</span>, <span class="st">"c"</span>, <span class="st">"d"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> IIF(`c` &gt; `d`, 'c', 'd')<span style="color: #0000BB;"> AS </span>`x`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> CASE WHEN (`c` &gt; `d`) THEN 'c' WHEN NOT (`c` &gt; `d`) THEN 'd' END<span style="color: #0000BB;"> AS </span>`x`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `df`</span>
 </code></pre></div>
     </div>
