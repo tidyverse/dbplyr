@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* SQL Server: `if`/`ifelse()`, and `if_else()` now use `CASE WHEN` instead of `IIF`. This ensures the handling of `NULL`s matches the R's `NA` handling rules (#1569). 
 * `if_else()` uses simpler translation for `missing` (#1573).
 * New translations for stringr function `str_ilike()` for Postgres, Redshift, and Snowflake (@edward-burn, #1628).
 * Argument `ignore_case` for `str_like()` has been deprecated (@edward-burn, #1630).

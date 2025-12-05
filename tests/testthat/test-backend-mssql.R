@@ -25,22 +25,6 @@ test_that("custom scalar translated correctly", {
   expect_translation(con, substr(x, 1, 2), "SUBSTRING(`x`, 1, 2)")
   expect_translation(con, trimws(x), "LTRIM(RTRIM(`x`))")
   expect_translation(con, paste(x, y), "`x` + ' ' + `y`")
-  expect_translation(
-    con,
-    if_else(x, "true", "false", "missing"),
-    "CASE WHEN `x` THEN 'true' WHEN NOT `x` THEN 'false' ELSE 'missing' END"
-  )
-  expect_translation(
-    con,
-    ifelse(x, "true", "false"),
-    "IIF(`x`, 'true', 'false')"
-  )
-  expect_translation(con, ifelse(x, "true", NULL), "IIF(`x`, 'true', NULL)")
-  expect_translation(
-    con,
-    if (x) "true" else "false",
-    "IIF(`x`, 'true', 'false')"
-  )
 
   expect_error(
     translate_sql(bitwShiftL(x, 2L), con = con),
