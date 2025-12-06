@@ -38,6 +38,18 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
   sql_variant(
     sql_translator(
       .parent = base_odbc_scalar,
+      # stringr ---------------------------------------------------------------
+      str_like = function(string, pattern, ignore_case = deprecated()) {
+        ignore_case <- deprecate_ignore_case(ignore_case)
+        if (ignore_case) {
+          sql_expr(!!string %ILIKE% !!pattern)
+        } else {
+          sql_expr(!!string %LIKE% !!pattern)
+        }
+      },
+      str_ilike = function(string, pattern) {
+        sql_expr(!!string %ILIKE% !!pattern)
+      },
       # clock ---------------------------------------------------------------
       add_days = function(x, n, ...) {
         check_dots_empty()
