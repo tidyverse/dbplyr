@@ -189,7 +189,7 @@ test_that("custom clock functions translated correctly", {
   expect_translation(
     con,
     date_count_between(date_column_1, date_column_2, "day"),
-    "DATEDIFF(DAY, `date_column_1`, `date_column_2`)"
+    "DATEDIFF_BIG(DAY, `date_column_1`, `date_column_2`)"
   )
   expect_snapshot(
     error = TRUE,
@@ -217,12 +217,12 @@ test_that("difftime is translated correctly", {
   expect_translation(
     con,
     difftime(start_date, end_date, units = "days"),
-    "DATEDIFF(DAY, `end_date`, `start_date`)"
+    "DATEDIFF_BIG(DAY, `end_date`, `start_date`)"
   )
   expect_translation(
     con,
     difftime(start_date, end_date),
-    "DATEDIFF(DAY, `end_date`, `start_date`)"
+    "DATEDIFF_BIG(DAY, `end_date`, `start_date`)"
   )
 
   expect_snapshot(
