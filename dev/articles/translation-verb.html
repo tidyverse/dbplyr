@@ -213,6 +213,10 @@ necessary. We strive to avoid this as much as possible, but our analysis
 of the generated SQL is not always complete, so we’ll typically err on
 the side of safety (creating more subqueries) rather than
 performance.</p>
+<p>It’s important to know that most SQL dialects either error or include
+<code>LIMIT</code> and <code>ORDER BY</code> statements inside of
+subqueries. For that reason, you should always put <code><a href="https://rdrr.io/r/utils/head.html" class="external-link">head()</a></code>
+and <code><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange()</a></code> as late as possible in your pipeline.</p>
 </div>
 <div class="section level2">
 <h2 id="dual-table-verbs">Dual table verbs<a class="anchor" aria-label="anchor" href="#dual-table-verbs"></a>

@@ -130,6 +130,12 @@ necessary. We strive to avoid this as much as possible, but our analysis
 of the generated SQL is not always complete, so we’ll typically err on
 the side of safety (creating more subqueries) rather than performance.
 
+It’s important to know that most SQL dialects either error or include
+`LIMIT` and `ORDER BY` statements inside of subqueries. For that reason,
+you should always put [`head()`](https://rdrr.io/r/utils/head.html) and
+[`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html) as
+late as possible in your pipeline.
+
 ## Dual table verbs
 
 | R                                                                         | SQL                                                                  |

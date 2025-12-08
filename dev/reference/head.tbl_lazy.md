@@ -11,7 +11,10 @@ ordering performed with
 [`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html), but
 it's not guaranteed. [`tail()`](https://rdrr.io/r/utils/head.html) is
 not supported at all because the situation is even murkier for the
-"last" rows.
+"last" rows. Additionally, `LIMIT` clauses can not generally appear in
+subqueries, which means that you should use
+[`head()`](https://rdrr.io/r/utils/head.html) as late as possible in
+your pipelines.
 
 ## Usage
 
