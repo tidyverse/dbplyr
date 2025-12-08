@@ -2,6 +2,8 @@
 
 ## dbplyr (development version)
 
+- `fill()` now errors if you attempt to rename a column, for consistency
+  with dplyr ([\#1536](https://github.com/tidyverse/dbplyr/issues/1536))
 - Redshift: fixed syntax error in `date_build()` translation
   ([\#1512](https://github.com/tidyverse/dbplyr/issues/1512)).
 - Ensure `str_like()` and `str_ilike()` have consistent behaviour on SQL
