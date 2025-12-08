@@ -2,6 +2,9 @@
 
 ## dbplyr (development version)
 
+- Ensure `str_like()` and `str_ilike()` have consistent behaviour on SQL
+  Server ([@edward-burn](https://github.com/edward-burn),
+  [\#1669](https://github.com/tidyverse/dbplyr/issues/1669)).
 - SQL Server: `if`/[`ifelse()`](https://rdrr.io/r/base/ifelse.html), and
   [`if_else()`](https://dplyr.tidyverse.org/reference/if_else.html) now
   use `CASE WHEN` instead of `IIF`. This ensures the handling of `NULL`s
