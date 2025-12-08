@@ -342,6 +342,18 @@ simulate_mssql <- function(version = "15.0") {
       str_c = sql_paste_infix("", "+", function(x) {
         sql_expr(cast(!!x %as% text))
       }),
+      # use COLLATE to ensure consistent behaviour https://learn.microsoft.com/en-us/sql/relational-databases/collations/set-or-change-the-column-collation?view=sql-server-ver17&source=recommendations
+      str_like = function(string, pattern, ignore_case = deprecated()) {
+        ignore_case <- deprecate_ignore_case(ignore_case)
+        if (ignore_case) {
+          sql_expr(!!string %COLLATE Latin1_General_100_CI_AS LIKE% !!pattern)
+        } else {
+          sql_expr(!!string %COLLATE Latin1_General_100_CS_AS LIKE% !!pattern)
+        }
+      },
+      str_ilike = function(string, pattern) {
+        sql_expr(!!string %COLLATE Latin1_General_100_CI_AS LIKE% !!pattern)
+      },
       # no built in function: https://stackoverflow.com/questions/230138
       str_to_title = sql_not_supported("str_to_title"),
       # https://docs.microsoft.com/en-us/sql/t-sql/functions/substring-transact-sql?view=sql-server-ver15
@@ -747,5 +759,7 @@ utils::globalVariables(c(
   "%AND%",
   "%BETWEEN%",
   "CHECKSUM",
-  "NEWID"
+  "NEWID",
+  "%COLLATE Latin1_General_100_CI_AS LIKE%",
+  "%COLLATE Latin1_General_100_CS_AS LIKE%"
 ))
