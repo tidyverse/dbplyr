@@ -2,6 +2,8 @@
 
 ## dbplyr (development version)
 
+- Redshift: fixed syntax error in `date_build()` translation
+  ([\#1512](https://github.com/tidyverse/dbplyr/issues/1512)).
 - Ensure `str_like()` and `str_ilike()` have consistent behaviour on SQL
   Server ([@edward-burn](https://github.com/edward-burn),
   [\#1669](https://github.com/tidyverse/dbplyr/issues/1669)).
