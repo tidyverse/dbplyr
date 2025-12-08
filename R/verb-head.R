@@ -10,6 +10,8 @@
 #' means is subject to interpretation. Most databases will respect ordering
 #' performed with `arrange()`, but it's not guaranteed. `tail()` is not
 #' supported at all because the situation is even murkier for the "last" rows.
+#' Additionally, `LIMIT` clauses can not generally appear in subqueries, which
+#' means that you should use `head()` as late as possible in your pipelines.
 #'
 #' @param x A lazy data frame backed by a database query.
 #' @param n Number of rows to return
