@@ -131,6 +131,16 @@
       x `.data` does not have explicit order.
       i Please use `dbplyr::window_order()` to make order explicit.
 
+# fill() errors on attempted rename
+
+    Code
+      tidyr::fill(lazy_frame(x = 1), y = x)
+    Condition
+      Error in `tidyr::fill()`:
+      ! Arguments in `...` must be passed by position, not name.
+      x Problematic argument:
+      * y = x
+
 # fill() produces nice error messages
 
     Code
