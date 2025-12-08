@@ -100,6 +100,12 @@ test_that("fill errors on unsorted data", {
   })
 })
 
+test_that("fill() errors on attempted rename", {
+  expect_snapshot(error = TRUE, {
+    lazy_frame(x = 1) |> tidyr::fill(y = x)
+  })
+})
+
 test_that("fill() produces nice error messages", {
   expect_snapshot(error = TRUE, {
     lazy_frame(x = 1) |> tidyr::fill(non_existent)

@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* `fill()` now errors if you attempt to rename a column, for consistency with dplyr (#1536)
 * Ensure `str_like()` and `str_ilike()` have consistent behaviour on SQL Server (@edward-burn, #1669).
 * SQL Server: `if`/`ifelse()`, and `if_else()` now use `CASE WHEN` instead of `IIF`. This ensures the handling of `NULL`s matches the R's `NA` handling rules (#1569). 
 * `if_else()` uses simpler translation for `missing` (#1573).

@@ -38,7 +38,11 @@ fill.tbl_lazy <- function(
   ...,
   .direction = c("down", "up", "updown", "downup")
 ) {
-  cols_to_fill <- tidyselect::eval_select(expr(c(...)), .data)
+  cols_to_fill <- tidyselect::eval_select(
+    expr(c(...)),
+    .data,
+    allow_rename = FALSE
+  )
   cols_to_fill <- syms(names(cols_to_fill))
   order_by_cols <- op_sort(.data)
   .direction <- arg_match0(.direction, c("down", "up", "updown", "downup"))
