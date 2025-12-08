@@ -104,12 +104,12 @@ test_that("custom clock functions translated correctly", {
   expect_translation(
     con,
     date_build(2020, 1, 1),
-    "TO_DATE(CAST(2020.0 AS TEXT) || '-' CAST(1.0 AS TEXT) || '-' || CAST(1.0 AS TEXT)), 'YYYY-MM-DD')"
+    "TO_DATE(CAST(2020.0 AS TEXT) || '-' || CAST(1.0 AS TEXT) || '-' || CAST(1.0 AS TEXT), 'YYYY-MM-DD')"
   )
   expect_translation(
     con,
     date_build(year_column, 1L, 1L),
-    "TO_DATE(CAST(`year_column` AS TEXT) || '-' CAST(1 AS TEXT) || '-' || CAST(1 AS TEXT)), 'YYYY-MM-DD')"
+    "TO_DATE(CAST(`year_column` AS TEXT) || '-' || CAST(1 AS TEXT) || '-' || CAST(1 AS TEXT), 'YYYY-MM-DD')"
   )
   expect_translation(
     con,
