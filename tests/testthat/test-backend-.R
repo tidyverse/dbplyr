@@ -130,6 +130,11 @@ test_that("can translate nzchar", {
   con <- simulate_dbi()
   expect_translation(con, nzchar(y), "((`y` IS NULL) OR `y` != '')")
   expect_translation(con, nzchar(y, TRUE), "`y` != ''")
+
+  # Uses individual translations from backend
+  con <- simulate_access()
+  expect_translation(con, nzchar(y), "(ISNULL(`y`) OR `y` <> '')")
+  expect_translation(con, nzchar(y, TRUE), "`y` <> ''")
 })
 
 # aggregates --------------------------------------------------------------
