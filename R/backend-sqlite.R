@@ -157,5 +157,3 @@ supports_window_clause.SQLiteConnection <- function(con) {
 db_supports_table_alias_with_as.SQLiteConnection <- function(con) {
   TRUE
 }
-
-utils::globalVariables(c("datetime", "NUMERIC", "REAL"))

@@ -87,5 +87,3 @@ db_connection_describe.OdbcConnection <- function(con, ...) {
   )
 }
 # nocov end
-
-utils::globalVariables("EXP")

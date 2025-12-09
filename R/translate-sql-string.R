@@ -252,9 +252,6 @@ check_collapse <- function(collapse) {
   ))
 }
 
-utils::globalVariables(c("ltrim", "rtrim"))
-
-
 deprecate_ignore_case <- function(ignore_case, frame = caller_env()) {
   if (lifecycle::is_present(ignore_case)) {
     lifecycle::deprecate_warn(

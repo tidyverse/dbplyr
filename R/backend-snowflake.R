@@ -395,17 +395,3 @@ snowflake_pmin_pmax_builder <- function(dot_1, dot_2, comparison) {
     )
   )
 }
-
-utils::globalVariables(c(
-  "%REGEXP%",
-  "DAYNAME",
-  "DECODE",
-  "FLOAT",
-  "MONTHNAME",
-  "POSITION",
-  "trim",
-  "LENGTH",
-  "DATE_FROM_PARTS",
-  "DATE_PART",
-  "%=%"
-))

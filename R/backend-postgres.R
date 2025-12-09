@@ -515,24 +515,3 @@ db_col_types.PqConnection <- function(con, table, call) {
 
 #' @export
 db_col_types.PostgreSQL <- db_col_types.PqConnection
-
-utils::globalVariables(c(
-  "strpos",
-  "%::%",
-  "%FROM%",
-  "%ILIKE%",
-  "DATE",
-  "EXTRACT",
-  "TO_CHAR",
-  "string_agg",
-  "%~*%",
-  "%~%",
-  "MONTH",
-  "DOY",
-  "DATE_TRUNC",
-  "INTERVAL",
-  "FLOOR",
-  "WEEK",
-  "make_date",
-  "date_part"
-))

@@ -205,5 +205,3 @@ sql_escape_datetime.ACCESS <- function(con, x) {
 supports_window_clause.ACCESS <- function(con) {
   TRUE
 }
-
-utils::globalVariables(c("CStr", "iif", "isnull"))

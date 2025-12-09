@@ -236,12 +236,3 @@ sql_table_analyze.Teradata <- function(con, table, ...) {
   # https://www.tutorialspoint.com/teradata/teradata_statistics.htm
   glue_sql2(con, "COLLECT STATISTICS {.tbl table}")
 }
-
-utils::globalVariables(c(
-  "ATAN2",
-  "SUBSTR",
-  "DECIMAL",
-  "WEEKNUMBER_OF_YEAR",
-  "VARCHAR",
-  "SUM"
-))

@@ -580,5 +580,3 @@ base_no_win <- sql_translator(
   str_flatten = win_absent("str_flatten"),
   count = win_absent("count")
 )
-
-utils::globalVariables(c("RANDOM", "%LIKE%"))

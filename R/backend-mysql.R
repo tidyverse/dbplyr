@@ -306,14 +306,3 @@ supports_window_clause.MariaDBConnection <- function(con) {
 supports_window_clause.MySQLConnection <- supports_window_clause.MariaDBConnection
 #' @export
 supports_window_clause.MySQL <- supports_window_clause.MariaDBConnection
-
-utils::globalVariables(c(
-  "%separator%",
-  "group_concat",
-  "IF",
-  "REGEXP_INSTR",
-  "RAND",
-  "%LIKE BINARY%",
-  "TRUNCATE",
-  "DOUBLE"
-))

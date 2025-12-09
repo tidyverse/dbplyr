@@ -175,10 +175,3 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
 
   table
 }
-
-utils::globalVariables(c(
-  "regexp_replace",
-  "date_add",
-  "add_months",
-  "datediff"
-))

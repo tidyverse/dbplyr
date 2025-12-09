@@ -273,13 +273,3 @@ sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
 
 #' @export
 db_supports_table_alias_with_as.OraConnection <- db_supports_table_alias_with_as.Oracle
-
-utils::globalVariables(c(
-  "DATE",
-  "CURRENT_TIMESTAMP",
-  "TRUNC",
-  "dbms_random.VALUE",
-  "DATEDIFF",
-  "CEIL",
-  "NUMTODSINTERVAL"
-))

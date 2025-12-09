@@ -725,40 +725,4 @@ bit_to_boolean <- function(x_expr) {
   }
 }
 
-utils::globalVariables(c(
-  "BIT",
-  "CAST",
-  "%AS%",
-  "%is%",
-  "convert",
-  "DATE",
-  "DATEADD",
-  "DATEFROMPARTS",
-  "DATEDIFF",
-  "DATENAME",
-  "DATEPART",
-  "IIF",
-  "NOT",
-  "SUBSTRING",
-  "LTRIM",
-  "RTRIM",
-  "CHARINDEX",
-  "SYSDATETIME",
-  "SECOND",
-  "MINUTE",
-  "HOUR",
-  "DAY",
-  "DAYOFWEEK",
-  "DAYOFYEAR",
-  "MONTH",
-  "QUARTER",
-  "YEAR",
-  "BIGINT",
-  "INT",
-  "%AND%",
-  "%BETWEEN%",
-  "CHECKSUM",
-  "NEWID",
-  "%COLLATE Latin1_General_100_CI_AS LIKE%",
-  "%COLLATE Latin1_General_100_CS_AS LIKE%"
-))
+utils::globalVariables(c("cast", "%AS%", "BIT"))

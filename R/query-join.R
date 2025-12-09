@@ -381,5 +381,3 @@ sql_qualify_var <- function(con, table, var) {
     var
   }
 }
-
-utils::globalVariables("COALESCE")

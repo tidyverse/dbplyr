@@ -115,5 +115,3 @@ sql_query_set_op.Hive <- function(
 supports_window_clause.Hive <- function(con) {
   TRUE
 }
-
-utils::globalVariables("regexp_replace")

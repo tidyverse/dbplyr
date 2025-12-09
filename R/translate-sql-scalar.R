@@ -155,5 +155,3 @@ sql_runif <- function(rand_expr, n = n(), min = 0, max = 1) {
 
   sql(rand_expr)
 }
-
-utils::globalVariables(c("%as%", "cast", "ln", "try_cast"))
