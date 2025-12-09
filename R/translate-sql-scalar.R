@@ -34,8 +34,8 @@ sql_infix <- function(f, pad = TRUE, con = sql_current_con()) {
   # This is fixed with `escape_infix_expr()`
   # see https://github.com/tidyverse/dbplyr/issues/634
   check_string(f)
+
   check_bool(pad)
-  f <- sql(f)
 
   function(x, y) {
     x <- escape_infix_expr(enexpr(x), x)
@@ -43,15 +43,15 @@ sql_infix <- function(f, pad = TRUE, con = sql_current_con()) {
 
     if (is.null(x)) {
       if (pad) {
-        sql <- "{f} {.val y}"
+        sql <- "{.sql f} {.val y}"
       } else {
-        sql <- "{f}{.val y}"
+        sql <- "{.sql f}{.val y}"
       }
     } else {
       if (pad) {
-        sql <- "{.val x} {f} {.val y}"
+        sql <- "{.val x} {.sql f} {.val y}"
       } else {
-        sql <- "{.val x}{f}{.val y}"
+        sql <- "{.val x}{.sql f}{.val y}"
       }
     }
     glue_sql2(con, sql)
@@ -78,7 +78,6 @@ escape_infix_expr <- function(xq, x, escape_unary_minus = FALSE) {
 #' @export
 sql_prefix <- function(f, n = NULL) {
   check_string(f)
-  f <- sql(f)
 
   function(...) {
     args <- list(...)
@@ -91,7 +90,7 @@ sql_prefix <- function(f, n = NULL) {
     if (any(names2(args) != "")) {
       cli::cli_warn("Named arguments ignored for SQL {f}")
     }
-    sql_glue("{f}({.val args*})")
+    sql_glue("{.sql f}({.val args*})")
   }
 }
 
@@ -99,18 +98,16 @@ sql_prefix <- function(f, n = NULL) {
 #' @param type SQL type name as a string.
 #' @export
 sql_cast <- function(type) {
-  type <- sql(type)
   function(x) {
-    sql_glue("CAST({x} AS {type})")
+    sql_glue("CAST({x} AS {.sql type})")
   }
 }
 
 #' @rdname sql_translation_scalar
 #' @export
 sql_try_cast <- function(type) {
-  type <- sql(type)
   function(x) {
-    sql_glue("TRY_CAST({x} AS {type})")
+    sql_glue("TRY_CAST({x} AS {.sql type})")
     # try_cast available in MSSQL 2012+
   }
 }
@@ -148,17 +145,16 @@ sql_runif <- function(rand_expr, n = n(), min = 0, max = 1) {
     cli_abort("Only {.code n = n()} is supported.")
   }
 
-  rand_expr <- sql(rand_expr)
   range <- max - min
   if (range != 1) {
-    rand_expr <- sql_glue("{rand_expr} * {range}")
+    rand_expr <- sql_glue("{.sql rand_expr} * {range}")
   }
 
   if (min != 0) {
-    rand_expr <- sql_glue("{rand_expr} + {min}")
+    rand_expr <- sql_glue("{.sql rand_expr} + {min}")
   }
 
-  rand_expr
+  sql(rand_expr)
 }
 
 utils::globalVariables(c("%as%", "cast", "ln", "try_cast"))

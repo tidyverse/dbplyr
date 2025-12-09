@@ -145,7 +145,6 @@ rows <- function(from = -Inf, to = 0) {
 #' @rdname sql_translation_window
 #' @export
 win_rank <- function(f, empty_order = FALSE) {
-  f <- sql(f)
   check_bool(empty_order)
 
   function(order = NULL) {
@@ -188,7 +187,7 @@ win_rank <- function(f, empty_order = FALSE) {
     }
 
     rank_sql <- win_over(
-      sql(glue("{f}()")),
+      sql_glue("{.sql f}()"),
       partition = group,
       order = order_over,
       frame = win_current_frame()
@@ -205,14 +204,12 @@ win_rank <- function(f, empty_order = FALSE) {
 #' @rdname sql_translation_window
 #' @export
 win_aggregate <- function(f) {
-  f <- sql(f)
-
   function(x, na.rm = FALSE) {
     sql_check_na_rm(na.rm)
     frame <- win_current_frame()
 
     win_over(
-      sql_glue("{f}({.val x})"),
+      sql_glue("{.sql f}({.val x})"),
       partition = win_current_group(),
       order = if (!is.null(frame)) win_current_order(),
       frame = frame
@@ -223,12 +220,11 @@ win_aggregate <- function(f) {
 #' @rdname sql_translation_window
 #' @export
 win_aggregate_2 <- function(f) {
-  f <- sql(f)
   function(x, y) {
     frame <- win_current_frame()
 
     win_over(
-      sql_glue("{f}({.val x}, {.val y})"),
+      sql_glue("{.sql f}({.val x}, {.val y})"),
       partition = win_current_group(),
       order = if (!is.null(frame)) win_current_order(),
       frame = frame
@@ -245,10 +241,9 @@ win_recycled <- win_aggregate
 #' @rdname sql_translation_window
 #' @export
 win_cumulative <- function(f) {
-  f <- sql(f)
   function(x, order = NULL) {
     win_over(
-      sql_glue("{f}({.val x})"),
+      sql_glue("{.sql f}({.val x})"),
       partition = win_current_group(),
       order = order %||% win_current_order(),
       frame = c(-Inf, 0)
@@ -283,17 +278,16 @@ sql_nth <- function(
     args <- glue_sql2(con, "{args}, {.val n}")
   }
 
-  sql_f <- sql(f)
   if (na_rm) {
     if (ignore_nulls == "inside") {
-      sql_expr <- "{sql_f}({args} IGNORE NULLS)"
+      sql_expr <- "{.sql f}({args} IGNORE NULLS)"
     } else if (ignore_nulls == "outside") {
-      sql_expr <- "{sql_f}({args}) IGNORE NULLS"
+      sql_expr <- "{.sql f}({args}) IGNORE NULLS"
     } else {
-      sql_expr <- "{sql_f}({args}, TRUE)"
+      sql_expr <- "{.sql f}({args}, TRUE)"
     }
   } else {
-    sql_expr <- "{sql_f}({args})"
+    sql_expr <- "{.sql f}({args})"
   }
 
   win_over(
