@@ -69,7 +69,7 @@
 }
 \arguments{
 \item{x}{A lazy table.
-For \code{in_place = TRUE}, this must be a table instantiated with \code{\link[=tbl]{tbl()}} or
+For \code{in_place = TRUE}, this must be a table instantiated with \code{\link[dplyr:tbl]{dplyr::tbl()}} or
 \code{\link[dplyr:compute]{dplyr::compute()}}, not to a lazy query. The \code{\link[=remote_name]{remote_name()}} function is used to
 determine the name of the table to be updated.}
 

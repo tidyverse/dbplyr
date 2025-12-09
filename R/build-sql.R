@@ -81,13 +81,7 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
 #' @param .con A database connection.
 #' @param ... SQL fragments to interpolate. These are evaluated in `.envir` and
 #'   then combined according to their type markers.
-#' @param .sep Separator to use between elements of `...`.
 #' @param .envir Environment to evaluate `...` in.
-#' @param .open,.close Opening and closing delimiters for interpolation.
-#' @param .na,.null Values to use for `NA`/`NULL` values.
-#' @param .comment Comment character to use.
-#' @param .literal Whether to treat strings literally.
-#' @param .trim Whether to trim whitespace.
 #' @return An SQL string.
 #' @export
 #' @examples
@@ -106,29 +100,15 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
 glue_sql2 <- function(
   .con,
   ...,
-  .sep = "",
-  .envir = parent.frame(),
-  .open = "{",
-  .close = "}",
-  .na = DBI::SQL("NULL"),
-  .null = "",
-  .comment = "#",
-  .literal = FALSE,
-  .trim = TRUE
+  .envir = parent.frame()
 ) {
   env <- current_env()
   sql(glue(
     ...,
-    .sep = .sep,
     .envir = .envir,
-    .open = .open,
-    .close = .close,
-    .na = .na,
-    .null = .null,
-    .comment = .comment,
-    .literal = .literal,
+    .na = "NULL",
+    .null = "",
     .transformer = sql_quote_transformer(.con, call = env),
-    .trim = .trim
   ))
 }
 

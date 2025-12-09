@@ -4,19 +4,7 @@
 \alias{glue_sql2}
 \title{Build SQL strings with glue syntax}
 \usage{
-glue_sql2(
-  .con,
-  ...,
-  .sep = "",
-  .envir = parent.frame(),
-  .open = "{",
-  .close = "}",
-  .na = DBI::SQL("NULL"),
-  .null = "",
-  .comment = "#",
-  .literal = FALSE,
-  .trim = TRUE
-)
+glue_sql2(.con, ..., .envir = parent.frame())
 }
 \arguments{
 \item{.con}{A database connection.}
@@ -24,19 +12,7 @@ glue_sql2(
 \item{...}{SQL fragments to interpolate. These are evaluated in \code{.envir} and
 then combined according to their type markers.}
 
-\item{.sep}{Separator to use between elements of \code{...}.}
-
 \item{.envir}{Environment to evaluate \code{...} in.}
-
-\item{.open, .close}{Opening and closing delimiters for interpolation.}
-
-\item{.na, .null}{Values to use for \code{NA}/\code{NULL} values.}
-
-\item{.comment}{Comment character to use.}
-
-\item{.literal}{Whether to treat strings literally.}
-
-\item{.trim}{Whether to trim whitespace.}
 }
 \value{
 An SQL string.
