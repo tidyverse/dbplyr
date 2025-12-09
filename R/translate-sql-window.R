@@ -135,7 +135,7 @@ rows <- function(from = -Inf, to = 0) {
   if (to == 0) {
     sql(bound(from))
   } else {
-    glue_sql2(sql_current_con(), "BETWEEN {bound(from)} AND {bound(to)}")
+    sql_glue("BETWEEN {bound(from)} AND {bound(to)}")
   }
 }
 
@@ -208,7 +208,7 @@ win_aggregate <- function(f) {
     frame <- win_current_frame()
 
     win_over(
-      glue_sql2(sql_current_con(), "{f}({.val x})"),
+      sql_glue("{f}({.val x})"),
       partition = win_current_group(),
       order = if (!is.null(frame)) win_current_order(),
       frame = frame
@@ -223,7 +223,7 @@ win_aggregate_2 <- function(f) {
     frame <- win_current_frame()
 
     win_over(
-      glue_sql2(sql_current_con(), "{f}({.val x}, {.val y})"),
+      sql_glue("{f}({.val x}, {.val y})"),
       partition = win_current_group(),
       order = if (!is.null(frame)) win_current_order(),
       frame = frame
@@ -243,7 +243,7 @@ win_cumulative <- function(f) {
   force(f)
   function(x, order = NULL) {
     win_over(
-      glue_sql2(sql_current_con(), "{f}({.val x})"),
+      sql_glue("{f}({.val x})"),
       partition = win_current_group(),
       order = order %||% win_current_order(),
       frame = c(-Inf, 0)

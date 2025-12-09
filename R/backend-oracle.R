@@ -125,7 +125,7 @@ sql_translation.Oracle <- function(con) {
       # https://stackoverflow.com/questions/1171196
       as.character = sql_cast("VARCHAR2(255)"),
       # https://oracle-base.com/articles/misc/oracle-dates-timestamps-and-intervals
-      as.Date = \(x) glue_sql2(sql_current_con(), "DATE {.val x}"),
+      as.Date = \(x) sql_glue("DATE {.val x}"),
       # bit64::as.integer64 can translate to BIGINT for some
       # vendors, which is equivalent to NUMBER(19) in Oracle
       # https://docs.oracle.com/cd/B19306_01/gateways.102/b14270/apa.htm

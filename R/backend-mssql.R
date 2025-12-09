@@ -272,7 +272,7 @@ simulate_mssql <- function(version = "15.0") {
 
       `[` = function(x, i) {
         i <- with_mssql_bool(i)
-        glue_sql2(sql_current_con(), "CASE WHEN ({i}) THEN ({x}) END")
+        sql_glue("CASE WHEN ({i}) THEN ({x}) END")
       },
 
       bitwShiftL = sql_not_supported("bitwShiftL"),
@@ -634,7 +634,7 @@ mssql_infix_comparison <- function(f) {
   check_string(f)
   f <- toupper(f)
   function(x, y) {
-    mssql_as_bit(glue_sql2(sql_current_con(), "{.val x} {f} {.val y}"))
+    mssql_as_bit(sql_glue("{.val x} {f} {.val y}"))
   }
 }
 

@@ -31,7 +31,7 @@ sql_aggregate <- function(f, f_r = f) {
 
   function(x, na.rm = FALSE) {
     sql_check_na_rm(na.rm)
-    glue_sql2(sql_current_con(), "{f}({.val x})")
+    sql_glue("{f}({.val x})")
   }
 }
 
@@ -41,7 +41,7 @@ sql_aggregate_2 <- function(f) {
   check_string(f)
 
   function(x, y) {
-    glue_sql2(sql_current_con(), "{f}({.val x}, {.val y})")
+    sql_glue("{f}({.val x}, {.val y})")
   }
 }
 
@@ -53,7 +53,7 @@ sql_aggregate_n <- function(f, f_r = f) {
   function(..., na.rm = FALSE) {
     sql_check_na_rm(na.rm)
     dots <- list(...)
-    glue_sql2(sql_current_con(), "{f}({.val dots*})")
+    sql_glue("{f}({.val dots*})")
   }
 }
 

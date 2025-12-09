@@ -66,7 +66,7 @@ escape_infix_expr <- function(xq, x, escape_unary_minus = FALSE) {
     !is_atomic(x, n = 1)
 
   if (is_infix || is_unary_minus) {
-    enpared <- glue_sql2(sql_current_con(), "({.val x})")
+    enpared <- sql_glue("({.val x})")
     return(enpared)
   }
 
@@ -91,7 +91,7 @@ sql_prefix <- function(f, n = NULL) {
     if (any(names2(args) != "")) {
       cli::cli_warn("Named arguments ignored for SQL {f}")
     }
-    glue_sql2(sql_current_con(), "{f}({.val args*})")
+    sql_glue("{f}({.val args*})")
   }
 }
 

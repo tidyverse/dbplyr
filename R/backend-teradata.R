@@ -159,7 +159,7 @@ sql_translation.Teradata <- function(con) {
         sql_expr(WEEKNUMBER_OF_YEAR(!!x, 'iso'))
       },
       quarter = function(x) {
-        glue_sql2(sql_current_con(), "to_char({.val x}, 'q')")
+        sql_glue("to_char({.val x}, 'q')")
       }
     ),
     sql_translator(
@@ -225,7 +225,7 @@ teradata_as_date <- function(x) {
   xq <- enquo(x)
   x_expr <- quo_get_expr(xq)
   if (is.character(x_expr) && !is.sql(x_expr)) {
-    glue_sql2(sql_current_con(), "DATE {.val x}")
+    sql_glue("DATE {.val x}")
   } else {
     sql_cast("DATE")(x)
   }

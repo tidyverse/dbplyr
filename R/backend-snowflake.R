@@ -224,25 +224,25 @@ sql_translation.Snowflake <- function(con) {
         sql_expr(EXTRACT("year", !!x))
       },
       seconds = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{.val x} second'")
+        sql_glue("INTERVAL '{.val x} second'")
       },
       minutes = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{.val x} minute'")
+        sql_glue("INTERVAL '{.val x} minute'")
       },
       hours = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{.val x} hour'")
+        sql_glue("INTERVAL '{.val x} hour'")
       },
       days = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{.val x} day'")
+        sql_glue("INTERVAL '{.val x} day'")
       },
       weeks = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{.val x} week'")
+        sql_glue("INTERVAL '{.val x} week'")
       },
       months = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{.val x} month'")
+        sql_glue("INTERVAL '{.val x} month'")
       },
       years = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{.val x} year'")
+        sql_glue("INTERVAL '{.val x} year'")
       },
       # https://docs.snowflake.com/en/sql-reference/functions/date_trunc.html
       floor_date = function(x, unit = "seconds") {
@@ -315,7 +315,7 @@ sql_translation.Snowflake <- function(con) {
         if (identical(na.rm, TRUE)) {
           snowflake_pmin_pmax_sql_expression(dots = dots, comparison = "<=")
         } else {
-          glue_sql2(sql_current_con(), "LEAST({.val dots*})")
+          sql_glue("LEAST({.val dots*})")
         }
       },
       pmax = function(..., na.rm = FALSE) {
@@ -323,12 +323,12 @@ sql_translation.Snowflake <- function(con) {
         if (identical(na.rm, TRUE)) {
           snowflake_pmin_pmax_sql_expression(dots = dots, comparison = ">=")
         } else {
-          glue_sql2(sql_current_con(), "GREATEST({.val dots*})")
+          sql_glue("GREATEST({.val dots*})")
         }
       },
       `$` = function(x, name) {
         if (is.sql(x)) {
-          glue_sql2(sql_current_con(), "{x}:{.col name}")
+          sql_glue("{x}:{.col name}")
         } else {
           eval(bquote(`$`(x, .(substitute(name)))))
         }

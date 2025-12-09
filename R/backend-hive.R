@@ -108,14 +108,7 @@ sql_query_set_op.Hive <- function(
   check_bool(all)
   # parentheses are not allowed
   method <- paste0(method, if (all) " ALL")
-  glue_sql2(
-    con,
-    "\n", # dummy line to protect indent
-    "{x}\n",
-    lvl_indent(lvl),
-    "{.kw method}\n",
-    y
-  )
+  glue_sql2(con, "{x}\n", lvl_indent(lvl), "{method}\n", y)
 }
 
 #' @export

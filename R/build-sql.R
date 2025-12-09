@@ -140,6 +140,10 @@ glue_sql2 <- function(
   ))
 }
 
+sql_glue <- function(x, con = sql_current_con(), envir = parent.frame()) {
+  glue_sql2(con, x, .envir = envir)
+}
+
 sql_quote_transformer <- function(connection) {
   function(text, envir) {
     collapse_regex <- "[*][[:space:]]*$"
@@ -212,6 +216,7 @@ sql_quote_transformer <- function(connection) {
     unclass(value)
   }
 }
+
 
 glue_check_collapse <- function(type, collapse) {
   if (type %in% c("col", "val")) {
