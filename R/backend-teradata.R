@@ -143,9 +143,8 @@ sql_translation.Teradata <- function(con) {
         sql_glue("SUBSTR({x}, {start}, {len})")
       },
       startsWith = function(string, pattern) {
-        glue_sql2(
-          sql_current_con(),
-          "CAST(CASE WHEN INSTR({.val string}, {.val pattern}) = 1 THEN 1 ELSE 0 END AS INTEGER)"
+        sql_glue(
+          "CAST(CASE WHEN INSTR({string}, {pattern}) = 1 THEN 1 ELSE 0 END AS INTEGER)"
         )
       },
       paste = sql_paste_infix(" ", "||", function(x) x),
@@ -159,7 +158,7 @@ sql_translation.Teradata <- function(con) {
         sql_glue("WEEKNUMBER_OF_YEAR({x}, 'iso')")
       },
       quarter = function(x) {
-        sql_glue("TO_CHAR({.val x}, 'q')")
+        sql_glue("TO_CHAR({x}, 'q')")
       }
     ),
     sql_translator(

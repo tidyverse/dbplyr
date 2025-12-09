@@ -52,14 +52,13 @@ escaped and formatted:
 \item \code{.sql} - An existing SQL string.
 \item \code{.tbl} - A table identifier (e.g., \code{DBI::Id()}, string, or \code{in_schema()}).
 \item \code{.from} - A subquery or table identifier.
-\item \code{.name} - A name for an index or subquery (string or \code{ident()}).
-\item \code{.col} - A column name or multiple columns (use \code{*} suffix for multiple).
+\item \code{.id} - Database identifiers. Use \code{*} suffix for multiple identifiers,
+which will not be wrapped.
 \item \code{.kw} - An SQL keyword that will be syntax-highlighted.
-\item \code{.val} - Any value to be escaped (vectors, dates, SQL, etc.).
+\item \code{.val} - A value. Typically used when the function has a scalar argument
+or a vector argument is that not vectorised with the primary input.
+Use \code{*} suffix for multiple values, which will be wrapped in \verb{()}.
 }
-
-The \code{*} suffix after \code{.col} or \code{.val} collapses the vector into a
-comma-separated list.
 }
 \examples{
 con <- simulate_dbi()
@@ -72,6 +71,6 @@ name <- "Robert'); DROP TABLE students;--"
 glue_sql2(con, "INSERT INTO students (name) VALUES ({.val name})")
 
 # Multiple columns with collapse
-cols <- c("name", "age", "grade")
-glue_sql2(con, "SELECT {.col cols*} FROM students")
+cols <- ident(c("name", "age", "grade"))
+glue_sql2(con, "SELECT {.id cols*} FROM students")
 }

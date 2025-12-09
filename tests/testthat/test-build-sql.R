@@ -48,20 +48,10 @@ test_that("glue_sql() interpolates .from correctly", {
   )
 })
 
-test_that("glue_sql() interpolates .name correctly", {
+test_that("glue_sql() interpolates id correctly", {
   con <- simulate_dbi()
-  expect_equal(glue_sql2("{.name 'table'}", .con = con), sql("`table`"))
-  expect_equal(glue_sql2("{.name ident('table')}", .con = con), sql("`table`"))
-  expect_equal(
-    glue_sql2("{.name ident_q('ta ble')}", .con = con),
-    sql("ta ble")
-  )
-})
-
-test_that("glue_sql() interpolates .col correctly", {
-  con <- simulate_dbi()
-  expect_equal(glue_sql2("{.col 'x'}", .con = con), sql("`x`"))
-  expect_equal(glue_sql2("{.col ident('x')}", .con = con), sql("`x`"))
+  expect_equal(glue_sql2("{.id 'x'}", .con = con), sql("`x`"))
+  expect_equal(glue_sql2("{.id ident('x')}", .con = con), sql("`x`"))
 })
 
 test_that("glue_sql() interpolates .kw correctly", {
@@ -79,20 +69,21 @@ test_that("glue_sql() checks size", {
   con <- simulate_dbi()
   x <- c("a", "b")
   expect_snapshot(error = TRUE, {
-    glue_sql2("{.col x}", .con = con)
-    glue_sql2("{.col character()}", .con = con)
+    glue_sql2("{.id x}", .con = con)
+    glue_sql2("{.id character()}", .con = con)
   })
 })
 
 test_that("glue_sql() can collapse", {
   con <- simulate_dbi()
   x <- c("a", "b")
-  expect_equal(glue_sql2("{.col x*}", .con = con), sql("`a`, `b`"))
+
+  expect_equal(glue_sql2("{x*}", .con = con), sql("'a', 'b'"))
+  expect_equal(glue_sql2("{.id x*}", .con = con), sql("`a`, `b`"))
   expect_equal(glue_sql2("{.val x*}", .con = con), sql("'a', 'b'"))
 
   expect_snapshot(error = TRUE, {
     glue_sql2("{.tbl x*}", .con = con)
-    glue_sql2("{.name x*}", .con = con)
     glue_sql2("{.from x*}", .con = con)
   })
 })

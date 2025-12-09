@@ -73,7 +73,8 @@ base_scalar <- sql_translator(
     # `x` can be a table, column or even an expression (e.g. for json)
     i <- enexpr(i)
     if (is.character(i)) {
-      sql_glue("{x}.{.col i}")
+      i <- ident(i)
+      sql_glue("{x}.{i}")
     } else if (is.numeric(i)) {
       i <- as.integer(i)
       sql_glue("{x}[{.val i}]")

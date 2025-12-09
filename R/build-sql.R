@@ -35,12 +35,6 @@
 #' build_sql("INSERT INTO students (name) VALUES (", name, ")", con = con)
 #' # New:
 #' glue_sql2(con, "INSERT INTO students (name) VALUES ({.val name})")
-#'
-#' # Old:
-#' cols <- c("x", "y")
-#' build_sql("SELECT ", ident(cols), " FROM table", con = con)
-#' # New:
-#' glue_sql2(con, "SELECT {.col cols*} FROM {.tbl 'table'}")
 build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
   lifecycle::deprecate_warn("2.6.0", "build_sql()", "glue_sql2()")
   check_con(con)
@@ -77,13 +71,12 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
 #' * `.sql` - An existing SQL string.
 #' * `.tbl` - A table identifier (e.g., `DBI::Id()`, string, or `in_schema()`).
 #' * `.from` - A subquery or table identifier.
-#' * `.name` - A name for an index or subquery (string or `ident()`).
-#' * `.col` - A column name or multiple columns (use `*` suffix for multiple).
+#' * `.id` - Database identifiers. Use `*` suffix for multiple identifiers,
+#'   which will not be wrapped.
 #' * `.kw` - An SQL keyword that will be syntax-highlighted.
-#' * `.val` - Any value to be escaped (vectors, dates, SQL, etc.).
-#'
-#' The `*` suffix after `.col` or `.val` collapses the vector into a
-#' comma-separated list.
+#' * `.val` - A value. Typically used when the function has a scalar argument
+#'   or a vector argument is that not vectorised with the primary input.
+#'   Use `*` suffix for multiple values, which will be wrapped in `()`.
 #'
 #' @param .con A database connection.
 #' @param ... SQL fragments to interpolate. These are evaluated in `.envir` and
@@ -108,8 +101,8 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
 #' glue_sql2(con, "INSERT INTO students (name) VALUES ({.val name})")
 #'
 #' # Multiple columns with collapse
-#' cols <- c("name", "age", "grade")
-#' glue_sql2(con, "SELECT {.col cols*} FROM students")
+#' cols <- ident(c("name", "age", "grade"))
+#' glue_sql2(con, "SELECT {.id cols*} FROM students")
 glue_sql2 <- function(
   .con,
   ...,
@@ -123,6 +116,7 @@ glue_sql2 <- function(
   .literal = FALSE,
   .trim = TRUE
 ) {
+  env <- current_env()
   sql(glue(
     ...,
     .sep = .sep,
@@ -133,7 +127,7 @@ glue_sql2 <- function(
     .null = .null,
     .comment = .comment,
     .literal = .literal,
-    .transformer = sql_quote_transformer(.con),
+    .transformer = sql_quote_transformer(.con, call = env),
     .trim = .trim
   ))
 }
@@ -142,7 +136,7 @@ sql_glue <- function(x, con = sql_current_con(), envir = parent.frame()) {
   glue_sql2(con, x, .envir = envir)
 }
 
-sql_quote_transformer <- function(connection) {
+sql_quote_transformer <- function(connection, call = caller_env()) {
   function(text, envir) {
     collapse_regex <- "[*][[:space:]]*$"
     should_collapse <- grepl(collapse_regex, text)
@@ -150,7 +144,7 @@ sql_quote_transformer <- function(connection) {
       text <- sub(collapse_regex, "", text)
     }
 
-    type_regex <- "^\\.(tbl|col|name|from|kw|val|sql) (.*)"
+    type_regex <- "^\\.(tbl|id|from|kw|val|sql) (.*)"
     m <- regexec(type_regex, text)
     is_quoted <- any(m[[1]] != -1)
     if (is_quoted) {
@@ -171,26 +165,20 @@ sql_quote_transformer <- function(connection) {
       value <- as_table_path(value, connection)
     } else if (type == "from") {
       value <- as_table_source(value, connection)
-    } else if (type == "col") {
-      if (is_bare_character(value)) {
-        value <- ident(value)
-      }
-    } else if (type == "name") {
-      # allowed should be `ident`, `ident_q` (maybe), string
+    } else if (type == "id") {
       if (is_bare_character(value)) {
         value <- ident(value)
       }
     } else if (type == "kw") {
       value <- sql(style_kw(value))
     } else if (type == "val") {
-      # keep as is
-    } else if (type == "raw") {
-      # if (!is.sql(value) && !is_string(value)) {
-      #   stop_input_type(value, what = c("a string", "scalar SQL"))
-      # }
-    }
+      if (!is_atomic(type)) {
+        cli::cli_abort(
+          "{{.val}} must be used with atomic vectors.",
+          call = call
+        )
+      }
 
-    if (type == "val") {
       if (should_collapse) {
         value <- escape(
           value,
@@ -201,7 +189,9 @@ sql_quote_transformer <- function(connection) {
       } else {
         value <- escape(value, con = connection)
       }
-    } else if (type %in% c("tbl", "from", "col", "name", "raw")) {
+    } else if (type == "raw") {}
+
+    if (type == "val") {} else if (type %in% c("tbl", "from", "id", "raw")) {
       value <- escape(value, collapse = NULL, parens = FALSE, con = connection)
       if (should_collapse) {
         value <- paste0(unclass(value), collapse = ", ")
@@ -210,7 +200,10 @@ sql_quote_transformer <- function(connection) {
 
     # TODO use `vctrs::vec_check_size(value, size = 1L)`
     if (length(value) != 1) {
-      cli_abort("{.arg value} must have size 1, not {length(value)}.")
+      cli_abort(
+        "{{{text}}} must have size 1, not {length(value)}.",
+        call = call
+      )
     }
 
     unclass(value)
@@ -219,7 +212,7 @@ sql_quote_transformer <- function(connection) {
 
 
 glue_check_collapse <- function(type, collapse) {
-  if (type %in% c("col", "val")) {
+  if (type %in% c("id", "val", "raw")) {
     return()
   }
 

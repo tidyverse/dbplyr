@@ -43,11 +43,5 @@ name <- "Robert"
 build_sql("INSERT INTO students (name) VALUES (", name, ")", con = con)
 # New:
 glue_sql2(con, "INSERT INTO students (name) VALUES ({.val name})")
-
-# Old:
-cols <- c("x", "y")
-build_sql("SELECT ", ident(cols), " FROM table", con = con)
-# New:
-glue_sql2(con, "SELECT {.col cols*} FROM {.tbl 'table'}")
 }
 \keyword{internal}

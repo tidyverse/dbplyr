@@ -276,11 +276,11 @@ sql_translation.PqConnection <- function(con) {
       # clock ---------------------------------------------------------------
       add_days = function(x, n, ...) {
         check_dots_empty()
-        sql_glue("({.col x} + {.val n}*INTERVAL'1 day')")
+        sql_glue("({x} + {n}*INTERVAL'1 day')")
       },
       add_years = function(x, n, ...) {
         check_dots_empty()
-        sql_glue("({.col x} + {.val n}*INTERVAL'1 year')")
+        sql_glue("({x} + {n}*INTERVAL'1 year')")
       },
       date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
         check_unsupported_arg(invalid, allow_null = TRUE)
@@ -360,7 +360,11 @@ sql_expr_matches.PostgreSQL <- sql_expr_matches.PqConnection
 sql_query_explain.PqConnection <- function(con, sql, format = "text", ...) {
   format <- match.arg(format, c("text", "json", "yaml", "xml"))
 
-  glue_sql2(con, "EXPLAIN ", if (!is.null(format)) "(FORMAT {format}) ", sql)
+  if (!is.null(format)) {
+    glue_sql2(con, "EXPLAIN (FORMAT {format}) {.sql sql}")
+  } else {
+    glue_sql2(con, "EXPLAIN {.sql sql}")
+  }
 }
 #' @export
 sql_query_explain.PostgreSQL <- sql_query_explain.PqConnection

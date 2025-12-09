@@ -66,7 +66,7 @@ sql_query_select.Oracle <- function(
     # Requires Oracle 12c, released in 2013
     limit = if (!is.null(limit)) {
       limit <- as.integer(limit)
-      glue_sql2(con, "FETCH FIRST {.val limit} ROWS ONLY")
+      glue_sql2(con, "FETCH FIRST {limit} ROWS ONLY")
     },
     lvl = lvl
   )
@@ -125,7 +125,7 @@ sql_translation.Oracle <- function(con) {
       # https://stackoverflow.com/questions/1171196
       as.character = sql_cast("VARCHAR2(255)"),
       # https://oracle-base.com/articles/misc/oracle-dates-timestamps-and-intervals
-      as.Date = \(x) sql_glue("DATE {.val x}"),
+      as.Date = \(x) sql_glue("DATE {x}"),
       # bit64::as.integer64 can translate to BIGINT for some
       # vendors, which is equivalent to NUMBER(19) in Oracle
       # https://docs.oracle.com/cd/B19306_01/gateways.102/b14270/apa.htm
@@ -211,8 +211,8 @@ sql_table_analyze.Oracle <- function(con, table, ...) {
 
 #' @export
 sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
-  type <- if (temporary) sql("GLOBAL TEMPORARY ") else sql("")
-  glue_sql2(con, "CREATE {type}TABLE {.tbl name} AS\n{sql}")
+  type <- if (temporary) "GLOBAL TEMPORARY TABLE" else "TABLE"
+  glue_sql2(con, "CREATE {.sql type} {.tbl name} AS\n{sql}")
 }
 
 #' @export

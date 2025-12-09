@@ -180,25 +180,25 @@ sql_translation.Snowflake <- function(con) {
         sql_glue("EXTRACT('year', {x})")
       },
       seconds = function(x) {
-        sql_glue("INTERVAL '{.val x} second'")
+        sql_glue("INTERVAL '{x} second'")
       },
       minutes = function(x) {
-        sql_glue("INTERVAL '{.val x} minute'")
+        sql_glue("INTERVAL '{x} minute'")
       },
       hours = function(x) {
-        sql_glue("INTERVAL '{.val x} hour'")
+        sql_glue("INTERVAL '{x} hour'")
       },
       days = function(x) {
-        sql_glue("INTERVAL '{.val x} day'")
+        sql_glue("INTERVAL '{x} day'")
       },
       weeks = function(x) {
-        sql_glue("INTERVAL '{.val x} week'")
+        sql_glue("INTERVAL '{x} week'")
       },
       months = function(x) {
-        sql_glue("INTERVAL '{.val x} month'")
+        sql_glue("INTERVAL '{x} month'")
       },
       years = function(x) {
-        sql_glue("INTERVAL '{.val x} year'")
+        sql_glue("INTERVAL '{x} year'")
       },
       # https://docs.snowflake.com/en/sql-reference/functions/date_trunc.html
       floor_date = function(x, unit = "seconds") {
@@ -271,7 +271,7 @@ sql_translation.Snowflake <- function(con) {
         if (identical(na.rm, TRUE)) {
           snowflake_pmin_pmax_sql_expression(dots = dots, comparison = "<=")
         } else {
-          sql_glue("LEAST({.val dots*})")
+          sql_glue("LEAST({dots*})")
         }
       },
       pmax = function(..., na.rm = FALSE) {
@@ -279,12 +279,12 @@ sql_translation.Snowflake <- function(con) {
         if (identical(na.rm, TRUE)) {
           snowflake_pmin_pmax_sql_expression(dots = dots, comparison = ">=")
         } else {
-          sql_glue("GREATEST({.val dots*})")
+          sql_glue("GREATEST({dots*})")
         }
       },
       `$` = function(x, name) {
         if (is.sql(x)) {
-          sql_glue("{x}:{.col name}")
+          sql_glue("{x}:{.sql name}")
         } else {
           eval(bquote(`$`(x, .(substitute(name)))))
         }

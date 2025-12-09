@@ -144,7 +144,7 @@ sql_str_detect_fixed_instr <- function(type = c("detect", "start", "end")) {
   function(string, pattern, negate = FALSE) {
     con <- sql_current_con()
     pattern <- unclass(pattern)
-    index_sql <- glue_sql2(con, "INSTR({.val string}, {.val pattern})")
+    index_sql <- glue_sql2(con, "INSTR({string}, {pattern})")
 
     if (negate) {
       switch(
@@ -176,7 +176,7 @@ sql_str_detect_fixed_position <- function(type = c("detect", "start", "end")) {
   function(string, pattern, negate = FALSE) {
     con <- sql_current_con()
     pattern <- unclass(pattern)
-    index_sql <- glue_sql2(con, "POSITION({.val pattern} in {.val string})")
+    index_sql <- glue_sql2(con, "POSITION({pattern} in {string})")
 
     if (negate) {
       switch(

@@ -427,7 +427,7 @@ simulate_mssql <- function(version = "15.0") {
         check_unsupported_arg(precision, allowed = "day")
         check_unsupported_arg(n, allowed = 1L)
 
-        sql_glue("DATEDIFF(DAY, {.val start}, {.val end})")
+        sql_glue("DATEDIFF(DAY, {start}, {end})")
       },
 
       difftime = function(time1, time2, tz, units = "days") {
@@ -632,9 +632,8 @@ mssql_is_null <- function(x) {
 
 mssql_infix_comparison <- function(f) {
   check_string(f)
-  f <- sql(f)
   function(x, y) {
-    mssql_as_bit(sql_glue("{.val x} {f} {.val y}"))
+    mssql_as_bit(sql_glue("{x} {.sql f} {y}"))
   }
 }
 

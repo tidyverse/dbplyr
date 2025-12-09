@@ -39,12 +39,12 @@ win_over <- function(
 ) {
   if (length(partition) > 0) {
     partition <- as.sql(partition, con = con)
-    partition <- glue_sql2(con, "PARTITION BY {.val partition*}")
+    partition <- glue_sql2(con, "PARTITION BY {partition*}")
   }
 
   if (length(order) > 0) {
     order <- as.sql(order, con = con)
-    order <- glue_sql2(con, "ORDER BY {.val order*}")
+    order <- glue_sql2(con, "ORDER BY {order*}")
   }
   if (length(frame) > 0) {
     if (length(order) == 0) {
@@ -73,7 +73,7 @@ win_over <- function(
     over <- win_get(over, con)
   }
 
-  glue_sql2(con, "{expr} OVER {.val over}")
+  glue_sql2(con, "{expr} OVER {over}")
 }
 
 win_register_activate <- function() {
@@ -209,7 +209,7 @@ win_aggregate <- function(f) {
     frame <- win_current_frame()
 
     win_over(
-      sql_glue("{.sql f}({.val x})"),
+      sql_glue("{.sql f}({x})"),
       partition = win_current_group(),
       order = if (!is.null(frame)) win_current_order(),
       frame = frame
@@ -224,7 +224,7 @@ win_aggregate_2 <- function(f) {
     frame <- win_current_frame()
 
     win_over(
-      sql_glue("{.sql f}({.val x}, {.val y})"),
+      sql_glue("{.sql f}({x}, {y})"),
       partition = win_current_group(),
       order = if (!is.null(frame)) win_current_order(),
       frame = frame
@@ -243,7 +243,7 @@ win_recycled <- win_aggregate
 win_cumulative <- function(f) {
   function(x, order = NULL) {
     win_over(
-      sql_glue("{.sql f}({.val x})"),
+      sql_glue("{.sql f}({x})"),
       partition = win_current_group(),
       order = order %||% win_current_order(),
       frame = c(-Inf, 0)
@@ -275,7 +275,7 @@ sql_nth <- function(
     if (is.numeric(n)) {
       n <- as.integer(n)
     }
-    args <- glue_sql2(con, "{args}, {.val n}")
+    args <- glue_sql2(con, "{args}, {n}")
   }
 
   if (na_rm) {

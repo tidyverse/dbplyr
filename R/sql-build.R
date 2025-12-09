@@ -162,7 +162,7 @@ cte_render <- function(query_list, con) {
     query_list[-n],
     function(query, name) {
       name <- table_path(name)
-      glue_sql2(con, "{.name name} {.kw 'AS'} (\n{query}\n)")
+      glue_sql2(con, "{.tbl name} {.kw 'AS'} (\n{query}\n)")
     }
   )
   cte_query <- sql_vector(

@@ -78,9 +78,8 @@ sql_translation.RedshiftConnection <- function(con) {
       },
       date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
         check_unsupported_arg(invalid, allow_null = TRUE)
-        glue_sql2(
-          sql_current_con(),
-          "TO_DATE(CAST({.val year} AS TEXT) || '-' || CAST({.val month} AS TEXT) || '-' || CAST({.val day} AS TEXT), 'YYYY-MM-DD')"
+        sql_glue(
+          "TO_DATE(CAST({year} AS TEXT) || '-' || CAST({month} AS TEXT) || '-' || CAST({day} AS TEXT), 'YYYY-MM-DD')"
         )
       },
       get_year = function(x) {

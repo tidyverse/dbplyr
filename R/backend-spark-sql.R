@@ -82,11 +82,11 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
       median = sql_aggregate("MEDIAN"),
       first = function(x, na_rm = FALSE) {
         sql_check_na_rm(na_rm)
-        sql_glue("FIRST({.val x})")
+        sql_glue("FIRST({x})")
       },
       last = function(x, na_rm = FALSE) {
         sql_check_na_rm(na_rm)
-        sql_glue("LAST({.val x})")
+        sql_glue("LAST({x})")
       },
     ),
     sql_translator(

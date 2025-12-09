@@ -34,7 +34,6 @@ sql_infix <- function(f, pad = TRUE, con = sql_current_con()) {
   # This is fixed with `escape_infix_expr()`
   # see https://github.com/tidyverse/dbplyr/issues/634
   check_string(f)
-
   check_bool(pad)
 
   function(x, y) {
@@ -49,9 +48,9 @@ sql_infix <- function(f, pad = TRUE, con = sql_current_con()) {
       }
     } else {
       if (pad) {
-        sql <- "{.val x} {.sql f} {.val y}"
+        sql <- "{x} {.sql f} {.val y}"
       } else {
-        sql <- "{.val x}{.sql f}{.val y}"
+        sql <- "{x}{.sql f}{.val y}"
       }
     }
     glue_sql2(con, sql)
@@ -90,7 +89,7 @@ sql_prefix <- function(f, n = NULL) {
     if (any(names2(args) != "")) {
       cli::cli_warn("Named arguments ignored for SQL {f}")
     }
-    sql_glue("{.sql f}({.val args*})")
+    sql_glue("{.sql f}({args*})")
   }
 }
 

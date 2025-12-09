@@ -100,7 +100,7 @@ sql_if <- function(cond, if_true, if_false = quo(NULL), missing = quo(NULL)) {
   enpared_missing <- enpar(missing)
   con <- sql_current_con()
 
-  out <- "CASE WHEN {.val enpared_cond} THEN {.val enpared_if_true}"
+  out <- "CASE WHEN {enpared_cond} THEN {enpared_if_true}"
 
   # `ifelse()` and `if_else()` have a three value logic: they return `NA` resp.
   # `missing` if `cond` is `NA`. To get the same in SQL it is necessary to
@@ -112,12 +112,12 @@ sql_if <- function(cond, if_true, if_false = quo(NULL), missing = quo(NULL)) {
   # END
 
   if (!quo_is_null(if_false) && !identical(if_false, missing)) {
-    false_sql <- " WHEN NOT {.val enpared_cond} THEN {.val enpared_if_false}"
+    false_sql <- " WHEN NOT {enpared_cond} THEN {enpared_if_false}"
     out <- paste0(out, false_sql)
   }
 
   if (!quo_is_null(missing)) {
-    missing_sql <- " ELSE {.val enpared_missing}"
+    missing_sql <- " ELSE {enpared_missing}"
     out <- paste0(out, missing_sql)
   }
   out <- paste0(out, " END")
@@ -192,7 +192,7 @@ sql_switch <- function(x, ...) {
   named <- names2(input) != ""
 
   clauses <- purrr::map2_chr(names(input)[named], input[named], function(x, y) {
-    glue_sql2(con, "WHEN ({.val x}) THEN ({.val y})")
+    glue_sql2(con, "WHEN ({x}) THEN ({y})")
   })
 
   n_unnamed <- sum(!named)
@@ -200,13 +200,13 @@ sql_switch <- function(x, ...) {
     # do nothing
   } else if (n_unnamed == 1) {
     idx <- which(!named)
-    clauses <- c(clauses, glue_sql2(con, "ELSE ({.val input[[idx]]})"))
+    clauses <- c(clauses, glue_sql2(con, "ELSE ({input[[idx]]})"))
   } else {
     cli_abort("Can only have one unnamed (ELSE) input")
   }
 
   clauses_collapsed <- paste0(clauses, collapse = " ")
-  glue_sql2(con, "CASE {.val x} {.sql clauses_collapsed} END")
+  glue_sql2(con, "CASE {x} {.sql clauses_collapsed} END")
 }
 
 sql_is_null <- function(x) {
@@ -225,7 +225,7 @@ enpar <- function(x, tidy = TRUE, env = NULL) {
     x_sql <- eval_bare(x, env = env)
   }
   if (quo_is_call(x)) {
-    sql_glue("({.val x_sql})")
+    sql_glue("({x_sql})")
   } else {
     x_sql
   }
