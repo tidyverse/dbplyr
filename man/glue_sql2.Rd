@@ -49,6 +49,7 @@ special type markers for safe SQL generation. It replaces the deprecated
 Within the glue template, use type markers to specify how values should be
 escaped and formatted:
 \itemize{
+\item \code{.sql} - An existing SQL string.
 \item \code{.tbl} - A table identifier (e.g., \code{DBI::Id()}, string, or \code{in_schema()}).
 \item \code{.from} - A subquery or table identifier.
 \item \code{.name} - A name for an index or subquery (string or \code{ident()}).
@@ -59,9 +60,6 @@ escaped and formatted:
 
 The \code{*} suffix after \code{.col} or \code{.val} collapses the vector into a
 comma-separated list.
-
-If no type is specified, the value must be a string or scalar SQL and won't
-be escaped or collapsed.
 }
 \examples{
 con <- simulate_dbi()

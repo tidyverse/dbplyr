@@ -74,6 +74,7 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
 #' Within the glue template, use type markers to specify how values should be
 #' escaped and formatted:
 #'
+#' * `.sql` - An existing SQL string.
 #' * `.tbl` - A table identifier (e.g., `DBI::Id()`, string, or `in_schema()`).
 #' * `.from` - A subquery or table identifier.
 #' * `.name` - A name for an index or subquery (string or `ident()`).
