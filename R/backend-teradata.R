@@ -118,13 +118,13 @@ sql_translation.Teradata <- function(con) {
       bitwShiftR = sql_prefix("SHIFTRIGHT", 2),
       as.numeric = function(x, digits = 9L) {
         digits <- vctrs::vec_cast(digits, integer())
-        sql_expr(CAST(!!x %as% DECIMAL(12L, !!digits)))
+        sql_glue("CAST({x} AS DECIMAL(12, {digits}))")
       },
       as.double = sql_cast("FLOAT"),
       as.character = function(x, nchar = 255L) {
         check_number_whole(nchar, min = 0, max = 64000)
         nchar <- vctrs::vec_cast(nchar, integer())
-        sql_expr(CAST(!!x %as% VARCHAR(!!nchar)))
+        sql_glue("CAST({x} AS VARCHAR({nchar}))")
       },
       as.Date = teradata_as_date,
       log10 = sql_prefix("LOG"),
@@ -136,11 +136,11 @@ sql_translation.Teradata <- function(con) {
       ceil = sql_prefix("CEILING"),
       ceiling = sql_prefix("CEILING"),
       atan2 = function(x, y) {
-        sql_expr(ATAN2(!!y, !!x))
+        sql_glue("ATAN2({y}, {x})")
       },
       substr = function(x, start, stop) {
         len <- stop - start + 1
-        sql_expr(SUBSTR(!!x, !!start, !!len))
+        sql_glue("SUBSTR({x}, {start}, {len})")
       },
       startsWith = function(string, pattern) {
         glue_sql2(
@@ -148,18 +148,18 @@ sql_translation.Teradata <- function(con) {
           "CAST(CASE WHEN INSTR({.val string}, {.val pattern}) = 1 THEN 1 ELSE 0 END AS INTEGER)"
         )
       },
-      paste = sql_paste_infix(" ", "||", function(x) sql_expr(!!x)),
-      paste0 = sql_paste_infix("", "||", function(x) sql_expr(!!x)),
+      paste = sql_paste_infix(" ", "||", function(x) x),
+      paste0 = sql_paste_infix("", "||", function(x) x),
       row_number = win_rank("ROW_NUMBER", empty_order = TRUE),
 
       # lubridate ---------------------------------------------------------------
       # https://en.wikibooks.org/wiki/SQL_Dialects_Reference/Functions_and_expressions/Date_and_time_functions
       as_date = teradata_as_date,
       week = function(x) {
-        sql_expr(WEEKNUMBER_OF_YEAR(!!x, 'iso'))
+        sql_glue("WEEKNUMBER_OF_YEAR({x}, 'iso')")
       },
       quarter = function(x) {
-        sql_glue("to_char({.val x}, 'q')")
+        sql_glue("TO_CHAR({.val x}, 'q')")
       }
     ),
     sql_translator(
@@ -170,7 +170,7 @@ sql_translation.Teradata <- function(con) {
         # nocov start
         check_unsupported_arg(na.rm, allowed = TRUE)
         win_over(
-          sql_expr(SUM((!!x * !!w)) / SUM(!!w)),
+          sql_glue("SUM(({x} * {w})) / SUM({w})"),
           win_current_group(),
           win_current_group(),
           win_current_frame()
@@ -184,15 +184,16 @@ sql_translation.Teradata <- function(con) {
       row_number = win_rank("ROW_NUMBER", empty_order = TRUE),
       lead = function(x, n = 1L, default = NA, order_by = NULL) {
         win_over(
-          sql_expr(LEAD(!!x, !!n, !!default)),
+          sql_glue("LEAD({x}, {n}, {default})"),
           win_current_group(),
           order_by %||% win_current_group(),
           win_current_frame()
         )
       },
       lag = function(x, n = 1L, default = NA, order_by = NULL) {
+        n <- as.integer(n)
         win_over(
-          sql_expr(LAG(!!x, !!as.integer(n), !!default)),
+          sql_glue("LAG({x}, {n}, {default})"),
           win_current_group(),
           order_by %||% win_current_group(),
           win_current_frame()
@@ -200,7 +201,7 @@ sql_translation.Teradata <- function(con) {
       },
       cumsum = function(x, order_by = NULL, frame = c(-Inf, 0)) {
         win_over(
-          sql_expr(SUM(!!x)),
+          sql_glue("SUM({x})"),
           win_current_group(),
           order_by %||% win_current_group(),
           frame %||% win_current_frame()
@@ -210,7 +211,7 @@ sql_translation.Teradata <- function(con) {
         # nocov start
         check_unsupported_arg(na.rm, allowed = TRUE)
         win_over(
-          sql_expr(SUM((!!x * !!w)) / SUM(!!w)),
+          sql_glue("SUM(({x} * {w})) / SUM({w})"),
           win_current_group(),
           win_current_group(),
           win_current_frame()

@@ -40,11 +40,11 @@ sql_translation.Hive <- function(con) {
       bitwShiftR = sql_prefix("SHIFTRIGHT", 2),
 
       cot = function(x) {
-        sql_expr(1 / tan(!!x))
+        sql_glue("1.0 / TAN({x})")
       },
 
       str_replace_all = function(string, pattern, replacement) {
-        sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
+        sql_glue("REGEXP_REPLACE({string}, {pattern}, {replacement})")
       }
     ),
     sql_translator(
@@ -108,7 +108,7 @@ sql_query_set_op.Hive <- function(
   check_bool(all)
   # parentheses are not allowed
   method <- paste0(method, if (all) " ALL")
-  glue_sql2(con, "{x}\n", lvl_indent(lvl), "{method}\n", y)
+  glue_sql2(con, "{x}\n", lvl_indent(lvl), "{.sql method}\n", y)
 }
 
 #' @export

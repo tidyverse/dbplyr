@@ -84,9 +84,6 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
 #' The `*` suffix after `.col` or `.val` collapses the vector into a
 #' comma-separated list.
 #'
-#' If no type is specified, the value must be a string or scalar SQL and won't
-#' be escaped or collapsed.
-#'
 #' @param .con A database connection.
 #' @param ... SQL fragments to interpolate. These are evaluated in `.envir` and
 #'   then combined according to their type markers.
@@ -152,7 +149,7 @@ sql_quote_transformer <- function(connection) {
       text <- sub(collapse_regex, "", text)
     }
 
-    type_regex <- "^\\.(tbl|col|name|from|kw|val) (.*)"
+    type_regex <- "^\\.(tbl|col|name|from|kw|val|sql) (.*)"
     m <- regexec(type_regex, text)
     is_quoted <- any(m[[1]] != -1)
     if (is_quoted) {
@@ -167,7 +164,9 @@ sql_quote_transformer <- function(connection) {
     value <- eval(parse(text = value, keep.source = FALSE), envir)
     glue_check_collapse(type, should_collapse)
 
-    if (type == "tbl") {
+    if (type == "sql") {
+      # leave as is
+    } else if (type == "tbl") {
       value <- as_table_path(value, connection)
     } else if (type == "from") {
       value <- as_table_source(value, connection)
@@ -185,9 +184,9 @@ sql_quote_transformer <- function(connection) {
     } else if (type == "val") {
       # keep as is
     } else if (type == "raw") {
-      if (!is.sql(value) && !is_string(value)) {
-        stop_input_type(value, what = c("a string", "scalar SQL"))
-      }
+      # if (!is.sql(value) && !is_string(value)) {
+      #   stop_input_type(value, what = c("a string", "scalar SQL"))
+      # }
     }
 
     if (type == "val") {
@@ -201,7 +200,7 @@ sql_quote_transformer <- function(connection) {
       } else {
         value <- escape(value, con = connection)
       }
-    } else if (type %in% c("tbl", "from", "col", "name")) {
+    } else if (type %in% c("tbl", "from", "col", "name", "raw")) {
       value <- escape(value, collapse = NULL, parens = FALSE, con = connection)
       if (should_collapse) {
         value <- paste0(unclass(value), collapse = ", ")

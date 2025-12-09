@@ -86,7 +86,7 @@ sql_translation.MariaDBConnection <- function(con) {
       # https://dev.mysql.com/doc/refman/8.0/en/cast-functions.html#function_cast
       # https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Vector-objects
       as.logical = function(x) {
-        sql_expr(IF(!!x, TRUE, FALSE))
+        sql_glue("IF({x}, TRUE, FALSE)")
       },
       as.character = sql_cast("CHAR"),
       as.numeric = sql_cast("DOUBLE"),
@@ -99,7 +99,7 @@ sql_translation.MariaDBConnection <- function(con) {
       as.integer64 = sql_cast("INTEGER"),
 
       runif = function(n = n(), min = 0, max = 1) {
-        sql_runif(RAND(), n = {{ n }}, min = min, max = max)
+        sql_runif("RAND()", n = {{ n }}, min = min, max = max)
       },
 
       # string functions ------------------------------------------------
@@ -116,20 +116,20 @@ sql_translation.MariaDBConnection <- function(con) {
       str_like = function(string, pattern, ignore_case = deprecated()) {
         ignore_case <- deprecate_ignore_case(ignore_case)
         if (ignore_case) {
-          sql_expr(!!string %LIKE% !!pattern)
+          sql_glue("{string} LIKE {pattern}")
         } else {
-          sql_expr(!!string %LIKE BINARY% !!pattern)
+          sql_glue("{string} LIKE BINARY {pattern}")
         }
       },
       str_ilike = function(string, pattern) {
         # MySQL's LIKE is case-insensitive by default
-        sql_expr(!!string %LIKE% !!pattern)
+        sql_glue("{string} LIKE {pattern}")
       },
       str_locate = function(string, pattern) {
-        sql_expr(REGEXP_INSTR(!!string, !!pattern))
+        sql_glue("REGEXP_INSTR({string}, {pattern})")
       },
       str_replace_all = function(string, pattern, replacement) {
-        sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
+        sql_glue("REGEXP_REPLACE({string}, {pattern}, {replacement})")
       }
     ),
     sql_translator(
@@ -138,7 +138,7 @@ sql_translation.MariaDBConnection <- function(con) {
       var = sql_aggregate("VAR_SAMP", "var"),
       str_flatten = function(x, collapse = "", na.rm = FALSE) {
         sql_check_na_rm(na.rm)
-        sql_expr(group_concat(!!x %separator% !!collapse))
+        sql_glue("GROUP_CONCAT({x} SEPARATOR {collapse})")
       }
     ),
     sql_translator(

@@ -66,11 +66,10 @@ escape_infix_expr <- function(xq, x, escape_unary_minus = FALSE) {
     !is_atomic(x, n = 1)
 
   if (is_infix || is_unary_minus) {
-    enpared <- sql_glue("({.val x})")
-    return(enpared)
+    sql(paste0("(", x, ")"))
+  } else {
+    x
   }
-
-  x
 }
 
 #' @rdname sql_translation_scalar
@@ -79,6 +78,7 @@ escape_infix_expr <- function(xq, x, escape_unary_minus = FALSE) {
 #' @export
 sql_prefix <- function(f, n = NULL) {
   check_string(f)
+  f <- sql(f)
 
   function(...) {
     args <- list(...)
@@ -101,7 +101,7 @@ sql_prefix <- function(f, n = NULL) {
 sql_cast <- function(type) {
   type <- sql(type)
   function(x) {
-    sql_expr(cast(!!x %as% !!type))
+    sql_glue("CAST({x} AS {type})")
   }
 }
 
@@ -110,7 +110,7 @@ sql_cast <- function(type) {
 sql_try_cast <- function(type) {
   type <- sql(type)
   function(x) {
-    sql_expr(try_cast(!!x %as% !!type))
+    sql_glue("TRY_CAST({x} AS {type})")
     # try_cast available in MSSQL 2012+
   }
 }
@@ -120,9 +120,9 @@ sql_try_cast <- function(type) {
 sql_log <- function() {
   function(x, base = exp(1)) {
     if (isTRUE(all.equal(base, exp(1)))) {
-      sql_expr(ln(!!x))
+      sql_glue("LN({x})")
     } else {
-      sql_expr(log(!!x) / log(!!base))
+      sql_glue("LOG({x}) / LOG({base})")
     }
   }
 }
@@ -132,7 +132,7 @@ sql_log <- function() {
 #' @export
 sql_cot <- function() {
   function(x) {
-    sql_expr(1L / tan(!!x))
+    sql_glue("1 / TAN({x})")
   }
 }
 
@@ -141,22 +141,24 @@ sql_cot <- function() {
 #' @param min,max Range of random values.
 #' @export
 sql_runif <- function(rand_expr, n = n(), min = 0, max = 1) {
+  rand_expr <- enexpr(rand_expr)
+
   n_expr <- quo_get_expr(enquo(n))
   if (!is_call(n_expr, "n", n = 0)) {
     cli_abort("Only {.code n = n()} is supported.")
   }
 
-  rand_expr <- enexpr(rand_expr)
+  rand_expr <- sql(rand_expr)
   range <- max - min
   if (range != 1) {
-    rand_expr <- expr(!!rand_expr * !!range)
+    rand_expr <- sql_glue("{rand_expr} * {range}")
   }
 
   if (min != 0) {
-    rand_expr <- expr(!!rand_expr + !!min)
+    rand_expr <- sql_glue("{rand_expr} + {min}")
   }
 
-  sql_expr(!!rand_expr)
+  rand_expr
 }
 
 utils::globalVariables(c("%as%", "cast", "ln", "try_cast"))

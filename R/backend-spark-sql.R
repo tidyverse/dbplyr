@@ -41,38 +41,38 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
       # clock ---------------------------------------------------------------
       add_days = function(x, n, ...) {
         check_dots_empty()
-        sql_expr(date_add(!!x, !!n))
+        sql_glue("DATE_ADD({x}, {n})")
       },
       add_years = function(x, n, ...) {
         check_dots_empty()
-        sql_expr(add_months(!!x, !!n * 12))
+        sql_glue("ADD_MONTHS({x}, {n} * 12)")
       },
       date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
         check_unsupported_arg(invalid, allow_null = TRUE)
-        sql_expr(make_date(!!year, !!month, !!day))
+        sql_glue("MAKE_DATE({year}, {month}, {day})")
       },
       get_year = function(x) {
-        sql_expr(date_part('YEAR', !!x))
+        sql_glue("DATE_PART('YEAR', {x})")
       },
       get_month = function(x) {
-        sql_expr(date_part('MONTH', !!x))
+        sql_glue("DATE_PART('MONTH', {x})")
       },
       get_day = function(x) {
-        sql_expr(date_part('DAY', !!x))
+        sql_glue("DATE_PART('DAY', {x})")
       },
       date_count_between = function(start, end, precision, ..., n = 1L) {
         check_dots_empty()
         check_unsupported_arg(precision, allowed = "day")
         check_unsupported_arg(n, allowed = 1L)
 
-        sql_expr(datediff(!!end, !!start))
+        sql_glue("DATEDIFF({end}, {start})")
       },
 
       difftime = function(time1, time2, tz, units = "days") {
         check_unsupported_arg(tz)
         check_unsupported_arg(units, allowed = "days")
 
-        sql_expr(datediff(!!time2, !!time1))
+        sql_glue("DATEDIFF({time2}, {time1})")
       }
     ),
     sql_translator(

@@ -70,7 +70,7 @@ sql_str_sub <- function(
         if (n == 0) {
           length_sql <- sql_call2(length_f, string, con = con)
         } else {
-          length_sql <- sql_expr(!!sql_call2(length_f, string) - !!n)
+          length_sql <- sql_glue("{sql_call2(length_f, string)} - {n}")
         }
       } else {
         length_sql <- pmax(end - start + 1L, 0L)
@@ -84,7 +84,7 @@ start_pos <- function(string, start, length_f, con = NULL) {
   if (start == -1) {
     sql_call2(length_f, string, con = con)
   } else if (start < 0) {
-    sql_expr(!!sql_call2(length_f, string) - !!abs(start + 1L), con = con)
+    sql_glue("{sql_call2(length_f, string)} - {abs(start + 1L)}")
   } else {
     start
   }
@@ -94,9 +94,9 @@ sql_str_trim <- function(string, side = c("both", "left", "right")) {
   side <- match.arg(side)
   switch(
     side,
-    left = sql_expr(ltrim(!!string)),
-    right = sql_expr(rtrim(!!string)),
-    both = sql_expr(ltrim(rtrim(!!string))),
+    left = sql_glue("LTRIM({string})"),
+    right = sql_glue("RTRIM({string})"),
+    both = sql_glue("LTRIM(RTRIM({string}))"),
   )
 }
 

@@ -65,8 +65,8 @@ sql_query_select.Oracle <- function(
     order_by = sql_clause_order_by(order_by, subquery, limit),
     # Requires Oracle 12c, released in 2013
     limit = if (!is.null(limit)) {
-      limit <- format(as.integer(limit))
-      glue_sql2(con, "FETCH FIRST {limit} ROWS ONLY")
+      limit <- as.integer(limit)
+      glue_sql2(con, "FETCH FIRST {.val limit} ROWS ONLY")
     },
     lvl = lvl
   )
@@ -134,43 +134,43 @@ sql_translation.Oracle <- function(con) {
       as.double = sql_cast("NUMBER"),
 
       runif = function(n = n(), min = 0, max = 1) {
-        sql_runif(dbms_random.VALUE(), n = {{ n }}, min = min, max = max)
+        sql_runif("DBMS_RANDOM.VALUE()", n = {{ n }}, min = min, max = max)
       },
 
       # string -----------------------------------------------------------------
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/operators003.htm#i997789
       paste = sql_paste_infix(" ", "||", function(x) {
-        sql_expr(cast(!!x %as% text))
+        sql_glue("CAST({x} AS text)")
       }),
       paste0 = sql_paste_infix("", "||", function(x) {
-        sql_expr(cast(!!x %as% text))
+        sql_glue("CAST({x} AS text)")
       }),
       str_c = sql_paste_infix("", "||", function(x) {
-        sql_expr(cast(!!x %as% text))
+        sql_glue("CAST({x} AS text)")
       }),
 
       # https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/REGEXP_REPLACE.html
       # 4th argument is starting position (default: 1 => first char of string)
       # 5th argument is occurrence (default: 0 => match all occurrences)
       str_replace = function(string, pattern, replacement) {
-        sql_expr(regexp_replace(!!string, !!pattern, !!replacement, 1L, 1L))
+        sql_glue("REGEXP_REPLACE({string}, {pattern}, {replacement}, 1, 1)")
       },
       str_replace_all = function(string, pattern, replacement) {
-        sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
+        sql_glue("REGEXP_REPLACE({string}, {pattern}, {replacement})")
       },
 
       # lubridate --------------------------------------------------------------
-      today = \() sql_expr(TRUNC(CURRENT_TIMESTAMP)),
-      now = \() sql_expr(CURRENT_TIMESTAMP),
+      today = \() sql_glue("TRUNC(CURRENT_TIMESTAMP)"),
+      now = \() sql("CURRENT_TIMESTAMP"),
 
       # clock ------------------------------------------------------------------
       add_days = function(x, n, ...) {
         check_dots_empty()
-        sql_expr((!!x + NUMTODSINTERVAL(!!n, 'day')))
+        sql_glue("({x} + NUMTODSINTERVAL({n}, 'day'))")
       },
       add_years = function(x, n, ...) {
         check_dots_empty()
-        sql_expr((!!x + NUMTODSINTERVAL(!!n * 365.25, 'day')))
+        sql_glue("({x} + NUMTODSINTERVAL({n} * 365.25, 'day'))")
       },
 
       difftime = function(time1, time2, tz, units = "days") {
@@ -186,7 +186,7 @@ sql_translation.Oracle <- function(con) {
           )
         }
 
-        sql_expr(CEIL(CAST(!!time2 %AS% DATE) - CAST(!!time1 %AS% DATE)))
+        sql_glue("CEIL(CAST({time2} AS DATE) - CAST({time1} AS DATE))")
       }
     ),
     base_odbc_agg,
@@ -211,7 +211,7 @@ sql_table_analyze.Oracle <- function(con, table, ...) {
 
 #' @export
 sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
-  type <- if (temporary) "GLOBAL TEMPORARY " else ""
+  type <- if (temporary) sql("GLOBAL TEMPORARY ") else sql("")
   glue_sql2(con, "CREATE {type}TABLE {.tbl name} AS\n{sql}")
 }
 

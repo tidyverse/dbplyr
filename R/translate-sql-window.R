@@ -57,6 +57,7 @@ win_over <- function(
     if (is.numeric(frame)) {
       frame <- rows(frame[1], frame[2])
     }
+    f <- sql(frame)
     frame <- glue_sql2(con, "ROWS {frame}")
   }
 
@@ -71,7 +72,8 @@ win_over <- function(
   } else {
     over <- win_get(over, con)
   }
-  glue_sql2(con, "{.val expr} OVER {.val over}")
+
+  glue_sql2(con, "{expr} OVER {.val over}")
 }
 
 win_register_activate <- function() {
@@ -127,9 +129,10 @@ rows <- function(from = -Inf, to = 0) {
   val <- function(x) if (is.finite(x)) as.integer(abs(x)) else "UNBOUNDED"
   bound <- function(x) {
     if (x == 0) {
-      return("CURRENT ROW")
+      sql("CURRENT ROW")
+    } else {
+      sql(paste(val(x), dir(x)))
     }
-    paste(val(x), dir(x))
   }
 
   if (to == 0) {
@@ -142,7 +145,7 @@ rows <- function(from = -Inf, to = 0) {
 #' @rdname sql_translation_window
 #' @export
 win_rank <- function(f, empty_order = FALSE) {
-  force(f)
+  f <- sql(f)
   check_bool(empty_order)
 
   function(order = NULL) {
@@ -202,7 +205,8 @@ win_rank <- function(f, empty_order = FALSE) {
 #' @rdname sql_translation_window
 #' @export
 win_aggregate <- function(f) {
-  force(f)
+  f <- sql(f)
+
   function(x, na.rm = FALSE) {
     sql_check_na_rm(na.rm)
     frame <- win_current_frame()
@@ -219,6 +223,7 @@ win_aggregate <- function(f) {
 #' @rdname sql_translation_window
 #' @export
 win_aggregate_2 <- function(f) {
+  f <- sql(f)
   function(x, y) {
     frame <- win_current_frame()
 
@@ -240,7 +245,7 @@ win_recycled <- win_aggregate
 #' @rdname sql_translation_window
 #' @export
 win_cumulative <- function(f) {
-  force(f)
+  f <- sql(f)
   function(x, order = NULL) {
     win_over(
       sql_glue("{f}({.val x})"),
@@ -266,18 +271,19 @@ sql_nth <- function(
   frame <- win_current_frame()
   args <- translate_sql(!!x, con = con)
   if (n == 1) {
-    sql_f <- "FIRST_VALUE"
+    f <- "FIRST_VALUE"
   } else if (is.infinite(n) && n > 0) {
-    sql_f <- "LAST_VALUE"
+    f <- "LAST_VALUE"
     frame <- frame %||% c(-Inf, Inf)
   } else {
-    sql_f <- "NTH_VALUE"
+    f <- "NTH_VALUE"
     if (is.numeric(n)) {
       n <- as.integer(n)
     }
     args <- glue_sql2(con, "{args}, {.val n}")
   }
 
+  sql_f <- sql(f)
   if (na_rm) {
     if (ignore_nulls == "inside") {
       sql_expr <- "{sql_f}({args} IGNORE NULLS)"

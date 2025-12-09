@@ -120,8 +120,9 @@ sql_if <- function(cond, if_true, if_false = quo(NULL), missing = quo(NULL)) {
     missing_sql <- " ELSE {.val enpared_missing}"
     out <- paste0(out, missing_sql)
   }
+  out <- paste0(out, " END")
 
-  glue_sql2(con, out, " END")
+  glue_sql2(con, out)
 }
 
 sql_case_when <- function(
@@ -205,12 +206,12 @@ sql_switch <- function(x, ...) {
   }
 
   clauses_collapsed <- paste0(clauses, collapse = " ")
-  glue_sql2(con, "CASE {.val x} {clauses_collapsed} END")
+  glue_sql2(con, "CASE {.val x} {.sql clauses_collapsed} END")
 }
 
 sql_is_null <- function(x) {
   x_sql <- enpar(enquo(x))
-  sql_expr((!!x_sql %is% NULL))
+  sql_glue("({x_sql} IS NULL)")
 }
 
 enpar <- function(x, tidy = TRUE, env = NULL) {

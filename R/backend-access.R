@@ -85,21 +85,21 @@ sql_translation.ACCESS <- function(con) {
       exp = sql_prefix("EXP"),
       log = sql_prefix("LOG"),
       log10 = function(x) {
-        sql_expr(log(!!x) / log(10L))
+        sql_glue("LOG({x}) / LOG(10)")
       },
       sqrt = sql_prefix("SQR"),
       sign = sql_prefix("SGN"),
       floor = sql_prefix("INT"),
       # Nearly add 1, then drop off the decimal. This results in the equivalent to ceiling()
       ceiling = function(x) {
-        sql_expr(int(!!x + .9999999999))
+        sql_glue("INT({x} + 0.9999999999)")
       },
       ceil = function(x) {
-        sql_expr(int(!!x + .9999999999))
+        sql_glue("INT({x} + 0.9999999999)")
       },
       # There is no POWER function in Access. It uses ^ instead
       `^` = function(x, y) {
-        sql_expr((!!x)^(!!y))
+        sql_glue("{x} ^ {y}")
       },
 
       # Strings
@@ -110,12 +110,12 @@ sql_translation.ACCESS <- function(con) {
       substr = function(x, start, stop) {
         right <- stop - start + 1
         left <- stop
-        sql_expr(right(left(!!x, !!left), !!right))
+        sql_glue("RIGHT(LEFT({x}, {.val left}), {.val right})")
       },
       trimws = sql_prefix("TRIM"),
       # No support for CONCAT in Access
-      paste = sql_paste_infix(" ", "&", function(x) sql_expr(CStr(!!x))),
-      paste0 = sql_paste_infix("", "&", function(x) sql_expr(CStr(!!x))),
+      paste = sql_paste_infix(" ", "&", function(x) sql_glue("CSTR({x})")),
+      paste0 = sql_paste_infix("", "&", function(x) sql_glue("CSTR({x})")),
 
       # Logic
       # Access always returns -1 for True and 0 for False
@@ -123,7 +123,7 @@ sql_translation.ACCESS <- function(con) {
       is.na = sql_prefix("ISNULL"),
       # IIF() is like ifelse()
       ifelse = function(test, yes, no) {
-        sql_expr(iif(!!test, !!yes, !!no))
+        sql_glue("IIF({test}, {yes}, {no})")
       },
       # Access uses <> for inequality
       `!=` = sql_infix("<>"),
@@ -132,16 +132,16 @@ sql_translation.ACCESS <- function(con) {
       # NZ() only works while in Access, not with the Access driver
       # IIF(ISNULL()) is the best way to construct this
       coalesce = function(x, y) {
-        sql_expr(iif(isnull(!!x), !!y, !!x))
+        sql_glue("IIF(ISNULL({x}), {y}, {x})")
       },
 
       # pmin/pmax for 2 columns
       pmin = function(x, y) {
-        sql_expr(iif(!!x <= !!y, !!x, !!y))
+        sql_glue("IIF({x} <= {y}, {x}, {y})")
       },
 
       pmax = function(x, y) {
-        sql_expr(iif(!!x <= !!y, !!y, !!x))
+        sql_glue("IIF({x} <= {y}, {y}, {x})")
       },
 
       # Dates

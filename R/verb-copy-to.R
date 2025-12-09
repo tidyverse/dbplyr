@@ -407,7 +407,9 @@ sql_values_cast_clauses <- function(con, df, types, na) {
       types,
       ~ {
         val <- if (na) NA else ident(.y)
-        sql_expr(cast(!!val %as% !!sql(.x)), con = con)
+        val <- escape(val, con = con)
+        type <- sql(.x)
+        sql_glue("CAST({val} AS {type})", con = con)
       }
     )
   }

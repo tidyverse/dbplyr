@@ -31,7 +31,7 @@ dbplyr_edition.Redshift <- dbplyr_edition.RedshiftConnection
 
 redshift_round <- function(x, digits = 0L) {
   digits <- as.integer(digits)
-  sql_expr(round(((!!x)) %::% float, !!digits))
+  sql_glue("ROUND(({x})::float, {digits})")
 }
 
 #' @export
@@ -53,7 +53,7 @@ sql_translation.RedshiftConnection <- function(con) {
       str_c = sql_paste_redshift(""),
 
       str_ilike = function(string, pattern) {
-        sql_expr(!!string %ILIKE% !!pattern)
+        sql_glue("{string} ILIKE {pattern}")
       },
 
       # https://docs.aws.amazon.com/redshift/latest/dg/r_SUBSTRING.html
@@ -64,17 +64,17 @@ sql_translation.RedshiftConnection <- function(con) {
       # https://docs.aws.amazon.com/redshift/latest/dg/REGEXP_REPLACE.html
       str_replace = sql_not_supported("str_replace"),
       str_replace_all = function(string, pattern, replacement) {
-        sql_expr(REGEXP_REPLACE(!!string, !!pattern, !!replacement))
+        sql_glue("REGEXP_REPLACE({string}, {pattern}, {replacement})")
       },
 
       # clock ---------------------------------------------------------------
       add_days = function(x, n, ...) {
         check_dots_empty()
-        sql_expr(DATEADD(DAY, !!n, !!x))
+        sql_glue("DATEADD(DAY, {n}, {x})")
       },
       add_years = function(x, n, ...) {
         check_dots_empty()
-        sql_expr(DATEADD(YEAR, !!n, !!x))
+        sql_glue("DATEADD(YEAR, {n}, {x})")
       },
       date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
         check_unsupported_arg(invalid, allow_null = TRUE)
@@ -84,27 +84,27 @@ sql_translation.RedshiftConnection <- function(con) {
         )
       },
       get_year = function(x) {
-        sql_expr(DATE_PART('year', !!x))
+        sql_glue("DATE_PART('year', {x})")
       },
       get_month = function(x) {
-        sql_expr(DATE_PART('month', !!x))
+        sql_glue("DATE_PART('month', {x})")
       },
       get_day = function(x) {
-        sql_expr(DATE_PART('day', !!x))
+        sql_glue("DATE_PART('day', {x})")
       },
       date_count_between = function(start, end, precision, ..., n = 1L) {
         check_dots_empty()
         check_unsupported_arg(precision, allowed = "day")
         check_unsupported_arg(n, allowed = 1L)
 
-        sql_expr(DATEDIFF(DAY, !!start, !!end))
+        sql_glue("DATEDIFF(DAY, {start}, {end})")
       },
 
       difftime = function(time1, time2, tz, units = "days") {
         check_unsupported_arg(tz)
         check_unsupported_arg(units, allowed = "days")
 
-        sql_expr(DATEDIFF(DAY, !!time2, !!time1))
+        sql_glue("DATEDIFF(DAY, {time2}, {time1})")
       }
     ),
     sql_translator(
@@ -112,7 +112,7 @@ sql_translation.RedshiftConnection <- function(con) {
       # https://docs.aws.amazon.com/redshift/latest/dg/r_LISTAGG.html
       str_flatten = function(x, collapse = "", na.rm = FALSE) {
         sql_check_na_rm(na.rm)
-        sql_expr(LISTAGG(!!x, !!collapse))
+        sql_glue("LISTAGG({x}, {collapse})")
       }
     ),
     sql_translator(
@@ -121,8 +121,9 @@ sql_translation.RedshiftConnection <- function(con) {
       quantile = sql_win_not_supported("quantile", "Redshift"),
       # https://docs.aws.amazon.com/redshift/latest/dg/r_WF_LAG.html
       lag = function(x, n = 1L, order_by = NULL) {
+        n <- as.integer(n)
         win_over(
-          sql_expr(LAG(!!x, !!as.integer(n))),
+          sql_glue("LAG({x}, {n})"),
           win_current_group(),
           order_by %||% win_current_order(),
           win_current_frame()
@@ -130,8 +131,9 @@ sql_translation.RedshiftConnection <- function(con) {
       },
       # https://docs.aws.amazon.com/redshift/latest/dg/r_WF_LEAD.html
       lead = function(x, n = 1L, order_by = NULL) {
+        n <- as.integer(n)
         win_over(
-          sql_expr(LEAD(!!x, !!as.integer(n))),
+          sql_glue("LEAD({x}, {n})"),
           win_current_group(),
           order_by %||% win_current_order(),
           win_current_frame()
@@ -141,7 +143,7 @@ sql_translation.RedshiftConnection <- function(con) {
       str_flatten = function(x, collapse = "", na.rm = FALSE) {
         sql_check_na_rm(na.rm)
         order <- win_current_order()
-        listagg_sql <- sql_expr(LISTAGG(!!x, !!collapse))
+        listagg_sql <- sql_glue("LISTAGG({x}, {collapse})")
 
         if (length(order) > 0) {
           sql <- glue_sql2(
@@ -167,7 +169,7 @@ sql_translation.RedshiftConnection <- function(con) {
 sql_translation.Redshift <- sql_translation.RedshiftConnection
 
 sql_paste_redshift <- function(sep) {
-  sql_paste_infix(sep, "||", function(x) sql_expr(cast(!!x %as% text)))
+  sql_paste_infix(sep, "||", function(x) sql_glue("CAST({x} AS text)"))
 }
 
 # https://docs.aws.amazon.com/redshift/latest/dg/r_EXPLAIN.html
