@@ -224,7 +224,7 @@ window = sql_translator(
 
 ### Custom translation functions
 
-For more complex translations, you can write custom functions that return SQL expressions using `sql_expr()`. This is a tidy-evaluation function that allows you to use `!!` operator to in inject a single value into SQL expressions or `!!!` to splice a list of values.
+For more complex translations, you can write custom functions that return SQL expressions using `sql_glue()`. This uses glue syntax for string interpolation with automatic escaping.
 
 ```{r, eval = FALSE}
 scalar = sql_translator(
@@ -233,16 +233,15 @@ scalar = sql_translator(
   # Custom log function with change of base
   log = function(x, base = exp(1)) {
     if (isTRUE(all.equal(base, exp(1)))) {
-      sql_expr(ln(!!x))
+      sql_glue("LN({x})")
     } else {
-      sql_expr(log(!!x) / log(!!base))
+      sql_glue("LOG({x}) / LOG({base})")
     }
   },
 
   # Custom paste function using CONCAT
   paste = function(..., sep = " ") {
-    args <- list(...)
-    sql_expr(CONCAT_WS(!!sep, !!!args))
+    sql_glue("CONCAT_WS({sep}, {...})")
   }
 )
 ```
