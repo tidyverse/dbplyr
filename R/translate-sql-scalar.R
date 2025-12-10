@@ -133,11 +133,16 @@ sql_cot <- function() {
 }
 
 #' @rdname sql_translation_scalar
-#' @param rand_expr A SQL expression that generates random numbers.
+#' @param rand_expr An string giving an SQL expression that generates a
+#'   random number between 0 and 1, e.g. `"RANDOM()"`.
 #' @param min,max Range of random values.
 #' @export
 sql_runif <- function(rand_expr, n = n(), min = 0, max = 1) {
   rand_expr <- enexpr(rand_expr)
+  if (!is_string(rand_expr)) {
+    # for backward compatibility
+    rand_expr <- sql_expr(!!rand_expr)
+  }
 
   n_expr <- quo_get_expr(enquo(n))
   if (!is_call(n_expr, "n", n = 0)) {

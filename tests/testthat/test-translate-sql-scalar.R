@@ -39,3 +39,10 @@ test_that("runif is translated", {
 
   expect_translation_snapshot(con, runif(2), error = TRUE)
 })
+
+test_that("sql_runif() still works with an expression", {
+  local_con(simulate_dbi())
+
+  expect_equal(sql_runif(RANDOM()), sql("RANDOM()"))
+  expect_equal(sql_runif(RANDOM(), min = 1, max = 2), sql("RANDOM() + 1.0"))
+})
