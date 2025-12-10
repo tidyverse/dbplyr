@@ -85,8 +85,12 @@ Make sure you've read `vignette("translation-verb")` so you have the lay of the 
 If you need to generate your own SQL, we recommend using `glue_sql2()`. It uses glue syntax with type markers for safe SQL generation:
 
 ```{r}
-#| eval: false
+con <- simulate_dbi()
+
 # Create an index
+index_name <- "index"
+table <- I("schema.table")
+columns <- c("column1", "column2")
 glue_sql2(con, "CREATE INDEX {.id index_name} ON {.tbl table} {.id columns*}")
 
 # Insert values safely
@@ -98,8 +102,6 @@ table <- "my_table"
 cols <- c("id", "name", "value")
 glue_sql2(con, "SELECT {.id cols} FROM {.tbl table}")
 ```
-
-Type markers include `.tbl` (tables), `.id` (identifiers).. Use `*` after `.id` or `.val` to collapse vectors into comma-separated lists.
 
 ## SQL translation: vectors
 

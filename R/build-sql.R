@@ -99,22 +99,25 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
 #' glue_sql2(con, "SELECT * WHERE variable IN {x*}")
 glue_sql2 <- function(con, sql, envir = parent.frame()) {
   check_con(con)
+  dbplyr_glue(con, sql, envir = envir)
+}
 
-  env <- current_env()
+sql_glue <- function(sql, envir = parent.frame()) {
+  dbplyr_glue(sql_current_con(), sql, envir = envir)
+}
+
+dbplyr_glue <- function(con, sql, envir = caller_env(), call = caller_env()) {
   sql(glue(
     sql,
     .envir = envir,
     .na = "NULL",
     .null = "",
     .transformer = function(text, envir) {
-      glue_transformer(con, text, envir, call = env)
+      glue_transformer(con, text, envir, call = call)
     }
   ))
 }
 
-sql_glue <- function(sql, envir = parent.frame()) {
-  glue_sql2(sql_current_con(), sql, envir = envir)
-}
 
 glue_transformer <- function(con, text, envir, call = caller_env()) {
   parsed <- parse_glue_spec(text)
