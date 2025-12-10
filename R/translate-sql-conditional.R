@@ -110,15 +110,11 @@ sql_if <- function(cond, if_true, if_false = quo(NULL), missing = quo(NULL)) {
   #   WHEN NOT <cond> THEN `if_false`
   #   ELSE `missing`
   # END
-
   if (!quo_is_null(if_false) && !identical(if_false, missing)) {
-    false_sql <- " WHEN NOT {enpared_cond} THEN {enpared_if_false}"
-    out <- paste0(out, false_sql)
+    out <- paste0(out, " WHEN NOT {enpared_cond} THEN {enpared_if_false}")
   }
-
   if (!quo_is_null(missing)) {
-    missing_sql <- " ELSE {enpared_missing}"
-    out <- paste0(out, missing_sql)
+    out <- paste0(out, " ELSE {enpared_missing}")
   }
   out <- paste0(out, " END")
 
