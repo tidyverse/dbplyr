@@ -111,7 +111,6 @@ Collate:
     'lazy-set-op-query.R'
     'memdb.R'
     'optimise-utils.R'
-    'pillar.R'
     'progress.R'
     'sql-build.R'
     'query-join.R'
