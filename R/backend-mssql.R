@@ -265,10 +265,10 @@ simulate_mssql <- function(version = "15.0") {
       `>` = mssql_infix_comparison(">"),
       `>=` = mssql_infix_comparison(">="),
 
-      `&` = mssql_infix_boolean("&", "%AND%"),
-      `&&` = mssql_infix_boolean("&", "%AND%"),
-      `|` = mssql_infix_boolean("|", "%OR%"),
-      `||` = mssql_infix_boolean("|", "%OR%"),
+      `&` = mssql_infix_boolean("&", "AND"),
+      `&&` = mssql_infix_boolean("&", "AND"),
+      `|` = mssql_infix_boolean("|", "OR"),
+      `||` = mssql_infix_boolean("|", "OR"),
 
       `[` = function(x, i) {
         i <- with_mssql_bool(i)
@@ -645,9 +645,9 @@ mssql_infix_boolean <- function(if_bit, if_bool) {
     if (mssql_needs_bit()) {
       x <- with_mssql_bool(x)
       y <- with_mssql_bool(y)
-      mssql_as_bit(sql_call2(if_bool, x, y))
+      mssql_as_bit(sql_glue("{x} {.sql if_bool} {y}"))
     } else {
-      sql_call2(if_bool, x, y)
+      sql_glue("{x} {.sql if_bool} {y}")
     }
   }
 }

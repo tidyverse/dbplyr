@@ -80,7 +80,7 @@ sql_prefix <- function(f, n = NULL) {
 
   function(...) {
     args <- list(...)
-    if (!is.null(n) && length(args) != n) {
+    if (!is.null(n) && ...length() != n) {
       cli_abort(
         "Invalid number of args to SQL function {f}",
         i = "Expecting {n} and got {length(args)}"
@@ -89,7 +89,7 @@ sql_prefix <- function(f, n = NULL) {
     if (any(names2(args) != "")) {
       cli::cli_warn("Named arguments ignored for SQL {f}")
     }
-    sql_glue("{.sql f}({args})")
+    sql_glue("{.sql f}({...})")
   }
 }
 

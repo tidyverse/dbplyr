@@ -372,6 +372,16 @@ sql_current_con <- function() {
   sql_context$con
 }
 
+local_con <- function(con, frame = caller_env()) {
+  check_con(con)
+
+  old <- sql_context$con
+  withr::defer(sql_context$con <- old, envir = frame)
+
+  sql_context$con <- con
+  invisible(old)
+}
+
 # Functions to manage information for special cases
 set_current_context <- function(context) {
   old <- sql_context$context

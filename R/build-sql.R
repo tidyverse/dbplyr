@@ -127,16 +127,21 @@ glue_transformer <- function(con, text, envir, call = caller_env()) {
       call = call
     )
   }
-  withCallingHandlers(
-    value <- eval(parse(text = parsed$value, keep.source = FALSE), envir),
-    error = function(e) {
-      cli::cli_abort(
-        "Failed to interpolate {{{text}}.",
-        call = call,
-        parent = e
-      )
-    }
-  )
+
+  if (parsed$value == "...") {
+    value <- eval(quote(list(...)), envir)
+  } else {
+    withCallingHandlers(
+      value <- eval(parse(text = parsed$value, keep.source = FALSE), envir),
+      error = function(e) {
+        cli::cli_abort(
+          "Failed to interpolate {{{text}}.",
+          call = call,
+          parent = e
+        )
+      }
+    )
+  }
 
   # Coerce types that need coercion
   if (parsed$type == "sql") {

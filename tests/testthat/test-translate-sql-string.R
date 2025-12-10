@@ -39,9 +39,9 @@ test_that("sql_str_sub works as expected", {
 })
 
 test_that("sql_str_sub can require length parameter", {
-  con <- simulate_dbi()
+  local_con(simulate_dbi())
   x <- ident("x")
-  str_sub <- sql_str_sub("SUBSTR", optional_length = FALSE, con = con)
+  str_sub <- sql_str_sub("SUBSTR", optional_length = FALSE)
 
   expect_equal(str_sub(x), sql("SUBSTR(`x`, 1, LENGTH(`x`))"))
   expect_equal(str_sub(x, 1), sql("SUBSTR(`x`, 1, LENGTH(`x`))"))
@@ -107,13 +107,9 @@ test_that("basic prefix paste", {
 })
 
 test_that("basic infix paste", {
-  con <- simulate_dbi()
-  paste <- sql_paste_infix(
-    "",
-    "&&",
-    \(x) sql_expr(cast((!!x) %as% text), con = con),
-    con = simulate_dbi()
-  )
+  local_con(simulate_dbi())
+
+  paste <- sql_paste_infix("", "&&", \(x) sql_glue("CAST({x} AS text)"))
   x <- ident("x")
   y <- ident("y")
 

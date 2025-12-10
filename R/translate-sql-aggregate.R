@@ -52,8 +52,7 @@ sql_aggregate_n <- function(f, f_r = f) {
 
   function(..., na.rm = FALSE) {
     sql_check_na_rm(na.rm)
-    dots <- list(...)
-    sql_glue("{.sql f}({dots})")
+    sql_glue("{.sql f}({...})")
   }
 }
 
@@ -156,10 +155,9 @@ sql_quantile <- function(f, style = c("infix", "ordered"), window = FALSE) {
     sql_check_na_rm(na.rm)
 
     if (style == "infix") {
-      sql <- sql_call2(f, x, probs)
+      sql <- sql_glue("{.sql f}({x}, {probs})")
     } else {
-      call <- sql_call2(f, probs)
-      sql <- sql_glue("{call} WITHIN GROUP (ORDER BY {x})")
+      sql <- sql_glue("{.sql f}({probs}) WITHIN GROUP (ORDER BY {x})")
     }
 
     if (window) {

@@ -34,7 +34,7 @@ sql_translation.Snowflake <- function(con) {
             i = "Please use {.fn str_flatten} instead."
           ))
         }
-        sql_call2("CONCAT_WS", sep, ...)
+        sql_glue("CONCAT_WS({sep}, {...})")
       },
       str_like = function(string, pattern, ignore_case = deprecated()) {
         ignore_case <- deprecate_ignore_case(ignore_case)
@@ -367,11 +367,7 @@ snowflake_round <- function(x, digits = 0L) {
 snowflake_paste <- function(default_sep) {
   function(..., sep = default_sep, collapse = NULL) {
     check_collapse(collapse)
-    sql_call2(
-      "ARRAY_TO_STRING",
-      sql_call2("ARRAY_CONSTRUCT_COMPACT", ...),
-      sep
-    )
+    sql_glue("ARRAY_TO_STRING(ARRAY_CONSTRUCT_COMPACT({...}), {sep})")
   }
 }
 

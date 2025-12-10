@@ -40,6 +40,16 @@ test_that("glue_sql() can collapse with and without parens", {
 })
 
 
+test_that("glue_sql() can interpolate ...", {
+  con <- simulate_dbi()
+  f <- function(...) {
+    glue_sql2(con, "f({...})")
+  }
+  expect_equal(f(), sql("f()"))
+  expect_equal(f("a"), sql("f('a')"))
+  expect_equal(f("a", "b"), sql("f('a', 'b')"))
+})
+
 test_that("gives informative errors", {
   con <- simulate_dbi()
   x <- 1
