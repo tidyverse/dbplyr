@@ -87,22 +87,19 @@ If you need to generate your own SQL, we recommend using `glue_sql2()`. It uses 
 ```{r}
 #| eval: false
 # Create an index
-glue_sql2(
-  con,
-  "CREATE INDEX {.sql index_name} ON {.tbl table} ({.id columns*})"
-)
+glue_sql2(con, "CREATE INDEX {.id index_name} ON {.tbl table} {.id columns*}")
 
 # Insert values safely
 name <- "O'Brien"
-glue_sql2(con, "INSERT INTO students (name) VALUES ({.val name})")
+glue_sql2(con, "INSERT INTO students (name) VALUES {name*}")
 
 # Build a query
 table <- "my_table"
 cols <- c("id", "name", "value")
-glue_sql2(con, "SELECT {.id cols*} FROM {.tbl table}")
+glue_sql2(con, "SELECT {.id cols} FROM {.tbl table}")
 ```
 
-Type markers include `.tbl` (tables), `.id` (identifiers), `.val` (values), `.name` (names), `.from` (subqueries/tables), and `.kw` (keywords). Use `*` after `.id` or `.val` to collapse vectors into comma-separated lists.
+Type markers include `.tbl` (tables), `.id` (identifiers).. Use `*` after `.id` or `.val` to collapse vectors into comma-separated lists.
 
 ## SQL translation: vectors
 

@@ -22,18 +22,18 @@ An SQL string.
 special type markers for safe SQL generation. It replaces the deprecated
 \code{\link[=build_sql]{build_sql()}} function with a more explicit and type-safe approach.
 
-Within the glue template, use type markers to specify how values should be
-escaped and formatted:
+The default glue syntax, \code{{x}}, will escape the \code{x} using the
+database connection. If there are multiple values in \code{x}, they'll be
+collapsed into a single string with \verb{,}. If you want them to be wrapped in
+\verb{()}, use a \code{*} suffix, e.g. \verb{\{x*\}}.
+
+You can also use a type markers to control how the value is treated:
 \itemize{
-\item \code{.sql} - An existing SQL string.
-\item \code{.tbl} - A table identifier (e.g., \code{DBI::Id()}, string, or \code{in_schema()}).
-\item \code{.from} - A subquery or table identifier.
-\item \code{.id} - Database identifiers. Use \code{*} suffix for multiple identifiers,
-which will not be wrapped.
-\item \code{.kw} - An SQL keyword that will be syntax-highlighted.
-\item \code{.val} - A value. Typically used when the function has a scalar argument
-or a vector argument is that not vectorised with the primary input.
-Use \code{*} suffix for multiple values, which will be wrapped in \verb{()}.
+\item \verb{\{.sql x\}}: \code{x} is literal SQL that should be interpolated as
+is, without additional escaping.
+\item \verb{\{.tbl x\}}: \code{x} is a table identifier like a string, \code{I()}, or one of
+the older forms like  \code{DBI::Id()} or \code{in_schema()}.
+\item \verb{\{.id x\}}: \code{x} is an generic identifiers like for a column or index.
 }
 }
 \examples{
@@ -44,9 +44,10 @@ glue_sql2(con, "SELECT * FROM {.tbl tbl}")
 
 # Values are properly escaped
 name <- "Robert'); DROP TABLE students;--"
-glue_sql2(con, "INSERT INTO students (name) VALUES ({.val name})")
+glue_sql2(con, "INSERT INTO students (name) VALUES ({name})")
 
-# Multiple columns with collapse
-cols <- ident(c("name", "age", "grade"))
-glue_sql2(con, "SELECT {.id cols*} FROM students")
+# Control wrapping with *
+x <- c("name", "age", "grade")
+glue_sql2(con, "SELECT {.id x} FROM students")
+glue_sql2(con, "SELECT * WHERE variable IN {x*}")
 }

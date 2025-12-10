@@ -225,7 +225,7 @@ teradata_as_date <- function(x) {
   xq <- enquo(x)
   x_expr <- quo_get_expr(xq)
   if (is.character(x_expr) && !is.sql(x_expr)) {
-    sql_glue("DATE {.val x}")
+    sql_glue("DATE {x}")
   } else {
     sql_cast("DATE")(x)
   }

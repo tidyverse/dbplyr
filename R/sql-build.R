@@ -162,7 +162,7 @@ cte_render <- function(query_list, con) {
     query_list[-n],
     function(query, name) {
       name <- table_path(name)
-      glue_sql2(con, "{.tbl name} {.kw 'AS'} (\n{query}\n)")
+      glue_sql2(con, "{.tbl name} AS (\n{query}\n)")
     }
   )
   cte_query <- sql_vector(
@@ -172,7 +172,7 @@ cte_render <- function(query_list, con) {
     con = con
   )
 
-  glue_sql2(con, "{.kw 'WITH'} ", cte_query, "\n", query_list[[n]])
+  glue_sql2(con, " WITH ", cte_query, "\n", query_list[[n]])
 }
 
 get_subquery_name <- function(x, query_list) {

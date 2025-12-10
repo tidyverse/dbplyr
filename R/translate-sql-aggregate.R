@@ -53,7 +53,7 @@ sql_aggregate_n <- function(f, f_r = f) {
   function(..., na.rm = FALSE) {
     sql_check_na_rm(na.rm)
     dots <- list(...)
-    sql_glue("{.sql f}({dots*})")
+    sql_glue("{.sql f}({dots})")
   }
 }
 

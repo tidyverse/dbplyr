@@ -96,7 +96,7 @@ test_that("user infix functions are translated", {
   expect_translation(con, x %foo% y, "`x` foo `y`")
 
   # keep case and also works with vectors of length > 1 #1299
-  expect_translation(con, x %foo% 1:2, "`x` foo (1, 2)")
+  expect_translation(con, x %foo% (1:2), "`x` foo (1, 2)")
 })
 
 test_that("sql() evaluates input locally", {

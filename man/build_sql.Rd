@@ -42,6 +42,6 @@ glue_sql2(con, "SELECT * FROM {.tbl 'table'}")
 name <- "Robert"
 build_sql("INSERT INTO students (name) VALUES (", name, ")", con = con)
 # New:
-glue_sql2(con, "INSERT INTO students (name) VALUES ({.val name})")
+glue_sql2(con, "INSERT INTO students (name) VALUES ({name})")
 }
 \keyword{internal}

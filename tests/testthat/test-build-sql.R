@@ -1,3 +1,5 @@
+# build_sql() ------------------------------------------------------------------
+
 test_that("build_sql() is deprecated", {
   con <- simulate_dbi()
   expect_snapshot(
@@ -10,6 +12,8 @@ test_that("build_sql() requires connection", {
   x <- ident("TABLE")
   expect_snapshot(error = TRUE, build_sql("SELECT * FROM ", x))
 })
+
+# glue_sql() -------------------------------------------------------------------
 
 test_that("glue_sql() interpolates .tbl correctly", {
   con <- simulate_dbi()
@@ -27,63 +31,37 @@ test_that("glue_sql() interpolates .tbl correctly", {
   )
 })
 
-test_that("glue_sql() interpolates .from correctly", {
+test_that("glue_sql() handles type casting", {
   con <- simulate_dbi()
-  expect_equal(glue_sql2("{.from 'table'}", .con = con), sql("`table`"))
-  tbl <- "table"
-  expect_equal(glue_sql2("{.from tbl}", .con = con), sql("`table`"))
-  tbl <- ident("table")
-  expect_equal(glue_sql2("{.from tbl}", .con = con), sql("`table`"))
-  tbl <- in_schema("schema", "table")
-  expect_equal(glue_sql2("{.from tbl}", .con = con), sql("`schema`.`table`"))
-  tbl <- in_catalog("catalog", "schema", "table")
-  expect_equal(
-    glue_sql2("{.from tbl}", .con = con),
-    sql("`catalog`.`schema`.`table`")
-  )
+  x <- "x"
 
-  expect_equal(
-    glue_sql2("{.from sql('(SELECT * FROM df_x)')}", .con = con),
-    sql("(SELECT * FROM df_x)")
-  )
+  expect_equal(glue_sql2("{x}", .con = con), sql("'x'"))
+  expect_equal(glue_sql2("{.id x}", .con = con), sql("`x`"))
+  expect_equal(glue_sql2("{.sql x}", .con = con), sql("x"))
+
+  tbl1 <- "table"
+  tbl2 <- I("schema.table")
+  tbl3 <- in_schema("schema", "table")
+  expect_equal(glue_sql2(con, "{.tbl tbl1}"), sql("`table`"))
+  expect_equal(glue_sql2(con, "{.tbl tbl2}"), sql("schema.table"))
+  expect_equal(glue_sql2(con, "{.tbl tbl3}"), sql("`schema`.`table`"))
 })
 
-test_that("glue_sql() interpolates id correctly", {
-  con <- simulate_dbi()
-  expect_equal(glue_sql2("{.id 'x'}", .con = con), sql("`x`"))
-  expect_equal(glue_sql2("{.id ident('x')}", .con = con), sql("`x`"))
-})
-
-test_that("glue_sql() interpolates .kw correctly", {
-  withr::local_options(dbplyr_use_colour = TRUE)
-  local_reproducible_output(crayon = TRUE)
-  withr::local_options(dbplyr_highlight = cli::combine_ansi_styles("blue"))
-  con <- simulate_dbi()
-  expect_equal(
-    glue_sql2("{.kw 'FROM'}", .con = con),
-    sql("\033[34mFROM\033[39m")
-  )
-})
-
-test_that("glue_sql() checks size", {
-  con <- simulate_dbi()
-  x <- c("a", "b")
-  expect_snapshot(error = TRUE, {
-    glue_sql2("{.id x}", .con = con)
-    glue_sql2("{.id character()}", .con = con)
-  })
-})
-
-test_that("glue_sql() can collapse", {
+test_that("glue_sql() can collapse with and without parens", {
   con <- simulate_dbi()
   x <- c("a", "b")
 
-  expect_equal(glue_sql2("{x*}", .con = con), sql("'a', 'b'"))
-  expect_equal(glue_sql2("{.id x*}", .con = con), sql("`a`, `b`"))
-  expect_equal(glue_sql2("{.val x*}", .con = con), sql("'a', 'b'"))
+  expect_equal(glue_sql2("{.sql x}", .con = con), sql("a, b"))
+  expect_equal(glue_sql2("{.sql x*}", .con = con), sql("(a, b)"))
+})
 
+
+test_that("gives informative errors", {
+  con <- simulate_dbi()
+  x <- 1
   expect_snapshot(error = TRUE, {
-    glue_sql2("{.tbl x*}", .con = con)
-    glue_sql2("{.from x*}", .con = con)
+    glue_sql2(con, "{y*}")
+    glue_sql2(con, "{1 + }")
+    glue_sql2(con, "{.bar x}")
   })
 })

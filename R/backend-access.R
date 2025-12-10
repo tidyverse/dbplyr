@@ -110,7 +110,7 @@ sql_translation.ACCESS <- function(con) {
       substr = function(x, start, stop) {
         right <- stop - start + 1
         left <- stop
-        sql_glue("RIGHT(LEFT({x}, {.val left}), {.val right})")
+        sql_glue("RIGHT(LEFT({x}, {left}), {right})")
       },
       trimws = sql_prefix("TRIM"),
       # No support for CONCAT in Access

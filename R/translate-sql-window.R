@@ -39,12 +39,12 @@ win_over <- function(
 ) {
   if (length(partition) > 0) {
     partition <- as.sql(partition, con = con)
-    partition <- glue_sql2(con, "PARTITION BY {partition*}")
+    partition <- glue_sql2(con, "PARTITION BY {partition}")
   }
 
   if (length(order) > 0) {
     order <- as.sql(order, con = con)
-    order <- glue_sql2(con, "ORDER BY {order*}")
+    order <- glue_sql2(con, "ORDER BY {order}")
   }
   if (length(frame) > 0) {
     if (length(order) == 0) {

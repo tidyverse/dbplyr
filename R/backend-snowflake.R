@@ -271,7 +271,7 @@ sql_translation.Snowflake <- function(con) {
         if (identical(na.rm, TRUE)) {
           snowflake_pmin_pmax_sql_expression(dots = dots, comparison = "<=")
         } else {
-          sql_glue("LEAST({dots*})")
+          sql_glue("LEAST({dots})")
         }
       },
       pmax = function(..., na.rm = FALSE) {
@@ -279,7 +279,7 @@ sql_translation.Snowflake <- function(con) {
         if (identical(na.rm, TRUE)) {
           snowflake_pmin_pmax_sql_expression(dots = dots, comparison = ">=")
         } else {
-          sql_glue("GREATEST({dots*})")
+          sql_glue("GREATEST({dots})")
         }
       },
       `$` = function(x, name) {

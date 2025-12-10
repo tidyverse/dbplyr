@@ -17,29 +17,27 @@
       Error in `build_sql()`:
       ! `con` must not be NULL.
 
-# glue_sql() checks size
+# gives informative errors
 
     Code
-      glue_sql2("{.id x}", .con = con)
+      glue_sql2(con, "{y*}")
     Condition
       Error in `glue_sql2()`:
-      ! {.id x} must have size 1, not 2.
+      ! Failed to interpolate {y*}.
+      Caused by error:
+      ! object 'y' not found
     Code
-      glue_sql2("{.id character()}", .con = con)
+      glue_sql2(con, "{1 + }")
     Condition
       Error in `glue_sql2()`:
-      ! {.id character()} must have size 1, not 0.
-
-# glue_sql() can collapse
-
+      ! Failed to interpolate {1 + }.
+      Caused by error in `parse()`:
+      ! <text>:2:0: unexpected end of input
+      1: 1 + 
+         ^
     Code
-      glue_sql2("{.tbl x*}", .con = con)
+      glue_sql2(con, "{.bar x}")
     Condition
-      Error in `glue_check_collapse()`:
-      ! Collapsing is only allowed for "col" and "val", not for "tbl".
-    Code
-      glue_sql2("{.from x*}", .con = con)
-    Condition
-      Error in `glue_check_collapse()`:
-      ! Collapsing is only allowed for "col" and "val", not for "from".
+      Error in `glue_sql2()`:
+      ! Unknown marker "bar" in {.bar x}.
 

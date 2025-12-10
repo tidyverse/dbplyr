@@ -161,7 +161,7 @@ sql_table_index.DBIConnection <- function(
     "CREATE ",
     if (unique) "UNIQUE ",
     "INDEX {.id name}",
-    " ON {.tbl table} ({.id columns*})"
+    " ON {.tbl table} {.id columns*}"
   )
 }
 
@@ -215,13 +215,14 @@ sql_query_save.DBIConnection <- function(
   temporary = TRUE,
   ...
 ) {
+  sql <- as_table_source(sql)
   glue_sql2(
     con,
     "CREATE ",
     if (temporary) sql("TEMPORARY "),
     "TABLE \n",
     "{.tbl {name}} AS\n",
-    "{.from sql}"
+    "{sql}"
   )
 }
 #' @export

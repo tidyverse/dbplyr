@@ -77,7 +77,7 @@ base_scalar <- sql_translator(
       sql_glue("{x}.{i}")
     } else if (is.numeric(i)) {
       i <- as.integer(i)
-      sql_glue("{x}[{.val i}]")
+      sql_glue("{x}[{i}]")
     } else {
       cli_abort("Can only index with strings and numbers")
     }
@@ -101,10 +101,8 @@ base_scalar <- sql_translator(
     table <- unname(table)
     if (length(table) == 0) {
       sql("FALSE")
-    } else if (length(table) == 1) {
-      sql_glue("{x} IN ({.val table})")
     } else {
-      sql_glue("{x} IN {.val table}")
+      sql_glue("{x} IN {table*}")
     }
   },
 

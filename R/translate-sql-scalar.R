@@ -42,15 +42,15 @@ sql_infix <- function(f, pad = TRUE, con = sql_current_con()) {
 
     if (is.null(x)) {
       if (pad) {
-        sql <- "{.sql f} {.val y}"
+        sql <- "{.sql f} {y}"
       } else {
-        sql <- "{.sql f}{.val y}"
+        sql <- "{.sql f}{y}"
       }
     } else {
       if (pad) {
-        sql <- "{x} {.sql f} {.val y}"
+        sql <- "{x} {.sql f} {y}"
       } else {
-        sql <- "{x}{.sql f}{.val y}"
+        sql <- "{x}{.sql f}{y}"
       }
     }
     glue_sql2(con, sql)
@@ -89,7 +89,7 @@ sql_prefix <- function(f, n = NULL) {
     if (any(names2(args) != "")) {
       cli::cli_warn("Named arguments ignored for SQL {f}")
     }
-    sql_glue("{.sql f}({args*})")
+    sql_glue("{.sql f}({args})")
   }
 }
 
