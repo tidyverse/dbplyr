@@ -20,7 +20,8 @@
 #' }
 #'
 #' You can override the guesses using `local()` and `remote()` to force
-#' computation, or by using the `.data` and `.env` pronouns of tidy evaluation.
+#' computation, by using the `.data` and `.env` pronouns of tidy evaluation,
+#' or by using dbplyr's own `.sql` pronoun.
 #'
 #' @param call an unevaluated expression, as produced by [quote()]
 #' @param data A lazy data frame backed by a database query.
@@ -49,6 +50,11 @@
 #' f <- function(x) x + 1
 #' partial_eval(quote(year > f(1980)), lf)
 #' partial_eval(quote(year > local(f(1980))), lf)
+#'
+#' # You can use `.sql` to make it clear that the function comes from SQL,
+#' # and inside a package, reduce the number of globalVariables() directives
+#' # needed
+#' partial_eval(quote(.sql$EXTRACT_YEAR(year)), lf)
 partial_eval <- function(
   call,
   data,
@@ -193,6 +199,9 @@ partial_eval_sym <- function(sym, data, env) {
 is_mask_pronoun <- function(call) {
   is_call(call, c("$", "[["), n = 2) && is_symbol(call[[2]], c(".data", ".env"))
 }
+is_sql_pronoun <- function(call) {
+  is_call(call, "$", n = 2) && is_symbol(call[[2]], ".sql")
+}
 
 partial_eval_call <- function(call, data, env) {
   fun <- call[[1]]
@@ -213,13 +222,15 @@ partial_eval_call <- function(call, data, env) {
     call[[1]] <- fun <- sym(fun_name)
   }
 
-  # Compound calls, apart from `::` aren't translatable
+  # Compound calls, apart from pronouns and `::` aren't translatable
   if (is_call(fun) && !is_call(fun, "::")) {
     if (is_mask_pronoun(fun)) {
       cli::cli_abort(
         "Use local() or remote() to force evaluation of functions",
         call = NULL
       )
+    } else if (is_sql_pronoun(fun)) {
+      call[[1]] <- fun[[3]]
     } else {
       return(eval_bare(call, env))
     }
@@ -237,6 +248,8 @@ partial_eval_call <- function(call, data, env) {
     } else {
       eval_bare(var, env)
     }
+  } else if (is_sql_pronoun(call)) {
+    call[[3]]
   } else {
     # Process call arguments recursively, unless user has manually called
     # remote/local

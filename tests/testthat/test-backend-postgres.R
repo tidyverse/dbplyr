@@ -32,10 +32,22 @@ test_that("custom stringr functions translated correctly", {
     "LTRIM(RTRIM(REGEXP_REPLACE(`x`, '\\s+', ' ', 'g')))"
   )
   expect_translation(con, str_remove(x, y), "REGEXP_REPLACE(`x`, `y`, '')")
-  expect_translation(con, str_remove_all(x, y), "REGEXP_REPLACE(`x`, `y`, '', 'g')")
+  expect_translation(
+    con,
+    str_remove_all(x, y),
+    "REGEXP_REPLACE(`x`, `y`, '', 'g')"
+  )
 
-  expect_translation(con, str_detect(x, fixed("%0")), "POSITION('%0' in `x`) > 0")
-  expect_translation(con, str_starts(x, fixed("%0")), "POSITION('%0' in `x`) = 1")
+  expect_translation(
+    con,
+    str_detect(x, fixed("%0")),
+    "POSITION('%0' in `x`) > 0"
+  )
+  expect_translation(
+    con,
+    str_starts(x, fixed("%0")),
+    "POSITION('%0' in `x`) = 1"
+  )
   expect_translation(
     con,
     str_ends(x, fixed("%0")),
@@ -53,8 +65,18 @@ test_that("two variable aggregates are translated correctly", {
 test_that("pasting translated correctly", {
   con <- simulate_postgres()
 
-  expect_translation(con, paste(x, y), "CONCAT_WS(' ', `x`, `y`)", window = FALSE)
-  expect_translation(con, paste0(x, y), "CONCAT_WS('', `x`, `y`)", window = FALSE)
+  expect_translation(
+    con,
+    paste(x, y),
+    "CONCAT_WS(' ', `x`, `y`)",
+    window = FALSE
+  )
+  expect_translation(
+    con,
+    paste0(x, y),
+    "CONCAT_WS('', `x`, `y`)",
+    window = FALSE
+  )
 
   expect_snapshot(
     error = TRUE,
@@ -111,10 +133,26 @@ test_that("custom clock functions translated correctly", {
     class = "rlib_error_dots_nonempty"
   )
   expect_translation(con, date_build(2020, 1, 1), "MAKE_DATE(2020.0, 1.0, 1.0)")
-  expect_translation(con, date_build(year_column, 1L, 1L), "MAKE_DATE(`year_column`, 1, 1)")
-  expect_translation(con, get_year(date_column), "DATE_PART('year', `date_column`)")
-  expect_translation(con, get_month(date_column), "DATE_PART('month', `date_column`)")
-  expect_translation(con, get_day(date_column), "DATE_PART('day', `date_column`)")
+  expect_translation(
+    con,
+    date_build(year_column, 1L, 1L),
+    "MAKE_DATE(`year_column`, 1, 1)"
+  )
+  expect_translation(
+    con,
+    get_year(date_column),
+    "DATE_PART('year', `date_column`)"
+  )
+  expect_translation(
+    con,
+    get_month(date_column),
+    "DATE_PART('month', `date_column`)"
+  )
+  expect_translation(
+    con,
+    get_day(date_column),
+    "DATE_PART('day', `date_column`)"
+  )
   expect_translation(
     con,
     date_count_between(date_column_1, date_column_2, "day"),
@@ -122,16 +160,22 @@ test_that("custom clock functions translated correctly", {
   )
   expect_snapshot(
     error = TRUE,
-    translate_sql(date_count_between(date_column_1, date_column_2, "year"), con = con)
+    translate_sql(
+      date_count_between(date_column_1, date_column_2, "year"),
+      con = con
+    )
   )
   expect_snapshot(
     error = TRUE,
-    translate_sql(date_count_between(
-      date_column_1,
-      date_column_2,
-      "day",
-      n = 5
-    ), con = con)
+    translate_sql(
+      date_count_between(
+        date_column_1,
+        date_column_2,
+        "day",
+        n = 5
+      ),
+      con = con
+    )
   )
 })
 
@@ -154,12 +198,15 @@ test_that("difftime is translated correctly", {
   )
   expect_snapshot(
     error = TRUE,
-    translate_sql(difftime(
-      start_date,
-      end_date,
-      tz = "UTC",
-      units = "days"
-    ), con = con)
+    translate_sql(
+      difftime(
+        start_date,
+        end_date,
+        tz = "UTC",
+        units = "days"
+      ),
+      con = con
+    )
   )
 })
 

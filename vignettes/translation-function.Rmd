@@ -16,25 +16,26 @@ options(tibble.print_min = 6L, tibble.print_max = 6L, digits = 3)
 There are two parts to dbplyr SQL translation: translating dplyr verbs, and translating expressions within those verbs. This vignette describes how individual expressions (function calls) are translated; `vignette("translation-verb")` describes how entire verbs are translated.
 
 ```{r}
-#| message = FALSE
 library(dbplyr)
-library(dplyr)
+library(dplyr, warn.conflicts = FALSE)
 
-con <- simulate_dbi()
+lf <- lazy_frame(x = 1, y = 2, g = "a")
 ```
 
-`dbplyr::translate_sql()` powers translation of individual function calls, and I'll use it extensively in this vignette to show what's happening. You shouldn't need to use it ordinary code as dbplyr takes care of the translation automatically.
+In this vignette, I'll use `lazy_frame()` to create a toy lazy table that allows us to see the translation without needing to connect to a real database:
 
 ```{r}
-translate_sql((x + y) / 2, con = con)
+lf |> mutate(z = (x + y) / 2)
 ```
 
-`translate_sql()` takes an optional `con` parameter. If not supplied, this causes dbplyr to generate (approximately) SQL-92 compliant SQL. If supplied, dbplyr uses `sql_translation()` to look up a custom environment which makes it possible for different databases to generate slightly different SQL: see `vignette("new-backend")` for more details.  You can use the various simulate helpers to see the translations used by different backends:
+The default `lazy_frame()` uses a generic database that generates (approximately) SQL-92 compliant SQL. You can use `simulate_*()` connections to see the translations used by different backends. Different databases generate slightly different SQL; see `vignette("new-backend")` for more details.
 
 ```{r}
-translate_sql(x ^ 2L, con = con)
-translate_sql(x ^ 2L, con = simulate_sqlite())
-translate_sql(x ^ 2L, con = simulate_access())
+lf_sqlite <- lazy_frame(x = 1, con = simulate_sqlite())
+lf_access <- lazy_frame(x = 1, con = simulate_access())
+
+lf_sqlite |> transmute(z = x^2)
+lf_access |> transmute(z = x^2)
 ```
 
 Perfect translation is not possible because databases don't have all the functions that R does. The goal of dbplyr is to provide a semantic rather than a literal translation: what you mean, rather than precisely what is done. In fact, even for functions that exist both in databases and in R, you shouldn't expect results to be identical; database programmers have different priorities than R core programmers. For example, in R in order to get a higher level of numerical accuracy, `mean()` loops through the data twice. R's `mean()` also provides a `trim` option for computing trimmed means; this is something that databases do not provide. 
@@ -48,12 +49,12 @@ There are two fundamental differences between R and SQL:
 *   `"` and `'` mean different things. 
     R can use either `"` or `'` for strings, but in ANSI SQL, `"` is used for names and only `'` can be used for strings.
 
-*   R and SQL have different defaults for integers and reals. 
+*   R and SQL have different defaults for integers and reals.
     In R, 1 is a real, and 1L is an integer. In SQL, 1 is an integer, and 1.0 is a real.
-    
+
     ```{r}
-    translate_sql(1, con = con)
-    translate_sql(1L, con = con)
+    lf |> transmute(z = 1)
+    lf |> transmute(z = 1L)
     ```
 
 ## Known functions
@@ -66,7 +67,7 @@ There are two fundamental differences between R and SQL:
 * logarithmic: `log()`, `log10()`, `exp()`
 * misc: `abs()`, `ceiling()`, `sqrt()`, `sign()`, `round()`
 
-## Modulo arithmetic
+### Modulo arithmetic
 
 dbplyr translates `%%` to the SQL equivalents but note that it's not precisely the same: most databases use truncated division where the modulo operator takes the sign of the dividend, where R using the mathematically preferred floored division with the modulo sign taking the sign of the divisor.
 
@@ -75,10 +76,10 @@ df <- tibble(
   x = c(10L, 10L, -10L, -10L), 
   y = c(3L, -3L, 3L, -3L)
 )
-mf <- tbl_memdb(df)
+db <- tbl_memdb(df)
 
 df |> mutate(x %% y)
-mf |> mutate(x %% y)
+db |> mutate(x %% y)
 ```
 
 dbplyr no longer translates `%/%` because there's no robust cross-database translation available.
@@ -93,14 +94,15 @@ dbplyr no longer translates `%/%` because there's no robust cross-database trans
 All databases provide translation for the basic aggregations: `mean()`, `sum()`, `min()`, `max()`, `sd()`, `var()`. Databases automatically drop NULLs (their equivalent of missing values) whereas in R you have to ask nicely. The aggregation functions warn you about this important difference:
 
 ```{r}
-translate_sql(mean(x), con = con)
-translate_sql(mean(x, na.rm = TRUE), con = con)
+lf |> summarise(z = mean(x))
+lf |> summarise(z = mean(x, na.rm = TRUE))
 ```
 
-Note that, by default, `translate()` assumes that the call is inside a `mutate()` or `filter()` and generates a window translation. If you want to see the equivalent `summarise()`/aggregation translation, use `window = FALSE`:
+Note that aggregation functions used inside `mutate()` or `filter()` generate a window translation:
 
 ```{r}
-translate_sql(mean(x, na.rm = TRUE), window = FALSE, con = con)
+lf |> mutate(z = mean(x, na.rm = TRUE))
+lf |> filter(mean(x, na.rm = TRUE) > 0)
 ```
 
 ### Conditional evaluation
@@ -108,12 +110,10 @@ translate_sql(mean(x, na.rm = TRUE), window = FALSE, con = con)
 `if` and `switch()` are translated to `CASE WHEN`:
 
 ```{r}
-translate_sql(if (x > 5) "big" else "small", con = con)
-translate_sql(switch(x, a = 1L, b = 2L, 3L), con = con)
+lf |> mutate(z = if (x > 5) "big" else "small")
+lf |> mutate(z = switch(g, a = 1L, b = 2L, 3L))
 ```
   
-### String manipulation
-
 ### Date/time
 
 * string functions: `tolower`, `toupper`, `trimws`, `nchar`, `substr`
@@ -121,34 +121,50 @@ translate_sql(switch(x, a = 1L, b = 2L, 3L), con = con)
 
 ## Unknown functions
 
-Any function that dbplyr doesn't know how to convert is left as is. This means that database functions that are not covered by dbplyr can often be used directly via `translate_sql()`. 
+Any function that dbplyr doesn't know how to convert is left as is. This means that database functions that are not covered by dbplyr can often be used directly.
 
 ### Prefix functions
 
 Any function that dbplyr doesn't know about will be left as is:
 
 ```{r}
-translate_sql(foofify(x, y), con = con)
+lf |> mutate(z = foofify(x, y))
 ```
 
 Because SQL functions are generally case insensitive, I recommend using upper case when you're using SQL functions in R code. That makes it easier to spot that you're doing something unusual:
 
 ```{r}
-translate_sql(FOOFIFY(x, y), con = con)
+lf |> transmute(z = FOOFIFY(x, y))
 ```
+
+If you are writing code like this inside a package, `R CMD CHECK` will complain about `FOOFIFY` not being defined. You can silence this note using `globalVariables("FOOFIFY")` but this gets tedious if you use many SQL functions. So instead you can use the `.sql` prefix:
+
+```{r}
+lf |> transmute(z = .sql$FOOFIFY(x, y))
+```
+
+`.sql$` is stripped off automatically in the translation, but it means that you can do a single `globalVariables(".sql")` call, instead of one for each function.
 
 ### Infix functions
 
 As well as prefix functions (where the name of the function comes before the arguments), dbplyr also translates infix functions. That allows you to use expressions like `LIKE`, which does a limited form of pattern matching:
 
 ```{r}
-translate_sql(x %LIKE% "%foo%", con = con)
+lf |> filter(x %LIKE% "%foo%")
 ```
 
-Or use `||` for string concatenation (although most backends will translate `paste()` and `paste0()` for you):
+You can also use `str_like()` for this common case:
 
 ```{r}
-translate_sql(x %||% y, con = con)
+lf |> filter(str_like(x, "%foo%"))
+```
+
+You could use `||` for string concatenation, but in most cases it's more R-like to use `paste()` or `paste0()`:
+
+```{r}
+lf |> transmute(z = x %||% y)
+lf |> transmute(z = paste0(x, y))
+lf |> transmute(z = paste(x, y))
 ```
 
 ### Special forms
@@ -156,22 +172,15 @@ translate_sql(x %||% y, con = con)
 SQL functions tend to have a greater variety of syntax than R. That means there are a number of expressions that can't be translated directly from R code. To insert these in your own queries, you can use literal SQL inside `sql()`:
 
 ```{r}
-translate_sql(sql("x!"), con = con)
-translate_sql(x == sql("ANY VALUES(1, 2, 3)"), con = con)
+lf |> transmute(z = sql("x!"))
+lf |> transmute(z = x == sql("ANY VALUES(1, 2, 3)"))
 ```
 
-This gives you a lot of freedom to generate the SQL you need: 
+This gives you a lot of freedom to generate the SQL you need:
 
 ```{r}
-mf <- memdb_frame(x = 1, y = 2)
-
-mf |> 
-  transmute(factorial = sql("x!")) |> 
-  show_query()
-
-mf |> 
-  transmute(factorial = sql("CAST(x AS FLOAT)")) |> 
-  show_query()
+lf |> transmute(factorial = sql("x!"))
+lf |> transmute(factorial = sql("CAST(x AS FLOAT)"))
 ```
 
 ### Error for unknown translations
@@ -181,7 +190,7 @@ If needed, you can also use the `dplyr.strict_sql` option to force dbplyr to err
 ```{r}
 #| error = TRUE
 options(dplyr.strict_sql = TRUE)
-translate_sql(glob(x, y), con = con)
+lf |> mutate(z = glob(x, y))
 ```
 
 ## Window functions
@@ -199,22 +208,22 @@ Things get a little trickier with window functions, because SQL's window functio
   be partitioned into different groups, but not all databases support it, and
   neither does dplyr.
   
-* The __order clause__ controls the ordering (when it makes a difference).
-  This is important for the ranking functions since it specifies which 
-  variables to rank by, but it's also needed for cumulative functions and lead.
-  Whenever you're thinking about before and after in SQL, you must always tell 
-  it which variable defines the order. If the order clause is missing when 
-  needed, some databases fail with an error message while others return 
-  non-deterministic results.
+*   The __order clause__ controls the ordering (when it makes a difference).
+    This is important for the ranking functions since it specifies which 
+    variables to rank by, but it's also needed for cumulative functions and lead.
+    Whenever you're thinking about before and after in SQL, you must always tell 
+    it which variable defines the order. If the order clause is missing when 
+    needed, some databases fail with an error message while others return 
+    non-deterministic results.
   
-* The __frame clause__ defines which rows, or __frame__, that are passed 
-  to the window function, describing which rows (relative to the current row)
-  should be included. The frame clause provides two offsets which determine
-  the start and end of frame. There are three special values: -Inf means
-  to include all preceding rows (in SQL, "unbounded preceding"), 0 means the
-  current row ("current row"), and Inf means all following rows ("unbounded
-  following"). The complete set of options is comprehensive, but fairly 
-  confusing, and is summarised visually below.
+*   The __frame clause__ defines which rows, or __frame__, that are passed 
+    to the window function, describing which rows (relative to the current row)
+    should be included. The frame clause provides two offsets which determine
+    the start and end of frame. There are three special values: -Inf means
+    to include all preceding rows (in SQL, "unbounded preceding"), 0 means the
+    current row ("current row"), and Inf means all following rows ("unbounded
+    following"). The complete set of options is comprehensive, but fairly 
+    confusing, and is summarised visually below.
 
     ```{r}
     #| echo: false
@@ -243,20 +252,24 @@ Things get a little trickier with window functions, because SQL's window functio
     dbplyr generates the frame clause based on whether you're using a recycled
     aggregate or a cumulative aggregate.
     
-To see how individual window functions are translated to SQL, we can again use `translate_sql()`:
+To see how individual window functions are translated to SQL, we can use `mutate()`:
 
 ```{r}
-translate_sql(mean(G), con = con)
-translate_sql(rank(G), con = con)
-translate_sql(ntile(G, 2), con = con)
-translate_sql(lag(G), con = con)
+lf <- lazy_frame(g = 1, year = 2020, id = 3, con = simulate_dbi())
+
+lf |> transmute(
+  mean = mean(g), 
+  rank = min_rank(g), 
+  cumsum = cumsum(g),
+  lag = lag(g)
+)
 ```
 
-If the tbl has been grouped or arranged previously in the pipeline, then dplyr will use that information to set the "partition by" and "order by" clauses. For interactive exploration, you can achieve the same effect by setting the `vars_group` and `vars_order` arguments to `translate_sql()`:
+If the lazy frame has been grouped or arranged previously in the pipeline, then dbplyr will use that information to set the "partition by" and "order by" clauses:
 
 ```{r}
-translate_sql(cummean(G), vars_order = "year", con = con)
-translate_sql(rank(), vars_group = "ID", con = con)
+lf |> arrange(year) |> mutate(z = cummean(g))
+lf |> group_by(id) |> mutate(z = rank())
 ```
 
 There are some challenges when translating window functions between R and SQL, because dbplyr tries to keep the window functions as similar as possible to both the existing R analogues and to the SQL functions. This means that there are three ways to control the order clause depending on which window function you're using:
@@ -275,11 +288,10 @@ There are some challenges when translating window functions between R and SQL, b
 The three options are illustrated in the snippet below:
 
 ```{r}
-#| eval = FALSE
-mutate(players,
-  min_rank(yearID),
-  order_by(yearID, cumsum(G)),
-  lead(G, order_by = yearID)
+lf |> transmute(
+  x1 = min_rank(g),
+  x2 = order_by(year, cumsum(g)),
+  x3 = lead(g, order_by = year)
 )
 ```
 

@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* New `.sql` pronoun makes it a little easier to use known SQL functions in packages, requiring only a single `utils::globalVariables(".sql")` (#1117).
 * `fill()` now errors if you attempt to rename a column, for consistency with dplyr (#1536)
 * Redshift: fixed syntax error in `date_build()` translation (#1512).
 * Ensure `str_like()` and `str_ilike()` have consistent behaviour on SQL Server (@edward-burn, #1669).

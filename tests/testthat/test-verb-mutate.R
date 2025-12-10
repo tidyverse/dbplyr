@@ -211,6 +211,17 @@ test_that("empty mutate returns input", {
   expect_equal(mutate(gf, !!!list()), gf)
 })
 
+test_that("can use .sql pronoun", {
+  lf <- lazy_frame(x = 1)
+
+  # Provides similar capability to existing escaping mechanisms, but is more
+  # convenient for package usage since you only need to globalVariables(".sql")
+  expect_equal(
+    lf |> mutate(y = .sql$foo(x), z = .sql$abc + x),
+    lf |> mutate(y = foo(x), z = remote(abc) + x)
+  )
+})
+
 # .by -------------------------------------------------------------------------
 
 test_that("can group transiently using `.by`", {
