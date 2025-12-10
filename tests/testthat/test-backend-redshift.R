@@ -34,11 +34,7 @@ test_that("numeric translations", {
 
   expect_translation(con, as.numeric(x), "CAST(`x` AS FLOAT)")
   expect_translation(con, as.double(x), "CAST(`x` AS FLOAT)")
-  expect_translation(
-    con,
-    round(1.234, 1),
-    "ROUND((1.234) :: float, 1)"
-  )
+  expect_translation(con, round(1.234, 1), "ROUND((1.234)::float, 1)")
 })
 
 test_that("aggregate functions", {

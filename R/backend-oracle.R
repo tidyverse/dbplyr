@@ -65,8 +65,8 @@ sql_query_select.Oracle <- function(
     order_by = sql_clause_order_by(order_by, subquery, limit),
     # Requires Oracle 12c, released in 2013
     limit = if (!is.null(limit)) {
-      limit <- format(as.integer(limit))
-      glue_sql2(con, "FETCH FIRST {limit} ROWS ONLY")
+      limit <- as.integer(limit)
+      sql_glue2(con, "FETCH FIRST {limit} ROWS ONLY")
     },
     lvl = lvl
   )
@@ -125,7 +125,7 @@ sql_translation.Oracle <- function(con) {
       # https://stackoverflow.com/questions/1171196
       as.character = sql_cast("VARCHAR2(255)"),
       # https://oracle-base.com/articles/misc/oracle-dates-timestamps-and-intervals
-      as.Date = \(x) glue_sql2(sql_current_con(), "DATE {.val x}"),
+      as.Date = \(x) sql_glue("DATE {x}"),
       # bit64::as.integer64 can translate to BIGINT for some
       # vendors, which is equivalent to NUMBER(19) in Oracle
       # https://docs.oracle.com/cd/B19306_01/gateways.102/b14270/apa.htm
@@ -134,43 +134,37 @@ sql_translation.Oracle <- function(con) {
       as.double = sql_cast("NUMBER"),
 
       runif = function(n = n(), min = 0, max = 1) {
-        sql_runif(dbms_random.VALUE(), n = {{ n }}, min = min, max = max)
+        sql_runif("DBMS_RANDOM.VALUE()", n = {{ n }}, min = min, max = max)
       },
 
       # string -----------------------------------------------------------------
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/operators003.htm#i997789
-      paste = sql_paste_infix(" ", "||", function(x) {
-        sql_expr(cast(!!x %as% text))
-      }),
-      paste0 = sql_paste_infix("", "||", function(x) {
-        sql_expr(cast(!!x %as% text))
-      }),
-      str_c = sql_paste_infix("", "||", function(x) {
-        sql_expr(cast(!!x %as% text))
-      }),
+      paste = sql_paste_infix(" ", "||"),
+      paste0 = sql_paste_infix("", "||"),
+      str_c = sql_paste_infix("", "||"),
 
       # https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/REGEXP_REPLACE.html
       # 4th argument is starting position (default: 1 => first char of string)
       # 5th argument is occurrence (default: 0 => match all occurrences)
       str_replace = function(string, pattern, replacement) {
-        sql_expr(regexp_replace(!!string, !!pattern, !!replacement, 1L, 1L))
+        sql_glue("REGEXP_REPLACE({string}, {pattern}, {replacement}, 1, 1)")
       },
       str_replace_all = function(string, pattern, replacement) {
-        sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
+        sql_glue("REGEXP_REPLACE({string}, {pattern}, {replacement})")
       },
 
       # lubridate --------------------------------------------------------------
-      today = \() sql_expr(TRUNC(CURRENT_TIMESTAMP)),
-      now = \() sql_expr(CURRENT_TIMESTAMP),
+      today = \() sql_glue("TRUNC(CURRENT_TIMESTAMP)"),
+      now = \() sql("CURRENT_TIMESTAMP"),
 
       # clock ------------------------------------------------------------------
       add_days = function(x, n, ...) {
         check_dots_empty()
-        sql_expr((!!x + NUMTODSINTERVAL(!!n, 'day')))
+        sql_glue("({x} + NUMTODSINTERVAL({n}, 'day'))")
       },
       add_years = function(x, n, ...) {
         check_dots_empty()
-        sql_expr((!!x + NUMTODSINTERVAL(!!n * 365.25, 'day')))
+        sql_glue("({x} + NUMTODSINTERVAL({n} * 365.25, 'day'))")
       },
 
       difftime = function(time1, time2, tz, units = "days") {
@@ -186,7 +180,7 @@ sql_translation.Oracle <- function(con) {
           )
         }
 
-        sql_expr(CEIL(CAST(!!time2 %AS% DATE) - CAST(!!time1 %AS% DATE)))
+        sql_glue("CEIL(CAST({time2} AS DATE) - CAST({time1} AS DATE))")
       }
     ),
     base_odbc_agg,
@@ -198,21 +192,21 @@ sql_translation.Oracle <- function(con) {
 sql_query_explain.Oracle <- function(con, sql, ...) {
   # https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/generating-and-displaying-execution-plans.html
   c(
-    glue_sql2(con, "EXPLAIN PLAN FOR {sql}"),
-    glue_sql2(con, "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())")
+    sql_glue2(con, "EXPLAIN PLAN FOR {sql}"),
+    sql_glue2(con, "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())")
   )
 }
 
 #' @export
 sql_table_analyze.Oracle <- function(con, table, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_4005.htm
-  glue_sql2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
+  sql_glue2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
 }
 
 #' @export
 sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
-  type <- if (temporary) "GLOBAL TEMPORARY " else ""
-  glue_sql2(con, "CREATE {type}TABLE {.tbl name} AS\n{sql}")
+  type <- if (temporary) "GLOBAL TEMPORARY TABLE" else "TABLE"
+  sql_glue2(con, "CREATE {.sql type} {.tbl name} AS\n{sql}")
 }
 
 #' @export
@@ -231,7 +225,7 @@ setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
 #' @export
 sql_expr_matches.Oracle <- function(con, x, y, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/functions040.htm
-  glue_sql2(con, "decode({x}, {y}, 0, 1) = 0")
+  sql_glue2(con, "decode({x}, {y}, 0, 1) = 0")
 }
 
 #' @export
@@ -273,13 +267,3 @@ sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
 
 #' @export
 db_supports_table_alias_with_as.OraConnection <- db_supports_table_alias_with_as.Oracle
-
-utils::globalVariables(c(
-  "DATE",
-  "CURRENT_TIMESTAMP",
-  "TRUNC",
-  "dbms_random.VALUE",
-  "DATEDIFF",
-  "CEIL",
-  "NUMTODSINTERVAL"
-))

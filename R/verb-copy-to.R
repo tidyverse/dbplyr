@@ -403,13 +403,10 @@ sql_values_cast_clauses <- function(con, df, types, na) {
       }
     )
   } else {
-    typed_cols <- purrr::imap_chr(
-      types,
-      ~ {
-        val <- if (na) NA else ident(.y)
-        sql_expr(cast(!!val %as% !!sql(.x)), con = con)
-      }
-    )
+    typed_cols <- purrr::imap_chr(types, function(type, val) {
+      val <- if (na) NA else ident(val)
+      sql_glue2(con, "CAST({val} AS {.sql type})")
+    })
   }
 
   sql_vector(typed_cols, parens = FALSE, collapse = NULL, con = con)
@@ -474,4 +471,6 @@ sql_cast_dispatch.integer64 <- function(x) {
   expr(as.integer64)
 }
 
-utils::globalVariables(c("as.integer64"))
+#' @importFrom dplyr coalesce
+NULL
+utils::globalVariables("as.integer64")

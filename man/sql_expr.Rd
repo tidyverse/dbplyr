@@ -20,11 +20,13 @@ called from a function translation.}
 \item{...}{Arguments to function}
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#superseded}{\figure{lifecycle-superseded.svg}{options: alt='[Superseded]'}}}{\strong{[Superseded]}}
+\code{sql_expr()} and \code{sql_call2()} are superseded in favour of \code{\link[=sql_glue]{sql_glue()}}.
+
 Low-level building block for generating SQL from R expressions.
 Strings are escaped; names become bare SQL identifiers. User infix
 functions have \verb{\%} stripped.
-}
-\details{
+
 Using \code{sql_expr()} in package will require use of \code{\link[=globalVariables]{globalVariables()}}
 to avoid \verb{R CMD check} NOTES. This is a small amount of additional pain,
 which I think is worthwhile because it leads to more readable translation

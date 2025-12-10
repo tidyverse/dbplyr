@@ -105,5 +105,3 @@ check_cut_labels <- function(
 
   labels
 }
-
-utils::globalVariables(c("case_when"))

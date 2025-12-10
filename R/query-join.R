@@ -289,13 +289,9 @@ sql_rf_join_vars <- function(
       vars$y,
       ~ {
         if (!is.na(.x) && !is.na(.y)) {
-          out <- sql_expr(
-            COALESCE(
-              !!sql_table_prefix(con, .x, table = x_as),
-              !!sql_table_prefix(con, .y, table = y_as)
-            ),
-            con = con
-          )
+          x_prefix <- sql_table_prefix(con, .x, table = x_as)
+          y_prefix <- sql_table_prefix(con, .y, table = y_as)
+          out <- sql_glue2(con, "COALESCE({x_prefix}, {y_prefix})")
 
           return(out)
         }
@@ -385,5 +381,3 @@ sql_qualify_var <- function(con, table, var) {
     var
   }
 }
-
-utils::globalVariables("COALESCE")

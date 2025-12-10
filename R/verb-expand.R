@@ -149,5 +149,3 @@ replace_na.tbl_lazy <- function(data, replace = list(), ...) {
 
   mutate(data, !!!coalesce_expr)
 }
-
-utils::globalVariables(c("coalesce", "expand", "replace_na"))
