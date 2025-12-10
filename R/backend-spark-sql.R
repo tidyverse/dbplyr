@@ -164,15 +164,11 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
   check_bool(overwrite)
   check_bool(temporary)
 
+  action <- if (overwrite) "CREATE OR REPLACE" else "CREATE"
+  type <- if (temporary) "TEMPORARY VIEW" else "TABLE"
+
   sql <- as_table_source(sql)
-  sql <- glue_sql2(
-    con,
-    "CREATE ",
-    if (overwrite) "OR REPLACE ",
-    if (temporary) "TEMPORARY VIEW" else "TABLE",
-    " {.tbl {table}} AS \n",
-    "{sql}"
-  )
+  sql <- glue_sql2(con, "{.sql action} {.sql type} {.tbl table} AS \n{sql}")
   DBI::dbExecute(con, sql)
 
   table

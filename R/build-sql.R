@@ -78,10 +78,9 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
 #'   the older forms like  `DBI::Id()` or `in_schema()`.
 #' * `{.id x}`: `x` is an generic identifiers like for a column or index.
 #'
-#' @param .con A database connection.
-#' @param ... SQL fragments to interpolate. These are evaluated in `.envir` and
-#'   then combined according to their type markers.
-#' @param .envir Environment to evaluate `...` in.
+#' @param con A database connection.
+#' @param sql A string to interpolate.
+#' @param envir Environment to evaluate `sql` in.
 #' @return An SQL string.
 #' @export
 #' @examples
@@ -98,27 +97,23 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
 #' x <- c("name", "age", "grade")
 #' glue_sql2(con, "SELECT {.id x} FROM students")
 #' glue_sql2(con, "SELECT * WHERE variable IN {x*}")
-glue_sql2 <- function(
-  .con,
-  ...,
-  .envir = parent.frame()
-) {
-  check_con(.con)
+glue_sql2 <- function(con, sql, envir = parent.frame()) {
+  check_con(con)
 
   env <- current_env()
   sql(glue(
-    ...,
-    .envir = .envir,
+    sql,
+    .envir = envir,
     .na = "NULL",
     .null = "",
     .transformer = function(text, envir) {
-      glue_transformer(.con, text, envir, call = env)
+      glue_transformer(con, text, envir, call = env)
     }
   ))
 }
 
-sql_glue <- function(x, con = sql_current_con(), envir = parent.frame()) {
-  glue_sql2(con, x, .envir = envir)
+sql_glue <- function(sql, envir = parent.frame()) {
+  glue_sql2(sql_current_con(), sql, envir = envir)
 }
 
 glue_transformer <- function(con, text, envir, call = caller_env()) {

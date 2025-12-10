@@ -4,15 +4,14 @@
 \alias{glue_sql2}
 \title{Build SQL strings with glue syntax}
 \usage{
-glue_sql2(.con, ..., .envir = parent.frame())
+glue_sql2(con, sql, envir = parent.frame())
 }
 \arguments{
-\item{.con}{A database connection.}
+\item{con}{A database connection.}
 
-\item{...}{SQL fragments to interpolate. These are evaluated in \code{.envir} and
-then combined according to their type markers.}
+\item{sql}{A string to interpolate.}
 
-\item{.envir}{Environment to evaluate \code{...} in.}
+\item{envir}{Environment to evaluate \code{sql} in.}
 }
 \value{
 An SQL string.

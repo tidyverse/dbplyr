@@ -388,10 +388,7 @@ snowflake_pmin_pmax_sql_expression <- function(dots, comparison) {
 }
 
 snowflake_pmin_pmax_builder <- function(dot_1, dot_2, comparison) {
-  glue_sql2(
-    sql_current_con(),
-    glue(
-      "COALESCE(IFF({dot_2} {comparison} {dot_1}, {dot_2}, {dot_1}), {dot_2}, {dot_1})"
-    )
+  sql_glue(
+    "COALESCE(IFF({dot_2} {.sql comparison} {dot_1}, {dot_2}, {dot_1}), {dot_2}, {dot_1})"
   )
 }

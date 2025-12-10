@@ -155,15 +155,12 @@ sql_quantile <- function(f, style = c("infix", "ordered"), window = FALSE) {
     check_probs(probs)
     sql_check_na_rm(na.rm)
 
-    sql <- switch(
-      style,
-      infix = sql_call2(f, x, probs),
-      ordered = glue_sql2(
-        sql_current_con(),
-        sql_call2(f, probs),
-        " WITHIN GROUP (ORDER BY {x})"
-      )
-    )
+    if (style == "infix") {
+      sql <- sql_call2(f, x, probs)
+    } else {
+      call <- sql_call2(f, probs)
+      sql <- sql_glue("{call} WITHIN GROUP (ORDER BY {x})")
+    }
 
     if (window) {
       sql <- win_over(

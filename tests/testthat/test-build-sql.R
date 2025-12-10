@@ -15,29 +15,13 @@ test_that("build_sql() requires connection", {
 
 # glue_sql() -------------------------------------------------------------------
 
-test_that("glue_sql() interpolates .tbl correctly", {
-  con <- simulate_dbi()
-  expect_equal(glue_sql2("{.tbl 'table'}", .con = con), sql("`table`"))
-  tbl <- "table"
-  expect_equal(glue_sql2("{.tbl tbl}", .con = con), sql("`table`"))
-  tbl <- ident("table")
-  expect_equal(glue_sql2("{.tbl tbl}", .con = con), sql("`table`"))
-  tbl <- in_schema("schema", "table")
-  expect_equal(glue_sql2("{.tbl tbl}", .con = con), sql("`schema`.`table`"))
-  tbl <- in_catalog("catalog", "schema", "table")
-  expect_equal(
-    glue_sql2("{.tbl tbl}", .con = con),
-    sql("`catalog`.`schema`.`table`")
-  )
-})
-
 test_that("glue_sql() handles type casting", {
   con <- simulate_dbi()
   x <- "x"
 
-  expect_equal(glue_sql2("{x}", .con = con), sql("'x'"))
-  expect_equal(glue_sql2("{.id x}", .con = con), sql("`x`"))
-  expect_equal(glue_sql2("{.sql x}", .con = con), sql("x"))
+  expect_equal(glue_sql2(con, "{x}"), sql("'x'"))
+  expect_equal(glue_sql2(con, "{.id x}", ), sql("`x`"))
+  expect_equal(glue_sql2(con, "{.sql x}", ), sql("x"))
 
   tbl1 <- "table"
   tbl2 <- I("schema.table")
@@ -51,8 +35,8 @@ test_that("glue_sql() can collapse with and without parens", {
   con <- simulate_dbi()
   x <- c("a", "b")
 
-  expect_equal(glue_sql2("{.sql x}", .con = con), sql("a, b"))
-  expect_equal(glue_sql2("{.sql x*}", .con = con), sql("(a, b)"))
+  expect_equal(glue_sql2(con, "{.sql x}"), sql("a, b"))
+  expect_equal(glue_sql2(con, "{.sql x*}"), sql("(a, b)"))
 })
 
 

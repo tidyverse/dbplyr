@@ -503,11 +503,11 @@ db_supports_table_alias_with_as.PostgreSQL <- function(con) {
 #' @export
 db_col_types.PqConnection <- function(con, table, call) {
   table <- as_table_path(table, con, error_call = call)
-  res <- DBI::dbSendQuery(
-    con,
-    glue_sql2(con, "SELECT * FROM {.tbl table} LIMIT 0")
-  )
+
+  sql <- glue_sql2(con, "SELECT * FROM {.tbl table} LIMIT 0")
+  res <- DBI::dbSendQuery(con, sql)
   on.exit(DBI::dbClearResult(res))
+
   DBI::dbFetch(res, n = 0)
   col_info_df <- DBI::dbColumnInfo(res)
   set_names(col_info_df[[".typname"]], col_info_df[["name"]])

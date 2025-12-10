@@ -145,10 +145,7 @@ sql_translation.RedshiftConnection <- function(con) {
         listagg_sql <- sql_glue("LISTAGG({x}, {collapse})")
 
         if (length(order) > 0) {
-          sql <- glue_sql2(
-            sql_current_con(),
-            "{listagg_sql} WITHIN GROUP (ORDER BY {order})"
-          )
+          sql <- sql_glue("{listagg_sql} WITHIN GROUP (ORDER BY {order})")
         } else {
           sql <- listagg_sql
         }

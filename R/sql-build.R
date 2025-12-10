@@ -172,7 +172,7 @@ cte_render <- function(query_list, con) {
     con = con
   )
 
-  glue_sql2(con, " WITH ", cte_query, "\n", query_list[[n]])
+  glue_sql2(con, " WITH {.sql cte_query}\n{query_list[[n]]}")
 }
 
 get_subquery_name <- function(x, query_list) {

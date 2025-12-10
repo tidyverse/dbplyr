@@ -51,15 +51,10 @@ sql_clause_select <- function(
 
   if (!is.null(top)) {
     top <- as.integer(top)
+    top <- glue_sql2(con, " TOP {top}")
   }
 
-  clause <- glue_sql2(
-    con,
-    "SELECT",
-    if (distinct) " DISTINCT",
-    if (!is.null(top)) " TOP {top}"
-  )
-
+  clause <- paste0("SELECT", if (distinct) " DISTINCT", top)
   sql_clause(clause, select)
 }
 
