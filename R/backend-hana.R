@@ -41,16 +41,10 @@ sql_translation.HDB <- function(con) {
       as.numeric = sql_cast("DOUBLE"),
       as.double = sql_cast("DOUBLE"),
 
-      # string functions ----------------'--------------------------------
-      paste = sql_paste_infix(" ", "||", function(x) {
-        sql_glue("CAST({x} AS text)")
-      }),
-      paste0 = sql_paste_infix("", "||", function(x) {
-        sql_glue("CAST({x} AS text)")
-      }),
-      str_c = sql_paste_infix("", "||", function(x) {
-        sql_glue("CAST({x} AS text)")
-      }),
+      # string functions ------------------------------------------------
+      paste = sql_paste_infix(" ", "||"),
+      paste0 = sql_paste_infix("", "||"),
+      str_c = sql_paste_infix("", "||"),
 
       # https://help.sap.com/viewer/7c78579ce9b14a669c1f3295b0d8ca16/Cloud/en-US/20e8341275191014a4cfdcd3c830fc98.html
       substr = sql_substr("SUBSTRING"),
