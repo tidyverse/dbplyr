@@ -109,7 +109,7 @@ test_that("basic prefix paste", {
 test_that("basic infix paste", {
   local_con(simulate_dbi())
 
-  paste <- sql_paste_infix("", "&&", \(x) sql_glue("CAST({x} AS text)"))
+  paste <- sql_paste_infix("", "&&")
   x <- ident("x")
   y <- ident("y")
 

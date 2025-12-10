@@ -14,7 +14,7 @@ sql_str_sub(subset_f = "SUBSTR", length_f = "LENGTH", optional_length = TRUE)
 
 sql_paste(default_sep, f = "CONCAT_WS")
 
-sql_paste_infix(default_sep, op, cast, con = sql_current_con())
+sql_paste_infix(default_sep, op, cast = sql_cast("text"))
 }
 \arguments{
 \item{f}{The name of the SQL function as a string.}
@@ -31,8 +31,6 @@ substring function.}
 \item{op}{The SQL operator to use for infix paste operations.}
 
 \item{cast}{A function to cast values to strings.}
-
-\item{con}{The database connection.}
 }
 \description{
 These functions help you create custom string SQL translations when

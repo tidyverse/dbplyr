@@ -40,3 +40,4 @@
     Condition
       Error in `sql_glue2()`:
       ! Unknown marker "bar" in {.bar x}.
+

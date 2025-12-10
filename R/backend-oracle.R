@@ -139,15 +139,9 @@ sql_translation.Oracle <- function(con) {
 
       # string -----------------------------------------------------------------
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/operators003.htm#i997789
-      paste = sql_paste_infix(" ", "||", function(x) {
-        sql_glue("CAST({x} AS text)")
-      }),
-      paste0 = sql_paste_infix("", "||", function(x) {
-        sql_glue("CAST({x} AS text)")
-      }),
-      str_c = sql_paste_infix("", "||", function(x) {
-        sql_glue("CAST({x} AS text)")
-      }),
+      paste = sql_paste_infix(" ", "||"),
+      paste0 = sql_paste_infix("", "||"),
+      str_c = sql_paste_infix("", "||"),
 
       # https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/REGEXP_REPLACE.html
       # 4th argument is starting position (default: 1 => first char of string)

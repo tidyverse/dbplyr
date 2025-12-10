@@ -68,12 +68,8 @@ sql_translation.SQLiteConnection <- function(con) {
           sql_glue("LOG({x})")
         }
       },
-      paste = sql_paste_infix(" ", "||", function(x) {
-        sql_glue("CAST({x} AS TEXT)")
-      }),
-      paste0 = sql_paste_infix("", "||", function(x) {
-        sql_glue("CAST({x} AS TEXT)")
-      }),
+      paste = sql_paste_infix(" ", "||"),
+      paste0 = sql_paste_infix("", "||"),
       # https://www.sqlite.org/lang_corefunc.html#maxoreunc
       pmin = sql_aggregate_n("MIN", "pmin"),
       pmax = sql_aggregate_n("MAX", "pmax"),

@@ -14,7 +14,6 @@
 #'   like `||`.
 #'
 #' @param f The name of the SQL function as a string.
-#' @param con The database connection.
 #' @family SQL translation helpers
 #' @name sql_translation_string
 NULL
@@ -215,7 +214,7 @@ sql_paste <- function(default_sep, f = "CONCAT_WS") {
 #' @rdname sql_translation_string
 #' @param op The SQL operator to use for infix paste operations.
 #' @param cast A function to cast values to strings.
-sql_paste_infix <- function(default_sep, op, cast, con = sql_current_con()) {
+sql_paste_infix <- function(default_sep, op, cast = sql_cast("text")) {
   check_string(default_sep)
   check_string(op)
   check_function(cast)

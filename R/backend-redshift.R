@@ -48,9 +48,9 @@ sql_translation.RedshiftConnection <- function(con) {
       round = redshift_round,
 
       # https://stackoverflow.com/questions/56708136
-      paste = sql_paste_redshift(" "),
-      paste0 = sql_paste_redshift(""),
-      str_c = sql_paste_redshift(""),
+      paste = sql_paste_infix(" ", "||"),
+      paste0 = sql_paste_infix("", "||"),
+      str_c = sql_paste_infix("", "||"),
 
       str_ilike = function(string, pattern) {
         sql_glue("{string} ILIKE {pattern}")
@@ -163,10 +163,6 @@ sql_translation.RedshiftConnection <- function(con) {
 
 #' @export
 sql_translation.Redshift <- sql_translation.RedshiftConnection
-
-sql_paste_redshift <- function(sep) {
-  sql_paste_infix(sep, "||", function(x) sql_glue("CAST({x} AS text)"))
-}
 
 # https://docs.aws.amazon.com/redshift/latest/dg/r_EXPLAIN.html
 #' @export

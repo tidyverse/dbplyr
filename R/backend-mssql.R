@@ -328,20 +328,14 @@ simulate_mssql <- function(version = "15.0") {
 
       # string functions ------------------------------------------------
       nchar = sql_prefix("LEN"),
-      paste = sql_paste_infix(" ", "+", function(x) {
-        sql_glue("CAST({x} AS text)")
-      }),
-      paste0 = sql_paste_infix("", "+", function(x) {
-        sql_glue("CAST({x} AS text)")
-      }),
+      paste = sql_paste_infix(" ", "+"),
+      paste0 = sql_paste_infix("", "+"),
       substr = sql_substr("SUBSTRING"),
       substring = sql_substr("SUBSTRING"),
 
       # stringr functions
       str_length = sql_prefix("LEN"),
-      str_c = sql_paste_infix("", "+", function(x) {
-        sql_glue("CAST({x} AS text)")
-      }),
+      str_c = sql_paste_infix("", "+"),
       # use COLLATE to ensure consistent behaviour https://learn.microsoft.com/en-us/sql/relational-databases/collations/set-or-change-the-column-collation?view=sql-server-ver17&source=recommendations
       str_like = function(string, pattern, ignore_case = deprecated()) {
         ignore_case <- deprecate_ignore_case(ignore_case)
