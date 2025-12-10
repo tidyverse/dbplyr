@@ -23,16 +23,11 @@ to define how R string functions should be translated to SQL.
 ``` r
 sql_substr(f = "SUBSTR")
 
-sql_str_sub(
-  subset_f = "SUBSTR",
-  length_f = "LENGTH",
-  optional_length = TRUE,
-  con = sql_current_con()
-)
+sql_str_sub(subset_f = "SUBSTR", length_f = "LENGTH", optional_length = TRUE)
 
 sql_paste(default_sep, f = "CONCAT_WS")
 
-sql_paste_infix(default_sep, op, cast, con = sql_current_con())
+sql_paste_infix(default_sep, op, cast = sql_cast("text"))
 ```
 
 ## Arguments
@@ -52,10 +47,6 @@ sql_paste_infix(default_sep, op, cast, con = sql_current_con())
 - optional_length:
 
   Whether the length argument is optional in the SQL substring function.
-
-- con:
-
-  The database connection.
 
 - default_sep:
 

@@ -158,21 +158,17 @@
 
 ## SQL generation
 
-- [`build_sql()`](https://dbplyr.tidyverse.org/dev/reference/build_sql.md)
-  **\[deprecated\]** : Build a SQL string.
 - [`escape()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   [`escape_ansi()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   [`sql_vector()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   : Escape/quote a string.
-- [`partial_eval()`](https://dbplyr.tidyverse.org/dev/reference/partial_eval.md)
-  : Partially evaluate an expression.
 - [`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md)
   [`is.sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md)
   [`as.sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md) : SQL
   escaping.
-- [`sql_expr()`](https://dbplyr.tidyverse.org/dev/reference/sql_expr.md)
-  [`sql_call2()`](https://dbplyr.tidyverse.org/dev/reference/sql_expr.md)
-  : Generate SQL from R expressions
+- [`sql_glue()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
+  [`sql_glue2()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
+  : Build SQL strings with glue syntax
 - [`translate_sql()`](https://dbplyr.tidyverse.org/dev/reference/translate_sql.md)
   [`translate_sql_()`](https://dbplyr.tidyverse.org/dev/reference/translate_sql.md)
   : Translate an expression to SQL
@@ -223,7 +219,8 @@ Documentation for authors of new dbplyr backends
   [`sql_escape_datetime()`](https://dbplyr.tidyverse.org/dev/reference/db-quote.md)
   [`sql_escape_raw()`](https://dbplyr.tidyverse.org/dev/reference/db-quote.md)
   : SQL escaping/quoting generics
-- [`glue_sql2()`](https://dbplyr.tidyverse.org/dev/reference/glue_sql2.md)
+- [`sql_glue()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
+  [`sql_glue2()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
   : Build SQL strings with glue syntax
 - [`sql_variant()`](https://dbplyr.tidyverse.org/dev/reference/sql_variant.md)
   [`sql_translator()`](https://dbplyr.tidyverse.org/dev/reference/sql_variant.md)

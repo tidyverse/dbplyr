@@ -24,6 +24,7 @@ package, you’ll need to import dplyr and DBI.
 
 ``` r
 library(dplyr)
+library(dbplyr)
 library(DBI)
 ```
 
@@ -122,30 +123,30 @@ the key verbs work:
 ### Building SQL strings
 
 If you need to generate your own SQL, we recommend using
-[`glue_sql2()`](https://dbplyr.tidyverse.org/dev/reference/glue_sql2.md).
+[`sql_glue2()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md).
 It uses glue syntax with type markers for safe SQL generation:
 
 ``` r
+con <- simulate_dbi()
+
 # Create an index
-glue_sql2(
-  con,
-  "CREATE INDEX {.name index_name} ON {.tbl table} ({.col columns*})"
-)
+index_name <- "index"
+table <- I("schema.table")
+columns <- c("column1", "column2")
+sql_glue2(con, "CREATE INDEX {.id index_name} ON {.tbl table} {.id columns*}")
+#> <SQL> CREATE INDEX `index` ON schema.table (`column1`, `column2`)
 
 # Insert values safely
 name <- "O'Brien"
-glue_sql2(con, "INSERT INTO students (name) VALUES ({.val name})")
+sql_glue2(con, "INSERT INTO students (name) VALUES {name*}")
+#> <SQL> INSERT INTO students (name) VALUES ('O''Brien')
 
 # Build a query
 table <- "my_table"
 cols <- c("id", "name", "value")
-glue_sql2(con, "SELECT {.col cols*} FROM {.tbl table}")
+sql_glue2(con, "SELECT {.id cols} FROM {.tbl table}")
+#> <SQL> SELECT `id`, `name`, `value` FROM `my_table`
 ```
-
-Type markers include `.tbl` (tables), `.col` (columns), `.val` (values),
-`.name` (names), `.from` (subqueries/tables), and `.kw` (keywords). Use
-`*` after `.col` or `.val` to collapse vectors into comma-separated
-lists.
 
 ## SQL translation: vectors
 
@@ -280,10 +281,8 @@ window = sql_translator(
 
 For more complex translations, you can write custom functions that
 return SQL expressions using
-[`sql_expr()`](https://dbplyr.tidyverse.org/dev/reference/sql_expr.md).
-This is a tidy-evaluation function that allows you to use `!!` operator
-to in inject a single value into SQL expressions or `!!!` to splice a
-list of values.
+[`sql_glue()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md).
+This uses glue syntax for string interpolation with automatic escaping.
 
 ``` r
 scalar = sql_translator(
@@ -292,16 +291,15 @@ scalar = sql_translator(
   # Custom log function with change of base
   log = function(x, base = exp(1)) {
     if (isTRUE(all.equal(base, exp(1)))) {
-      sql_expr(ln(!!x))
+      sql_glue("LN({x})")
     } else {
-      sql_expr(log(!!x) / log(!!base))
+      sql_glue("LOG({x}) / LOG({base})")
     }
   },
 
   # Custom paste function using CONCAT
   paste = function(..., sep = " ") {
-    args <- list(...)
-    sql_expr(CONCAT_WS(!!sep, !!!args))
+    sql_glue("CONCAT_WS({sep}, {...})")
   }
 )
 ```

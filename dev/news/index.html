@@ -57,7 +57,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li>
+<ul><li>New <code><a href="../reference/sql_glue.html">sql_glue()</a></code> and <code><a href="../reference/sql_glue.html">sql_glue2()</a></code> provide a convenient syntax for building SQL strings. These functions replace the now superseded <code><a href="../reference/build_sql.html">build_sql()</a></code>, <code><a href="../reference/sql_expr.html">sql_expr()</a></code>, and <code><a href="../reference/sql_expr.html">sql_call2()</a></code>. (<a href="https://github.com/tidyverse/dbplyr/issues/1249" class="external-link">#1249</a>).</li>
+<li>
 <code>fill()</code> now errors if you attempt to rename a column, for consistency with dplyr (<a href="https://github.com/tidyverse/dbplyr/issues/1536" class="external-link">#1536</a>)</li>
 <li>Redshift: fixed syntax error in <code>date_build()</code> translation (<a href="https://github.com/tidyverse/dbplyr/issues/1512" class="external-link">#1512</a>).</li>
 <li>Ensure <code>str_like()</code> and <code>str_ilike()</code> have consistent behaviour on SQL Server (<a href="https://github.com/edward-burn" class="external-link">@edward-burn</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1669" class="external-link">#1669</a>).</li>
@@ -77,7 +78,7 @@
 <li>
 <code><a href="../reference/sql_translation_agg.html">sql_check_na_rm()</a></code> is now exported for use in other backends (<a href="https://github.com/tidyverse/dbplyr/issues/1483" class="external-link">#1483</a>).</li>
 <li>
-<code><a href="../reference/glue_sql2.html">glue_sql2()</a></code> is now exported for building SQL strings with glue syntax and type markers. <code><a href="../reference/build_sql.html">build_sql()</a></code> is deprecated in favor of <code><a href="../reference/glue_sql2.html">glue_sql2()</a></code> (<a href="https://github.com/tidyverse/dbplyr/issues/1249" class="external-link">#1249</a>).</li>
+<code><a href="../reference/sql_glue.html">sql_glue2()</a></code> is now exported for building SQL strings with glue syntax and type markers. <code><a href="../reference/build_sql.html">build_sql()</a></code> is deprecated in favor of <code><a href="../reference/sql_glue.html">sql_glue2()</a></code> (<a href="https://github.com/tidyverse/dbplyr/issues/1249" class="external-link">#1249</a>).</li>
 <li>dbplyr 1e interfaces are now deprecated (<a href="https://github.com/tidyverse/dbplyr/issues/1197" class="external-link">#1197</a>). Backend developers have had &gt;2 years to update.</li>
 <li>MySQL gains slightly better translation for <code><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer()</a></code> and <code>as.integer64()</code> (<a href="https://github.com/tidyverse/dbplyr/issues/1647" class="external-link">#1647</a>).</li>
 <li>Fixed snowflake translations that were being reported as unknown (<a href="https://github.com/edward-burn" class="external-link">@edward-burn</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1570" class="external-link">#1570</a>).</li>

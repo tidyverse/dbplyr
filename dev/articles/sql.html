@@ -121,7 +121,7 @@ subqueries if you want to use a freshly created variable in
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> (</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> `dbplyr_tmp_SwlKLUUEdL`.*, `y` * `x`<span style="color: #0000BB;"> AS </span>`a`</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_SwlKLUUEdL`</span></span>
-<span><span class="co">#&gt; )<span style="color: #0000BB;"> AS </span>`q01`</span></span></code></pre></div>
+<span><span class="co">#&gt; ) <span style="color: #0000BB;">AS </span>`q01`</span></span></code></pre></div>
 <p>In general, it’s much easier to work iteratively in dbplyr. You can
 easily give intermediate queries names, and reuse them in multiple
 places. Or if you have a common operation that you want to do to many

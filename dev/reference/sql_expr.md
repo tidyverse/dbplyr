@@ -1,8 +1,18 @@
 # Generate SQL from R expressions
 
+**\[superseded\]** `sql_expr()` and `sql_call2()` are superseded in
+favour of
+[`sql_glue()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md).
+
 Low-level building block for generating SQL from R expressions. Strings
 are escaped; names become bare SQL identifiers. User infix functions
 have `%` stripped.
+
+Using `sql_expr()` in package will require use of
+[`globalVariables()`](https://rdrr.io/r/utils/globalVariables.html) to
+avoid `R CMD check` NOTES. This is a small amount of additional pain,
+which I think is worthwhile because it leads to more readable
+translation code.
 
 ## Usage
 
@@ -30,14 +40,6 @@ sql_call2(.fn, ..., con = sql_current_con())
 - ...:
 
   Arguments to function
-
-## Details
-
-Using `sql_expr()` in package will require use of
-[`globalVariables()`](https://rdrr.io/r/utils/globalVariables.html) to
-avoid `R CMD check` NOTES. This is a small amount of additional pain,
-which I think is worthwhile because it leads to more readable
-translation code.
 
 ## Examples
 

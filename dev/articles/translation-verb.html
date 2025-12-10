@@ -192,7 +192,7 @@ create subqueries where needed:</p>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> (</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> `distance`, `air_time`, `air_time` / 60.0<span style="color: #0000BB;"> AS </span>`air_time_h`</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> `nycflights13::flights`</span></span>
-<span><span class="co">#&gt; )<span style="color: #0000BB;"> AS </span>`q01`</span></span></code></pre></div>
+<span><span class="co">#&gt; ) <span style="color: #0000BB;">AS </span>`q01`</span></span></code></pre></div>
 <p>It’s also possible to use a CTE if you so desire:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">flights</span> <span class="op">|&gt;</span></span>
@@ -202,7 +202,7 @@ create subqueries where needed:</p>
 <span>    speed <span class="op">=</span> <span class="va">distance</span> <span class="op">/</span> <span class="va">air_time_h</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/show_query.html">show_query</a></span><span class="op">(</span>sql_options <span class="op">=</span> <span class="fu"><a href="../reference/sql_options.html">sql_options</a></span><span class="op">(</span>cte <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">WITH</span> `q01` <span style="color: #0000BB;">AS</span> (</span></span>
+<span><span class="co">#&gt; WITH `q01` AS (</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> `distance`, `air_time`, `air_time` / 60.0<span style="color: #0000BB;"> AS </span>`air_time_h`</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> `nycflights13::flights`</span></span>
 <span><span class="co">#&gt; )</span></span>

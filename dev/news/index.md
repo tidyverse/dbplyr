@@ -2,6 +2,17 @@
 
 ## dbplyr (development version)
 
+- New
+  [`sql_glue()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
+  and
+  [`sql_glue2()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
+  provide a convenient syntax for building SQL strings. These functions
+  replace the now superseded
+  [`build_sql()`](https://dbplyr.tidyverse.org/dev/reference/build_sql.md),
+  [`sql_expr()`](https://dbplyr.tidyverse.org/dev/reference/sql_expr.md),
+  and
+  [`sql_call2()`](https://dbplyr.tidyverse.org/dev/reference/sql_expr.md).
+  ([\#1249](https://github.com/tidyverse/dbplyr/issues/1249)).
 - `fill()` now errors if you attempt to rename a column, for consistency
   with dplyr ([\#1536](https://github.com/tidyverse/dbplyr/issues/1536))
 - Redshift: fixed syntax error in `date_build()` translation
@@ -52,12 +63,12 @@
 - [`sql_check_na_rm()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_agg.md)
   is now exported for use in other backends
   ([\#1483](https://github.com/tidyverse/dbplyr/issues/1483)).
-- [`glue_sql2()`](https://dbplyr.tidyverse.org/dev/reference/glue_sql2.md)
+- [`sql_glue2()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
   is now exported for building SQL strings with glue syntax and type
   markers.
   [`build_sql()`](https://dbplyr.tidyverse.org/dev/reference/build_sql.md)
   is deprecated in favor of
-  [`glue_sql2()`](https://dbplyr.tidyverse.org/dev/reference/glue_sql2.md)
+  [`sql_glue2()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
   ([\#1249](https://github.com/tidyverse/dbplyr/issues/1249)).
 - dbplyr 1e interfaces are now deprecated
   ([\#1197](https://github.com/tidyverse/dbplyr/issues/1197)). Backend

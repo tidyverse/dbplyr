@@ -112,12 +112,12 @@ multiple tables.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `df`<span style="color: #0000BB;"> AS </span>`df_LHS`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">LEFT JOIN</span> `df`<span style="color: #0000BB;"> AS </span>`df_RHS`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #0000BB;">ON</span> (`df_LHS`.`key` = `df_RHS`.`key`)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> )<span style="color: #0000BB;"> AS </span>`q01`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ) <span style="color: #0000BB;">AS </span>`q01`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">WHERE</span> (`c` &gt;= 3.0)</span>
 <span class="r-in"><span><span class="va">sql_options</span> <span class="op">&lt;-</span> <span class="fu">sql_options</span><span class="op">(</span>cte <span class="op">=</span> <span class="cn">TRUE</span>, qualify_all_columns <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="va">result</span>, sql_options <span class="op">=</span> <span class="va">sql_options</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">WITH</span> `q01` <span style="color: #0000BB;">AS</span> (</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> WITH `q01` AS (</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     `df_LHS`.`key`<span style="color: #0000BB;"> AS </span>`key`,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     `df_LHS`.`a`<span style="color: #0000BB;"> AS </span>`a.x`,</span>
