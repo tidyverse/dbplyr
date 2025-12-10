@@ -154,11 +154,11 @@ sql_quantile <- function(f, style = c("infix", "ordered"), window = FALSE) {
     check_probs(probs)
     sql_check_na_rm(na.rm)
 
-    if (style == "infix") {
-      sql <- sql_glue("{.sql f}({x}, {probs})")
-    } else {
-      sql <- sql_glue("{.sql f}({probs}) WITHIN GROUP (ORDER BY {x})")
-    }
+    sql <- switch(
+      style,
+      infix = sql_glue("{.sql f}({x}, {probs})"),
+      ordered = sql_glue("{.sql f}({probs}) WITHIN GROUP (ORDER BY {x})")
+    )
 
     if (window) {
       sql <- win_over(
