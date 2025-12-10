@@ -92,7 +92,7 @@ sql_translation.Hive <- function(con) {
 #' @export
 sql_table_analyze.Hive <- function(con, table, ...) {
   # https://cwiki.apache.org/confluence/display/Hive/StatsDev
-  glue_sql2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
+  sql_glue2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
 }
 
 #' @export
@@ -108,7 +108,7 @@ sql_query_set_op.Hive <- function(
   check_bool(all)
   # compared to default method, can't use parentheses
   method <- paste0(method, if (all) " ALL")
-  glue_sql2(con, "{x}\n{.sql method}\n{y}")
+  sql_glue2(con, "{x}\n{.sql method}\n{y}")
 }
 
 #' @export

@@ -64,7 +64,7 @@ db_connection_describe.MySQLConnection <- db_connection_describe.MariaDBConnecti
 
 #' @export
 db_col_types.MariaDBConnection <- function(con, table, call = caller_env()) {
-  sql <- glue_sql2(con, "SHOW COLUMNS FROM {.tbl table}")
+  sql <- sql_glue2(con, "SHOW COLUMNS FROM {.tbl table}")
   col_info_df <- DBI::dbGetQuery(con, sql)
   set_names(col_info_df[["Type"]], col_info_df[["Field"]])
 }
@@ -168,7 +168,7 @@ sql_translation.MySQLConnection <- sql_translation.MySQL
 
 #' @export
 sql_table_analyze.MariaDBConnection <- function(con, table, ...) {
-  glue_sql2(con, "ANALYZE TABLE {.tbl table}")
+  sql_glue2(con, "ANALYZE TABLE {.tbl table}")
 }
 #' @export
 sql_table_analyze.MySQL <- sql_table_analyze.MariaDBConnection
@@ -199,7 +199,7 @@ sql_query_join.MySQLConnection <- sql_query_join.MariaDBConnection
 #' @export
 sql_expr_matches.MariaDBConnection <- function(con, x, y, ...) {
   # https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_equal-to
-  glue_sql2(con, "{x} <=> {y}")
+  sql_glue2(con, "{x} <=> {y}")
 }
 #' @export
 sql_expr_matches.MySQL <- sql_expr_matches.MariaDBConnection

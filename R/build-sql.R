@@ -1,8 +1,8 @@
 #' Build a SQL string.
 #'
 #' @description
-#' `r lifecycle::badge("deprecated")`
-#' `build_sql()` is deprecated in favor of [glue_sql2()].
+#' `r lifecycle::badge("superseded")`
+#' `build_sql()` is superseded in favor of [sql_glue2()].
 #'
 #' This is a convenience function that should prevent sql injection attacks
 #' (which in the context of dplyr are most likely to be accidental not
@@ -28,15 +28,15 @@
 #' # Old:
 #' build_sql("SELECT * FROM ", ident("table"), con = con)
 #' # New:
-#' glue_sql2(con, "SELECT * FROM {.tbl 'table'}")
+#' sql_glue2(con, "SELECT * FROM {.tbl 'table'}")
 #'
 #' # Old:
 #' name <- "Robert"
 #' build_sql("INSERT INTO students (name) VALUES (", name, ")", con = con)
 #' # New:
-#' glue_sql2(con, "INSERT INTO students (name) VALUES ({name})")
+#' sql_glue2(con, "INSERT INTO students (name) VALUES ({name})")
 build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
-  lifecycle::deprecate_warn("2.6.0", "build_sql()", "glue_sql2()")
+  lifecycle::deprecate_warn("2.6.0", "build_sql()", "sql_glue2()")
   check_con(con)
 
   escape_expr <- function(x, con) {
@@ -61,22 +61,25 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
 #' Build SQL strings with glue syntax
 #'
 #' @description
-#' `glue_sql2()` is a SQL string builder that uses [glue::glue()] syntax with
-#' special type markers for safe SQL generation. It replaces the deprecated
-#' [build_sql()] function with a more explicit and type-safe approach.
+#' `sql_glue()` and `sql_glue2()` are designed to help dbplyr extenders
+#' generate custom SQL. They differ only in whether or not they require
+#' a connection. `sql_glue()` retrieves the ambient connection, making it
+#' suitable for use inside [sql_translation()] methods; `sql_glue2()` requires
+#' a connection, making it suitable for use inside all other `sql_` methods.
 #'
-#' The default glue syntax, `{x}`, will escape the `x` using the
-#' database connection. If there are multiple values in `x`, they'll be
-#' collapsed into a single string with `,`. If you want them to be wrapped in
-#' `()`, use a `*` suffix, e.g. `{x*}`.
+#' As the name suggests, these functions use \pkg{glue} syntax to make it
+#' easy to mix fixed SQL with varying user inputs. The default glue syntax, `{x}`,
+#' will escape `x` using the database connection. If there are multiple values
+#' in `x`, they'll be collapsed into a single string with `,`. If you want them
+#' to be wrapped in `()`, use a `*` suffix, e.g. `{x*}`.
 #'
-#' You can also use a type markers to control how the value is treated:
+#' You can also use type markers to control how the value is treated:
 #'
 #' * `{.sql x}`: `x` is literal SQL that should be interpolated as
 #'   is, without additional escaping.
 #' * `{.tbl x}`: `x` is a table identifier like a string, `I()`, or one of
-#'   the older forms like  `DBI::Id()` or `in_schema()`.
-#' * `{.id x}`: `x` is an generic identifiers like for a column or index.
+#'   the older forms like `DBI::Id()` or `in_schema()`.
+#' * `{.id x}`: `x` is a generic identifier, e.g. for a column or index.
 #'
 #' @param con A database connection.
 #' @param sql A string to interpolate.
@@ -87,24 +90,28 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
 #' con <- simulate_dbi()
 #'
 #' tbl <- "my_table"
-#' glue_sql2(con, "SELECT * FROM {.tbl tbl}")
+#' sql_glue2(con, "SELECT * FROM {.tbl tbl}")
 #'
 #' # Values are properly escaped
 #' name <- "Robert'); DROP TABLE students;--"
-#' glue_sql2(con, "INSERT INTO students (name) VALUES ({name})")
+#' sql_glue2(con, "INSERT INTO students (name) VALUES ({name})")
 #'
 #' # Control wrapping with *
 #' x <- c("name", "age", "grade")
-#' glue_sql2(con, "SELECT {.id x} FROM students")
-#' glue_sql2(con, "SELECT * WHERE variable IN {x*}")
-glue_sql2 <- function(con, sql, envir = parent.frame()) {
+#' sql_glue2(con, "SELECT {.id x} FROM students")
+#' sql_glue2(con, "SELECT * WHERE variable IN {x*}")
+#' @export
+sql_glue <- function(sql, envir = parent.frame()) {
+  dbplyr_glue(sql_current_con(), sql, envir = envir)
+}
+
+#' @export
+#' @rdname sql_glue
+sql_glue2 <- function(con, sql, envir = parent.frame()) {
   check_con(con)
   dbplyr_glue(con, sql, envir = envir)
 }
 
-sql_glue <- function(sql, envir = parent.frame()) {
-  dbplyr_glue(sql_current_con(), sql, envir = envir)
-}
 
 dbplyr_glue <- function(con, sql, envir = caller_env(), call = caller_env()) {
   sql(glue(

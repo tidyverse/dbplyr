@@ -122,7 +122,7 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
 #' @export
 `sql_table_analyze.Spark SQL` <- function(con, table, ...) {
   # https://docs.databricks.com/en/sql/language-manual/sql-ref-syntax-aux-analyze-table.html
-  glue_sql2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
+  sql_glue2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
 }
 
 #' @export
@@ -168,7 +168,7 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
   type <- if (temporary) "TEMPORARY VIEW" else "TABLE"
 
   sql <- as_table_source(sql)
-  sql <- glue_sql2(con, "{.sql action} {.sql type} {.tbl table} AS \n{sql}")
+  sql <- sql_glue2(con, "{.sql action} {.sql type} {.tbl table} AS \n{sql}")
   DBI::dbExecute(con, sql)
 
   table

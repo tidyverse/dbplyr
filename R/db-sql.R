@@ -79,7 +79,7 @@ sql_expr_matches <- function(con, x, y, ...) {
 sql_expr_matches.DBIConnection <- function(con, x, y, ...) {
   # https://modern-sql.com/feature/is-distinct-from
   sql <- "CASE WHEN ({x} = {y}) OR ({x} IS NULL AND {y} IS NULL) THEN 0 ELSE 1 END = 0"
-  glue_sql2(con, sql)
+  sql_glue2(con, sql)
 }
 
 #' @export
@@ -115,7 +115,7 @@ sql_table_analyze <- function(con, table, ...) {
 }
 #' @export
 sql_table_analyze.DBIConnection <- function(con, table, ...) {
-  glue_sql2(con, "ANALYZE {.tbl {table}}")
+  sql_glue2(con, "ANALYZE {.tbl {table}}")
 }
 
 #' @rdname db-sql
@@ -154,7 +154,7 @@ sql_table_index.DBIConnection <- function(
   }
 
   index <- if (unique) "UNIQUE INDEX" else "INDEX"
-  glue_sql2(
+  sql_glue2(
     con,
     "CREATE {.sql index} {.id name} ON {.tbl table} {.id columns*}"
   )
@@ -171,7 +171,7 @@ sql_query_explain <- function(con, sql, ...) {
 }
 #' @export
 sql_query_explain.DBIConnection <- function(con, sql, ...) {
-  glue_sql2(con, "EXPLAIN {sql}")
+  sql_glue2(con, "EXPLAIN {sql}")
 }
 
 #' @rdname db-sql
@@ -213,7 +213,7 @@ sql_query_save.DBIConnection <- function(
   sql <- as_table_source(sql)
 
   table <- if (temporary) "TEMPORARY TABLE" else "TABLE"
-  glue_sql2(con, "CREATE {.sql table}\n{.tbl {name}} AS\n{sql}")
+  sql_glue2(con, "CREATE {.sql table}\n{.tbl {name}} AS\n{sql}")
 }
 #' @export
 #' @rdname db-sql
@@ -237,7 +237,7 @@ sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
     from <- sql_indent_subquery(from, con, lvl)
     # some backends, e.g. Postgres, require an alias for a subquery
     name <- name %||% unique_subquery_name()
-    glue_sql2(con, "{from} {.sql as_sql}{.tbl name}")
+    sql_glue2(con, "{from} {.sql as_sql}{.tbl name}")
   } else {
     # must be a table_path
     if (!is.null(name)) {
@@ -280,7 +280,7 @@ sql_query_rows <- function(con, sql, ...) {
 sql_query_rows.DBIConnection <- function(con, sql, ...) {
   sql <- as_table_source(sql, con)
   from <- dbplyr_sql_subquery(con, sql, "master")
-  glue_sql2(con, "SELECT COUNT(*) FROM {.from from}")
+  sql_glue2(con, "SELECT COUNT(*) FROM {.from from}")
 }
 
 #' @rdname db-sql
@@ -602,7 +602,7 @@ sql_query_semi_join.DBIConnection <- function(
   lines <- list(
     sql_clause_select(con, vars),
     sql_clause_from(x),
-    glue_sql2(con, "WHERE {.sql exists} ("),
+    sql_glue2(con, "WHERE {.sql exists} ("),
     # lvl = 1 because they are basically in a subquery
     sql_clause("SELECT 1 FROM", y, lvl = 1),
     sql_clause_where(c(on, where), lvl = 1),

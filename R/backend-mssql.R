@@ -563,7 +563,7 @@ mssql_version <- function(con) {
 #' @export
 `sql_table_analyze.Microsoft SQL Server` <- function(con, table, ...) {
   # https://docs.microsoft.com/en-us/sql/t-sql/statements/update-statistics-transact-sql
-  glue_sql2(con, "UPDATE STATISTICS {.tbl table}")
+  sql_glue2(con, "UPDATE STATISTICS {.tbl table}")
 }
 
 # SQL server does not use CREATE TEMPORARY TABLE and instead prefixes
@@ -592,7 +592,7 @@ mssql_version <- function(con) {
   ...
 ) {
   # https://stackoverflow.com/q/16683758/946850
-  glue_sql2(con, "SELECT * INTO {.tbl name} FROM (\n  {sql}\n) AS temp")
+  sql_glue2(con, "SELECT * INTO {.tbl name} FROM (\n  {sql}\n) AS temp")
 }
 
 #' @export

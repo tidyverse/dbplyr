@@ -86,7 +86,7 @@ sql_case_match_clause <- function(f, x, con) {
   }
 
   if (has_na) {
-    query <- paste(c(query, glue_sql2(con, "{x} IS NULL")), collapse = " OR ")
+    query <- paste(c(query, sql_glue2(con, "{x} IS NULL")), collapse = " OR ")
   }
 
   query
@@ -122,7 +122,7 @@ sql_if <- function(cond, if_true, if_false = quo(NULL), missing = quo(NULL)) {
   }
   out <- paste0(out, " END")
 
-  glue_sql2(con, out)
+  sql_glue2(con, out)
 }
 
 sql_case_when <- function(
@@ -192,7 +192,7 @@ sql_switch <- function(x, ...) {
   named <- names2(input) != ""
 
   clauses <- purrr::map2_chr(names(input)[named], input[named], function(x, y) {
-    glue_sql2(con, "WHEN ({x}) THEN ({y})")
+    sql_glue2(con, "WHEN ({x}) THEN ({y})")
   })
 
   n_unnamed <- sum(!named)
@@ -200,13 +200,13 @@ sql_switch <- function(x, ...) {
     # do nothing
   } else if (n_unnamed == 1) {
     idx <- which(!named)
-    clauses <- c(clauses, glue_sql2(con, "ELSE ({input[[idx]]})"))
+    clauses <- c(clauses, sql_glue2(con, "ELSE ({input[[idx]]})"))
   } else {
     cli_abort("Can only have one unnamed (ELSE) input")
   }
 
   clauses_collapsed <- paste0(clauses, collapse = " ")
-  glue_sql2(con, "CASE {x} {.sql clauses_collapsed} END")
+  sql_glue2(con, "CASE {x} {.sql clauses_collapsed} END")
 }
 
 sql_is_null <- function(x) {

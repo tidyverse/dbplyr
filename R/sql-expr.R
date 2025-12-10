@@ -1,5 +1,8 @@
 #' Generate SQL from R expressions
 #'
+#' @description
+#' `r lifecycle::badge("superseded")`
+#'
 #' Low-level building block for generating SQL from R expressions.
 #' Strings are escaped; names become bare SQL identifiers. User infix
 #' functions have `%` stripped.
@@ -8,6 +11,8 @@
 #' to avoid `R CMD check` NOTES. This is a small amount of additional pain,
 #' which I think is worthwhile because it leads to more readable translation
 #' code.
+#'
+#' No longer recommended: use [sql_glue()]/[sql_glue2()] instead.
 #'
 #' @param x A quasiquoted expression
 #' @param con Connection to use for escaping. Will be set automatically when

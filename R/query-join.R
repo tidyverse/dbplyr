@@ -291,7 +291,7 @@ sql_rf_join_vars <- function(
         if (!is.na(.x) && !is.na(.y)) {
           x_prefix <- sql_table_prefix(con, .x, table = x_as)
           y_prefix <- sql_table_prefix(con, .y, table = y_as)
-          out <- glue_sql2(con, "COALESCE({x_prefix}, {y_prefix})")
+          out <- sql_glue2(con, "COALESCE({x_prefix}, {y_prefix})")
 
           return(out)
         }

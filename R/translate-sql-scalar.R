@@ -53,7 +53,7 @@ sql_infix <- function(f, pad = TRUE, con = sql_current_con()) {
         sql <- "{x}{.sql f}{y}"
       }
     }
-    glue_sql2(con, sql)
+    sql_glue2(con, sql)
   }
 }
 

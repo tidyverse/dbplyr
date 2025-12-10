@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* New `sql_glue()` and `sql_glue2()` provide a convenient syntax for building SQL strings. These functions replace the now superseded `build_sql()`, `sql_expr()`, and `sql_call2()`. (#1249).
 * `fill()` now errors if you attempt to rename a column, for consistency with dplyr (#1536)
 * Redshift: fixed syntax error in `date_build()` translation (#1512).
 * Ensure `str_like()` and `str_ilike()` have consistent behaviour on SQL Server (@edward-burn, #1669).
@@ -13,8 +14,8 @@
 * `semi_join()` and `anti_join()` once again work with filtered windowed values (#1534, #1606).
 * `window_order()` works with `dplyr::desc()` (not just `desc()`) (#1486).
 * `sql_check_na_rm()` is now exported for use in other backends (#1483).
-* `glue_sql2()` is now exported for building SQL strings with glue syntax and
-  type markers. `build_sql()` is deprecated in favor of `glue_sql2()` (#1249).
+* `sql_glue2()` is now exported for building SQL strings with glue syntax and
+  type markers. `build_sql()` is deprecated in favor of `sql_glue2()` (#1249).
 * dbplyr 1e interfaces are now deprecated (#1197). Backend developers have had >2 years to update.
 * MySQL gains slightly better translation for `as.integer()` and `as.integer64()` (#1647).
 * Fixed snowflake translations that were being reported as unknown (@edward-burn, #1570). 

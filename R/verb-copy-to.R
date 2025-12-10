@@ -405,7 +405,7 @@ sql_values_cast_clauses <- function(con, df, types, na) {
   } else {
     typed_cols <- purrr::imap_chr(types, function(type, val) {
       val <- if (na) NA else ident(val)
-      glue_sql2(con, "CAST({val} AS {.sql type})")
+      sql_glue2(con, "CAST({val} AS {.sql type})")
     })
   }
 

@@ -350,7 +350,7 @@ sql_translation.PostgreSQL <- sql_translation.PqConnection
 #' @export
 sql_expr_matches.PqConnection <- function(con, x, y, ...) {
   # https://www.postgresql.org/docs/current/functions-comparison.html
-  glue_sql2(con, "{x} IS NOT DISTINCT FROM {y}")
+  sql_glue2(con, "{x} IS NOT DISTINCT FROM {y}")
 }
 #' @export
 sql_expr_matches.PostgreSQL <- sql_expr_matches.PqConnection
@@ -361,9 +361,9 @@ sql_query_explain.PqConnection <- function(con, sql, format = "text", ...) {
   format <- match.arg(format, c("text", "json", "yaml", "xml"))
 
   if (!is.null(format)) {
-    glue_sql2(con, "EXPLAIN (FORMAT {format}) {.sql sql}")
+    sql_glue2(con, "EXPLAIN (FORMAT {format}) {.sql sql}")
   } else {
-    glue_sql2(con, "EXPLAIN {.sql sql}")
+    sql_glue2(con, "EXPLAIN {.sql sql}")
   }
 }
 #' @export
@@ -504,7 +504,7 @@ db_supports_table_alias_with_as.PostgreSQL <- function(con) {
 db_col_types.PqConnection <- function(con, table, call) {
   table <- as_table_path(table, con, error_call = call)
 
-  sql <- glue_sql2(con, "SELECT * FROM {.tbl table} LIMIT 0")
+  sql <- sql_glue2(con, "SELECT * FROM {.tbl table} LIMIT 0")
   res <- DBI::dbSendQuery(con, sql)
   on.exit(DBI::dbClearResult(res))
 

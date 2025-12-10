@@ -66,7 +66,7 @@ sql_query_select.Oracle <- function(
     # Requires Oracle 12c, released in 2013
     limit = if (!is.null(limit)) {
       limit <- as.integer(limit)
-      glue_sql2(con, "FETCH FIRST {limit} ROWS ONLY")
+      sql_glue2(con, "FETCH FIRST {limit} ROWS ONLY")
     },
     lvl = lvl
   )
@@ -198,21 +198,21 @@ sql_translation.Oracle <- function(con) {
 sql_query_explain.Oracle <- function(con, sql, ...) {
   # https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/generating-and-displaying-execution-plans.html
   c(
-    glue_sql2(con, "EXPLAIN PLAN FOR {sql}"),
-    glue_sql2(con, "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())")
+    sql_glue2(con, "EXPLAIN PLAN FOR {sql}"),
+    sql_glue2(con, "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())")
   )
 }
 
 #' @export
 sql_table_analyze.Oracle <- function(con, table, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_4005.htm
-  glue_sql2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
+  sql_glue2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
 }
 
 #' @export
 sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
   type <- if (temporary) "GLOBAL TEMPORARY TABLE" else "TABLE"
-  glue_sql2(con, "CREATE {.sql type} {.tbl name} AS\n{sql}")
+  sql_glue2(con, "CREATE {.sql type} {.tbl name} AS\n{sql}")
 }
 
 #' @export
@@ -231,7 +231,7 @@ setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
 #' @export
 sql_expr_matches.Oracle <- function(con, x, y, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/functions040.htm
-  glue_sql2(con, "decode({x}, {y}, 0, 1) = 0")
+  sql_glue2(con, "decode({x}, {y}, 0, 1) = 0")
 }
 
 #' @export

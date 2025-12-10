@@ -17,8 +17,8 @@ be needed in typical use.}
 \item{con}{database connection; used to select correct quoting characters.}
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
-\code{build_sql()} is deprecated in favor of \code{\link[=glue_sql2]{glue_sql2()}}.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#superseded}{\figure{lifecycle-superseded.svg}{options: alt='[Superseded]'}}}{\strong{[Superseded]}}
+\code{build_sql()} is superseded in favor of \code{\link[=sql_glue2]{sql_glue2()}}.
 
 This is a convenience function that should prevent sql injection attacks
 (which in the context of dplyr are most likely to be accidental not
@@ -36,12 +36,12 @@ con <- simulate_dbi()
 # Old:
 build_sql("SELECT * FROM ", ident("table"), con = con)
 # New:
-glue_sql2(con, "SELECT * FROM {.tbl 'table'}")
+sql_glue2(con, "SELECT * FROM {.tbl 'table'}")
 
 # Old:
 name <- "Robert"
 build_sql("INSERT INTO students (name) VALUES (", name, ")", con = con)
 # New:
-glue_sql2(con, "INSERT INTO students (name) VALUES ({name})")
+sql_glue2(con, "INSERT INTO students (name) VALUES ({name})")
 }
 \keyword{internal}
