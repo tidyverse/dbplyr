@@ -2,6 +2,7 @@
 #'
 #' @description
 #' `r lifecycle::badge("superseded")`
+#' `sql_expr()` and `sql_call2()` are superseded in favour of [sql_glue()].
 #'
 #' Low-level building block for generating SQL from R expressions.
 #' Strings are escaped; names become bare SQL identifiers. User infix
@@ -11,8 +12,6 @@
 #' to avoid `R CMD check` NOTES. This is a small amount of additional pain,
 #' which I think is worthwhile because it leads to more readable translation
 #' code.
-#'
-#' No longer recommended: use [sql_glue()]/[sql_glue2()] instead.
 #'
 #' @param x A quasiquoted expression
 #' @param con Connection to use for escaping. Will be set automatically when
