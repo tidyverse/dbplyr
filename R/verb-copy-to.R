@@ -403,15 +403,10 @@ sql_values_cast_clauses <- function(con, df, types, na) {
       }
     )
   } else {
-    typed_cols <- purrr::imap_chr(
-      types,
-      ~ {
-        val <- if (na) NA else ident(.y)
-        val <- escape(val, con = con)
-        type <- sql(.x)
-        glue_sql2(con, "CAST({val} AS {type})")
-      }
-    )
+    typed_cols <- purrr::imap_chr(types, function(type, val) {
+      val <- if (na) NA else ident(val)
+      glue_sql2(con, "CAST({val} AS {.sql type})")
+    })
   }
 
   sql_vector(typed_cols, parens = FALSE, collapse = NULL, con = con)
