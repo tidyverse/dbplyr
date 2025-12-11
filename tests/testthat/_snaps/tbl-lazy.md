@@ -33,7 +33,7 @@
       ! The `names()` method of <tbl_lazy> is for internal use only.
       i Did you mean `colnames()`?
     Output
-      [1] "lazy_query" "src"       
+      [1] "con"        "src"        "lazy_query"
 
 # $ aborts when not used with src or lazy_query
 

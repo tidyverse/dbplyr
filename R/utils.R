@@ -121,8 +121,9 @@ local_db_table <- function(
   con,
   value,
   name,
-  ...,
+  types = NULL,
   temporary = TRUE,
+  overwrite = FALSE,
   envir = parent.frame()
 ) {
   if (inherits(con, "Microsoft SQL Server") && temporary) {
@@ -130,8 +131,15 @@ local_db_table <- function(
   }
 
   withr::defer(DBI::dbRemoveTable(con, name), envir = envir)
-  copy_to(con, value, name, temporary = temporary, ...)
-  tbl(con, name)
+  table <- db_copy_to(
+    con,
+    name,
+    value,
+    types = types,
+    temporary = temporary,
+    overwrite = overwrite
+  )
+  new_tbl_sql(con, table, names(value))
 }
 
 local_sqlite_connection <- function(envir = parent.frame()) {

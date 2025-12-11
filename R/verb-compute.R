@@ -37,17 +37,17 @@ compute.tbl_sql <- function(
     name <- unique_table_name()
   }
 
-  name <- as_table_path(name, x$src$con)
+  name <- as_table_path(name, x$con)
   vars <- op_vars(x)
 
   compute_check_indexes(x, indexes)
   compute_check_indexes(x, unique_indexes)
 
   x_aliased <- select(x, !!!syms(vars)) # avoids problems with SQLite quoting (#1754)
-  sql <- db_sql_render(x$src$con, x_aliased$lazy_query, cte = cte)
+  sql <- db_sql_render(x$con, x_aliased$lazy_query, cte = cte)
 
   name <- db_compute(
-    x$src$con,
+    x$con,
     name,
     sql,
     temporary = temporary,
@@ -58,7 +58,7 @@ compute.tbl_sql <- function(
     ...
   )
 
-  tbl_src_dbi(x$src, name, colnames(x)) |>
+  new_tbl_sql(x$con, name, vars = colnames(x)) |>
     group_by(!!!syms(op_grps(x))) |>
     window_order(!!!op_sort(x))
 }
