@@ -5,19 +5,8 @@ decreasing the number of rows. The inverse transformation is
 `pivot_longer()`. Learn more in
 [`vignette("pivot", "tidyr")`](https://tidyr.tidyverse.org/articles/pivot.html).
 
-Note that `pivot_wider()` is not and cannot be lazy because we need to
-look at the data to figure out what the new column names will be. If you
-have a long running query you have two options:
-
-- (temporarily) store the result of the query via
-  [`compute()`](https://dplyr.tidyverse.org/reference/compute.html).
-
-- Create a spec before and use `dbplyr_pivot_wider_spec()` - dbplyr's
-  version of
-  [`tidyr::pivot_wider_spec()`](https://tidyr.tidyverse.org/reference/pivot_wider_spec.html).
-  Note that this function is only a temporary solution until
-  `pivot_wider_spec()` becomes a generic. It will then be removed soon
-  afterwards.
+`pivot_wider()` on database tables comes with some caveats, please make
+sure to read below for details.
 
 ## Usage
 
@@ -135,7 +124,8 @@ dbplyr_pivot_wider_spec(
 - values_fill:
 
   Optionally, a (scalar) value that specifies what each `value` should
-  be filled in with when missing.
+  be filled in with when missing. Be careful when using this in
+  combination with the default `values_fn`.
 
 - values_fn:
 
@@ -182,14 +172,42 @@ dbplyr_pivot_wider_spec(
   [`abort()`](https://rlang.r-lib.org/reference/abort.html) for more
   information.
 
-## Details
+## Caveats
+
+### `pivot_wider()` is eager
+
+Note that `pivot_wider()` cannot be lazy because we need to look at the
+data to figure out what the new column names will be. If you have a
+long-running query you have two options:
+
+- Temporarily store the result of the query via
+  [`compute()`](https://dplyr.tidyverse.org/reference/compute.html).
+
+- Create a spec before and use `dbplyr_pivot_wider_spec()` - dbplyr's
+  version of
+  [`tidyr::pivot_wider_spec()`](https://tidyr.tidyverse.org/reference/pivot_wider_spec.html).
+
+### You must supply `values_fn`
 
 The big difference to `pivot_wider()` for local data frames is that
 `values_fn` must not be `NULL`. By default it is
 [`max()`](https://rdrr.io/r/base/Extremes.html) which yields the same
-results as for local data frames if the combination of `id_cols` and
-`value` column uniquely identify an observation. Mind that you also do
-not get a warning if an observation is not uniquely identified.
+results as for local data frames if three conditions are true:
+
+1.  The combination of `id_cols` and `value` uniquely identify an
+    observation.
+
+2.  The column has a comparable type (e.g. numeric, date-time, or (for
+    most databases) string).
+
+3.  `values_fill` is `NULL`.
+
+If either the second or third condition is not met, you must supply a
+custom `values_fn`. Unfortunately there is no generally available
+alternative and you'll need to look for something database specific,
+like `FIRST()` or `ANY_VALUE()`.
+
+## How does it work?
 
 The translation to SQL code basically works as follows:
 
@@ -197,10 +215,8 @@ The translation to SQL code basically works as follows:
 
 2.  For each key value generate an expression of the form:
 
-        value_fn(
-          CASE WHEN (`names from column` == `key value`)
-          THEN (`value column`)
-          END
+        values_fn(
+          CASE WHEN (`names from column` == `key value`) THEN (`value column`) END
         ) AS `output column`
 
 3.  Group data by id columns.
