@@ -105,27 +105,22 @@ as.data.frame.tbl_sql <- function(
   as.data.frame(collect(x, n = n))
 }
 
+#' @importFrom pillar tbl_format_header
 #' @export
-#' @importFrom tibble tbl_sum
-tbl_sum.tbl_sql <- function(x) {
+tbl_format_header.tbl_sql <- function(x, setup, ...) {
   grps <- op_grps(x$lazy_query)
   sort <- op_sort(x$lazy_query)
-  c(
+  named_header <- c(
     # Can be overwritten by tbl_format_header.tbl_lazy:
-    "Source" = tbl_desc(x),
+    "A query" = paste0("?? x ", length(op_vars(x))),
     "Database" = db_connection_describe(x$src$con),
     "Groups" = if (length(grps) > 0) commas(grps),
     "Ordered by" = if (length(sort) > 0) commas(deparse_all(sort))
   )
-}
-
-tbl_desc <- function(x, rows_total = NA_integer_) {
-  paste0(
-    op_desc(x$lazy_query),
-    " [",
-    op_rows(x$lazy_query, rows_total),
-    " x ",
-    big_mark(op_cols(x$lazy_query)),
-    "]"
+  header <- paste0(
+    pillar::align(paste0(names(named_header), ":")),
+    " ",
+    named_header
   )
+  pillar::style_subtle(paste0("# ", header))
 }

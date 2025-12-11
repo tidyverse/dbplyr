@@ -1,15 +1,26 @@
-# sql tbl can be printed
+# has nice print method
 
     Code
-      mf2
+      mf
     Output
-      # Source:   SQL [?? x 2]
-      # Database: sqlite ?.?.? [:memory:]
+      # A query:  ?? x 2
+      # Database: sqlite <version> [:memory:]
             x     y
-        <int> <int>
-      1     1     3
-      2     2     2
-      3     3     1
+        <dbl> <dbl>
+      1     1     1
+
+---
+
+    Code
+      out2
+    Output
+      # A query:    ?? x 3
+      # Database:   sqlite <version> [:memory:]
+      # Groups:     x, y
+      # Ordered by: x
+            x     y     z
+        <dbl> <dbl> <dbl>
+      1     1     1     2
 
 # useful error if missing I()
 

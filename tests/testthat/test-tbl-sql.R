@@ -17,6 +17,15 @@ test_that("same_src distinguishes srcs", {
   expect_false(same_src(db1, mtcars))
 })
 
+test_that("has nice print method", {
+  mf <- copy_to_test("sqlite", tibble(x = 1, y = 1), name = "tbl_sum_test")
+  expect_snapshot(mf, transform = scrub_sqlite_version)
+
+  out2 <- mf |> group_by(x, y) |> arrange(x) |> mutate(z = x + y)
+  expect_snapshot(out2, transform = scrub_sqlite_version)
+})
+
+
 # tbl ---------------------------------------------------------------------
 
 test_that("can generate sql tbls with raw sql", {
@@ -24,15 +33,6 @@ test_that("can generate sql tbls with raw sql", {
   mf2 <- tbl(mf1$src, sql(glue("SELECT * FROM {remote_name(mf1)}")))
 
   expect_equal(collect(mf1), collect(mf2))
-})
-
-test_that("sql tbl can be printed", {
-  mf1 <- memdb_frame(x = 1:3, y = 3:1)
-  mf2 <- tbl(mf1$src, sql(glue("SELECT * FROM {remote_name(mf1)}")))
-
-  expect_snapshot(mf2, transform = function(x) {
-    gsub("sqlite .* \\[:memory:\\]", "sqlite ?.?.? [:memory:]", x)
-  })
 })
 
 test_that("can refer to default schema explicitly", {
@@ -81,23 +81,4 @@ test_that("check basic group size implementation", {
   gb <- group_by(db, x)
   expect_equal(n_groups(gb), 3L)
   expect_equal(group_size(gb), rep(10, 3))
-})
-
-# tbl_sum -------------------------------------------------------------------
-
-test_that("ungrouped output", {
-  mf <- copy_to_test("sqlite", tibble(x = 1:5, y = 1:5), name = "tbl_sum_test")
-
-  out1 <- tbl_sum(mf)
-  expect_named(out1, c("Source", "Database"))
-  expect_equal(out1[["Source"]], "table<`tbl_sum_test`> [?? x 2]")
-  expect_match(out1[["Database"]], "sqlite (.*) \\[:memory:\\]")
-
-  out2 <- tbl_sum(mf |> group_by(x, y))
-  expect_named(out2, c("Source", "Database", "Groups"))
-  expect_equal(out2[["Groups"]], c("x, y"))
-
-  out3 <- tbl_sum(mf |> arrange(x))
-  expect_named(out3, c("Source", "Database", "Ordered by"))
-  expect_equal(out3[["Ordered by"]], c("x"))
 })
