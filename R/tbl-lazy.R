@@ -109,7 +109,7 @@ names.tbl_lazy <- function(x) {
       i = "Did you mean {.fn colnames}?"
     ))
   }
-  names(unclass(x))
+  NextMethod()
 }
 
 #' @export

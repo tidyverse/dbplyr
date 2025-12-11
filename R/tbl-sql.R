@@ -78,7 +78,7 @@ new_tbl_lazy <- function(con, query, subclass = NULL) {
   subclass <- c(subclass %||% class(con)[[1]], if (is_sql) "sql", "lazy")
 
   dplyr::make_tbl(
-    c(subclass, "lazy"),
+    subclass,
     con = con,
     src = src_dbi(con), # for backward compatibility
     lazy_query = query
