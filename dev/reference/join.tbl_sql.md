@@ -277,7 +277,7 @@ band_db |> left_join(instrument_db) |> show_query()
 band_db |>
   left_join(dplyr::band_instruments, copy = TRUE)
 #> Joining with `by = join_by(name)`
-#> # Source:   SQL [?? x 3]
+#> # A query:  ?? x 3
 #> # Database: sqlite 3.51.1 [:memory:]
 #>   name  band    plays 
 #>   <chr> <chr>   <chr> 
@@ -289,7 +289,7 @@ band_db |>
 db <- memdb_frame(x = c(1, 2, NA))
 label <- memdb_frame(x = c(1, NA), label = c("one", "missing"))
 db |> left_join(label, by = "x")
-#> # Source:   SQL [?? x 2]
+#> # A query:  ?? x 2
 #> # Database: sqlite 3.51.1 [:memory:]
 #>       x label
 #>   <dbl> <chr>
@@ -298,7 +298,7 @@ db |> left_join(label, by = "x")
 #> 3    NA NA   
 # But you can activate R's usual behaviour with the na_matches argument
 db |> left_join(label, by = "x", na_matches = "na")
-#> # Source:   SQL [?? x 2]
+#> # A query:  ?? x 2
 #> # Database: sqlite 3.51.1 [:memory:]
 #>       x label  
 #>   <dbl> <chr>  

@@ -211,7 +211,7 @@ a reference to it:</p>
 regular tibble:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">flights_db</span> </span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;`flights`&gt; [?? x 19]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A query:  ?? x 19</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.51.1 [:memory:]</span></span></span>
 <span><span class="co">#&gt;    year month   day dep_time sched_dep_time dep_delay arr_time</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
@@ -244,7 +244,7 @@ can continue to use the dplyr verbs that you’re already familiar
 with:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">flights_db</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">year</span><span class="op">:</span><span class="va">day</span>, <span class="va">dep_delay</span>, <span class="va">arr_delay</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 5]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A query:  ?? x 5</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.51.1 [:memory:]</span></span></span>
 <span><span class="co">#&gt;    year month   day dep_delay arr_delay</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -257,7 +257,7 @@ with:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ more rows</span></span></span>
 <span></span>
 <span><span class="va">flights_db</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">dep_delay</span> <span class="op">&gt;</span> <span class="fl">240</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 19]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A query:  ?? x 19</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.51.1 [:memory:]</span></span></span>
 <span><span class="co">#&gt;    year month   day dep_time sched_dep_time dep_delay arr_time</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
@@ -279,7 +279,7 @@ with:</p>
 <span><span class="co">#&gt; Warning: Missing values are always removed in SQL aggregation functions.</span></span>
 <span><span class="co">#&gt; Use `na.rm = TRUE` to silence this warning</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 2]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A query:  ?? x 2</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.51.1 [:memory:]</span></span></span>
 <span><span class="co">#&gt;   dest  delay</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -328,7 +328,7 @@ the results from the database. Even then it tries to do as little work
 as possible and only pulls down a few rows.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tailnum_delay_db</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Source:     SQL [?? x 3]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A query:    ?? x 3</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Database:   sqlite 3.51.1 [:memory:]</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Ordered by: desc(delay)</span></span></span>
 <span><span class="co">#&gt;   tailnum delay     n</span></span>

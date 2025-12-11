@@ -39,7 +39,7 @@ to execute the query and return data to R.
 ``` r
 df <- memdb_frame(x = c(1, 2, NA), y = c("a", NA, "b"))
 df |> tidyr::replace_na(list(x = 0, y = "unknown"))
-#> # Source:   SQL [?? x 2]
+#> # A query:  ?? x 2
 #> # Database: sqlite 3.51.1 [:memory:]
 #>       x y      
 #>   <dbl> <chr>  

@@ -53,7 +53,7 @@ src_memdb()
 library(dplyr)
 df <- memdb_frame(x = runif(100), y = runif(100))
 df |> arrange(x)
-#> # Source:     SQL [?? x 2]
+#> # A query:    ?? x 2
 #> # Database:   sqlite 3.51.1 [:memory:]
 #> # Ordered by: x
 #>         x      y

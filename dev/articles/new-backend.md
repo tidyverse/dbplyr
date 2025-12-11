@@ -35,7 +35,7 @@ con <- DBI::dbConnect(RSQLite::SQLite(), path = ":memory:")
 DBI::dbWriteTable(con, "mtcars", mtcars)
 
 tbl(con, "mtcars")
-#> # Source:   table<`mtcars`> [?? x 11]
+#> # A query:  ?? x 11
 #> # Database: sqlite 3.51.1 []
 #>     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #>   <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>

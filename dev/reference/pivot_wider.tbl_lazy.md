@@ -220,7 +220,7 @@ memdb_frame(
     names_from = key,
     values_from = value
   )
-#> # Source:   SQL [?? x 3]
+#> # A query:  ?? x 3
 #> # Database: sqlite 3.51.1 [:memory:]
 #>      id     x     y
 #>   <dbl> <int> <int>

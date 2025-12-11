@@ -58,7 +58,7 @@ rows1 <- copy_inline(con, data.frame(number = c(1, 5)))
 rows_insert(info, rows1, conflict = "ignore", in_place = TRUE)
 #> Matching, by = "number"
 info
-#> # Source:   table<`Info`> [?? x 2]
+#> # A query:  ?? x 2
 #> # Database: sqlite 3.51.1 [:memory:]
 #>      id number
 #>   <int>  <int>
@@ -77,7 +77,7 @@ info <- rows_insert(
 )
 #> Matching, by = "number"
 info
-#> # Source:   table<`Info`> [?? x 2]
+#> # A query:  ?? x 2
 #> # Database: sqlite 3.51.1 [:memory:]
 #>      id number
 #>   <int>  <int>

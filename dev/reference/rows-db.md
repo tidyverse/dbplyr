@@ -211,14 +211,14 @@ applejack <- copy_inline(con, data.frame(
 # The default behavior is to generate a SELECT query
 rows_insert(ponies, applejack, conflict = "ignore")
 #> Matching, by = "name"
-#> # Source:   SQL [?? x 3]
+#> # A query:  ?? x 3
 #> # Database: sqlite 3.51.1 [:memory:]
 #>   id    name       cutie_mark  
 #>   <lgl> <chr>      <chr>       
 #> 1 NA    Apple Jack three apples
 # And the original table is left unchanged:
 ponies
-#> # Source:   table<`Ponies`> [?? x 3]
+#> # A query:  ?? x 3
 #> # Database: sqlite 3.51.1 [:memory:]
 #> # ℹ 3 variables: id <int>, name <chr>, cutie_mark <chr>
 
@@ -228,7 +228,7 @@ rows_insert(ponies, applejack, conflict = "ignore", in_place = TRUE)
 # In this case `rows_insert()` returns nothing and the underlying
 # data is modified
 ponies
-#> # Source:   table<`Ponies`> [?? x 3]
+#> # A query:  ?? x 3
 #> # Database: sqlite 3.51.1 [:memory:]
 #>      id name       cutie_mark  
 #>   <int> <chr>      <chr>       

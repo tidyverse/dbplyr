@@ -113,7 +113,7 @@ library(dplyr, warn.conflicts = FALSE)
 df <- data.frame(x = 1:5, y = letters[5:1])
 db <- copy_to(src_memdb(), df)
 db
-#> # Source:   table<`df`> [?? x 2]
+#> # A query:  ?? x 2
 #> # Database: sqlite 3.51.1 [:memory:]
 #>       x y    
 #>   <int> <chr>
@@ -128,7 +128,7 @@ df2 <- data.frame(y = c("a", "d"), fruit = c("apple", "date"))
 # in the join functions
 db |> left_join(df2, copy = TRUE)
 #> Joining with `by = join_by(y)`
-#> # Source:   SQL [?? x 3]
+#> # A query:  ?? x 3
 #> # Database: sqlite 3.51.1 [:memory:]
 #>       x y     fruit
 #>   <int> <chr> <chr>

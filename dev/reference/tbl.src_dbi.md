@@ -67,7 +67,7 @@ DBI::dbListTables(con)
 
 # To retrieve a single table from a source, use `tbl()`
 con |> tbl("mtcars")
-#> # Source:   table<`mtcars`> [?? x 11]
+#> # A query:  ?? x 11
 #> # Database: sqlite 3.51.1 [:memory:]
 #>      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #>    <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
@@ -85,7 +85,7 @@ con |> tbl("mtcars")
 
 # Use `I()` for qualified table names
 con |> tbl(I("temp.mtcars")) |> head(1)
-#> # Source:   SQL [?? x 11]
+#> # A query:  ?? x 11
 #> # Database: sqlite 3.51.1 [:memory:]
 #>     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #>   <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
@@ -93,7 +93,7 @@ con |> tbl(I("temp.mtcars")) |> head(1)
 
 # You can also use pass raw SQL if you want a more sophisticated query
 con |> tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))
-#> # Source:   SQL [?? x 11]
+#> # A query:  ?? x 11
 #> # Database: sqlite 3.51.1 [:memory:]
 #>      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #>    <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>

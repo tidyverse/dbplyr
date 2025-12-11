@@ -48,7 +48,7 @@ df <- data.frame(x = 1:3, y = c("a", "b", "c"))
 con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
 
 copy_inline(con, df)
-#> # Source:   SQL [?? x 2]
+#> # A query:  ?? x 2
 #> # Database: sqlite 3.51.1 [:memory:]
 #>       x y    
 #>   <int> <chr>

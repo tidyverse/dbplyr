@@ -148,14 +148,14 @@ db |> group_by(y) |> slice_min(x) |> show_query()
 # By default, ties are includes so you may get more rows
 # than you expect
 db |> slice_min(y, n = 1)
-#> # Source:   SQL [?? x 2]
+#> # A query:  ?? x 2
 #> # Database: sqlite 3.51.1 [:memory:]
 #>       x     y
 #>   <int> <dbl>
 #> 1     1     1
 #> 2     2     1
 db |> slice_min(y, n = 1, with_ties = FALSE)
-#> # Source:   SQL [?? x 2]
+#> # A query:  ?? x 2
 #> # Database: sqlite 3.51.1 [:memory:]
 #>       x     y
 #>   <int> <dbl>
@@ -163,7 +163,7 @@ db |> slice_min(y, n = 1, with_ties = FALSE)
 
 # Non-integer group sizes are rounded down
 db |> slice_min(x, prop = 0.5)
-#> # Source:   SQL [?? x 2]
+#> # A query:  ?? x 2
 #> # Database: sqlite 3.51.1 [:memory:]
 #>       x     y
 #>   <int> <dbl>

@@ -149,7 +149,7 @@ tibble:
 
 ``` r
 flights_db 
-#> # Source:   table<`flights`> [?? x 19]
+#> # A query:  ?? x 19
 #> # Database: sqlite 3.51.1 [:memory:]
 #>    year month   day dep_time sched_dep_time dep_delay arr_time
 #>   <int> <int> <int>    <int>          <int>     <dbl>    <int>
@@ -183,7 +183,7 @@ continue to use the dplyr verbs that you’re already familiar with:
 
 ``` r
 flights_db |> select(year:day, dep_delay, arr_delay)
-#> # Source:   SQL [?? x 5]
+#> # A query:  ?? x 5
 #> # Database: sqlite 3.51.1 [:memory:]
 #>    year month   day dep_delay arr_delay
 #>   <int> <int> <int>     <dbl>     <dbl>
@@ -196,7 +196,7 @@ flights_db |> select(year:day, dep_delay, arr_delay)
 #> # ℹ more rows
 
 flights_db |> filter(dep_delay > 240)
-#> # Source:   SQL [?? x 19]
+#> # A query:  ?? x 19
 #> # Database: sqlite 3.51.1 [:memory:]
 #>    year month   day dep_time sched_dep_time dep_delay arr_time
 #>   <int> <int> <int>    <int>          <int>     <dbl>    <int>
@@ -218,7 +218,7 @@ flights_db |>
 #> Warning: Missing values are always removed in SQL aggregation functions.
 #> Use `na.rm = TRUE` to silence this warning
 #> This warning is displayed once every 8 hours.
-#> # Source:   SQL [?? x 2]
+#> # A query:  ?? x 2
 #> # Database: sqlite 3.51.1 [:memory:]
 #>   dest  delay
 #>   <chr> <dbl>
@@ -274,7 +274,7 @@ a few rows.
 
 ``` r
 tailnum_delay_db
-#> # Source:     SQL [?? x 3]
+#> # A query:    ?? x 3
 #> # Database:   sqlite 3.51.1 [:memory:]
 #> # Ordered by: desc(delay)
 #>   tailnum delay     n

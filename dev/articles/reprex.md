@@ -42,7 +42,7 @@ You can easily create a SQLite in-memory database table using
 ``` r
 mf <- memdb_frame(g = c(1, 1, 2, 2, 2), x = 1:5, y = 5:1)
 mf
-#> # Source:   table<`dbplyr_tmp_SwlKLUUEdL`> [?? x 3]
+#> # A query:  ?? x 3
 #> # Database: sqlite 3.51.1 [:memory:]
 #>       g     x     y
 #>   <dbl> <int> <int>
@@ -55,7 +55,7 @@ mf
 mf |> 
   group_by(g) |> 
   summarise_all(mean, na.rm = TRUE)
-#> # Source:   SQL [?? x 3]
+#> # A query:  ?? x 3
 #> # Database: sqlite 3.51.1 [:memory:]
 #>       g     x     y
 #>   <dbl> <dbl> <dbl>

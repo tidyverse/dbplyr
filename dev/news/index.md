@@ -2,6 +2,9 @@
 
 ## dbplyr (development version)
 
+- The print method no longer mentions the “source” in the header,
+  because it’s an outdated dplyr concept
+  ([\#897](https://github.com/tidyverse/dbplyr/issues/897)).
 - New
   [`sql_glue()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
   and
