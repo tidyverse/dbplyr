@@ -47,7 +47,7 @@
   simpler translation for `missing`
   ([\#1573](https://github.com/tidyverse/dbplyr/issues/1573)).
 - New translations for stringr function `str_ilike()` for Postgres,
-  Redshift, and Snowflake
+  Redshift, Snowflake, and Spark
   ([@edward-burn](https://github.com/edward-burn),
   [\#1628](https://github.com/tidyverse/dbplyr/issues/1628)).
 - Argument `ignore_case` for `str_like()` has been deprecated
