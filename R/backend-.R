@@ -11,7 +11,10 @@
 #' @include import-standalone-obj-type.R
 #' @include import-standalone-types-check.R
 #' @include utils-check.R
+#' @include db.R
 #' @include db-sql.R
+#' @include verb-copy-to.R
+#' @include verb-copy-inline.R
 NULL
 
 #' @export
