@@ -345,11 +345,13 @@ sql_join_tbls <- function(con, by, na_matches) {
 
     if (na_matches == "na") {
       compare <- purrr::map_chr(seq_along(lhs), function(i) {
-        sql_expr_matches(sql(lhs[[i]]), sql(rhs[[i]]), con = con)
+        sql_expr_matches(con, lhs[[i]], rhs[[i]])
       })
     } else {
       by$condition[by$condition == "=="] <- "="
-      compare <- paste0(lhs, " ", by$condition, " ", rhs)
+      compare <- purrr::map_chr(seq_along(lhs), function(i) {
+        sql_glue2(con, "{lhs[i]} {.sql by$condition[[i]]} {rhs[i]}")
+      })
     }
 
     sql(compare)
@@ -378,6 +380,6 @@ sql_qualify_var <- function(con, table, var) {
 
     sql(paste0(table, ".", var))
   } else {
-    var
+    sql(var)
   }
 }
