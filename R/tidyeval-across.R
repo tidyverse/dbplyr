@@ -210,7 +210,7 @@ across_fun <- function(fun, env, dots, fn) {
       )
     }
 
-    partial_eval_prepare_fun(f_rhs(fun), c(".", ".x"))
+    partial_eval_prepare_fun(f_rhs(fun), c(".", ".x"), f_env(fun))
   } else if (is_call(fun, "function")) {
     fun <- eval(fun, env)
     partial_eval_fun(fun, env, fn)
@@ -235,10 +235,12 @@ partial_eval_fun <- function(fun, env, fn) {
   }
   args <- fn_fmls_names(fun)
 
-  partial_eval_prepare_fun(body[[2]], args[[1]])
+  partial_eval_prepare_fun(body[[2]], args[[1]], fn_env(fun))
 }
 
-partial_eval_prepare_fun <- function(call, sym) {
+partial_eval_prepare_fun <- function(call, sym, env) {
+  # First resolve any .data/.env pronouns before symbol replacement
+  call <- resolve_mask_pronouns(call, env)
   call <- replace_sym(call, sym, replace = quote(!!.x))
   call <- replace_call(call, replace = quote(!!.cur_col))
   function(x, .cur_col) {
@@ -246,6 +248,27 @@ partial_eval_prepare_fun <- function(call, sym) {
       expr(!!call),
       child_env(empty_env(), .x = x, expr = rlang::expr, .cur_col = .cur_col)
     )
+  }
+}
+
+resolve_mask_pronouns <- function(call, env) {
+  if (is_mask_pronoun(call)) {
+    var <- call[[3]]
+    if (is_call(call, "[[")) {
+      var <- sym(eval(var, env))
+    }
+
+    if (is_symbol(call[[2]], ".data")) {
+      var
+    } else {
+      # .env - evaluate fully
+      eval_bare(var, env)
+    }
+  } else if (is_call(call)) {
+    call[] <- lapply(call, resolve_mask_pronouns, env = env)
+    call
+  } else {
+    call
   }
 }
 
