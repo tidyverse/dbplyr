@@ -97,8 +97,7 @@ copy_to.src_sql <- function(
       in_transaction = in_transaction,
       ...
     )
-
-    out <- tbl_src_dbi(dest, name, vars = names(df))
+    out <- new_tbl_sql(dest$con, name, vars = names(df))
   }
 
   invisible(out)
@@ -107,7 +106,9 @@ copy_to.src_sql <- function(
 #' @importFrom dplyr auto_copy
 #' @export
 auto_copy.tbl_sql <- function(x, y, copy = FALSE, ...) {
-  copy_to(x$src, as.data.frame(y), unique_table_name(), ...)
+  y <- as.data.frame(y)
+  tbl <- db_copy_to(x$con, table = unique_table_name(), values = y, ...)
+  new_tbl_sql(con = x$con, source = tbl, vars = colnames(y))
 }
 
 #' Use a local data frame in a dbplyr query
@@ -152,30 +153,21 @@ copy_inline <- function(con, df, types = NULL) {
     }
   }
 
-  # This workaround is needed because `tbl_sql()` applies `as.sql()` on `from`
-  subclass <- class(con)[[1]] # prefix added by dplyr::make_tbl
-  dplyr::make_tbl(
-    c(subclass, "sql", "lazy"),
-    src = src_dbi(con),
-    from = df,
-    lazy_query = lazy_values_query(df, types),
-    vars = colnames(df)
-  )
+  lazy_query <- lazy_values_query(df, types)
+  new_tbl_lazy(con, lazy_query)
 }
 
 lazy_values_query <- function(df, types) {
-  lazy_query(
-    query_type = "values",
+  lazy_base_query(
+    class = "values",
     x = df,
-    col_types = types,
-    group_vars = character(),
-    order_vars = NULL,
-    frame = NULL
+    vars = colnames(df),
+    col_types = types
   )
 }
 
 #' @export
-sql_build.lazy_values_query <- function(op, con, ..., sql_options = NULL) {
+sql_build.lazy_base_values_query <- function(op, con, ..., sql_options = NULL) {
   class(op) <- c("values_query", "query")
   op
 }
@@ -198,7 +190,7 @@ flatten_query.values_query <- function(qry, query_list, con) {
 }
 
 #' @export
-op_vars.lazy_values_query <- function(op) {
+op_vars.lazy_base_values_query <- function(op) {
   colnames(op$x)
 }
 
@@ -471,6 +463,11 @@ sql_cast_dispatch.integer64 <- function(x) {
   expr(as.integer64)
 }
 
+#' @export
+sql_cast_dispatch.blob <- function(x) {
+  expr(as.blob)
+}
+
 #' @importFrom dplyr coalesce
 NULL
-utils::globalVariables("as.integer64")
+utils::globalVariables(c("as.integer64", "as.blob"))

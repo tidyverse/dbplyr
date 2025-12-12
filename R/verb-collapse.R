@@ -14,9 +14,9 @@
 #' db |> filter(a <= 2) |> show_query()
 #' db |> filter(a <= 2) |> collapse() |> show_query()
 collapse.tbl_sql <- function(x, ...) {
-  sql <- db_sql_render(x$src$con, x)
+  sql <- db_sql_render(x$con, x)
 
-  tbl_src_dbi(x$src, sql, colnames(x)) |>
+  new_tbl_sql(x$con, sql, vars = colnames(x)) |>
     group_by(!!!syms(op_grps(x))) |>
-    arrange.tbl_lazy(!!!op_sort(x))
+    arrange(!!!op_sort(x))
 }

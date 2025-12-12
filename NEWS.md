@@ -1,10 +1,13 @@
 # dbplyr (development version)
 
 * `na_matches = "na"` now works correctly with inequality and overlap joins, preserving the comparison operator instead of converting to equality (#1505).
+* `copy_inline()` now works with blob columns (#1515).
+* `tbl_sql()` is now (soft) deprecated. It hasn't been required in a while. 
 * The print method no longer mentions the "source" in the header, because it's an outdated dplyr concept (#897).
 * New `sql_glue()` and `sql_glue2()` provide a convenient syntax for building SQL strings. These functions replace the now superseded `build_sql()`, `sql_expr()`, and `sql_call2()`. (#1249).
 * `fill()` now errors if you attempt to rename a column, for consistency with dplyr (#1536)
 * Redshift: fixed syntax error in `date_build()` translation (#1512).
+* dbplyr now longer attempts to translate `pi` to `PI()`. This caused problems if you had a column called `pi` (#1531).
 * Ensure `str_like()` and `str_ilike()` have consistent behaviour on SQL Server (@edward-burn, #1669).
 * SQL Server: `if`/`ifelse()`, and `if_else()` now use `CASE WHEN` instead of `IIF`. This ensures the handling of `NULL`s matches the R's `NA` handling rules (#1569). 
 * `if_else()` uses simpler translation for `missing` (#1573).

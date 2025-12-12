@@ -108,6 +108,16 @@ test_that("can translate a table", {
   )
 })
 
+test_that("can translate blob columns", {
+  con <- local_sqlite_connection()
+
+  df <- tibble(x = blob::blob(charToRaw("abc"), charToRaw("def")))
+  db <- copy_inline(con, df)
+
+  expect_snapshot(show_query(db))
+  expect_equal(collect(db), df)
+})
+
 test_that("can translate 1-column tables", {
   con <- local_sqlite_connection()
   expect_snapshot(

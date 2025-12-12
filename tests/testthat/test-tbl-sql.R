@@ -1,8 +1,17 @@
 test_that("tbl_sql() works with string argument", {
+  withr::local_options(lifecycle_verbosity = "quiet")
+
   name <- unclass(unique_table_name())
   df <- memdb_frame(a = 1, .name = name)
 
   expect_equal(collect(tbl_sql("sqlite", df$src, name)), collect(df))
+})
+
+test_that("tbl_sql() respects subclass argument", {
+  withr::local_options(lifecycle_verbosity = "quiet")
+
+  x <- tbl_sql("foo", src_memdb(), "abc", vars = letters)
+  expect_s3_class(x, "tbl_foo")
 })
 
 test_that("same_src distinguishes srcs", {
@@ -68,7 +77,7 @@ test_that("check_from is deprecated", {
   con <- local_sqlite_connection()
   DBI::dbExecute(con, "CREATE TABLE x (y)")
 
-  expect_snapshot(out <- tbl(con, "x", check_from = FALSE))
+  expect_snapshot(out <- tbl_sql("foo", src_dbi(con), "x", check_from = FALSE))
 })
 
 # n_groups ----------------------------------------------------------------

@@ -27,7 +27,7 @@
     Code
       tbl(src_memdb(), "foo.bar")
     Condition
-      Error in `tbl_sql()`:
+      Error in `tbl()`:
       ! Failed to find table `foo.bar`.
       i Did you mean `from = I("foo.bar")`?
       Caused by error in `dbplyr_query_fields()`:
@@ -39,8 +39,10 @@
 # check_from is deprecated
 
     Code
-      out <- tbl(con, "x", check_from = FALSE)
+      out <- tbl_sql("foo", src_dbi(con), "x", check_from = FALSE)
     Condition
+      Warning:
+      `tbl_sql()` was deprecated in dbplyr 2.6.0.
       Warning:
       The `check_from` argument of `tbl_sql()` is deprecated as of dbplyr 2.5.0.
 
