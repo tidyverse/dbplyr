@@ -9,7 +9,7 @@
       By:
         x-x
       Where:
-        "`df_RHS`.`z` = 2.0"
+        `df_RHS`.`z` = 2.0
       X:
         <table_path> `df`
       Y:

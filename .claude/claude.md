@@ -1,7 +1,3 @@
-## SQL
-
-CRITICAL: SQL correctness is paramount in dbplyr. Before implementing SQL for any backend, you MUST use the **sql-research** skill to research syntax and behavior. Only implement after completing research and documentation.
-
 ## R package development
 
 ### Key commands
@@ -14,7 +10,7 @@ Rscript -e "devtools::load_all(); code"
 Rscript -e "devtools::test()"
 
 # To run tests for R/{name.R}
-Rscript -e "devtools::test(filter = '{name}', reporter = 'llm')"
+Rscript -e "devtools::test(filter = '{name}')"
 
 # To document the package
 Rscript -e "devtools::document()"
@@ -51,6 +47,7 @@ air format .
 ### Writing
 
 - Use sentence case for headings.
+- Use US English.
 
 ### Proofreading
 

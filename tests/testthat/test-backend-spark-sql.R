@@ -3,7 +3,7 @@ test_that("custom clock functions translated correctly", {
   expect_translation(
     con,
     add_years(x, 1),
-    "ADD_MONTHS(`x`, 1.0 * 12.0)"
+    "ADD_MONTHS(`x`, 1.0 * 12)"
   )
   expect_translation(con, add_days(x, 1), "DATE_ADD(`x`, 1.0)")
   expect_error(

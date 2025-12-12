@@ -40,23 +40,23 @@ Translations are added to the `sql_translation()` method for the connection clas
 ```r
 sql_translator(.parent = base_scalar,
   # Simple function name mapping
-  log10 = function(x) sql_expr(log(!!x)),
+  log10 = \(x) sql_glue("LOG({x}) / LOG(10)"),
 
   # Function with different arguments
   round = function(x, digits = 0L) {
     digits <- as.integer(digits)
-    sql_expr(round(((!!x)) %::% numeric, !!digits))
+    sql_glue("ROUND(CAST({x} AS NUMERIC), {.val digits})")
   },
 
   # Infix operators
-  paste0 = sql_paste(""),
+  paste0 = sql_paste_infix("", "||"),
 
   # Complex logic
   grepl = function(pattern, x, ignore.case = FALSE) {
     if (ignore.case) {
-      sql_expr(((!!x)) %~*% ((!!pattern)))
+      sql_glue("{x} ~* {pattern}")
     } else {
-      sql_expr(((!!x)) %~% ((!!pattern)))
+      sql_glue("{x} ~ {pattern}")
     }
   }
 )
@@ -84,10 +84,11 @@ sql_translator(.parent = base_win,
 
 Common translation patterns:
 
-- `sql_expr()` - Build SQL expressions with `!!` for interpolation
+- `sql_glue()` - Build SQL expressions with `{x}` for interpolation
+- `{.val x}` - Interpolate literal R values (not SQL expressions)
 - `sql_cast(type)` - Type casting (e.g., `sql_cast("REAL")`)
 - `sql_aggregate(sql_name, r_name)` - Simple aggregates
-- `sql_paste(sep)` - String concatenation
+- `sql_paste_infix(sep, op)` - String concatenation with infix operator
 - `sql_not_supported(name)` - Mark unsupported functions
 - `win_aggregate(sql_name)` - Window aggregates
 - `win_absent(name)` - Window functions not supported
@@ -158,9 +159,10 @@ Rscript -e "devtools::document()"
 - `base_win` - Common window functions
 
 **SQL expression building:**
-- Use `sql_expr()` to build SQL
-- Use `!!` to interpolate R variables
-- Use `%as%` for AS, `%::%` for ::, etc.
+- Use `sql_glue()` to build SQL with string interpolation
+- Use `{x}` to interpolate SQL expressions (function arguments)
+- Use `{.val x}` to interpolate literal R values
+- Use `{sql x}` to interpolate raw SQL strings
 
 **Argument handling:**
 - Check arguments with `check_bool()`, `check_unsupported_arg()`

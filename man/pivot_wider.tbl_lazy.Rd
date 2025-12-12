@@ -86,7 +86,8 @@ sorted, identical to what \code{names_sort} would produce.}
 \item{names_repair}{What happens if the output has invalid column names?}
 
 \item{values_fill}{Optionally, a (scalar) value that specifies what each
-\code{value} should be filled in with when missing.}
+\code{value} should be filled in with when missing. Be careful when using this
+in combination with the default \code{values_fn}.}
 
 \item{values_fn}{A function, the default is \code{max()}, applied to the \code{value}
 in each cell in the output. In contrast to local data frames it must not be
@@ -126,43 +127,58 @@ mentioned in error messages as the source of the error. See the
 \description{
 \code{pivot_wider()} "widens" data, increasing the number of columns and
 decreasing the number of rows. The inverse transformation is
-\code{pivot_longer()}.
-Learn more in \code{vignette("pivot", "tidyr")}.
+\code{pivot_longer()}. Learn more in \code{vignette("pivot", "tidyr")}.
 
-Note that \code{pivot_wider()} is not and cannot be lazy because we need to look
+\code{pivot_wider()} on database tables comes with some caveats, please make
+sure to read below for details.
+}
+\section{Caveats}{
+\subsection{\code{pivot_wider()} is eager}{
+
+Note that \code{pivot_wider()} cannot be lazy because we need to look
 at the data to figure out what the new column names will be.
-If you have a long running query you have two options:
+If you have a long-running query you have two options:
 \itemize{
-\item (temporarily) store the result of the query via \code{compute()}.
+\item Temporarily store the result of the query via \code{compute()}.
 \item Create a spec before and use \code{dbplyr_pivot_wider_spec()} - dbplyr's version
-of \code{tidyr::pivot_wider_spec()}. Note that this function is only a temporary
-solution until \code{pivot_wider_spec()} becomes a generic. It will then be
-removed soon afterwards.
+of \code{tidyr::pivot_wider_spec()}.
 }
 }
-\details{
+
+\subsection{You must supply \code{values_fn}}{
+
 The big difference to \code{pivot_wider()} for local data frames is that
 \code{values_fn} must not be \code{NULL}. By default it is \code{max()} which yields
-the same results as for local data frames if the combination of \code{id_cols}
-and \code{value} column uniquely identify an observation.
-Mind that you also do not get a warning if an observation is not uniquely
-identified.
+the same results as for local data frames if three conditions are true:
+\enumerate{
+\item The combination of \code{id_cols} and \code{value} uniquely identify an observation.
+\item The column has a comparable type (e.g. numeric, date-time, or
+(for most databases) string).
+\item \code{values_fill} is \code{NULL}.
+}
 
+If either the second or third condition is not met, you must supply a
+custom \code{values_fn}. Unfortunately there is no generally available alternative
+and you'll need to look for something database specific, like \code{FIRST()}
+or \code{ANY_VALUE()}.
+}
+}
+
+\section{How does it work?}{
 The translation to SQL code basically works as follows:
 \enumerate{
 \item Get unique keys in \code{names_from} column.
 \item For each key value generate an expression of the form:
 
-\if{html}{\out{<div class="sourceCode sql">}}\preformatted{value_fn(
-  CASE WHEN (`names from column` == `key value`)
-  THEN (`value column`)
-  END
+\if{html}{\out{<div class="sourceCode sql">}}\preformatted{values_fn(
+  CASE WHEN (`names from column` == `key value`) THEN (`value column`) END
 ) AS `output column`
 }\if{html}{\out{</div>}}
 \item Group data by id columns.
 \item Summarise the grouped data with the expressions from step 2.
 }
 }
+
 \examples{
 \dontshow{if (rlang::is_installed("tidyr", version = "1.0.0")) withAutoprint(\{ # examplesIf}
 memdb_frame(

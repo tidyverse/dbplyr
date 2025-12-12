@@ -55,9 +55,6 @@
 #' lf |> transmute(x = ifelse(c > d, "c", "d"))
 NULL
 
-#' @include verb-copy-to.R
-NULL
-
 #' @export
 #' @rdname backend-mssql
 simulate_mssql <- function(version = "15.0") {
@@ -252,9 +249,9 @@ simulate_mssql <- function(version = "15.0") {
       `!` = function(x) {
         if (mssql_needs_bit()) {
           x <- with_mssql_bool(x)
-          sql_expr(~ !!mssql_as_bit(x))
+          sql_glue("~{mssql_as_bit(x)}")
         } else {
-          sql_expr(NOT(!!x))
+          sql_glue("NOT({x})")
         }
       },
 
@@ -265,14 +262,14 @@ simulate_mssql <- function(version = "15.0") {
       `>` = mssql_infix_comparison(">"),
       `>=` = mssql_infix_comparison(">="),
 
-      `&` = mssql_infix_boolean("&", "%AND%"),
-      `&&` = mssql_infix_boolean("&", "%AND%"),
-      `|` = mssql_infix_boolean("|", "%OR%"),
-      `||` = mssql_infix_boolean("|", "%OR%"),
+      `&` = mssql_infix_boolean("&", "AND"),
+      `&&` = mssql_infix_boolean("&", "AND"),
+      `|` = mssql_infix_boolean("|", "OR"),
+      `||` = mssql_infix_boolean("|", "OR"),
 
       `[` = function(x, i) {
         i <- with_mssql_bool(i)
-        glue_sql2(sql_current_con(), "CASE WHEN ({i}) THEN ({x}) END")
+        sql_glue("CASE WHEN ({i}) THEN ({x}) END")
       },
 
       bitwShiftL = sql_not_supported("bitwShiftL"),
@@ -301,9 +298,9 @@ simulate_mssql <- function(version = "15.0") {
       between = function(x, left, right) {
         context <- sql_current_context()
         if (context$clause == "WHERE") {
-          sql_expr(!!x %BETWEEN% !!left %AND% !!right)
+          sql_glue("{x} BETWEEN {left} AND {right}")
         } else {
-          sql_expr(IIF(!!x %BETWEEN% !!left %AND% !!right, 1L, 0L))
+          sql_glue("IIF({x} BETWEEN {left} AND {right}, 1, 0)")
         }
       },
 
@@ -323,25 +320,31 @@ simulate_mssql <- function(version = "15.0") {
 
       runif = function(n = n(), min = 0, max = 1) {
         # https://stackoverflow.com/a/9039661
-        sql_runif(RAND(CHECKSUM(NEWID())), n = {{ n }}, min = min, max = max)
+        sql_runif("RAND(CHECKSUM(NEWID()))", n = {{ n }}, min = min, max = max)
       },
 
       # string functions ------------------------------------------------
       nchar = sql_prefix("LEN"),
-      paste = sql_paste_infix(" ", "+", function(x) {
-        sql_expr(cast(!!x %as% text))
-      }),
-      paste0 = sql_paste_infix("", "+", function(x) {
-        sql_expr(cast(!!x %as% text))
-      }),
+      paste = sql_paste_infix(" ", "+"),
+      paste0 = sql_paste_infix("", "+"),
       substr = sql_substr("SUBSTRING"),
       substring = sql_substr("SUBSTRING"),
 
       # stringr functions
       str_length = sql_prefix("LEN"),
-      str_c = sql_paste_infix("", "+", function(x) {
-        sql_expr(cast(!!x %as% text))
-      }),
+      str_c = sql_paste_infix("", "+"),
+      # use COLLATE to ensure consistent behaviour https://learn.microsoft.com/en-us/sql/relational-databases/collations/set-or-change-the-column-collation?view=sql-server-ver17&source=recommendations
+      str_like = function(string, pattern, ignore_case = deprecated()) {
+        ignore_case <- deprecate_ignore_case(ignore_case)
+        if (ignore_case) {
+          sql_glue("{string} COLLATE Latin1_General_100_CI_AS LIKE {pattern}")
+        } else {
+          sql_glue("{string} COLLATE Latin1_General_100_CS_AS LIKE {pattern}")
+        }
+      },
+      str_ilike = function(string, pattern) {
+        sql_glue("{string} COLLATE Latin1_General_100_CI_AS LIKE {pattern}")
+      },
       # no built in function: https://stackoverflow.com/questions/230138
       str_to_title = sql_not_supported("str_to_title"),
       # https://docs.microsoft.com/en-us/sql/t-sql/functions/substring-transact-sql?view=sql-server-ver15
@@ -356,24 +359,24 @@ simulate_mssql <- function(version = "15.0") {
       # https://docs.microsoft.com/en-us/sql/t-sql/data-types/datetime-transact-sql?view=sql-server-2017
       as_datetime = sql_cast("DATETIME2"),
 
-      today = \() sql_expr(CAST(SYSDATETIME() %AS% DATE)),
+      today = \() sql_glue("CAST(SYSDATETIME() AS DATE)"),
 
       # https://docs.microsoft.com/en-us/sql/t-sql/functions/datepart-transact-sql?view=sql-server-2017
-      year = \(x) sql_expr(DATEPART(YEAR, !!x)),
-      day = \(x) sql_expr(DATEPART(DAY, !!x)),
-      mday = \(x) sql_expr(DATEPART(DAY, !!x)),
-      yday = \(x) sql_expr(DATEPART(DAYOFYEAR, !!x)),
-      hour = \(x) sql_expr(DATEPART(HOUR, !!x)),
-      minute = \(x) sql_expr(DATEPART(MINUTE, !!x)),
-      second = \(x) sql_expr(DATEPART(SECOND, !!x)),
+      year = \(x) sql_glue("DATEPART(YEAR, {x})"),
+      day = \(x) sql_glue("DATEPART(DAY, {x})"),
+      mday = \(x) sql_glue("DATEPART(DAY, {x})"),
+      yday = \(x) sql_glue("DATEPART(DAYOFYEAR, {x})"),
+      hour = \(x) sql_glue("DATEPART(HOUR, {x})"),
+      minute = \(x) sql_glue("DATEPART(MINUTE, {x})"),
+      second = \(x) sql_glue("DATEPART(SECOND, {x})"),
 
       month = function(x, label = FALSE, abbr = TRUE) {
         check_bool(label)
         if (!label) {
-          sql_expr(DATEPART(MONTH, !!x))
+          sql_glue("DATEPART(MONTH, {x})")
         } else {
           check_unsupported_arg(abbr, FALSE, backend = "SQL Server")
-          sql_expr(DATENAME(MONTH, !!x))
+          sql_glue("DATENAME(MONTH, {x})")
         }
       },
 
@@ -382,47 +385,47 @@ simulate_mssql <- function(version = "15.0") {
         check_unsupported_arg(fiscal_start, 1, backend = "SQL Server")
 
         if (with_year) {
-          sql_expr((DATENAME(YEAR, !!x) + '.' + DATENAME(QUARTER, !!x)))
+          sql_glue("(DATENAME(YEAR, {x}) + '.' + DATENAME(QUARTER, {x}))")
         } else {
-          sql_expr(DATEPART(QUARTER, !!x))
+          sql_glue("DATEPART(QUARTER, {x})")
         }
       },
 
       # clock ---------------------------------------------------------------
       add_days = function(x, n, ...) {
         check_dots_empty()
-        sql_expr(DATEADD(DAY, !!n, !!x))
+        sql_glue("DATEADD(DAY, {n}, {x})")
       },
       add_years = function(x, n, ...) {
         check_dots_empty()
-        sql_expr(DATEADD(YEAR, !!n, !!x))
+        sql_glue("DATEADD(YEAR, {n}, {x})")
       },
       date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
         check_unsupported_arg(invalid, allow_null = TRUE)
-        sql_expr(DATEFROMPARTS(!!year, !!month, !!day))
+        sql_glue("DATEFROMPARTS({year}, {month}, {day})")
       },
       get_year = function(x) {
-        sql_expr(DATEPART(YEAR, !!x))
+        sql_glue("DATEPART(YEAR, {x})")
       },
       get_month = function(x) {
-        sql_expr(DATEPART(MONTH, !!x))
+        sql_glue("DATEPART(MONTH, {x})")
       },
       get_day = function(x) {
-        sql_expr(DATEPART(DAY, !!x))
+        sql_glue("DATEPART(DAY, {x})")
       },
       date_count_between = function(start, end, precision, ..., n = 1L) {
         check_dots_empty()
         check_unsupported_arg(precision, allowed = "day")
         check_unsupported_arg(n, allowed = 1L)
-
-        sql_expr(DATEDIFF(DAY, !!start, !!end))
+        # https://learn.microsoft.com/en-us/sql/t-sql/functions/datediff-big-transact-sql?view=sql-server-ver17
+        sql_glue("DATEDIFF_BIG(DAY, {start}, {end})")
       },
 
       difftime = function(time1, time2, tz, units = "days") {
         check_unsupported_arg(tz)
         check_unsupported_arg(units, allowed = "days")
 
-        sql_expr(DATEDIFF(DAY, !!time2, !!time1))
+        sql_glue("DATEDIFF_BIG(DAY, {time2}, {time1})")
       }
     )
 
@@ -442,10 +445,10 @@ simulate_mssql <- function(version = "15.0") {
       # So we parse to NUMERIC (which doesn't have this problem), then to the
       # target type
       as.integer = function(x) {
-        sql_expr(try_cast(try_cast(!!x %as% NUMERIC) %as% INT))
+        sql_glue("TRY_CAST(TRY_CAST({x} AS NUMERIC) AS INT)")
       },
       as.integer64 = function(x) {
-        sql_expr(try_cast(try_cast(!!x %as% NUMERIC(38L, 0L)) %as% BIGINT))
+        sql_glue("TRY_CAST(TRY_CAST({x} AS NUMERIC(38, 0)) AS BIGINT)")
       },
       as.character = sql_try_cast("VARCHAR(MAX)"),
       as_date = sql_try_cast("DATE"),
@@ -463,7 +466,7 @@ simulate_mssql <- function(version = "15.0") {
       var = sql_aggregate("VAR", "var"),
       str_flatten = function(x, collapse = "", na.rm = FALSE) {
         sql_check_na_rm(na.rm)
-        sql_expr(string_agg(!!x, !!collapse))
+        sql_glue("STRING_AGG({x}, {collapse})")
       },
 
       median = sql_agg_not_supported("median", "SQL Server"),
@@ -478,7 +481,7 @@ simulate_mssql <- function(version = "15.0") {
       str_flatten = function(x, collapse = "", na.rm = FALSE) {
         sql_check_na_rm(na.rm)
         win_over(
-          sql_expr(string_agg(!!x, !!collapse)),
+          sql_glue("STRING_AGG({x}, {collapse})"),
           partition = win_current_group(),
           order = win_current_order()
         )
@@ -551,7 +554,7 @@ mssql_version <- function(con) {
 #' @export
 `sql_table_analyze.Microsoft SQL Server` <- function(con, table, ...) {
   # https://docs.microsoft.com/en-us/sql/t-sql/statements/update-statistics-transact-sql
-  glue_sql2(con, "UPDATE STATISTICS {.tbl table}")
+  sql_glue2(con, "UPDATE STATISTICS {.tbl table}")
 }
 
 # SQL server does not use CREATE TEMPORARY TABLE and instead prefixes
@@ -580,7 +583,7 @@ mssql_version <- function(con) {
   ...
 ) {
   # https://stackoverflow.com/q/16683758/946850
-  glue_sql2(con, "SELECT * INTO {.tbl name} FROM (\n  {sql}\n) AS temp")
+  sql_glue2(con, "SELECT * INTO {.tbl name} FROM (\n  {sql}\n) AS temp")
 }
 
 #' @export
@@ -608,7 +611,7 @@ with_mssql_bool <- function(code) {
 
 mssql_as_bit <- function(x) {
   if (mssql_needs_bit()) {
-    sql_expr(cast(iif(!!x, 1L, 0L) %as% BIT))
+    sql_glue("CAST(IIF({x}, 1, 0) AS BIT)")
   } else {
     x
   }
@@ -620,9 +623,8 @@ mssql_is_null <- function(x) {
 
 mssql_infix_comparison <- function(f) {
   check_string(f)
-  f <- toupper(f)
   function(x, y) {
-    mssql_as_bit(glue_sql2(sql_current_con(), "{.val x} {f} {.val y}"))
+    mssql_as_bit(sql_glue("{x} {.sql f} {y}"))
   }
 }
 
@@ -634,9 +636,9 @@ mssql_infix_boolean <- function(if_bit, if_bool) {
     if (mssql_needs_bit()) {
       x <- with_mssql_bool(x)
       y <- with_mssql_bool(y)
-      mssql_as_bit(sql_call2(if_bool, x, y))
+      mssql_as_bit(sql_glue("{x} {.sql if_bool} {y}"))
     } else {
-      sql_call2(if_bool, x, y)
+      sql_glue("{x} {.sql if_bool} {y}")
     }
   }
 }
@@ -714,38 +716,4 @@ bit_to_boolean <- function(x_expr) {
   }
 }
 
-utils::globalVariables(c(
-  "BIT",
-  "CAST",
-  "%AS%",
-  "%is%",
-  "convert",
-  "DATE",
-  "DATEADD",
-  "DATEFROMPARTS",
-  "DATEDIFF",
-  "DATENAME",
-  "DATEPART",
-  "IIF",
-  "NOT",
-  "SUBSTRING",
-  "LTRIM",
-  "RTRIM",
-  "CHARINDEX",
-  "SYSDATETIME",
-  "SECOND",
-  "MINUTE",
-  "HOUR",
-  "DAY",
-  "DAYOFWEEK",
-  "DAYOFYEAR",
-  "MONTH",
-  "QUARTER",
-  "YEAR",
-  "BIGINT",
-  "INT",
-  "%AND%",
-  "%BETWEEN%",
-  "CHECKSUM",
-  "NEWID"
-))
+utils::globalVariables(c("cast", "%AS%", "BIT"))

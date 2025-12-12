@@ -33,10 +33,10 @@ collect.tbl_sql <- function(
     x <- head(x, n)
   }
 
-  sql <- db_sql_render(x$src$con, x, cte = cte)
+  sql <- db_sql_render(x$con, x, cte = cte)
   withCallingHandlers(
     out <- db_collect(
-      x$src$con,
+      x$con,
       sql,
       n = n,
       warn_incomplete = warn_incomplete,

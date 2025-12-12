@@ -60,7 +60,7 @@ test_that("custom scalar translated correctly", {
   expect_translation(
     con,
     quarter(as.Date("2020-01-01")),
-    "to_char(DATE '2020-01-01', 'q')"
+    "TO_CHAR(DATE '2020-01-01', 'q')"
   )
 })
 
