@@ -22,9 +22,6 @@
 #' lf |> summarise(y = cor(b, c), z = cov(b, c))
 NULL
 
-#' @include verb-copy-to.R
-NULL
-
 #' @export
 #' @rdname backend-postgres
 simulate_postgres <- function() simulate_dbi("PqConnection")
