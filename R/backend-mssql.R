@@ -417,15 +417,15 @@ simulate_mssql <- function(version = "15.0") {
         check_dots_empty()
         check_unsupported_arg(precision, allowed = "day")
         check_unsupported_arg(n, allowed = 1L)
-
-        sql_glue("DATEDIFF(DAY, {start}, {end})")
+        # https://learn.microsoft.com/en-us/sql/t-sql/functions/datediff-big-transact-sql?view=sql-server-ver17
+        sql_glue("DATEDIFF_BIG(DAY, {start}, {end})")
       },
 
       difftime = function(time1, time2, tz, units = "days") {
         check_unsupported_arg(tz)
         check_unsupported_arg(units, allowed = "days")
 
-        sql_glue("DATEDIFF(DAY, {time2}, {time1})")
+        sql_glue("DATEDIFF_BIG(DAY, {time2}, {time1})")
       }
     )
 
