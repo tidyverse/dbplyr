@@ -463,6 +463,11 @@ sql_cast_dispatch.integer64 <- function(x) {
   expr(as.integer64)
 }
 
+#' @export
+sql_cast_dispatch.blob <- function(x) {
+  expr(as.blob)
+}
+
 #' @importFrom dplyr coalesce
 NULL
-utils::globalVariables("as.integer64")
+utils::globalVariables(c("as.integer64", "as.blob"))
