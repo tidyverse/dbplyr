@@ -55,9 +55,6 @@
 #' lf |> transmute(x = ifelse(c > d, "c", "d"))
 NULL
 
-#' @include verb-copy-to.R
-NULL
-
 #' @export
 #' @rdname backend-mssql
 simulate_mssql <- function(version = "15.0") {
