@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* SQL Server uses `DATEDIFF_BIG` instead of `DATEDIFF` to work regardless of data size (@edward-burn, #1666).
 * `na_matches = "na"` now works correctly with inequality and overlap joins, preserving the comparison operator instead of converting to equality (#1505).
 * `copy_inline()` now works with blob columns (#1515).
 * `tbl_sql()` is now (soft) deprecated. It hasn't been required in a while. 
