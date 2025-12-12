@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* `na_matches = "na"` now works correctly with inequality and overlap joins, preserving the comparison operator instead of converting to equality (#1505).
 * `copy_inline()` now works with blob columns (#1515).
 * `tbl_sql()` is now (soft) deprecated. It hasn't been required in a while. 
 * The print method no longer mentions the "source" in the header, because it's an outdated dplyr concept (#897).

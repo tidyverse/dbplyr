@@ -412,6 +412,20 @@
         WHERE (`lf1`.`x` IS NOT DISTINCT FROM `lf2`.`x`)
       )
 
+---
+
+    Code
+      left_join(lf1, lf3, by = by, na_matches = "na")
+    Output
+      <SQL>
+      SELECT `x`, `lf3`.*
+      FROM `lf1`
+      LEFT JOIN `lf3`
+        ON (
+          (`lf1`.`x` >= `lf3`.`lower` OR (`lf1`.`x` IS NULL AND `lf3`.`lower` IS NULL)) AND
+          (`lf1`.`x` <= `lf3`.`upper` OR (`lf1`.`x` IS NULL AND `lf3`.`upper` IS NULL))
+        )
+
 # suffix arg is checked
 
     Code

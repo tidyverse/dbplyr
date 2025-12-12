@@ -345,7 +345,15 @@ sql_join_tbls <- function(con, by, na_matches) {
 
     if (na_matches == "na") {
       compare <- purrr::map_chr(seq_along(lhs), function(i) {
-        sql_expr_matches(con, lhs[[i]], rhs[[i]])
+        op <- by$condition[[i]]
+        if (op == "==") {
+          sql_expr_matches(con, lhs[[i]], rhs[[i]])
+        } else {
+          sql_glue2(
+            con,
+            "({lhs[[i]]} {.sql op} {rhs[[i]]} OR ({lhs[[i]]} IS NULL AND {rhs[[i]]} IS NULL))"
+          )
+        }
       })
     } else {
       by$condition[by$condition == "=="] <- "="
