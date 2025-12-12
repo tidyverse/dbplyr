@@ -530,6 +530,21 @@ test_that("named by works in combination with inlined select", {
   expect_equal(lq$joins$by[[1]]$y, c("id_y", "x"))
 })
 
+test_that("rename works with duplicate column names in join_by (#1572)", {
+  lf1 <- lazy_frame(x = 1, .name = "df")
+  lf2 <- lazy_frame(y = 1, .name = "df")
+
+  # between(x, z, z) produces by$y = c("z", "z")
+  # both must be renamed back to "y"
+  out <- left_join(lf1, lf2 |> rename(z = y), join_by(between(x, z, z)))
+
+  lq <- out$lazy_query
+  expect_equal(lq$joins$by[[1]]$x, c("x", "x"))
+  expect_equal(lq$joins$by[[1]]$y, c("y", "y"))
+
+  expect_snapshot(out)
+})
+
 test_that("suffix works in combination with inlined select", {
   lf <- lazy_frame(id = 1, x = 1, .name = "lf1")
   lf2 <- lazy_frame(id = 12, x = 2, .name = "lf2")
