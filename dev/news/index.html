@@ -21,7 +21,6 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a></li>
     <li><a class="dropdown-item" href="../articles/reprex.html">Reprexes for dbplyr</a></li>
-    <li><a class="dropdown-item" href="../articles/sql.html">Writing SQL with dbplyr</a></li>
     <li><a class="dropdown-item" href="../articles/translation-function.html">Function translation</a></li>
     <li><a class="dropdown-item" href="../articles/translation-verb.html">Verb translation</a></li>
   </ul></li>
@@ -798,7 +797,7 @@ FROM (
 <ul><li><p>Joins and semi-joins no longer add an unneeded subquery (<a href="https://github.com/tidyverse/dbplyr/issues/236" class="external-link">#236</a>). This is facilitated by the new <code>bare_identifier_ok</code> argument to <code><a href="../reference/sql_build.html">sql_render()</a></code>; the previous argument was called <code>root</code> and confused me.</p></li>
 <li><p>Many sequences of <code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code>, and <code><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute()</a></code> can be collapsed into a single query, instead of always generating a subquery (<a href="https://github.com/tidyverse/dbplyr/issues/213" class="external-link">#213</a>).</p></li>
 </ul></li>
-<li><p>New <code><a href="../articles/sql.html">vignette("sql")</a></code> describes some advantages of dbplyr over SQL (<a href="https://github.com/tidyverse/dbplyr/issues/205" class="external-link">#205</a>) and gives some advice about writing literal SQL inside of dplyr, when you need to (<a href="https://github.com/tidyverse/dbplyr/issues/196" class="external-link">#196</a>).</p></li>
+<li><p>New <code>vignette("sql")</code> describes some advantages of dbplyr over SQL (<a href="https://github.com/tidyverse/dbplyr/issues/205" class="external-link">#205</a>) and gives some advice about writing literal SQL inside of dplyr, when you need to (<a href="https://github.com/tidyverse/dbplyr/issues/196" class="external-link">#196</a>).</p></li>
 <li><p>New <code><a href="../articles/reprex.html">vignette("reprex")</a></code> gives some hints on creating reprexes that work anywhere (<a href="https://github.com/tidyverse/dbplyr/issues/117" class="external-link">#117</a>). This is supported by a new <code><a href="../reference/memdb_frame.html">tbl_memdb()</a></code> that matches the existing <code><a href="../reference/tbl_lazy.html">tbl_lazy()</a></code>.</p></li>
 <li><p>All <code>..._join()</code> functions gain an <code>sql_on</code> argument that allows specifying arbitrary join predicates in SQL code (<a href="https://github.com/tidyverse/dbplyr/issues/146" class="external-link">#146</a>, <a href="https://github.com/krlmlr" class="external-link">@krlmlr</a>).</p></li>
 </ul></div>

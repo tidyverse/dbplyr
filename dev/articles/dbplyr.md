@@ -71,7 +71,8 @@ about if you need to do things to the database that are beyond the scope
 of dplyr.
 
 ``` r
-library(dplyr)
+library(dbplyr)
+library(dplyr, warn.conflicts = FALSE)
 con <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
 ```
 
@@ -117,24 +118,8 @@ function. This is a quick and dirty way of getting data into a database
 and is useful primarily for demos and other small jobs.
 
 ``` r
-copy_to(con, nycflights13::flights, "flights",
-  temporary = FALSE, 
-  indexes = list(
-    c("year", "month", "day"), 
-    "carrier", 
-    "tailnum",
-    "dest"
-  )
-)
+copy_to(con, nycflights13::flights, "flights", temporary = FALSE)
 ```
-
-As you can see, the
-[`copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html)
-operation has an additional argument that allows you to supply indexes
-for the table. Here we set up indexes that will allow us to quickly
-process the data by day, carrier, plane, and destination. Creating the
-right indices is key to good database performance, but is unfortunately
-beyond the scope of this article.
 
 Now that we’ve copied the data, we can use
 [`tbl()`](https://dplyr.tidyverse.org/reference/tbl.html) to take a
@@ -182,7 +167,8 @@ Most of the time you don’t need to know anything about SQL, and you can
 continue to use the dplyr verbs that you’re already familiar with:
 
 ``` r
-flights_db |> select(year:day, dep_delay, arr_delay)
+flights_db |> 
+  select(year:day, dep_delay, arr_delay)
 #> # A query:  ?? x 5
 #> # Database: sqlite 3.51.1 [:memory:]
 #>    year month   day dep_delay arr_delay
@@ -195,7 +181,8 @@ flights_db |> select(year:day, dep_delay, arr_delay)
 #> 6  2013     1     1        -4        12
 #> # ℹ more rows
 
-flights_db |> filter(dep_delay > 240)
+flights_db |> 
+  filter(dep_delay > 240)
 #> # A query:  ?? x 19
 #> # Database: sqlite 3.51.1 [:memory:]
 #>    year month   day dep_time sched_dep_time dep_delay arr_time
@@ -214,10 +201,7 @@ flights_db |> filter(dep_delay > 240)
 
 flights_db |> 
   group_by(dest) |>
-  summarise(delay = mean(dep_delay))
-#> Warning: Missing values are always removed in SQL aggregation functions.
-#> Use `na.rm = TRUE` to silence this warning
-#> This warning is displayed once every 8 hours.
+  summarise(delay = mean(dep_delay, na.rm = TRUE))
 #> # A query:  ?? x 2
 #> # Database: sqlite 3.51.1 [:memory:]
 #>   dest  delay
@@ -274,6 +258,9 @@ a few rows.
 
 ``` r
 tailnum_delay_db
+#> Warning: Missing values are always removed in SQL aggregation functions.
+#> Use `na.rm = TRUE` to silence this warning
+#> This warning is displayed once every 8 hours.
 #> # A query:    ?? x 3
 #> # Database:   sqlite 3.51.1 [:memory:]
 #> # Ordered by: desc(delay)
@@ -302,12 +289,8 @@ tailnum_delay_db |> show_query()
 #> ORDER BY `delay` DESC
 ```
 
-If you’re familiar with SQL, this probably isn’t exactly what you’d
-write by hand, but it does the job. You can learn more about the SQL
-translation in
-[`vignette("translation-verb")`](https://dbplyr.tidyverse.org/dev/articles/translation-verb.md)
-and
-[`vignette("translation-function")`](https://dbplyr.tidyverse.org/dev/articles/translation-function.md).
+This might not be exactly what you’d write by hand, but it’s probably
+pretty close.
 
 Typically, you’ll iterate a few times before you figure out what data
 you need from the database. Once you’ve figured it out, use
@@ -356,6 +339,85 @@ output is database dependent, and can be esoteric, but learning a bit
 about it can be very useful because it helps you understand if the
 database can execute the query efficiently, or if you need to create new
 indices.
+
+## Why use dbplyr?
+
+If you already know SQL, why use dbplyr? One nicety it will
+automatically generate subqueries if you want to use a freshly created
+variable in
+[`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html):
+
+``` r
+db <- lazy_frame(x = 1, y = 2)
+
+db |> 
+  mutate(
+    a = y * x,
+    b = a ^ 2,
+  )
+#> <SQL>
+#> SELECT `q01`.*, POWER(`a`, 2.0) AS `b`
+#> FROM (
+#>   SELECT `df`.*, `y` * `x` AS `a`
+#>   FROM `df`
+#> ) AS `q01`
+```
+
+In general, it’s much easier to work iteratively in dbplyr. You can
+easily give intermediate queries names, and reuse them in multiple
+places. Or if you have a common operation that you want to do to many
+queries, you can easily wrap it up in a function. It’s also easy to
+chain [`count()`](https://dplyr.tidyverse.org/reference/count.html) to
+the end of any query to check the results are about what you expect.
+
+## What happens when dbplyr fails?
+
+dbplyr aims to translate the most common R functions to their SQL
+equivalents, allowing you to ignore the vagaries of the SQL dialect that
+you’re working with, so you can focus on the data analysis problem at
+hand. But different backends have different capabilities, and sometimes
+there are SQL functions that don’t have exact equivalents in R. In those
+cases, you’ll need to write SQL code directly.
+
+Any function that dbplyr doesn’t know about will be left as is:
+
+``` r
+db |>
+  mutate(z = foofify(x, y))
+#> <SQL>
+#> SELECT `df`.*, foofify(`x`, `y`) AS `z`
+#> FROM `df`
+
+db |>
+  filter(x %LIKE% "%foo%")
+#> <SQL>
+#> SELECT `df`.*
+#> FROM `df`
+#> WHERE (`x` LIKE '%foo%')
+```
+
+SQL functions tend to have a greater variety of syntax than R. That
+means there are a number of expressions that can’t be translated
+directly from R code. To insert these in your own queries, you can use
+literal SQL inside
+[`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md):
+
+``` r
+db |>
+  transmute(factorial = sql("x!"))
+#> <SQL>
+#> SELECT x! AS `factorial`
+#> FROM `df`
+
+db |>
+  transmute(factorial = sql("CAST(x AS FLOAT)"))
+#> <SQL>
+#> SELECT CAST(x AS FLOAT) AS `factorial`
+#> FROM `df`
+```
+
+Learn more in
+[`vignette("translation-function")`](https://dbplyr.tidyverse.org/dev/articles/translation-function.md).
 
 ## Creating your own database
 

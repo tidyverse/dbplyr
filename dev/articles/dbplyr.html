@@ -45,7 +45,6 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a></li>
     <li><a class="dropdown-item" href="../articles/reprex.html">Reprexes for dbplyr</a></li>
-    <li><a class="dropdown-item" href="../articles/sql.html">Writing SQL with dbplyr</a></li>
     <li><a class="dropdown-item" href="../articles/translation-function.html">Function translation</a></li>
     <li><a class="dropdown-item" href="../articles/translation-verb.html">Verb translation</a></li>
   </ul>
@@ -157,7 +156,8 @@ the DBI package here, but it’s the foundation upon which dbplyr is
 built. You’ll need to learn more about if you need to do things to the
 database that are beyond the scope of dplyr.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dbplyr.tidyverse.org/">dbplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span>, warn.conflicts <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span>, dbname <span class="op">=</span> <span class="st">":memory:"</span><span class="op">)</span></span></code></pre></div>
 <p>The arguments to <code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">DBI::dbConnect()</a></code> vary from database to
 database, but the first argument is always the database backend. It’s
@@ -188,21 +188,7 @@ over <code><a href="https://rdrr.io/pkg/nycflights13/man/flights.html" class="ex
 getting data into a database and is useful primarily for demos and other
 small jobs.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to</a></span><span class="op">(</span><span class="va">con</span>, <span class="fu">nycflights13</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nycflights13/man/flights.html" class="external-link">flights</a></span>, <span class="st">"flights"</span>,</span>
-<span>  temporary <span class="op">=</span> <span class="cn">FALSE</span>, </span>
-<span>  indexes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"year"</span>, <span class="st">"month"</span>, <span class="st">"day"</span><span class="op">)</span>, </span>
-<span>    <span class="st">"carrier"</span>, </span>
-<span>    <span class="st">"tailnum"</span>,</span>
-<span>    <span class="st">"dest"</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>As you can see, the <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to()</a></code> operation has an
-additional argument that allows you to supply indexes for the table.
-Here we set up indexes that will allow us to quickly process the data by
-day, carrier, plane, and destination. Creating the right indices is key
-to good database performance, but is unfortunately beyond the scope of
-this article.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to</a></span><span class="op">(</span><span class="va">con</span>, <span class="fu">nycflights13</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nycflights13/man/flights.html" class="external-link">flights</a></span>, <span class="st">"flights"</span>, temporary <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>Now that we’ve copied the data, we can use <code><a href="https://dplyr.tidyverse.org/reference/tbl.html" class="external-link">tbl()</a></code> to take
 a reference to it:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -243,7 +229,8 @@ analyst.</p>
 can continue to use the dplyr verbs that you’re already familiar
 with:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">flights_db</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">year</span><span class="op">:</span><span class="va">day</span>, <span class="va">dep_delay</span>, <span class="va">arr_delay</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">flights_db</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">year</span><span class="op">:</span><span class="va">day</span>, <span class="va">dep_delay</span>, <span class="va">arr_delay</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A query:  ?? x 5</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.51.1 [:memory:]</span></span></span>
 <span><span class="co">#&gt;    year month   day dep_delay arr_delay</span></span>
@@ -256,7 +243,8 @@ with:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>  <span style="text-decoration: underline;">2</span>013     1     1        -<span style="color: #BB0000;">4</span>        12</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ more rows</span></span></span>
 <span></span>
-<span><span class="va">flights_db</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">dep_delay</span> <span class="op">&gt;</span> <span class="fl">240</span><span class="op">)</span></span>
+<span><span class="va">flights_db</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">dep_delay</span> <span class="op">&gt;</span> <span class="fl">240</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A query:  ?? x 19</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.51.1 [:memory:]</span></span></span>
 <span><span class="co">#&gt;    year month   day dep_time sched_dep_time dep_delay arr_time</span></span>
@@ -275,10 +263,7 @@ with:</p>
 <span></span>
 <span><span class="va">flights_db</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">dest</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>delay <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">dep_delay</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Missing values are always removed in SQL aggregation functions.</span></span>
-<span><span class="co">#&gt; Use `na.rm = TRUE` to silence this warning</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>delay <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">dep_delay</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A query:  ?? x 2</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.51.1 [:memory:]</span></span></span>
 <span><span class="co">#&gt;   dest  delay</span></span>
@@ -328,6 +313,9 @@ the results from the database. Even then it tries to do as little work
 as possible and only pulls down a few rows.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tailnum_delay_db</span></span>
+<span><span class="co">#&gt; Warning: Missing values are always removed in SQL aggregation functions.</span></span>
+<span><span class="co">#&gt; Use `na.rm = TRUE` to silence this warning</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A query:    ?? x 3</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Database:   sqlite 3.51.1 [:memory:]</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Ordered by: desc(delay)</span></span></span>
@@ -350,10 +338,8 @@ see the SQL it’s generating with <code><a href="../reference/show_query.html">
 <span><span class="co">#&gt; <span style="color: #0000BB;">GROUP BY</span> `tailnum`</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">HAVING</span> (COUNT(*) &gt; 100.0)</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">ORDER BY</span> `delay` DESC</span></span></code></pre></div>
-<p>If you’re familiar with SQL, this probably isn’t exactly what you’d
-write by hand, but it does the job. You can learn more about the SQL
-translation in <code><a href="../articles/translation-verb.html">vignette("translation-verb")</a></code> and
-<code><a href="../articles/translation-function.html">vignette("translation-function")</a></code>.</p>
+<p>This might not be exactly what you’d write by hand, but it’s probably
+pretty close.</p>
 <p>Typically, you’ll iterate a few times before you figure out what data
 you need from the database. Once you’ve figured it out, use
 <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect()</a></code> to pull all the data down into a local
@@ -393,6 +379,74 @@ whole query, you can’t use <code><a href="https://rdrr.io/r/utils/head.html" c
 esoteric, but learning a bit about it can be very useful because it
 helps you understand if the database can execute the query efficiently,
 or if you need to create new indices.</p>
+</div>
+<div class="section level2">
+<h2 id="why-use-dbplyr">Why use dbplyr?<a class="anchor" aria-label="anchor" href="#why-use-dbplyr"></a>
+</h2>
+<p>If you already know SQL, why use dbplyr? One nicety it will
+automatically generate subqueries if you want to use a freshly created
+variable in <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code>:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tbl_lazy.html">lazy_frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span>, y <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">db</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    a <span class="op">=</span> <span class="va">y</span> <span class="op">*</span> <span class="va">x</span>,</span>
+<span>    b <span class="op">=</span> <span class="va">a</span> <span class="op">^</span> <span class="fl">2</span>,</span>
+<span>  <span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;SQL&gt;</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `q01`.*, POWER(`a`, 2.0)<span style="color: #0000BB;"> AS </span>`b`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> (</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> `df`.*, `y` * `x`<span style="color: #0000BB;"> AS </span>`a`</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> `df`</span></span>
+<span><span class="co">#&gt; ) <span style="color: #0000BB;">AS </span>`q01`</span></span></code></pre></div>
+<p>In general, it’s much easier to work iteratively in dbplyr. You can
+easily give intermediate queries names, and reuse them in multiple
+places. Or if you have a common operation that you want to do to many
+queries, you can easily wrap it up in a function. It’s also easy to
+chain <code><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count()</a></code> to the end of any query to check the results
+are about what you expect.</p>
+</div>
+<div class="section level2">
+<h2 id="what-happens-when-dbplyr-fails">What happens when dbplyr fails?<a class="anchor" aria-label="anchor" href="#what-happens-when-dbplyr-fails"></a>
+</h2>
+<p>dbplyr aims to translate the most common R functions to their SQL
+equivalents, allowing you to ignore the vagaries of the SQL dialect that
+you’re working with, so you can focus on the data analysis problem at
+hand. But different backends have different capabilities, and sometimes
+there are SQL functions that don’t have exact equivalents in R. In those
+cases, you’ll need to write SQL code directly.</p>
+<p>Any function that dbplyr doesn’t know about will be left as is:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">db</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>z <span class="op">=</span> <span class="fu">foofify</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;SQL&gt;</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `df`.*, foofify(`x`, `y`)<span style="color: #0000BB;"> AS </span>`z`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
+<span></span>
+<span><span class="va">db</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">x</span> <span class="op">%LIKE%</span> <span class="st">"%foo%"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;SQL&gt;</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `df`.*</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> (`x` LIKE '%foo%')</span></span></code></pre></div>
+<p>SQL functions tend to have a greater variety of syntax than R. That
+means there are a number of expressions that can’t be translated
+directly from R code. To insert these in your own queries, you can use
+literal SQL inside <code><a href="../reference/sql.html">sql()</a></code>:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">db</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>factorial <span class="op">=</span> <span class="fu"><a href="../reference/sql.html">sql</a></span><span class="op">(</span><span class="st">"x!"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;SQL&gt;</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> x!<span style="color: #0000BB;"> AS </span>`factorial`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
+<span></span>
+<span><span class="va">db</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>factorial <span class="op">=</span> <span class="fu"><a href="../reference/sql.html">sql</a></span><span class="op">(</span><span class="st">"CAST(x AS FLOAT)"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;SQL&gt;</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> CAST(x AS FLOAT)<span style="color: #0000BB;"> AS </span>`factorial`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span></code></pre></div>
+<p>Learn more in <code><a href="../articles/translation-function.html">vignette("translation-function")</a></code>.</p>
 </div>
 <div class="section level2">
 <h2 id="creating-your-own-database">Creating your own database<a class="anchor" aria-label="anchor" href="#creating-your-own-database"></a>

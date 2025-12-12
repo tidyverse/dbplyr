@@ -7,8 +7,8 @@ It allows you to use remote database tables as if they are in-memory
 data frames by automatically converting dplyr code into SQL.
 
 To learn more about why you might use dbplyr instead of writing SQL, see
-[`vignette("sql")`](https://dbplyr.tidyverse.org/dev/articles/sql.md).
-To learn more about the details of the SQL translation, see
+`vignette("sql")`. To learn more about the details of the SQL
+translation, see
 [`vignette("translation-verb")`](https://dbplyr.tidyverse.org/dev/articles/translation-verb.md)
 and
 [`vignette("translation-function")`](https://dbplyr.tidyverse.org/dev/articles/translation-function.md).

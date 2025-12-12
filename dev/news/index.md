@@ -2145,9 +2145,7 @@ CRAN release: 2019-04-23
     can be collapsed into a single query, instead of always generating a
     subquery ([\#213](https://github.com/tidyverse/dbplyr/issues/213)).
 
-- New
-  [`vignette("sql")`](https://dbplyr.tidyverse.org/dev/articles/sql.md)
-  describes some advantages of dbplyr over SQL
+- New `vignette("sql")` describes some advantages of dbplyr over SQL
   ([\#205](https://github.com/tidyverse/dbplyr/issues/205)) and gives
   some advice about writing literal SQL inside of dplyr, when you need
   to ([\#196](https://github.com/tidyverse/dbplyr/issues/196)).
