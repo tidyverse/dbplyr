@@ -74,16 +74,12 @@ sql_expr_matches <- function(con, x, y, ...) {
   check_dots_used()
   UseMethod("sql_expr_matches")
 }
-# https://modern-sql.com/feature/is-distinct-from
+
 #' @export
 sql_expr_matches.DBIConnection <- function(con, x, y, ...) {
-  glue_sql2(
-    con,
-    "CASE WHEN ({x} = {y}) OR ({x} IS NULL AND {y} IS NULL) ",
-    "THEN 0 ",
-    "ELSE 1 ",
-    "END = 0"
-  )
+  # https://modern-sql.com/feature/is-distinct-from
+  sql <- "CASE WHEN ({x} = {y}) OR ({x} IS NULL AND {y} IS NULL) THEN 0 ELSE 1 END = 0"
+  sql_glue2(con, sql)
 }
 
 #' @export
@@ -119,7 +115,7 @@ sql_table_analyze <- function(con, table, ...) {
 }
 #' @export
 sql_table_analyze.DBIConnection <- function(con, table, ...) {
-  glue_sql2(con, "ANALYZE {.tbl {table}}")
+  sql_glue2(con, "ANALYZE {.tbl {table}}")
 }
 
 #' @rdname db-sql
@@ -156,12 +152,11 @@ sql_table_index.DBIConnection <- function(
     table_name <- table_path_name(table, con)
     name <- name %||% paste0(c(table_name, columns), collapse = "_")
   }
-  glue_sql2(
+
+  index <- if (unique) "UNIQUE INDEX" else "INDEX"
+  sql_glue2(
     con,
-    "CREATE ",
-    if (unique) "UNIQUE ",
-    "INDEX {.name name}",
-    " ON {.tbl table} ({.col columns*})"
+    "CREATE {.sql index} {.id name} ON {.tbl table} {.id columns*}"
   )
 }
 
@@ -176,7 +171,7 @@ sql_query_explain <- function(con, sql, ...) {
 }
 #' @export
 sql_query_explain.DBIConnection <- function(con, sql, ...) {
-  glue_sql2(con, "EXPLAIN {sql}")
+  sql_glue2(con, "EXPLAIN {sql}")
 }
 
 #' @rdname db-sql
@@ -215,16 +210,10 @@ sql_query_save.DBIConnection <- function(
   temporary = TRUE,
   ...
 ) {
-  name <- as_table_path(name, con)
+  sql <- as_table_source(sql)
 
-  glue_sql2(
-    con,
-    "CREATE ",
-    if (temporary) sql("TEMPORARY "),
-    "TABLE \n",
-    "{.tbl {name}} AS\n",
-    "{.from sql}"
-  )
+  table <- if (temporary) "TEMPORARY TABLE" else "TABLE"
+  sql_glue2(con, "CREATE {.sql table}\n{.tbl {name}} AS\n{sql}")
 }
 #' @export
 #' @rdname db-sql
@@ -240,15 +229,15 @@ sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
 
   if (is.sql(from)) {
     if (db_supports_table_alias_with_as(con)) {
-      as_sql <- style_kw(" AS ")
+      as_sql <- style_kw("AS ")
     } else {
-      as_sql <- " "
+      as_sql <- ""
     }
 
     from <- sql_indent_subquery(from, con, lvl)
     # some backends, e.g. Postgres, require an alias for a subquery
     name <- name %||% unique_subquery_name()
-    glue_sql2(con, "{from}", as_sql, "{.tbl name}")
+    sql_glue2(con, "{from} {.sql as_sql}{.tbl name}")
   } else {
     # must be a table_path
     if (!is.null(name)) {
@@ -291,7 +280,7 @@ sql_query_rows <- function(con, sql, ...) {
 sql_query_rows.DBIConnection <- function(con, sql, ...) {
   sql <- as_table_source(sql, con)
   from <- dbplyr_sql_subquery(con, sql, "master")
-  glue_sql2(con, "SELECT COUNT(*) FROM {.from from}")
+  sql_glue2(con, "SELECT COUNT(*) FROM {.from from}")
 }
 
 #' @rdname db-sql
@@ -608,10 +597,12 @@ sql_query_semi_join.DBIConnection <- function(
 
   on <- sql_join_tbls(con, by, na_matches = by$na_matches)
 
+  exists <- if (anti) "NOT EXISTS" else "EXISTS"
+
   lines <- list(
     sql_clause_select(con, vars),
     sql_clause_from(x),
-    glue_sql2(con, "WHERE ", if (anti) "NOT ", "EXISTS ("),
+    sql_glue2(con, "WHERE {.sql exists} ("),
     # lvl = 1 because they are basically in a subquery
     sql_clause("SELECT 1 FROM", y, lvl = 1),
     sql_clause_where(c(on, where), lvl = 1),
@@ -999,13 +990,7 @@ sql_query_upsert.DBIConnection <- function(
   updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
   update_name <- sql(escape(ident("updated"), con = con))
 
-  join_by <- list(
-    x = by,
-    y = by,
-    x_as = "updated",
-    y_as = "...y",
-    condition = "="
-  )
+  join_by <- new_join_by(by, x_as = "updated", y_as = "...y")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
 
   clauses <- list2(

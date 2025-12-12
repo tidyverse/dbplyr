@@ -32,8 +32,7 @@ print.semi_join_query <- function(x, ...) {
 
   if (length(x$where)) {
     cat_line("Where:")
-    where <- purrr::map_chr(x$where, as_label)
-    cat_line(indent(paste0(where)))
+    cat_line(indent(x$where))
   }
 
   cat_line("X:")

@@ -252,6 +252,10 @@ as_table_source <- function(
 
 check_table_source <- function(x, arg = caller_arg(x), call = caller_env()) {
   if (!is.sql(x) && !is_table_id(x)) {
-    stop_input_type(x, "a table source (SQL or a table identifier)")
+    stop_input_type(
+      x,
+      "a table source (SQL or a table identifier)",
+      call = call
+    )
   }
 }

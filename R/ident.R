@@ -44,3 +44,14 @@ format.ident <- function(x, ...) {
 #' @rdname ident
 #' @export
 is.ident <- function(x) inherits(x, "ident")
+
+
+as_ident <- function(x) {
+  if (is.ident(x)) {
+    x
+  } else if (is.character(x)) {
+    ident(x)
+  } else {
+    cli::cli_abort("Invalid input", .internal = TRUE)
+  }
+}

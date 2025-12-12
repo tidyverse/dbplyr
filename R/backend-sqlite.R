@@ -39,7 +39,7 @@ db_connection_describe.SQLiteConnection <- function(con, ...) {
 
 #' @export
 sql_query_explain.SQLiteConnection <- function(con, sql, ...) {
-  glue_sql2(con, "EXPLAIN QUERY PLAN {sql}")
+  sql_glue2(con, "EXPLAIN QUERY PLAN {sql}")
 }
 
 #' @export
@@ -63,17 +63,13 @@ sql_translation.SQLiteConnection <- function(con) {
       as.double = sql_cast("REAL"),
       log = function(x, base = exp(1)) {
         if (base != exp(1)) {
-          sql_expr(log(!!x) / log(!!base))
+          sql_glue("LOG({x}) / LOG({base})")
         } else {
-          sql_expr(log(!!x))
+          sql_glue("LOG({x})")
         }
       },
-      paste = sql_paste_infix(" ", "||", function(x) {
-        sql_expr(cast(!!x %as% text))
-      }),
-      paste0 = sql_paste_infix("", "||", function(x) {
-        sql_expr(cast(!!x %as% text))
-      }),
+      paste = sql_paste_infix(" ", "||"),
+      paste0 = sql_paste_infix("", "||"),
       # https://www.sqlite.org/lang_corefunc.html#maxoreunc
       pmin = sql_aggregate_n("MIN", "pmin"),
       pmax = sql_aggregate_n("MAX", "pmax"),
@@ -81,7 +77,7 @@ sql_translation.SQLiteConnection <- function(con) {
       runif = function(n = n(), min = 0, max = 1) {
         # https://stackoverflow.com/a/23785593/7529482
         sql_runif(
-          (0.5 + RANDOM() / 18446744073709551616.0),
+          "(0.5 + RANDOM() / 18446744073709551616.0)",
           n = {{ n }},
           min = min,
           max = max
@@ -90,19 +86,18 @@ sql_translation.SQLiteConnection <- function(con) {
 
       # lubridate,
       today = function() {
-        date <- \(x) {} # suppress R CMD check note
-        sql_expr(date("now"))
+        sql_glue("DATE('now')")
       },
-      now = \() sql_expr(datetime("now")),
+      now = \() sql_glue("DATETIME('now')"),
       # https://modern-sql.com/feature/extract#proprietary-strftime
-      year = \(x) sql_expr(cast(strftime("%Y", !!x) %as% NUMERIC)),
-      month = \(x) sql_expr(cast(strftime("%m", !!x) %as% NUMERIC)),
-      mday = \(x) sql_expr(cast(strftime("%d", !!x) %as% NUMERIC)),
-      day = \(x) sql_expr(cast(strftime("%d", !!x) %as% NUMERIC)),
-      hour = \(x) sql_expr(cast(strftime("%H", !!x) %as% NUMERIC)),
-      minute = \(x) sql_expr(cast(strftime("%M", !!x) %as% NUMERIC)),
-      second = \(x) sql_expr(cast(strftime("%f", !!x) %as% REAL)),
-      yday = \(x) sql_expr(cast(strftime("%j", !!x) %as% NUMERIC)),
+      year = \(x) sql_glue("CAST(STRFTIME('%Y', {x}) AS NUMERIC)"),
+      month = \(x) sql_glue("CAST(STRFTIME('%m', {x}) AS NUMERIC)"),
+      mday = \(x) sql_glue("CAST(STRFTIME('%d', {x}) AS NUMERIC)"),
+      day = \(x) sql_glue("CAST(STRFTIME('%d', {x}) AS NUMERIC)"),
+      hour = \(x) sql_glue("CAST(STRFTIME('%H', {x}) AS NUMERIC)"),
+      minute = \(x) sql_glue("CAST(STRFTIME('%M', {x}) AS NUMERIC)"),
+      second = \(x) sql_glue("CAST(STRFTIME('%f', {x}) AS REAL)"),
+      yday = \(x) sql_glue("CAST(STRFTIME('%j', {x}) AS NUMERIC)"),
     ),
     sql_translator(
       .parent = base_agg,
@@ -133,7 +128,7 @@ sql_escape_logical.SQLiteConnection <- function(con, x) {
 #' @export
 sql_expr_matches.SQLiteConnection <- function(con, x, y, ...) {
   # https://sqlite.org/lang_expr.html#isisnot
-  glue_sql2(con, "{x} IS {y}")
+  sql_glue2(con, "{x} IS {y}")
 }
 
 #' @export
@@ -158,5 +153,3 @@ supports_window_clause.SQLiteConnection <- function(con) {
 db_supports_table_alias_with_as.SQLiteConnection <- function(con) {
   TRUE
 }
-
-utils::globalVariables(c("datetime", "NUMERIC", "REAL"))

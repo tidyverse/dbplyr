@@ -28,6 +28,8 @@ Note that databases don't really have a sense of row order, so what "first"
 means is subject to interpretation. Most databases will respect ordering
 performed with \code{arrange()}, but it's not guaranteed. \code{tail()} is not
 supported at all because the situation is even murkier for the "last" rows.
+Additionally, \code{LIMIT} clauses can not generally appear in subqueries, which
+means that you should use \code{head()} as late as possible in your pipelines.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)

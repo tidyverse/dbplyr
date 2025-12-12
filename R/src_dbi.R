@@ -21,6 +21,9 @@
 #'   recommend using `I()` to identify a table outside the default catalog or
 #'   schema, e.g. `I("schema.table")` or `I("catalog.schema.table")`. You can
 #'   also use [in_schema()]/[in_catalog()] or [DBI::Id()].
+#' @param vars Optionally, provide a character vector of column names. If
+#'   not supplied, will be retrieved from the database by running a simple
+#'   query. Mainly useful for better performance when creating many `tbl`s.
 #' @param ... Passed on to [tbl_sql()]
 #' @export
 #' @examples
@@ -83,19 +86,26 @@
 #' }
 #' @importFrom dplyr tbl
 #' @aliases tbl_dbi
-tbl.src_dbi <- function(src, from, ...) {
-  subclass <- class(src$con)[[1]] # prefix added by dplyr::make_tbl
-  tbl_sql(c(subclass, "dbi"), src = src, from = from, ...)
+tbl.src_dbi <- function(src, from, vars = NULL, ...) {
+  check_dots_empty()
+  db_table(src$con, from, vars = vars)
 }
 
-# Internal calls to `tbl()` should be avoided in favor of tbl_src_dbi().
-# The former may query the database for column names if `vars` is omitted,
-# the latter always requires `vars`.
-tbl_src_dbi <- function(src, from, vars) {
-  force(vars)
-  tbl(src, from, vars = vars)
-}
+db_table <- function(
+  con,
+  from,
+  vars = NULL,
+  subclass = NULL,
+  call = caller_env()
+) {
+  check_con(con)
+  source <- as_table_source(from, con = con, error_call = call)
 
+  check_character(vars, allow_null = TRUE, call = call)
+  vars <- vars %||% find_variables(con, from, call = call)
+
+  new_tbl_sql(con = con, source = source, vars = vars, subclass = subclass)
+}
 
 #' Database src
 #'

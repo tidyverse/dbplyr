@@ -195,10 +195,7 @@ sql_data_mask <- function(
   idents <- lapply(names, ident)
   name_env <- ceply(idents, escape, con = con, parent = special_calls2)
 
-  # Known sql expressions
-  symbol_env <- env_clone(base_symbols, parent = name_env)
-
-  new_data_mask(symbol_env, top_env)
+  new_data_mask(name_env, top_env)
 }
 
 is_infix_base <- function(x) {

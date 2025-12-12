@@ -80,11 +80,9 @@ reference:
 
 - title: SQL generation
   contents:
-  - build_sql
   - escape
-  - partial_eval
   - sql
-  - sql_expr
+  - sql_glue
   - translate_sql
   - window_order
   - sql_options
@@ -96,7 +94,7 @@ reference:
   - db-misc
   - db-sql
   - db-quote
-  - glue_sql2
+  - sql_glue2
   - sql_variant
   - sql_query_insert
   - sql_translation_scalar
