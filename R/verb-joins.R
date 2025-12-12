@@ -480,8 +480,15 @@ add_join <- function(
   x_lq
 }
 
-join_inline_select <- function(lq, by, on) {
-  if (is_empty(on) && is_lazy_select_query_simple(lq, select = "projection")) {
+join_inline_select <- function(lq, by, on, semi = FALSE) {
+  can_inline <- is_lazy_select_query_simple(
+    lq,
+    ignore_where = semi,
+    ignore_group_by = semi,
+    select = "projection"
+  )
+
+  if (is_empty(on) && can_inline) {
     vars <- purrr::map_chr(lq$select$expr, as_string)
 
     # Rename join by columns if needed
@@ -494,14 +501,18 @@ join_inline_select <- function(lq, by, on) {
     lq$group_vars <- op_grps(lq_org)
     lq$order_vars <- op_sort(lq_org)
     lq$frame <- op_frame(lq_org)
+
+    where <- if (semi) lq_org$where
   } else {
     vars <- op_vars(lq)
+    where <- NULL
   }
 
   list(
     lq = lq,
     vars = vars,
-    by = by
+    by = by,
+    where = where
   )
 }
 
@@ -699,7 +710,7 @@ add_semi_join <- function(
   x_vars <- inline_result$vars
   by$x <- inline_result$by
 
-  inline_result <- semi_join_inline_select(y$lazy_query, by$y, sql_on)
+  inline_result <- join_inline_select(y$lazy_query, by$y, sql_on, semi = TRUE)
   y_lq <- inline_result$lq
   by$y <- inline_result$by
   where <- inline_result$where
@@ -729,44 +740,6 @@ add_semi_join <- function(
     by = by,
     where = where,
     call = call
-  )
-}
-
-can_inline_semi_join <- function(x) {
-  is_lazy_select_query_simple(
-    x,
-    ignore_where = TRUE,
-    ignore_group_by = TRUE,
-    select = "projection"
-  )
-}
-
-semi_join_inline_select <- function(lq, by, on) {
-  if (is_empty(on) && can_inline_semi_join(lq)) {
-    vars <- purrr::map_chr(lq$select$expr, as_string)
-
-    # Rename join by columns if needed
-    idx <- match(by, lq$select$name)
-    matched <- !is.na(idx)
-    by[matched] <- vars[idx[matched]]
-
-    lq_org <- lq
-    lq <- lq$x
-    lq$group_vars <- op_grps(lq_org)
-    lq$order_vars <- op_sort(lq_org)
-    lq$frame <- op_frame(lq_org)
-
-    where <- lq_org$where
-  } else {
-    vars <- op_vars(lq)
-    where <- NULL
-  }
-
-  list(
-    lq = lq,
-    vars = vars,
-    by = by,
-    where = where
   )
 }
 
