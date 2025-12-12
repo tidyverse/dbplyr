@@ -75,7 +75,7 @@ results to R. You can see the query with <code><a href="show_query.html">show_qu
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'src_dbi'</span></span>
-<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html" class="external-link">tbl</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">from</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html" class="external-link">tbl</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">from</span>, vars <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -92,6 +92,12 @@ results to R. You can see the query with <code><a href="show_query.html">show_qu
 recommend using <code><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I()</a></code> to identify a table outside the default catalog or
 schema, e.g. <code>I("schema.table")</code> or <code>I("catalog.schema.table")</code>. You can
 also use <code><a href="in_schema.html">in_schema()</a></code>/<code><a href="in_schema.html">in_catalog()</a></code> or <code><a href="https://dbi.r-dbi.org/reference/Id.html" class="external-link">DBI::Id()</a></code>.</p></dd>
+
+
+<dt id="arg-vars">vars<a class="anchor" aria-label="anchor" href="#arg-vars"></a></dt>
+<dd><p>Optionally, provide a character vector of column names. If
+not supplied, will be retrieved from the database by running a simple
+query. Mainly useful for better performance when creating many <code>tbl</code>s.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

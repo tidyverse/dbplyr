@@ -1,8 +1,10 @@
 # Create an SQL tbl (abstract)
 
-Generally, you should no longer need to provide a custom
-[`tbl()`](https://dplyr.tidyverse.org/reference/tbl.html) method. The
-default `tbl.DBIConnect` method should work in most cases.
+**\[deprecated\]**
+
+This function is no longer needed, since backends don't need to create
+their own custom classes. Instead, rely on the default
+`tbl.DBIConnection()` method.
 
 ## Usage
 
@@ -16,15 +18,32 @@ tbl_sql(subclass, src, from, ..., vars = NULL, check_from = deprecated())
 
   name of subclass
 
+- src:
+
+  A `DBIConnection` object produced by
+  [`DBI::dbConnect()`](https://dbi.r-dbi.org/reference/dbConnect.html).
+
+- from:
+
+  Either a table identifier or a literal
+  [`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md) string.
+
+  Use a string to identify a table in the current schema/catalog. We
+  recommend using [`I()`](https://rdrr.io/r/base/AsIs.html) to identify
+  a table outside the default catalog or schema, e.g.
+  `I("schema.table")` or `I("catalog.schema.table")`. You can also use
+  [`in_schema()`](https://dbplyr.tidyverse.org/dev/reference/in_schema.md)/[`in_catalog()`](https://dbplyr.tidyverse.org/dev/reference/in_schema.md)
+  or [`DBI::Id()`](https://dbi.r-dbi.org/reference/Id.html).
+
 - ...:
 
   needed for agreement with generic. Not otherwise used.
 
 - vars:
 
-  Provide column names as a character vector to avoid retrieving them
-  from the database. Mainly useful for better performance when creating
-  multiple `tbl` objects.
+  Optionally, provide a character vector of column names. If not
+  supplied, will be retrieved from the database by running a simple
+  query. Mainly useful for better performance when creating many `tbl`s.
 
 - check_from:
 

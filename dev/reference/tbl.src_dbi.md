@@ -14,7 +14,7 @@ to retrieve the results to R. You can see the query with
 
 ``` r
 # S3 method for class 'src_dbi'
-tbl(src, from, ...)
+tbl(src, from, vars = NULL, ...)
 ```
 
 ## Arguments
@@ -35,6 +35,12 @@ tbl(src, from, ...)
   `I("schema.table")` or `I("catalog.schema.table")`. You can also use
   [`in_schema()`](https://dbplyr.tidyverse.org/dev/reference/in_schema.md)/[`in_catalog()`](https://dbplyr.tidyverse.org/dev/reference/in_schema.md)
   or [`DBI::Id()`](https://dbi.r-dbi.org/reference/Id.html).
+
+- vars:
+
+  Optionally, provide a character vector of column names. If not
+  supplied, will be retrieved from the database by running a simple
+  query. Mainly useful for better performance when creating many `tbl`s.
 
 - ...:
 

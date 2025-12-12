@@ -2,6 +2,8 @@
 
 ## dbplyr (development version)
 
+- [`tbl_sql()`](https://dbplyr.tidyverse.org/dev/reference/tbl_sql.md)
+  is now (soft) deprecated. It hasn’t been required in a while.
 - The print method no longer mentions the “source” in the header,
   because it’s an outdated dplyr concept
   ([\#897](https://github.com/tidyverse/dbplyr/issues/897)).
