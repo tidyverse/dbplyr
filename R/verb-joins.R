@@ -745,8 +745,7 @@ semi_join_inline_select <- function(lq, by, on) {
   if (is_empty(on) && can_inline_semi_join(lq)) {
     vars <- purrr::map_chr(lq$select$expr, as_string)
 
-    # Use match(by, names) instead of vec_match(names, by) to handle
-    # duplicate column names in `by` (e.g., from `between(x, z, z)`)
+    # Rename join by columns if needed
     idx <- match(by, lq$select$name)
     matched <- !is.na(idx)
     by[matched] <- vars[idx[matched]]
