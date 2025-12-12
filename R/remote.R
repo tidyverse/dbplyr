@@ -92,7 +92,7 @@ remote_src <- function(x) {
 #' @export
 #' @rdname remote_name
 remote_con <- function(x) {
-  x$src$con
+  x$con
 }
 
 #' @export

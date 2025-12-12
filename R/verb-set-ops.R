@@ -111,7 +111,7 @@ add_set_op <- function(
 }
 
 check_set_op_sqlite <- function(x, y, call) {
-  if (inherits(x$src$con, "SQLiteConnection")) {
+  if (inherits(x$con, "SQLiteConnection")) {
     # LIMIT only part the compound-select-statement not the select-core.
     #
     # https://www.sqlite.org/syntax/compound-select-stmt.html

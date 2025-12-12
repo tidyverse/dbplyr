@@ -377,7 +377,7 @@ add_join <- function(
     indexes = if (auto_index) list(by$y)
   )
 
-  suffix <- suffix %||% sql_join_suffix(x$src$con, suffix)
+  suffix <- suffix %||% sql_join_suffix(x$con, suffix)
   vars <- join_cols(
     x_names = x_names,
     y_names = y_names,
@@ -392,7 +392,7 @@ add_join <- function(
   # the table alias can only be determined after `select()` was inlined.
   # This works even though `by` is used in `join_inline_select()` and updated
   # because this does not touch `by$x_as` and `by$y_as`.
-  join_alias <- make_join_aliases(x$src$con, x_as, y_as, sql_on, call)
+  join_alias <- make_join_aliases(x$con, x_as, y_as, sql_on, call)
 
   inline_result <- join_inline_select(x$lazy_query, by$x, by$on)
   x_lq <- inline_result$lq
@@ -709,7 +709,7 @@ add_semi_join <- function(
   by$na_matches <- na_matches
 
   # the table alias can only be determined after `select()` was inlined
-  join_alias <- make_join_aliases(x$src$con, x_as, y_as, sql_on, call)
+  join_alias <- make_join_aliases(x$con, x_as, y_as, sql_on, call)
 
   aliases <- vctrs::vec_rbind(
     make_table_names(join_alias$x, x_lq),
