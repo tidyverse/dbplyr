@@ -2,6 +2,10 @@
 
 ## dbplyr (development version)
 
+- SQL Server uses `DATEDIFF_BIG` instead of `DATEDIFF` to work
+  regardless of data size
+  ([@edward-burn](https://github.com/edward-burn),
+  [\#1666](https://github.com/tidyverse/dbplyr/issues/1666)).
 - `na_matches = "na"` now works correctly with inequality and overlap
   joins, preserving the comparison operator instead of converting to
   equality ([\#1505](https://github.com/tidyverse/dbplyr/issues/1505)).
