@@ -205,3 +205,55 @@ sql_escape_datetime.ACCESS <- function(con, x) {
 supports_window_clause.ACCESS <- function(con) {
   TRUE
 }
+
+# MS Access requires parentheses around chained joins
+# https://github.com/tidyverse/dbplyr/issues/1576
+#' @export
+sql_query_multi_join.ACCESS <- function(
+  con,
+  x,
+  joins,
+  table_names,
+  by_list,
+  select,
+  ...,
+  lvl = 0
+) {
+  if (vctrs::vec_duplicate_any(table_names)) {
+    cli_abort("{.arg table_names} must be unique.")
+  }
+
+  from <- dbplyr_sql_subquery(con, x, name = table_names[[1]], lvl = lvl)
+  types <- toupper(paste0(joins$type, " JOIN"))
+
+  n_joins <- length(types)
+
+  # MS Access requires: ((t1 JOIN t2 ON ...) JOIN t3 ON ...)
+  # N joins need N opening parens, each ON clause followed by closing paren
+  open_parens <- strrep("(", n_joins)
+  from <- sql(paste0(open_parens, from))
+
+  for (i in seq_len(n_joins)) {
+    table <- dbplyr_sql_subquery(
+      con,
+      joins$table[[i]],
+      name = table_names[[i + 1]],
+      lvl = lvl
+    )
+    by <- joins$by[[i]]
+    on <- sql_join_tbls(con, by = by, na_matches = by$na_matches)
+
+    from <- sql(paste0(
+      paste0(from, "\n"),
+      paste0(types[[i]], " ", table, "\n"),
+      paste0("ON ", on, ")")
+    ))
+  }
+
+  clauses <- list(
+    sql_clause_select(con, select),
+    sql_clause_from(from)
+  )
+
+  sql_format_clauses(clauses, lvl = lvl, con = con)
+}
