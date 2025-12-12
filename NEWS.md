@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* `na_matches = "na"` now works correctly with inequality and overlap joins, preserving the comparison operator instead of converting to equality (#1505).
 * The print method no longer mentions the "source" in the header, because it's an outdated dplyr concept (#897).
 * New `sql_glue()` and `sql_glue2()` provide a convenient syntax for building SQL strings. These functions replace the now superseded `build_sql()`, `sql_expr()`, and `sql_call2()`. (#1249).
 * `fill()` now errors if you attempt to rename a column, for consistency with dplyr (#1536)

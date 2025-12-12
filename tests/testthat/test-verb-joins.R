@@ -1192,6 +1192,11 @@ test_that("can optionally match NA values", {
   lf2 <- lazy_frame(x = 1, .name = "lf2", con = con)
   expect_snapshot(left_join(lf1, lf2, by = "x", na_matches = "na"))
   expect_snapshot(semi_join(lf1, lf2, by = "x", na_matches = "na"))
+
+  # even with non-equi conditions #1505
+  lf3 <- lazy_frame(lower = 1, upper = 2, .name = "lf3")
+  by <- join_by(between(x, lower, upper))
+  expect_snapshot(left_join(lf1, lf3, by = by, na_matches = "na"))
 })
 
 test_that("join captures both tables", {
