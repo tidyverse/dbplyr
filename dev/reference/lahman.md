@@ -80,7 +80,7 @@ if (has_lahman("sqlite")) {
 #> Creating table: TeamsFranchises
 #> Creating table: TeamsHalf
 #> # A query:  ?? x 22
-#> # Database: sqlite 3.51.1 [/tmp/RtmpoemuFj/lahman.sqlite]
+#> # Database: sqlite 3.51.1 [/tmp/RtmpudEF8J/lahman.sqlite]
 #>    playerID  yearID stint teamID lgID      G    AB     R     H   X2B
 #>    <chr>      <int> <int> <chr>  <chr> <int> <int> <int> <int> <int>
 #>  1 aardsda01   2004     1 SFN    NL       11     0     0     0     0

@@ -2,6 +2,8 @@
 
 ## dbplyr (development version)
 
+- `join_by(between())` now correctly handles column renames
+  ([\#1572](https://github.com/tidyverse/dbplyr/issues/1572)).
 - SQL Server uses `DATEDIFF_BIG` instead of `DATEDIFF` to work
   regardless of data size
   ([@edward-burn](https://github.com/edward-burn),
