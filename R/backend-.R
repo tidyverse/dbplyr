@@ -212,6 +212,7 @@ base_scalar <- sql_translator(
   # Postgres - https://www.postgresql.org/docs/8.4/static/datatype-numeric.html
   # Impala - https://impala.apache.org/docs/build/html/topics/impala_bigint.html
   as.integer64 = sql_cast("BIGINT"),
+  as.blob = sql_cast("BLOB"),
 
   c = function(...) {
     c(...)

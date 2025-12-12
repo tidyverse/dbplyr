@@ -33,6 +33,22 @@
         VALUES (1, 1, 1.5, 'a', '2020-01-01', '2020-01-01T01:23:45Z')
       ) AS `values_table`
 
+# can translate blob columns
+
+    Code
+      show_query(db)
+    Output
+      <SQL>
+      SELECT CAST(`x` AS BLOB) AS `x`
+      FROM (
+        SELECT NULL AS `x`
+        WHERE (0 = 1)
+      
+        UNION ALL
+      
+        VALUES ((X'616263')), ((X'646566'))
+      ) AS `values_table`
+
 # can translate 1-column tables
 
     Code
