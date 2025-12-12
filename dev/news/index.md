@@ -2,6 +2,9 @@
 
 ## dbplyr (development version)
 
+- [`copy_inline()`](https://dbplyr.tidyverse.org/dev/reference/copy_inline.md)
+  now works with blob columns
+  ([\#1515](https://github.com/tidyverse/dbplyr/issues/1515)).
 - [`tbl_sql()`](https://dbplyr.tidyverse.org/dev/reference/tbl_sql.md)
   is now (soft) deprecated. It hasn’t been required in a while.
 - The print method no longer mentions the “source” in the header,

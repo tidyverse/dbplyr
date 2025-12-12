@@ -58,6 +58,8 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
 <ul><li>
+<code><a href="../reference/copy_inline.html">copy_inline()</a></code> now works with blob columns (<a href="https://github.com/tidyverse/dbplyr/issues/1515" class="external-link">#1515</a>).</li>
+<li>
 <code><a href="../reference/tbl_sql.html">tbl_sql()</a></code> is now (soft) deprecated. It hasn’t been required in a while.</li>
 <li>The print method no longer mentions the “source” in the header, because it’s an outdated dplyr concept (<a href="https://github.com/tidyverse/dbplyr/issues/897" class="external-link">#897</a>).</li>
 <li>New <code><a href="../reference/sql_glue.html">sql_glue()</a></code> and <code><a href="../reference/sql_glue.html">sql_glue2()</a></code> provide a convenient syntax for building SQL strings. These functions replace the now superseded <code><a href="../reference/build_sql.html">build_sql()</a></code>, <code><a href="../reference/sql_expr.html">sql_expr()</a></code>, and <code><a href="../reference/sql_expr.html">sql_call2()</a></code>. (<a href="https://github.com/tidyverse/dbplyr/issues/1249" class="external-link">#1249</a>).</li>
