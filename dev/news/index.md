@@ -2,6 +2,9 @@
 
 ## dbplyr (development version)
 
+- `na_matches = "na"` now works correctly with inequality and overlap
+  joins, preserving the comparison operator instead of converting to
+  equality ([\#1505](https://github.com/tidyverse/dbplyr/issues/1505)).
 - [`copy_inline()`](https://dbplyr.tidyverse.org/dev/reference/copy_inline.md)
   now works with blob columns
   ([\#1515](https://github.com/tidyverse/dbplyr/issues/1515)).
