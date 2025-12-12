@@ -484,8 +484,10 @@ join_inline_select <- function(lq, by, on) {
   if (is_empty(on) && is_lazy_select_query_simple(lq, select = "projection")) {
     vars <- purrr::map_chr(lq$select$expr, as_string)
 
-    idx <- vctrs::vec_match(lq$select$name, by)
-    by <- vctrs::vec_assign(by, idx, vars)
+    # Rename join by columns if needed
+    idx <- match(by, lq$select$name)
+    matched <- !is.na(idx)
+    by[matched] <- vars[idx[matched]]
 
     lq_org <- lq
     lq <- lq$x
@@ -743,8 +745,11 @@ semi_join_inline_select <- function(lq, by, on) {
   if (is_empty(on) && can_inline_semi_join(lq)) {
     vars <- purrr::map_chr(lq$select$expr, as_string)
 
-    idx <- vctrs::vec_match(lq$select$name, by)
-    by <- vctrs::vec_assign(by, idx, vars)
+    # Use match(by, names) instead of vec_match(names, by) to handle
+    # duplicate column names in `by` (e.g., from `between(x, z, z)`)
+    idx <- match(by, lq$select$name)
+    matched <- !is.na(idx)
+    by[matched] <- vars[idx[matched]]
 
     lq_org <- lq
     lq <- lq$x
