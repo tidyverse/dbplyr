@@ -70,7 +70,9 @@ db_sql_render.DBIConnection <- function(
   cte = FALSE,
   sql_options = NULL
 ) {
-  sql_render(sql, con = con, ..., sql_options = sql_options)
+  out <- sql_render(sql, con = con, ..., sql_options = sql_options)
+  the$last_sql <- out
+  out
 }
 
 #' @rdname db-misc

@@ -106,3 +106,21 @@ remote_query <- function(x, cte = FALSE, sql_options = NULL) {
 remote_query_plan <- function(x, ...) {
   dbplyr_explain(remote_con(x), db_sql_render(remote_con(x), x$lazy_query), ...)
 }
+
+#' Retrieve the last SQL query generated
+#'
+#' This is a helper function that retrieves the most recent SQL query generated
+#' by dbplyr, which can be useful for debugging.
+#'
+#' @return A SQL string, or `NULL` if no query has been generated yet.
+#' @export
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' df <- lazy_frame(x = 1:3)
+#' df |> filter(x > 1)
+#'
+#' last_sql()
+last_sql <- function() {
+  the$last_sql
+}

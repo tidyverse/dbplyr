@@ -28,6 +28,7 @@ reference:
   - copy_inline
   - pull.tbl_sql
   - show_query
+  - last_sql
 
 - subtitle: Verbs that affect rows
   contents:
