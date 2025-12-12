@@ -12,6 +12,10 @@ sql <- function(...) {
   structure(x, class = c("sql", "character"))
 }
 
+sql_c <- function(...) {
+  sql(paste0(unlist(list(...)), collapse = ""))
+}
+
 #' @export
 `[.sql` <- function(x, i) {
   sql(NextMethod())
