@@ -7,8 +7,9 @@
 simulate_mssql(version = "15.0")
 }
 \arguments{
-\item{version}{Version of MS SQL to simulate. Currently only, difference is
-that 15.0 and above will use \code{TRY_CAST()} instead of \code{CAST()}.}
+\item{version}{Version of MS SQL to simulate. Currently, 11.0 and above
+will use \code{TRY_CAST()} instead of \code{CAST()}, and 17.0 and above will
+support regular expression patterns in stringr functions.}
 }
 \description{
 See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
@@ -22,6 +23,12 @@ yourself to avoid the message.
 \item Custom types for \verb{as.*} functions
 \item Lubridate extraction functions, \code{year()}, \code{month()}, \code{day()} etc
 \item Semi-automated bit <-> boolean translation (see below)
+\item stringr functions \code{str_detect()}, \code{str_starts()}, \code{str_ends()} with
+\code{fixed()} patterns work on all versions; regular expression patterns
+require SQL Server 2025+ (version 17.0)
+\item stringr functions \code{str_replace()}, \code{str_replace_all()}, \code{str_remove()},
+\code{str_remove_all()}, \code{str_extract()}, and \code{str_count()} require SQL Server
+2025+ (version 17.0)
 }
 
 Use \code{simulate_mssql()} with \code{lazy_frame()} to see simulated SQL without

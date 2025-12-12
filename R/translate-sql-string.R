@@ -116,7 +116,7 @@ sql_str_pattern_switch <- function(
   } else {
     if (is_null(f_regex)) {
       cli_abort(
-        "Only fixed patterns are supported on database backends.",
+        "Only fixed patterns are supported on this backend.",
         call = error_call
       )
     } else {

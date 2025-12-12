@@ -12,6 +12,12 @@
 #' - Custom types for `as.*` functions
 #' - Lubridate extraction functions, `year()`, `month()`, `day()` etc
 #' - Semi-automated bit <-> boolean translation (see below)
+#' - stringr functions `str_detect()`, `str_starts()`, `str_ends()` with
+#'   `fixed()` patterns work on all versions; regular expression patterns
+#'   require SQL Server 2025+ (version 17.0)
+#' - stringr functions `str_replace()`, `str_replace_all()`, `str_remove()`,
+#'   `str_remove_all()`, `str_extract()`, and `str_count()` require SQL Server
+#'   2025+ (version 17.0)
 #'
 #' Use `simulate_mssql()` with `lazy_frame()` to see simulated SQL without
 #' converting to live access database.
@@ -36,8 +42,9 @@
 #' * To convert from bit to boolean use `x == 1`
 #' * To convert from boolean to bit use `as.logical(if(x, 0, 1))`
 #'
-#' @param version Version of MS SQL to simulate. Currently only, difference is
-#'   that 15.0 and above will use `TRY_CAST()` instead of `CAST()`.
+#' @param version Version of MS SQL to simulate. Currently, 11.0 and above
+#'   will use `TRY_CAST()` instead of `CAST()`, and 17.0 and above will
+#'   support regular expression patterns in stringr functions.
 #' @name backend-mssql
 #' @aliases NULL
 #' @examples
@@ -345,6 +352,31 @@ simulate_mssql <- function(version = "15.0") {
       str_ilike = function(string, pattern) {
         sql_glue("{string} COLLATE Latin1_General_100_CI_AS LIKE {pattern}")
       },
+      # Fixed pattern support for all SQL Server versions (regex requires 2025+)
+      str_detect = function(string, pattern, negate = FALSE) {
+        sql_str_pattern_switch(
+          string = string,
+          pattern = {{ pattern }},
+          negate = negate,
+          f_fixed = mssql_str_detect("detect")
+        )
+      },
+      str_starts = function(string, pattern, negate = FALSE) {
+        sql_str_pattern_switch(
+          string = string,
+          pattern = {{ pattern }},
+          negate = negate,
+          f_fixed = mssql_str_detect("start")
+        )
+      },
+      str_ends = function(string, pattern, negate = FALSE) {
+        sql_str_pattern_switch(
+          string = string,
+          pattern = {{ pattern }},
+          negate = negate,
+          f_fixed = mssql_str_detect("end")
+        )
+      },
       # no built in function: https://stackoverflow.com/questions/230138
       str_to_title = sql_not_supported("str_to_title"),
       # https://docs.microsoft.com/en-us/sql/t-sql/functions/substring-transact-sql?view=sql-server-ver15
@@ -453,6 +485,79 @@ simulate_mssql <- function(version = "15.0") {
       as.character = sql_try_cast("VARCHAR(MAX)"),
       as_date = sql_try_cast("DATE"),
       as_datetime = sql_try_cast("DATETIME2")
+    )
+  }
+
+  if (mssql_version(con) >= "17.0") {
+    # MSSQL 2025 - regex functions
+    # https://learn.microsoft.com/en-us/sql/t-sql/functions/regexp-like-transact-sql
+    mssql_scalar <- sql_translator(
+      .parent = mssql_scalar,
+      str_detect = function(string, pattern, negate = FALSE) {
+        sql_str_pattern_switch(
+          string = string,
+          pattern = {{ pattern }},
+          negate = negate,
+          f_fixed = mssql_str_detect("detect"),
+          f_regex = function(string, pattern, negate = FALSE) {
+            if (isTRUE(negate)) {
+              mssql_as_bit(sql_glue("NOT REGEXP_LIKE({string}, {pattern})"))
+            } else {
+              mssql_as_bit(sql_glue("REGEXP_LIKE({string}, {pattern})"))
+            }
+          }
+        )
+      },
+      str_starts = function(string, pattern, negate = FALSE) {
+        sql_str_pattern_switch(
+          string = string,
+          pattern = {{ pattern }},
+          negate = negate,
+          f_fixed = mssql_str_detect("start"),
+          f_regex = function(string, pattern, negate = FALSE) {
+            pattern <- sql_glue("'^' + {pattern}")
+            if (isTRUE(negate)) {
+              mssql_as_bit(sql_glue("NOT REGEXP_LIKE({string}, {pattern})"))
+            } else {
+              mssql_as_bit(sql_glue("REGEXP_LIKE({string}, {pattern})"))
+            }
+          }
+        )
+      },
+      str_ends = function(string, pattern, negate = FALSE) {
+        sql_str_pattern_switch(
+          string = string,
+          pattern = {{ pattern }},
+          negate = negate,
+          f_fixed = mssql_str_detect("end"),
+          f_regex = function(string, pattern, negate = FALSE) {
+            pattern <- sql_glue("{pattern} + '$'")
+            if (isTRUE(negate)) {
+              mssql_as_bit(sql_glue("NOT REGEXP_LIKE({string}, {pattern})"))
+            } else {
+              mssql_as_bit(sql_glue("REGEXP_LIKE({string}, {pattern})"))
+            }
+          }
+        )
+      },
+      str_replace = function(string, pattern, replacement) {
+        sql_glue("REGEXP_REPLACE({string}, {pattern}, {replacement}, 1, 1)")
+      },
+      str_replace_all = function(string, pattern, replacement) {
+        sql_glue("REGEXP_REPLACE({string}, {pattern}, {replacement})")
+      },
+      str_remove = function(string, pattern) {
+        sql_glue("REGEXP_REPLACE({string}, {pattern}, '', 1, 1)")
+      },
+      str_remove_all = function(string, pattern) {
+        sql_glue("REGEXP_REPLACE({string}, {pattern}, '')")
+      },
+      str_extract = function(string, pattern) {
+        sql_glue("REGEXP_SUBSTR({string}, {pattern})")
+      },
+      str_count = function(string, pattern) {
+        sql_glue("REGEXP_COUNT({string}, {pattern})")
+      }
     )
   }
 
@@ -666,6 +771,32 @@ mssql_bit_int_bit <- function(f) {
     )
 
     f_wrapped(x)
+  }
+}
+
+# SQL Server uses CHARINDEX(substring, string) instead of INSTR(string, substring)
+mssql_str_detect <- function(type = c("detect", "start", "end")) {
+  type <- arg_match(type)
+
+  function(string, pattern, negate = FALSE) {
+    index_sql <- sql_glue("CHARINDEX({pattern}, {string})")
+
+    if (negate) {
+      sql <- switch(
+        type,
+        detect = sql_glue("{index_sql} = 0"),
+        start = sql_glue("{index_sql} != 1"),
+        end = sql_glue("{index_sql} != (LEN({string}) - LEN({pattern})) + 1")
+      )
+    } else {
+      sql <- switch(
+        type,
+        detect = sql_glue("{index_sql} > 0"),
+        start = sql_glue("{index_sql} = 1"),
+        end = sql_glue("{index_sql} = (LEN({string}) - LEN({pattern})) + 1")
+      )
+    }
+    mssql_as_bit(sql)
   }
 }
 
