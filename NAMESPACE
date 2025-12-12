@@ -2,7 +2,9 @@
 
 S3method("$",tbl_lazy)
 S3method("[",dbplyr_table_path)
+S3method("[",sql)
 S3method("[[",dbplyr_table_path)
+S3method("[[",sql)
 S3method(add_count,tbl_lazy)
 S3method(anti_join,tbl_lazy)
 S3method(arrange,tbl_lazy)

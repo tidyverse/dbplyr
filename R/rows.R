@@ -763,12 +763,11 @@ target_table <- function(x, in_place) {
 }
 
 rows_prep <- function(con, table, from, by, lvl = 0) {
-  y_name <- "...y"
-  join_by <- list(x = by, y = by, x_as = y_name, y_as = table, condition = "=")
+  join_by <- new_join_by(by, x_as = "...y", y_as = table)
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
 
   list(
-    from = sql_query_wrap(con, from, y_name, lvl = lvl),
+    from = sql_query_wrap(con, from, join_by$x_as, lvl = lvl),
     where = where
   )
 }
@@ -776,7 +775,7 @@ rows_prep <- function(con, table, from, by, lvl = 0) {
 rows_insert_prep <- function(con, table, from, cols, by, lvl = 0) {
   out <- rows_prep(con, table, from, by, lvl = lvl)
 
-  join_by <- list(x = by, y = by, x_as = table, y_as = "...y", condition = "=")
+  join_by <- new_join_by(by, x_as = table, y_as = "...y")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
   out$conflict_clauses <- sql_clause_where_exists(table, where, not = TRUE)
 
