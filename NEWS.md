@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* SQL Server 2025 (version 17.0) now supports stringr regex functions: `str_detect()`, `str_starts()`, `str_ends()`, `str_replace()`, `str_replace_all()`, `str_remove()`, `str_remove_all()`, `str_extract()`, and `str_count()`. Fixed pattern versions of `str_detect()`, `str_starts()`, and `str_ends()` work on all SQL Server versions (#1671).
 * SQL Server uses `DATEDIFF_BIG` instead of `DATEDIFF` to work regardless of data size (@edward-burn, #1666).
 * `na_matches = "na"` now works correctly with inequality and overlap joins, preserving the comparison operator instead of converting to equality (#1505).
 * `copy_inline()` now works with blob columns (#1515).
