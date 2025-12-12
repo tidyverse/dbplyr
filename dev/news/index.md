@@ -22,6 +22,9 @@
   with dplyr ([\#1536](https://github.com/tidyverse/dbplyr/issues/1536))
 - Redshift: fixed syntax error in `date_build()` translation
   ([\#1512](https://github.com/tidyverse/dbplyr/issues/1512)).
+- dbplyr now longer attempts to translate `pi` to `PI()`. This caused
+  problems if you had a column called `pi`
+  ([\#1531](https://github.com/tidyverse/dbplyr/issues/1531)).
 - Ensure `str_like()` and `str_ilike()` have consistent behaviour on SQL
   Server ([@edward-burn](https://github.com/edward-burn),
   [\#1669](https://github.com/tidyverse/dbplyr/issues/1669)).

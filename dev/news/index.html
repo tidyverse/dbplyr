@@ -64,6 +64,7 @@
 <li>
 <code>fill()</code> now errors if you attempt to rename a column, for consistency with dplyr (<a href="https://github.com/tidyverse/dbplyr/issues/1536" class="external-link">#1536</a>)</li>
 <li>Redshift: fixed syntax error in <code>date_build()</code> translation (<a href="https://github.com/tidyverse/dbplyr/issues/1512" class="external-link">#1512</a>).</li>
+<li>dbplyr now longer attempts to translate <code>pi</code> to <code>PI()</code>. This caused problems if you had a column called <code>pi</code> (<a href="https://github.com/tidyverse/dbplyr/issues/1531" class="external-link">#1531</a>).</li>
 <li>Ensure <code>str_like()</code> and <code>str_ilike()</code> have consistent behaviour on SQL Server (<a href="https://github.com/edward-burn" class="external-link">@edward-burn</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1669" class="external-link">#1669</a>).</li>
 <li>SQL Server: <code>if</code>/<code><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse()</a></code>, and <code><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else()</a></code> now use <code>CASE WHEN</code> instead of <code>IIF</code>. This ensures the handling of <code>NULL</code>s matches the R’s <code>NA</code> handling rules (<a href="https://github.com/tidyverse/dbplyr/issues/1569" class="external-link">#1569</a>).</li>
 <li>
