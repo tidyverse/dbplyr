@@ -201,14 +201,15 @@
       out
     Output
       <SQL>
-      SELECT `df_LHS`.*
-      FROM `df` AS `df_LHS`
+      SELECT `df`.*
+      FROM `df`
       WHERE EXISTS (
-        SELECT 1 FROM `df` AS `df_RHS`
-        WHERE
-          (`df_LHS`.`x` = `df_RHS`.`x2`) AND
-          (`df_RHS`.`a` = 1) AND
-          (`df_RHS`.`b` = 2)
+        SELECT 1 FROM (
+        SELECT `x2` AS `x`, `a` AS `a2`, `b`
+        FROM `df`
+        WHERE (`a` = 1) AND (`b` = 2)
+      ) AS `RHS`
+        WHERE (`df`.`x` = `RHS`.`x`)
       )
 
 # filtered aggregates with subsequent select are not inlined away in semi_join (#1474)
@@ -239,10 +240,14 @@
       FROM `df1`
       WHERE NOT EXISTS (
         SELECT 1 FROM (
-        SELECT `df2`.*, ROW_NUMBER() OVER () AS `col01`
-        FROM `df2`
+        SELECT `id`
+        FROM (
+          SELECT `df2`.*, ROW_NUMBER() OVER () AS `col01`
+          FROM `df2`
+        ) AS `q01`
+        WHERE (`col01` <= 3.0)
       ) AS `RHS`
-        WHERE (`df1`.`id` = `RHS`.`id`) AND (`RHS`.`col01` <= 3.0)
+        WHERE (`df1`.`id` = `RHS`.`id`)
       )
 
 # multiple joins create a single query
