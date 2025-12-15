@@ -9,6 +9,12 @@ String basics: paste(), substr(), nchar()
 Custom types for as.* functions
 Lubridate extraction functions, year(), month(), day() etc
 Semi-automated bit &amp;lt;-&amp;gt; boolean translation (see below)
+stringr functions str_detect(), str_starts(), str_ends() with
+fixed() patterns work on all versions; regular expression patterns
+require SQL Server 2025+ (version 17.0)
+stringr functions str_replace(), str_replace_all(), str_remove(),
+str_remove_all(), str_extract(), and str_count() require SQL Server
+2025+ (version 17.0)
 
 
 Use simulate_mssql() with lazy_frame() to see simulated SQL without
@@ -22,6 +28,12 @@ String basics: paste(), substr(), nchar()
 Custom types for as.* functions
 Lubridate extraction functions, year(), month(), day() etc
 Semi-automated bit &amp;lt;-&amp;gt; boolean translation (see below)
+stringr functions str_detect(), str_starts(), str_ends() with
+fixed() patterns work on all versions; regular expression patterns
+require SQL Server 2025+ (version 17.0)
+stringr functions str_replace(), str_replace_all(), str_remove(),
+str_remove_all(), str_extract(), and str_count() require SQL Server
+2025+ (version 17.0)
 
 
 Use simulate_mssql() with lazy_frame() to see simulated SQL without
@@ -91,6 +103,12 @@ yourself to avoid the message.</p></li>
 <li><p>Custom types for <code>as.*</code> functions</p></li>
 <li><p>Lubridate extraction functions, <code>year()</code>, <code>month()</code>, <code>day()</code> etc</p></li>
 <li><p>Semi-automated bit &lt;-&gt; boolean translation (see below)</p></li>
+<li><p>stringr functions <code>str_detect()</code>, <code>str_starts()</code>, <code>str_ends()</code> with
+<code>fixed()</code> patterns work on all versions; regular expression patterns
+require SQL Server 2025+ (version 17.0)</p></li>
+<li><p>stringr functions <code>str_replace()</code>, <code>str_replace_all()</code>, <code>str_remove()</code>,
+<code>str_remove_all()</code>, <code>str_extract()</code>, and <code>str_count()</code> require SQL Server
+2025+ (version 17.0)</p></li>
 </ul><p>Use <code>simulate_mssql()</code> with <code><a href="tbl_lazy.html">lazy_frame()</a></code> to see simulated SQL without
 converting to live access database.</p>
     </div>
@@ -105,8 +123,9 @@ converting to live access database.</p>
 
 
 <dl><dt id="arg-version">version<a class="anchor" aria-label="anchor" href="#arg-version"></a></dt>
-<dd><p>Version of MS SQL to simulate. Currently only, difference is
-that 15.0 and above will use <code>TRY_CAST()</code> instead of <code>CAST()</code>.</p></dd>
+<dd><p>Version of MS SQL to simulate. Currently, 11.0 and above
+will use <code>TRY_CAST()</code> instead of <code>CAST()</code>, and 17.0 and above will
+support regular expression patterns in stringr functions.</p></dd>
 
 </dl></div>
     <div class="section level2">

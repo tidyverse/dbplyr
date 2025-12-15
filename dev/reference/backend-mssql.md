@@ -22,6 +22,14 @@ backend are:
 
 - Semi-automated bit \<-\> boolean translation (see below)
 
+- stringr functions `str_detect()`, `str_starts()`, `str_ends()` with
+  `fixed()` patterns work on all versions; regular expression patterns
+  require SQL Server 2025+ (version 17.0)
+
+- stringr functions `str_replace()`, `str_replace_all()`,
+  `str_remove()`, `str_remove_all()`, `str_extract()`, and `str_count()`
+  require SQL Server 2025+ (version 17.0)
+
 Use `simulate_mssql()` with
 [`lazy_frame()`](https://dbplyr.tidyverse.org/dev/reference/tbl_lazy.md)
 to see simulated SQL without converting to live access database.
@@ -36,8 +44,9 @@ simulate_mssql(version = "15.0")
 
 - version:
 
-  Version of MS SQL to simulate. Currently only, difference is that 15.0
-  and above will use `TRY_CAST()` instead of `CAST()`.
+  Version of MS SQL to simulate. Currently, 11.0 and above will use
+  `TRY_CAST()` instead of `CAST()`, and 17.0 and above will support
+  regular expression patterns in stringr functions.
 
 ## Bit vs boolean
 
