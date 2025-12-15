@@ -48,7 +48,11 @@ If you're interested in how `translate_sql()` is implemented, the basic techniqu
 There are two fundamental differences between R and SQL:
 
 *   `"` and `'` mean different things. 
-    R can use either `"` or `'` for strings, but in ANSI SQL, `"` is used for names and only `'` can be used for strings.
+    R can use either `"` or `'` for strings, but in ANSI SQL, must be `"` used for names and must be `'` used for strings.
+
+    ```{r}
+    lf |> filter(x == "x")
+    ```
 
 *   R and SQL have different defaults for integers and reals.
     In R, 1 is a real, and 1L is an integer. In SQL, 1 is an integer, and 1.0 is a real.
@@ -64,9 +68,15 @@ There are two fundamental differences between R and SQL:
 
 * basic math operators: `+`, `-`, `*`, `/`, `^`
 * trigonometry: `acos()`, `asin()`, `atan()`, `atan2()`, `cos()`, `cot()`, `tan()`, `sin()`
-* hypergeometric: `cosh()`, `coth()`, `sinh()`, `tanh()`
+* hyperbolic: `cosh()`, `coth()`, `sinh()`, `tanh()`
 * logarithmic: `log()`, `log10()`, `exp()`
-* misc: `abs()`, `ceiling()`, `sqrt()`, `sign()`, `round()`
+* misc: `abs()`, `ceiling()`, `floor()`, `sqrt()`, `sign()`, `round()`
+
+```{r}
+lf |> transmute(x = x / 2, y = x^2 + y^2)
+
+lf |> transmute(x = log(x), y = round(y, 1))
+```
 
 ### Modulo arithmetic
 
@@ -74,7 +84,7 @@ dbplyr translates `%%` to the SQL equivalents but note that it's not precisely t
 
 ```{r}
 df <- tibble(
-  x = c(10L, 10L, -10L, -10L), 
+  x = c(10L, 10L, -10L, -10L),
   y = c(3L, -3L, 3L, -3L)
 )
 db <- tbl_memdb(df)
@@ -85,14 +95,58 @@ db |> mutate(x %% y)
 
 dbplyr no longer translates `%/%` because there's no robust cross-database translation available.
 
-### Logical comparisons
+### Logical comparisons and boolean operations
 
-* logical comparisons: `<`, `<=`, `!=`, `>=`, `>`, `==`, `%in%`
+* logical comparisons: `<`, `<=`, `!=`, `>=`, `>`, `==`, `%in%`, `between()`
 * boolean operations: `&`, `&&`, `|`, `||`, `!`, `xor()`
+
+```{r}
+lf |> filter(x > 5 | y == 2)
+
+lf |> filter(x %in% c(1, 2, 3))
+
+lf |> filter(between(x, 1, 5))
+```
+
+### Bitwise operations
+
+`bitwNot()`, `bitwAnd()`, `bitwOr()`, `bitwXor()`, `bitwShiftL()`, and `bitwShiftR()` are all supported:
+
+```{r}
+lf |> transmute(x = bitwAnd(x, 3L), y = bitwShiftL(x, 2L))
+```
+
+### Type coercion
+
+Type coercion functions use the corresponding SQL `CAST()` call:
+
+```{r}
+lf |> transmute(x = as.integer(y), y = as.character(x))
+```
+
+* integer types: `as.integer()`, `as.integer64()`
+* floating point: `as.numeric()`, `as.double()`
+* character: `as.character()`
+* logical: `as.logical()`
+* date/time: `as.Date()`, `as.POSIXct()`
+
+### `NULL`/`NA` handling
+
+* `is.na()`, `is.null()`: test for `NULL`.
+* `na_if()`: replace a value with `NULL`.
+* `coalesce()`: replace `NULL` with a default value.
+
+```{r}
+lf |> filter(!is.na(x))
+
+lf |> transmute(x = coalesce(x, 0L))
+
+lf |> transmute(x = na_if(x, 0L))
+```
 
 ### Aggregation
 
-All databases provide translation for the basic aggregations: `mean()`, `sum()`, `min()`, `max()`, `sd()`, `var()`. Databases automatically drop NULLs (their equivalent of missing values) whereas in R you have to ask nicely. The aggregation functions warn you about this important difference:
+All databases provide translation for the basic aggregations: `mean()`, `sum()`, `min()`, `max()`. Databases automatically drop NULLs (their equivalent of missing values) whereas in R you have to ask nicely. The aggregation functions warn you about this important difference:
 
 ```{r}
 lf |> summarise(z = mean(x))
@@ -106,19 +160,87 @@ lf |> mutate(z = mean(x, na.rm = TRUE))
 lf |> filter(mean(x, na.rm = TRUE) > 0)
 ```
 
+Most backends also support:
+
+* `sd()`, `var()`, `cor()`, `cov()`
+* `median()`, `quantile()`
+* `n()`, `n_distinct()`
+* `all()`, `any()`
+* `str_flatten()`
+
 ### Conditional evaluation
 
-`if` and `switch()` are translated to `CASE WHEN`:
+`if`, `ifelse()`, and `if_else()` are translated to `CASE WHEN`:
 
 ```{r}
-lf |> mutate(z = if (x > 5) "big" else "small")
+lf |> transmute(z = ifelse(x > 5, "big", "small"))
+```
+
+`case_when()`, `case_match()`, and `switch()` are also supported:
+
+```{r}
+lf |> 
+  mutate(z = case_when(
+    x > 10 ~ "medium",
+    x > 30 ~ "big", 
+    .default = "small"
+  ))
+
 lf |> mutate(z = switch(g, a = 1L, b = 2L, 3L))
 ```
-  
-### Date/time
 
-* string functions: `tolower`, `toupper`, `trimws`, `nchar`, `substr`
-* coerce types: `as.numeric`, `as.integer`, `as.character`
+### String functions
+
+Base R string functions and their stringr equivalents are widely supported:
+
+* `nchar()`, `str_length()`
+* `tolower()`, `toupper()`, `str_to_lower()`, `str_to_upper()`, `str_to_title()`
+* `trimws()`, `str_trim()`
+* `paste()`, `paste0()`, `str_c()`
+* `substr()`, `substring()`, `str_sub()`
+
+```{r}
+lf |> transmute(x = paste0(g, " dog"))
+
+lf |> transmute(x = substr(g, 1L, 2L))
+```
+
+Many backends also support regular expression functions like `str_detect()`, `str_replace()`, `str_replace_all()`, `str_remove()`, `str_remove_all()`, `str_squish()`, and `str_like()`. Support varies by backend; see the individual backend documentation for details.
+
+### Date/time functions
+
+dbplyr supports many lubridate functions for extracting date components:
+
+* `today()`, `now()`
+* `year()`, `month()`, `day()`, `mday()`, `hour()`, `minute()`, `second()`
+
+```{r}
+lf_dt <- lazy_frame(dt = Sys.time())
+
+lf_dt |> transmute(
+  year = year(dt),
+  month = month(dt),
+  day = day(dt)
+)
+```
+
+Some backends also support additional lubridate functions including `yday()`, `wday()`, `week()`, `isoweek()`, `quarter()`, `isoyear()`, `floor_date()`, and period functions like `seconds()`, `minutes()`, `hours()`, `days()`, `weeks()`, `months()`, `years()`.
+
+Several backends (including PostgreSQL, Snowflake, SQL Server, Redshift, and Spark SQL) support [clock](https://clock.r-lib.org) functions for date arithmetic. 
+
+* `add_days()`, `add_years()`
+* `date_build()`
+* `get_year()`, `get_month()`, `get_day()`
+* `date_count_between()`
+* `difftime()`
+
+clock functions tend to be easier to translate than lubridate functions because they are more specific.
+
+### Other functions
+
+* `pmin()`, `pmax()` for parallel min/max
+* `desc()` for descending order
+* `cut()` for binning numeric values into categories
 
 ## Unknown functions
 
@@ -194,8 +316,13 @@ Things get a little trickier with window functions, because SQL's window functio
 
 * The __expression__ is a combination of variable names and window functions.
   Support for window functions varies from database to database, but most
-  support the ranking functions, `lead`, `lag`, `nth`, `first`,
-  `last`, `count`, `min`, `max`, `sum`, `avg` and `stddev`.
+  support:
+
+  - ranking: `row_number()`, `min_rank()`, `rank()`, `dense_rank()`,
+    `percent_rank()`, `cume_dist()`, `ntile()`;
+  - offsets: `lead()`, `lag()`, `first()`, `last()`, `nth()`;
+  - aggregates: `mean()`, `sum()`, `min()`, `max()`, `n()`, `n_distinct()`;
+  - cumulative: `cummean()`, `cumsum()`, `cummin()`, `cummax()`.
 
 * The __partition clause__ specifies how the window function is broken down
   over groups. It plays an analogous role to `GROUP BY` for aggregate functions,
@@ -276,8 +403,8 @@ There are some challenges when translating window functions between R and SQL, b
 * Accumulating aggregates only take a single argument (the vector to aggregate).
   To control ordering, use `order_by()`.
   
-* Aggregates implemented in dplyr (`lead`, `lag`, `nth_value`, `first_value`, 
-  `last_value`) have an `order_by` argument. Supply it to override the
+* Aggregates implemented in dplyr (`lead()`, `lag()`, `nth()`, `first()`,
+  `last()`) have an `order_by` argument. Supply it to override the
   default ordering.
 
 The three options are illustrated in the snippet below:
