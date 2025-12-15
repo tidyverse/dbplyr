@@ -1,6 +1,6 @@
 # dbplyr (development version)
 
-* `.data$col` and `.data[[col]]` now work correctly inside `across()` (#1520).
+* `.data$col`, `.data[[col]]`, `.env$var`, and `.env$[[var]]` now work correctly inside `across()` (#1520).
 * New `.sql` pronoun makes it a little easier to use known SQL functions in packages, requiring only `@importFrom dbplyr .sql` (#1117).
 * `join_by(between())` now correctly handles column renames (#1572).
 * SQL Server uses `DATEDIFF_BIG` instead of `DATEDIFF` to work regardless of data size (@edward-burn, #1666).
