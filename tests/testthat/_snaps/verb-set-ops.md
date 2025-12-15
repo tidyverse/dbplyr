@@ -55,3 +55,21 @@
       SELECT *
       FROM `q04`
 
+# set ops correctly quote reused queries in CTEs
+
+    Code
+      show_query(union_all(lf, lf), sql_options = sql_options(cte = TRUE))
+    Output
+      <SQL>
+      WITH `q01` AS (
+        SELECT `lf`.*, `x` + 1.0 AS `y`
+        FROM `lf`
+      )
+      SELECT *
+      FROM `q01`
+      
+      UNION ALL
+      
+      SELECT *
+      FROM `q01`
+
