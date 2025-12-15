@@ -290,7 +290,7 @@ find_fun <- function(fun) {
 fun_name <- function(fun) {
   # `dtplyr` uses the same idea but needs different environments
   pkg_env <- env_parent(global_env())
-  known <- c(ls_all(base_agg), ls_all(base_scalar))
+  known <- c(env_names(base_agg), env_names(base_scalar))
 
   for (x in known) {
     if (!env_has(pkg_env, x, inherit = TRUE)) {

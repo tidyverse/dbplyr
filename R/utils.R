@@ -3,8 +3,6 @@ deparse_all <- function(x) {
   purrr::map_chr(x, expr_text, width = 500L)
 }
 
-ls_all <- function(...) ls(..., all.names = TRUE)
-
 #' Provides comma-separated string out of the parameters
 #' @export
 #' @keywords internal
