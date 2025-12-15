@@ -1476,6 +1476,14 @@ test_that("joins reuse queries in cte mode", {
   )
 })
 
+test_that("joins correctly quote reused queries in CTEs", {
+  lf <- lazy_frame(x = 1, .name = "lf") |> mutate(z = x * 2)
+  expect_snapshot(
+    left_join(lf, lf, by = join_by(z)) |>
+      show_query(sql_options = sql_options(cte = TRUE))
+  )
+})
+
 test_that("can force to qualify all columns", {
   lf1 <- lazy_frame(x = 1, a = 2, y = 1, .name = "lf1")
   lf2 <- lazy_frame(x = 1, a = 2, z = 1, .name = "lf2")

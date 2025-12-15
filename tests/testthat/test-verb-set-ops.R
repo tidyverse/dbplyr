@@ -58,6 +58,13 @@ test_that("can combine multiple unions in one query", {
   expect_equal(out$select, sql("`q01`.*", a = "`x` + `y`"))
 })
 
+test_that("set ops correctly quote reused queries in CTEs", {
+  lf <- lazy_frame(x = 1, .name = "lf") |> mutate(y = x + 1)
+  expect_snapshot(
+    union_all(lf, lf) |> show_query(sql_options = sql_options(cte = TRUE))
+  )
+})
+
 test_that("intersect and setdiff work for supported backends", {
   df <- tibble(x = 1:10, y = x %% 2)
 

@@ -194,7 +194,7 @@ querylist_reuse_query <- function(qry, query_list, con) {
   )
 
   if (!is.na(id)) {
-    query_list$name <- names(query_list$queries)[[id]]
+    query_list$name <- table_path(names(query_list$queries)[[id]])
   } else {
     name <- as_table_path(unique_subquery_name(), con)
     wrapped_query <- set_names(list(qry), name)
