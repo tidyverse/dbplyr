@@ -4,7 +4,7 @@
 \alias{partial_eval}
 \title{Partially evaluate an expression.}
 \usage{
-partial_eval(call, data, env = caller_env(), vars = deprecated(), error_call)
+partial_eval(call, data, env = caller_env(), error_call = caller_env())
 }
 \arguments{
 \item{call}{an unevaluated expression, as produced by \code{\link[=quote]{quote()}}}
@@ -12,9 +12,6 @@ partial_eval(call, data, env = caller_env(), vars = deprecated(), error_call)
 \item{data}{A lazy data frame backed by a database query.}
 
 \item{env}{environment in which to search for local values}
-
-\item{vars}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}: Pass a lazy frame to \code{data}
-instead.}
 }
 \description{
 This function partially evaluates an expression, using information from
@@ -38,7 +35,8 @@ variable, then remote.
 }
 
 You can override the guesses using \code{local()} and \code{remote()} to force
-computation, or by using the \code{.data} and \code{.env} pronouns of tidy evaluation.
+computation, by using the \code{.data} and \code{.env} pronouns of tidy evaluation,
+or by using dbplyr's own \code{.sql} pronoun.
 }
 
 \examples{
@@ -63,5 +61,10 @@ partial_eval(quote(year > .env$year), lf)
 f <- function(x) x + 1
 partial_eval(quote(year > f(1980)), lf)
 partial_eval(quote(year > local(f(1980))), lf)
+
+# You can use `.sql` to make it clear that the function comes from SQL,
+# and inside a package, reduce the number of globalVariables() directives
+# needed
+partial_eval(quote(.sql$EXTRACT_YEAR(year)), lf)
 }
 \keyword{internal}

@@ -308,7 +308,7 @@ stop_input_type <- function(x,
   cli <- env_get_list(
     nms = c("format_arg", "format_code"),
     last = topenv(),
-    default = function(x) sprintf("`%s`", x),
+    default = \(x) sprintf("`%s`", x),
     inherit = TRUE
   )
 

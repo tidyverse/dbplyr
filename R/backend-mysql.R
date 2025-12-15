@@ -19,7 +19,7 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_mysql())
-#' lf %>% transmute(x = paste0(d, " times"))
+#' lf |> transmute(x = paste0(d, " times"))
 NULL
 
 #' @export
@@ -63,12 +63,9 @@ db_connection_describe.MySQL <- db_connection_describe.MariaDBConnection
 db_connection_describe.MySQLConnection <- db_connection_describe.MariaDBConnection
 
 #' @export
-db_col_types.MariaDBConnection <- function(con, table, call) {
-  table <- as_table_path(table, con, error_call = call)
-  col_info_df <- DBI::dbGetQuery(
-    con,
-    glue_sql2(con, "SHOW COLUMNS FROM {.tbl table};")
-  )
+db_col_types.MariaDBConnection <- function(con, table, call = caller_env()) {
+  sql <- sql_glue2(con, "SHOW COLUMNS FROM {.tbl table}")
+  col_info_df <- DBI::dbGetQuery(con, sql)
   set_names(col_info_df[["Type"]], col_info_df[["Field"]])
 }
 #' @export
@@ -86,7 +83,7 @@ sql_translation.MariaDBConnection <- function(con) {
       # https://dev.mysql.com/doc/refman/8.0/en/cast-functions.html#function_cast
       # https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Vector-objects
       as.logical = function(x) {
-        sql_expr(IF(!!x, TRUE, FALSE))
+        sql_glue("IF({x}, TRUE, FALSE)")
       },
       as.character = sql_cast("CHAR"),
       as.numeric = sql_cast("DOUBLE"),
@@ -99,7 +96,7 @@ sql_translation.MariaDBConnection <- function(con) {
       as.integer64 = sql_cast("INTEGER"),
 
       runif = function(n = n(), min = 0, max = 1) {
-        sql_runif(RAND(), n = {{ n }}, min = min, max = max)
+        sql_runif("RAND()", n = {{ n }}, min = min, max = max)
       },
 
       # string functions ------------------------------------------------
@@ -113,26 +110,32 @@ sql_translation.MariaDBConnection <- function(con) {
       # but available in MariaDB. A few more details at:
       # https://www.oreilly.com/library/view/mysql-cookbook/0596001452/ch04s11.html
       str_detect = sql_infix("REGEXP"),
-      str_like = function(string, pattern, ignore_case = TRUE) {
-        if (isTRUE(ignore_case)) {
-          sql_expr(!!string %LIKE% !!pattern)
+      str_like = function(string, pattern, ignore_case = deprecated()) {
+        ignore_case <- deprecate_ignore_case(ignore_case)
+        if (ignore_case) {
+          sql_glue("{string} LIKE {pattern}")
         } else {
-          sql_expr(!!string %LIKE BINARY% !!pattern)
+          sql_glue("{string} LIKE BINARY {pattern}")
         }
       },
+      str_ilike = function(string, pattern) {
+        # MySQL's LIKE is case-insensitive by default
+        sql_glue("{string} LIKE {pattern}")
+      },
       str_locate = function(string, pattern) {
-        sql_expr(REGEXP_INSTR(!!string, !!pattern))
+        sql_glue("REGEXP_INSTR({string}, {pattern})")
       },
       str_replace_all = function(string, pattern, replacement) {
-        sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
+        sql_glue("REGEXP_REPLACE({string}, {pattern}, {replacement})")
       }
     ),
     sql_translator(
       .parent = base_agg,
       sd = sql_aggregate("STDDEV_SAMP", "sd"),
       var = sql_aggregate("VAR_SAMP", "var"),
-      str_flatten = function(x, collapse = "") {
-        sql_expr(group_concat(!!x %separator% !!collapse))
+      str_flatten = function(x, collapse = "", na.rm = FALSE) {
+        sql_check_na_rm(na.rm)
+        sql_glue("GROUP_CONCAT({x} SEPARATOR {collapse})")
       }
     ),
     sql_translator(
@@ -152,13 +155,9 @@ sql_translation.MySQL <- function(con) {
   sql_variant(
     sql_translator(
       .parent = maria$scalar,
-      # MySQL doesn't support casting to INTEGER or BIGINT.
-      as.integer = function(x) {
-        sql_expr(TRUNCATE(CAST(!!x %AS% DOUBLE), 0L))
-      },
-      as.integer64 = function(x) {
-        sql_expr(TRUNCATE(CAST(!!x %AS% DOUBLE), 0L))
-      },
+      # SIGNED INTEGER is a BIGINT; no way to cast smaller
+      as.integer = sql_cast("SIGNED INTEGER"),
+      as.integer64 = sql_cast("SIGNED INTEGER"),
     ),
     maria$aggregate,
     maria$window
@@ -169,7 +168,7 @@ sql_translation.MySQLConnection <- sql_translation.MySQL
 
 #' @export
 sql_table_analyze.MariaDBConnection <- function(con, table, ...) {
-  glue_sql2(con, "ANALYZE TABLE {.tbl table}")
+  sql_glue2(con, "ANALYZE TABLE {.tbl table}")
 }
 #' @export
 sql_table_analyze.MySQL <- sql_table_analyze.MariaDBConnection
@@ -200,7 +199,7 @@ sql_query_join.MySQLConnection <- sql_query_join.MariaDBConnection
 #' @export
 sql_expr_matches.MariaDBConnection <- function(con, x, y, ...) {
   # https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_equal-to
-  glue_sql2(con, "{x} <=> {y}")
+  sql_glue2(con, "{x} <=> {y}")
 }
 #' @export
 sql_expr_matches.MySQL <- sql_expr_matches.MariaDBConnection
@@ -307,14 +306,3 @@ supports_window_clause.MariaDBConnection <- function(con) {
 supports_window_clause.MySQLConnection <- supports_window_clause.MariaDBConnection
 #' @export
 supports_window_clause.MySQL <- supports_window_clause.MariaDBConnection
-
-utils::globalVariables(c(
-  "%separator%",
-  "group_concat",
-  "IF",
-  "REGEXP_INSTR",
-  "RAND",
-  "%LIKE BINARY%",
-  "TRUNCATE",
-  "DOUBLE"
-))

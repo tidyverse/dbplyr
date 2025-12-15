@@ -17,7 +17,7 @@ order.}
 grouped data frames only.}
 }
 \value{
-Another \code{tbl_lazy}. Use \code{\link[dplyr:explain]{dplyr::show_query()}} to see the generated
+Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
 query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
@@ -39,10 +39,10 @@ can override this behaviour by explicitly sorting on \code{is.na(x)}.
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(a = c(3, 4, 1, 2), b = c(5, 1, 2, NA))
-db \%>\% arrange(a) \%>\% show_query()
+db |> arrange(a) |> show_query()
 
 # Note that NAs are sorted first
-db \%>\% arrange(b)
+db |> arrange(b)
 # override by sorting on is.na() first
-db \%>\% arrange(is.na(b), b)
+db |> arrange(is.na(b), b)
 }

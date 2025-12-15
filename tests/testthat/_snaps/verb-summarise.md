@@ -1,7 +1,7 @@
 # reframe is not supported
 
     Code
-      lazy_frame(x = 1) %>% reframe()
+      reframe(lazy_frame(x = 1))
     Condition
       Error in `reframe()`:
       ! `reframe()` is not supported on database backends.
@@ -54,8 +54,8 @@
 # summarise(.groups=)
 
     Code
-      eval_bare(expr(lazy_frame(x = 1, y = 2) %>% dplyr::group_by(x, y) %>% dplyr::summarise() %>%
-        remote_query()), env(global_env()))
+      eval_bare(expr(remote_query(dplyr::summarise(dplyr::group_by(lazy_frame(x = 1,
+        y = 2), x, y)))), env(global_env()))
     Message
       `summarise()` has grouped output by "x". You can override using the `.groups` argument.
     Output
@@ -66,7 +66,7 @@
 ---
 
     Code
-      df %>% summarise(.groups = "rowwise")
+      summarise(df, .groups = "rowwise")
     Condition
       Error in `summarise()`:
       ! `.groups` can't be "rowwise" in dbplyr
@@ -75,7 +75,7 @@
 # summarise can modify grouping variables
 
     Code
-      (result1 <- lf %>% group_by(g) %>% summarise(g = g + 1))
+      (result1 <- summarise(group_by(lf, g), g = g + 1))
     Output
       <SQL>
       SELECT `g` + 1.0 AS `g`
@@ -85,7 +85,7 @@
 ---
 
     Code
-      (result2 <- lf %>% group_by(g) %>% summarise(x = x + 1, g = g + 1))
+      (result2 <- summarise(group_by(lf, g), x = x + 1, g = g + 1))
     Output
       <SQL>
       SELECT `g` + 1.0 AS `g`, `x` + 1.0 AS `x`
@@ -95,7 +95,7 @@
 # across() does not select grouping variables
 
     Code
-      df %>% group_by(g) %>% summarise(across(.fns = ~0))
+      summarise(group_by(df, g), across(.fns = ~0))
     Output
       <SQL>
       SELECT `g`, 0.0 AS `x`
@@ -131,7 +131,7 @@
 # quoting for rendering summarized grouped table
 
     Code
-      out %>% sql_render
+      sql_render(out)
     Output
       <SQL> SELECT `x`, COUNT(*) AS `n`
       FROM `verb-summarise`

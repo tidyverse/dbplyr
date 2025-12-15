@@ -13,9 +13,9 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(g = c(1, 1, 1, 2, 2), x = c(4, 3, 6, 9, 2))
-#' db %>% count(g) %>% show_query()
-#' db %>% count(g, wt = x) %>% show_query()
-#' db %>% count(g, wt = x, sort = TRUE) %>% show_query()
+#' db |> count(g) |> show_query()
+#' db |> count(g, wt = x) |> show_query()
+#' db |> count(g, wt = x, sort = TRUE) |> show_query()
 count.tbl_lazy <- function(x, ..., wt = NULL, sort = FALSE, name = NULL) {
   if (!missing(...)) {
     out <- group_by(x, ..., .add = TRUE)

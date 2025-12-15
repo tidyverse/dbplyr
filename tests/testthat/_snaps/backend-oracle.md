@@ -1,18 +1,18 @@
 # string functions translate correctly
 
     Code
-      test_translate_sql(str_replace(col, "pattern", "replacement"))
+      translate_sql(str_replace(col, "pattern", "replacement"), con = con)
     Output
       <SQL> REGEXP_REPLACE(`col`, 'pattern', 'replacement', 1, 1)
     Code
-      test_translate_sql(str_replace_all(col, "pattern", "replacement"))
+      translate_sql(str_replace_all(col, "pattern", "replacement"), con = con)
     Output
       <SQL> REGEXP_REPLACE(`col`, 'pattern', 'replacement')
 
 # queries translate correctly
 
     Code
-      mf %>% head()
+      head(mf)
     Output
       <SQL>
       SELECT `df`.*
@@ -99,13 +99,13 @@
 # copy_inline uses UNION ALL
 
     Code
-      copy_inline(con, y %>% slice(0)) %>% remote_query()
+      remote_query(copy_inline(con, slice(y, 0)))
     Output
       <SQL> SELECT CAST(NULL AS INT) AS `id`, CAST(NULL AS VARCHAR2(255)) AS `arr`
       FROM `DUAL`
       WHERE (0 = 1)
     Code
-      copy_inline(con, y) %>% remote_query()
+      remote_query(copy_inline(con, y))
     Output
       <SQL> SELECT CAST(`id` AS INT) AS `id`, CAST(`arr` AS VARCHAR2(255)) AS `arr`
       FROM (
@@ -118,13 +118,13 @@
         SELECT 1, '{1,2,3}' FROM DUAL
       ) `values_table`
     Code
-      copy_inline(con, y %>% slice(0), types = types) %>% remote_query()
+      remote_query(copy_inline(con, slice(y, 0), types = types))
     Output
       <SQL> SELECT CAST(NULL AS bigint) AS `id`, CAST(NULL AS integer[]) AS `arr`
       FROM `DUAL`
       WHERE (0 = 1)
     Code
-      copy_inline(con, y, types = types) %>% remote_query()
+      remote_query(copy_inline(con, y, types = types))
     Output
       <SQL> SELECT CAST(`id` AS bigint) AS `id`, CAST(`arr` AS integer[]) AS `arr`
       FROM (
@@ -140,7 +140,7 @@
 # difftime is translated correctly
 
     Code
-      test_translate_sql(difftime(start_date, end_date, units = "auto"))
+      translate_sql(difftime(start_date, end_date, units = "auto"), con = con)
     Condition
       Error in `difftime()`:
       ! The only supported value for `units` on SQL backends is "days"
@@ -148,7 +148,7 @@
 ---
 
     Code
-      test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days"))
+      translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days"), con = con)
     Condition
       Error in `difftime()`:
       ! The `tz` argument is not supported for SQL backends.

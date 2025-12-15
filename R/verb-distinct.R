@@ -12,8 +12,8 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(x = c(1, 1, 2, 2), y = c(1, 2, 1, 1))
-#' db %>% distinct() %>% show_query()
-#' db %>% distinct(x) %>% show_query()
+#' db |> distinct() |> show_query()
+#' db |> distinct(x) |> show_query()
 distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
   grps <- syms(op_grps(.data))
   empty_dots <- dots_n(...) == 0
@@ -23,16 +23,16 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
 
     if (needs_dummy_order) {
       dummy_order_vars <- colnames(.data)[[1]]
-      .data <- .data %>% window_order(!!sym(dummy_order_vars))
+      .data <- .data |> window_order(!!sym(dummy_order_vars))
     }
 
-    .data <- .data %>%
-      group_by(..., .add = TRUE) %>%
-      filter(row_number() == 1L) %>%
+    .data <- .data |>
+      group_by(..., .add = TRUE) |>
+      filter(row_number() == 1L) |>
       group_by(!!!grps)
 
     if (needs_dummy_order) {
-      .data <- .data %>% window_order()
+      .data <- .data |> window_order()
     }
 
     return(.data)
@@ -88,7 +88,7 @@ distinct_prepare_compat <- function(
         rep("x", length(missing_vars))
       )
     )
-    abort(bullets, call = error_call)
+    cli::cli_abort(bullets, call = error_call)
   }
 
   # Only keep unique vars

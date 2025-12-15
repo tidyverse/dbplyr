@@ -1,7 +1,7 @@
 # basic arithmetic is correct
 
     Code
-      test_translate_sql(100L %/% 3L)
+      translate_sql(100L %/% 3L, con = con)
     Condition
       Error in `100L %/% 3L`:
       ! `%/%()` is not available in this SQL variant.
@@ -9,12 +9,15 @@
 # can translate subsetting
 
     Code
-      test_translate_sql(a[[x]])
+      translate_sql(a[[x]], con = con)
     Condition
       Error in `a[[x]]`:
       ! Can only index with strings and numbers
+
+---
+
     Code
-      test_translate_sql(a[[TRUE]])
+      translate_sql(a[[TRUE]], con = con)
     Condition
       Error in `a[[TRUE]]`:
       ! Can only index with strings and numbers
@@ -22,7 +25,7 @@
 # $ doesn't evaluate second argument
 
     Code
-      lazy_frame(x = 1, y = 1) %>% filter(x == y$id)
+      filter(lazy_frame(x = 1, y = 1), x == y$id)
     Output
       <SQL>
       SELECT `df`.*
@@ -32,7 +35,7 @@
 ---
 
     Code
-      lazy_frame(x = 1) %>% filter(x == y$id)
+      filter(lazy_frame(x = 1), x == y$id)
     Output
       <SQL>
       SELECT `df`.*
@@ -42,7 +45,7 @@
 # useful error if $ used with inlined value
 
     Code
-      lazy_frame(x = 1) %>% filter(x == y$id)
+      filter(lazy_frame(x = 1), x == y$id)
     Condition
       Error in `x$id`:
       ! $ operator is invalid for atomic vectors
@@ -50,17 +53,40 @@
 # can only translate case sensitive str_like
 
     Code
-      test_translate_sql(str_like(x, "abc", ignore_case = TRUE))
+      translate_sql(str_like(x, "abc", ignore_case = FALSE), con = con)
     Condition
+      Warning:
+      The `ignore_case` argument of `str_like()` is deprecated as of dbplyr 2.6.0.
+      i `str_like()` is always case sensitive.
+      i Use `str_ilike()` for case insensitive string matching.
+    Output
+      <SQL> `x` LIKE 'abc'
+
+---
+
+    Code
+      translate_sql(str_like(x, "abc", ignore_case = TRUE), con = con)
+    Condition
+      Warning:
+      The `ignore_case` argument of `str_like()` is deprecated as of dbplyr 2.6.0.
+      i `str_like()` is always case sensitive.
+      i Use `str_ilike()` for case insensitive string matching.
       Error in `str_like()`:
       ! Backend does not support case insensitive `str_like()`.
-      i Set `ignore_case = FALSE` for case sensitive match.
       i Use `tolower()` on both arguments to achieve a case insensitive match.
+
+---
+
+    Code
+      translate_sql(str_ilike(x, "abc"), con = con)
+    Condition
+      Error in `str_ilike()`:
+      ! `str_ilike()` is not available in this SQL variant.
 
 # default raw escapes translated correctly
 
     Code
-      mf %>% filter(x == a)
+      filter(mf, x == a)
     Output
       <SQL>
       SELECT `df`.*
@@ -70,7 +96,7 @@
 ---
 
     Code
-      mf %>% filter(x %in% L)
+      filter(mf, x %in% L)
     Output
       <SQL>
       SELECT `df`.*
@@ -141,7 +167,7 @@
     Code
       sql_query_save(con, sql("SELECT * FROM foo"), in_schema("temp", "tbl"))
     Output
-      <SQL> CREATE TEMPORARY TABLE 
+      <SQL> CREATE TEMPORARY TABLE
       `temp`.`tbl` AS
       SELECT * FROM foo
 

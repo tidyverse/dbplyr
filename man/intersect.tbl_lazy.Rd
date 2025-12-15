@@ -28,7 +28,7 @@ planner.
 This allows you to join tables across srcs, but it's potentially expensive
 operation so you must opt into it.}
 
-\item{...}{Not currently used; provided for future extensions.}
+\item{...}{Must be empty.}
 
 \item{all}{If \code{TRUE}, includes all matches in output, not just unique rows.}
 }

@@ -79,7 +79,7 @@ is_lazy_sql_part <- function(x) {
   if (!is.list(x)) {
     return(FALSE)
   }
-  purrr::every(x, ~ is_quosure(.x) || is_symbol(.x) || is_call(.x))
+  purrr::every(x, \(item) is_quosure(item) || is_symbol(item) || is_call(item))
 }
 
 new_lazy_select <- function(

@@ -1,16 +1,18 @@
 test_that("custom scalar & string functions translated correctly", {
-  local_con(simulate_hive())
+  con <- simulate_hive()
 
-  expect_equal(test_translate_sql(bitwShiftL(x, 2L)), sql("SHIFTLEFT(`x`, 2)"))
-  expect_equal(test_translate_sql(bitwShiftR(x, 2L)), sql("SHIFTRIGHT(`x`, 2)"))
-  expect_equal(test_translate_sql(cot(x)), sql("1.0 / TAN(`x`)"))
-  expect_equal(
-    test_translate_sql(str_replace_all(x, "old", "new")),
-    sql("REGEXP_REPLACE(`x`, 'old', 'new')")
+  expect_translation(con, bitwShiftL(x, 2L), "SHIFTLEFT(`x`, 2)")
+  expect_translation(con, bitwShiftR(x, 2L), "SHIFTRIGHT(`x`, 2)")
+  expect_translation(con, cot(x), "1.0 / TAN(`x`)")
+  expect_translation(
+    con,
+    str_replace_all(x, "old", "new"),
+    "REGEXP_REPLACE(`x`, 'old', 'new')"
   )
-  expect_equal(
-    test_translate_sql(median(x, na.rm = TRUE)),
-    sql("PERCENTILE(`x`, 0.5) OVER ()")
+  expect_translation(
+    con,
+    median(x, na.rm = TRUE),
+    "PERCENTILE(`x`, 0.5) OVER ()"
   )
 })
 

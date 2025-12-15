@@ -27,8 +27,8 @@ through R in one pass, so it is only suitable for transferring small
 amounts of data.}
 
 \item{name}{Name of new remote table. Use a string to create the table
-in the current catalog/schema. Use \code{I()} if you want to create it
-in a specific catalog/schema, e.g. \code{I("schema.table")}.}
+in the current catalog/schema. Use \code{I()} to create the table in a specific
+catalog/schema, e.g. \code{I("schema.table")}.}
 
 \item{overwrite}{If \code{TRUE}, will overwrite an existing table with
 name \code{name}. If \code{FALSE}, will throw an error if \code{name} already
@@ -59,7 +59,7 @@ database doesn't support transactions, or you're wrapping in a transaction
 higher up (and your database doesn't support nested transactions.)}
 }
 \value{
-Another \code{tbl_lazy}. Use \code{\link[dplyr:explain]{dplyr::show_query()}} to see the generated
+Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
 query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
@@ -81,7 +81,7 @@ db
 df2 <- data.frame(y = c("a", "d"), fruit = c("apple", "date"))
 # copy_to() is called automatically if you set copy = TRUE
 # in the join functions
-db \%>\% left_join(df2, copy = TRUE)
+db |> left_join(df2, copy = TRUE)
 }
 \seealso{
 \code{\link[=copy_inline]{copy_inline()}} to use small data in an SQL query without actually

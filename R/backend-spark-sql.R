@@ -17,11 +17,11 @@
 #'
 #' lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = simulate_spark_sql())
 #'
-#' lf %>% summarise(x = median(d, na.rm = TRUE))
-#' lf %>% summarise(x = var(c, na.rm = TRUE), .by = d)
+#' lf |> summarise(x = median(d, na.rm = TRUE))
+#' lf |> summarise(x = var(c, na.rm = TRUE), .by = d)
 #'
-#' lf %>% mutate(x = first(c))
-#' lf %>% mutate(x = first(c), .by = d)
+#' lf |> mutate(x = first(c))
+#' lf |> mutate(x = first(c), .by = d)
 NULL
 
 #' @export
@@ -38,41 +38,53 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
   sql_variant(
     sql_translator(
       .parent = base_odbc_scalar,
+      # stringr ---------------------------------------------------------------
+      str_like = function(string, pattern, ignore_case = deprecated()) {
+        ignore_case <- deprecate_ignore_case(ignore_case)
+        if (ignore_case) {
+          sql_glue("{string} ILIKE {pattern}")
+        } else {
+          sql_glue("{string} LIKE {pattern}")
+        }
+      },
+      str_ilike = function(string, pattern) {
+        sql_glue("{string} ILIKE {pattern}")
+      },
       # clock ---------------------------------------------------------------
       add_days = function(x, n, ...) {
         check_dots_empty()
-        sql_expr(date_add(!!x, !!n))
+        sql_glue("DATE_ADD({x}, {n})")
       },
       add_years = function(x, n, ...) {
         check_dots_empty()
-        sql_expr(add_months(!!x, !!n * 12))
+        sql_glue("ADD_MONTHS({x}, {n} * 12)")
       },
       date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
         check_unsupported_arg(invalid, allow_null = TRUE)
-        sql_expr(make_date(!!year, !!month, !!day))
+        sql_glue("MAKE_DATE({year}, {month}, {day})")
       },
       get_year = function(x) {
-        sql_expr(date_part('YEAR', !!x))
+        sql_glue("DATE_PART('YEAR', {x})")
       },
       get_month = function(x) {
-        sql_expr(date_part('MONTH', !!x))
+        sql_glue("DATE_PART('MONTH', {x})")
       },
       get_day = function(x) {
-        sql_expr(date_part('DAY', !!x))
+        sql_glue("DATE_PART('DAY', {x})")
       },
       date_count_between = function(start, end, precision, ..., n = 1L) {
         check_dots_empty()
         check_unsupported_arg(precision, allowed = "day")
         check_unsupported_arg(n, allowed = 1L)
 
-        sql_expr(datediff(!!end, !!start))
+        sql_glue("DATEDIFF({end}, {start})")
       },
 
       difftime = function(time1, time2, tz, units = "days") {
         check_unsupported_arg(tz)
         check_unsupported_arg(units, allowed = "days")
 
-        sql_expr(datediff(!!time2, !!time1))
+        sql_glue("DATEDIFF({time2}, {time1})")
       }
     ),
     sql_translator(
@@ -81,12 +93,12 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
       quantile = sql_quantile("PERCENTILE"),
       median = sql_aggregate("MEDIAN"),
       first = function(x, na_rm = FALSE) {
-        check_na_rm(na_rm)
-        glue_sql2(sql_current_con(), "FIRST({.val x})")
+        sql_check_na_rm(na_rm)
+        sql_glue("FIRST({x})")
       },
       last = function(x, na_rm = FALSE) {
-        check_na_rm(na_rm)
-        glue_sql2(sql_current_con(), "LAST({.val x})")
+        sql_check_na_rm(na_rm)
+        sql_glue("LAST({x})")
       },
     ),
     sql_translator(
@@ -122,7 +134,7 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
 #' @export
 `sql_table_analyze.Spark SQL` <- function(con, table, ...) {
   # https://docs.databricks.com/en/sql/language-manual/sql-ref-syntax-aux-analyze-table.html
-  glue_sql2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
+  sql_glue2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
 }
 
 #' @export
@@ -163,22 +175,13 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
 ) {
   check_bool(overwrite)
   check_bool(temporary)
-  sql <- glue_sql2(
-    con,
-    "CREATE ",
-    if (overwrite) "OR REPLACE ",
-    if (temporary) "TEMPORARY VIEW" else "TABLE",
-    " {.tbl {table}} AS \n",
-    "{.from {sql}}"
-  )
+
+  action <- if (overwrite) "CREATE OR REPLACE" else "CREATE"
+  type <- if (temporary) "TEMPORARY VIEW" else "TABLE"
+
+  sql <- as_table_source(sql)
+  sql <- sql_glue2(con, "{.sql action} {.sql type} {.tbl table} AS \n{sql}")
   DBI::dbExecute(con, sql)
 
   table
 }
-
-utils::globalVariables(c(
-  "regexp_replace",
-  "date_add",
-  "add_months",
-  "datediff"
-))

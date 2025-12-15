@@ -176,7 +176,7 @@ sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
 
   op$joins$table <- purrr::map(
     op$joins$table,
-    ~ sql_optimise(sql_build(.x, con, sql_options = sql_options), con)
+    \(table) sql_optimise(sql_build(table, con, sql_options = sql_options), con)
   )
   op$joins$by <- purrr::map2(
     op$joins$by,
@@ -278,15 +278,11 @@ sql_build.lazy_semi_join_query <- function(op, con, ..., sql_options = NULL) {
     vars <- ident(set_names(op$vars$var, op$vars$name))
   }
 
+  # We've introduced aliases to disambiguate the internal and external tables
+  # so need to update the WHERE clause
   y_vars <- op_vars(op$y)
-  replacements <- purrr::map(
-    y_vars,
-    ~ call2("$", call2("sql", op$by$y_as), sym(.x))
-  )
-  where <- purrr::map(
-    op$where,
-    ~ replace_sym(.x, y_vars, replacements)
-  )
+  replacements <- lapply(y_vars, \(var) call2("$", sql(op$by$y_as), sym(var)))
+  where <- lapply(op$where, \(expr) replace_sym(expr, y_vars, replacements))
 
   where_sql <- translate_sql_(
     where,

@@ -1,36 +1,19 @@
-#' Compute results of a query
+#' Save results into a new remote table
 #'
-#' These are methods for the dplyr generics [collapse()], [compute()],
-#' and [collect()]. `collapse()` creates a subquery, `compute()` stores
-#' the results in a remote table, and `collect()` executes the query and
-#' downloads the data into R.
+#' `compute()` executes the query and stores the results in a new remote table.
+#' This is useful when you want to cache intermediate results for reuse or to
+#' improve performance by avoiding repeated computation of complex queries.
 #'
+#' @inheritParams collect.tbl_sql
+#' @inheritParams copy_to.src_sql
 #' @export
-#' @param x A lazy data frame backed by a database query.
-#' @importFrom dplyr collapse
+#' @importFrom dplyr compute
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(a = c(3, 4, 1, 2), b = c(5, 1, 2, NA))
-#' db %>% filter(a <= 2) %>% collect()
-collapse.tbl_sql <- function(x, ...) {
-  sql <- db_sql_render(x$src$con, x)
-
-  tbl_src_dbi(x$src, sql, colnames(x)) %>%
-    group_by(!!!syms(op_grps(x))) %>%
-    arrange.tbl_lazy(!!!op_sort(x))
-}
-
-# compute -----------------------------------------------------------------
-
-#' @rdname collapse.tbl_sql
-#' @param name Table name in remote database.
-#' @param temporary Should the table be temporary (`TRUE`, the default) or
-#'   persistent (`FALSE`)?
-#' @inheritParams copy_to.src_sql
-#' @inheritParams collect.tbl_sql
-#' @export
-#' @importFrom dplyr compute
+#' db |> filter(a <= 2) |> show_query()
+#' db |> filter(a <= 2) |> compute() |> show_query()
 compute.tbl_sql <- function(
   x,
   name = NULL,
@@ -54,17 +37,17 @@ compute.tbl_sql <- function(
     name <- unique_table_name()
   }
 
-  name <- as_table_path(name, x$src$con)
+  name <- as_table_path(name, x$con)
   vars <- op_vars(x)
 
   compute_check_indexes(x, indexes)
   compute_check_indexes(x, unique_indexes)
 
   x_aliased <- select(x, !!!syms(vars)) # avoids problems with SQLite quoting (#1754)
-  sql <- db_sql_render(x$src$con, x_aliased$lazy_query, cte = cte)
+  sql <- db_sql_render(x$con, x_aliased$lazy_query, cte = cte)
 
   name <- db_compute(
-    x$src$con,
+    x$con,
     name,
     sql,
     temporary = temporary,
@@ -75,8 +58,8 @@ compute.tbl_sql <- function(
     ...
   )
 
-  tbl_src_dbi(x$src, name, colnames(x)) %>%
-    group_by(!!!syms(op_grps(x))) %>%
+  new_tbl_sql(x$con, name, vars = colnames(x)) |>
+    group_by(!!!syms(op_grps(x))) |>
     window_order(!!!op_sort(x))
 }
 
@@ -116,44 +99,4 @@ compute_check_indexes <- function(
 
     cli_abort(message, call = error_call)
   }
-}
-
-# collect -----------------------------------------------------------------
-
-#' @rdname collapse.tbl_sql
-#' @param n Number of rows to fetch. Defaults to `Inf`, meaning all rows.
-#' @param warn_incomplete Warn if `n` is less than the number of result rows?
-#' @param cte `r lifecycle::badge("experimental")`
-#'   Use common table expressions in the generated SQL?
-#' @importFrom dplyr collect
-#' @export
-collect.tbl_sql <- function(
-  x,
-  ...,
-  n = Inf,
-  warn_incomplete = TRUE,
-  cte = FALSE
-) {
-  if (identical(n, Inf)) {
-    n <- -1
-  } else {
-    # Gives the query planner information that it might be able to take
-    # advantage of
-    x <- head(x, n)
-  }
-
-  sql <- db_sql_render(x$src$con, x, cte = cte)
-  withCallingHandlers(
-    out <- db_collect(
-      x$src$con,
-      sql,
-      n = n,
-      warn_incomplete = warn_incomplete,
-      ...
-    ),
-    error = function(cnd) {
-      cli_abort("Failed to collect lazy table.", parent = cnd)
-    }
-  )
-  dplyr::grouped_df(out, intersect(op_grps(x), names(out)))
 }

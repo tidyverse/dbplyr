@@ -1,5 +1,9 @@
 #' Build a SQL string.
 #'
+#' @description
+#' `r lifecycle::badge("superseded")`
+#' `build_sql()` is superseded in favor of [sql_glue2()].
+#'
 #' This is a convenience function that should prevent sql injection attacks
 #' (which in the context of dplyr are most likely to be accidental not
 #' deliberate) by automatically escaping all expressions in the input, while
@@ -20,16 +24,19 @@
 #' @export
 #' @examples
 #' con <- simulate_dbi()
-#' build_sql("SELECT * FROM TABLE", con = con)
-#' x <- "TABLE"
-#' build_sql("SELECT * FROM ", x, con = con)
-#' build_sql("SELECT * FROM ", ident(x), con = con)
-#' build_sql("SELECT * FROM ", sql(x), con = con)
 #'
-#' # http://xkcd.com/327/
-#' name <- "Robert'); DROP TABLE Students;--"
-#' build_sql("INSERT INTO Students (Name) VALUES (", name, ")", con = con)
+#' # Old:
+#' build_sql("SELECT * FROM ", ident("table"), con = con)
+#' # New:
+#' sql_glue2(con, "SELECT * FROM {.tbl 'table'}")
+#'
+#' # Old:
+#' name <- "Robert"
+#' build_sql("INSERT INTO students (name) VALUES (", name, ")", con = con)
+#' # New:
+#' sql_glue2(con, "INSERT INTO students (name) VALUES ({name})")
 build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
+  lifecycle::deprecate_warn("2.6.0", "build_sql()", "sql_glue2()")
   check_con(con)
 
   escape_expr <- function(x, con) {
@@ -51,149 +58,127 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
   sql(paste0(pieces, collapse = ""))
 }
 
-#' A dbplyr specific version of glue
+#' Build SQL strings with glue syntax
 #'
-#' Similar to the inline markup of cli this function makes SQL generation easier
-#' and safer by providing a couple of types. For example
+#' @description
+#' `sql_glue()` and `sql_glue2()` are designed to help dbplyr extenders
+#' generate custom SQL. They differ only in whether or not they require
+#' a connection. `sql_glue()` retrieves the ambient connection, making it
+#' suitable for use inside [sql_translation()] methods; `sql_glue2()` requires
+#' a connection, making it suitable for use inside all other `sql_` methods.
 #'
-#' ```
-#'   glue_sql2(
-#'      con,
-#'      "CREATE ", if (unique) "UNIQUE ", "INDEX {.name name}",
-#'      " ON {.tbl table} ({.col columns*})"
-#'    )
-#' ```
+#' As the name suggests, these functions use \pkg{glue} syntax to make it
+#' easy to mix fixed SQL with varying user inputs. The default glue syntax, `{x}`,
+#' will escape `x` using the database connection. If there are multiple values
+#' in `x`, they'll be collapsed into a single string with `,`. If you want them
+#' to be wrapped in `()`, use a `*` suffix, e.g. `{x*}`.
 #'
-#' The following types are supported:
+#' You can also use type markers to control how the value is treated:
 #'
-#' * .tbl A table identifier, e.g. `DBI::Id()`. Converted via `as_table_ident()`.
-#' * .from A subquery or a table identifier. Converted via `as_from()`.
-#' * .name A name, e.g. for an index or a subquery. Can be a string or a scalar (quoted) ident.
-#' * .col A column or multiple columns if expression ends with `*`.
-#' * .kw An SQL keyword - e.g. `SELECT` or `WHERE` - that should be highlighted.
-#' * .val Any value - e.g. an integer vector, a Date, SQL - which is escaped as
-#'   usual via `escape()`.
+#' * `{.sql x}`: `x` is literal SQL that should be interpolated as
+#'   is, without additional escaping.
+#' * `{.tbl x}`: `x` is a table identifier like a string, `I()`, or one of
+#'   the older forms like `DBI::Id()` or `in_schema()`.
+#' * `{.id x}`: `x` is a generic identifier, e.g. for a column or index.
 #'
-#' If no type is specified the value must be a string or scalar SQL and it isn't
-#' escaped or collapsed.
-#'
-#' @noRd
-#'
+#' @param con A database connection.
+#' @param sql A string to interpolate.
+#' @param envir Environment to evaluate `sql` in.
+#' @return An SQL string.
+#' @export
 #' @examples
-#' glue_sql2(con, "COLLECT STATISTICS {.tbl table}")
-#' glue_sql2(con, "{f}({.val x}, {.val y})")
-glue_sql2 <- function(
-  .con,
-  ...,
-  .sep = "",
-  .envir = parent.frame(),
-  .open = "{",
-  .close = "}",
-  .na = DBI::SQL("NULL"),
-  .null = "",
-  .comment = "#",
-  .literal = FALSE,
-  .trim = TRUE
-) {
+#' con <- simulate_dbi()
+#'
+#' tbl <- "my_table"
+#' sql_glue2(con, "SELECT * FROM {.tbl tbl}")
+#'
+#' # Values are properly escaped
+#' name <- "Robert'); DROP TABLE students;--"
+#' sql_glue2(con, "INSERT INTO students (name) VALUES ({name})")
+#'
+#' # Control wrapping with *
+#' x <- c("name", "age", "grade")
+#' sql_glue2(con, "SELECT {.id x} FROM students")
+#' sql_glue2(con, "SELECT * WHERE variable IN {x*}")
+#' @export
+sql_glue <- function(sql, envir = parent.frame()) {
+  dbplyr_glue(sql_current_con(), sql, envir = envir)
+}
+
+#' @export
+#' @rdname sql_glue
+sql_glue2 <- function(con, sql, envir = parent.frame()) {
+  check_con(con)
+  dbplyr_glue(con, sql, envir = envir)
+}
+
+
+dbplyr_glue <- function(con, sql, envir = caller_env(), call = caller_env()) {
   sql(glue(
-    ...,
-    .sep = .sep,
-    .envir = .envir,
-    .open = .open,
-    .close = .close,
-    .na = .na,
-    .null = .null,
-    .comment = .comment,
-    .literal = .literal,
-    .transformer = sql_quote_transformer(.con),
-    .trim = .trim
+    sql,
+    .envir = envir,
+    .na = "NULL",
+    .null = "",
+    .transformer = function(text, envir) {
+      glue_transformer(con, text, envir, call = call)
+    }
   ))
 }
 
-sql_quote_transformer <- function(connection) {
-  function(text, envir) {
-    collapse_regex <- "[*][[:space:]]*$"
-    should_collapse <- grepl(collapse_regex, text)
-    if (should_collapse) {
-      text <- sub(collapse_regex, "", text)
-    }
 
-    type_regex <- "^\\.(tbl|col|name|from|kw|val) (.*)"
-    m <- regexec(type_regex, text)
-    is_quoted <- any(m[[1]] != -1)
-    if (is_quoted) {
-      matches <- regmatches(text, regexec(type_regex, text))[[1]]
-
-      type <- matches[[2]]
-      value <- matches[[3]]
-    } else {
-      value <- text
-      type <- "raw"
-    }
-    value <- eval(parse(text = value, keep.source = FALSE), envir)
-    glue_check_collapse(type, should_collapse)
-
-    if (type == "tbl") {
-      value <- as_table_path(value, connection)
-    } else if (type == "from") {
-      value <- as_table_source(value, connection)
-    } else if (type == "col") {
-      if (is_bare_character(value)) {
-        value <- ident(value)
-      }
-    } else if (type == "name") {
-      # allowed should be `ident`, `ident_q` (maybe), string
-      if (is_bare_character(value)) {
-        value <- ident(value)
-      }
-    } else if (type == "kw") {
-      value <- sql(style_kw(value))
-    } else if (type == "val") {
-      # keep as is
-    } else if (type == "raw") {
-      if (!is.sql(value) && !is_string(value)) {
-        stop_input_type(
-          value,
-          what = c("a string", "scalar SQL")
-        )
-      }
-    }
-
-    if (type == "val") {
-      if (should_collapse) {
-        value <- escape(
-          value,
-          collapse = ", ",
-          parens = FALSE,
-          con = connection
-        )
-      } else {
-        value <- escape(value, con = connection)
-      }
-    } else if (type %in% c("tbl", "from", "col", "name")) {
-      value <- escape(value, collapse = NULL, parens = FALSE, con = connection)
-      if (should_collapse) {
-        value <- paste0(unclass(value), collapse = ", ")
-      }
-    }
-
-    # TODO use `vctrs::vec_check_size(value, size = 1L)`
-    if (length(value) != 1) {
-      cli_abort("{.arg value} must have size 1, not {length(value)}.")
-    }
-
-    unclass(value)
-  }
-}
-
-glue_check_collapse <- function(type, collapse) {
-  if (type %in% c("col", "val")) {
-    return()
-  }
-
-  if (collapse) {
-    cli_abort(
-      "Collapsing is only allowed for {.val col} and {.val val}, not for {.val {type}}."
+glue_transformer <- function(con, text, envir, call = caller_env()) {
+  parsed <- parse_glue_spec(text)
+  if (!parsed$type %in% c("sql", "tbl", "from", "id", "")) {
+    cli::cli_abort(
+      "Unknown marker {.val {parsed$type}} in {{{text}}}.",
+      call = call
     )
   }
+
+  if (parsed$value == "...") {
+    value <- eval(quote(list(...)), envir)
+  } else {
+    withCallingHandlers(
+      value <- eval(parse(text = parsed$value, keep.source = FALSE), envir),
+      error = function(e) {
+        cli::cli_abort(
+          "Failed to interpolate {{{text}}.",
+          call = call,
+          parent = e
+        )
+      }
+    )
+  }
+
+  # Coerce types that need coercion
+  if (parsed$type == "sql") {
+    value <- sql(value)
+  } else if (parsed$type == "tbl") {
+    value <- as_table_path(value, con)
+  } else if (parsed$type == "id") {
+    value <- as_ident(value)
+  }
+
+  if (parsed$collapse) {
+    value <- escape(value, collapse = ", ", parens = TRUE, con = con)
+  } else {
+    value <- escape(value, collapse = ", ", parens = FALSE, con = con)
+  }
+
+  unclass(value)
+}
+
+parse_glue_spec <- function(text) {
+  # optional format string, like .id, .table
+  # followed by R expression
+  # followed by optional *, and whitespace
+  re <- "^(\\.([^ ]+) )?\\s*([^*]+)([*]?)\\s*$"
+  rc <- regexec(re, text)
+  rm <- regmatches(text, rc)[[1]]
+
+  list(
+    type = rm[[3]],
+    value = rm[[4]],
+    collapse = rm[[5]] == "*"
+  )
 }

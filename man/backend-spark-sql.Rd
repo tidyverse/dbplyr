@@ -21,9 +21,9 @@ library(dplyr, warn.conflicts = FALSE)
 
 lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = simulate_spark_sql())
 
-lf \%>\% summarise(x = median(d, na.rm = TRUE))
-lf \%>\% summarise(x = var(c, na.rm = TRUE), .by = d)
+lf |> summarise(x = median(d, na.rm = TRUE))
+lf |> summarise(x = var(c, na.rm = TRUE), .by = d)
 
-lf \%>\% mutate(x = first(c))
-lf \%>\% mutate(x = first(c), .by = d)
+lf |> mutate(x = first(c))
+lf |> mutate(x = first(c), .by = d)
 }

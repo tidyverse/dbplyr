@@ -30,7 +30,9 @@
 #'
 #' * `sql_query_explain(con, sql)` generates SQL that "explains" a query,
 #'   i.e. generates a query plan describing what indexes etc that the
-#'   database will use.
+#'   database will use. It can return character vector, in which case the
+#'   first n elements are used to generate the plan and the final element
+#'   is used to return the query plan.
 #'
 #' * `sql_query_fields()` generates SQL for a 0-row result that is used to
 #'   capture field names in [tbl_sql()]
@@ -61,31 +63,6 @@
 #' * `sql_query_delete()` generates SQL for an `DELETE FROM` query
 #' * `sql_returning_cols()` generates SQL for a `RETURNING` clause
 #'
-#' @section dbplyr 2.0.0:
-#'
-#' Many `dplyr::db_*` generics have been replaced by `dbplyr::sql_*` generics.
-#' To update your backend, you'll need to extract the SQL generation out of your
-#' existing code, and place it in a new method for a dbplyr `sql_` generic.
-#'
-#' * `dplyr::db_analyze()` is replaced by `dbplyr::sql_table_analyze()`
-#' * `dplyr::db_explain()` is replaced by `dbplyr::sql_query_explain()`
-#' * `dplyr::db_create_index()` is replaced by `dbplyr::sql_table_index()`
-#' * `dplyr::db_query_fields()` is replaced by `dbplyr::sql_query_fields()`
-#' * `dplyr::db_query_rows()` is no longer used; you can delete it
-#' * `dplyr::db_save_query()` is replaced by `dbplyr::sql_query_save()`
-#'
-#' The query generating functions have also changed names. Their behaviour is
-#' unchanged, so you just need to rename the generic and import from dbplyr
-#' instead of dplyr.
-#'
-#' * `dplyr::sql_select()` is replaced by `dbplyr::sql_query_select()`
-#' * `dplyr::sql_join()` is replaced by `dbplyr::sql_query_join()`
-#' * `dplyr::sql_semi_join()` is replaced by `dbplyr::sql_query_semi_join()`
-#' * `dplyr::sql_set_op()` is replaced by `dbplyr::sql_query_set_op()`
-#' * `dplyr::sql_subquery()` is replaced by `dbplyr::sql_query_wrap()`
-#'
-#' Learn more in `vignette("backend-2.0")`
-#'
 #' @keywords internal
 #' @family generic
 #' @name db-sql
@@ -97,16 +74,12 @@ sql_expr_matches <- function(con, x, y, ...) {
   check_dots_used()
   UseMethod("sql_expr_matches")
 }
-# https://modern-sql.com/feature/is-distinct-from
+
 #' @export
 sql_expr_matches.DBIConnection <- function(con, x, y, ...) {
-  glue_sql2(
-    con,
-    "CASE WHEN ({x} = {y}) OR ({x} IS NULL AND {y} IS NULL) ",
-    "THEN 0 ",
-    "ELSE 1 ",
-    "END = 0"
-  )
+  # https://modern-sql.com/feature/is-distinct-from
+  sql <- "CASE WHEN ({x} = {y}) OR ({x} IS NULL AND {y} IS NULL) THEN 0 ELSE 1 END = 0"
+  sql_glue2(con, sql)
 }
 
 #' @export
@@ -116,11 +89,7 @@ sql_translation <- function(con) {
 }
 # sql_translation.DBIConnection lives in backend-.R
 dbplyr_sql_translation <- function(con) {
-  dbplyr_fallback(con, "sql_translate_env")
-}
-#' @importFrom dplyr sql_translate_env
-#' @export
-sql_translate_env.DBIConnection <- function(con) {
+  check_2ed(con)
   sql_translation(con)
 }
 
@@ -146,7 +115,7 @@ sql_table_analyze <- function(con, table, ...) {
 }
 #' @export
 sql_table_analyze.DBIConnection <- function(con, table, ...) {
-  glue_sql2(con, "ANALYZE {.tbl {table}}")
+  sql_glue2(con, "ANALYZE {.tbl {table}}")
 }
 
 #' @rdname db-sql
@@ -183,12 +152,11 @@ sql_table_index.DBIConnection <- function(
     table_name <- table_path_name(table, con)
     name <- name %||% paste0(c(table_name, columns), collapse = "_")
   }
-  glue_sql2(
+
+  index <- if (unique) "UNIQUE INDEX" else "INDEX"
+  sql_glue2(
     con,
-    "CREATE ",
-    if (unique) "UNIQUE ",
-    "INDEX {.name name}",
-    " ON {.tbl table} ({.col columns*})"
+    "CREATE {.sql index} {.id name} ON {.tbl table} {.id columns*}"
   )
 }
 
@@ -203,7 +171,7 @@ sql_query_explain <- function(con, sql, ...) {
 }
 #' @export
 sql_query_explain.DBIConnection <- function(con, sql, ...) {
-  glue_sql2(con, "EXPLAIN {sql}")
+  sql_glue2(con, "EXPLAIN {sql}")
 }
 
 #' @rdname db-sql
@@ -242,16 +210,10 @@ sql_query_save.DBIConnection <- function(
   temporary = TRUE,
   ...
 ) {
-  name <- as_table_path(name, con)
+  sql <- as_table_source(sql)
 
-  glue_sql2(
-    con,
-    "CREATE ",
-    if (temporary) sql("TEMPORARY "),
-    "TABLE \n",
-    "{.tbl {name}} AS\n",
-    "{.from sql}"
-  )
+  table <- if (temporary) "TEMPORARY TABLE" else "TABLE"
+  sql_glue2(con, "CREATE {.sql table}\n{.tbl {name}} AS\n{sql}")
 }
 #' @export
 #' @rdname db-sql
@@ -267,15 +229,15 @@ sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
 
   if (is.sql(from)) {
     if (db_supports_table_alias_with_as(con)) {
-      as_sql <- style_kw(" AS ")
+      as_sql <- style_kw("AS ")
     } else {
-      as_sql <- " "
+      as_sql <- ""
     }
 
     from <- sql_indent_subquery(from, con, lvl)
     # some backends, e.g. Postgres, require an alias for a subquery
     name <- name %||% unique_subquery_name()
-    glue_sql2(con, "{from}", as_sql, "{.tbl name}")
+    sql_glue2(con, "{from} {.sql as_sql}{.tbl name}")
   } else {
     # must be a table_path
     if (!is.null(name)) {
@@ -318,7 +280,7 @@ sql_query_rows <- function(con, sql, ...) {
 sql_query_rows.DBIConnection <- function(con, sql, ...) {
   sql <- as_table_source(sql, con)
   from <- dbplyr_sql_subquery(con, sql, "master")
-  glue_sql2(con, "SELECT COUNT(*) FROM {.from from}")
+  sql_glue2(con, "SELECT COUNT(*) FROM {.from from}")
 }
 
 #' @rdname db-sql
@@ -401,12 +363,7 @@ sql_query_select.DBIConnection <- function(
     lvl = lvl
   )
 }
-dbplyr_query_select <- function(con, ...) {
-  dbplyr_fallback(con, "sql_select", ...)
-}
-#' @importFrom dplyr sql_select
-#' @export
-sql_select.DBIConnection <- function(
+dbplyr_query_select <- function(
   con,
   select,
   from,
@@ -418,6 +375,7 @@ sql_select.DBIConnection <- function(
   distinct = FALSE,
   ...
 ) {
+  check_2ed(con)
   # TODO should add argument `window` after tidyverse/dplyr#4663
   # TODO should add argument `subquery` after tidyverse/dplyr#4663
   sql_query_select(
@@ -486,12 +444,7 @@ sql_query_join.DBIConnection <- function(
   )
   sql_format_clauses(clauses, lvl, con)
 }
-dbplyr_query_join <- function(con, ..., lvl = 0) {
-  dbplyr_fallback(con, "sql_join", ..., lvl = lvl)
-}
-#' @export
-#' @importFrom dplyr sql_join
-sql_join.DBIConnection <- function(
+dbplyr_query_join <- function(
   con,
   x,
   y,
@@ -503,6 +456,7 @@ sql_join.DBIConnection <- function(
   select = NULL,
   lvl = 0
 ) {
+  check_2ed(con)
   sql_query_join(
     con,
     x,
@@ -551,7 +505,7 @@ sql_query_multi_join <- function(
 #' df2 <- lazy_frame(x = 1, z = 1)
 #' df3 <- lazy_frame(x = 1, z2 = 1)
 #'
-#' tmp <- left_join(df1, df2, by = "x") %>%
+#' tmp <- left_join(df1, df2, by = "x") |>
 #'   left_join(df3, by = c("x", z = "z2"))
 #' tibble(
 #'   table = list(df1, df2),
@@ -577,36 +531,27 @@ sql_query_multi_join.DBIConnection <- function(
   }
 
   from <- dbplyr_sql_subquery(con, x, name = table_names[[1]], lvl = lvl)
-
-  join_table_queries <- purrr::map2(
-    joins$table,
-    table_names[-1],
-    function(table, name) {
-      dbplyr_sql_subquery(con, table, name = name, lvl = lvl)
-    }
-  )
+  names <- table_names[-1]
+  tables <- joins$table
   types <- toupper(paste0(joins$type, " JOIN"))
-  join_clauses <- purrr::map2(
-    types,
-    join_table_queries,
-    function(join_kw, from) sql_clause(join_kw, from)
-  )
 
-  on_clauses <- purrr::map(
-    joins$by,
-    function(by) {
-      on <- sql_join_tbls(con, by = by, na_matches = by$na_matches)
-      sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1)
-    }
-  )
-  join_on_clauses <- vctrs::vec_interleave(join_clauses, on_clauses)
+  n_joins <- length(types)
+  out <- vector("list", n_joins * 2)
+
+  for (i in seq_len(n_joins)) {
+    table <- dbplyr_sql_subquery(con, tables[[i]], name = names[[i]], lvl = lvl)
+    out[[2 * i - 1]] <- sql_clause(types[[i]], table)
+
+    by <- joins$by[[i]]
+    on <- sql_join_tbls(con, by = by, na_matches = by$na_matches)
+    out[[2 * i]] <- sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1)
+  }
 
   clauses <- list2(
     sql_clause_select(con, select),
     sql_clause_from(from),
-    !!!join_on_clauses
+    !!!out
   )
-
   sql_format_clauses(clauses, lvl = lvl, con = con)
 }
 
@@ -643,10 +588,12 @@ sql_query_semi_join.DBIConnection <- function(
 
   on <- sql_join_tbls(con, by, na_matches = by$na_matches)
 
+  exists <- if (anti) "NOT EXISTS" else "EXISTS"
+
   lines <- list(
     sql_clause_select(con, vars),
     sql_clause_from(x),
-    glue_sql2(con, "WHERE ", if (anti) "NOT ", "EXISTS ("),
+    sql_glue2(con, "WHERE {.sql exists} ("),
     # lvl = 1 because they are basically in a subquery
     sql_clause("SELECT 1 FROM", y, lvl = 1),
     sql_clause_where(c(on, where), lvl = 1),
@@ -655,12 +602,7 @@ sql_query_semi_join.DBIConnection <- function(
   sql_format_clauses(lines, lvl, con)
 }
 
-dbplyr_query_semi_join <- function(con, ...) {
-  dbplyr_fallback(con, "sql_semi_join", ...)
-}
-#' @export
-#' @importFrom dplyr sql_semi_join
-sql_semi_join.DBIConnection <- function(
+dbplyr_query_semi_join <- function(
   con,
   x,
   y,
@@ -669,6 +611,7 @@ sql_semi_join.DBIConnection <- function(
   ...,
   lvl = 0
 ) {
+  check_2ed(con)
   sql_query_semi_join(con, x, y, anti = anti, by = by, ..., lvl = lvl)
 }
 
@@ -697,17 +640,6 @@ sql_query_set_op.DBIConnection <- function(
   )
   sql_format_clauses(lines, lvl, con)
 }
-# nocov start
-dbplyr_query_set_op <- function(con, ...) {
-  dbplyr_fallback(con, "sql_set_op", ...)
-}
-#' @importFrom dplyr sql_set_op
-#' @export
-sql_set_op.DBIConnection <- function(con, x, y, method) {
-  # dplyr::sql_set_op() doesn't have ...
-  sql_query_set_op(con, x, y, method)
-}
-# nocov end
 
 #' @rdname db-sql
 #' @export
@@ -1049,13 +981,7 @@ sql_query_upsert.DBIConnection <- function(
   updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
   update_name <- sql(escape(ident("updated"), con = con))
 
-  join_by <- list(
-    x = by,
-    y = by,
-    x_as = "updated",
-    y_as = "...y",
-    condition = "="
-  )
+  join_by <- new_join_by(by, x_as = "updated", y_as = "...y")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
 
   clauses <- list2(
@@ -1134,12 +1060,9 @@ sql_named_cols <- function(con, cols, table = NULL) {
 
 # dplyr fallbacks ---------------------------------------------------------
 
-dbplyr_analyze <- function(con, ...) {
-  dbplyr_fallback(con, "db_analyze", ...)
-}
-#' @export
-#' @importFrom dplyr db_analyze
-db_analyze.DBIConnection <- function(con, table, ...) {
+dbplyr_analyze <- function(con, table, ...) {
+  check_2ed(con)
+
   sql <- sql_table_analyze(con, table, ...)
   if (is.null(sql)) {
     return() # nocov
@@ -1152,12 +1075,7 @@ db_analyze.DBIConnection <- function(con, table, ...) {
   )
 }
 
-dbplyr_create_index <- function(con, ...) {
-  dbplyr_fallback(con, "db_create_index", ...)
-}
-#' @export
-#' @importFrom dplyr db_create_index
-db_create_index.DBIConnection <- function(
+dbplyr_create_index <- function(
   con,
   table,
   columns,
@@ -1165,6 +1083,7 @@ db_create_index.DBIConnection <- function(
   unique = FALSE,
   ...
 ) {
+  check_2ed(con)
   sql <- sql_table_index(con, table, columns, name = name, unique = unique, ...)
   db_execute(
     con,
@@ -1173,36 +1092,30 @@ db_create_index.DBIConnection <- function(
   )
 }
 
-dbplyr_explain <- function(con, ...) {
-  dbplyr_fallback(con, "db_explain", ...)
-}
-#' @export
-#' @importFrom dplyr db_explain
-db_explain.DBIConnection <- function(con, sql, ...) {
+dbplyr_explain <- function(con, sql, ...) {
+  check_2ed(con)
+
   sql <- sql_query_explain(con, sql, ...)
-  expl <- db_get_query(con, sql, "Can't explain query.")
+  n <- length(sql)
+  for (i in seq_len(n - 1)) {
+    db_execute(con, sql[[i]], "Can't explain query.")
+  }
+  expl <- db_get_query(con, sql[[n]], "Can't explain query.")
 
   out <- utils::capture.output(print(expl))
   paste(out, collapse = "\n")
 }
 
-dbplyr_query_fields <- function(con, ...) {
-  dbplyr_fallback(con, "db_query_fields", ...)
-}
-#' @export
-#' @importFrom dplyr db_query_fields
-db_query_fields.DBIConnection <- function(con, sql, ...) {
+
+dbplyr_query_fields <- function(con, sql, ...) {
+  check_2ed(con)
+
   sql <- sql_query_fields(con, sql, ...)
   df <- db_get_query(con, sql, "Can't query fields.")
   names(df)
 }
 
-dbplyr_save_query <- function(con, ...) {
-  dbplyr_fallback(con, "db_save_query", ...)
-}
-#' @export
-#' @importFrom dplyr db_save_query
-db_save_query.DBIConnection <- function(
+dbplyr_save_query <- function(
   con,
   sql,
   name,
@@ -1210,6 +1123,8 @@ db_save_query.DBIConnection <- function(
   ...,
   overwrite = FALSE
 ) {
+  check_2ed(con)
+
   name <- as_table_path(name, con)
   sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
 
@@ -1229,18 +1144,14 @@ db_save_query.DBIConnection <- function(
   name
 }
 
-dbplyr_sql_subquery <- function(con, ...) {
-  dbplyr_fallback(con, "sql_subquery", ...)
-}
-#' @export
-#' @importFrom dplyr sql_subquery
-sql_subquery.DBIConnection <- function(
+dbplyr_sql_subquery <- function(
   con,
   from,
   name = unique_subquery_name(),
   ...,
   lvl = 0
 ) {
+  check_2ed(con)
   sql_query_wrap(con, from = from, name = name, ..., lvl = lvl)
 }
 

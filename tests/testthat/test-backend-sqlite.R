@@ -5,78 +5,72 @@ test_that("logicals translated to integers", {
 })
 
 test_that("vectorised translations", {
-  local_con(simulate_sqlite())
+  con <- simulate_sqlite()
 
-  expect_equal(test_translate_sql(paste(x, y)), sql("`x` || ' ' || `y`"))
-  expect_equal(test_translate_sql(paste0(x, y)), sql("`x` || `y`"))
+  expect_translation(con, paste(x, y), "`x` || ' ' || `y`")
+  expect_translation(con, paste0(x, y), "`x` || `y`")
 })
 
 test_that("pmin and max become MIN and MAX", {
-  local_con(simulate_sqlite())
+  con <- simulate_sqlite()
 
-  expect_equal(
-    test_translate_sql(pmin(x, y, na.rm = TRUE)),
-    sql('MIN(`x`, `y`)')
-  )
-  expect_equal(
-    test_translate_sql(pmax(x, y, na.rm = TRUE)),
-    sql('MAX(`x`, `y`)')
-  )
+  expect_translation(con, pmin(x, y, na.rm = TRUE), "MIN(`x`, `y`)")
+  expect_translation(con, pmax(x, y, na.rm = TRUE), "MAX(`x`, `y`)")
 })
 
 test_that("sqlite mimics two argument log", {
-  local_con(simulate_sqlite())
+  con <- simulate_sqlite()
 
-  expect_equal(test_translate_sql(log(x)), sql('LOG(`x`)'))
-  expect_equal(test_translate_sql(log(x, 10)), sql('LOG(`x`) / LOG(10.0)'))
+  expect_translation(con, log(x), "LOG(`x`)")
+  expect_translation(con, log(x, 10), "LOG(`x`) / LOG(10.0)")
 })
 
 test_that("date-time", {
-  local_con(simulate_sqlite())
+  con <- simulate_sqlite()
 
-  expect_equal(test_translate_sql(today()), sql("DATE('now')"))
-  expect_equal(test_translate_sql(now()), sql("DATETIME('now')"))
+  expect_translation(con, today(), "DATE('now')")
+  expect_translation(con, now(), "DATETIME('now')")
 })
 
 test_that("custom aggregates translated", {
-  local_con(simulate_sqlite())
+  con <- simulate_sqlite()
 
-  expect_equal(
-    test_translate_sql(median(x, na.rm = TRUE), window = FALSE),
-    sql('MEDIAN(`x`)')
+  expect_translation(
+    con,
+    median(x, na.rm = TRUE),
+    "MEDIAN(`x`)",
+    window = FALSE
   )
-  expect_equal(
-    test_translate_sql(sd(x, na.rm = TRUE), window = FALSE),
-    sql('STDEV(`x`)')
-  )
+  expect_translation(con, sd(x, na.rm = TRUE), "STDEV(`x`)", window = FALSE)
   expect_error(
-    test_translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE),
+    translate_sql(quantile(x, 0.5, na.rm = TRUE), con = con, window = FALSE),
     class = "dbplyr_error_unsupported_fn"
   )
   expect_error(
-    test_translate_sql(quantile(x, 0.5, na.rm = TRUE), window = TRUE),
+    translate_sql(quantile(x, 0.5, na.rm = TRUE), con = con, window = TRUE),
     class = "dbplyr_error_unsupported_fn"
   )
 })
 
 test_that("custom SQL translation", {
-  local_con(simulate_sqlite())
+  con <- simulate_sqlite()
 
   lf <- lazy_frame(x = 1, con = simulate_sqlite())
   expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
 
-  expect_snapshot(test_translate_sql(runif(n())))
+  expect_snapshot(translate_sql(runif(n()), con = con))
 })
 
 test_that("case_when translates correctly to ELSE when TRUE ~ is used", {
+  con <- simulate_sqlite()
   expect_snapshot(
-    test_translate_sql(
+    translate_sql(
       case_when(
         x == 1L ~ "yes",
         x == 0L ~ "no",
         TRUE ~ "undefined"
       ),
-      con = simulate_sqlite()
+      con = con
     )
   )
 })
@@ -87,14 +81,14 @@ test_that("case_when translates correctly to ELSE when TRUE ~ is used", {
 test_that("as.numeric()/as.double() get custom translation", {
   mf <- dbplyr::memdb_frame(x = 1L)
 
-  out <- mf %>% mutate(x1 = as.numeric(x), x2 = as.double(x)) %>% collect()
+  out <- mf |> mutate(x1 = as.numeric(x), x2 = as.double(x)) |> collect()
   expect_type(out$x1, "double")
   expect_type(out$x2, "double")
 })
 
 test_that("date extraction agrees with R", {
   db <- memdb_frame(x = "2000-01-02 03:40:50.5")
-  out <- db %>%
+  out <- db |>
     transmute(
       year = year(x),
       month = month(x),
@@ -103,8 +97,8 @@ test_that("date extraction agrees with R", {
       minute = minute(x),
       second = second(x),
       yday = yday(x),
-    ) %>%
-    collect() %>%
+    ) |>
+    collect() |>
     as.list()
 
   expect_equal(
@@ -123,5 +117,5 @@ test_that("date extraction agrees with R", {
 
 test_that("can explain a query", {
   db <- copy_to_test("sqlite", data.frame(x = 1:5), indexes = list("x"))
-  expect_snapshot(db %>% filter(x > 2) %>% explain())
+  expect_snapshot(db |> filter(x > 2) |> explain())
 })

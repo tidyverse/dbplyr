@@ -101,7 +101,7 @@ memdb_frame(
   id = c("a", "b"),
   x = 1:2,
   y = 3:4
-) \%>\%
+) |>
   tidyr::pivot_longer(-id)
 \dontshow{\}) # examplesIf}
 }

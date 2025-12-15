@@ -18,7 +18,7 @@ If a combination of \code{...} is not distinct, this keeps the
 first row of values.}
 }
 \value{
-Another \code{tbl_lazy}. Use \code{\link[dplyr:explain]{dplyr::show_query()}} to see the generated
+Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
 query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
@@ -30,6 +30,6 @@ This is a method for the dplyr \code{\link[dplyr:distinct]{dplyr::distinct()}} g
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(x = c(1, 1, 2, 2), y = c(1, 2, 1, 1))
-db \%>\% distinct() \%>\% show_query()
-db \%>\% distinct(x) \%>\% show_query()
+db |> distinct() |> show_query()
+db |> distinct(x) |> show_query()
 }

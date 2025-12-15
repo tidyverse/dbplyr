@@ -34,7 +34,7 @@ the option "dplyr.summarise.inform" is set to \code{FALSE},
 or when \code{summarise()} is called from a function in a package.}
 }
 \value{
-Another \code{tbl_lazy}. Use \code{\link[dplyr:explain]{dplyr::show_query()}} to see the generated
+Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
 query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
@@ -47,12 +47,12 @@ This is a method for the dplyr \code{\link[dplyr:summarise]{dplyr::summarise()}}
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(g = c(1, 1, 1, 2, 2), x = c(4, 3, 6, 9, 2))
-db \%>\%
-  summarise(n()) \%>\%
+db |>
+  summarise(n()) |>
   show_query()
 
-db \%>\%
-  group_by(g) \%>\%
-  summarise(n()) \%>\%
+db |>
+  group_by(g) |>
+  summarise(n()) |>
   show_query()
 }

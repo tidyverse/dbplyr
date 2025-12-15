@@ -5,7 +5,7 @@
 \alias{tbl_dbi}
 \title{Use dplyr verbs with a remote database table}
 \usage{
-\method{tbl}{src_dbi}(src, from, ...)
+\method{tbl}{src_dbi}(src, from, vars = NULL, ...)
 }
 \arguments{
 \item{src}{A \code{DBIConnection} object produced by \code{DBI::dbConnect()}.}
@@ -17,6 +17,10 @@ recommend using \code{I()} to identify a table outside the default catalog or
 schema, e.g. \code{I("schema.table")} or \code{I("catalog.schema.table")}. You can
 also use \code{\link[=in_schema]{in_schema()}}/\code{\link[=in_catalog]{in_catalog()}} or \code{\link[DBI:Id]{DBI::Id()}}.}
 
+\item{vars}{Optionally, provide a character vector of column names. If
+not supplied, will be retrieved from the database by running a simple
+query. Mainly useful for better performance when creating many \code{tbl}s.}
+
 \item{...}{Passed on to \code{\link[=tbl_sql]{tbl_sql()}}}
 }
 \description{
@@ -24,7 +28,7 @@ All data manipulation on SQL tbls are lazy: they will not actually
 run the query or retrieve the data unless you ask for it: they all return
 a new \code{tbl_dbi} object. Use \code{\link[dplyr:compute]{dplyr::compute()}} to run the query and save the
 results in a temporary table in the database, or use \code{\link[dplyr:compute]{dplyr::collect()}} to retrieve the
-results to R. You can see the query with \code{\link[dplyr:explain]{dplyr::show_query()}}.
+results to R. You can see the query with \code{\link[=show_query]{show_query()}}.
 }
 \details{
 For best performance, the database should have an index on the variables
@@ -45,13 +49,13 @@ copy_to(con, mtcars)
 DBI::dbListTables(con)
 
 # To retrieve a single table from a source, use `tbl()`
-con \%>\% tbl("mtcars")
+con |> tbl("mtcars")
 
 # Use `I()` for qualified table names
-con \%>\% tbl(I("temp.mtcars")) \%>\% head(1)
+con |> tbl(I("temp.mtcars")) |> head(1)
 
 # You can also use pass raw SQL if you want a more sophisticated query
-con \%>\% tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))
+con |> tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))
 
 # If you just want a temporary in-memory database, use src_memdb()
 src2 <- src_memdb()
@@ -65,15 +69,15 @@ batting <- copy_to(con, Lahman::Batting)
 batting
 
 # Basic data manipulation verbs work in the same way as with a tibble
-batting \%>\% filter(yearID > 2005, G > 130)
-batting \%>\% select(playerID:lgID)
-batting \%>\% arrange(playerID, desc(yearID))
-batting \%>\% summarise(G = mean(G), n = n())
+batting |> filter(yearID > 2005, G > 130)
+batting |> select(playerID:lgID)
+batting |> arrange(playerID, desc(yearID))
+batting |> summarise(G = mean(G), n = n())
 
 # There are a few exceptions. For example, databases give integer results
 # when dividing one integer by another. Multiply by 1 to fix the problem
-batting \%>\%
-  select(playerID:lgID, AB, R, G) \%>\%
+batting |>
+  select(playerID:lgID, AB, R, G) |>
   mutate(
    R_per_game1 = R / G,
    R_per_game2 = R * 1.0 / G
@@ -86,10 +90,10 @@ system.time(recent <- filter(batting, yearID > 2010))
 system.time(collect(recent))
 
 # You can see the query that dplyr creates with show_query()
-batting \%>\%
-  filter(G > 0) \%>\%
-  group_by(playerID) \%>\%
-  summarise(n = n()) \%>\%
+batting |>
+  filter(G > 0) |>
+  group_by(playerID) |>
+  summarise(n = n()) |>
   show_query()
 }
 }

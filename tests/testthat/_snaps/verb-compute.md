@@ -18,24 +18,13 @@
 # compute can handle schema
 
     Code
-      df %>% compute(name = in_schema("main", "db1"), temporary = FALSE)
+      compute(df, name = in_schema("main", "db1"), temporary = FALSE)
     Condition
       Error in `db_compute()`:
       ! Can't copy query to table `main`.`db1`.
-      Caused by error in `db_save_query.DBIConnection()`:
+      Caused by error in `dbplyr_save_query()`:
       ! Can't save query to table `main`.`db1`.
       i Using SQL: CREATE TABLE `main`.`db1` AS SELECT * FROM `dbplyr_{tmp}`
-      Caused by error:
-      ! dummy DBI error
-
-# collect() handles DBI error
-
-    Code
-      (expect_error(mf %>% mutate(a = sql("invalid sql")) %>% collect()))
-    Output
-      <error/rlang_error>
-      Error in `collect()`:
-      ! Failed to collect lazy table.
       Caused by error:
       ! dummy DBI error
 

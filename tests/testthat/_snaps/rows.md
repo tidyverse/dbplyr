@@ -34,8 +34,8 @@
 ---
 
     Code
-      (df %>% mutate(x = x + 1) %>% rows_insert(df, by = "x", conflict = "ignore",
-        in_place = TRUE))
+      (rows_insert(mutate(df, x = x + 1), df, by = "x", conflict = "ignore",
+      in_place = TRUE))
     Condition
       Error in `target_table()`:
       ! Can't determine name for target table. Set `in_place = FALSE` to return a lazy table.
@@ -43,7 +43,7 @@
 ---
 
     Code
-      (df %>% rows_insert(df, by = "x", conflict = "ignore", returning = c(y)))
+      (rows_insert(df, df, by = "x", conflict = "ignore", returning = c(y)))
     Condition
       Error in `rows_insert()`:
       ! Can't select columns that don't exist.
@@ -144,14 +144,14 @@
 # rows_append() checks arguments
 
     Code
-      (lf %>% rows_append(df, by = "x"))
+      (rows_append(lf, df, by = "x"))
     Condition
       Error in `rows_append()`:
       ! `...` must be empty.
       x Problematic argument:
       * by = "x"
     Code
-      (lf %>% rows_append(df, conflict = "error"))
+      (rows_append(lf, df, conflict = "error"))
     Condition
       Error in `rows_append()`:
       ! `...` must be empty.
@@ -274,8 +274,8 @@
 ---
 
     Code
-      (df %>% mutate(x = x + 1) %>% rows_update(df, by = "x", unmatched = "ignore",
-        in_place = TRUE))
+      (rows_update(mutate(df, x = x + 1), df, by = "x", unmatched = "ignore",
+      in_place = TRUE))
     Condition
       Error in `target_table()`:
       ! Can't determine name for target table. Set `in_place = FALSE` to return a lazy table.

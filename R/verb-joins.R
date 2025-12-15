@@ -45,25 +45,25 @@
 #'
 #' band_db <- tbl_memdb(dplyr::band_members)
 #' instrument_db <- tbl_memdb(dplyr::band_instruments)
-#' band_db %>% left_join(instrument_db) %>% show_query()
+#' band_db |> left_join(instrument_db) |> show_query()
 #'
 #' # Can join with local data frames by setting copy = TRUE
-#' band_db %>%
+#' band_db |>
 #'   left_join(dplyr::band_instruments, copy = TRUE)
 #'
 #' # Unlike R, joins in SQL don't usually match NAs (NULLs)
 #' db <- memdb_frame(x = c(1, 2, NA))
 #' label <- memdb_frame(x = c(1, NA), label = c("one", "missing"))
-#' db %>% left_join(label, by = "x")
+#' db |> left_join(label, by = "x")
 #' # But you can activate R's usual behaviour with the na_matches argument
-#' db %>% left_join(label, by = "x", na_matches = "na")
+#' db |> left_join(label, by = "x", na_matches = "na")
 #'
 #' # By default, joins are equijoins, but you can use `sql_on` to
 #' # express richer relationships
 #' db1 <- memdb_frame(x = 1:5)
 #' db2 <- memdb_frame(x = 1:3, y = letters[1:3])
-#' db1 %>% left_join(db2) %>% show_query()
-#' db1 %>% left_join(db2, sql_on = "LHS.x < RHS.x") %>% show_query()
+#' db1 |> left_join(db2) |> show_query()
+#' db1 |> left_join(db2, sql_on = "LHS.x < RHS.x") |> show_query()
 #' @name join.tbl_sql
 NULL
 
@@ -377,7 +377,7 @@ add_join <- function(
     indexes = if (auto_index) list(by$y)
   )
 
-  suffix <- suffix %||% sql_join_suffix(x$src$con, suffix)
+  suffix <- suffix %||% sql_join_suffix(x$con, suffix)
   vars <- join_cols(
     x_names = x_names,
     y_names = y_names,
@@ -392,7 +392,7 @@ add_join <- function(
   # the table alias can only be determined after `select()` was inlined.
   # This works even though `by` is used in `join_inline_select()` and updated
   # because this does not touch `by$x_as` and `by$y_as`.
-  join_alias <- make_join_aliases(x$src$con, x_as, y_as, sql_on, call)
+  join_alias <- make_join_aliases(x$con, x_as, y_as, sql_on, call)
 
   inline_result <- join_inline_select(x$lazy_query, by$x, by$on)
   x_lq <- inline_result$lq
@@ -480,26 +480,39 @@ add_join <- function(
   x_lq
 }
 
-join_inline_select <- function(lq, by, on) {
-  if (is_empty(on) && is_lazy_select_query_simple(lq, select = "projection")) {
+join_inline_select <- function(lq, by, on, semi = FALSE) {
+  can_inline <- is_lazy_select_query_simple(
+    lq,
+    ignore_where = semi,
+    ignore_group_by = semi,
+    select = "projection"
+  )
+
+  if (is_empty(on) && can_inline) {
     vars <- purrr::map_chr(lq$select$expr, as_string)
 
-    idx <- vctrs::vec_match(lq$select$name, by)
-    by <- vctrs::vec_assign(by, idx, vars)
+    # Rename join by columns if needed
+    idx <- match(by, lq$select$name)
+    matched <- !is.na(idx)
+    by[matched] <- vars[idx[matched]]
 
     lq_org <- lq
     lq <- lq$x
     lq$group_vars <- op_grps(lq_org)
     lq$order_vars <- op_sort(lq_org)
     lq$frame <- op_frame(lq_org)
+
+    where <- if (semi) lq_org$where
   } else {
     vars <- op_vars(lq)
+    where <- NULL
   }
 
   list(
     lq = lq,
     vars = vars,
-    by = by
+    by = by,
+    where = where
   )
 }
 
@@ -697,7 +710,7 @@ add_semi_join <- function(
   x_vars <- inline_result$vars
   by$x <- inline_result$by
 
-  inline_result <- semi_join_inline_select(y$lazy_query, by$y, sql_on)
+  inline_result <- join_inline_select(y$lazy_query, by$y, sql_on, semi = TRUE)
   y_lq <- inline_result$lq
   by$y <- inline_result$by
   where <- inline_result$where
@@ -709,7 +722,7 @@ add_semi_join <- function(
   by$na_matches <- na_matches
 
   # the table alias can only be determined after `select()` was inlined
-  join_alias <- make_join_aliases(x$src$con, x_as, y_as, sql_on, call)
+  join_alias <- make_join_aliases(x$con, x_as, y_as, sql_on, call)
 
   aliases <- vctrs::vec_rbind(
     make_table_names(join_alias$x, x_lq),
@@ -727,42 +740,6 @@ add_semi_join <- function(
     by = by,
     where = where,
     call = call
-  )
-}
-
-can_inline_semi_join <- function(x) {
-  is_lazy_select_query_simple(
-    x,
-    ignore_where = TRUE,
-    ignore_group_by = TRUE,
-    select = "projection"
-  )
-}
-
-semi_join_inline_select <- function(lq, by, on) {
-  if (is_empty(on) && can_inline_semi_join(lq)) {
-    vars <- purrr::map_chr(lq$select$expr, as_string)
-
-    idx <- vctrs::vec_match(lq$select$name, by)
-    by <- vctrs::vec_assign(by, idx, vars)
-
-    lq_org <- lq
-    lq <- lq$x
-    lq$group_vars <- op_grps(lq_org)
-    lq$order_vars <- op_sort(lq_org)
-    lq$frame <- op_frame(lq_org)
-
-    where <- lq_org$where
-  } else {
-    vars <- op_vars(lq)
-    where <- NULL
-  }
-
-  list(
-    lq = lq,
-    vars = vars,
-    by = by,
-    where = where
   )
 }
 

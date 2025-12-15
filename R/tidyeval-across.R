@@ -83,7 +83,7 @@ partial_eval_if <- function(
   if (is_empty(conditions)) {
     return(TRUE)
   }
-  Reduce(function(x, y) call2(reduce, x, y), conditions)
+  Reduce(\(x, y) call2(reduce, x, y), conditions)
 }
 
 deprecate_across_dots <- function(call, env, user_env) {
@@ -112,7 +112,7 @@ deprecate_across_dots <- function(call, env, user_env) {
 
 across_funs <- function(funs, env, dots, names_spec, fn, evaluated = FALSE) {
   if (is.null(funs)) {
-    fns <- list(`1` = function(x, ...) x)
+    fns <- list(`1` = \(x, ...) x)
     names_spec <- names_spec %||% "{.col}"
   } else if (is_quosure(funs)) {
     return(across_funs(
@@ -193,11 +193,11 @@ across_fun <- function(fun, env, dots, fn) {
   if (is_function(fun)) {
     fn_name <- find_fun(fun)
     if (!is_null(fn_name)) {
-      return(function(x, cur_col) call2(fn_name, x, !!!dots))
+      return(\(x, cur_col) call2(fn_name, x, !!!dots))
     }
     partial_eval_fun(fun, env, fn)
   } else if (is_symbol(fun) || is_string(fun)) {
-    function(x, cur_col) call2(fun, x, !!!dots)
+    \(x, cur_col) call2(fun, x, !!!dots)
   } else if (is_call(fun, "~")) {
     if (!is_empty(dots)) {
       cli_abort(
@@ -210,7 +210,7 @@ across_fun <- function(fun, env, dots, fn) {
       )
     }
 
-    partial_eval_prepare_fun(f_rhs(fun), c(".", ".x"))
+    partial_eval_prepare_fun(f_rhs(fun), c(".", ".x"), env)
   } else if (is_call(fun, "function")) {
     fun <- eval(fun, env)
     partial_eval_fun(fun, env, fn)
@@ -235,10 +235,12 @@ partial_eval_fun <- function(fun, env, fn) {
   }
   args <- fn_fmls_names(fun)
 
-  partial_eval_prepare_fun(body[[2]], args[[1]])
+  partial_eval_prepare_fun(body[[2]], args[[1]], fn_env(fun))
 }
 
-partial_eval_prepare_fun <- function(call, sym) {
+partial_eval_prepare_fun <- function(call, sym, env) {
+  # First resolve any .data/.env pronouns before symbol replacement
+  call <- resolve_mask_pronouns(call, env)
   call <- replace_sym(call, sym, replace = quote(!!.x))
   call <- replace_call(call, replace = quote(!!.cur_col))
   function(x, .cur_col) {
@@ -246,6 +248,31 @@ partial_eval_prepare_fun <- function(call, sym) {
       expr(!!call),
       child_env(empty_env(), .x = x, expr = rlang::expr, .cur_col = .cur_col)
     )
+  }
+}
+
+resolve_mask_pronouns <- function(call, env) {
+  if (is_mask_pronoun(call)) {
+    var <- call[[3]]
+
+    if (is_symbol(call[[2]], ".data")) {
+      if (is_call(call, "[[")) {
+        sym(eval(var, env))
+      } else {
+        var
+      }
+    } else {
+      if (is_call(call, "[[")) {
+        env_get(env, var)
+      } else {
+        env_get(env, as.character(var))
+      }
+    }
+  } else if (is_call(call)) {
+    call[] <- lapply(call, resolve_mask_pronouns, env = env)
+    call
+  } else {
+    call
   }
 }
 
@@ -361,8 +388,8 @@ across_glue_mask <- function(.col, .fn, .caller_env) {
   # TODO: we can make these bindings louder later
   env_bind_active(
     glue_mask,
-    col = function() glue_mask$.col,
-    fn = function() glue_mask$.fn
+    col = \() glue_mask$.col,
+    fn = \() glue_mask$.fn
   )
   glue_mask
 }

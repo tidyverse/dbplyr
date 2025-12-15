@@ -8,34 +8,28 @@
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::group_by
 #' @param .drop Not supported by this method.
-#' @param add Deprecated. Please use `.add` instead.
 #' @export
 #' @importFrom dplyr group_by
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(g = c(1, 1, 1, 2, 2), x = c(4, 3, 6, 9, 2))
-#' db %>%
-#'   group_by(g) %>%
-#'   summarise(n()) %>%
+#' db |>
+#'   group_by(g) |>
+#'   summarise(n()) |>
 #'   show_query()
 #'
-#' db %>%
-#'   group_by(g) %>%
-#'   mutate(x2 = x / sum(x, na.rm = TRUE)) %>%
+#' db |>
+#'   group_by(g) |>
+#'   mutate(x2 = x / sum(x, na.rm = TRUE)) |>
 #'   show_query()
 group_by.tbl_lazy <- function(
   .data,
   ...,
   .add = FALSE,
-  add = deprecated(),
   .drop = TRUE
 ) {
   dots <- partial_eval_dots(.data, ..., .named = FALSE)
-
-  if (lifecycle::is_present(add)) {
-    lifecycle::deprecate_stop("1.0.0", "dplyr::group_by(add)", "group_by(.add)")
-  }
 
   check_unsupported_arg(.drop, TRUE)
   groups <- dplyr::group_by_prepare(

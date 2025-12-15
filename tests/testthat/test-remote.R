@@ -3,19 +3,19 @@ test_that("remote_table returns name when it makes sense", {
 
   # produces name after `group_by()`
   expect_equal(
-    mf %>% group_by(x) %>% remote_table(),
+    mf |> group_by(x) |> remote_table(),
     table_path("`refxiudlph`")
   )
 
   # produces name after unarranging
   expect_equal(
-    mf %>% arrange(x) %>% arrange() %>% remote_table(),
+    mf |> arrange(x) |> arrange() |> remote_table(),
     table_path("`refxiudlph`")
   )
 
   # produces name after compute()
   expect_false(is_null(
-    mf %>% mutate(x = x + 1) %>% compute() %>% remote_table()
+    mf |> mutate(x = x + 1) |> compute() |> remote_table()
   ))
 })
 
@@ -23,22 +23,22 @@ test_that("remote_table returns null for computed tables", {
   mf <- copy_to_test("sqlite", tibble(x = 5, y = 1), name = "refxiudlph")
   expect_equal(remote_table(mf), table_path("`refxiudlph`"))
 
-  expect_null(mf %>% filter(x == 3) %>% remote_table())
-  expect_null(mf %>% distinct(x) %>% remote_table())
-  expect_null(mf %>% mutate(x = x + 1) %>% remote_table())
-  expect_null(mf %>% select(x) %>% remote_table())
-  expect_null(mf %>% relocate(y, x) %>% remote_table())
-  expect_null(mf %>% head(3) %>% remote_table())
+  expect_null(mf |> filter(x == 3) |> remote_table())
+  expect_null(mf |> distinct(x) |> remote_table())
+  expect_null(mf |> mutate(x = x + 1) |> remote_table())
+  expect_null(mf |> select(x) |> remote_table())
+  expect_null(mf |> relocate(y, x) |> remote_table())
+  expect_null(mf |> head(3) |> remote_table())
 
-  expect_null(left_join(mf, mf, by = "x") %>% remote_table())
+  expect_null(left_join(mf, mf, by = "x") |> remote_table())
   lf <- lazy_frame(x = 1)
-  expect_null(lf %>% remote_table())
-  expect_null(lf %>% group_by(x) %>% remote_table())
+  expect_null(lf |> remote_table())
+  expect_null(lf |> group_by(x) |> remote_table())
 
   lf <- lazy_frame(x = 1)
-  expect_equal(lf %>% remote_table(null_if_local = FALSE), table_path("`df`"))
+  expect_equal(lf |> remote_table(null_if_local = FALSE), table_path("`df`"))
   expect_equal(
-    lf %>% group_by(x) %>% remote_table(null_if_local = FALSE),
+    lf |> group_by(x) |> remote_table(null_if_local = FALSE),
     table_path("`df`")
   )
 })

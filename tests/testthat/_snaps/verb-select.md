@@ -1,7 +1,7 @@
 # select after distinct produces subquery
 
     Code
-      lf %>% distinct() %>% select(x)
+      select(distinct(lf), x)
     Output
       <SQL>
       SELECT `x`
@@ -13,13 +13,13 @@
 # rename/relocate after distinct is inlined #1141
 
     Code
-      lf %>% distinct() %>% rename(z = y)
+      rename(distinct(lf), z = y)
     Output
       <SQL>
       SELECT DISTINCT `x`, `y` AS `z`
       FROM `df`
     Code
-      lf %>% distinct() %>% relocate(y)
+      relocate(distinct(lf), y)
     Output
       <SQL>
       SELECT DISTINCT `y`, `x`
@@ -28,14 +28,14 @@
 # select preserves grouping vars
 
     Code
-      out <- mf %>% select(a) %>% collect()
+      out <- collect(select(mf, a))
     Message
       Adding missing grouping variables: `b`
 
 # select() after left_join() is inlined
 
     Code
-      (out <- left_join(lf1, lf2, by = "x") %>% select(b, x))
+      (out <- select(left_join(lf1, lf2, by = "x"), b, x))
     Output
       <SQL>
       SELECT `b`, `lf1`.`x` AS `x`
@@ -46,7 +46,7 @@
 ---
 
     Code
-      (out <- left_join(lf1, lf2, by = "x") %>% relocate(b))
+      (out <- relocate(left_join(lf1, lf2, by = "x"), b))
     Output
       <SQL>
       SELECT `b`, `lf1`.*
@@ -57,7 +57,7 @@
 # select() after semi_join() is inlined
 
     Code
-      (out <- semi_join(lf1, lf2, by = "x") %>% select(x, a2 = a))
+      (out <- select(semi_join(lf1, lf2, by = "x"), x, a2 = a))
     Output
       <SQL>
       SELECT `x`, `a` AS `a2`
@@ -70,7 +70,7 @@
 ---
 
     Code
-      (out <- anti_join(lf1, lf2, by = "x") %>% relocate(a))
+      (out <- relocate(anti_join(lf1, lf2, by = "x"), a))
     Output
       <SQL>
       SELECT `a`, `x`
@@ -107,13 +107,13 @@
 # select() produces nice error messages
 
     Code
-      lf %>% select(non_existent)
+      select(lf, non_existent)
     Condition
       Error in `select()`:
       ! Can't select columns that don't exist.
       x Column `non_existent` doesn't exist.
     Code
-      lf %>% select(non_existent + 1)
+      select(lf, non_existent + 1)
     Condition
       Error in `select()`:
       i In argument: `non_existent + 1`.
@@ -123,13 +123,13 @@
 ---
 
     Code
-      lf %>% relocate(non_existent)
+      relocate(lf, non_existent)
     Condition
       Error in `relocate()`:
       ! Can't relocate columns that don't exist.
       x Column `non_existent` doesn't exist.
     Code
-      lf %>% relocate(non_existent + 1)
+      relocate(lf, non_existent + 1)
     Condition
       Error in `relocate()`:
       i In argument: `non_existent + 1`.
@@ -139,18 +139,18 @@
 ---
 
     Code
-      lf %>% rename(x)
+      rename(lf, x)
     Condition
       Error in `rename()`:
       ! All renaming inputs must be named.
     Code
-      lf %>% rename(y = non_existent)
+      rename(lf, y = non_existent)
     Condition
       Error in `rename()`:
       ! Can't rename columns that don't exist.
       x Column `non_existent` doesn't exist.
     Code
-      lf %>% rename(y = non_existent + 1)
+      rename(lf, y = non_existent + 1)
     Condition
       Error in `rename()`:
       i In argument: `non_existent + 1`.
@@ -160,13 +160,13 @@
 ---
 
     Code
-      lf %>% rename_with(toupper, .cols = non_existent)
+      rename_with(lf, toupper, .cols = non_existent)
     Condition
       Error in `rename_with()`:
       ! Can't select columns that don't exist.
       x Column `non_existent` doesn't exist.
     Code
-      lf %>% rename_with(toupper, .cols = non_existent + 1)
+      rename_with(lf, toupper, .cols = non_existent + 1)
     Condition
       Error in `rename_with()`:
       i In argument: `non_existent + 1`.
@@ -176,7 +176,7 @@
 # where() isn't suppored
 
     Code
-      lf %>% select(where(is.integer))
+      select(lf, where(is.integer))
     Condition
       Error in `select()`:
       ! This tidyselect interface doesn't support predicates.
@@ -184,7 +184,7 @@
 # arranged computed columns are not inlined away
 
     Code
-      lf %>% mutate(z = 1) %>% arrange(x, z) %>% select(x)
+      select(arrange(mutate(lf, z = 1), x, z), x)
     Condition
       Warning:
       ORDER BY is ignored in subqueries without LIMIT
@@ -200,7 +200,7 @@
 # multiple selects are collapsed
 
     Code
-      lf %>% select(2:1) %>% select(2:1)
+      select(select(lf, 2:1), 2:1)
     Output
       <SQL>
       SELECT `df`.*
@@ -209,7 +209,7 @@
 ---
 
     Code
-      lf %>% select(2:1) %>% select(2:1) %>% select(2:1)
+      select(select(select(lf, 2:1), 2:1), 2:1)
     Output
       <SQL>
       SELECT `y`, `x`
@@ -218,7 +218,7 @@
 ---
 
     Code
-      lf %>% select(x1 = x) %>% select(x2 = x1)
+      select(select(lf, x1 = x), x2 = x1)
     Output
       <SQL>
       SELECT `x` AS `x2`
@@ -227,7 +227,7 @@
 # mutate collapses over nested select
 
     Code
-      lf %>% mutate(a = 1, b = 2) %>% select(a)
+      select(mutate(lf, a = 1, b = 2), a)
     Output
       <SQL>
       SELECT 1.0 AS `a`
@@ -236,7 +236,7 @@
 ---
 
     Code
-      lf %>% mutate(a = 1, b = 2) %>% select(x)
+      select(mutate(lf, a = 1, b = 2), x)
     Output
       <SQL>
       SELECT `x`
@@ -248,11 +248,11 @@
       show_query(out, sql_options = sql_options(cte = TRUE))
     Output
       <SQL>
-      [34mWITH[39m `q01` [34mAS[39m (
+      WITH `q01` AS (
         [34mSELECT[39m `x`, AVG(`y`) OVER (PARTITION BY `x`)[34m AS [39m`y`, `z` + 1.0[34m AS [39m`z`
         [34mFROM[39m `df`
       ),
-      `q02` [34mAS[39m (
+      `q02` AS (
         [34mSELECT[39m `q01`.*
         [34mFROM[39m `q01`
         [34mWHERE[39m (`z` = 1.0)

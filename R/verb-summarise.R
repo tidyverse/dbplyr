@@ -25,13 +25,13 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(g = c(1, 1, 1, 2, 2), x = c(4, 3, 6, 9, 2))
-#' db %>%
-#'   summarise(n()) %>%
+#' db |>
+#'   summarise(n()) |>
 #'   show_query()
 #'
-#' db %>%
-#'   group_by(g) %>%
-#'   summarise(n()) %>%
+#' db |>
+#'   group_by(g) |>
+#'   summarise(n()) |>
 #'   show_query()
 summarise.tbl_lazy <- function(.data, ..., .by = NULL, .groups = NULL) {
   check_groups(.groups)
@@ -122,16 +122,14 @@ summarise_bind_error <- function(cur_data, dots, i, error_env) {
 }
 
 summarise_bind_error1 <- function(error_env, dot_name) {
-  msg <- cli::format_message(c(
+  msg <- c(
     "In {.pkg dbplyr} you cannot use a variable created in the same {.fun summarise}.",
     x = "{.var {dot_name}} was created earlier in this {.fun summarise}.",
     i = "You need an extra {.fun mutate} step to use it."
-  ))
+  )
   env_bind_lazy(
     error_env,
-    !!dot_name := {
-      abort(msg, call = NULL)
-    }
+    !!dot_name := cli::cli_abort(msg, call = NULL)
   )
 }
 

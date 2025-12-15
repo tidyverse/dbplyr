@@ -7,9 +7,10 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-```{r, echo = FALSE, message = FALSE}
-knitr::opts_chunk$set(collapse = T, comment = "#>")
-options(tibble.print_min = 4L, tibble.print_max = 4L)
+```{r}
+#| include: false
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+options(tibble.print_min = 6L, tibble.print_max = 6L, digits = 3)
 ```
 
 This document describes how to add a new SQL backend to dbplyr. To begin:
@@ -30,6 +31,7 @@ For interactive exploitation, attach dplyr and DBI. If you're creating a package
 
 ```{r setup, message = FALSE}
 library(dplyr)
+library(dbplyr)
 library(DBI)
 ```
 
@@ -70,20 +72,177 @@ Next, check that `copy_to()`, `collapse()`, `compute()`, and `collect()` work:
 *   If `compute()` fails, your database has a non-standard way of saving queries
     in temporary tables. Add a method for `db_save_query()`.
 
-## SQL translation
+## SQL translation: verbs
 
-Make sure you've read `vignette("translation-verb")` so you have the lay of the land. 
-
-### Verbs
-
-Check that SQL translation for the key verbs work:
+Make sure you've read `vignette("translation-verb")` so you have the lay of the land. First check that SQL translation for the key verbs work:
 
 * `summarise()`, `mutate()`, `filter()` etc: powered by `sql_query_select()`
 * `left_join()`, `inner_join()`: powered by `sql_query_join()`
 * `semi_join()`, `anti_join()`: powered by `sql_query_semi_join()`
 * `union()`, `intersect()`, `setdiff()`: powered by `sql_query_set_op()`
 
-### Vectors
+### Building SQL strings
 
-Finally, you may have to provide custom R -> SQL translation at the vector level by providing a method for `sql_translate_env()`. This function should return an object created by `sql_variant()`. See existing methods for examples.
+If you need to generate your own SQL, we recommend using `sql_glue2()`. It uses glue syntax with type markers for safe SQL generation:
 
+```{r}
+con <- simulate_dbi()
+
+# Create an index
+index_name <- "index"
+table <- I("schema.table")
+columns <- c("column1", "column2")
+sql_glue2(con, "CREATE INDEX {.id index_name} ON {.tbl table} {.id columns*}")
+
+# Insert values safely
+name <- "O'Brien"
+sql_glue2(con, "INSERT INTO students (name) VALUES {name*}")
+
+# Build a query
+table <- "my_table"
+cols <- c("id", "name", "value")
+sql_glue2(con, "SELECT {.id cols} FROM {.tbl table}")
+```
+
+## SQL translation: vectors
+
+Finally, you may have to provide custom R -> SQL translation for functions that work with vectors within verbs. You can do with by providing a method for `sql_translation()`, which return an object created by `sql_variant()`. The `sql_variant()` function creates a container for three types of function translations:
+
+```{r, eval = FALSE}
+sql_translation.myConnectionClass <- function(con) {
+  sql_variant(
+    scalar = sql_translator(base_scalar, ...), # Functions in SELECT (non-aggregated)
+    aggregate = sql_translator(base_aggregate, ...), # Aggregation functions (mean, sum, etc.)
+    window = sql_translator(base_win, ...) # Window functions (lead, lag, rank, etc.)
+  )
+}
+```
+
+Each translator will inherits from the base (ANSI SQL) translator and overrides only what's different for your backend:
+
+```{r, eval = FALSE}
+sql_translator(
+  base_scalar, # Inherit most translations
+  # Override specific functions for your backend
+  `+` = sql_infix("+"),
+  mean = sql_aggregate("AVERAGE", "mean")
+)
+```
+
+### Scalar function helpers
+
+dbplyr provides several helper functions to make it easier to translate R functions to SQL:
+
+*   **`sql_prefix(f, n = NULL)`**: For standard SQL functions. The `n` argument
+    optionally specifies the number of arguments.
+*   **`sql_infix(f)`**: For infix operators like `+`, `*`, or `==`.
+*   **`sql_cast(type)`**: For type casting functions.
+*   **`sql_not_supported(f)`**: For functions with no SQL translation.
+
+Here's an example showing all of these helpers in use:
+
+```{r}
+#| eval: false
+sql_translation.myConnectionClass <- function(con) {
+  sql_variant(
+    scalar = sql_translator(
+      base_scalar,
+      # Standard SQL functions
+      cos = sql_prefix("COS", 1),
+      round = sql_prefix("ROUND", 2),
+      # Infix operators
+      `+` = sql_infix("+"),
+      `*` = sql_infix("*"),
+      `==` = sql_infix("="),
+      # Type casting
+      as.numeric = sql_cast("NUMERIC"),
+      as.character = sql_cast("VARCHAR")
+    ),
+    aggregate = sql_translator(base_agg),
+    window = sql_translator(base_win)
+  )
+}
+```
+
+### Aggregation function helpers
+
+*   **`sql_aggregate(f, f_r = f)`**: For single-argument SQL aggregate
+    functions. The `f_r` argument gives the name of the R function.
+*   **`sql_aggregate_2(f)`**: For two-argument SQL aggregate functions.
+*   **`sql_aggregate_n(f, f_r = f)`**: For variadic SQL aggregate functions.
+
+```{r}
+#| eval: false
+sql_translation.myConnectionClass <- function(con) {
+  sql_variant(
+    scalar = sql_translator(base_scalar),
+    aggregate = sql_translator(
+      .parent = base_agg,
+      # Single-argument aggregates
+      mean = sql_aggregate("AVG", "mean"),
+      var = sql_aggregate("VAR_SAMP", "var"),
+      # Two-argument aggregates
+      cov = sql_aggregate_2("COVAR_SAMP"),
+      # Variadic aggregates
+      pmin = sql_aggregate_n("LEAST", "pmin"),
+      pmax = sql_aggregate_n("GREATEST", "pmax"),
+      # Unsupported functions
+      median = sql_not_supported("median")
+    ),
+    window = sql_translator(base_win)
+  )
+}
+```
+
+### Window function helpers
+
+Window functions have their own set of helpers:
+
+*   **`win_rank(f)`**: For ranking functions.
+*   **`win_aggregate(f)`**: For aggregate functions used as window functions.
+*   **`win_cumulative(f)`**: For cumulative functions.
+*   **`win_absent(f)`**: For backends that don't support certain window
+    functions.
+
+Here's an example showing all of these helpers in use:
+
+```{r, eval = FALSE}
+window = sql_translator(
+  base_win,
+  # Ranking functions
+  row_number = win_rank("ROW_NUMBER"),
+  rank = win_rank("RANK"),
+  dense_rank = win_rank("DENSE_RANK"),
+  # Aggregate functions as window functions
+  mean = win_aggregate("AVG"),
+  sum = win_aggregate("SUM"),
+  # Cumulative functions
+  cumsum = win_cumulative("SUM"),
+  # Absent functions
+  cume_dist = win_absent("cume_dist")
+)
+```
+
+### Custom translation functions
+
+For more complex translations, you can write custom functions that return SQL expressions using `sql_glue()`. This uses glue syntax for string interpolation with automatic escaping.
+
+```{r, eval = FALSE}
+scalar = sql_translator(
+  base_scalar,
+
+  # Custom log function with change of base
+  log = function(x, base = exp(1)) {
+    if (isTRUE(all.equal(base, exp(1)))) {
+      sql_glue("LN({x})")
+    } else {
+      sql_glue("LOG({x}) / LOG({base})")
+    }
+  },
+
+  # Custom paste function using CONCAT
+  paste = function(..., sep = " ") {
+    sql_glue("CONCAT_WS({sep}, {...})")
+  }
+)
+```

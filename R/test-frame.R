@@ -27,7 +27,7 @@ test_register_src <- function(name, src) {
       test_srcs$add(name, src)
       message("OK")
     },
-    error = function(e) message("\n* ", conditionMessage(e))
+    error = \(e) message("\n* ", conditionMessage(e))
   )
 }
 
@@ -73,7 +73,7 @@ test_frame <- function(..., srcs = test_srcs$get(), ignore = character()) {
 # Manage cache of testing srcs
 test_srcs <- local({
   list(
-    get = function() env_get(cache(), "srcs", list()),
+    get = \() env_get(cache(), "srcs", list()),
 
     has = function(x) {
       srcs <- env_get(cache(), "srcs", list())

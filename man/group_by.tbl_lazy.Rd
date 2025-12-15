@@ -4,7 +4,7 @@
 \alias{group_by.tbl_lazy}
 \title{Group by one or more variables}
 \usage{
-\method{group_by}{tbl_lazy}(.data, ..., .add = FALSE, add = deprecated(), .drop = TRUE)
+\method{group_by}{tbl_lazy}(.data, ..., .add = FALSE, .drop = TRUE)
 }
 \arguments{
 \item{.data}{A lazy data frame backed by a database query.}
@@ -21,8 +21,6 @@ This argument was previously called \code{add}, but that prevented
 creating a new grouping variable called \code{add}, and conflicts with
 our naming conventions.}
 
-\item{add}{Deprecated. Please use \code{.add} instead.}
-
 \item{.drop}{Not supported by this method.}
 }
 \description{
@@ -35,13 +33,13 @@ window functions when used with \code{\link[=mutate.tbl_lazy]{mutate()}}.
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(g = c(1, 1, 1, 2, 2), x = c(4, 3, 6, 9, 2))
-db \%>\%
-  group_by(g) \%>\%
-  summarise(n()) \%>\%
+db |>
+  group_by(g) |>
+  summarise(n()) |>
   show_query()
 
-db \%>\%
-  group_by(g) \%>\%
-  mutate(x2 = x / sum(x, na.rm = TRUE)) \%>\%
+db |>
+  group_by(g) |>
+  mutate(x2 = x / sum(x, na.rm = TRUE)) |>
   show_query()
 }

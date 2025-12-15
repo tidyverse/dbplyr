@@ -12,8 +12,7 @@
 #' @param ...,dots Expressions to translate. `translate_sql()`
 #'   automatically quotes them for you.  `translate_sql_()` expects
 #'   a list of already quoted objects.
-#' @param con An optional database connection to control the details of
-#'   the translation. The default, `NULL`, generates ANSI SQL.
+#' @param con Database connection used to determine the SQL dialect.
 #' @param vars_group,vars_order,vars_frame Parameters used in the `OVER`
 #'   expression of windowed functions.
 #' @param window Use `FALSE` to suppress generation of the `OVER`
@@ -77,24 +76,6 @@ translate_sql <- function(
   translate_sql_(
     quos(...),
     con = con,
-    vars_group = vars_group,
-    vars_order = vars_order,
-    vars_frame = vars_frame,
-    window = window
-  )
-}
-
-test_translate_sql <- function(
-  ...,
-  con = NULL,
-  vars_group = NULL,
-  vars_order = NULL,
-  vars_frame = NULL,
-  window = TRUE
-) {
-  translate_sql(
-    ...,
-    con = con %||% sql_current_con(),
     vars_group = vars_group,
     vars_order = vars_order,
     vars_frame = vars_frame,
@@ -214,10 +195,7 @@ sql_data_mask <- function(
   idents <- lapply(names, ident)
   name_env <- ceply(idents, escape, con = con, parent = special_calls2)
 
-  # Known sql expressions
-  symbol_env <- env_clone(base_symbols, parent = name_env)
-
-  new_data_mask(symbol_env, top_env)
+  new_data_mask(name_env, top_env)
 }
 
 is_infix_base <- function(x) {

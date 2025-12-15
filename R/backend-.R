@@ -1,9 +1,9 @@
 #' @include translate-sql-conditional.R
 #' @include translate-sql-window.R
 #' @include translate-sql-helpers.R
-#' @include translate-sql-paste.R
+#' @include translate-sql-scalar.R
+#' @include translate-sql-aggregate.R
 #' @include translate-sql-string.R
-#' @include translate-sql-quantile.R
 #' @include translate-sql-cut.R
 #' @include escape.R
 #' @include sql.R
@@ -11,7 +11,10 @@
 #' @include import-standalone-obj-type.R
 #' @include import-standalone-types-check.R
 #' @include utils-check.R
+#' @include db.R
 #' @include db-sql.R
+#' @include verb-copy-to.R
+#' @include verb-copy-inline.R
 NULL
 
 #' @export
@@ -33,12 +36,12 @@ base_scalar <- sql_translator(
       if (is.numeric(x)) {
         x
       } else {
-        sql_expr(!!x)
+        sql_glue("{x}")
       }
     } else {
       y <- escape_infix_expr(enexpr(y), y)
 
-      sql_expr(!!x + !!y)
+      sql_glue("{x} + {y}")
     }
   },
   `*` = sql_infix("*"),
@@ -52,18 +55,18 @@ base_scalar <- sql_translator(
       if (is.numeric(x)) {
         -x
       } else {
-        sql_expr(-!!x)
+        sql_glue("-{x}")
       }
     } else {
       y <- escape_infix_expr(enexpr(y), y)
 
-      sql_expr(!!x - !!y)
+      sql_glue("{x} - {y}")
     }
   },
 
   `$` = function(x, name) {
     if (is.sql(x)) {
-      glue_sql2(sql_current_con(), "{x}.{.col name}")
+      sql_glue("{x}.{name}")
     } else {
       eval(bquote(`$`(x, .(substitute(name)))))
     }
@@ -73,16 +76,17 @@ base_scalar <- sql_translator(
     # `x` can be a table, column or even an expression (e.g. for json)
     i <- enexpr(i)
     if (is.character(i)) {
-      glue_sql2(sql_current_con(), "{x}.{.col i}")
+      i <- ident(i)
+      sql_glue("{x}.{i}")
     } else if (is.numeric(i)) {
       i <- as.integer(i)
-      glue_sql2(sql_current_con(), "{x}[{.val i}]")
+      sql_glue("{x}[{i}]")
     } else {
       cli_abort("Can only index with strings and numbers")
     }
   },
   `[` = function(x, i) {
-    glue_sql2(sql_current_con(), "CASE WHEN ({i}) THEN ({x}) END")
+    sql_glue("CASE WHEN ({i}) THEN ({x}) END")
   },
 
   `!=` = sql_infix("!="),
@@ -93,12 +97,15 @@ base_scalar <- sql_translator(
   `>=` = sql_infix(">="),
 
   `%in%` = function(x, table) {
-    if (is.sql(table) || length(table) > 1) {
-      sql_expr(!!x %in% !!table)
-    } else if (length(table) == 0) {
-      sql_expr(FALSE)
+    if (is.sql(table)) {
+      return(sql_glue("{x} IN {table}"))
+    }
+
+    table <- unname(table)
+    if (length(table) == 0) {
+      sql("FALSE")
     } else {
-      sql_expr(!!x %in% ((!!table)))
+      sql_glue("{x} IN {table*}")
     }
   },
 
@@ -108,7 +115,7 @@ base_scalar <- sql_translator(
   `|` = sql_infix("OR"),
   `||` = sql_infix("OR"),
   xor = function(x, y) {
-    sql_expr(!!x %OR% !!y %AND NOT% (!!x %AND% !!y))
+    sql_glue("{x} OR {y} AND NOT ({x} AND {y})")
   },
 
   # bitwise operators
@@ -121,7 +128,7 @@ base_scalar <- sql_translator(
   #   Oracle: https://docs.oracle.com/cd/E19253-01/817-6223/chp-typeopexpr-7/index.html
   #   SQLite: https://www.tutorialspoint.com/sqlite/sqlite_bitwise_operators.htm
   #   Teradata: https://docs.teradata.com/reader/1DcoER_KpnGTfgPinRAFUw/h3CS4MuKL1LCMQmnubeSRQ
-  bitwNot = function(x) sql_expr(~ ((!!x))),
+  bitwNot = \(x) sql_glue("~({x})"),
   bitwAnd = sql_infix("&"),
   bitwOr = sql_infix("|"),
   bitwXor = sql_infix("^"),
@@ -141,14 +148,15 @@ base_scalar <- sql_translator(
   floor = sql_prefix("FLOOR", 1),
   log = function(x, base = exp(1)) {
     if (isTRUE(all.equal(base, exp(1)))) {
-      sql_expr(ln(!!x))
+      sql_glue("LN({x})")
     } else {
-      sql_expr(log(!!base, !!x))
+      sql_glue("LOG({base}, {x})")
     }
   },
   log10 = sql_prefix("LOG10", 1),
   round = function(x, digits = 0L) {
-    sql_expr(ROUND(!!x, !!as.integer(digits)))
+    digits <- as.integer(digits)
+    sql_glue("ROUND({x}, {digits})")
   },
   sign = sql_prefix("SIGN", 1),
   sin = sql_prefix("SIN", 1),
@@ -156,10 +164,10 @@ base_scalar <- sql_translator(
   tan = sql_prefix("TAN", 1),
   # cosh, sinh, coth and tanh calculations are based on this article
   # https://en.wikipedia.org/wiki/Hyperbolic_function
-  cosh = function(x) sql_expr((!!sql_exp(1, x) + !!sql_exp(-1, x)) / 2L),
-  sinh = function(x) sql_expr((!!sql_exp(1, x) - !!sql_exp(-1, x)) / 2L),
-  tanh = function(x) sql_expr((!!sql_exp(2, x) - 1L) / (!!sql_exp(2, x) + 1L)),
-  coth = function(x) sql_expr((!!sql_exp(2, x) + 1L) / (!!sql_exp(2, x) - 1L)),
+  cosh = \(x) sql_glue("({sql_exp(1, x)} + {sql_exp(-1, x)}) / 2"),
+  sinh = \(x) sql_glue("({sql_exp(1, x)} - {sql_exp(-1, x)}) / 2"),
+  tanh = \(x) sql_glue("({sql_exp(2, x)} - 1) / ({sql_exp(2, x)} + 1)"),
+  coth = \(x) sql_glue("({sql_exp(2, x)} + 1) / ({sql_exp(2, x)} - 1)"),
 
   `if` = function(cond, if_true, if_false = NULL) {
     sql_if(enquo(cond), enquo(if_true), enquo(if_false))
@@ -172,22 +180,22 @@ base_scalar <- sql_translator(
       enquo(missing)
     )
   },
-  ifelse = function(test, yes, no) sql_if(enquo(test), enquo(yes), enquo(no)),
+  ifelse = \(test, yes, no) sql_if(enquo(test), enquo(yes), enquo(no)),
 
-  switch = function(x, ...) sql_switch(x, ...),
+  switch = \(x, ...) sql_switch(x, ...),
   case_when = function(..., .default = NULL, .ptype = NULL, .size = NULL) {
     sql_case_when(..., .default = .default, .ptype = .ptype, .size = .size)
   },
   case_match = sql_case_match,
 
   `(` = function(x) {
-    sql_expr(((!!x)))
+    sql_glue("({x})")
   },
   `{` = function(x) {
-    sql_expr(((!!x)))
+    sql_glue("({x})")
   },
   desc = function(x) {
-    glue_sql2(sql_current_con(), "{x} DESC")
+    sql_glue("{x} DESC")
   },
 
   is.null = sql_is_null,
@@ -207,14 +215,15 @@ base_scalar <- sql_translator(
   # Postgres - https://www.postgresql.org/docs/8.4/static/datatype-numeric.html
   # Impala - https://impala.apache.org/docs/build/html/topics/impala_bigint.html
   as.integer64 = sql_cast("BIGINT"),
+  as.blob = sql_cast("BLOB"),
 
   c = function(...) {
     c(...)
   },
-  `:` = function(from, to) from:to,
+  `:` = \(from, to) from:to,
 
   between = function(x, left, right) {
-    sql_expr(!!x %BETWEEN% !!left %AND% !!right)
+    sql_glue("{x} BETWEEN {left} AND {right}")
   },
 
   pmin = sql_aggregate_n("LEAST", "pmin"),
@@ -228,20 +237,20 @@ base_scalar <- sql_translator(
   as_date = sql_cast("DATE"),
   as_datetime = sql_cast("TIMESTAMP"),
 
-  today = function() sql_expr(CURRENT_DATE),
-  now = function() sql_expr(CURRENT_TIMESTAMP),
+  today = \() sql("CURRENT_DATE"),
+  now = \() sql("CURRENT_TIMESTAMP"),
 
   # https://modern-sql.com/feature/extract
-  year = function(x) sql_expr(EXTRACT(year %from% !!x)),
-  month = function(x) sql_expr(EXTRACT(month %from% !!x)),
-  day = function(x) sql_expr(EXTRACT(day %from% !!x)),
-  mday = function(x) sql_expr(EXTRACT(day %from% !!x)),
+  year = \(x) sql_glue("EXTRACT(year FROM {x})"),
+  month = \(x) sql_glue("EXTRACT(month FROM {x})"),
+  day = \(x) sql_glue("EXTRACT(day FROM {x})"),
+  mday = \(x) sql_glue("EXTRACT(day FROM {x})"),
   yday = sql_not_supported("yday"),
   qday = sql_not_supported("qday"),
   wday = sql_not_supported("wday"),
-  hour = function(x) sql_expr(EXTRACT(hour %from% !!x)),
-  minute = function(x) sql_expr(EXTRACT(minute %from% !!x)),
-  second = function(x) sql_expr(EXTRACT(second %from% !!x)),
+  hour = \(x) sql_glue("EXTRACT(hour FROM {x})"),
+  minute = \(x) sql_glue("EXTRACT(minute FROM {x})"),
+  second = \(x) sql_glue("EXTRACT(second FROM {x})"),
 
   # String functions ------------------------------------------------------
   # SQL Syntax reference links:
@@ -266,14 +275,14 @@ base_scalar <- sql_translator(
   },
   tolower = sql_prefix("LOWER", 1),
   toupper = sql_prefix("UPPER", 1),
-  trimws = function(x, which = "both") sql_str_trim(x, side = which),
+  trimws = \(x, which = "both") sql_str_trim(x, side = which),
   paste = sql_paste(" "),
   paste0 = sql_paste(""),
   substr = sql_substr("SUBSTR"),
   substring = sql_substr("SUBSTR"),
   cut = sql_cut,
   runif = function(n = n(), min = 0, max = 1) {
-    sql_runif(RANDOM(), n = {{ n }}, min = min, max = max)
+    sql_runif("RANDOM()", n = {{ n }}, min = min, max = max)
   },
 
   # stringr functions
@@ -285,18 +294,20 @@ base_scalar <- sql_translator(
   str_c = sql_paste(""),
   str_sub = sql_str_sub("SUBSTR"),
   # https://docs.getdbt.com/sql-reference/like is typically case sensitive (#1490)
-  str_like = function(string, pattern, ignore_case = FALSE) {
-    if (isTRUE(ignore_case)) {
+  str_like = function(string, pattern, ignore_case = deprecated()) {
+    ignore_case <- deprecate_ignore_case(ignore_case)
+
+    if (ignore_case) {
       cli_abort(c(
         "Backend does not support case insensitive {.fn str_like}.",
-        i = "Set {.code ignore_case = FALSE} for case sensitive match.",
         i = "Use {.fn tolower} on both arguments to achieve a case insensitive match."
       ))
     } else {
-      sql_expr(!!string %LIKE% !!pattern)
+      sql_glue("{string} LIKE {pattern}")
     }
   },
 
+  str_ilike = sql_not_supported("str_ilike"),
   str_conv = sql_not_supported("str_conv"),
   str_count = sql_not_supported("str_count"),
 
@@ -358,19 +369,14 @@ base_scalar <- sql_translator(
   str_wrap = sql_not_supported("str_wrap")
 )
 
-base_symbols <- sql_translator(
-  pi = sql("PI()"),
-  `*` = sql("*"),
-  `NULL` = sql("NULL")
-)
 sql_exp <- function(a, x) {
   a <- as.integer(a)
   if (identical(a, 1L)) {
-    sql_expr(EXP(!!x))
+    sql_glue("EXP({x})")
   } else if (identical(a, -1L)) {
-    sql_expr(EXP(-((!!x))))
+    sql_glue("EXP(-({x}))")
   } else {
-    sql_expr(EXP(!!a * ((!!x))))
+    sql_glue("EXP({a} * ({x}))")
   }
 }
 
@@ -380,7 +386,7 @@ sql_exp <- function(a, x) {
 base_agg <- sql_translator(
   # SQL-92 aggregates
   # http://db.apache.org/derby/docs/10.7/ref/rrefsqlj33923.html
-  n = function() sql("COUNT(*)"),
+  n = \() sql("COUNT(*)"),
   mean = sql_aggregate("AVG", "mean"),
   sum = sql_aggregate("SUM"),
   min = sql_aggregate("MIN"),
@@ -407,8 +413,9 @@ base_agg <- sql_translator(
   # last = sql_prefix("LAST_VALUE", 1),
   # nth = sql_prefix("NTH_VALUE", 2),
 
-  n_distinct = function(x) {
-    glue_sql2(sql_current_con(), "COUNT(DISTINCT {x})")
+  n_distinct = function(x, na.rm = FALSE) {
+    sql_check_na_rm(na.rm)
+    sql_glue("COUNT(DISTINCT {x})")
   }
 )
 
@@ -424,8 +431,9 @@ base_win <- sql_translator(
   percent_rank = win_rank("PERCENT_RANK"),
   cume_dist = win_rank("CUME_DIST"),
   ntile = function(x, n) {
+    n <- as.integer(n)
     win_over(
-      sql_expr(NTILE(!!as.integer(n))),
+      sql_glue("NTILE({n})"),
       win_current_group(),
       x %||% win_current_order()
     )
@@ -461,16 +469,18 @@ base_win <- sql_translator(
   },
 
   lead = function(x, n = 1L, default = NA, order_by = NULL) {
+    n <- as.integer(n)
     win_over(
-      sql_expr(LEAD(!!x, !!as.integer(n), !!default)),
+      sql_glue("LEAD({x}, {n}, {default})"),
       win_current_group(),
       order_by %||% win_current_order(),
       win_current_frame()
     )
   },
   lag = function(x, n = 1L, default = NA, order_by = NULL) {
+    n <- as.integer(n)
     win_over(
-      sql_expr(LAG(!!x, !!as.integer(n), !!default)),
+      sql_glue("LAG({x}, {n}, {default})"),
       win_current_group(),
       order_by %||% win_current_order(),
       win_current_frame()
@@ -505,9 +515,10 @@ base_win <- sql_translator(
       frame = frame
     )
   },
-  n_distinct = function(x) {
+  n_distinct = function(x, na.rm = FALSE) {
+    sql_check_na_rm(na.rm)
     win_over(
-      glue_sql2(sql_current_con(), "COUNT(DISTINCT {x})"),
+      sql_glue("COUNT(DISTINCT {x})"),
       win_current_group()
     )
   },
@@ -566,5 +577,3 @@ base_no_win <- sql_translator(
   str_flatten = win_absent("str_flatten"),
   count = win_absent("count")
 )
-
-utils::globalVariables(c("RANDOM", "%LIKE%"))

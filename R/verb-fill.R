@@ -26,8 +26,8 @@
 #' )
 #' squirrels$id <- 1:12
 #'
-#' tbl_memdb(squirrels) %>%
-#'   window_order(id) %>%
+#' tbl_memdb(squirrels) |>
+#'   window_order(id) |>
 #'   tidyr::fill(
 #'     n_squirrels,
 #'     n_squirrels2,
@@ -38,7 +38,11 @@ fill.tbl_lazy <- function(
   ...,
   .direction = c("down", "up", "updown", "downup")
 ) {
-  cols_to_fill <- tidyselect::eval_select(expr(c(...)), .data)
+  cols_to_fill <- tidyselect::eval_select(
+    expr(c(...)),
+    .data,
+    allow_rename = FALSE
+  )
   cols_to_fill <- syms(names(cols_to_fill))
   order_by_cols <- op_sort(.data)
   .direction <- arg_match0(.direction, c("down", "up", "updown", "downup"))
@@ -106,22 +110,33 @@ dbplyr_fill0.DBIConnection <- function(
 
   fill_sql <- purrr::map(
     cols_to_fill,
-    ~ translate_sql(
-      last(!!.x, na_rm = TRUE),
-      vars_group = op_grps(.data),
-      vars_order = translate_sql(!!!order_by_cols, con = .con),
-      vars_frame = c(-Inf, 0),
-      con = .con
-    )
-  ) %>%
+    function(col) {
+      translate_sql(
+        last(!!col, na_rm = TRUE),
+        vars_group = op_grps(.data),
+        vars_order = translate_sql(!!!order_by_cols, con = .con),
+        vars_frame = c(-Inf, 0),
+        con = .con
+      )
+    }
+  ) |>
     set_names(as.character(cols_to_fill))
 
-  .data %>%
+  .data |>
     transmute(
       !!!syms(colnames(.data)),
       !!!fill_sql
     )
 }
+
+# Define function & avoid R CMD CHECK note
+last <- function(x, na_rm = TRUE) {
+  if (na_rm) {
+    x <- x[!is.na(x)]
+  }
+  x[[length(x)]]
+}
+
 
 # databases without support for `IGNORE NULLS`
 # * sqlite
@@ -153,34 +168,38 @@ dbplyr_fill0.SQLiteConnection <- function(
   # 3. remove the helper column again.
   partition_sql <- purrr::map(
     cols_to_fill,
-    ~ translate_sql(
-      cumsum(case_when(is.na(!!.x) ~ 0L, TRUE ~ 1L)),
-      con = .con,
-      vars_order = translate_sql(!!!order_by_cols, con = .con),
-      vars_group = op_grps(.data),
-    )
-  ) %>%
+    function(col) {
+      translate_sql(
+        cumsum(case_when(is.na(!!col) ~ 0L, TRUE ~ 1L)),
+        con = .con,
+        vars_order = translate_sql(!!!order_by_cols, con = .con),
+        vars_group = op_grps(.data),
+      )
+    }
+  ) |>
     set_names(paste0("..dbplyr_partition_", seq_along(cols_to_fill)))
 
-  dp <- .data %>%
+  dp <- .data |>
     mutate(!!!partition_sql)
 
   fill_sql <- purrr::map2(
     cols_to_fill,
     names(partition_sql),
-    ~ translate_sql(
-      max(!!.x, na.rm = TRUE),
-      con = .con,
-      vars_group = c(op_grps(.data), .y),
-    )
-  ) %>%
+    function(col, partition_name) {
+      translate_sql(
+        max(!!col, na.rm = TRUE),
+        con = .con,
+        vars_group = c(op_grps(.data), partition_name),
+      )
+    }
+  ) |>
     set_names(purrr::map_chr(cols_to_fill, as_name))
 
-  dp %>%
+  dp |>
     transmute(
       !!!syms(colnames(.data)),
       !!!fill_sql
-    ) %>%
+    ) |>
     select(!!!colnames(.data))
 }
 
@@ -205,3 +224,6 @@ dbplyr_fill0.MariaDBConnection <- dbplyr_fill0.SQLiteConnection
 dbplyr_fill0.MySQLConnection <- dbplyr_fill0.SQLiteConnection
 #' @export
 dbplyr_fill0.MySQL <- dbplyr_fill0.SQLiteConnection
+
+#' @importFrom dplyr case_when
+NULL

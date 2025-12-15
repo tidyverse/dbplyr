@@ -106,7 +106,7 @@ sql_render.multi_join_query <- function(
   x <- sql_render(query$x, con, ..., subquery = TRUE, lvl = lvl + 1)
   query$joins$table <- purrr::map(
     query$joins$table,
-    function(table) sql_render(table, con, ..., subquery = TRUE, lvl = lvl + 1)
+    \(table) sql_render(table, con, ..., subquery = TRUE, lvl = lvl + 1)
   )
 
   sql_query_multi_join(
@@ -190,7 +190,7 @@ sql_multi_join_vars <- function(
   use_star,
   qualify_all_columns
 ) {
-  all_vars <- tolower(unlist(table_vars))
+  all_vars <- tolower(unlist(table_vars, use.names = FALSE))
   if (qualify_all_columns) {
     duplicated_vars <- unique(all_vars)
   } else {
@@ -218,7 +218,9 @@ sql_multi_join_vars <- function(
       out[vars_idx_i] <- purrr::map2(
         used_vars_i,
         i,
-        ~ sql_multi_join_var(con, .x, .y, table_paths, duplicated_vars)
+        function(var, table_idx) {
+          sql_multi_join_var(con, var, table_idx, table_paths, duplicated_vars)
+        }
       )
     }
   }
@@ -287,13 +289,9 @@ sql_rf_join_vars <- function(
       vars$y,
       ~ {
         if (!is.na(.x) && !is.na(.y)) {
-          out <- sql_expr(
-            COALESCE(
-              !!sql_table_prefix(con, .x, table = x_as),
-              !!sql_table_prefix(con, .y, table = y_as)
-            ),
-            con = con
-          )
+          x_prefix <- sql_table_prefix(con, .x, table = x_as)
+          y_prefix <- sql_table_prefix(con, .y, table = y_as)
+          out <- sql_glue2(con, "COALESCE({x_prefix}, {y_prefix})")
 
           return(out)
         }
@@ -347,11 +345,21 @@ sql_join_tbls <- function(con, by, na_matches) {
 
     if (na_matches == "na") {
       compare <- purrr::map_chr(seq_along(lhs), function(i) {
-        sql_expr_matches(sql(lhs[[i]]), sql(rhs[[i]]), con = con)
+        op <- by$condition[[i]]
+        if (op == "==") {
+          sql_expr_matches(con, lhs[[i]], rhs[[i]])
+        } else {
+          sql_glue2(
+            con,
+            "({lhs[[i]]} {.sql op} {rhs[[i]]} OR ({lhs[[i]]} IS NULL AND {rhs[[i]]} IS NULL))"
+          )
+        }
       })
     } else {
       by$condition[by$condition == "=="] <- "="
-      compare <- paste0(lhs, " ", by$condition, " ", rhs)
+      compare <- purrr::map_chr(seq_along(lhs), function(i) {
+        sql_glue2(con, "{lhs[i]} {.sql by$condition[[i]]} {rhs[i]}")
+      })
     }
 
     sql(compare)
@@ -380,8 +388,6 @@ sql_qualify_var <- function(con, table, var) {
 
     sql(paste0(table, ".", var))
   } else {
-    var
+    sql(var)
   }
 }
-
-utils::globalVariables("COALESCE")

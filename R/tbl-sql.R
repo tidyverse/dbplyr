@@ -1,17 +1,17 @@
 #' Create an SQL tbl (abstract)
 #'
-#' Generally, you should no longer need to provide a custom `tbl()`
+#' @description
+#' `r lifecycle::badge("deprecated")`
+#'
+#' This function is no longer needed, since backends don't need to create
+#' their own custom classes. Instead, rely on the default `tbl.DBIConnection()`
 #' method.
-#' The default `tbl.DBIConnect` method should work in most cases.
 #'
 #' @keywords internal
 #' @export
+#' @inheritParams tbl.src_dbi
 #' @param subclass name of subclass
 #' @param ... needed for agreement with generic. Not otherwise used.
-#' @param vars Provide column names as a character vector
-#'   to avoid retrieving them from the database.
-#'   Mainly useful for better performance when creating
-#'   multiple `tbl` objects.
 #' @param check_from `r lifecycle::badge("deprecated")`
 tbl_sql <- function(
   subclass,
@@ -21,18 +21,24 @@ tbl_sql <- function(
   vars = NULL,
   check_from = deprecated()
 ) {
-  # Can't use check_dots_used(), #1429
-  check_character(vars, allow_null = TRUE)
+  lifecycle::deprecate_soft("2.6.0", "tbl_sql()")
+
+  check_dots_empty()
+
   if (lifecycle::is_present(check_from)) {
     lifecycle::deprecate_warn("2.5.0", "tbl_sql(check_from)")
   }
 
-  is_suspicious <- is_bare_string(from) && grepl(".", from, fixed = TRUE)
-  source <- as_table_source(from, con = src$con)
+  db_table(src$con, from, vars = vars, subclass = subclass)
+}
+
+find_variables <- function(con, from, call = caller_env()) {
+  source <- as_table_source(from, con = con, error_call = call)
 
   withCallingHandlers(
-    vars <- vars %||% dbplyr_query_fields(src$con, source),
+    dbplyr_query_fields(con, source),
     error = function(err) {
+      is_suspicious <- is_bare_string(from) && grepl(".", from, fixed = TRUE)
       if (!is_suspicious) {
         return()
       }
@@ -42,22 +48,47 @@ tbl_sql <- function(
           "Failed to find table {source}.",
           i = "Did you mean {.code from = I({.str {from}})}?"
         ),
-        parent = err
+        parent = err,
+        call = call
       )
     }
   )
+}
+
+new_tbl_sql <- function(con, source, vars, subclass = NULL) {
+  check_con(con)
+  check_table_source(source)
+  check_character(vars)
+
+  lazy_query <- lazy_query_remote(source, vars)
+  new_tbl_lazy(con, lazy_query, subclass = subclass)
+}
+
+# The goal of this function is to paper over all of the historical differences
+# and provide a consistent forward looking interface, recognising that the
+# primary different between the three cases (tbl(), lazy_frame(), and
+# copy_inline()) is the base query
+new_tbl_lazy <- function(con, query, subclass = NULL) {
+  check_con(con)
+  if (!inherits(query, "lazy_base_query")) {
+    stop_input_type(query, "a <lazy_base_query>")
+  }
+
+  is_sql <- !inherits(query, "lazy_base_local_query")
+  subclass <- c(subclass %||% class(con)[[1]], if (is_sql) "sql", "lazy")
 
   dplyr::make_tbl(
-    c(subclass, "sql", "lazy"),
-    src = src,
-    lazy_query = lazy_query_remote(source, vars)
+    subclass,
+    con = con,
+    src = src_dbi(con), # for backward compatibility
+    lazy_query = query
   )
 }
 
 #' @importFrom dplyr same_src
 #' @export
 same_src.tbl_sql <- function(x, y) {
-  inherits(y, "tbl_sql") && same_src(x$src, y$src)
+  inherits(y, "tbl_sql") && identical(x$con, y$con)
 }
 
 # Grouping methods -------------------------------------------------------------
@@ -65,8 +96,8 @@ same_src.tbl_sql <- function(x, y) {
 #' @importFrom dplyr group_size
 #' @export
 group_size.tbl_sql <- function(x) {
-  df <- x %>%
-    summarise(n = n()) %>%
+  df <- x |>
+    summarise(n = n()) |>
     collect()
   df$n
 }
@@ -78,10 +109,10 @@ n_groups.tbl_sql <- function(x) {
     return(1L)
   }
 
-  df <- x %>%
-    summarise() %>%
-    ungroup() %>%
-    summarise(n = n()) %>%
+  df <- x |>
+    summarise() |>
+    ungroup() |>
+    summarise(n = n()) |>
     collect()
   df$n
 }
@@ -105,27 +136,22 @@ as.data.frame.tbl_sql <- function(
   as.data.frame(collect(x, n = n))
 }
 
+#' @importFrom pillar tbl_format_header
 #' @export
-#' @importFrom tibble tbl_sum
-tbl_sum.tbl_sql <- function(x) {
+tbl_format_header.tbl_sql <- function(x, setup, ...) {
   grps <- op_grps(x$lazy_query)
   sort <- op_sort(x$lazy_query)
-  c(
+  named_header <- c(
     # Can be overwritten by tbl_format_header.tbl_lazy:
-    "Source" = tbl_desc(x),
-    "Database" = dbplyr_connection_describe(x$src$con),
+    "A query" = paste0("?? x ", length(op_vars(x))),
+    "Database" = db_connection_describe(x$con),
     "Groups" = if (length(grps) > 0) commas(grps),
     "Ordered by" = if (length(sort) > 0) commas(deparse_all(sort))
   )
-}
-
-tbl_desc <- function(x, rows_total = NA_integer_) {
-  paste0(
-    op_desc(x$lazy_query),
-    " [",
-    op_rows(x$lazy_query, rows_total),
-    " x ",
-    big_mark(op_cols(x$lazy_query)),
-    "]"
+  header <- paste0(
+    pillar::align(paste0(names(named_header), ":")),
+    " ",
+    named_header
   )
+  pillar::style_subtle(paste0("# ", header))
 }

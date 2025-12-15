@@ -14,12 +14,12 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = simulate_hive())
-#' lf %>% transmute(x = cot(b))
-#' lf %>% transmute(x = bitwShiftL(c, 1L))
-#' lf %>% transmute(x = str_replace_all(c, "a", "b"))
+#' lf |> transmute(x = cot(b))
+#' lf |> transmute(x = bitwShiftL(c, 1L))
+#' lf |> transmute(x = str_replace_all(c, "a", "b"))
 #'
-#' lf %>% summarise(x = median(d, na.rm = TRUE))
-#' lf %>% summarise(x = var(c, na.rm = TRUE))
+#' lf |> summarise(x = median(d, na.rm = TRUE))
+#' lf |> summarise(x = var(c, na.rm = TRUE))
 NULL
 
 #' @export
@@ -40,11 +40,11 @@ sql_translation.Hive <- function(con) {
       bitwShiftR = sql_prefix("SHIFTRIGHT", 2),
 
       cot = function(x) {
-        sql_expr(1 / tan(!!x))
+        sql_glue("1.0 / TAN({x})")
       },
 
       str_replace_all = function(string, pattern, replacement) {
-        sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
+        sql_glue("REGEXP_REPLACE({string}, {pattern}, {replacement})")
       }
     ),
     sql_translator(
@@ -92,7 +92,7 @@ sql_translation.Hive <- function(con) {
 #' @export
 sql_table_analyze.Hive <- function(con, table, ...) {
   # https://cwiki.apache.org/confluence/display/Hive/StatsDev
-  glue_sql2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
+  sql_glue2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
 }
 
 #' @export
@@ -106,21 +106,12 @@ sql_query_set_op.Hive <- function(
   lvl = 0
 ) {
   check_bool(all)
-  # parentheses are not allowed
+  # compared to default method, can't use parentheses
   method <- paste0(method, if (all) " ALL")
-  glue_sql2(
-    con,
-    "\n", # dummy line to protect indent
-    "{x}\n",
-    lvl_indent(lvl),
-    "{.kw method}\n",
-    y
-  )
+  sql_glue2(con, "{x}\n{.sql method}\n{y}")
 }
 
 #' @export
 supports_window_clause.Hive <- function(con) {
   TRUE
 }
-
-utils::globalVariables("regexp_replace")

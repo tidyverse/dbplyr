@@ -21,10 +21,14 @@ reference:
 - subtitle: Connecting, copying, and retrieving data
   contents:
   - tbl.src_dbi
+  - collapse.tbl_sql
+  - collect.tbl_sql
+  - compute.tbl_sql
   - copy_to.src_sql
   - copy_inline
-  - collapse.tbl_sql
   - pull.tbl_sql
+  - show_query
+  - .sql
 
 - subtitle: Verbs that affect rows
   contents:
@@ -77,11 +81,9 @@ reference:
 
 - title: SQL generation
   contents:
-  - build_sql
   - escape
-  - partial_eval
   - sql
-  - sql_expr
+  - sql_glue
   - translate_sql
   - window_order
   - sql_options
@@ -93,7 +95,13 @@ reference:
   - db-misc
   - db-sql
   - db-quote
+  - sql_glue2
+  - sql_variant
   - sql_query_insert
+  - sql_translation_scalar
+  - sql_translation_string
+  - sql_translation_agg
+  - sql_translation_window
 
 news:
   releases:

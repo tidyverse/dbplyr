@@ -20,13 +20,12 @@
 #' }
 #'
 #' You can override the guesses using `local()` and `remote()` to force
-#' computation, or by using the `.data` and `.env` pronouns of tidy evaluation.
+#' computation, by using the `.data` and `.env` pronouns of tidy evaluation,
+#' or by using dbplyr's own `.sql` pronoun.
 #'
 #' @param call an unevaluated expression, as produced by [quote()]
 #' @param data A lazy data frame backed by a database query.
 #' @param env environment in which to search for local values
-#' @param vars `r lifecycle::badge("deprecated")`: Pass a lazy frame to `data`
-#'   instead.
 #' @export
 #' @keywords internal
 #' @examples
@@ -51,21 +50,19 @@
 #' f <- function(x) x + 1
 #' partial_eval(quote(year > f(1980)), lf)
 #' partial_eval(quote(year > local(f(1980))), lf)
+#'
+#' # You can use `.sql` to make it clear that the function comes from SQL,
+#' # and inside a package, reduce the number of globalVariables() directives
+#' # needed
+#' partial_eval(quote(.sql$EXTRACT_YEAR(year)), lf)
 partial_eval <- function(
   call,
   data,
   env = caller_env(),
-  vars = deprecated(),
-  error_call
+  error_call = caller_env()
 ) {
-  if (lifecycle::is_present(vars)) {
-    lifecycle::deprecate_stop("2.1.2", "partial_eval(vars)")
-  }
-  if (is.character(data)) {
-    lifecycle::deprecate_stop(
-      "2.1.2",
-      "partial_eval(data = 'must be a lazy frame')",
-    )
+  if (!inherits(data, "tbl_lazy")) {
+    cli::cli_abort("`data` must be a lazy data frame", call = error_call)
   }
 
   if (is_sql_literal(call)) {
@@ -202,6 +199,9 @@ partial_eval_sym <- function(sym, data, env) {
 is_mask_pronoun <- function(call) {
   is_call(call, c("$", "[["), n = 2) && is_symbol(call[[2]], c(".data", ".env"))
 }
+is_sql_pronoun <- function(call) {
+  is_call(call, "$", n = 2) && is_symbol(call[[2]], ".sql")
+}
 
 partial_eval_call <- function(call, data, env) {
   fun <- call[[1]]
@@ -222,20 +222,22 @@ partial_eval_call <- function(call, data, env) {
     call[[1]] <- fun <- sym(fun_name)
   }
 
-  # Compound calls, apart from `::` aren't translatable
+  # Compound calls, apart from pronouns and `::` aren't translatable
   if (is_call(fun) && !is_call(fun, "::")) {
     if (is_mask_pronoun(fun)) {
-      stop(
+      cli::cli_abort(
         "Use local() or remote() to force evaluation of functions",
-        call. = FALSE
+        call = NULL
       )
+    } else if (is_sql_pronoun(fun)) {
+      call[[1]] <- fun[[3]]
     } else {
       return(eval_bare(call, env))
     }
   }
 
-  # .data$, .data[[]], .env$, .env[[]] need special handling
   if (is_mask_pronoun(call)) {
+    # special handling for .data$, .data[[]], .env$, .env[[]]
     var <- call[[3]]
     if (is_call(call, "[[")) {
       var <- sym(eval(var, env))
@@ -246,6 +248,9 @@ partial_eval_call <- function(call, data, env) {
     } else {
       eval_bare(var, env)
     }
+  } else if (is_sql_pronoun(call)) {
+    # special handling for .sql$
+    call[[3]]
   } else {
     # Process call arguments recursively, unless user has manually called
     # remote/local
@@ -315,3 +320,24 @@ replace_sym <- function(call, sym, replace) {
     call
   }
 }
+
+
+#' Flag SQL function usage
+#'
+#' @description
+#' Use `.sql$foo(x, y)` to make it clear that you're calling the SQL
+#' `foo()` function, not the R `foo()` function. This also makes it easier to
+#' reduce `R CMD check` notes in packages; just import `.sql` from dbplyr with
+#' e.g. `@importFrom dbplyr .sql`.
+#'
+#' Note that `.sql` itself does nothing and is just `NULL`; it is automatically
+#' removed when dbplyr translates your R code to SQL.
+#'
+#' @export
+#' @format NULL
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' db <- lazy_frame(x = 1, y = 2)
+#' db |> mutate(z = .sql$CUMULATIVE_SUM(x, 1))
+.sql <- NULL

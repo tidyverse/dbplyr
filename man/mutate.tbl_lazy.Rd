@@ -45,7 +45,7 @@ should appear (the default is to add to the right hand side). See
 \code{\link[dplyr:relocate]{relocate()}} for more details.}
 }
 \value{
-Another \code{tbl_lazy}. Use \code{\link[dplyr:explain]{dplyr::show_query()}} to see the generated
+Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
 query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
@@ -58,12 +58,12 @@ the SQL query.
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(x = 1:5, y = 5:1)
-db \%>\%
-  mutate(a = (x + y) / 2, b = sqrt(x^2L + y^2L)) \%>\%
+db |>
+  mutate(a = (x + y) / 2, b = sqrt(x^2L + y^2L)) |>
   show_query()
 
 # dbplyr automatically creates subqueries as needed
-db \%>\%
-  mutate(x1 = x + 1, x2 = x1 * 2) \%>\%
+db |>
+  mutate(x1 = x + 1, x2 = x1 * 2) |>
   show_query()
 }

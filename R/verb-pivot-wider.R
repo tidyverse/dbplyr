@@ -3,36 +3,48 @@
 #' @description
 #' `pivot_wider()` "widens" data, increasing the number of columns and
 #' decreasing the number of rows. The inverse transformation is
-#' `pivot_longer()`.
-#' Learn more in `vignette("pivot", "tidyr")`.
+#' `pivot_longer()`. Learn more in `vignette("pivot", "tidyr")`.
 #'
-#' Note that `pivot_wider()` is not and cannot be lazy because we need to look
+#' `pivot_wider()` on database tables comes with some caveats, please make
+#' sure to read below for details.
+#'
+#' # Caveats
+#'
+#' ## `pivot_wider()` is eager
+#'
+#' Note that `pivot_wider()` cannot be lazy because we need to look
 #' at the data to figure out what the new column names will be.
-#' If you have a long running query you have two options:
+#' If you have a long-running query you have two options:
 #'
-#' * (temporarily) store the result of the query via `compute()`.
+#' * Temporarily store the result of the query via `compute()`.
 #' * Create a spec before and use `dbplyr_pivot_wider_spec()` - dbplyr's version
-#'   of `tidyr::pivot_wider_spec()`. Note that this function is only a temporary
-#'   solution until `pivot_wider_spec()` becomes a generic. It will then be
-#'   removed soon afterwards.
+#'   of `tidyr::pivot_wider_spec()`.
 #'
-#' @details
+#' ## You must supply `values_fn`
+#'
 #' The big difference to `pivot_wider()` for local data frames is that
 #' `values_fn` must not be `NULL`. By default it is `max()` which yields
-#' the same results as for local data frames if the combination of `id_cols`
-#' and `value` column uniquely identify an observation.
-#' Mind that you also do not get a warning if an observation is not uniquely
-#' identified.
+#' the same results as for local data frames if three conditions are true:
+#'
+#' 1. The combination of `id_cols` and `value` uniquely identify an observation.
+#' 1. The column has a comparable type (e.g. numeric, date-time, or
+#'    (for most databases) string).
+#' 1. `values_fill` is `NULL`.
+#'
+#' If either the second or third condition is not met, you must supply a
+#' custom `values_fn`. Unfortunately there is no generally available alternative
+#' and you'll need to look for something database specific, like `FIRST()`
+#' or `ANY_VALUE()`.
+#'
+#' # How does it work?
 #'
 #' The translation to SQL code basically works as follows:
 #'
 #' 1. Get unique keys in `names_from` column.
 #' 2. For each key value generate an expression of the form:
 #'     ```sql
-#'     value_fn(
-#'       CASE WHEN (`names from column` == `key value`)
-#'       THEN (`value column`)
-#'       END
+#'     values_fn(
+#'       CASE WHEN (`names from column` == `key value`) THEN (`value column`) END
 #'     ) AS `output column`
 #'     ```
 #' 3. Group data by id columns.
@@ -75,7 +87,8 @@
 #'   possible values in `names_from`. Additionally, the column names will be
 #'   sorted, identical to what `names_sort` would produce.
 #' @param values_fill Optionally, a (scalar) value that specifies what each
-#'   `value` should be filled in with when missing.
+#'   `value` should be filled in with when missing. Be careful when using this
+#'   in combination with the default `values_fn`.
 #' @param values_fn A function, the default is `max()`, applied to the `value`
 #' in each cell in the output. In contrast to local data frames it must not be
 #' `NULL`.
@@ -100,7 +113,7 @@
 #'   id = 1,
 #'   key = c("x", "y"),
 #'   value = 1:2
-#' ) %>%
+#' ) |>
 #'   tidyr::pivot_wider(
 #'     id_cols = id,
 #'     names_from = key,
@@ -187,14 +200,14 @@ dbplyr_build_wider_spec <- function(
   # prepare a minimal local tibble we can pass to `tidyr::build_wider_spec`
   # 1. create a tibble with unique values in the `names_from` column
   # row_ids <- vec_unique(data[names_from])
-  names_from <- tidyselect::eval_select(enquo(names_from), data) %>% names()
+  names_from <- tidyselect::eval_select(enquo(names_from), data) |> names()
   if (is_empty(names_from)) {
     cli_abort("{.arg names_from} must select at least one column.")
   }
   distinct_data <- collect(distinct(data, !!!syms(names_from)))
 
   # 2. add `values_from` column
-  values_from <- tidyselect::eval_select(enquo(values_from), data) %>% names()
+  values_from <- tidyselect::eval_select(enquo(values_from), data) |> names()
   if (is_empty(values_from)) {
     cli_abort("{.arg values_from} must select at least one column.")
   }
@@ -326,12 +339,12 @@ dbplyr_pivot_wider_spec <- function(
   }
   pivot_exprs <- set_names(pivot_exprs, out_nms_repaired)
 
-  data_grouped %>%
+  data_grouped |>
     summarise(
       !!!pivot_exprs,
       !!!unused_col_expr,
       .groups = "drop"
-    ) %>%
+    ) |>
     group_by(!!!syms(group_vars(data)))
 }
 

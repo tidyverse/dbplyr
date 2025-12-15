@@ -1,7 +1,7 @@
 # can pivot all cols to long
 
     Code
-      lazy_frame(x = 1:2, y = 3:4) %>% tidyr::pivot_longer(x:y)
+      tidyr::pivot_longer(lazy_frame(x = 1:2, y = 3:4), x:y)
     Output
       <SQL>
       SELECT 'x' AS `name`, `x` AS `value`
@@ -43,7 +43,7 @@
 # can drop missing values
 
     Code
-      lazy_frame(x = c(1, NA), y = c(NA, 2)) %>% tidyr::pivot_longer(x:y,
+      tidyr::pivot_longer(lazy_frame(x = c(1, NA), y = c(NA, 2)), x:y,
       values_drop_na = TRUE)
     Output
       <SQL>
@@ -79,7 +79,7 @@
 # can override default output column type
 
     Code
-      lazy_frame(x = 1) %>% tidyr::pivot_longer(x, values_transform = list(value = as.character))
+      tidyr::pivot_longer(lazy_frame(x = 1), x, values_transform = list(value = as.character))
     Output
       <SQL>
       SELECT 'x' AS `name`, CAST(`x` AS TEXT) AS `value`
@@ -88,7 +88,7 @@
 # values_transform can be a formula
 
     Code
-      lazy_frame(x = 1) %>% tidyr::pivot_longer(x, values_transform = list(value = ~
+      tidyr::pivot_longer(lazy_frame(x = 1), x, values_transform = list(value = ~
         as.character(.x)))
     Output
       <SQL>
@@ -150,7 +150,7 @@
 # can repair names
 
     Code
-      out <- df %>% tidyr::pivot_longer(c(x, y), names_repair = "unique")
+      out <- tidyr::pivot_longer(df, c(x, y), names_repair = "unique")
     Message
       New names:
       * `name` -> `name...2`
@@ -161,7 +161,7 @@
 # values_ptype is not supported
 
     Code
-      lazy_frame(x = 1:2, y = 3:4) %>% tidyr::pivot_longer(x:y, values_ptypes = character())
+      tidyr::pivot_longer(lazy_frame(x = 1:2, y = 3:4), x:y, values_ptypes = character())
     Condition
       Error in `tidyr::pivot_longer()`:
       ! Argument `values_ptypes` isn't supported on database backends.
@@ -169,7 +169,7 @@
 # cols_vary is not supported
 
     Code
-      lazy_frame(x = 1:2, y = 3:4) %>% tidyr::pivot_longer(x:y, cols_vary = "fastest")
+      tidyr::pivot_longer(lazy_frame(x = 1:2, y = 3:4), x:y, cols_vary = "fastest")
     Condition
       Error in `tidyr::pivot_longer()`:
       ! Argument `cols_vary` isn't supported on database backends.

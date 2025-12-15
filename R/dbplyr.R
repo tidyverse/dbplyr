@@ -6,7 +6,6 @@
 #' @import rlang
 #' @import DBI
 #' @importFrom tibble tibble as_tibble
-#' @importFrom magrittr %>%
 #' @importFrom lifecycle deprecated
 #' @keywords internal
 "_PACKAGE"
