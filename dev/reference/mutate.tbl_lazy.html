@@ -136,10 +136,10 @@ and return data to R.</p>
 <span class="r-in"><span>  <span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   `dbplyr_tmp_8U3eI6Ojtg`.*,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   `dbplyr_tmp_I6Ojtgl00s`.*,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   (`x` + `y`) / 2.0<span style="color: #0000BB;"> AS </span>`a`,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   SQRT((POWER(`x`, 2)) + POWER(`y`, 2))<span style="color: #0000BB;"> AS </span>`b`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_8U3eI6Ojtg`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_I6Ojtgl00s`</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># dbplyr automatically creates subqueries as needed</span></span></span>
 <span class="r-in"><span><span class="va">db</span> <span class="op">|&gt;</span></span></span>
@@ -148,8 +148,8 @@ and return data to R.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `q01`.*, `x1` * 2.0<span style="color: #0000BB;"> AS </span>`x2`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> (</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span> `dbplyr_tmp_8U3eI6Ojtg`.*, `x` + 1.0<span style="color: #0000BB;"> AS </span>`x1`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_8U3eI6Ojtg`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span> `dbplyr_tmp_I6Ojtgl00s`.*, `x` + 1.0<span style="color: #0000BB;"> AS </span>`x1`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_I6Ojtgl00s`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ) <span style="color: #0000BB;">AS </span>`q01`</span>
 </code></pre></div>
     </div>

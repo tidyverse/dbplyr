@@ -71,8 +71,8 @@ df |> arrange(x)
 #> # ℹ more rows
 df |> arrange(x) |> show_query()
 #> <SQL>
-#> SELECT `dbplyr_tmp_3TKpjGw3nP`.*
-#> FROM `dbplyr_tmp_3TKpjGw3nP`
+#> SELECT `dbplyr_tmp_KpjGw3nPZi`.*
+#> FROM `dbplyr_tmp_KpjGw3nPZi`
 #> ORDER BY `x`
 
 mtcars_db <- tbl_memdb(mtcars)

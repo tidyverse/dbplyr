@@ -90,10 +90,10 @@ db |>
   show_query()
 #> <SQL>
 #> SELECT
-#>   `dbplyr_tmp_8U3eI6Ojtg`.*,
+#>   `dbplyr_tmp_I6Ojtgl00s`.*,
 #>   (`x` + `y`) / 2.0 AS `a`,
 #>   SQRT((POWER(`x`, 2)) + POWER(`y`, 2)) AS `b`
-#> FROM `dbplyr_tmp_8U3eI6Ojtg`
+#> FROM `dbplyr_tmp_I6Ojtgl00s`
 
 # dbplyr automatically creates subqueries as needed
 db |>
@@ -102,7 +102,7 @@ db |>
 #> <SQL>
 #> SELECT `q01`.*, `x1` * 2.0 AS `x2`
 #> FROM (
-#>   SELECT `dbplyr_tmp_8U3eI6Ojtg`.*, `x` + 1.0 AS `x1`
-#>   FROM `dbplyr_tmp_8U3eI6Ojtg`
+#>   SELECT `dbplyr_tmp_I6Ojtgl00s`.*, `x` + 1.0 AS `x1`
+#>   FROM `dbplyr_tmp_I6Ojtgl00s`
 #> ) AS `q01`
 ```
