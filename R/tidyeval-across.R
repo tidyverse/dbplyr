@@ -210,7 +210,7 @@ across_fun <- function(fun, env, dots, fn) {
       )
     }
 
-    partial_eval_prepare_fun(f_rhs(fun), c(".", ".x"), f_env(fun))
+    partial_eval_prepare_fun(f_rhs(fun), c(".", ".x"), env)
   } else if (is_call(fun, "function")) {
     fun <- eval(fun, env)
     partial_eval_fun(fun, env, fn)
@@ -254,15 +254,19 @@ partial_eval_prepare_fun <- function(call, sym, env) {
 resolve_mask_pronouns <- function(call, env) {
   if (is_mask_pronoun(call)) {
     var <- call[[3]]
-    if (is_call(call, "[[")) {
-      var <- sym(eval(var, env))
-    }
 
     if (is_symbol(call[[2]], ".data")) {
-      var
+      if (is_call(call, "[[")) {
+        sym(eval(var, env))
+      } else {
+        var
+      }
     } else {
-      # .env - evaluate fully
-      eval_bare(var, env)
+      if (is_call(call, "[[")) {
+        env_get(env, var)
+      } else {
+        env_get(env, as.character(var))
+      }
     }
   } else if (is_call(call)) {
     call[] <- lapply(call, resolve_mask_pronouns, env = env)
