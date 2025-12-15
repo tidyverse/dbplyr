@@ -2,6 +2,9 @@
 
 ## dbplyr (development version)
 
+- MS Access now correctly generates SQL for multiple joins by adding
+  required parentheses
+  ([\#1576](https://github.com/tidyverse/dbplyr/issues/1576)).
 - `.data$col`, `.data[[col]]`, `.env$var`, and `.env$[[var]]` now work
   correctly inside
   [`across()`](https://dplyr.tidyverse.org/reference/across.html)
