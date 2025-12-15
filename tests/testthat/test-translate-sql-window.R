@@ -298,11 +298,11 @@ test_that("names windows automatically", {
   expect_equal(
     sql_list$select_sql,
     sql(
-      part = ident("part"),
-      col1 = sql("SUM(`col1`) OVER `win1`"),
-      col2 = sql("SUM(`col2`) OVER `win1`"),
-      col3 = sql("SUM(`col3`) OVER `win2`"),
-      col4 = sql("SUM(`col4`) OVER `win2`")
+      part = "`part`",
+      col1 = "SUM(`col1`) OVER `win1`",
+      col2 = "SUM(`col2`) OVER `win1`",
+      col3 = "SUM(`col3`) OVER `win2`",
+      col4 = "SUM(`col4`) OVER `win2`"
     )
   )
 
@@ -333,11 +333,11 @@ test_that("names windows automatically", {
   expect_equal(
     sql_list$select_sql,
     sql(
-      part = ident("part"),
-      col1 = sql("SUM(`col1`) OVER `win1`"),
-      col3 = sql("SUM(`col3`) OVER `win2`"),
-      col2 = sql("SUM(`col2`) OVER `win1`"),
-      col4 = sql("SUM(`col4`) OVER `win2`")
+      part = "`part`",
+      col1 = "SUM(`col1`) OVER `win1`",
+      col3 = "SUM(`col3`) OVER `win2`",
+      col2 = "SUM(`col2`) OVER `win1`",
+      col4 = "SUM(`col4`) OVER `win2`"
     )
   )
 })
@@ -370,12 +370,10 @@ test_that("only name windows if they appear multiple times", {
   expect_equal(
     sql_list$select_sql,
     sql(
-      part = ident("part"),
-      col1 = sql("SUM(`col1`) OVER `win1`"),
-      col2 = sql("SUM(`col2`) OVER `win1`"),
-      col3 = sql(
-        "SUM(`col3`) OVER (PARTITION BY `part` ORDER BY `ord` DESC ROWS UNBOUNDED PRECEDING)"
-      )
+      part = "`part`",
+      col1 = "SUM(`col1`) OVER `win1`",
+      col2 = "SUM(`col2`) OVER `win1`",
+      col3 = "SUM(`col3`) OVER (PARTITION BY `part` ORDER BY `ord` DESC ROWS UNBOUNDED PRECEDING)"
     )
   )
 })
@@ -404,9 +402,9 @@ test_that("name windows only if supported", {
   expect_equal(
     sql_list$select_sql,
     sql(
-      part = ident("part"),
-      col1 = sql("SUM(`col1`) OVER (PARTITION BY `part`)"),
-      col2 = sql("SUM(`col2`) OVER (PARTITION BY `part`)")
+      part = "`part`",
+      col1 = "SUM(`col1`) OVER (PARTITION BY `part`)",
+      col2 = "SUM(`col2`) OVER (PARTITION BY `part`)"
     )
   )
 })

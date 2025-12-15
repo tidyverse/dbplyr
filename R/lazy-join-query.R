@@ -279,11 +279,11 @@ sql_build.lazy_semi_join_query <- function(op, con, ..., sql_options = NULL) {
   }
 
   # We've introduced aliases to disambiguate the internal and external tables
-  # so need to update the WHERE clause
+  # so need to update the existing WHERE clause
   y_vars <- op_vars(op$y)
-  replacements <- lapply(y_vars, \(var) call2("$", sql(op$by$y_as), sym(var)))
+  y_as <- op$by$y_as
+  replacements <- lapply(y_vars, \(var) sql_glue2(con, "{y_as}.{.id var}"))
   where <- lapply(op$where, \(expr) replace_sym(expr, y_vars, replacements))
-
   where_sql <- translate_sql_(
     where,
     con = con,

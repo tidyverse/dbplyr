@@ -38,12 +38,12 @@ win_over <- function(
   con = sql_current_con()
 ) {
   if (length(partition) > 0) {
-    partition <- as.sql(partition, con = con)
+    partition <- as_ident_or_sql(partition)
     partition <- sql_glue2(con, "PARTITION BY {partition}")
   }
 
   if (length(order) > 0) {
-    order <- as.sql(order, con = con)
+    order <- as_ident_or_sql(order)
     order <- sql_glue2(con, "ORDER BY {order}")
   }
   if (length(frame) > 0) {
@@ -57,15 +57,11 @@ win_over <- function(
     if (is.numeric(frame)) {
       frame <- rows(frame[1], frame[2])
     }
-    f <- sql(frame)
-    frame <- sql_glue2(con, "ROWS {frame}")
+    frame <- sql_glue2(con, "ROWS {.sql frame}")
   }
 
-  over <- sql_vector(
-    purrr::compact(list(partition, order, frame)),
-    parens = TRUE,
-    con = con
-  )
+  over <- paste(c(partition, order, frame), collapse = " ")
+  over <- sql(paste0("(", over, ")"))
 
   if (sql_context$register_windows) {
     win_register(over)
@@ -85,7 +81,7 @@ win_register_deactivate <- function() {
 }
 
 win_register <- function(over) {
-  sql_context$windows <- append(sql_context$windows, over)
+  sql_context$windows <- sql(c(sql_context$windows, over))
 }
 
 win_register_names <- function() {
@@ -117,7 +113,7 @@ win_get <- function(over, con) {
 
 win_reset <- function() {
   sql_context$window_names <- NULL
-  sql_context$windows <- list()
+  sql_context$windows <- sql()
 }
 
 rows <- function(from = -Inf, to = 0) {

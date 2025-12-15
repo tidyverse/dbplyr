@@ -31,6 +31,14 @@ test_that("glue_sql() handles type casting", {
   expect_equal(sql_glue2(con, "{.tbl tbl3}"), sql("`schema`.`table`"))
 })
 
+test_that("useful error if bad identified", {
+  con <- simulate_dbi()
+  expect_snapshot(error = TRUE, {
+    sql_glue2(con, "{.id 1}")
+    sql_glue2(con, "{.tbl 1}")
+  })
+})
+
 test_that("glue_sql() can collapse with and without parens", {
   con <- simulate_dbi()
   x <- c("a", "b")

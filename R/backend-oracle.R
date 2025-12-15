@@ -191,7 +191,7 @@ sql_translation.Oracle <- function(con) {
 #' @export
 sql_query_explain.Oracle <- function(con, sql, ...) {
   # https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/generating-and-displaying-execution-plans.html
-  c(
+  sql(
     sql_glue2(con, "EXPLAIN PLAN FOR {sql}"),
     sql_glue2(con, "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())")
   )
