@@ -40,6 +40,13 @@
       RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
       ;
 
+# db_table_temporary adds ORA$PTT_ prefix
+
+    Code
+      result <- db_table_temporary(con, table_path("tbl"), temporary = TRUE)
+    Message
+      Created a temporary table named ORA$PTT_tbl
+
 # generates custom sql
 
     Code
@@ -69,18 +76,19 @@
 ---
 
     Code
-      sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"))
+      sql_query_save(con, sql("SELECT * FROM foo"), "ORA$PTT_tbl")
     Output
-      <SQL> CREATE GLOBAL TEMPORARY TABLE `schema`.`tbl` AS
+      <SQL> CREATE PRIVATE TEMPORARY TABLE `ORA$PTT_tbl`
+      ON COMMIT PRESERVE ROWS
+      AS
       SELECT * FROM foo
 
 ---
 
     Code
-      sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"),
-      temporary = FALSE)
+      sql_query_save(con, sql("SELECT * FROM foo"), "tbl", temporary = FALSE)
     Output
-      <SQL> CREATE TABLE `schema`.`tbl` AS
+      <SQL> CREATE TABLE `tbl` AS
       SELECT * FROM foo
 
 ---

@@ -68,6 +68,27 @@ test_that("`sql_query_upsert()` is correct", {
   )
 })
 
+test_that("db_table_temporary adds ORA$PTT_ prefix", {
+  con <- simulate_oracle()
+
+  # Adds prefix (with message) for temporary tables
+  expect_snapshot(
+    result <- db_table_temporary(con, table_path("tbl"), temporary = TRUE)
+  )
+  expect_equal(as.character(result$table), "ORA$PTT_tbl")
+  expect_false(result$temporary)
+
+  # Doesn't double-prefix if already has ORA$PTT_
+  result <- db_table_temporary(con, table_path("ORA$PTT_tbl"), temporary = TRUE)
+  expect_equal(as.character(result$table), "ORA$PTT_tbl")
+  expect_false(result$temporary)
+
+  # Returns table unchanged for non-temporary
+  result <- db_table_temporary(con, table_path("tbl"), temporary = FALSE)
+  expect_equal(as.character(result$table), "tbl")
+  expect_false(result$temporary)
+})
+
 test_that("generates custom sql", {
   con <- simulate_oracle()
 
@@ -77,15 +98,13 @@ test_that("generates custom sql", {
   lf <- lazy_frame(x = 1, con = con)
   expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
 
+  # With ORA$PTT_ prefix -> creates PRIVATE TEMPORARY TABLE
+  expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), "ORA$PTT_tbl"))
+  # Without ORA$PTT_ prefix -> creates regular TABLE
   expect_snapshot(sql_query_save(
     con,
     sql("SELECT * FROM foo"),
-    in_schema("schema", "tbl")
-  ))
-  expect_snapshot(sql_query_save(
-    con,
-    sql("SELECT * FROM foo"),
-    in_schema("schema", "tbl"),
+    "tbl",
     temporary = FALSE
   ))
 
