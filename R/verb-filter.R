@@ -84,7 +84,7 @@ add_filter <- function(.data, dots) {
     # Do partial evaluation, then extract out window functions
     where <- translate_window_where_all(
       dots,
-      ls(dbplyr_sql_translation(con)$window)
+      env_names(dbplyr_sql_translation(con)$window)
     )
 
     # Add extracted window expressions as columns
