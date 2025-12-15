@@ -106,3 +106,19 @@ test_that("other backends can combine with a limit", {
     purrr::map2(tbls_head, union_all) |>
     expect_equal_tbls(head(df, 1))
 })
+
+test_that("intersect works with copy = 'temp-table'", {
+  df1 <- memdb_frame(x = 1:3)
+  df2 <- tibble(x = 2:4)
+
+  out <- intersect(df1, df2, copy = "temp-table") |> collect()
+  expect_equal(out, tibble(x = 2:3))
+})
+
+test_that("intersect works with copy = 'inline'", {
+  df1 <- memdb_frame(x = 1:3)
+  df2 <- tibble(x = 2:4)
+
+  out <- intersect(df1, df2, copy = "inline") |> collect()
+  expect_equal(out, tibble(x = 2:3))
+})

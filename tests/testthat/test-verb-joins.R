@@ -1272,6 +1272,14 @@ test_that("copy = TRUE works", {
   )
 })
 
+test_that("copy = 'inline' works", {
+  df1 <- memdb_frame(x = 1:3, y = c("a", "b", "c"))
+  df2 <- tibble(x = 1L)
+
+  out <- semi_join(df1, df2, by = "x", copy = "inline")
+  expect_equal(collect(out), collect(df1)[1, ])
+})
+
 test_that("left_join/inner_join uses *", {
   lf1 <- lazy_frame(a = 1, b = 2, c = 1)
   lf2 <- lazy_frame(a = 1, b = 2, z = 1)

@@ -49,7 +49,7 @@ setdiff.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
 }
 
 add_union <- function(x, y, all, copy = FALSE, call = caller_env()) {
-  y <- auto_copy(x, y, copy)
+  y <- dbplyr_auto_copy(x, y, copy = copy, call = call)
   check_set_op_sqlite(x, y, call = call)
 
   # Ensure each has same variables
@@ -93,7 +93,7 @@ add_set_op <- function(
   all = FALSE,
   call = caller_env()
 ) {
-  y <- auto_copy(x, y, copy)
+  y <- dbplyr_auto_copy(x, y, copy = copy, call = call)
   check_set_op_sqlite(x, y, call = call)
 
   # Ensure each has same variables

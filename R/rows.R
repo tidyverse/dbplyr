@@ -798,7 +798,7 @@ rows_auto_copy <- function(x, y, copy, call = caller_env()) {
     x_types <- x_types[colnames(y)]
   }
 
-  auto_copy(x, y, copy = copy, types = x_types)
+  dbplyr_auto_copy(x, y, copy = copy, types = x_types, call = call)
 }
 
 rows_get_or_execute <- function(x, sql, returning_cols, call = caller_env()) {
