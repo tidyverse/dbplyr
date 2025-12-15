@@ -206,8 +206,6 @@ supports_window_clause.ACCESS <- function(con) {
   TRUE
 }
 
-# MS Access requires parentheses around chained joins
-# https://github.com/tidyverse/dbplyr/issues/1576
 #' @export
 sql_query_multi_join.ACCESS <- function(
   con,
@@ -224,6 +222,8 @@ sql_query_multi_join.ACCESS <- function(
   }
 
   from <- dbplyr_sql_subquery(con, x, name = table_names[[1]], lvl = lvl)
+  names <- table_names[-1]
+  tables <- joins$table
   types <- toupper(paste0(joins$type, " JOIN"))
 
   n_joins <- length(types)
@@ -234,12 +234,7 @@ sql_query_multi_join.ACCESS <- function(
   from <- sql(paste0(open_parens, from))
 
   for (i in seq_len(n_joins)) {
-    table <- dbplyr_sql_subquery(
-      con,
-      joins$table[[i]],
-      name = table_names[[i + 1]],
-      lvl = lvl
-    )
+    table <- dbplyr_sql_subquery(con, tables[[i]], name = names[[i]], lvl = lvl)
     by <- joins$by[[i]]
     on <- sql_join_tbls(con, by = by, na_matches = by$na_matches)
 
@@ -254,6 +249,5 @@ sql_query_multi_join.ACCESS <- function(
     sql_clause_select(con, select),
     sql_clause_from(from)
   )
-
   sql_format_clauses(clauses, lvl = lvl, con = con)
 }

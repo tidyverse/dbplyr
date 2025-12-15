@@ -531,18 +531,15 @@ sql_query_multi_join.DBIConnection <- function(
   }
 
   from <- dbplyr_sql_subquery(con, x, name = table_names[[1]], lvl = lvl)
+  names <- table_names[-1]
+  tables <- joins$table
   types <- toupper(paste0(joins$type, " JOIN"))
 
   n_joins <- length(types)
   out <- vector("list", n_joins * 2)
 
   for (i in seq_len(n_joins)) {
-    table <- dbplyr_sql_subquery(
-      con,
-      joins$table[[i]],
-      name = table_names[[i + 1]],
-      lvl = lvl
-    )
+    table <- dbplyr_sql_subquery(con, tables[[i]], name = names[[i]], lvl = lvl)
     out[[2 * i - 1]] <- sql_clause(types[[i]], table)
 
     by <- joins$by[[i]]
@@ -555,7 +552,6 @@ sql_query_multi_join.DBIConnection <- function(
     sql_clause_from(from),
     !!!out
   )
-
   sql_format_clauses(clauses, lvl = lvl, con = con)
 }
 
