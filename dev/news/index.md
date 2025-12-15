@@ -2,6 +2,10 @@
 
 ## dbplyr (development version)
 
+- `.data$col`, `.data[[col]]`, `.env$var`, and `.env$[[var]]` now work
+  correctly inside
+  [`across()`](https://dplyr.tidyverse.org/reference/across.html)
+  ([\#1520](https://github.com/tidyverse/dbplyr/issues/1520)).
 - New `.sql` pronoun makes it a little easier to use known SQL functions
   in packages, requiring only `@importFrom dbplyr .sql`
   ([\#1117](https://github.com/tidyverse/dbplyr/issues/1117)).
