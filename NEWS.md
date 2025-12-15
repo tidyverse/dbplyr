@@ -1,6 +1,7 @@
 # dbplyr (development version)
 
 * `.data$col` and `.data[[col]]` now work correctly inside `across()` (#1520).
+* New `.sql` pronoun makes it a little easier to use known SQL functions in packages, requiring only `@importFrom dbplyr .sql` (#1117).
 * `join_by(between())` now correctly handles column renames (#1572).
 * SQL Server uses `DATEDIFF_BIG` instead of `DATEDIFF` to work regardless of data size (@edward-burn, #1666).
 * `na_matches = "na"` now works correctly with inequality and overlap joins, preserving the comparison operator instead of converting to equality (#1505).

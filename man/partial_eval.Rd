@@ -35,7 +35,8 @@ variable, then remote.
 }
 
 You can override the guesses using \code{local()} and \code{remote()} to force
-computation, or by using the \code{.data} and \code{.env} pronouns of tidy evaluation.
+computation, by using the \code{.data} and \code{.env} pronouns of tidy evaluation,
+or by using dbplyr's own \code{.sql} pronoun.
 }
 
 \examples{
@@ -60,5 +61,10 @@ partial_eval(quote(year > .env$year), lf)
 f <- function(x) x + 1
 partial_eval(quote(year > f(1980)), lf)
 partial_eval(quote(year > local(f(1980))), lf)
+
+# You can use `.sql` to make it clear that the function comes from SQL,
+# and inside a package, reduce the number of globalVariables() directives
+# needed
+partial_eval(quote(.sql$EXTRACT_YEAR(year)), lf)
 }
 \keyword{internal}
