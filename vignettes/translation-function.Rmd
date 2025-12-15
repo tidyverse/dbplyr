@@ -18,13 +18,14 @@ There are two parts to dbplyr SQL translation: translating dplyr verbs, and tran
 ```{r}
 library(dbplyr)
 library(dplyr, warn.conflicts = FALSE)
-
-lf <- lazy_frame(x = 1, y = 2, g = "a")
 ```
+
+## Getting started with translations
 
 In this vignette, I'll use `lazy_frame()` to create a toy lazy table that allows us to see the translation without needing to connect to a real database:
 
 ```{r}
+lf <- lazy_frame(x = 1, y = 2, g = "a")
 lf |> mutate(z = (x + y) / 2)
 ```
 
@@ -131,19 +132,13 @@ Any function that dbplyr doesn't know about will be left as is:
 lf |> mutate(z = foofify(x, y))
 ```
 
-Because SQL functions are generally case insensitive, I recommend using upper case when you're using SQL functions in R code. That makes it easier to spot that you're doing something unusual:
+But to make it clear that you're deliberately calling a SQL function, we recommend using the `.sql` pronoun:
 
 ```{r}
-lf |> transmute(z = FOOFIFY(x, y))
+lf |> transmute(z = .sql$foofify(x, y))
 ```
 
-If you are writing code like this inside a package, `R CMD CHECK` will complain about `FOOFIFY` not being defined. You can silence this note using `globalVariables("FOOFIFY")` but this gets tedious if you use many SQL functions. So instead you can use the `.sql` prefix:
-
-```{r}
-lf |> transmute(z = .sql$FOOFIFY(x, y))
-```
-
-`.sql$` is stripped off automatically in the translation, but it means that you can do a single `globalVariables(".sql")` call, instead of one for each function.
+If you're working inside a package, this also makes it easier to avoid `R CMD CHECK` notes. Just import `.sql` from dbplyr using a roxygen2 tag like `@importFrom dbplyr .sql`
 
 ### Infix functions
 
@@ -159,7 +154,7 @@ You can also use `str_like()` for this common case:
 lf |> filter(str_like(x, "%foo%"))
 ```
 
-You could use `||` for string concatenation, but in most cases it's more R-like to use `paste()` or `paste0()`:
+You could use `%||%` for string concatenation, but in most cases it's more R-like to use `paste()` or `paste0()`:
 
 ```{r}
 lf |> transmute(z = x %||% y)
@@ -252,7 +247,7 @@ Things get a little trickier with window functions, because SQL's window functio
     dbplyr generates the frame clause based on whether you're using a recycled
     aggregate or a cumulative aggregate.
     
-To see how individual window functions are translated to SQL, we can use `mutate()`:
+To see how individual window functions are translated to SQL, we can use `transmute()`:
 
 ```{r}
 lf <- lazy_frame(g = 1, year = 2020, id = 3, con = simulate_dbi())

@@ -236,8 +236,8 @@ partial_eval_call <- function(call, data, env) {
     }
   }
 
-  # .data$, .data[[]], .env$, .env[[]] need special handling
   if (is_mask_pronoun(call)) {
+    # special handling for .data$, .data[[]], .env$, .env[[]]
     var <- call[[3]]
     if (is_call(call, "[[")) {
       var <- sym(eval(var, env))
@@ -249,6 +249,7 @@ partial_eval_call <- function(call, data, env) {
       eval_bare(var, env)
     }
   } else if (is_sql_pronoun(call)) {
+    # special handling for .sql$
     call[[3]]
   } else {
     # Process call arguments recursively, unless user has manually called
@@ -319,3 +320,24 @@ replace_sym <- function(call, sym, replace) {
     call
   }
 }
+
+
+#' Flag SQL function usage
+#'
+#' @description
+#' Use `.sql$foo(x, y)` to make it clear that you're calling the SQL
+#' `foo()` function, not the R `foo()` function. This also makes it easier to
+#' reduce `R CMD check` notes in packages; just import `.sql` from dbplyr with
+#' e.g. `@importFrom dbplyr .sql`.
+#'
+#' Note that `.sql` itself does nothing and is just `NULL`; it is automatically
+#' removed when dbplyr translates your R code to SQL.
+#'
+#' @export
+#' @format NULL
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' db <- lazy_frame(x = 1, y = 2)
+#' db |> mutate(z = .sql$CUMULATIVE_SUM(x, 1))
+.sql <- NULL
