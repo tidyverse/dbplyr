@@ -10,6 +10,8 @@
 #' means is subject to interpretation. Most databases will respect ordering
 #' performed with `arrange()`, but it's not guaranteed. `tail()` is not
 #' supported at all because the situation is even murkier for the "last" rows.
+#' Additionally, `LIMIT` clauses can not generally appear in subqueries, which
+#' means that you should use `head()` as late as possible in your pipelines.
 #'
 #' @param x A lazy data frame backed by a database query.
 #' @param n Number of rows to return
@@ -20,11 +22,11 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(x = 1:100)
-#' db %>% head() %>% show_query()
+#' db |> head() |> show_query()
 #'
 #' # Pretend we have data in a SQL server database
 #' db2 <- lazy_frame(x = 1:100, con = simulate_mssql())
-#' db2 %>% head() %>% show_query()
+#' db2 |> head() |> show_query()
 head.tbl_lazy <- function(x, n = 6L, ...) {
   if (!is.numeric(n) || length(n) != 1L || n < 0) {
     cli_abort("{.arg n} must be a non-negative integer")

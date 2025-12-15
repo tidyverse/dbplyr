@@ -33,7 +33,7 @@ columns selected by \code{...}. Supplying neither will move columns to the
 left-hand side; specifying both is an error.}
 }
 \description{
-These are methods for the dplyr \code{\link[=select]{select()}}, \code{\link[=rename]{rename()}}, and \code{\link[=relocate]{relocate()}}
+These are methods for the dplyr \code{\link[dplyr:select]{dplyr::select()}}, \code{\link[dplyr:rename]{dplyr::rename()}}, and \code{\link[dplyr:relocate]{dplyr::relocate()}}
 generics. They generate the \code{SELECT} clause of the SQL query.
 
 These functions do not support predicate functions, i.e. you can
@@ -43,7 +43,7 @@ not use \code{where(is.numeric)} to select all numeric variables.
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(x = 1, y = 2, z = 3)
-db \%>\% select(-y) \%>\% show_query()
-db \%>\% relocate(z) \%>\% show_query()
-db \%>\% rename(first = x, last = z) \%>\% show_query()
+db |> select(-y) |> show_query()
+db |> relocate(z) |> show_query()
+db |> rename(first = x, last = z) |> show_query()
 }

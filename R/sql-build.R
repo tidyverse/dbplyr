@@ -66,12 +66,14 @@ sql_build.tbl_lazy <- function(op, con = op$src$con, ..., sql_options = NULL) {
 #' @param subquery Is this SQL going to be used in a subquery?
 #'   This is important because you can place a bare table name in a subquery
 #'   and  ORDER BY does not work in subqueries.
-sql_render <- function(query,
-                       con = NULL,
-                       ...,
-                       sql_options = NULL,
-                       subquery = FALSE,
-                       lvl = 0) {
+sql_render <- function(
+  query,
+  con = NULL,
+  ...,
+  sql_options = NULL,
+  subquery = FALSE,
+  lvl = 0
+) {
   if (is.null(sql_options)) {
     sql_options <- as_sql_options(sql_options)
     out <- sql_render(
@@ -91,12 +93,14 @@ sql_render <- function(query,
 }
 
 #' @export
-sql_render.tbl_lazy <- function(query,
-                                con = query$src$con,
-                                ...,
-                                sql_options = NULL,
-                                subquery = FALSE,
-                                lvl = 0) {
+sql_render.tbl_lazy <- function(
+  query,
+  con = query$src$con,
+  ...,
+  sql_options = NULL,
+  subquery = FALSE,
+  lvl = 0
+) {
   con <- con %||% query$src$con
   sql_render(
     query$lazy_query,
@@ -109,23 +113,36 @@ sql_render.tbl_lazy <- function(query,
 }
 
 #' @export
-sql_render.lazy_query <- function(query,
-                                  con = NULL,
-                                  ...,
-                                  sql_options = NULL,
-                                  subquery = FALSE,
-                                  lvl = 0) {
+sql_render.lazy_query <- function(
+  query,
+  con = NULL,
+  ...,
+  sql_options = NULL,
+  subquery = FALSE,
+  lvl = 0
+) {
   qry <- sql_build(query, con = con, sql_options = sql_options)
   qry <- sql_optimise(qry, con = con, subquery = subquery)
 
   if (sql_options$cte) {
-    query_list <- flatten_query(qry, list(queries = list(), name = NULL), con = con)
+    query_list <- flatten_query(
+      qry,
+      list(queries = list(), name = NULL),
+      con = con
+    )
     queries <- query_list$queries
 
     rendered_queries <- purrr::map2(
-      queries, seq_along(queries) != length(queries),
+      queries,
+      seq_along(queries) != length(queries),
       function(query, indent) {
-        sql_render(query, con = con, ..., subquery = subquery, lvl = as.integer(indent))
+        sql_render(
+          query,
+          con = con,
+          ...,
+          subquery = subquery,
+          lvl = as.integer(indent)
+        )
       }
     )
 
@@ -145,16 +162,23 @@ cte_render <- function(query_list, con) {
     query_list[-n],
     function(query, name) {
       name <- table_path(name)
-      glue_sql2(con, "{.name name} {.kw 'AS'} (\n{query}\n)")
+      sql_glue2(con, "{.tbl name} AS (\n{query}\n)")
     }
   )
-  cte_query <- sql_vector(unname(ctes), parens = FALSE, collapse = ",\n", con = con)
+  cte_query <- sql_vector(
+    unname(ctes),
+    parens = FALSE,
+    collapse = ",\n",
+    con = con
+  )
 
-  glue_sql2(con, "{.kw 'WITH'} ", cte_query, "\n", query_list[[n]])
+  sql_glue2(con, " WITH {.sql cte_query}\n{query_list[[n]]}")
 }
 
 get_subquery_name <- function(x, query_list) {
-  if (inherits(x, "base_query")) return(x)
+  if (inherits(x, "base_query")) {
+    return(x)
+  }
 
   base_query(query_list$name)
 }
@@ -164,7 +188,10 @@ flatten_query <- function(qry, query_list, con) {
 }
 
 querylist_reuse_query <- function(qry, query_list, con) {
-  id <- vctrs::vec_match(list(unclass(qry)), purrr::map(query_list$queries, unclass))
+  id <- vctrs::vec_match(
+    list(unclass(qry)),
+    purrr::map(query_list$queries, unclass)
+  )
 
   if (!is.na(id)) {
     query_list$name <- names(query_list$queries)[[id]]

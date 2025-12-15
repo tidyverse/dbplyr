@@ -28,14 +28,16 @@ Note that databases don't really have a sense of row order, so what "first"
 means is subject to interpretation. Most databases will respect ordering
 performed with \code{arrange()}, but it's not guaranteed. \code{tail()} is not
 supported at all because the situation is even murkier for the "last" rows.
+Additionally, \code{LIMIT} clauses can not generally appear in subqueries, which
+means that you should use \code{head()} as late as possible in your pipelines.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(x = 1:100)
-db \%>\% head() \%>\% show_query()
+db |> head() |> show_query()
 
 # Pretend we have data in a SQL server database
 db2 <- lazy_frame(x = 1:100, con = simulate_mssql())
-db2 \%>\% head() \%>\% show_query()
+db2 |> head() |> show_query()
 }

@@ -1,12 +1,12 @@
 test_that("custom string translations", {
-  local_con(simulate_hana())
+  con <- simulate_hana()
 
-  expect_snapshot(test_translate_sql(paste0("a", "b")))
-  expect_snapshot(test_translate_sql(paste("a", "b")))
+  expect_snapshot(translate_sql(paste0("a", "b"), con = con))
+  expect_snapshot(translate_sql(paste("a", "b"), con = con))
 
-  expect_snapshot(test_translate_sql(substr(x, 2, 4)))
-  expect_snapshot(test_translate_sql(substring(x, 2, 4)))
-  expect_snapshot(test_translate_sql(str_sub(x, 2, -2)))
+  expect_snapshot(translate_sql(substr(x, 2, 4), con = con))
+  expect_snapshot(translate_sql(substring(x, 2, 4), con = con))
+  expect_snapshot(translate_sql(str_sub(x, 2, -2), con = con))
 })
 
 test_that("copy_inline uses UNION ALL", {
@@ -15,11 +15,11 @@ test_that("copy_inline uses UNION ALL", {
 
   types <- c(id = "bigint", arr = "integer[]")
   expect_snapshot({
-    copy_inline(con, y %>% slice(0)) %>% remote_query()
-    copy_inline(con, y) %>% remote_query()
+    copy_inline(con, y |> slice(0)) |> remote_query()
+    copy_inline(con, y) |> remote_query()
 
     # with `types`
-    copy_inline(con, y %>% slice(0), types = types) %>% remote_query()
-    copy_inline(con, y, types = types) %>% remote_query()
+    copy_inline(con, y |> slice(0), types = types) |> remote_query()
+    copy_inline(con, y, types = types) |> remote_query()
   })
 })

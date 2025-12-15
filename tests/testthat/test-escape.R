@@ -25,10 +25,22 @@ test_that("zero length inputs yield zero length output when not collapsed", {
 test_that("zero length inputs yield length-1 output when collapsed", {
   con <- simulate_dbi()
 
-  expect_equal(sql_vector(sql(), parens = FALSE, collapse = "", con = con), sql(""))
-  expect_equal(sql_vector(sql(), parens = TRUE, collapse = "", con = con), sql("()"))
-  expect_equal(sql_vector(ident(), parens = FALSE, collapse = "", con = con), sql(""))
-  expect_equal(sql_vector(ident(), parens = TRUE, collapse = "", con = con), sql("()"))
+  expect_equal(
+    sql_vector(sql(), parens = FALSE, collapse = "", con = con),
+    sql("")
+  )
+  expect_equal(
+    sql_vector(sql(), parens = TRUE, collapse = "", con = con),
+    sql("()")
+  )
+  expect_equal(
+    sql_vector(ident(), parens = FALSE, collapse = "", con = con),
+    sql("")
+  )
+  expect_equal(
+    sql_vector(ident(), parens = TRUE, collapse = "", con = con),
+    sql("()")
+  )
 })
 
 # Numeric ------------------------------------------------------------------
@@ -95,8 +107,14 @@ test_that("date and date-times are converted to ISO 8601", {
 test_that("raw is SQL-99 compatible (by default)", {
   con <- simulate_dbi()
   expect_equal(escape(blob::as_blob(raw(0)), con = con), sql("X''"))
-  expect_equal(escape(blob::as_blob(as.raw(c(0x01, 0x02, 0x03))), con = con), sql("X'010203'"))
-  expect_equal(escape(blob::as_blob(as.raw(c(0x00, 0xff))), con = con), sql("X'00ff'"))
+  expect_equal(
+    escape(blob::as_blob(as.raw(c(0x01, 0x02, 0x03))), con = con),
+    sql("X'010203'")
+  )
+  expect_equal(
+    escape(blob::as_blob(as.raw(c(0x00, 0xff))), con = con),
+    sql("X'00ff'")
+  )
 })
 
 # Factor ------------------------------------------------------------------
@@ -120,12 +138,15 @@ test_that("other objects get informative error", {
   x <- structure(function() "y", class = "reactive")
   df <- data.frame(x = 1)
 
-  expect_snapshot({
-    lf %>% filter(x == input)
-    lf %>% filter(x == x())
-    lf %>% filter(x == df)
-    lf %>% filter(x == mean)
-  }, error = TRUE)
+  expect_snapshot(
+    {
+      lf |> filter(x == input)
+      lf |> filter(x == x())
+      lf |> filter(x == df)
+      lf |> filter(x == mean)
+    },
+    error = TRUE
+  )
 })
 
 # names_to_as() -----------------------------------------------------------
@@ -134,19 +155,22 @@ test_that("names_to_as() doesn't alias when ident name and value are identical",
   x <- ident(name = "name")
   y <- sql("`name`")
 
-  expect_equal(names_to_as(y, names2(x),  con = simulate_dbi()),  "`name`")
+  expect_equal(names_to_as(y, names2(x), con = simulate_dbi()), "`name`")
 })
 
 test_that("names_to_as() doesn't alias when ident name is missing", {
   x <- ident("*")
   y <- sql("`*`")
 
-  expect_equal(names_to_as(y, names2(x), con = simulate_dbi()),  "`*`")
+  expect_equal(names_to_as(y, names2(x), con = simulate_dbi()), "`*`")
 })
 
 test_that("names_to_as() aliases when ident name and value are different", {
   x <- ident(new_name = "name")
   y <- sql(new_name = "`name`")
 
-  expect_equal(names_to_as(y, names2(x),  con = simulate_dbi()),  "`name` AS `new_name`")
+  expect_equal(
+    names_to_as(y, names2(x), con = simulate_dbi()),
+    "`name` AS `new_name`"
+  )
 })

@@ -1,5 +1,9 @@
 #' Generate SQL from R expressions
 #'
+#' @description
+#' `r lifecycle::badge("superseded")`
+#' `sql_expr()` and `sql_call2()` are superseded in favour of [sql_glue()].
+#'
 #' Low-level building block for generating SQL from R expressions.
 #' Strings are escaped; names become bare SQL identifiers. User infix
 #' functions have `%` stripped.
@@ -71,10 +75,7 @@ replace_expr <- function(x, con) {
     } else {
       paste0(fun, "(", paste0(args, collapse = ", "), ")")
     }
-
   } else {
     x # nocov
   }
-
 }
-

@@ -17,7 +17,7 @@ converting to live access database.
 library(dplyr, warn.conflicts = FALSE)
 
 lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_redshift())
-lf \%>\% transmute(x = paste(c, " times"))
-lf \%>\% transmute(x = substr(c, 2, 3))
-lf \%>\% transmute(x = str_replace_all(c, "a", "z"))
+lf |> transmute(x = paste(c, " times"))
+lf |> transmute(x = substr(c, 2, 3))
+lf |> transmute(x = str_replace_all(c, "a", "z"))
 }

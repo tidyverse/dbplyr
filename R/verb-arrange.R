@@ -21,12 +21,12 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(a = c(3, 4, 1, 2), b = c(5, 1, 2, NA))
-#' db %>% arrange(a) %>% show_query()
+#' db |> arrange(a) |> show_query()
 #'
 #' # Note that NAs are sorted first
-#' db %>% arrange(b)
+#' db |> arrange(b)
 #' # override by sorting on is.na() first
-#' db %>% arrange(is.na(b), b)
+#' db |> arrange(is.na(b), b)
 #' @export
 #' @importFrom dplyr arrange
 arrange.tbl_lazy <- function(.data, ..., .by_group = FALSE) {
@@ -82,10 +82,13 @@ unwrap_order_expr <- function(order_by, f, error_call = caller_env()) {
   if (is_call(order_by_expr, "c")) {
     args <- call_args(order_by_expr)
     tibble_expr <- expr_text(expr(tibble(!!!args)))
-    cli_abort(c(
-      "Can't use `c()` in {.fun {f}}",
-      i = "Did you mean to use `{tibble_expr}` instead?"
-    ), call = error_call)
+    cli_abort(
+      c(
+        "Can't use `c()` in {.fun {f}}",
+        i = "Did you mean to use `{tibble_expr}` instead?"
+      ),
+      call = error_call
+    )
   }
 
   if (is_call(order_by_expr, c("tibble", "data.frame"))) {

@@ -68,15 +68,16 @@ test_that("respects tidy evaluation pronouns", {
   expect_equal(partial_eval(expr(.env[[x]]), lf), "XX")
 })
 
+test_that("respects .sql pronoun", {
+  lf <- lazy_frame(x = 1)
+
+  expect_equal(partial_eval(expr(.sql$foo), lf), expr(foo))
+  expect_equal(partial_eval(expr(.sql$foo(x, "y")), lf), expr(foo(x, "y")))
+})
+
+
 test_that("fails with multi-classes", {
   lf <- lazy_frame(x = 1, y = 2)
   x <- structure(list(), class = c('a', 'b'))
   expect_error(partial_eval(x, lf), "Unknown input type", fixed = TRUE)
-})
-
-test_that("old arguments are defunct", {
-  expect_snapshot(error = TRUE, {
-    partial_eval(quote(x), vars = c("x", "y"))
-    partial_eval(quote(x), data = c("x", "y"))
-  })
 })

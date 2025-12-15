@@ -1,80 +1,80 @@
 test_that("dplyr.strict_sql = TRUE prevents auto conversion", {
   withr::local_options(dplyr.strict_sql = TRUE)
-  local_con(simulate_dbi())
+  con <- simulate_dbi()
 
-  expect_equal(test_translate_sql(1 + 2), sql("1.0 + 2.0"))
+  expect_translation(con, 1 + 2, "1.0 + 2.0")
   expect_snapshot(error = TRUE, {
-    test_translate_sql(blah(x))
-    test_translate_sql(x %blah% y)
+    translate_sql(blah(x), con = con)
+    translate_sql(x %blah% y, con = con)
   })
 })
 
 test_that("namespace calls are translated", {
-  local_con(simulate_dbi())
-  expect_equal(test_translate_sql(dplyr::n(), window = FALSE), sql("COUNT(*)"))
-  expect_equal(test_translate_sql(base::ceiling(x)), sql("CEIL(`x`)"))
+  con <- simulate_dbi()
+  expect_translation(con, dplyr::n(), "COUNT(*)", window = FALSE)
+  expect_translation(con, base::ceiling(x), "CEIL(`x`)")
 
   expect_snapshot(error = TRUE, {
-    test_translate_sql(NOSUCHPACKAGE::foo())
-    test_translate_sql(dbplyr::NOSUCHFUNCTION())
-    test_translate_sql(base::abbreviate(x))
+    translate_sql(NOSUCHPACKAGE::foo(), con = con)
+    translate_sql(dbplyr::NOSUCHFUNCTION(), con = con)
+    translate_sql(base::abbreviate(x), con = con)
   })
 
   lz <- lazy_frame(x = 1)
   # Also test full pipeline to ensure that they make it through partial_eval
   expect_snapshot(error = TRUE, {
-    lz %>% mutate(x = NOSUCHPACKAGE::foo())
-    lz %>% mutate(x = dbplyr::NOSUCHFUNCTION())
-    lz %>% mutate(x = base::abbreviate(x))
+    lz |> mutate(x = NOSUCHPACKAGE::foo())
+    lz |> mutate(x = dbplyr::NOSUCHFUNCTION())
+    lz |> mutate(x = base::abbreviate(x))
   })
 })
 
 test_that("Wrong number of arguments raises error", {
-  local_con(simulate_dbi())
-  expect_error(test_translate_sql(mean(1, 2, na.rm = TRUE), window = FALSE), "unused argument")
+  con <- simulate_dbi()
+  expect_error(
+    translate_sql(mean(1, 2, na.rm = TRUE), con = con, window = FALSE),
+    "unused argument"
+  )
 })
 
 test_that("between translated to special form (#503)", {
-  local_con(simulate_dbi())
-  out <- test_translate_sql(between(x, 1, 2))
-  expect_equal(out, sql("`x` BETWEEN 1.0 AND 2.0"))
+  con <- simulate_dbi()
+  expect_translation(con, between(x, 1, 2), "`x` BETWEEN 1.0 AND 2.0")
 })
 
 test_that("%in% translation parenthesises when needed", {
-  local_con(simulate_dbi())
-  expect_equal(test_translate_sql(x %in% 1L), sql("`x` IN (1)"))
-  expect_equal(test_translate_sql(x %in% c(1L)), sql("`x` IN (1)"))
-  expect_equal(test_translate_sql(x %in% 1:2), sql("`x` IN (1, 2)"))
-  expect_equal(test_translate_sql(x %in% y), sql("`x` IN `y`"))
+  con <- simulate_dbi()
+  expect_translation(con, x %in% 1L, "`x` IN (1)")
+  expect_translation(con, x %in% c(1L), "`x` IN (1)")
+  expect_translation(con, x %in% 1:2, "`x` IN (1, 2)")
+  expect_translation(con, x %in% y, "`x` IN `y`")
 })
 
 test_that("%in% strips vector names", {
-  local_con(simulate_dbi())
-  expect_equal(test_translate_sql(x %in% c(a = 1L)), sql("`x` IN (1)"))
-  expect_equal(test_translate_sql(x %in% !!c(a = 1L)), sql("`x` IN (1)"))
+  con <- simulate_dbi()
+  expect_translation(con, x %in% c(a = 1L), "`x` IN (1)")
+  expect_translation(con, x %in% !!c(a = 1L), "`x` IN (1)")
 })
 
 test_that("%in% with empty vector", {
-  local_con(simulate_dbi())
-  expect_equal(test_translate_sql(x %in% !!integer()), sql("FALSE"))
+  con <- simulate_dbi()
+  expect_translation(con, x %in% !!integer(), "FALSE")
 })
 
 test_that("n_distinct(x) translated to COUNT(distinct, x)", {
-  local_con(simulate_dbi())
-  expect_equal(
-    test_translate_sql(n_distinct(x), window = FALSE),
-    sql("COUNT(DISTINCT `x`)")
+  con <- simulate_dbi()
+  expect_translation(con, n_distinct(x), "COUNT(DISTINCT `x`)", window = FALSE)
+  expect_translation(
+    con,
+    n_distinct(x),
+    "COUNT(DISTINCT `x`) OVER ()",
+    window = TRUE
   )
-  expect_equal(
-    test_translate_sql(n_distinct(x), window = TRUE),
-    sql("COUNT(DISTINCT `x`) OVER ()")
-  )
-  expect_error(test_translate_sql(n_distinct(x, y), window = FALSE), "unused argument")
 })
 
 test_that("na_if is translated to NULLIF (#211)", {
-  local_con(simulate_dbi())
-  expect_equal(test_translate_sql(na_if(x, 0L)), sql("NULLIF(`x`, 0)"))
+  con <- simulate_dbi()
+  expect_translation(con, na_if(x, 0L), "NULLIF(`x`, 0)")
 })
 
 test_that("connection affects quoting character", {
@@ -84,28 +84,32 @@ test_that("connection affects quoting character", {
 })
 
 test_that("magrittr pipe is translated", {
-  local_con(simulate_dbi())
-  expect_identical(test_translate_sql(1 %>% is.na()), test_translate_sql(is.na(1)))
+  con <- simulate_dbi()
+  expect_identical(
+    translate_sql(1 |> is.na(), con = con),
+    translate_sql(is.na(1), con = con)
+  )
 })
 
 test_that("user infix functions are translated", {
-  local_con(simulate_dbi())
-  expect_equal(test_translate_sql(x %like% y), sql("`x` like `y`"))
+  con <- simulate_dbi()
+  expect_translation(con, x %foo% y, "`x` foo `y`")
 
   # keep case and also works with vectors of length > 1 #1299
-  expect_equal(test_translate_sql(x %LIKE% 1:2), sql("`x` LIKE (1, 2)"))
+  expect_translation(con, x %foo% (1:2), "`x` foo (1, 2)")
 })
 
 test_that("sql() evaluates input locally", {
-  local_con(simulate_dbi())
+  con <- simulate_dbi()
   a <- "x"
-  expect_equal(test_translate_sql(a), sql("`a`"))
-  expect_equal(test_translate_sql(sql(a)), sql("x"))
+  expect_translation(con, a, "`a`")
+  expect_translation(con, sql(a), "x")
 
   f <- function() {
     a <- "y"
-    test_translate_sql(sql(paste0(a)))
+    translate_sql(sql(paste0(a)), con = con)
   }
+
   expect_equal(f(), sql("y"))
 })
 
@@ -113,10 +117,10 @@ test_that("sql() evaluates input locally in across()", {
   lf <- lazy_frame(x = 1, y = 2)
 
   expect_equal(
-    lf %>%
+    lf |>
       summarise(
-        across(x, ~ sql(gsub("x","y",cur_column())))
-      ) %>%
+        across(x, ~ sql(gsub("x", "y", cur_column())))
+      ) |>
       remote_query(),
     sql("SELECT y AS `x`\nFROM `df`")
   )
@@ -125,70 +129,74 @@ test_that("sql() evaluates input locally in across()", {
 # casts -------------------------------------------------------------------
 
 test_that("casts as expected", {
-  local_con(simulate_dbi())
-  expect_equal(test_translate_sql(as.integer64(x)), sql("CAST(`x` AS BIGINT)"))
-  expect_equal(test_translate_sql(as.logical(x)),   sql("CAST(`x` AS BOOLEAN)"))
-  expect_equal(test_translate_sql(as.Date(x)),      sql("CAST(`x` AS DATE)"))
+  con <- simulate_dbi()
+  expect_translation(con, as.integer64(x), "CAST(`x` AS BIGINT)")
+  expect_translation(con, as.logical(x), "CAST(`x` AS BOOLEAN)")
+  expect_translation(con, as.Date(x), "CAST(`x` AS DATE)")
 })
 
 # numeric -----------------------------------------------------------------
 
 test_that("hypergeometric functions use manual calculation", {
-  local_con(simulate_dbi())
-  expect_equal(test_translate_sql(cosh(x)), sql("(EXP(`x`) + EXP(-(`x`))) / 2"))
-  expect_equal(test_translate_sql(sinh(x)), sql("(EXP(`x`) - EXP(-(`x`))) / 2"))
-  expect_equal(test_translate_sql(tanh(x)), sql("(EXP(2 * (`x`)) - 1) / (EXP(2 * (`x`)) + 1)"))
-  expect_equal(test_translate_sql(coth(x)), sql("(EXP(2 * (`x`)) + 1) / (EXP(2 * (`x`)) - 1)"))
+  con <- simulate_dbi()
+  expect_translation(con, cosh(x), "(EXP(`x`) + EXP(-(`x`))) / 2")
+  expect_translation(con, sinh(x), "(EXP(`x`) - EXP(-(`x`))) / 2")
+  expect_translation(
+    con,
+    tanh(x),
+    "(EXP(2 * (`x`)) - 1) / (EXP(2 * (`x`)) + 1)"
+  )
+  expect_translation(
+    con,
+    coth(x),
+    "(EXP(2 * (`x`)) + 1) / (EXP(2 * (`x`)) - 1)"
+  )
 })
 
 test_that("pmin and max use GREATEST and LEAST", {
-  local_con(simulate_dbi())
-  expect_equal(test_translate_sql(pmin(x, y, z, na.rm = TRUE)), sql("LEAST(`x`, `y`, `z`)"))
-  expect_equal(test_translate_sql(pmax(x, y, na.rm = TRUE)), sql("GREATEST(`x`, `y`)"))
+  con <- simulate_dbi()
+  expect_translation(con, pmin(x, y, z, na.rm = TRUE), "LEAST(`x`, `y`, `z`)")
+  expect_translation(con, pmax(x, y, na.rm = TRUE), "GREATEST(`x`, `y`)")
 })
 
 test_that("round uses integer digits", {
-  local_con(simulate_dbi())
-  expect_equal(test_translate_sql(round(10.1)), sql("ROUND(10.1, 0)"))
-  expect_equal(test_translate_sql(round(10.1, digits = 1)),  sql("ROUND(10.1, 1)"))
+  con <- simulate_dbi()
+  expect_translation(con, round(10.1), "ROUND(10.1, 0)")
+  expect_translation(con, round(10.1, digits = 1), "ROUND(10.1, 1)")
 })
 
 # string functions --------------------------------------------------------
 
 test_that("paste() translated to CONCAT_WS", {
-  local_con(simulate_dbi())
-  expect_equal(test_translate_sql(paste0(x, y)),             sql("CONCAT_WS('', `x`, `y`)"))
-  expect_equal(test_translate_sql(paste(x, y)),              sql("CONCAT_WS(' ', `x`, `y`)"))
-  expect_equal(test_translate_sql(paste(x, y, sep = ",")),   sql("CONCAT_WS(',', `x`, `y`)"))
+  con <- simulate_dbi()
+  expect_translation(con, paste0(x, y), "CONCAT_WS('', `x`, `y`)")
+  expect_translation(con, paste(x, y), "CONCAT_WS(' ', `x`, `y`)")
+  expect_translation(con, paste(x, y, sep = ","), "CONCAT_WS(',', `x`, `y`)")
 })
 
 # stringr -------------------------------------------
 
 test_that("str_length() translates correctly ", {
-  local_con(simulate_dbi())
-  expect_equal(test_translate_sql(str_length(x)), sql("LENGTH(`x`)"))
+  con <- simulate_dbi()
+  expect_translation(con, str_length(x), "LENGTH(`x`)")
 })
 
 test_that("lower/upper translates correctly ", {
-  local_con(simulate_dbi())
-  expect_equal(test_translate_sql(str_to_upper(x)), sql("UPPER(`x`)"))
-  expect_equal(test_translate_sql(str_to_lower(x)), sql("LOWER(`x`)"))
+  con <- simulate_dbi()
+  expect_translation(con, str_to_upper(x), "UPPER(`x`)")
+  expect_translation(con, str_to_lower(x), "LOWER(`x`)")
 })
 
 test_that("str_trim() translates correctly ", {
-  local_con(simulate_dbi())
-  expect_equal(
-    test_translate_sql(str_trim(x, "both")),
-    sql("LTRIM(RTRIM(`x`))")
-  )
-  expect_equal(test_translate_sql(str_trim(x, "left")), sql("LTRIM(`x`)"))
-  expect_equal(test_translate_sql(str_trim(x, "right")), sql("RTRIM(`x`)"))
+  con <- simulate_dbi()
+  expect_translation(con, str_trim(x, "both"), "LTRIM(RTRIM(`x`))")
+  expect_translation(con, str_trim(x, "left"), "LTRIM(`x`)")
+  expect_translation(con, str_trim(x, "right"), "RTRIM(`x`)")
 })
 
 # subsetting --------------------------------------------------------------
 
 test_that("[ treated as if it is logical subsetting", {
-  local_con(simulate_dbi())
-  expect_equal(test_translate_sql(y[x == 0L]), sql("CASE WHEN (`x` = 0) THEN (`y`) END"))
+  con <- simulate_dbi()
+  expect_translation(con, y[x == 0L], "CASE WHEN (`x` = 0) THEN (`y`) END")
 })
-

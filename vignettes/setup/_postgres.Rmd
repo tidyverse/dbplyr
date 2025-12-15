@@ -8,16 +8,8 @@ First install PostgreSQL, create a data directory, and create a default database
 brew install postgresql
 export PGDATA=~/db/postgres # set this globally somewhere
 initdb
-createdb test
 
-psql -c "CREATE USER postgres WITH PASSWORD 'password';"
 psql -c "ALTER USER postgres WITH SUPERUSER;"
-```
-
-## Start
-
-```
-pg_ctl start
 ```
 
 ## Connect
@@ -33,4 +25,5 @@ con <- dbConnect(
   user = "postgres", 
   password = "passowrd"
 )
+dbListTables(con)
 ```

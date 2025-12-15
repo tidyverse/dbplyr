@@ -1,24 +1,43 @@
+# str_detect returns bit in SELECT context on SQL Server 2025
+
+    Code
+      mutate(lf, detected = str_detect(x, "abc"))
+    Output
+      <SQL>
+      SELECT `df`.*, CAST(IIF(REGEXP_LIKE(`x`, 'abc'), 1, 0) AS BIT) AS `detected`
+      FROM `df`
+
+---
+
+    Code
+      filter(lf, str_detect(x, "abc"))
+    Output
+      <SQL>
+      SELECT `df`.*
+      FROM `df`
+      WHERE (REGEXP_LIKE(`x`, 'abc'))
+
 # custom aggregators translated correctly
 
     Code
-      test_translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE)
+      translate_sql(quantile(x, 0.5, na.rm = TRUE), con = con, window = FALSE)
     Condition
       Error in `quantile()`:
       ! Translation of `quantile()` in `summarise()` is not supported for SQL Server.
       i Use a combination of `distinct()` and `mutate()` for the same result:
-        `mutate(<col> = quantile(x, 0.5, na.rm = TRUE)) %>% distinct(<col>)`
+        `mutate(<col> = quantile(x, 0.5, na.rm = TRUE)) |> distinct(<col>)`
     Code
-      test_translate_sql(median(x, na.rm = TRUE), window = FALSE)
+      translate_sql(median(x, na.rm = TRUE), con = con, window = FALSE)
     Condition
       Error in `median()`:
       ! Translation of `median()` in `summarise()` is not supported for SQL Server.
       i Use a combination of `distinct()` and `mutate()` for the same result:
-        `mutate(<col> = median(x, na.rm = TRUE)) %>% distinct(<col>)`
+        `mutate(<col> = median(x, na.rm = TRUE)) |> distinct(<col>)`
 
 # custom window functions translated correctly
 
     Code
-      test_translate_sql(n_distinct(x), vars_group = "x")
+      translate_sql(n_distinct(x), con = con, vars_group = "x")
     Condition
       Error in `n_distinct()`:
       ! No translation available in `mutate()`/`filter()` for SQL server.
@@ -26,7 +45,7 @@
 # custom lubridate functions translated correctly
 
     Code
-      test_translate_sql(month(x, label = TRUE, abbr = TRUE))
+      translate_sql(month(x, label = TRUE, abbr = TRUE), con = con)
     Condition
       Error in `month()`:
       ! `abbr = TRUE` isn't supported in SQL Server translation.
@@ -35,7 +54,7 @@
 ---
 
     Code
-      test_translate_sql(quarter(x, fiscal_start = 5))
+      translate_sql(quarter(x, fiscal_start = 5), con = con)
     Condition
       Error in `quarter()`:
       ! `fiscal_start = 5` isn't supported in SQL Server translation.
@@ -44,7 +63,7 @@
 # custom clock functions translated correctly
 
     Code
-      test_translate_sql(date_count_between(date_column_1, date_column_2, "year"))
+      translate_sql(date_count_between(date_column_1, date_column_2, "year"), con = con)
     Condition
       Error in `date_count_between()`:
       ! `precision = "year"` isn't supported on database backends.
@@ -53,7 +72,8 @@
 ---
 
     Code
-      test_translate_sql(date_count_between(date_column_1, date_column_2, "day", n = 5))
+      translate_sql(date_count_between(date_column_1, date_column_2, "day", n = 5),
+      con = con)
     Condition
       Error in `date_count_between()`:
       ! `n = 5` isn't supported on database backends.
@@ -62,7 +82,7 @@
 # difftime is translated correctly
 
     Code
-      test_translate_sql(difftime(start_date, end_date, units = "auto"))
+      translate_sql(difftime(start_date, end_date, units = "auto"), con = con)
     Condition
       Error in `difftime()`:
       ! `units = "auto"` isn't supported on database backends.
@@ -71,7 +91,7 @@
 ---
 
     Code
-      test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days"))
+      translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days"), con = con)
     Condition
       Error in `difftime()`:
       ! Argument `tz` isn't supported on database backends.
@@ -79,7 +99,7 @@
 # convert between bit and boolean as needed
 
     Code
-      mf %>% filter(is.na(x))
+      filter(mf, is.na(x))
     Output
       <SQL>
       SELECT `df`.*
@@ -89,7 +109,7 @@
 ---
 
     Code
-      mf %>% filter(!is.na(x))
+      filter(mf, !is.na(x))
     Output
       <SQL>
       SELECT `df`.*
@@ -99,7 +119,7 @@
 ---
 
     Code
-      mf %>% filter(x == 1L || x == 2L)
+      filter(mf, x == 1L || x == 2L)
     Output
       <SQL>
       SELECT `df`.*
@@ -109,16 +129,16 @@
 ---
 
     Code
-      mf %>% mutate(z = ifelse(x == 1L, 1L, 2L))
+      mutate(mf, z = ifelse(x == 1L, 1L, 2L))
     Output
       <SQL>
-      SELECT `df`.*, IIF(`x` = 1, 1, 2) AS `z`
+      SELECT `df`.*, CASE WHEN (`x` = 1) THEN 1 WHEN NOT (`x` = 1) THEN 2 END AS `z`
       FROM `df`
 
 ---
 
     Code
-      mf %>% mutate(z = case_when(x == 1L ~ 1L))
+      mutate(mf, z = case_when(x == 1L ~ 1L))
     Output
       <SQL>
       SELECT `df`.*, CASE WHEN (`x` = 1) THEN 1 END AS `z`
@@ -127,7 +147,7 @@
 ---
 
     Code
-      mf %>% mutate(z = !is.na(x))
+      mutate(mf, z = !is.na(x))
     Output
       <SQL>
       SELECT `df`.*, ~CAST(IIF((`x` IS NULL), 1, 0) AS BIT) AS `z`
@@ -136,7 +156,7 @@
 ---
 
     Code
-      mf %>% mutate(x = x == 1L)
+      mutate(mf, x = x == 1L)
     Output
       <SQL>
       SELECT CAST(IIF(`x` = 1, 1, 0) AS BIT) AS `x`
@@ -145,7 +165,7 @@
 ---
 
     Code
-      mf %>% mutate(x = x == 1L || x == 2L)
+      mutate(mf, x = x == 1L || x == 2L)
     Output
       <SQL>
       SELECT CAST(IIF(`x` = 1 OR `x` = 2, 1, 0) AS BIT) AS `x`
@@ -154,7 +174,7 @@
 ---
 
     Code
-      mf %>% mutate(x = x == 1L || x == 2L || x == 3L)
+      mutate(mf, x = x == 1L || x == 2L || x == 3L)
     Output
       <SQL>
       SELECT CAST(IIF(`x` = 1 OR `x` = 2 OR `x` = 3, 1, 0) AS BIT) AS `x`
@@ -163,7 +183,7 @@
 ---
 
     Code
-      mf %>% mutate(x = !(x == 1L || x == 2L || x == 3L))
+      mutate(mf, x = !(x == 1L || x == 2L || x == 3L))
     Output
       <SQL>
       SELECT ~CAST(IIF((`x` = 1 OR `x` = 2 OR `x` = 3), 1, 0) AS BIT) AS `x`
@@ -195,7 +215,7 @@
 # custom escapes translated correctly
 
     Code
-      mf %>% filter(x == a)
+      filter(mf, x == a)
     Output
       <SQL>
       SELECT `df`.*
@@ -205,7 +225,7 @@
 ---
 
     Code
-      mf %>% filter(x %in% L)
+      filter(mf, x %in% L)
     Output
       <SQL>
       SELECT `df`.*
@@ -225,7 +245,7 @@
 # logical escaping to 0/1 for both filter() and mutate()
 
     Code
-      mf %>% filter(x == TRUE)
+      filter(mf, x == TRUE)
     Output
       <SQL>
       SELECT `df`.*
@@ -235,7 +255,7 @@
 ---
 
     Code
-      mf %>% mutate(x = TRUE)
+      mutate(mf, x = TRUE)
     Output
       <SQL>
       SELECT 1 AS `x`
@@ -270,12 +290,12 @@
 ---
 
     Code
-      lf %>% slice_sample(n = 1)
+      slice_sample(lf, n = 1)
     Output
       <SQL>
       SELECT `x`
       FROM (
-        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY RAND()) AS `col01`
+        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY RAND(CHECKSUM(NEWID()))) AS `col01`
         FROM `df`
       ) AS `q01`
       WHERE (`col01` <= 1)
@@ -283,7 +303,7 @@
 ---
 
     Code
-      copy_inline(con, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
+      remote_query(copy_inline(con, tibble(x = 1:2, y = letters[1:2])))
     Output
       <SQL> SELECT
         TRY_CAST(TRY_CAST(`x` AS NUMERIC) AS INT) AS `x`,
@@ -293,7 +313,7 @@
 ---
 
     Code
-      copy_inline(con, trees) %>% remote_query()
+      remote_query(copy_inline(con, trees))
     Output
       <SQL> SELECT
         TRY_CAST(`Girth` AS FLOAT) AS `Girth`,
@@ -425,7 +445,7 @@
 # atoms and symbols are cast to bit in `filter`
 
     Code
-      mf %>% filter(x)
+      filter(mf, x)
     Output
       <SQL>
       SELECT `df`.*
@@ -435,7 +455,7 @@
 ---
 
     Code
-      mf %>% filter(TRUE)
+      filter(mf, TRUE)
     Output
       <SQL>
       SELECT `df`.*
@@ -445,7 +465,7 @@
 ---
 
     Code
-      mf %>% filter((!x) | FALSE)
+      filter(mf, (!x) | FALSE)
     Output
       <SQL>
       SELECT `df`.*
@@ -455,7 +475,7 @@
 ---
 
     Code
-      mf %>% filter(x) %>% inner_join(mf, by = "x")
+      inner_join(filter(mf, x), mf, by = "x")
     Output
       <SQL>
       SELECT `LHS`.`x` AS `x`
@@ -470,7 +490,7 @@
 # row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per empty_order)
 
     Code
-      mf %>% mutate(rown = row_number())
+      mutate(mf, rown = row_number())
     Output
       <SQL>
       SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS `rown`
@@ -479,7 +499,7 @@
 ---
 
     Code
-      mf %>% group_by(y) %>% mutate(rown = row_number())
+      mutate(group_by(mf, y), rown = row_number())
     Output
       <SQL>
       SELECT
@@ -490,12 +510,21 @@
 ---
 
     Code
-      mf %>% arrange(y) %>% mutate(rown = row_number())
+      mutate(arrange(mf, y), rown = row_number())
     Output
       <SQL>
       SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY `y`) AS `rown`
       FROM `df`
       ORDER BY `y`
+
+# count_big
+
+    Code
+      count(mf)
+    Output
+      <SQL>
+      SELECT COUNT_BIG(*) AS `n`
+      FROM `df`
 
 # add prefix to temporary table
 

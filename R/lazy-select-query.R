@@ -1,18 +1,20 @@
 #' @export
 #' @rdname sql_build
-lazy_select_query <- function(x,
-                              select = NULL,
-                              where = NULL,
-                              group_by = NULL,
-                              having = NULL,
-                              order_by = NULL,
-                              limit = NULL,
-                              distinct = FALSE,
-                              group_vars = NULL,
-                              order_vars = NULL,
-                              frame = NULL,
-                              select_operation = c("select", "mutate", "summarise"),
-                              message_summarise = NULL) {
+lazy_select_query <- function(
+  x,
+  select = NULL,
+  where = NULL,
+  group_by = NULL,
+  having = NULL,
+  order_by = NULL,
+  limit = NULL,
+  distinct = FALSE,
+  group_vars = NULL,
+  order_vars = NULL,
+  frame = NULL,
+  select_operation = c("select", "mutate", "summarise"),
+  message_summarise = NULL
+) {
   check_lazy_query(x, call = call)
   stopifnot(is.null(select) || is_lazy_sql_part(select))
   stopifnot(is_lazy_sql_part(where))
@@ -22,7 +24,10 @@ lazy_select_query <- function(x,
   check_bool(distinct)
 
   select <- select %||% syms(set_names(op_vars(x)))
-  select_operation <- arg_match0(select_operation, c("select", "mutate", "summarise"))
+  select_operation <- arg_match0(
+    select_operation,
+    c("select", "mutate", "summarise")
+  )
 
   check_string(message_summarise, allow_null = TRUE)
 
@@ -64,17 +69,25 @@ is_lazy_select_query <- function(x) {
 }
 
 is_lazy_sql_part <- function(x) {
-  if (is.null(x)) return(TRUE)
-  if (is_quosures(x)) return(TRUE)
+  if (is.null(x)) {
+    return(TRUE)
+  }
+  if (is_quosures(x)) {
+    return(TRUE)
+  }
 
-  if (!is.list(x)) return(FALSE)
-  purrr::every(x, ~ is_quosure(.x) || is_symbol(.x) || is_call(.x))
+  if (!is.list(x)) {
+    return(FALSE)
+  }
+  purrr::every(x, \(item) is_quosure(item) || is_symbol(item) || is_call(item))
 }
 
-new_lazy_select <- function(vars,
-                            group_vars = character(),
-                            order_vars = NULL,
-                            frame = NULL) {
+new_lazy_select <- function(
+  vars,
+  group_vars = character(),
+  order_vars = NULL,
+  frame = NULL
+) {
   vctrs::vec_as_names(names2(vars), repair = "check_unique")
 
   var_names <- names(vars)
@@ -91,10 +104,12 @@ new_lazy_select <- function(vars,
 
 # projection = only select (including rename) from parent query
 # identity = selects exactly the same variable as the parent query
-is_lazy_select_query_simple <- function(x,
-                                        ignore_where = FALSE,
-                                        ignore_group_by = FALSE,
-                                        select = c("projection", "identity")) {
+is_lazy_select_query_simple <- function(
+  x,
+  ignore_where = FALSE,
+  ignore_group_by = FALSE,
+  select = c("projection", "identity")
+) {
   if (!is_lazy_select_query(x)) {
     return(FALSE)
   }
@@ -142,15 +157,29 @@ print.lazy_select_query <- function(x, ...) {
   cat_line(indent_print(sql_build(x$x, simulate_dbi())))
 
   select <- purrr::set_names(x$select$expr, x$select$name)
-  if (length(select))     cat_line("Select:   ", named_commas(select))
-  if (length(x$where))    cat_line("Where:    ", named_commas(x$where))
-  if (length(x$group_by)) cat_line("Group by: ", named_commas(x$group_by))
-  if (length(x$order_by)) cat_line("Order by: ", named_commas(x$order_by))
-  if (length(x$limit))    cat_line("Limit:    ", x$limit)
+  if (length(select)) {
+    cat_line("Select:   ", named_commas(select))
+  }
+  if (length(x$where)) {
+    cat_line("Where:    ", named_commas(x$where))
+  }
+  if (length(x$group_by)) {
+    cat_line("Group by: ", named_commas(x$group_by))
+  }
+  if (length(x$order_by)) {
+    cat_line("Order by: ", named_commas(x$order_by))
+  }
+  if (length(x$limit)) {
+    cat_line("Limit:    ", x$limit)
+  }
 
-  if (length(x$group_vars)) cat_line("Group vars: ", named_commas(x$group_vars))
-  if (length(x$order_vars)) cat_line("Order vars: ", named_commas(x$order_vars))
-  if (length(x$frame))      cat_line("Frame:      ", x$frame)
+  if (length(x$group_vars)) {
+    cat_line("Group vars: ", named_commas(x$group_vars))
+  }
+  if (length(x$order_vars)) {
+    cat_line("Order vars: ", named_commas(x$order_vars))
+  }
+  if (length(x$frame)) cat_line("Frame:      ", x$frame)
 }
 
 #' @export
@@ -174,7 +203,11 @@ sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
     con = con,
     use_star = sql_options$use_star
   )
-  where_sql <- translate_sql_(op$where, con = con, context = list(clause = "WHERE"))
+  where_sql <- translate_sql_(
+    op$where,
+    con = con,
+    context = list(clause = "WHERE")
+  )
 
   select_query(
     from = from,
@@ -190,16 +223,28 @@ sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
   )
 }
 
-get_select_sql <- function(select,
-                           select_operation,
-                           in_vars,
-                           table_alias,
-                           con,
-                           use_star) {
+get_select_sql <- function(
+  select,
+  select_operation,
+  in_vars,
+  table_alias,
+  con,
+  use_star
+) {
   if (select_operation == "summarise") {
     select_expr <- set_names(select$expr, select$name)
-    select_sql_list <- translate_sql_(select_expr, con, window = FALSE, context = list(clause = "SELECT"))
-    select_sql <- sql_vector(select_sql_list, parens = FALSE, collapse = NULL, con = con)
+    select_sql_list <- translate_sql_(
+      select_expr,
+      con,
+      window = FALSE,
+      context = list(clause = "SELECT")
+    )
+    select_sql <- sql_vector(
+      select_sql_list,
+      parens = FALSE,
+      collapse = NULL,
+      con = con
+    )
     return(list(select_sql = select_sql, window_sql = character()))
   }
 
@@ -280,7 +325,11 @@ translate_select_sql <- function(con, select_df) {
       dots = select_df$expr[i],
       con = con,
       vars_group = translate_sql_(syms(select_df$group_vars[[i]]), con),
-      vars_order = translate_sql_(select_df$order_vars[[i]], con, context = list(clause = "ORDER")),
+      vars_order = translate_sql_(
+        select_df$order_vars[[i]],
+        con,
+        context = list(clause = "ORDER")
+      ),
       vars_frame = select_df$frame[[i]][[1]],
       context = list(clause = "SELECT")
     )

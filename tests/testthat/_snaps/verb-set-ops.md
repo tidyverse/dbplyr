@@ -1,7 +1,7 @@
 # can combine multiple union in one query
 
     Code
-      lf1 %>% union_all(lf2) %>% union(lf3)
+      union(union_all(lf1, lf2), lf3)
     Output
       <SQL>
       SELECT `lf1`.*, NULL AS `z`
@@ -23,8 +23,8 @@
 ---
 
     Code
-      lf1 %>% union_all(lf2) %>% union(lf3) %>% left_join(lf1, by = "x") %>%
-        show_query(sql_options = sql_options(cte = TRUE))
+      show_query(left_join(union(union_all(lf1, lf2), lf3), lf1, by = "x"),
+      sql_options = sql_options(cte = TRUE))
     Output
       <SQL>
       WITH `q01` AS (

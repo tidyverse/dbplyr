@@ -63,8 +63,8 @@ reach \code{n}/\code{prop}.}
 \item{weight_by, replace}{Not supported for database backends.}
 }
 \description{
-These are methods for the dplyr generics \code{\link[=slice_min]{slice_min()}}, \code{\link[=slice_max]{slice_max()}}, and
-\code{\link[=slice_sample]{slice_sample()}}. They are translated to SQL using \code{\link[=filter]{filter()}} and
+These are methods for the dplyr generics \code{\link[dplyr:slice]{dplyr::slice_min()}}, \code{\link[dplyr:slice]{dplyr::slice_max()}}, and
+\code{\link[dplyr:slice]{dplyr::slice_sample()}}. They are translated to SQL using \code{\link[dplyr:filter]{dplyr::filter()}} and
 window functions (\code{ROWNUMBER}, \code{MIN_RANK}, or \code{CUME_DIST} depending on
 arguments). \code{slice()}, \code{slice_head()}, and \code{slice_tail()} are not supported
 since database tables have no intrinsic order.
@@ -77,17 +77,17 @@ value of \code{x} in each group.
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(x = 1:3, y = c(1, 1, 2))
-db \%>\% slice_min(x) \%>\% show_query()
-db \%>\% slice_max(x) \%>\% show_query()
-db \%>\% slice_sample() \%>\% show_query()
+db |> slice_min(x) |> show_query()
+db |> slice_max(x) |> show_query()
+db |> slice_sample() |> show_query()
 
-db \%>\% group_by(y) \%>\% slice_min(x) \%>\% show_query()
+db |> group_by(y) |> slice_min(x) |> show_query()
 
 # By default, ties are includes so you may get more rows
 # than you expect
-db \%>\% slice_min(y, n = 1)
-db \%>\% slice_min(y, n = 1, with_ties = FALSE)
+db |> slice_min(y, n = 1)
+db |> slice_min(y, n = 1, with_ties = FALSE)
 
 # Non-integer group sizes are rounded down
-db \%>\% slice_min(x, prop = 0.5)
+db |> slice_min(x, prop = 0.5)
 }

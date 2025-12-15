@@ -180,7 +180,7 @@ inequality conditions.
 
 \item{na_matches}{Should NA (NULL) values match one another?
 The default, "never", is how databases usually work. \code{"na"} makes
-the joins behave like the dplyr join functions, \code{\link[=merge]{merge()}}, \code{\link[=match]{match()}},
+the joins behave like the dplyr join functions, \code{\link[=merge]{merge()}}, \code{\link[bit64:bit64S3]{bit64::match()}},
 and \code{\%in\%}.}
 
 \item{multiple, unmatched}{Unsupported in database backends. As a workaround
@@ -207,7 +207,7 @@ query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
 \description{
-These are methods for the dplyr \link{join} generics. They are translated
+These are methods for the dplyr \link[dplyr:mutate-joins]{dplyr::join} generics. They are translated
 to the following SQL queries:
 \itemize{
 \item \code{inner_join(x, y)}: \verb{SELECT * FROM x JOIN y ON x.a = y.a}
@@ -223,23 +223,23 @@ library(dplyr, warn.conflicts = FALSE)
 
 band_db <- tbl_memdb(dplyr::band_members)
 instrument_db <- tbl_memdb(dplyr::band_instruments)
-band_db \%>\% left_join(instrument_db) \%>\% show_query()
+band_db |> left_join(instrument_db) |> show_query()
 
 # Can join with local data frames by setting copy = TRUE
-band_db \%>\%
+band_db |>
   left_join(dplyr::band_instruments, copy = TRUE)
 
 # Unlike R, joins in SQL don't usually match NAs (NULLs)
 db <- memdb_frame(x = c(1, 2, NA))
 label <- memdb_frame(x = c(1, NA), label = c("one", "missing"))
-db \%>\% left_join(label, by = "x")
+db |> left_join(label, by = "x")
 # But you can activate R's usual behaviour with the na_matches argument
-db \%>\% left_join(label, by = "x", na_matches = "na")
+db |> left_join(label, by = "x", na_matches = "na")
 
 # By default, joins are equijoins, but you can use `sql_on` to
 # express richer relationships
 db1 <- memdb_frame(x = 1:5)
 db2 <- memdb_frame(x = 1:3, y = letters[1:3])
-db1 \%>\% left_join(db2) \%>\% show_query()
-db1 \%>\% left_join(db2, sql_on = "LHS.x < RHS.x") \%>\% show_query()
+db1 |> left_join(db2) |> show_query()
+db1 |> left_join(db2, sql_on = "LHS.x < RHS.x") |> show_query()
 }

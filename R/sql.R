@@ -12,6 +12,19 @@ sql <- function(...) {
   structure(x, class = c("sql", "character"))
 }
 
+sql_c <- function(...) {
+  sql(paste0(unlist(list(...)), collapse = ""))
+}
+
+#' @export
+`[.sql` <- function(x, i) {
+  sql(NextMethod())
+}
+#' @export
+`[[.sql` <- function(x, i) {
+  sql(NextMethod())
+}
+
 # See setOldClass definition in zzz.R
 
 # c() is also called outside of the dbplyr context so must supply default
@@ -21,7 +34,9 @@ sql <- function(...) {
 c.sql <- function(..., drop_null = FALSE, con = simulate_dbi()) {
   input <- list(...)
 
-  if (drop_null) input <- purrr::compact(input) # nocov
+  if (drop_null) {
+    input <- purrr::compact(input)
+  } # nocov
 
   out <- unlist(lapply(input, escape, collapse = NULL, con = con))
   sql(out)

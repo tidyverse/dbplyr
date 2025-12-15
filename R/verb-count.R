@@ -1,6 +1,6 @@
 #' Count observations by group
 #'
-#' These are methods for the dplyr [count()] and [tally()] generics. They
+#' These are methods for the dplyr [dplyr::count()] and [tally()] generics. They
 #' wrap up [group_by.tbl_lazy()], [summarise.tbl_lazy()] and, optionally,
 #' [arrange.tbl_lazy()].
 #'
@@ -13,9 +13,9 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(g = c(1, 1, 1, 2, 2), x = c(4, 3, 6, 9, 2))
-#' db %>% count(g) %>% show_query()
-#' db %>% count(g, wt = x) %>% show_query()
-#' db %>% count(g, wt = x, sort = TRUE) %>% show_query()
+#' db |> count(g) |> show_query()
+#' db |> count(g, wt = x) |> show_query()
+#' db |> count(g, wt = x, sort = TRUE) |> show_query()
 count.tbl_lazy <- function(x, ..., wt = NULL, sort = FALSE, name = NULL) {
   if (!missing(...)) {
     out <- group_by(x, ..., .add = TRUE)
@@ -30,7 +30,14 @@ count.tbl_lazy <- function(x, ..., wt = NULL, sort = FALSE, name = NULL) {
 #' @rdname count.tbl_lazy
 #' @importFrom dplyr add_count
 #' @export
-add_count.tbl_lazy <- function (x, ..., wt = NULL, sort = FALSE, name = NULL, .drop = NULL) {
+add_count.tbl_lazy <- function(
+  x,
+  ...,
+  wt = NULL,
+  sort = FALSE,
+  name = NULL,
+  .drop = NULL
+) {
   check_unsupported_arg(.drop)
 
   if (!missing(...)) {
@@ -64,7 +71,7 @@ tally.tbl_lazy <- function(x, wt = NULL, sort = FALSE, name = NULL) {
   }
 }
 
-n_name <- function (x) {
+n_name <- function(x) {
   name <- "n"
   while (name %in% x) {
     name <- paste0("n", name)
@@ -72,7 +79,12 @@ n_name <- function (x) {
   name
 }
 
-check_count_name <- function(name, vars, arg = caller_arg(name), call = caller_env()) {
+check_count_name <- function(
+  name,
+  vars,
+  arg = caller_arg(name),
+  call = caller_env()
+) {
   if (is.null(name)) {
     name <- n_name(vars)
     if (name != "n") {

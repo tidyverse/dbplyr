@@ -12,8 +12,8 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(x = c(1, 1, 2, 2), y = c(1, 2, 1, 1))
-#' db %>% distinct() %>% show_query()
-#' db %>% distinct(x) %>% show_query()
+#' db |> distinct() |> show_query()
+#' db |> distinct(x) |> show_query()
 distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
   grps <- syms(op_grps(.data))
   empty_dots <- dots_n(...) == 0
@@ -23,16 +23,16 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
 
     if (needs_dummy_order) {
       dummy_order_vars <- colnames(.data)[[1]]
-      .data <- .data %>% window_order(!!sym(dummy_order_vars))
+      .data <- .data |> window_order(!!sym(dummy_order_vars))
     }
 
-    .data <- .data %>%
-      group_by(..., .add = TRUE) %>%
-      filter(row_number() == 1L) %>%
+    .data <- .data |>
+      group_by(..., .add = TRUE) |>
+      filter(row_number() == 1L) |>
       group_by(!!!grps)
 
     if (needs_dummy_order) {
-      .data <- .data %>% window_order()
+      .data <- .data |> window_order()
     }
 
     return(.data)
@@ -53,13 +53,14 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
 
 # copied from dplyr with minor changes (names -> colnames)
 # https://github.com/tidyverse/dplyr/blob/main/R/distinct.R
-distinct_prepare_compat <- function(.data,
-                             vars,
-                             group_vars = character(),
-                             .keep_all = FALSE,
-                             caller_env = caller_env(2),
-                             error_call = caller_env()
-                             ) {
+distinct_prepare_compat <- function(
+  .data,
+  vars,
+  group_vars = character(),
+  .keep_all = FALSE,
+  caller_env = caller_env(2),
+  error_call = caller_env()
+) {
   stopifnot(is_quosures(vars), is.character(group_vars))
 
   # If no input, keep all variables
@@ -82,9 +83,12 @@ distinct_prepare_compat <- function(.data,
   if (length(missing_vars) > 0) {
     bullets <- c(
       "Must use existing variables.",
-      set_names(glue("`{missing_vars}` not found in `.data`."), rep("x", length(missing_vars)))
+      set_names(
+        glue("`{missing_vars}` not found in `.data`."),
+        rep("x", length(missing_vars))
+      )
     )
-    abort(bullets, call = error_call)
+    cli::cli_abort(bullets, call = error_call)
   }
 
   # Only keep unique vars
@@ -103,9 +107,7 @@ distinct_prepare_compat <- function(.data,
 
 # copied from dplyr
 # https://github.com/tidyverse/dplyr/blob/main/R/group-by.R#L243
-add_computed_columns <- function(.data,
-                                 vars,
-                                 error_call = caller_env()) {
+add_computed_columns <- function(.data, vars, error_call = caller_env()) {
   is_symbol <- purrr::map_lgl(vars, quo_is_variable_reference)
   needs_mutate <- have_name(vars) | !is_symbol
 

@@ -47,7 +47,7 @@
 ---
 
     Code
-      copy_inline(con_maria, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
+      remote_query(copy_inline(con_maria, tibble(x = 1:2, y = letters[1:2])))
     Output
       <SQL> SELECT CAST(`x` AS INTEGER) AS `x`, CAST(`y` AS CHAR) AS `y`
       FROM (
@@ -62,9 +62,9 @@
 ---
 
     Code
-      copy_inline(con_mysql, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
+      remote_query(copy_inline(con_mysql, tibble(x = 1:2, y = letters[1:2])))
     Output
-      <SQL> SELECT TRUNCATE(CAST(`x` AS DOUBLE), 0) AS `x`, CAST(`y` AS CHAR) AS `y`
+      <SQL> SELECT CAST(`x` AS SIGNED INTEGER) AS `x`, CAST(`y` AS CHAR) AS `y`
       FROM (
         SELECT NULL AS `x`, NULL AS `y`
         WHERE (0 = 1)
@@ -96,7 +96,7 @@
 # can explain
 
     Code
-      db %>% mutate(y = x + 1) %>% explain()
+      explain(mutate(db, y = x + 1))
     Output
       <SQL>
       SELECT `test`.*, `x` + 1.0 AS `y`

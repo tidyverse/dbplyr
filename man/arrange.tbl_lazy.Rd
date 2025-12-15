@@ -22,7 +22,7 @@ query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
 \description{
-This is an method for the dplyr \code{\link[=arrange]{arrange()}} generic. It generates
+This is an method for the dplyr \code{\link[dplyr:arrange]{dplyr::arrange()}} generic. It generates
 the \verb{ORDER BY} clause of the SQL query. It also affects the
 \code{\link[=window_order]{window_order()}} of windowed expressions in \code{\link[=mutate.tbl_lazy]{mutate.tbl_lazy()}}.
 
@@ -39,10 +39,10 @@ can override this behaviour by explicitly sorting on \code{is.na(x)}.
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(a = c(3, 4, 1, 2), b = c(5, 1, 2, NA))
-db \%>\% arrange(a) \%>\% show_query()
+db |> arrange(a) |> show_query()
 
 # Note that NAs are sorted first
-db \%>\% arrange(b)
+db |> arrange(b)
 # override by sorting on is.na() first
-db \%>\% arrange(is.na(b), b)
+db |> arrange(is.na(b), b)
 }

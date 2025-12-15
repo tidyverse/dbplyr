@@ -11,19 +11,14 @@
 #' df <- data.frame(x = 1, y = 2)
 #'
 #' df_sqlite <- tbl_lazy(df, con = simulate_sqlite())
-#' df_sqlite %>% summarise(x = sd(x, na.rm = TRUE)) %>% show_query()
+#' df_sqlite |> summarise(x = sd(x, na.rm = TRUE))
 tbl_lazy <- function(df, con = NULL, ..., name = "df") {
   check_dots_empty0(...)
   con <- con %||% sql_current_con() %||% simulate_dbi()
-  subclass <- class(con)[[1]]
 
   name <- as_table_path(name, con)
-
-  dplyr::make_tbl(
-    purrr::compact(c(subclass, "lazy")),
-    lazy_query = lazy_base_query(df, names(df), class = "local", name = name),
-    src = src_dbi(con)
-  )
+  lazy_query <- lazy_base_query(df, names(df), class = "local", name = name)
+  new_tbl_lazy(con, lazy_query)
 }
 methods::setOldClass(c("tbl_lazy", "tbl"))
 
@@ -114,12 +109,12 @@ names.tbl_lazy <- function(x) {
       i = "Did you mean {.fn colnames}?"
     ))
   }
-  NextMethod("names")
+  NextMethod()
 }
 
 #' @export
 `$.tbl_lazy` <- function(x, name) {
-  unexpected_name <- !name %in% c("lazy_query", "src")
+  unexpected_name <- !name %in% c("lazy_query", "src", "con")
 
   if (unexpected_name) {
     cli::cli_abort(c(

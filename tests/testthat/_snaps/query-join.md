@@ -1,7 +1,7 @@
 # print method doesn't change unexpectedly
 
     Code
-      left_join(lf1, lf2, by = "x") %>% left_join(lf3, by = "x") %>% sql_build()
+      sql_build(left_join(left_join(lf1, lf2, by = "x"), lf3, by = "x"))
     Output
       <SQL JOINS>
       X:

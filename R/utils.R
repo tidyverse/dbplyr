@@ -23,7 +23,7 @@ commas <- function(...) paste0(..., collapse = ", ")
 unique_table_name <- function(prefix = "") {
   vals <- c(letters, LETTERS, 0:9)
   name <- paste0(sample(vals, 10, replace = TRUE), collapse = "")
-  paste0(prefix, "dbplyr_", name)
+  paste0(prefix, "dbplyr_tmp_", name)
 }
 
 unique_subquery_name <- function() {
@@ -52,8 +52,9 @@ succeeds <- function(x, quiet = FALSE) {
       TRUE
     },
     error = function(e) {
-      if (!quiet)
-        message("Error: ", e$message) # nocov
+      if (!quiet) {
+        message("Error: ", e$message)
+      } # nocov
       FALSE
     }
   )
@@ -76,10 +77,14 @@ cat_line <- function(...) cat(paste0(..., "\n"), sep = "")
 
 # nocov start
 res_warn_incomplete <- function(res, hint = "n = -1") {
-  if (dbHasCompleted(res)) return()
+  if (dbHasCompleted(res)) {
+    return()
+  }
 
   rows <- big_mark(dbGetRowCount(res))
-  cli::cli_warn("Only first {rows} results retrieved. Use {hint} to retrieve all.")
+  cli::cli_warn(
+    "Only first {rows} results retrieved. Use {hint} to retrieve all."
+  )
 }
 
 add_temporary_prefix <- function(con, table, temporary = TRUE) {
@@ -112,14 +117,29 @@ local_methods <- function(..., .frame = caller_env()) {
   local_bindings(..., .env = global_env(), .frame = .frame)
 }
 
-local_db_table <- function(con, value, name, ..., temporary = TRUE, envir = parent.frame()) {
+local_db_table <- function(
+  con,
+  value,
+  name,
+  types = NULL,
+  temporary = TRUE,
+  overwrite = FALSE,
+  envir = parent.frame()
+) {
   if (inherits(con, "Microsoft SQL Server") && temporary) {
     name <- paste0("#", name)
   }
 
   withr::defer(DBI::dbRemoveTable(con, name), envir = envir)
-  copy_to(con, value, name, temporary = temporary, ...)
-  tbl(con, name)
+  table <- db_copy_to(
+    con,
+    name,
+    value,
+    types = types,
+    temporary = temporary,
+    overwrite = overwrite
+  )
+  new_tbl_sql(con, table, names(value))
 }
 
 local_sqlite_connection <- function(envir = parent.frame()) {
@@ -127,4 +147,15 @@ local_sqlite_connection <- function(envir = parent.frame()) {
     DBI::dbConnect(RSQLite::SQLite(), ":memory:"),
     .local_envir = envir
   )
+}
+
+local_memdb_frame <- function(name, ..., frame = parent.frame()) {
+  df <- tibble::tibble(...)
+
+  withr::defer(DBI::dbRemoveTable(src_memdb()$con, name), envir = frame)
+  copy_to(src_memdb(), df, name, temporary = TRUE)
+}
+
+is_testing <- function() {
+  identical(Sys.getenv("TESTTHAT"), "true")
 }

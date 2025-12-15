@@ -34,14 +34,14 @@ order.}
 A vector of data.
 }
 \description{
-This is a method for the dplyr \code{\link[=pull]{pull()}} generic. It evaluates the query
+This is a method for the dplyr \code{\link[dplyr:pull]{dplyr::pull()}} generic. It evaluates the query
 retrieving just the specified column.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(x = 1:5, y = 5:1)
-db \%>\%
-  mutate(z = x + y * 2) \%>\%
+db |>
+  mutate(z = x + y * 2) |>
   pull()
 }

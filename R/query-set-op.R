@@ -24,33 +24,26 @@ print.set_op_query <- function(x, ...) {
 }
 
 #' @export
-sql_render.set_op_query <- function(query,
-                                    con = NULL,
-                                    ...,
-                                    sql_options = NULL,
-                                    subquery = FALSE,
-                                    lvl = 0) {
+sql_render.set_op_query <- function(
+  query,
+  con = NULL,
+  ...,
+  sql_options = NULL,
+  subquery = FALSE,
+  lvl = 0
+) {
   sub_lvl <- lvl + !inherits(con, "SQLiteConnection")
   from_x <- sql_render(query$x, con, ..., subquery = FALSE, lvl = sub_lvl)
   from_y <- sql_render(query$y, con, ..., subquery = FALSE, lvl = sub_lvl)
 
-  if (dbplyr_edition(con) >= 2) {
-    sql_query_set_op(
-      con,
-      from_x,
-      from_y,
-      method = query$type,
-      all = query$all,
-      lvl = lvl
-    )
-  } else {
-    # nocov start
-    if (isTRUE(query$all)) {
-      cli_abort("{.arg all} argument not supported by this backend")
-    }
-    dbplyr_query_set_op(con, from_x, from_y, method = query$type)
-    # nocov end
-  }
+  sql_query_set_op(
+    con,
+    from_x,
+    from_y,
+    method = query$type,
+    all = query$all,
+    lvl = lvl
+  )
 }
 
 #' @export
@@ -84,17 +77,19 @@ print.union_query <- function(x, ...) {
 }
 
 #' @export
-sql_render.union_query <- function(query,
-                                   con = NULL,
-                                   ...,
-                                   sql_options = NULL,
-                                   subquery = FALSE,
-                                   lvl = 0) {
+sql_render.union_query <- function(
+  query,
+  con = NULL,
+  ...,
+  sql_options = NULL,
+  subquery = FALSE,
+  lvl = 0
+) {
   from_x <- sql_render(query$x, con, ..., subquery = FALSE, lvl = lvl)
   unions <- list()
   unions$table <- purrr::map(
     query$unions$table,
-    function(table) sql_render(table, con, ..., subquery = FALSE, lvl = lvl)
+    \(table) sql_render(table, con, ..., subquery = FALSE, lvl = lvl)
   )
   unions$all <- query$unions$all
 

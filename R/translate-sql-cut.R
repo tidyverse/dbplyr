@@ -1,4 +1,10 @@
-sql_cut <- function(x, breaks, labels = NULL, include.lowest = FALSE, right = TRUE) {
+sql_cut <- function(
+  x,
+  breaks,
+  labels = NULL,
+  include.lowest = FALSE,
+  right = TRUE
+) {
   breaks <- sort.int(as.double(breaks), na.last = TRUE)
   if (anyDuplicated(breaks)) {
     cli_abort("{.arg breaks} are not unique.")
@@ -17,11 +23,11 @@ sql_cut <- function(x, breaks, labels = NULL, include.lowest = FALSE, right = TR
 
   cases <- purrr::map(
     seq2(1, n - 2L),
-    ~ {
+    function(i) {
       if (right) {
-        expr(!!x <= !!breaks[[.x + 1]] ~ !!labels[[.x]])
+        expr(!!x <= !!breaks[[i + 1]] ~ !!labels[[i]])
       } else {
-        expr(!!x < !!breaks[[.x + 1]] ~ !!labels[[.x]])
+        expr(!!x < !!breaks[[i + 1]] ~ !!labels[[i]])
       }
     }
   )
@@ -59,7 +65,13 @@ sql_cut <- function(x, breaks, labels = NULL, include.lowest = FALSE, right = TR
   translate_sql(case_when(!!!cases, !!!last_cases), con = sql_current_con())
 }
 
-check_cut_labels <- function(labels, breaks, include.lowest, right, call = caller_env()) {
+check_cut_labels <- function(
+  labels,
+  breaks,
+  include.lowest,
+  right,
+  call = caller_env()
+) {
   labels <- labels %||% TRUE
 
   n <- length(breaks)
@@ -77,21 +89,19 @@ check_cut_labels <- function(labels, breaks, include.lowest, right, call = calle
   }
 
   if (right) {
-    labels <- paste0("(", breaks[seq2(1, n-1)], ",", breaks[seq2(2, n)], "]")
+    labels <- paste0("(", breaks[seq2(1, n - 1)], ",", breaks[seq2(2, n)], "]")
   } else {
-    labels <- paste0("[", breaks[seq2(1, n-1)], ",", breaks[seq2(2, n)], ")")
+    labels <- paste0("[", breaks[seq2(1, n - 1)], ",", breaks[seq2(2, n)], ")")
   }
 
   if (include.lowest) {
     if (right) {
       substr(labels[[1]], 1, 1) <- "["
     } else {
-      nchar <- nchar(labels[[n-1]], "chars")
-      substr(labels[[n-1]], nchar, nchar) <- "]"
+      nchar <- nchar(labels[[n - 1]], "chars")
+      substr(labels[[n - 1]], nchar, nchar) <- "]"
     }
   }
 
   labels
 }
-
-utils::globalVariables(c("case_when"))

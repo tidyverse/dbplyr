@@ -24,7 +24,7 @@ test_that("has print method", {
 
 test_that("support colwise variants", {
   mf <- memdb_frame(x = 1:5, y = factor(letters[1:5]))
-  exp <- mf %>% collect() %>% mutate(y = as.character(y))
+  exp <- mf |> collect() |> mutate(y = as.character(y))
 
   expect_message(
     mf1 <- dplyr::mutate_if(mf, is.factor, as.character),
@@ -37,7 +37,7 @@ test_that("support colwise variants", {
 })
 
 test_that("base source of tbl_lazy is always 'df'", {
-  out <- lazy_frame(x = 1, y = 5) %>% sql_build()
+  out <- lazy_frame(x = 1, y = 5) |> sql_build()
   expect_equal(out, base_query(table_path("`df`")))
 })
 

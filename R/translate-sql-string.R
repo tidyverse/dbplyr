@@ -1,15 +1,35 @@
-# R prefers to specify start / stop or start / end
-# databases usually specify start / length
-# https://www.postgresql.org/docs/current/functions-string.html
+#' SQL helpers for string functions
+#'
+#' @description
+#' These functions help you create custom string SQL translations when
+#' implementing a new backend. They are typically used within [sql_translator()]
+#' to define how R string functions should be translated to SQL.
+#'
+#' * `sql_substr()` creates a SQL substring function translator that converts
+#'   R's `substr(x, start, stop)` to SQL's `SUBSTR(x, start, length)`.
+#' * `sql_str_sub()` creates a SQL substring function translator that handles
+#'   stringr's `str_sub()` with support for negative indices.
+#' * `sql_paste()` creates a SQL paste function using `CONCAT_WS()` or similar.
+#' * `sql_paste_infix()` creates a SQL paste function using an infix operator
+#'   like `||`.
+#'
+#' @param f The name of the SQL function as a string.
+#' @family SQL translation helpers
+#' @name sql_translation_string
+NULL
+
 #' @export
-#' @rdname sql_variant
+#' @rdname sql_translation_string
 sql_substr <- function(f = "SUBSTR") {
+  # R prefers to specify start / stop or start / end
+  # databases usually specify start / length
+  # https://www.postgresql.org/docs/current/functions-string.html
   function(x, start, stop) {
     start <- max(cast_number_whole(start), 1L)
     stop <- max(cast_number_whole(stop), 1L)
     length <- max(stop - start + 1L, 0L)
 
-    sql_call2(f, x, start, length)
+    sql_glue("{.sql f}({x}, {start}, {length})")
   }
 }
 
@@ -22,12 +42,16 @@ cast_number_whole <- function(x, arg = caller_arg(x), call = caller_env()) {
 # SUBSTR(string, start, length) - start can be negative
 
 #' @export
-#' @rdname sql_variant
+#' @rdname sql_translation_string
+#' @param subset_f The name of the SQL substring function.
+#' @param length_f The name of the SQL string length function.
+#' @param optional_length Whether the length argument is optional in the SQL
+#'   substring function.
 sql_str_sub <- function(
-                        subset_f = "SUBSTR",
-                        length_f = "LENGTH",
-                        optional_length = TRUE
-  ) {
+  subset_f = "SUBSTR",
+  length_f = "LENGTH",
+  optional_length = TRUE
+) {
   function(string, start = 1L, end = -1L) {
     start <- cast_number_whole(start)
     end <- cast_number_whole(end)
@@ -35,30 +59,30 @@ sql_str_sub <- function(
     start_sql <- start_pos(string, start, length_f)
 
     if (optional_length && end == -1L) {
-      sql_call2(subset_f, string, start_sql)
+      sql_glue("{.sql subset_f}({string}, {start_sql})")
     } else {
       if (end == 0L) {
         length_sql <- 0L
-      } else if(start > 0 && end < 0) {
+      } else if (start > 0 && end < 0) {
         n <- start - end - 2L
         if (n == 0) {
-          length_sql <- sql_call2(length_f, string)
+          length_sql <- sql_glue("{.sql length_f}({string})")
         } else {
-          length_sql <- sql_expr(!!sql_call2(length_f, string) - !!n)
+          length_sql <- sql_glue("{.sql length_f}({string}) - {n}")
         }
       } else {
         length_sql <- pmax(end - start + 1L, 0L)
       }
-      sql_call2(subset_f, string, start_sql, length_sql)
+      sql_glue("{.sql subset_f}({string}, {start_sql}, {length_sql})")
     }
   }
 }
 
 start_pos <- function(string, start, length_f) {
   if (start == -1) {
-    sql_call2(length_f, string)
+    sql_glue("{.sql length_f}({string})")
   } else if (start < 0) {
-    sql_expr(!!sql_call2(length_f, string) - !!abs(start + 1L))
+    sql_glue("{.sql length_f}({string}) - {abs(start + 1L)}")
   } else {
     start
   }
@@ -66,29 +90,35 @@ start_pos <- function(string, start, length_f) {
 
 sql_str_trim <- function(string, side = c("both", "left", "right")) {
   side <- match.arg(side)
-  switch(side,
-    left = sql_expr(ltrim(!!string)),
-    right = sql_expr(rtrim(!!string)),
-    both = sql_expr(ltrim(rtrim(!!string))),
+  switch(
+    side,
+    left = sql_glue("LTRIM({string})"),
+    right = sql_glue("RTRIM({string})"),
+    both = sql_glue("LTRIM(RTRIM({string}))"),
   )
 }
 
 
-
-sql_str_pattern_switch <- function(string,
-                                   pattern,
-                                   negate = FALSE,
-                                   f_fixed = NULL,
-                                   f_regex = NULL,
-                                   error_call = caller_env()) {
+sql_str_pattern_switch <- function(
+  string,
+  pattern,
+  negate = FALSE,
+  f_fixed = NULL,
+  f_regex = NULL,
+  error_call = caller_env()
+) {
   pattern_quo <- enquo(pattern)
-  is_fixed <- quo_is_call(pattern_quo, "fixed") || inherits(pattern, "stringr_fixed")
+  is_fixed <- quo_is_call(pattern_quo, "fixed") ||
+    inherits(pattern, "stringr_fixed")
 
   if (is_fixed) {
     f_fixed(string, pattern, negate)
   } else {
     if (is_null(f_regex)) {
-      cli_abort("Only fixed patterns are supported on database backends.", call = error_call)
+      cli_abort(
+        "Only fixed patterns are supported on this backend.",
+        call = error_call
+      )
     } else {
       f_regex(string, pattern, negate)
     }
@@ -112,19 +142,27 @@ sql_str_detect_fixed_instr <- function(type = c("detect", "start", "end")) {
   function(string, pattern, negate = FALSE) {
     con <- sql_current_con()
     pattern <- unclass(pattern)
-    index_sql <- glue_sql2(con, "INSTR({.val string}, {.val pattern})")
+    index_sql <- sql_glue2(con, "INSTR({string}, {pattern})")
 
     if (negate) {
-      switch(type,
+      switch(
+        type,
         detect = translate_sql(!!index_sql == 0L, con = con),
         start = translate_sql(!!index_sql != 1L, con = con),
-        end = translate_sql(!!index_sql != nchar(!!string) - nchar(!!pattern) + 1L, con = con)
+        end = translate_sql(
+          !!index_sql != nchar(!!string) - nchar(!!pattern) + 1L,
+          con = con
+        )
       )
     } else {
-      switch(type,
+      switch(
+        type,
         detect = translate_sql(!!index_sql > 0L, con = con),
         start = translate_sql(!!index_sql == 1L, con = con),
-        end = translate_sql(!!index_sql == nchar(!!string) - nchar(!!pattern) + 1L, con = con)
+        end = translate_sql(
+          !!index_sql == nchar(!!string) - nchar(!!pattern) + 1L,
+          con = con
+        )
       )
     }
   }
@@ -136,22 +174,94 @@ sql_str_detect_fixed_position <- function(type = c("detect", "start", "end")) {
   function(string, pattern, negate = FALSE) {
     con <- sql_current_con()
     pattern <- unclass(pattern)
-    index_sql <- glue_sql2(con, "POSITION({.val pattern} in {.val string})")
+    index_sql <- sql_glue2(con, "POSITION({pattern} in {string})")
 
     if (negate) {
-      switch(type,
+      switch(
+        type,
         detect = translate_sql(!!index_sql == 0L, con = con),
         start = translate_sql(!!index_sql != 1L, con = con),
-        end = translate_sql(!!index_sql != nchar(!!string) - nchar(!!pattern) + 1L, con = con)
+        end = translate_sql(
+          !!index_sql != nchar(!!string) - nchar(!!pattern) + 1L,
+          con = con
+        )
       )
     } else {
-      switch(type,
+      switch(
+        type,
         detect = translate_sql(!!index_sql > 0L, con = con),
         start = translate_sql(!!index_sql == 1L, con = con),
-        end = translate_sql(!!index_sql == nchar(!!string) - nchar(!!pattern) + 1L, con = con)
+        end = translate_sql(
+          !!index_sql == nchar(!!string) - nchar(!!pattern) + 1L,
+          con = con
+        )
       )
     }
   }
 }
 
-utils::globalVariables(c("ltrim", "rtrim"))
+#' @export
+#' @rdname sql_translation_string
+#' @param default_sep The default separator for paste operations.
+sql_paste <- function(default_sep, f = "CONCAT_WS") {
+  function(..., sep = default_sep, collapse = NULL) {
+    check_collapse(collapse)
+    sql_glue("{.sql f}({sep}, {...})")
+  }
+}
+
+#' @export
+#' @rdname sql_translation_string
+#' @param op The SQL operator to use for infix paste operations.
+#' @param cast A function to cast values to strings.
+sql_paste_infix <- function(default_sep, op, cast = sql_cast("text")) {
+  check_string(default_sep)
+  check_string(op)
+  check_function(cast)
+
+  function(..., sep = default_sep, collapse = NULL) {
+    check_collapse(collapse)
+
+    args <- list(...)
+    if (length(args) == 1) {
+      return(cast(args[[1]]))
+    }
+
+    if (sep == "") {
+      infix <- function(x, y) sql_glue("{x} {.sql op} {y}")
+    } else {
+      infix <- function(x, y) sql_glue("{x} {.sql op} {sep} {.sql op} {y}")
+    }
+
+    purrr::reduce(args, infix)
+  }
+}
+
+check_collapse <- function(collapse) {
+  if (is.null(collapse)) {
+    return()
+  }
+
+  cli_abort(c(
+    "{.arg collapse} not supported in DB translation of {.fun paste}.",
+    i = "Please use {.fun str_flatten} instead."
+  ))
+}
+
+deprecate_ignore_case <- function(ignore_case, frame = caller_env()) {
+  if (lifecycle::is_present(ignore_case)) {
+    lifecycle::deprecate_warn(
+      when = "2.6.0",
+      what = "str_like(ignore_case)",
+      details = c(
+        "`str_like()` is always case sensitive.",
+        "Use `str_ilike()` for case insensitive string matching."
+      ),
+      env = frame
+    )
+    check_bool(ignore_case, call = frame)
+    ignore_case
+  } else {
+    FALSE
+  }
+}

@@ -16,7 +16,7 @@ test_that("can extract by name, or positive/negative position", {
 
 test_that("extracts correct column from grouped tbl", {
   mf <- memdb_frame(id = "a", value = 42)
-  gf <- mf %>% group_by(id)
+  gf <- mf |> group_by(id)
 
   expect_equal(pull(mf, value), 42)
 })
@@ -24,7 +24,7 @@ test_that("extracts correct column from grouped tbl", {
 test_that("doesn't unnecessarily select", {
   mf <- memdb_frame(x = c(3, 1, 2))
   # no warning about select after arrange
-  expect_warning(out <- mf %>% arrange(x) %>% pull(), NA)
+  expect_warning(out <- mf |> arrange(x) |> pull(), NA)
   expect_equal(out, 1:3)
 })
 
@@ -43,11 +43,10 @@ test_that("can extract named vectors", {
 
 test_that("ungroup() produces nice error messages", {
   expect_snapshot(error = TRUE, {
-    memdb_frame(x = 1) %>% pull(non_existent)
-    memdb_frame(x = 1) %>% pull("non_existent")
-    memdb_frame(x = 1) %>% pull(1000)
+    memdb_frame(x = 1) |> pull(non_existent)
+    memdb_frame(x = 1) |> pull("non_existent")
+    memdb_frame(x = 1) |> pull(1000)
 
-    memdb_frame(x = 1) %>% pull(x, "name_non_existent")
+    memdb_frame(x = 1) |> pull(x, "name_non_existent")
   })
 })
-

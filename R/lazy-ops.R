@@ -73,12 +73,14 @@ sql_build.lazy_base_local_query <- function(op, con, ...) {
 }
 
 #' @export
-sql_render.base_query <- function(query,
-                                  con = NULL,
-                                  ...,
-                                  sql_options = NULL,
-                                  subquery = FALSE,
-                                  lvl = 0) {
+sql_render.base_query <- function(
+  query,
+  con = NULL,
+  ...,
+  sql_options = NULL,
+  subquery = FALSE,
+  lvl = 0
+) {
   from <- query$from
   if (subquery || is.sql(from)) {
     from
@@ -137,32 +139,3 @@ op_frame <- function(op) UseMethod("op_frame")
 op_frame.tbl_lazy <- function(op) op_frame(op$lazy_query)
 #' @export
 op_frame.lazy_query <- function(op) op$frame
-
-# Description -------------------------------------------------------------
-
-op_rows <- function(op, rows_total = NA_integer_) {
-  if (is.na(rows_total)) {
-    "??"
-  } else {
-    big_mark(rows_total)
-  }
-}
-op_cols <- function(op) {
-  length(op_vars(op))
-}
-
-op_desc <- function(op) UseMethod("op_desc")
-#' @export
-op_desc.lazy_query <- function(op) {
-  "SQL"
-}
-
-#' @export
-op_desc.lazy_base_remote_query <- function(op) {
-  table <- remote_name(op)
-  if (is.null(table)) {
-    "SQL"
-  } else {
-    paste0("table<", table, ">")
-  }
-}

@@ -14,9 +14,9 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = simulate_odbc())
-#' lf %>% transmute(x = as.numeric(b))
-#' lf %>% transmute(x = as.integer(b))
-#' lf %>% transmute(x = as.character(b))
+#' lf |> transmute(x = as.numeric(b))
+#' lf |> transmute(x = as.integer(b))
+#' lf |> transmute(x = as.character(b))
 NULL
 
 #' @export
@@ -73,11 +73,17 @@ db_connection_describe.OdbcConnection <- function(con, ...) {
   port <- if (info$port == "") "" else paste0(":", info$port)
 
   paste0(
-    info$dbms.name, " ", info$db.version,
-    "[", info$username, "@", host, port,
-    "/", info$dbname, "]"
+    info$dbms.name,
+    " ",
+    info$db.version,
+    "[",
+    info$username,
+    "@",
+    host,
+    port,
+    "/",
+    info$dbname,
+    "]"
   )
 }
 # nocov end
-
-utils::globalVariables("EXP")

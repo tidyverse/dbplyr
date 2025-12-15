@@ -39,7 +39,7 @@ query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
 \description{
-This is a method for the dplyr \code{\link[=summarise]{summarise()}} generic. It generates the
+This is a method for the dplyr \code{\link[dplyr:summarise]{dplyr::summarise()}} generic. It generates the
 \code{SELECT} clause of the SQL query, and generally needs to be combined with
 \code{group_by()}.
 }
@@ -47,12 +47,12 @@ This is a method for the dplyr \code{\link[=summarise]{summarise()}} generic. It
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(g = c(1, 1, 1, 2, 2), x = c(4, 3, 6, 9, 2))
-db \%>\%
-  summarise(n()) \%>\%
+db |>
+  summarise(n()) |>
   show_query()
 
-db \%>\%
-  group_by(g) \%>\%
-  summarise(n()) \%>\%
+db |>
+  group_by(g) |>
+  summarise(n()) |>
   show_query()
 }

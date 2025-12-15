@@ -25,7 +25,7 @@ Turns implicit missing values into explicit missing values. This is a method
 for the \code{\link[tidyr:complete]{tidyr::complete()}} generic.
 }
 \examples{
-\dontshow{if (rlang::is_installed("tidyr", version = "1.0.0")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("tidyr", version = "1.0.0")) withAutoprint(\{ # examplesIf}
 df <- memdb_frame(
   group = c(1:2, 1),
   item_id = c(1:2, 2),
@@ -34,9 +34,9 @@ df <- memdb_frame(
   value2 = 4:6
 )
 
-df \%>\% tidyr::complete(group, nesting(item_id, item_name))
+df |> tidyr::complete(group, nesting(item_id, item_name))
 
 # You can also choose to fill in missing values
-df \%>\% tidyr::complete(group, nesting(item_id, item_name), fill = list(value1 = 0))
+df |> tidyr::complete(group, nesting(item_id, item_name), fill = list(value1 = 0))
 \dontshow{\}) # examplesIf}
 }

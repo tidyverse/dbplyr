@@ -14,27 +14,14 @@ test_that("missing columns filled with NULL", {
   expect_equal(out, tibble(x = c(1, NA), y = c(NA, 2)))
 })
 
-test_that("first edition works", {
-  con <- structure(list(), class = c("Test", "DBIConnection"))
-
-  local_methods(
-    sql_escape_ident.Test = function(con, x) sql_quote(x, "`")
-  )
-  lf <- lazy_frame(x = 1, con = con)
-
-  local_options(rlib_warning_verbosity = "quiet")
-
-  expect_error(union_all(lf, lf) %>% remote_query(), NA)
-})
-
 # SQL generation ----------------------------------------------------------
 
 test_that("set ops generates correct sql", {
   lf1 <- memdb_frame(x = 1)
   lf2 <- memdb_frame(x = c(1, 2))
 
-  out <- lf1 %>%
-    union(lf2) %>%
+  out <- lf1 |>
+    union(lf2) |>
     collect()
 
   expect_equal(out, tibble(x = c(1, 2)))
@@ -46,12 +33,12 @@ test_that("union and union all work for all backends", {
   tbls_full <- test_load(df)
   tbls_filter <- test_load(filter(df, y == 0))
 
-  tbls_full %>%
-    purrr::map2(tbls_filter, union) %>%
+  tbls_full |>
+    purrr::map2(tbls_filter, union) |>
     expect_equal_tbls()
 
-  tbls_full %>%
-    purrr::map2(tbls_filter, union_all) %>%
+  tbls_full |>
+    purrr::map2(tbls_filter, union_all) |>
     expect_equal_tbls()
 })
 
@@ -61,12 +48,21 @@ test_that("can combine multiple union in one query", {
   lf3 <- lazy_frame(z = 1, .name = "lf3")
 
   expect_snapshot(
-    lf1 %>%
-      union_all(lf2) %>%
+    lf1 |>
+      union_all(lf2) |>
       union(lf3)
   )
 
   # cte works
+  expect_snapshot(
+    lf1 |>
+      union_all(lf2) |>
+      union(lf3) |>
+      left_join(lf1, by = "x") |>
+      show_query(sql_options = sql_options(cte = TRUE))
+  )
+
+  # cte works with simple union
   expect_snapshot(
     lf1 %>%
       union_all(lf2) %>%
@@ -82,11 +78,11 @@ test_that("can combine multiple union in one query", {
       show_query(sql_options = sql_options(cte = TRUE))
   )
 
-  lf_union <- lf1 %>%
-    union_all(lf2) %>%
+  lf_union <- lf1 |>
+    union_all(lf2) |>
     union(lf3)
 
-  out <- lf_union %>% mutate(a = x + y) %>% sql_build()
+  out <- lf_union |> mutate(a = x + y) |> sql_build()
   expect_equal(out$select, sql("`q01`.*", a = "`x` + `y`"))
 })
 
@@ -97,12 +93,12 @@ test_that("intersect and setdiff work for supported backends", {
   tbls_full <- test_load(df, ignore = c("mysql", "MariaDB"))
   tbls_filter <- test_load(filter(df, y == 0), ignore = c("mysql", "MariaDB"))
 
-  tbls_full %>%
-    purrr::map2(tbls_filter, intersect) %>%
+  tbls_full |>
+    purrr::map2(tbls_filter, intersect) |>
     expect_equal_tbls()
 
-  tbls_full %>%
-    purrr::map2(tbls_filter, setdiff) %>%
+  tbls_full |>
+    purrr::map2(tbls_filter, setdiff) |>
     expect_equal_tbls()
 })
 
@@ -119,15 +115,15 @@ test_that("other backends can combine with a limit", {
 
   ignore <- c(
     "sqlite", # only allows limit at top level
-    "mssql"   # unusual execution order gives unintuitive result
+    "mssql" # unusual execution order gives unintuitive result
   )
   tbls_full <- test_load(df, ignore = ignore)
   tbls_head <- lapply(test_load(df, ignore = ignore), head, n = 1)
 
-  tbls_full %>%
-    purrr::map2(tbls_head, union) %>%
+  tbls_full |>
+    purrr::map2(tbls_head, union) |>
     expect_equal_tbls(head(df, 1))
-  tbls_full %>%
-    purrr::map2(tbls_head, union_all) %>%
+  tbls_full |>
+    purrr::map2(tbls_head, union_all) |>
     expect_equal_tbls(head(df, 1))
 })

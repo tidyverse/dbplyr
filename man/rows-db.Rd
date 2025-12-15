@@ -69,8 +69,8 @@
 }
 \arguments{
 \item{x}{A lazy table.
-For \code{in_place = TRUE}, this must be a table instantiated with \code{\link[=tbl]{tbl()}} or
-\code{\link[=compute]{compute()}}, not to a lazy query. The \code{\link[=remote_name]{remote_name()}} function is used to
+For \code{in_place = TRUE}, this must be a table instantiated with \code{\link[dplyr:tbl]{dplyr::tbl()}} or
+\code{\link[dplyr:compute]{dplyr::compute()}}, not to a lazy query. The \code{\link[=remote_name]{remote_name()}} function is used to
 determine the name of the table to be updated.}
 
 \item{y}{A lazy table, data frame, or data frame extensions (e.g. a tibble).}
@@ -134,8 +134,8 @@ because the purpose of this operation is the side effect of modifying rows
 in the table behind \code{x}.
 }
 \description{
-These are methods for the dplyr \code{\link[=rows_insert]{rows_insert()}}, \code{\link[=rows_append]{rows_append()}},
-\code{\link[=rows_update]{rows_update()}}, \code{\link[=rows_patch]{rows_patch()}}, \code{\link[=rows_upsert]{rows_upsert()}}, and \code{\link[=rows_delete]{rows_delete()}}
+These are methods for the dplyr \code{\link[dplyr:rows]{dplyr::rows_insert()}}, \code{\link[dplyr:rows]{dplyr::rows_append()}},
+\code{\link[dplyr:rows]{dplyr::rows_update()}}, \code{\link[dplyr:rows]{dplyr::rows_patch()}}, \code{\link[dplyr:rows]{dplyr::rows_upsert()}}, and \code{\link[dplyr:rows]{dplyr::rows_delete()}}
 generics.
 
 When \code{in_place = TRUE} these verbs do not generate \code{SELECT} queries, but

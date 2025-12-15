@@ -21,6 +21,9 @@
 #'   recommend using `I()` to identify a table outside the default catalog or
 #'   schema, e.g. `I("schema.table")` or `I("catalog.schema.table")`. You can
 #'   also use [in_schema()]/[in_catalog()] or [DBI::Id()].
+#' @param vars Optionally, provide a character vector of column names. If
+#'   not supplied, will be retrieved from the database by running a simple
+#'   query. Mainly useful for better performance when creating many `tbl`s.
 #' @param ... Passed on to [tbl_sql()]
 #' @export
 #' @examples
@@ -34,13 +37,13 @@
 #' DBI::dbListTables(con)
 #'
 #' # To retrieve a single table from a source, use `tbl()`
-#' con %>% tbl("mtcars")
+#' con |> tbl("mtcars")
 #'
 #' # Use `I()` for qualified table names
-#' con %>% tbl(I("temp.mtcars")) %>% head(1)
+#' con |> tbl(I("temp.mtcars")) |> head(1)
 #'
 #' # You can also use pass raw SQL if you want a more sophisticated query
-#' con %>% tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))
+#' con |> tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))
 #'
 #' # If you just want a temporary in-memory database, use src_memdb()
 #' src2 <- src_memdb()
@@ -54,15 +57,15 @@
 #' batting
 #'
 #' # Basic data manipulation verbs work in the same way as with a tibble
-#' batting %>% filter(yearID > 2005, G > 130)
-#' batting %>% select(playerID:lgID)
-#' batting %>% arrange(playerID, desc(yearID))
-#' batting %>% summarise(G = mean(G), n = n())
+#' batting |> filter(yearID > 2005, G > 130)
+#' batting |> select(playerID:lgID)
+#' batting |> arrange(playerID, desc(yearID))
+#' batting |> summarise(G = mean(G), n = n())
 #'
 #' # There are a few exceptions. For example, databases give integer results
 #' # when dividing one integer by another. Multiply by 1 to fix the problem
-#' batting %>%
-#'   select(playerID:lgID, AB, R, G) %>%
+#' batting |>
+#'   select(playerID:lgID, AB, R, G) |>
 #'   mutate(
 #'    R_per_game1 = R / G,
 #'    R_per_game2 = R * 1.0 / G
@@ -75,28 +78,34 @@
 #' system.time(collect(recent))
 #'
 #' # You can see the query that dplyr creates with show_query()
-#' batting %>%
-#'   filter(G > 0) %>%
-#'   group_by(playerID) %>%
-#'   summarise(n = n()) %>%
+#' batting |>
+#'   filter(G > 0) |>
+#'   group_by(playerID) |>
+#'   summarise(n = n()) |>
 #'   show_query()
 #' }
 #' @importFrom dplyr tbl
 #' @aliases tbl_dbi
-tbl.src_dbi <- function(src, from, ...) {
-  subclass <- class(src$con)[[1]] # prefix added by dplyr::make_tbl
-  tbl_sql(c(subclass, "dbi"), src = src, from = from, ...)
+tbl.src_dbi <- function(src, from, vars = NULL, ...) {
+  check_dots_empty()
+  db_table(src$con, from, vars = vars)
 }
 
-# Internal calls to `tbl()` should be avoided in favor of tbl_src_dbi().
-# The former may query the database for column names if `vars` is omitted,
-# the latter always requires `vars`.
-tbl_src_dbi <- function(src, from, vars) {
-  force(vars)
-  tbl(src, from, vars = vars)
+db_table <- function(
+  con,
+  from,
+  vars = NULL,
+  subclass = NULL,
+  call = caller_env()
+) {
+  check_con(con)
+  source <- as_table_source(from, con = con, error_call = call)
+
+  check_character(vars, allow_null = TRUE, call = call)
+  vars <- vars %||% find_variables(con, from, call = call)
+
+  new_tbl_sql(con = con, source = source, vars = vars, subclass = subclass)
 }
-
-
 
 #' Database src
 #'

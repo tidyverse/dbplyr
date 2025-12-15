@@ -9,7 +9,7 @@
 status](https://www.r-pkg.org/badges/version/dbplyr)](https://cran.r-project.org/package=dbplyr)
 [![R-CMD-check](https://github.com/tidyverse/dbplyr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tidyverse/dbplyr/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
-coverage](https://codecov.io/gh/tidyverse/dbplyr/branch/main/graph/badge.svg)](https://app.codecov.io/gh/tidyverse/dbplyr?branch=main)
+coverage](https://codecov.io/gh/tidyverse/dbplyr/graph/badge.svg)](https://app.codecov.io/gh/tidyverse/dbplyr)
 <!-- badges: end -->
 
 ## Overview
@@ -62,7 +62,7 @@ details). Printing it just retrieves the first few rows:
 mtcars2 <- tbl(con, "mtcars")
 mtcars2
 #> # Source:   table<`mtcars`> [?? x 11]
-#> # Database: sqlite 3.45.0 [:memory:]
+#> # Database: sqlite 3.50.4 [:memory:]
 #>      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #>    <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
 #>  1  21       6  160    110  3.9   2.62  16.5     0     1     4     4
@@ -83,13 +83,13 @@ to the database when you request the data.
 
 ``` r
 # lazily generates query
-summary <- mtcars2 %>% 
-  group_by(cyl) %>% 
-  summarise(mpg = mean(mpg, na.rm = TRUE)) %>% 
+summary <- mtcars2 |> 
+  group_by(cyl) |> 
+  summarise(mpg = mean(mpg, na.rm = TRUE)) |> 
   arrange(desc(mpg))
 
 # see query
-summary %>% show_query()
+summary |> show_query()
 #> <SQL>
 #> SELECT `cyl`, AVG(`mpg`) AS `mpg`
 #> FROM `mtcars`
@@ -97,7 +97,7 @@ summary %>% show_query()
 #> ORDER BY `mpg` DESC
 
 # execute query and retrieve results
-summary %>% collect()
+summary |> collect()
 #> # A tibble: 3 × 2
 #>     cyl   mpg
 #>   <dbl> <dbl>

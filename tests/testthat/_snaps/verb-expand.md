@@ -1,7 +1,7 @@
 # expand completes all values
 
     Code
-      lazy_frame(x = 1, y = 1) %>% tidyr::expand(x, y)
+      tidyr::expand(lazy_frame(x = 1, y = 1), x, y)
     Output
       <SQL>
       SELECT `x`, `y`
@@ -17,7 +17,7 @@
 # nesting doesn't expand values
 
     Code
-      df_lazy %>% tidyr::expand(nesting(x, y))
+      tidyr::expand(df_lazy, nesting(x, y))
     Output
       <SQL>
       SELECT DISTINCT `df`.*
@@ -44,7 +44,7 @@
 # works with tidyr::nesting
 
     Code
-      df_lazy %>% tidyr::expand(tidyr::nesting(x, y))
+      tidyr::expand(df_lazy, tidyr::nesting(x, y))
     Output
       <SQL>
       SELECT DISTINCT `df`.*
@@ -53,7 +53,7 @@
 # expand respects groups
 
     Code
-      df_lazy %>% group_by(a) %>% tidyr::expand(b, c)
+      tidyr::expand(group_by(df_lazy, a), b, c)
     Output
       <SQL>
       SELECT `LHS`.*, `c`
@@ -107,7 +107,7 @@
 # replace_na replaces missing values
 
     Code
-      lazy_frame(x = 1, y = "a") %>% tidyr::replace_na(list(x = 0, y = "unknown"))
+      tidyr::replace_na(lazy_frame(x = 1, y = "a"), list(x = 0, y = "unknown"))
     Output
       <SQL>
       SELECT COALESCE(`x`, 0.0) AS `x`, COALESCE(`y`, 'unknown') AS `y`
@@ -116,7 +116,7 @@
 # replace_na ignores missing columns
 
     Code
-      lazy_frame(x = 1) %>% tidyr::replace_na(list(not_there = 0))
+      tidyr::replace_na(lazy_frame(x = 1), list(not_there = 0))
     Output
       <SQL>
       SELECT *
@@ -125,7 +125,7 @@
 # complete completes missing combinations
 
     Code
-      df_lazy %>% tidyr::complete(x, y, fill = list(z = "c"))
+      tidyr::complete(df_lazy, x, y, fill = list(z = "c"))
     Output
       <SQL>
       SELECT `x`, `y`, COALESCE(`z`, 'c') AS `z`

@@ -1,7 +1,7 @@
 Type: Package
 Package: dbplyr
 Title: A 'dplyr' Back End for Databases
-Version: 2.5.0.9000
+Version: 2.5.1.9000
 Authors@R: c(
     person("Hadley", "Wickham", , "hadley@posit.co", role = c("aut", "cre")),
     person("Maximilian", "Girlich", role = "aut"),
@@ -17,7 +17,7 @@ License: MIT + file LICENSE
 URL: https://dbplyr.tidyverse.org/, https://github.com/tidyverse/dbplyr
 BugReports: https://github.com/tidyverse/dbplyr/issues
 Depends: 
-    R (>= 3.6)
+    R (>= 4.1)
 Imports: 
     blob (>= 1.2.0),
     cli (>= 3.6.1),
@@ -48,19 +48,22 @@ Suggests:
     rmarkdown,
     RPostgres (>= 1.4.5),
     RPostgreSQL,
-    RSQLite (>= 2.3.1),
+    RSQLite (>= 2.3.8),
     testthat (>= 3.1.10)
 VignetteBuilder: 
     knitr
 Config/Needs/website: tidyverse/tidytemplate
 Config/testthat/edition: 3
-Config/testthat/parallel: TRUE 
+Config/testthat/parallel: TRUE
 Encoding: UTF-8
 Language: en-gb
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.3
 Collate: 
+    'verb-copy-inline.R'
+    'verb-copy-to.R'
     'db-sql.R'
+    'db.R'
     'utils-check.R'
     'import-standalone-types-check.R'
     'import-standalone-obj-type.R'
@@ -68,9 +71,9 @@ Collate:
     'sql.R'
     'escape.R'
     'translate-sql-cut.R'
-    'translate-sql-quantile.R'
     'translate-sql-string.R'
-    'translate-sql-paste.R'
+    'translate-sql-aggregate.R'
+    'translate-sql-scalar.R'
     'translate-sql-helpers.R'
     'translate-sql-window.R'
     'translate-sql-conditional.R'
@@ -79,7 +82,6 @@ Collate:
     'backend-hana.R'
     'backend-hive.R'
     'backend-impala.R'
-    'verb-copy-to.R'
     'backend-mssql.R'
     'backend-mysql.R'
     'backend-odbc.R'
@@ -97,7 +99,6 @@ Collate:
     'data-nycflights13.R'
     'db-escape.R'
     'db-io.R'
-    'db.R'
     'dbplyr.R'
     'explain.R'
     'ident.R'
@@ -111,7 +112,6 @@ Collate:
     'lazy-set-op-query.R'
     'memdb.R'
     'optimise-utils.R'
-    'pillar.R'
     'progress.R'
     'sql-build.R'
     'query-join.R'
@@ -138,6 +138,8 @@ Collate:
     'translate-sql.R'
     'utils-format.R'
     'verb-arrange.R'
+    'verb-collapse.R'
+    'verb-collect.R'
     'verb-compute.R'
     'verb-count.R'
     'verb-distinct.R'

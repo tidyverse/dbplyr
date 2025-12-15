@@ -32,8 +32,8 @@
 #' copy_to(con, iris, "df", temporary = FALSE)
 #' copy_to(con, mtcars, I("aux.df"), temporary = FALSE)
 #'
-#' con %>% tbl("df")
-#' con %>% tbl(I("aux.df"))
+#' con |> tbl("df")
+#' con |> tbl(I("aux.df"))
 in_schema <- function(schema, table) {
   structure(
     list(
@@ -68,7 +68,13 @@ print.dbplyr_schema <- function(x, ...) {
 
 #' @export
 format.dbplyr_catalog <- function(x, ...) {
-  paste0(escape_ansi(x$catalog), ".", escape_ansi(x$schema), ".", escape_ansi(x$table))
+  paste0(
+    escape_ansi(x$catalog),
+    ".",
+    escape_ansi(x$schema),
+    ".",
+    escape_ansi(x$table)
+  )
 }
 #' @export
 print.dbplyr_catalog <- function(x, ...) {
@@ -83,7 +89,11 @@ as.sql.dbplyr_schema <- function(x, con) {
 #' @export
 as.sql.dbplyr_catalog <- function(x, con) {
   ident_q(paste0(
-    escape(x$catalog, con = con), ".", escape(x$schema, con = con), ".", escape(x$table, con = con)
+    escape(x$catalog, con = con),
+    ".",
+    escape(x$schema, con = con),
+    ".",
+    escape(x$table, con = con)
   ))
 }
 

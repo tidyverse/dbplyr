@@ -15,3 +15,8 @@
 ^\.httr-oauth$
 ^\.github$
 ^CRAN-SUBMISSION$
+^[.]?air[.]toml$
+^\.vscode$
+^\.devcontainer$
+^\.claude$
+^research$

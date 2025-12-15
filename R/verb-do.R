@@ -19,9 +19,9 @@ do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
   named <- named_args(args)
 
   # Create data frame of labels
-  labels <- .data %>%
-    select(!!! groups_sym) %>%
-    summarise() %>%
+  labels <- .data |>
+    select(!!!groups_sym) |>
+    summarise() |>
     collect()
 
   con <- .data$src$con
@@ -57,7 +57,7 @@ do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
     }
 
     # Create an id for each group
-    grouped <- chunk %>% dplyr::group_by(!!! syms(names(chunk)[gvars]))
+    grouped <- chunk |> dplyr::group_by(!!!syms(names(chunk)[gvars]))
 
     index <- dplyr::group_rows(grouped)
     n <- length(index)
@@ -129,11 +129,11 @@ label_output_list <- function(labels, out, groups) {
     labels[names(out)] <- out
     dplyr::rowwise(labels)
   } else {
-     # nocov start
+    # nocov start
     class(out) <- "data.frame"
     attr(out, "row.names") <- .set_row_names(length(out[[1]]))
     dplyr::rowwise(out)
-     # nocov end
+    # nocov end
   }
 }
 

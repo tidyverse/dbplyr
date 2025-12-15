@@ -23,13 +23,13 @@ query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
 \description{
-This is a method for the dplyr \code{\link[=distinct]{distinct()}} generic. It adds the
+This is a method for the dplyr \code{\link[dplyr:distinct]{dplyr::distinct()}} generic. It adds the
 \code{DISTINCT} clause to the SQL query.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(x = c(1, 1, 2, 2), y = c(1, 2, 1, 1))
-db \%>\% distinct() \%>\% show_query()
-db \%>\% distinct(x) \%>\% show_query()
+db |> distinct() |> show_query()
+db |> distinct(x) |> show_query()
 }
