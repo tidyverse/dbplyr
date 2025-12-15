@@ -8,40 +8,45 @@ describes how entire verbs are translated.
 
 ``` r
 library(dbplyr)
-library(dplyr)
-
-con <- simulate_dbi()
+library(dplyr, warn.conflicts = FALSE)
 ```
 
-[`dbplyr::translate_sql()`](https://dbplyr.tidyverse.org/dev/reference/translate_sql.md)
-powers translation of individual function calls, and I’ll use it
-extensively in this vignette to show what’s happening. You shouldn’t
-need to use it ordinary code as dbplyr takes care of the translation
-automatically.
+## Getting started with translations
+
+In this vignette, I’ll use
+[`lazy_frame()`](https://dbplyr.tidyverse.org/dev/reference/tbl_lazy.md)
+to create a toy lazy table that allows us to see the translation without
+needing to connect to a real database:
 
 ``` r
-translate_sql((x + y) / 2, con = con)
-#> <SQL> (`x` + `y`) / 2.0
+lf <- lazy_frame(x = 1, y = 2, g = "a")
+lf |> mutate(z = (x + y) / 2)
+#> <SQL>
+#> SELECT `df`.*, (`x` + `y`) / 2.0 AS `z`
+#> FROM `df`
 ```
 
-[`translate_sql()`](https://dbplyr.tidyverse.org/dev/reference/translate_sql.md)
-takes an optional `con` parameter. If not supplied, this causes dbplyr
-to generate (approximately) SQL-92 compliant SQL. If supplied, dbplyr
-uses
-[`sql_translation()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
-to look up a custom environment which makes it possible for different
-databases to generate slightly different SQL: see
+The default
+[`lazy_frame()`](https://dbplyr.tidyverse.org/dev/reference/tbl_lazy.md)
+uses a generic database that generates (approximately) SQL-92 compliant
+SQL. You can use `simulate_*()` connections to see the translations used
+by different backends. Different databases generate slightly different
+SQL; see
 [`vignette("new-backend")`](https://dbplyr.tidyverse.org/dev/articles/new-backend.md)
-for more details. You can use the various simulate helpers to see the
-translations used by different backends:
+for more details.
 
 ``` r
-translate_sql(x ^ 2L, con = con)
-#> <SQL> POWER(`x`, 2)
-translate_sql(x ^ 2L, con = simulate_sqlite())
-#> <SQL> POWER(`x`, 2)
-translate_sql(x ^ 2L, con = simulate_access())
-#> <SQL> `x` ^ 2
+lf_sqlite <- lazy_frame(x = 1, con = simulate_sqlite())
+lf_access <- lazy_frame(x = 1, con = simulate_access())
+
+lf_sqlite |> transmute(z = x^2)
+#> <SQL>
+#> SELECT POWER(`x`, 2.0) AS `z`
+#> FROM `df`
+lf_access |> transmute(z = x^2)
+#> <SQL>
+#> SELECT `x` ^ 2.0 AS `z`
+#> FROM `df`
 ```
 
 Perfect translation is not possible because databases don’t have all the
@@ -76,10 +81,14 @@ There are two fundamental differences between R and SQL:
   real.
 
   ``` r
-  translate_sql(1, con = con)
-  #> <SQL> 1.0
-  translate_sql(1L, con = con)
-  #> <SQL> 1
+  lf |> transmute(z = 1)
+  #> <SQL>
+  #> SELECT 1.0 AS `z`
+  #> FROM `df`
+  lf |> transmute(z = 1L)
+  #> <SQL>
+  #> SELECT 1 AS `z`
+  #> FROM `df`
   ```
 
 ## Known functions
@@ -106,7 +115,7 @@ There are two fundamental differences between R and SQL:
   [`sign()`](https://rdrr.io/r/base/sign.html),
   [`round()`](https://rdrr.io/r/base/Round.html)
 
-## Modulo arithmetic
+### Modulo arithmetic
 
 dbplyr translates `%%` to the SQL equivalents but note that it’s not
 precisely the same: most databases use truncated division where the
@@ -119,7 +128,7 @@ df <- tibble(
   x = c(10L, 10L, -10L, -10L), 
   y = c(3L, -3L, 3L, -3L)
 )
-mf <- tbl_memdb(df)
+db <- tbl_memdb(df)
 
 df |> mutate(x %% y)
 #> # A tibble: 4 × 3
@@ -129,7 +138,7 @@ df |> mutate(x %% y)
 #> 2    10    -3     -2
 #> 3   -10     3      2
 #> 4   -10    -3     -1
-mf |> mutate(x %% y)
+db |> mutate(x %% y)
 #> # A query:  ?? x 3
 #> # Database: sqlite 3.51.1 [:memory:]
 #>       x     y `x%%y`
@@ -163,25 +172,37 @@ ask nicely. The aggregation functions warn you about this important
 difference:
 
 ``` r
-translate_sql(mean(x), con = con)
+lf |> summarise(z = mean(x))
 #> Warning: Missing values are always removed in SQL aggregation functions.
 #> Use `na.rm = TRUE` to silence this warning
 #> This warning is displayed once every 8 hours.
-#> <SQL> AVG(`x`) OVER ()
-translate_sql(mean(x, na.rm = TRUE), con = con)
-#> <SQL> AVG(`x`) OVER ()
+#> <SQL>
+#> SELECT AVG(`x`) AS `z`
+#> FROM `df`
+lf |> summarise(z = mean(x, na.rm = TRUE))
+#> <SQL>
+#> SELECT AVG(`x`) AS `z`
+#> FROM `df`
 ```
 
-Note that, by default, `translate()` assumes that the call is inside a
+Note that aggregation functions used inside
 [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html) or
-[`filter()`](https://dplyr.tidyverse.org/reference/filter.html) and
-generates a window translation. If you want to see the equivalent
-[`summarise()`](https://dplyr.tidyverse.org/reference/summarise.html)/aggregation
-translation, use `window = FALSE`:
+[`filter()`](https://dplyr.tidyverse.org/reference/filter.html) generate
+a window translation:
 
 ``` r
-translate_sql(mean(x, na.rm = TRUE), window = FALSE, con = con)
-#> <SQL> AVG(`x`)
+lf |> mutate(z = mean(x, na.rm = TRUE))
+#> <SQL>
+#> SELECT `df`.*, AVG(`x`) OVER () AS `z`
+#> FROM `df`
+lf |> filter(mean(x, na.rm = TRUE) > 0)
+#> <SQL>
+#> SELECT `x`, `y`, `g`
+#> FROM (
+#>   SELECT `df`.*, AVG(`x`) OVER () AS `col01`
+#>   FROM `df`
+#> ) AS `q01`
+#> WHERE (`col01` > 0.0)
 ```
 
 ### Conditional evaluation
@@ -190,13 +211,19 @@ translate_sql(mean(x, na.rm = TRUE), window = FALSE, con = con)
 to `CASE WHEN`:
 
 ``` r
-translate_sql(if (x > 5) "big" else "small", con = con)
-#> <SQL> CASE WHEN (`x` > 5.0) THEN 'big' WHEN NOT (`x` > 5.0) THEN 'small' END
-translate_sql(switch(x, a = 1L, b = 2L, 3L), con = con)
-#> <SQL> CASE `x` WHEN ('a') THEN (1) WHEN ('b') THEN (2) ELSE (3) END
+lf |> mutate(z = if (x > 5) "big" else "small")
+#> <SQL>
+#> SELECT
+#>   `df`.*,
+#>   CASE WHEN (`x` > 5.0) THEN 'big' WHEN NOT (`x` > 5.0) THEN 'small' END AS `z`
+#> FROM `df`
+lf |> mutate(z = switch(g, a = 1L, b = 2L, 3L))
+#> <SQL>
+#> SELECT
+#>   `df`.*,
+#>   CASE `g` WHEN ('a') THEN (1) WHEN ('b') THEN (2) ELSE (3) END AS `z`
+#> FROM `df`
 ```
-
-### String manipulation
 
 ### Date/time
 
@@ -207,26 +234,32 @@ translate_sql(switch(x, a = 1L, b = 2L, 3L), con = con)
 
 Any function that dbplyr doesn’t know how to convert is left as is. This
 means that database functions that are not covered by dbplyr can often
-be used directly via
-[`translate_sql()`](https://dbplyr.tidyverse.org/dev/reference/translate_sql.md).
+be used directly.
 
 ### Prefix functions
 
 Any function that dbplyr doesn’t know about will be left as is:
 
 ``` r
-translate_sql(foofify(x, y), con = con)
-#> <SQL> foofify(`x`, `y`)
+lf |> mutate(z = foofify(x, y))
+#> <SQL>
+#> SELECT `df`.*, foofify(`x`, `y`) AS `z`
+#> FROM `df`
 ```
 
-Because SQL functions are generally case insensitive, I recommend using
-upper case when you’re using SQL functions in R code. That makes it
-easier to spot that you’re doing something unusual:
+But to make it clear that you’re deliberately calling a SQL function, we
+recommend using the `.sql` pronoun:
 
 ``` r
-translate_sql(FOOFIFY(x, y), con = con)
-#> <SQL> FOOFIFY(`x`, `y`)
+lf |> transmute(z = .sql$foofify(x, y))
+#> <SQL>
+#> SELECT foofify(`x`, `y`) AS `z`
+#> FROM `df`
 ```
+
+If you’re working inside a package, this also makes it easier to avoid
+`R CMD CHECK` notes. Just import `.sql` from dbplyr using a roxygen2 tag
+like `@importFrom dbplyr .sql`
 
 ### Infix functions
 
@@ -236,17 +269,40 @@ to use expressions like `LIKE`, which does a limited form of pattern
 matching:
 
 ``` r
-translate_sql(x %LIKE% "%foo%", con = con)
-#> <SQL> `x` LIKE '%foo%'
+lf |> filter(x %LIKE% "%foo%")
+#> <SQL>
+#> SELECT `df`.*
+#> FROM `df`
+#> WHERE (`x` LIKE '%foo%')
 ```
 
-Or use `||` for string concatenation (although most backends will
-translate [`paste()`](https://rdrr.io/r/base/paste.html) and
-[`paste0()`](https://rdrr.io/r/base/paste.html) for you):
+You can also use `str_like()` for this common case:
 
 ``` r
-translate_sql(x %||% y, con = con)
-#> <SQL> `x` || `y`
+lf |> filter(str_like(x, "%foo%"))
+#> <SQL>
+#> SELECT `df`.*
+#> FROM `df`
+#> WHERE (`x` LIKE '%foo%')
+```
+
+You could use `%||%` for string concatenation, but in most cases it’s
+more R-like to use [`paste()`](https://rdrr.io/r/base/paste.html) or
+[`paste0()`](https://rdrr.io/r/base/paste.html):
+
+``` r
+lf |> transmute(z = x %||% y)
+#> <SQL>
+#> SELECT `x` || `y` AS `z`
+#> FROM `df`
+lf |> transmute(z = paste0(x, y))
+#> <SQL>
+#> SELECT CONCAT_WS('', `x`, `y`) AS `z`
+#> FROM `df`
+lf |> transmute(z = paste(x, y))
+#> <SQL>
+#> SELECT CONCAT_WS(' ', `x`, `y`) AS `z`
+#> FROM `df`
 ```
 
 ### Special forms
@@ -258,30 +314,27 @@ literal SQL inside
 [`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md):
 
 ``` r
-translate_sql(sql("x!"), con = con)
-#> <SQL> x!
-translate_sql(x == sql("ANY VALUES(1, 2, 3)"), con = con)
-#> <SQL> `x` = ANY VALUES(1, 2, 3)
+lf |> transmute(z = sql("x!"))
+#> <SQL>
+#> SELECT x! AS `z`
+#> FROM `df`
+lf |> transmute(z = x == sql("ANY VALUES(1, 2, 3)"))
+#> <SQL>
+#> SELECT `x` = ANY VALUES(1, 2, 3) AS `z`
+#> FROM `df`
 ```
 
 This gives you a lot of freedom to generate the SQL you need:
 
 ``` r
-mf <- memdb_frame(x = 1, y = 2)
-
-mf |> 
-  transmute(factorial = sql("x!")) |> 
-  show_query()
+lf |> transmute(factorial = sql("x!"))
 #> <SQL>
 #> SELECT x! AS `factorial`
-#> FROM `dbplyr_tmp_uR8HfdVHIy`
-
-mf |> 
-  transmute(factorial = sql("CAST(x AS FLOAT)")) |> 
-  show_query()
+#> FROM `df`
+lf |> transmute(factorial = sql("CAST(x AS FLOAT)"))
 #> <SQL>
 #> SELECT CAST(x AS FLOAT) AS `factorial`
-#> FROM `dbplyr_tmp_uR8HfdVHIy`
+#> FROM `df`
 ```
 
 ### Error for unknown translations
@@ -291,7 +344,7 @@ dbplyr to error if it doesn’t know how to translate a function:
 
 ``` r
 options(dplyr.strict_sql = TRUE)
-translate_sql(glob(x, y), con = con)
+lf |> mutate(z = glob(x, y))
 #> Error in `glob()`:
 #> ! Don't know how to translate `glob()`
 ```
@@ -356,34 +409,45 @@ provided by base R or dplyr. They have the form
   dbplyr generates the frame clause based on whether you’re using a
   recycled aggregate or a cumulative aggregate.
 
-To see how individual window functions are translated to SQL, we can
-again use
-[`translate_sql()`](https://dbplyr.tidyverse.org/dev/reference/translate_sql.md):
+To see how individual window functions are translated to SQL, we can use
+[`transmute()`](https://dplyr.tidyverse.org/reference/transmute.html):
 
 ``` r
-translate_sql(mean(G), con = con)
-#> <SQL> AVG(`G`) OVER ()
-translate_sql(rank(G), con = con)
-#> <SQL> CASE
-#> WHEN (NOT((`G` IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN ((`G` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `G`)
-#> END
-translate_sql(ntile(G, 2), con = con)
-#> <SQL> NTILE(2) OVER (ORDER BY `G`)
-translate_sql(lag(G), con = con)
-#> <SQL> LAG(`G`, 1, NULL) OVER ()
+lf <- lazy_frame(g = 1, year = 2020, id = 3, con = simulate_dbi())
+
+lf |> transmute(
+  mean = mean(g), 
+  rank = min_rank(g), 
+  cumsum = cumsum(g),
+  lag = lag(g)
+)
+#> Warning: Windowed expression `SUM(`g`)` does not have explicit order.
+#> ℹ Please use `arrange()` or `window_order()` to make deterministic.
+#> <SQL>
+#> SELECT
+#>   AVG(`g`) OVER () AS `mean`,
+#>   CASE
+#> WHEN (NOT((`g` IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN ((`g` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `g`)
+#> END AS `rank`,
+#>   SUM(`g`) OVER (ROWS UNBOUNDED PRECEDING) AS `cumsum`,
+#>   LAG(`g`, 1, NULL) OVER () AS `lag`
+#> FROM `df`
 ```
 
-If the tbl has been grouped or arranged previously in the pipeline, then
-dplyr will use that information to set the “partition by” and “order by”
-clauses. For interactive exploration, you can achieve the same effect by
-setting the `vars_group` and `vars_order` arguments to
-[`translate_sql()`](https://dbplyr.tidyverse.org/dev/reference/translate_sql.md):
+If the lazy frame has been grouped or arranged previously in the
+pipeline, then dbplyr will use that information to set the “partition
+by” and “order by” clauses:
 
 ``` r
-translate_sql(cummean(G), vars_order = "year", con = con)
-#> <SQL> AVG(`G`) OVER (ORDER BY `year` ROWS UNBOUNDED PRECEDING)
-translate_sql(rank(), vars_group = "ID", con = con)
-#> <SQL> RANK() OVER (PARTITION BY `ID`)
+lf |> arrange(year) |> mutate(z = cummean(g))
+#> <SQL>
+#> SELECT `df`.*, AVG(`g`) OVER (ORDER BY `year` ROWS UNBOUNDED PRECEDING) AS `z`
+#> FROM `df`
+#> ORDER BY `year`
+lf |> group_by(id) |> mutate(z = rank())
+#> <SQL>
+#> SELECT `df`.*, RANK() OVER (PARTITION BY `id`) AS `z`
+#> FROM `df`
 ```
 
 There are some challenges when translating window functions between R
@@ -408,11 +472,19 @@ which window function you’re using:
 The three options are illustrated in the snippet below:
 
 ``` r
-mutate(players,
-  min_rank(yearID),
-  order_by(yearID, cumsum(G)),
-  lead(G, order_by = yearID)
+lf |> transmute(
+  x1 = min_rank(g),
+  x2 = order_by(year, cumsum(g)),
+  x3 = lead(g, order_by = year)
 )
+#> <SQL>
+#> SELECT
+#>   CASE
+#> WHEN (NOT((`g` IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN ((`g` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `g`)
+#> END AS `x1`,
+#>   SUM(`g`) OVER (ORDER BY `year` ROWS UNBOUNDED PRECEDING) AS `x2`,
+#>   LEAD(`g`, 1, NULL) OVER (ORDER BY `year`) AS `x3`
+#> FROM `df`
 ```
 
 Currently there is no way to order by multiple variables, except by

@@ -21,6 +21,8 @@
 - [`show_query(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
   [`explain(`*`<tbl_sql>`*`)`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
   : Show generated SQL and query plan
+- [`.sql`](https://dbplyr.tidyverse.org/dev/reference/dot-sql.md) : Flag
+  SQL function usage
 
 ### Verbs that affect rows
 

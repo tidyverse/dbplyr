@@ -396,6 +396,17 @@ db |>
 #> WHERE (`x` LIKE '%foo%')
 ```
 
+To make it more clear that you’re calling a SQL function, not an R
+function, you can use the `.sql` pronoun:
+
+``` r
+db |>
+  mutate(z = .sql$foofify(x, y))
+#> <SQL>
+#> SELECT `df`.*, foofify(`x`, `y`) AS `z`
+#> FROM `df`
+```
+
 SQL functions tend to have a greater variety of syntax than R. That
 means there are a number of expressions that can’t be translated
 directly from R code. To insert these in your own queries, you can use

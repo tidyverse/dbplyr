@@ -43,8 +43,8 @@ heuristic:
 
 You can override the guesses using
 [`local()`](https://rdrr.io/r/base/eval.html) and `remote()` to force
-computation, or by using the `.data` and `.env` pronouns of tidy
-evaluation.
+computation, by using the `.data` and `.env` pronouns of tidy
+evaluation, or by using dbplyr's own `.sql` pronoun.
 
 ## Examples
 
@@ -78,4 +78,10 @@ partial_eval(quote(year > f(1980)), lf)
 #> year > f(1980)
 partial_eval(quote(year > local(f(1980))), lf)
 #> year > 1981
+
+# You can use `.sql` to make it clear that the function comes from SQL,
+# and inside a package, reduce the number of globalVariables() directives
+# needed
+partial_eval(quote(.sql$EXTRACT_YEAR(year)), lf)
+#> EXTRACT_YEAR(year)
 ```

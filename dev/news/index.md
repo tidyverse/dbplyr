@@ -2,6 +2,9 @@
 
 ## dbplyr (development version)
 
+- New `.sql` pronoun makes it a little easier to use known SQL functions
+  in packages, requiring only `@importFrom dbplyr .sql`
+  ([\#1117](https://github.com/tidyverse/dbplyr/issues/1117)).
 - `join_by(between())` now correctly handles column renames
   ([\#1572](https://github.com/tidyverse/dbplyr/issues/1572)).
 - SQL Server uses `DATEDIFF_BIG` instead of `DATEDIFF` to work

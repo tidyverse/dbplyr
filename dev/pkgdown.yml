@@ -7,7 +7,7 @@ articles:
   reprex: reprex.html
   translation-function: translation-function.html
   translation-verb: translation-verb.html
-last_built: 2025-12-12T22:45Z
+last_built: 2025-12-15T14:45Z
 urls:
   reference: https://dbplyr.tidyverse.org/reference
   article: https://dbplyr.tidyverse.org/articles

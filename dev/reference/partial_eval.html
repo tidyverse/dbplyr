@@ -105,7 +105,8 @@ variable, then remote.</p></li>
 <li><p>If the symbol is defined locally, local.</p></li>
 <li><p>Otherwise, remote.</p></li>
 </ul><p>You can override the guesses using <code><a href="https://rdrr.io/r/base/eval.html" class="external-link">local()</a></code> and <code>remote()</code> to force
-computation, or by using the <code>.data</code> and <code>.env</code> pronouns of tidy evaluation.</p>
+computation, by using the <code>.data</code> and <code>.env</code> pronouns of tidy evaluation,
+or by using dbplyr's own <code>.sql</code> pronoun.</p>
     </div>
 
     <div class="section level2">
@@ -139,6 +140,12 @@ computation, or by using the <code>.data</code> and <code>.env</code> pronouns o
 <span class="r-out co"><span class="r-pr">#&gt;</span> year &gt; f(1980)</span>
 <span class="r-in"><span><span class="fu">partial_eval</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="va">year</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">local</a></span><span class="op">(</span><span class="fu">f</span><span class="op">(</span><span class="fl">1980</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="va">lf</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> year &gt; 1981</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># You can use `.sql` to make it clear that the function comes from SQL,</span></span></span>
+<span class="r-in"><span><span class="co"># and inside a package, reduce the number of globalVariables() directives</span></span></span>
+<span class="r-in"><span><span class="co"># needed</span></span></span>
+<span class="r-in"><span><span class="fu">partial_eval</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="va">.sql</span><span class="op">$</span><span class="fu">EXTRACT_YEAR</span><span class="op">(</span><span class="va">year</span><span class="op">)</span><span class="op">)</span>, <span class="va">lf</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> EXTRACT_YEAR(year)</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
