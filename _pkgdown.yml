@@ -29,6 +29,7 @@ reference:
   - pull.tbl_sql
   - show_query
   - last_sql
+  - .sql
 
 - subtitle: Verbs that affect rows
   contents:

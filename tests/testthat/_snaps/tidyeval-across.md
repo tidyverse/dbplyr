@@ -80,6 +80,15 @@
       SELECT SUM(`a`) AS `a`, SUM(`b`) AS `b`
       FROM `df`
 
+# lambdas in across() can use columns
+
+    Code
+      show_query(db_across)
+    Output
+      <SQL>
+      SELECT `x` / `y` AS `x`, `y` / `y` AS `y`, `z` / `y` AS `z`
+      FROM `across`
+
 # across() errors if named
 
     Code
