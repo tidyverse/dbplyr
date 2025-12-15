@@ -70,7 +70,6 @@
 * Spark SQL backend now supports persisting tables with
   `compute(x, name = I("x.y.z"), temporary = FALSE)` (@zacdav-db, #1502).
 
-
 # dbplyr 2.5.0
 
 ## Improved tools for qualified table names
