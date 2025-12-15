@@ -109,3 +109,17 @@ test_that("queries translate correctly", {
   mf <- lazy_frame(x = 1, con = simulate_access())
   expect_snapshot(mf |> head())
 })
+
+test_that("multiple joins use parens #1576", {
+  lf1 <- lazy_frame(x = 1, a = 1, .name = "lf1", con = simulate_access())
+  lf2 <- lazy_frame(x = 1, b = 1, .name = "lf2", con = simulate_access())
+  lf3 <- lazy_frame(x = 1, c = 1, .name = "lf3", con = simulate_access())
+  lf4 <- lazy_frame(x = 1, d = 1, .name = "lf4", con = simulate_access())
+
+  expect_snapshot(left_join(lf1, lf2, by = "x") |> inner_join(lf3, by = "x"))
+  expect_snapshot(
+    left_join(lf1, lf2, by = "x") |>
+      inner_join(lf3, by = "x") |>
+      left_join(lf4, by = "x")
+  )
+})

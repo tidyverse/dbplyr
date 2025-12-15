@@ -531,36 +531,27 @@ sql_query_multi_join.DBIConnection <- function(
   }
 
   from <- dbplyr_sql_subquery(con, x, name = table_names[[1]], lvl = lvl)
-
-  join_table_queries <- purrr::map2(
-    joins$table,
-    table_names[-1],
-    function(table, name) {
-      dbplyr_sql_subquery(con, table, name = name, lvl = lvl)
-    }
-  )
+  names <- table_names[-1]
+  tables <- joins$table
   types <- toupper(paste0(joins$type, " JOIN"))
-  join_clauses <- purrr::map2(
-    types,
-    join_table_queries,
-    \(join_kw, from) sql_clause(join_kw, from)
-  )
 
-  on_clauses <- purrr::map(
-    joins$by,
-    function(by) {
-      on <- sql_join_tbls(con, by = by, na_matches = by$na_matches)
-      sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1)
-    }
-  )
-  join_on_clauses <- vctrs::vec_interleave(join_clauses, on_clauses)
+  n_joins <- length(types)
+  out <- vector("list", n_joins * 2)
+
+  for (i in seq_len(n_joins)) {
+    table <- dbplyr_sql_subquery(con, tables[[i]], name = names[[i]], lvl = lvl)
+    out[[2 * i - 1]] <- sql_clause(types[[i]], table)
+
+    by <- joins$by[[i]]
+    on <- sql_join_tbls(con, by = by, na_matches = by$na_matches)
+    out[[2 * i]] <- sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1)
+  }
 
   clauses <- list2(
     sql_clause_select(con, select),
     sql_clause_from(from),
-    !!!join_on_clauses
+    !!!out
   )
-
   sql_format_clauses(clauses, lvl = lvl, con = con)
 }
 

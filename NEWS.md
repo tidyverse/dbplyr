@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* MS Access now correctly generates SQL for multiple joins by adding required parentheses (#1576).
 * `.data$col`, `.data[[col]]`, `.env$var`, and `.env$[[var]]` now work correctly inside `across()` (#1520).
 * New `.sql` pronoun makes it a little easier to use known SQL functions in packages, requiring only `@importFrom dbplyr .sql` (#1117).
 * `join_by(between())` now correctly handles column renames (#1572).
