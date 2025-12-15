@@ -105,7 +105,7 @@ flatten_query.union_query <- function(qry, query_list, con) {
   query_list_new <- flatten_query(x, query_list, con)
   qry$x <- get_subquery_name(x, query_list_new)
 
-  for (i in vctrs::vec_seq_along(qry$unions$table)) {
+  for (i in seq_along(qry$unions$table)) {
     y <- qry$unions$table[[i]]
     query_list_new <- flatten_query(y, query_list_new, con)
     qry$unions$table[[i]] <- get_subquery_name(y, query_list_new)
