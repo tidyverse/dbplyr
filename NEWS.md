@@ -1,6 +1,9 @@
 # dbplyr (development version)
 
 * MS Access now correctly generates SQL for multiple joins by adding required parentheses (#1576).
+* `.data$col`, `.data[[col]]`, `.env$var`, and `.env$[[var]]` now work correctly inside `across()` (#1520).
+* New `.sql` pronoun makes it a little easier to use known SQL functions in packages, requiring only `@importFrom dbplyr .sql` (#1117).
+* `join_by(between())` now correctly handles column renames (#1572).
 * SQL Server uses `DATEDIFF_BIG` instead of `DATEDIFF` to work regardless of data size (@edward-burn, #1666).
 * `na_matches = "na"` now works correctly with inequality and overlap joins, preserving the comparison operator instead of converting to equality (#1505).
 * `copy_inline()` now works with blob columns (#1515).
@@ -13,7 +16,7 @@
 * Ensure `str_like()` and `str_ilike()` have consistent behaviour on SQL Server (@edward-burn, #1669).
 * SQL Server: `if`/`ifelse()`, and `if_else()` now use `CASE WHEN` instead of `IIF`. This ensures the handling of `NULL`s matches the R's `NA` handling rules (#1569). 
 * `if_else()` uses simpler translation for `missing` (#1573).
-* New translations for stringr function `str_ilike()` for Postgres, Redshift, and Snowflake (@edward-burn, #1628).
+* New translations for stringr function `str_ilike()` for Postgres, Redshift, Snowflake, and Spark (@edward-burn, #1628).
 * Argument `ignore_case` for `str_like()` has been deprecated (@edward-burn, #1630).
 * Corrected error message for `quantile()` and `median()` in `mutate()` on Redshift (@edward-burn, #1571).
 * All set operations now error if you pass extra arguments (instead of silently ignoring then) (#1585).
