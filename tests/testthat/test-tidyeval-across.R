@@ -274,10 +274,10 @@ test_that("across() uses environment from the current quosure (dplyr#5460)", {
 })
 
 test_that("lambdas in across() can use columns", {
-  lf <- lazy_frame(x = 2, y = 4, z = 8)
+  db <- local_memdb_frame("across", x = 2, y = 4, z = 8)
 
   expect_equal(
-    partial_eval_dots(lf, across(everything(), ~ .x / y)),
+    partial_eval_dots(db, across(everything(), ~ .x / y)),
     list(
       x = quo(x / y),
       y = quo(y / y),
@@ -285,17 +285,37 @@ test_that("lambdas in across() can use columns", {
     )
   )
 
-  skip("not yet correctly supported")
-  # dplyr uses the old value of `y` for division
-  df <- tibble(x = 2, y = 4, z = 8)
-  df |> mutate(across(everything(), ~ .x / .data$y))
-  # so this is the equivalent
-  df |> mutate(data.frame(x = x / y, y = y / y, z = z / y))
-  # dbplyr uses the new value of `y`
-  lf |> mutate(across(everything(), ~ .x / .data$y))
+  db_across <- db |> mutate(across(everything(), ~ .x / y))
+  expect_snapshot(db_across |> show_query())
 
-  # so this is the dbplyr equivalent
-  df |> mutate(x = x / y, y = y / y, z = z / y)
+  # z should be 2 because the value of .data$y is only transformed
+  # _after_ across() is complete, the same as
+  # db |> collect() |> mutate(across(everything(), ~ .x / .data$y))
+  expect_equal(collect(db_across), tibble(x = 0.5, y = 1, z = 2))
+})
+
+test_that("can use .data and .env pronouns(#1520)", {
+  lf <- lazy_frame(x = 1, y = 2)
+
+  my_col <- "y"
+  expect_equal(
+    capture_across(lf, across(x:y, !!quo(~ .x / .data$y))),
+    exprs(x = x / y, y = y / y)
+  )
+  expect_equal(
+    capture_across(lf, across(x:y, !!quo(~ .x / .data[[my_col]]))),
+    exprs(x = x / y, y = y / y)
+  )
+
+  y <- 10
+  expect_equal(
+    capture_across(lf, across(x:y, !!quo(~ .x / .env$y))),
+    exprs(x = x / 10, y = y / 10)
+  )
+  expect_equal(
+    capture_across(lf, across(x:y, !!quo(~ .x / .env[["y"]]))),
+    exprs(x = x / 10, y = y / 10)
+  )
 })
 
 test_that("can pass quosure through `across()`", {

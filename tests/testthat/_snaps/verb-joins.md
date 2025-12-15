@@ -123,6 +123,17 @@
       LEFT JOIN `lf2`
         ON (`lf1`.`x1` = `lf2`.`x2`)
 
+# rename works with duplicate column names in join_by (#1572)
+
+    Code
+      out
+    Output
+      <SQL>
+      SELECT `x`, `y` AS `z`
+      FROM `df` AS `df_LHS`
+      LEFT JOIN `df` AS `df_RHS`
+        ON (`df_LHS`.`x` >= `df_RHS`.`y` AND `df_LHS`.`x` <= `df_RHS`.`y`)
+
 # select() before semi_join is inlined
 
     Code
