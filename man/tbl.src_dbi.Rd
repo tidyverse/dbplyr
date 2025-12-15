@@ -5,7 +5,7 @@
 \alias{tbl_dbi}
 \title{Use dplyr verbs with a remote database table}
 \usage{
-\method{tbl}{src_dbi}(src, from, ...)
+\method{tbl}{src_dbi}(src, from, vars = NULL, ...)
 }
 \arguments{
 \item{src}{A \code{DBIConnection} object produced by \code{DBI::dbConnect()}.}
@@ -16,6 +16,10 @@ Use a string to identify a table in the current schema/catalog. We
 recommend using \code{I()} to identify a table outside the default catalog or
 schema, e.g. \code{I("schema.table")} or \code{I("catalog.schema.table")}. You can
 also use \code{\link[=in_schema]{in_schema()}}/\code{\link[=in_catalog]{in_catalog()}} or \code{\link[DBI:Id]{DBI::Id()}}.}
+
+\item{vars}{Optionally, provide a character vector of column names. If
+not supplied, will be retrieved from the database by running a simple
+query. Mainly useful for better performance when creating many \code{tbl}s.}
 
 \item{...}{Passed on to \code{\link[=tbl_sql]{tbl_sql()}}}
 }

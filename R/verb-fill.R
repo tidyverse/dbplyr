@@ -224,3 +224,6 @@ dbplyr_fill0.MariaDBConnection <- dbplyr_fill0.SQLiteConnection
 dbplyr_fill0.MySQLConnection <- dbplyr_fill0.SQLiteConnection
 #' @export
 dbplyr_fill0.MySQL <- dbplyr_fill0.SQLiteConnection
+
+#' @importFrom dplyr case_when
+NULL

@@ -1,12 +1,20 @@
 # dbplyr (development version)
 
 * New `.sql` pronoun makes it a little easier to use known SQL functions in packages, requiring only a single `utils::globalVariables(".sql")` (#1117).
+* `join_by(between())` now correctly handles column renames (#1572).
+* SQL Server uses `DATEDIFF_BIG` instead of `DATEDIFF` to work regardless of data size (@edward-burn, #1666).
+* `na_matches = "na"` now works correctly with inequality and overlap joins, preserving the comparison operator instead of converting to equality (#1505).
+* `copy_inline()` now works with blob columns (#1515).
+* `tbl_sql()` is now (soft) deprecated. It hasn't been required in a while. 
+* The print method no longer mentions the "source" in the header, because it's an outdated dplyr concept (#897).
+* New `sql_glue()` and `sql_glue2()` provide a convenient syntax for building SQL strings. These functions replace the now superseded `build_sql()`, `sql_expr()`, and `sql_call2()`. (#1249).
 * `fill()` now errors if you attempt to rename a column, for consistency with dplyr (#1536)
 * Redshift: fixed syntax error in `date_build()` translation (#1512).
+* dbplyr now longer attempts to translate `pi` to `PI()`. This caused problems if you had a column called `pi` (#1531).
 * Ensure `str_like()` and `str_ilike()` have consistent behaviour on SQL Server (@edward-burn, #1669).
 * SQL Server: `if`/`ifelse()`, and `if_else()` now use `CASE WHEN` instead of `IIF`. This ensures the handling of `NULL`s matches the R's `NA` handling rules (#1569). 
 * `if_else()` uses simpler translation for `missing` (#1573).
-* New translations for stringr function `str_ilike()` for Postgres, Redshift, and Snowflake (@edward-burn, #1628).
+* New translations for stringr function `str_ilike()` for Postgres, Redshift, Snowflake, and Spark (@edward-burn, #1628).
 * Argument `ignore_case` for `str_like()` has been deprecated (@edward-burn, #1630).
 * Corrected error message for `quantile()` and `median()` in `mutate()` on Redshift (@edward-burn, #1571).
 * All set operations now error if you pass extra arguments (instead of silently ignoring then) (#1585).
@@ -14,8 +22,8 @@
 * `semi_join()` and `anti_join()` once again work with filtered windowed values (#1534, #1606).
 * `window_order()` works with `dplyr::desc()` (not just `desc()`) (#1486).
 * `sql_check_na_rm()` is now exported for use in other backends (#1483).
-* `glue_sql2()` is now exported for building SQL strings with glue syntax and
-  type markers. `build_sql()` is deprecated in favor of `glue_sql2()` (#1249).
+* `sql_glue2()` is now exported for building SQL strings with glue syntax and
+  type markers. `build_sql()` is deprecated in favor of `sql_glue2()` (#1249).
 * dbplyr 1e interfaces are now deprecated (#1197). Backend developers have had >2 years to update.
 * MySQL gains slightly better translation for `as.integer()` and `as.integer64()` (#1647).
 * Fixed snowflake translations that were being reported as unknown (@edward-burn, #1570). 

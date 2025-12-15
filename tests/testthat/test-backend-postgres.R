@@ -6,7 +6,7 @@ test_that("custom scalar translated correctly", {
   expect_translation(con, log(x), "LN(`x`)")
   expect_translation(con, log(x, 2), "LOG(`x`) / LOG(2.0)")
   expect_translation(con, cot(x), "1 / TAN(`x`)")
-  expect_translation(con, round(x, digits = 1.1), "ROUND((`x`) :: numeric, 1)")
+  expect_translation(con, round(x, digits = 1.1), "ROUND((`x`)::numeric, 1)")
   expect_translation(con, grepl("exp", x), "(`x`) ~ ('exp')")
   expect_translation(con, grepl("exp", x, TRUE), "(`x`) ~* ('exp')")
   expect_translation(con, substr("test", 2, 3), "SUBSTR('test', 2, 2)")

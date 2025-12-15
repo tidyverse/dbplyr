@@ -12,6 +12,15 @@ sql <- function(...) {
   structure(x, class = c("sql", "character"))
 }
 
+#' @export
+`[.sql` <- function(x, i) {
+  sql(NextMethod())
+}
+#' @export
+`[[.sql` <- function(x, i) {
+  sql(NextMethod())
+}
+
 # See setOldClass definition in zzz.R
 
 # c() is also called outside of the dbplyr context so must supply default

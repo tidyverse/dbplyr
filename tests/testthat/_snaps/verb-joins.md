@@ -123,6 +123,17 @@
       LEFT JOIN `lf2`
         ON (`lf1`.`x1` = `lf2`.`x2`)
 
+# rename works with duplicate column names in join_by (#1572)
+
+    Code
+      out
+    Output
+      <SQL>
+      SELECT `x`, `y` AS `z`
+      FROM `df` AS `df_LHS`
+      LEFT JOIN `df` AS `df_RHS`
+        ON (`df_LHS`.`x` >= `df_RHS`.`y` AND `df_LHS`.`x` <= `df_RHS`.`y`)
+
 # select() before semi_join is inlined
 
     Code
@@ -411,6 +422,20 @@
         SELECT 1 FROM `lf2`
         WHERE (`lf1`.`x` IS NOT DISTINCT FROM `lf2`.`x`)
       )
+
+---
+
+    Code
+      left_join(lf1, lf3, by = by, na_matches = "na")
+    Output
+      <SQL>
+      SELECT `x`, `lf3`.*
+      FROM `lf1`
+      LEFT JOIN `lf3`
+        ON (
+          (`lf1`.`x` >= `lf3`.`lower` OR (`lf1`.`x` IS NULL AND `lf3`.`lower` IS NULL)) AND
+          (`lf1`.`x` <= `lf3`.`upper` OR (`lf1`.`x` IS NULL AND `lf3`.`upper` IS NULL))
+        )
 
 # suffix arg is checked
 

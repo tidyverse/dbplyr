@@ -13,3 +13,5 @@ expect_translation_snapshot <- function(con, expr, ..., error = FALSE) {
     error = error
   ))
 }
+
+scrub_sqlite_version <- \(x) gsub(sqlite_version(), "<version>", x)

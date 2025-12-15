@@ -60,7 +60,10 @@ Language: en-gb
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Collate: 
+    'verb-copy-inline.R'
+    'verb-copy-to.R'
     'db-sql.R'
+    'db.R'
     'utils-check.R'
     'import-standalone-types-check.R'
     'import-standalone-obj-type.R'
@@ -79,7 +82,6 @@ Collate:
     'backend-hana.R'
     'backend-hive.R'
     'backend-impala.R'
-    'verb-copy-to.R'
     'backend-mssql.R'
     'backend-mysql.R'
     'backend-odbc.R'
@@ -97,7 +99,6 @@ Collate:
     'data-nycflights13.R'
     'db-escape.R'
     'db-io.R'
-    'db.R'
     'dbplyr.R'
     'explain.R'
     'ident.R'
@@ -111,7 +112,6 @@ Collate:
     'lazy-set-op-query.R'
     'memdb.R'
     'optimise-utils.R'
-    'pillar.R'
     'progress.R'
     'sql-build.R'
     'query-join.R'

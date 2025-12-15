@@ -1,10 +1,10 @@
 test_that("custom scalar translated correctly", {
   con <- simulate_snowflake()
-  expect_translation(con, log10(x), "LOG(10.0, `x`)")
+  expect_translation(con, log10(x), "LOG(10, `x`)")
   expect_translation(
     con,
     round(x, digits = 1.1),
-    "ROUND((`x`) :: FLOAT, 1)"
+    "ROUND((`x`)::FLOAT, 1)"
   )
   expect_translation(
     con,
@@ -81,12 +81,12 @@ test_that("custom stringr functions translated correctly", {
   expect_translation(
     con,
     str_replace(x, y, z),
-    "REGEXP_REPLACE(`x`, `y`, `z`, 1.0, 1.0)"
+    "REGEXP_REPLACE(`x`, `y`, `z`, 1, 1)"
   )
   expect_translation(
     con,
     str_replace(x, "\\d", z),
-    "REGEXP_REPLACE(`x`, '\\\\d', `z`, 1.0, 1.0)"
+    "REGEXP_REPLACE(`x`, '\\\\d', `z`, 1, 1)"
   )
   expect_translation(
     con,
@@ -101,7 +101,7 @@ test_that("custom stringr functions translated correctly", {
   expect_translation(
     con,
     str_remove(x, y),
-    "REGEXP_REPLACE(`x`, `y`, '', 1.0, 1.0)"
+    "REGEXP_REPLACE(`x`, `y`, '', 1, 1)"
   )
   expect_translation(
     con,
@@ -220,13 +220,13 @@ test_that("custom lubridate functions translated correctly", {
   expect_translation(
     con,
     wday(x),
-    "EXTRACT('dayofweek', DATE(`x`) + 0) + 1.0"
+    "EXTRACT('dayofweek', DATE(`x`) + 0) + 1"
   )
   expect_translation(con, wday(x, label = TRUE), "DAYNAME(`x`)")
   expect_translation(
     con,
     wday(x, label = TRUE, abbr = FALSE),
-    "DECODE(EXTRACT('dayofweek', `x`), 1.0, 'Monday', 2.0, 'Tuesday', 3.0, 'Wednesday', 4.0, 'Thursday', 5.0, 'Friday', 6.0, 'Saturday', 0.0, 'Sunday')"
+    "DECODE(EXTRACT('dayofweek', `x`), 1, 'Monday', 2, 'Tuesday', 3, 'Wednesday', 4, 'Thursday', 5, 'Friday', 6, 'Saturday', 0, 'Sunday')"
   )
   expect_translation(
     con,
@@ -243,7 +243,7 @@ test_that("custom lubridate functions translated correctly", {
   expect_translation(
     con,
     month(x, label = TRUE, abbr = FALSE),
-    "DECODE(EXTRACT('month', `x`), 1.0, 'January', 2.0, 'February', 3.0, 'March', 4.0, 'April', 5.0, 'May', 6.0, 'June', 7.0, 'July', 8.0, 'August', 9.0, 'September', 10.0, 'October', 11.0, 'November', 12.0, 'December')"
+    "DECODE(EXTRACT('month', `x`), 1, 'January', 2, 'February', 3, 'March', 4, 'April', 5, 'May', 6, 'June', 7, 'July', 8, 'August', 9, 'September', 10, 'October', 11, 'November', 12, 'December')"
   )
   expect_translation(con, quarter(x), "EXTRACT('quarter', `x`)")
   expect_translation(
