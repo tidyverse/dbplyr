@@ -73,8 +73,16 @@ R”](https://adv-r.hadley.nz/translation.html).
 There are two fundamental differences between R and SQL:
 
 - `"` and `'` mean different things. R can use either `"` or `'` for
-  strings, but in ANSI SQL, `"` is used for names and only `'` can be
+  strings, but in ANSI SQL, must be `"` used for names and must be `'`
   used for strings.
+
+  ``` r
+  lf |> filter(x == "x")
+  #> <SQL>
+  #> SELECT `df`.*
+  #> FROM `df`
+  #> WHERE (`x` = 'x')
+  ```
 
 - R and SQL have different defaults for integers and reals. In R, 1 is a
   real, and 1L is an integer. In SQL, 1 is an integer, and 1.0 is a
@@ -103,7 +111,7 @@ There are two fundamental differences between R and SQL:
   [`cos()`](https://rdrr.io/r/base/Trig.html), `cot()`,
   [`tan()`](https://rdrr.io/r/base/Trig.html),
   [`sin()`](https://rdrr.io/r/base/Trig.html)
-- hypergeometric: [`cosh()`](https://rdrr.io/r/base/Hyperbolic.html),
+- hyperbolic: [`cosh()`](https://rdrr.io/r/base/Hyperbolic.html),
   `coth()`, [`sinh()`](https://rdrr.io/r/base/Hyperbolic.html),
   [`tanh()`](https://rdrr.io/r/base/Hyperbolic.html)
 - logarithmic: [`log()`](https://rdrr.io/r/base/Log.html),
@@ -111,9 +119,25 @@ There are two fundamental differences between R and SQL:
   [`exp()`](https://rdrr.io/r/base/Log.html)
 - misc: [`abs()`](https://rdrr.io/r/base/MathFun.html),
   [`ceiling()`](https://rdrr.io/r/base/Round.html),
+  [`floor()`](https://rdrr.io/r/base/Round.html),
   [`sqrt()`](https://rdrr.io/r/base/MathFun.html),
   [`sign()`](https://rdrr.io/r/base/sign.html),
   [`round()`](https://rdrr.io/r/base/Round.html)
+
+``` r
+lf |> transmute(x = x / 2, y = x^2 + y^2)
+#> <SQL>
+#> SELECT `x`, (POWER(`x`, 2.0)) + POWER(`y`, 2.0) AS `y`
+#> FROM (
+#>   SELECT `x` / 2.0 AS `x`, `y`, `g`
+#>   FROM `df`
+#> ) AS `q01`
+
+lf |> transmute(x = log(x), y = round(y, 1))
+#> <SQL>
+#> SELECT LN(`x`) AS `x`, ROUND(`y`, 1) AS `y`
+#> FROM `df`
+```
 
 ### Modulo arithmetic
 
@@ -125,7 +149,7 @@ the sign of the divisor.
 
 ``` r
 df <- tibble(
-  x = c(10L, 10L, -10L, -10L), 
+  x = c(10L, 10L, -10L, -10L),
   y = c(3L, -3L, 3L, -3L)
 )
 db <- tbl_memdb(df)
@@ -152,11 +176,101 @@ db |> mutate(x %% y)
 dbplyr no longer translates `%/%` because there’s no robust
 cross-database translation available.
 
-### Logical comparisons
+### Logical comparisons and boolean operations
 
-- logical comparisons: `<`, `<=`, `!=`, `>=`, `>`, `==`, `%in%`
+- logical comparisons: `<`, `<=`, `!=`, `>=`, `>`, `==`, `%in%`,
+  [`between()`](https://dplyr.tidyverse.org/reference/between.html)
 - boolean operations: `&`, `&&`, `|`, `||`, `!`,
   [`xor()`](https://rdrr.io/r/base/Logic.html)
+
+``` r
+lf |> filter(x > 5 | y == 2)
+#> <SQL>
+#> SELECT `df`.*
+#> FROM `df`
+#> WHERE (`x` > 5.0 OR `y` = 2.0)
+
+lf |> filter(x %in% c(1, 2, 3))
+#> <SQL>
+#> SELECT `df`.*
+#> FROM `df`
+#> WHERE (`x` IN (1.0, 2.0, 3.0))
+
+lf |> filter(between(x, 1, 5))
+#> <SQL>
+#> SELECT `df`.*
+#> FROM `df`
+#> WHERE (`x` BETWEEN 1.0 AND 5.0)
+```
+
+### Bitwise operations
+
+[`bitwNot()`](https://rdrr.io/r/base/bitwise.html),
+[`bitwAnd()`](https://rdrr.io/r/base/bitwise.html),
+[`bitwOr()`](https://rdrr.io/r/base/bitwise.html),
+[`bitwXor()`](https://rdrr.io/r/base/bitwise.html),
+[`bitwShiftL()`](https://rdrr.io/r/base/bitwise.html), and
+[`bitwShiftR()`](https://rdrr.io/r/base/bitwise.html) are all supported:
+
+``` r
+lf |> transmute(x = bitwAnd(x, 3L), y = bitwShiftL(x, 2L))
+#> <SQL>
+#> SELECT `x`, `x` << 2 AS `y`
+#> FROM (
+#>   SELECT `x` & 3 AS `x`, `y`, `g`
+#>   FROM `df`
+#> ) AS `q01`
+```
+
+### Type coercion
+
+Type coercion functions use the corresponding SQL `CAST()` call:
+
+``` r
+lf |> transmute(x = as.integer(y), y = as.character(x))
+#> <SQL>
+#> SELECT `x`, CAST(`x` AS TEXT) AS `y`
+#> FROM (
+#>   SELECT CAST(`y` AS INTEGER) AS `x`, `y`, `g`
+#>   FROM `df`
+#> ) AS `q01`
+```
+
+- integer types: [`as.integer()`](https://rdrr.io/r/base/integer.html),
+  `as.integer64()`
+- floating point: [`as.numeric()`](https://rdrr.io/r/base/numeric.html),
+  [`as.double()`](https://rdrr.io/r/base/double.html)
+- character: [`as.character()`](https://rdrr.io/r/base/character.html)
+- logical: [`as.logical()`](https://rdrr.io/r/base/logical.html)
+- date/time: [`as.Date()`](https://rdrr.io/r/base/as.Date.html),
+  [`as.POSIXct()`](https://rdrr.io/r/base/as.POSIXlt.html)
+
+### `NULL`/`NA` handling
+
+- [`is.na()`](https://rdrr.io/r/base/NA.html),
+  [`is.null()`](https://rdrr.io/r/base/NULL.html): test for `NULL`.
+- [`na_if()`](https://dplyr.tidyverse.org/reference/na_if.html): replace
+  a value with `NULL`.
+- [`coalesce()`](https://dplyr.tidyverse.org/reference/coalesce.html):
+  replace `NULL` with a default value.
+
+``` r
+lf |> filter(!is.na(x))
+#> <SQL>
+#> SELECT `df`.*
+#> FROM `df`
+#> WHERE (NOT((`x` IS NULL)))
+
+lf |> transmute(x = coalesce(x, 0L))
+#> <SQL>
+#> SELECT COALESCE(`x`, 0) AS `x`
+#> FROM `df`
+
+lf |> transmute(x = na_if(x, 0L))
+#> <SQL>
+#> SELECT NULLIF(`x`, 0) AS `x`
+#> FROM `df`
+```
 
 ### Aggregation
 
@@ -164,9 +278,7 @@ All databases provide translation for the basic aggregations:
 [`mean()`](https://rdrr.io/r/base/mean.html),
 [`sum()`](https://rdrr.io/r/base/sum.html),
 [`min()`](https://rdrr.io/r/base/Extremes.html),
-[`max()`](https://rdrr.io/r/base/Extremes.html),
-[`sd()`](https://rdrr.io/r/stats/sd.html),
-[`var()`](https://rdrr.io/r/stats/cor.html). Databases automatically
+[`max()`](https://rdrr.io/r/base/Extremes.html). Databases automatically
 drop NULLs (their equivalent of missing values) whereas in R you have to
 ask nicely. The aggregation functions warn you about this important
 difference:
@@ -205,18 +317,54 @@ lf |> filter(mean(x, na.rm = TRUE) > 0)
 #> WHERE (`col01` > 0.0)
 ```
 
+Most backends also support:
+
+- [`sd()`](https://rdrr.io/r/stats/sd.html),
+  [`var()`](https://rdrr.io/r/stats/cor.html),
+  [`cor()`](https://rdrr.io/r/stats/cor.html),
+  [`cov()`](https://rdrr.io/r/stats/cor.html)
+- [`median()`](https://rdrr.io/r/stats/median.html),
+  [`quantile()`](https://rdrr.io/r/stats/quantile.html)
+- [`n()`](https://dplyr.tidyverse.org/reference/context.html),
+  [`n_distinct()`](https://dplyr.tidyverse.org/reference/n_distinct.html)
+- [`all()`](https://rdrr.io/r/base/all.html),
+  [`any()`](https://rdrr.io/r/base/any.html)
+- `str_flatten()`
+
 ### Conditional evaluation
 
-`if` and [`switch()`](https://rdrr.io/r/base/switch.html) are translated
-to `CASE WHEN`:
+`if`, [`ifelse()`](https://rdrr.io/r/base/ifelse.html), and
+[`if_else()`](https://dplyr.tidyverse.org/reference/if_else.html) are
+translated to `CASE WHEN`:
 
 ``` r
-lf |> mutate(z = if (x > 5) "big" else "small")
+lf |> transmute(z = ifelse(x > 5, "big", "small"))
+#> <SQL>
+#> SELECT CASE WHEN (`x` > 5.0) THEN 'big' WHEN NOT (`x` > 5.0) THEN 'small' END AS `z`
+#> FROM `df`
+```
+
+[`case_when()`](https://dplyr.tidyverse.org/reference/case_when.html),
+[`case_match()`](https://dplyr.tidyverse.org/reference/case_match.html),
+and [`switch()`](https://rdrr.io/r/base/switch.html) are also supported:
+
+``` r
+lf |> 
+  mutate(z = case_when(
+    x > 10 ~ "medium",
+    x > 30 ~ "big", 
+    .default = "small"
+  ))
 #> <SQL>
 #> SELECT
 #>   `df`.*,
-#>   CASE WHEN (`x` > 5.0) THEN 'big' WHEN NOT (`x` > 5.0) THEN 'small' END AS `z`
+#>   CASE
+#> WHEN (`x` > 10.0) THEN 'medium'
+#> WHEN (`x` > 30.0) THEN 'big'
+#> ELSE 'small'
+#> END AS `z`
 #> FROM `df`
+
 lf |> mutate(z = switch(g, a = 1L, b = 2L, 3L))
 #> <SQL>
 #> SELECT
@@ -225,10 +373,89 @@ lf |> mutate(z = switch(g, a = 1L, b = 2L, 3L))
 #> FROM `df`
 ```
 
-### Date/time
+### String functions
 
-- string functions: `tolower`, `toupper`, `trimws`, `nchar`, `substr`
-- coerce types: `as.numeric`, `as.integer`, `as.character`
+Base R string functions and their stringr equivalents are widely
+supported:
+
+- [`nchar()`](https://rdrr.io/r/base/nchar.html), `str_length()`
+- [`tolower()`](https://rdrr.io/r/base/chartr.html),
+  [`toupper()`](https://rdrr.io/r/base/chartr.html), `str_to_lower()`,
+  `str_to_upper()`, `str_to_title()`
+- [`trimws()`](https://rdrr.io/r/base/trimws.html), `str_trim()`
+- [`paste()`](https://rdrr.io/r/base/paste.html),
+  [`paste0()`](https://rdrr.io/r/base/paste.html), `str_c()`
+- [`substr()`](https://rdrr.io/r/base/substr.html),
+  [`substring()`](https://rdrr.io/r/base/substr.html), `str_sub()`
+
+``` r
+lf |> transmute(x = paste0(g, " dog"))
+#> <SQL>
+#> SELECT CONCAT_WS('', `g`, ' dog') AS `x`
+#> FROM `df`
+
+lf |> transmute(x = substr(g, 1L, 2L))
+#> <SQL>
+#> SELECT SUBSTR(`g`, 1, 2) AS `x`
+#> FROM `df`
+```
+
+Many backends also support regular expression functions like
+`str_detect()`, `str_replace()`, `str_replace_all()`, `str_remove()`,
+`str_remove_all()`, `str_squish()`, and `str_like()`. Support varies by
+backend; see the individual backend documentation for details.
+
+### Date/time functions
+
+dbplyr supports many lubridate functions for extracting date components:
+
+- `today()`, `now()`
+- `year()`, `month()`, `day()`, `mday()`, `hour()`, `minute()`,
+  `second()`
+
+``` r
+lf_dt <- lazy_frame(dt = Sys.time())
+
+lf_dt |> transmute(
+  year = year(dt),
+  month = month(dt),
+  day = day(dt)
+)
+#> <SQL>
+#> SELECT
+#>   EXTRACT(year FROM `dt`) AS `year`,
+#>   EXTRACT(month FROM `dt`) AS `month`,
+#>   EXTRACT(day FROM `dt`) AS `day`
+#> FROM `df`
+```
+
+Some backends also support additional lubridate functions including
+`yday()`, `wday()`, `week()`, `isoweek()`, `quarter()`, `isoyear()`,
+`floor_date()`, and period functions like `seconds()`, `minutes()`,
+`hours()`, `days()`, `weeks()`,
+[`months()`](https://rdrr.io/r/base/weekday.POSIXt.html), `years()`.
+
+Several backends (including PostgreSQL, Snowflake, SQL Server, Redshift,
+and Spark SQL) support [clock](https://clock.r-lib.org) functions for
+date arithmetic.
+
+- `add_days()`, `add_years()`
+- `date_build()`
+- `get_year()`, `get_month()`, `get_day()`
+- `date_count_between()`
+- [`difftime()`](https://rdrr.io/r/base/difftime.html)
+
+clock functions tend to be easier to translate than lubridate functions
+because they are more specific.
+
+### Other functions
+
+- [`pmin()`](https://rdrr.io/r/base/Extremes.html),
+  [`pmax()`](https://rdrr.io/r/base/Extremes.html) for parallel min/max
+- [`desc()`](https://dplyr.tidyverse.org/reference/desc.html) for
+  descending order
+- [`cut()`](https://rdrr.io/r/base/cut.html) for binning numeric values
+  into categories
 
 ## Unknown functions
 
@@ -358,9 +585,33 @@ provided by base R or dplyr. They have the form
 
 - The **expression** is a combination of variable names and window
   functions. Support for window functions varies from database to
-  database, but most support the ranking functions, `lead`, `lag`,
-  `nth`, `first`, `last`, `count`, `min`, `max`, `sum`, `avg` and
-  `stddev`.
+  database, but most support:
+
+  - ranking:
+    [`row_number()`](https://dplyr.tidyverse.org/reference/row_number.html),
+    [`min_rank()`](https://dplyr.tidyverse.org/reference/row_number.html),
+    [`rank()`](https://rdrr.io/r/base/rank.html),
+    [`dense_rank()`](https://dplyr.tidyverse.org/reference/row_number.html),
+    [`percent_rank()`](https://dplyr.tidyverse.org/reference/percent_rank.html),
+    [`cume_dist()`](https://dplyr.tidyverse.org/reference/percent_rank.html),
+    [`ntile()`](https://dplyr.tidyverse.org/reference/ntile.html);
+  - offsets:
+    [`lead()`](https://dplyr.tidyverse.org/reference/lead-lag.html),
+    [`lag()`](https://dplyr.tidyverse.org/reference/lead-lag.html),
+    [`first()`](https://dplyr.tidyverse.org/reference/nth.html),
+    [`last()`](https://dplyr.tidyverse.org/reference/nth.html),
+    [`nth()`](https://dplyr.tidyverse.org/reference/nth.html);
+  - aggregates: [`mean()`](https://rdrr.io/r/base/mean.html),
+    [`sum()`](https://rdrr.io/r/base/sum.html),
+    [`min()`](https://rdrr.io/r/base/Extremes.html),
+    [`max()`](https://rdrr.io/r/base/Extremes.html),
+    [`n()`](https://dplyr.tidyverse.org/reference/context.html),
+    [`n_distinct()`](https://dplyr.tidyverse.org/reference/n_distinct.html);
+  - cumulative:
+    [`cummean()`](https://dplyr.tidyverse.org/reference/cumall.html),
+    [`cumsum()`](https://rdrr.io/r/base/cumsum.html),
+    [`cummin()`](https://rdrr.io/r/base/cumsum.html),
+    [`cummax()`](https://rdrr.io/r/base/cumsum.html).
 
 - The **partition clause** specifies how the window function is broken
   down over groups. It plays an analogous role to `GROUP BY` for
@@ -465,9 +716,13 @@ which window function you’re using:
   aggregate). To control ordering, use
   [`order_by()`](https://dplyr.tidyverse.org/reference/order_by.html).
 
-- Aggregates implemented in dplyr (`lead`, `lag`, `nth_value`,
-  `first_value`, `last_value`) have an `order_by` argument. Supply it to
-  override the default ordering.
+- Aggregates implemented in dplyr
+  ([`lead()`](https://dplyr.tidyverse.org/reference/lead-lag.html),
+  [`lag()`](https://dplyr.tidyverse.org/reference/lead-lag.html),
+  [`nth()`](https://dplyr.tidyverse.org/reference/nth.html),
+  [`first()`](https://dplyr.tidyverse.org/reference/nth.html),
+  [`last()`](https://dplyr.tidyverse.org/reference/nth.html)) have an
+  `order_by` argument. Supply it to override the default ordering.
 
 The three options are illustrated in the snippet below:
 
