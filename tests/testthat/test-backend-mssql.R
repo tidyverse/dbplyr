@@ -49,6 +49,89 @@ test_that("custom stringr functions translated correctly", {
   expect_translation(con, str_length(x), "LEN(`x`)")
 })
 
+test_that("stringr fixed patterns use CHARINDEX", {
+  con <- simulate_mssql()
+
+  expect_translation(
+    con,
+    str_detect(x, fixed("abc")),
+    "CHARINDEX('abc', `x`) > 0"
+  )
+  expect_translation(
+    con,
+    str_detect(x, fixed("abc"), negate = TRUE),
+    "CHARINDEX('abc', `x`) = 0"
+  )
+  expect_translation(
+    con,
+    str_starts(x, fixed("abc")),
+    "CHARINDEX('abc', `x`) = 1"
+  )
+  expect_translation(
+    con,
+    str_ends(x, fixed("abc")),
+    "CHARINDEX('abc', `x`) = (LEN(`x`) - LEN('abc')) + 1"
+  )
+})
+
+test_that("stringr regex patterns require SQL Server 2025", {
+  con <- simulate_mssql("15.0")
+  expect_error(
+    translate_sql(str_detect(x, "abc"), con = con),
+    "Only fixed patterns are supported"
+  )
+})
+
+test_that("stringr regex functions work on SQL Server 2025", {
+  con <- simulate_mssql("17.0")
+
+  expect_translation(con, str_detect(x, "abc"), "REGEXP_LIKE(`x`, 'abc')")
+  expect_translation(
+    con,
+    str_detect(x, "abc", negate = TRUE),
+    "NOT REGEXP_LIKE(`x`, 'abc')"
+  )
+  expect_translation(
+    con,
+    str_starts(x, "abc"),
+    "REGEXP_LIKE(`x`, '^' + 'abc')"
+  )
+  expect_translation(
+    con,
+    str_ends(x, "abc"),
+    "REGEXP_LIKE(`x`, 'abc' + '$')"
+  )
+  expect_translation(
+    con,
+    str_replace(x, "abc", "def"),
+    "REGEXP_REPLACE(`x`, 'abc', 'def', 1, 1)"
+  )
+  expect_translation(
+    con,
+    str_replace_all(x, "abc", "def"),
+    "REGEXP_REPLACE(`x`, 'abc', 'def')"
+  )
+  expect_translation(
+    con,
+    str_remove(x, "abc"),
+    "REGEXP_REPLACE(`x`, 'abc', '', 1, 1)"
+  )
+  expect_translation(
+    con,
+    str_remove_all(x, "abc"),
+    "REGEXP_REPLACE(`x`, 'abc', '')"
+  )
+  expect_translation(con, str_extract(x, "abc"), "REGEXP_SUBSTR(`x`, 'abc')")
+  expect_translation(con, str_count(x, "abc"), "REGEXP_COUNT(`x`, 'abc')")
+})
+
+test_that("str_detect returns bit in SELECT context on SQL Server 2025", {
+  lf <- lazy_frame(x = "test", con = simulate_mssql("17.0"))
+
+  expect_snapshot(lf |> mutate(detected = str_detect(x, "abc")))
+  expect_snapshot(lf |> filter(str_detect(x, "abc")))
+})
+
 test_that("custom aggregators translated correctly", {
   con <- simulate_mssql()
 

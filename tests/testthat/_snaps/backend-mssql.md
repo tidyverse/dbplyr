@@ -1,3 +1,22 @@
+# str_detect returns bit in SELECT context on SQL Server 2025
+
+    Code
+      mutate(lf, detected = str_detect(x, "abc"))
+    Output
+      <SQL>
+      SELECT `df`.*, CAST(IIF(REGEXP_LIKE(`x`, 'abc'), 1, 0) AS BIT) AS `detected`
+      FROM `df`
+
+---
+
+    Code
+      filter(lf, str_detect(x, "abc"))
+    Output
+      <SQL>
+      SELECT `df`.*
+      FROM `df`
+      WHERE (REGEXP_LIKE(`x`, 'abc'))
+
 # custom aggregators translated correctly
 
     Code
