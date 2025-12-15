@@ -203,10 +203,45 @@ sql_table_analyze.Oracle <- function(con, table, ...) {
   sql_glue2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
 }
 
+is_oracle_temporary_table <- function(table, con) {
+  grepl("^ORA\\$PTT_", table_path_name(table, con), ignore.case = TRUE)
+}
+
+#' @export
+db_table_temporary.Oracle <- function(con, table, temporary, ...) {
+  if (!temporary) {
+    list(table = table, temporary = FALSE)
+  } else if (!is_oracle_temporary_table(table, con)) {
+    new_name <- paste0("ORA$PTT_", table_path_name(table, con))
+    cli::cli_inform(
+      paste0("Created a temporary table named ", new_name),
+      class = c("dbplyr_message_temp_table", "dbplyr_message")
+    )
+    list(table = table_path(new_name), temporary = FALSE)
+  } else {
+    list(table = table, temporary = FALSE)
+  }
+}
+
 #' @export
 sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
-  type <- if (temporary) "GLOBAL TEMPORARY TABLE" else "TABLE"
-  sql_glue2(con, "CREATE {.sql type} {.tbl name} AS\n{sql}")
+  # Since db_table_temporary handles the prefix, `temporary` here is always
+  # FALSE for temp tables (the name already has ORA$PTT_ prefix)
+
+  # ON COMMIT PRESERVE ROWS creates a session-specific temporary table
+  if (is_oracle_temporary_table(name, con)) {
+    sql_glue2(
+      con,
+      "
+      CREATE PRIVATE TEMPORARY TABLE {.tbl name}
+      ON COMMIT PRESERVE ROWS
+      AS
+      {sql}
+      "
+    )
+  } else {
+    sql_glue2(con, "CREATE TABLE {.tbl name} AS\n{sql}")
+  }
 }
 
 #' @export
@@ -252,6 +287,9 @@ sql_query_explain.OraConnection <- sql_query_explain.Oracle
 
 #' @export
 sql_table_analyze.OraConnection <- sql_table_analyze.Oracle
+
+#' @export
+db_table_temporary.OraConnection <- db_table_temporary.Oracle
 
 #' @export
 sql_query_save.OraConnection <- sql_query_save.Oracle
