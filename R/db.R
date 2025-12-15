@@ -49,17 +49,19 @@ db_sql_render <- function(con, sql, ..., cte = FALSE, sql_options = NULL) {
       with = I("db_sql_render(sql_options = sql_options(cte = TRUE))")
     )
     sql_options <- sql_options %||% sql_options(cte = TRUE)
-    out <- db_sql_render(con, sql, ..., sql_options = sql_options)
-    return(out)
   }
 
-  if (is.null(sql_options)) {
-    sql_options <- sql_options()
+  sql_options <- sql_options %||% sql_options()
 
-    out <- db_sql_render(con, sql, ..., sql_options = sql_options)
-    return(out)
-  }
+  out <- db_sql_render_dispatch(con, sql, ..., sql_options = sql_options)
+  the$last_sql <- out
+  return(out)
 
+  # Unusued declaration for roxygen2
+  UseMethod("db_sql_render")
+}
+
+db_sql_render_dispatch <- function(con, sql, ..., sql_options) {
   UseMethod("db_sql_render")
 }
 #' @export
@@ -70,9 +72,7 @@ db_sql_render.DBIConnection <- function(
   cte = FALSE,
   sql_options = NULL
 ) {
-  out <- sql_render(sql, con = con, ..., sql_options = sql_options)
-  the$last_sql <- out
-  out
+  sql_render(sql, con = con, ..., sql_options = sql_options)
 }
 
 #' @rdname db-misc
