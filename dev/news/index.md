@@ -2,6 +2,9 @@
 
 ## dbplyr (development version)
 
+- Custom translations of functions starting with `.` work
+  ([@MichaelChirico](https://github.com/MichaelChirico),
+  [\#1529](https://github.com/tidyverse/dbplyr/issues/1529)).
 - SQL Server 2025 (version 17.0) now supports stringr regex functions:
   `str_detect()`, `str_starts()`, `str_ends()`, `str_replace()`,
   `str_replace_all()`, `str_remove()`, `str_remove_all()`,
