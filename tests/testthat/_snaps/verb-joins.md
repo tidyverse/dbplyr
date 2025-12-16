@@ -470,3 +470,18 @@
       LEFT JOIN `q01` AS `...3`
         ON (`lf1...1`.`x` = `...3`.`x`)
 
+# joins correctly quote reused queries in CTEs
+
+    Code
+      show_query(left_join(lf, lf, by = join_by(z)), sql_options = sql_options(cte = TRUE))
+    Output
+      <SQL>
+      WITH `q01` AS (
+        SELECT `lf`.*, `x` * 2.0 AS `z`
+        FROM `lf`
+      )
+      SELECT `LHS`.`x` AS `x.x`, `LHS`.`z` AS `z`, `RHS`.`x` AS `x.y`
+      FROM `q01` AS `LHS`
+      LEFT JOIN `q01` AS `RHS`
+        ON (`LHS`.`z` = `RHS`.`z`)
+

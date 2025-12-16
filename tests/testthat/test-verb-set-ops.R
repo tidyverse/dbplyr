@@ -42,32 +42,27 @@ test_that("union and union all work for all backends", {
     expect_equal_tbls()
 })
 
-test_that("can combine multiple union in one query", {
+test_that("can combine multiple unions in one query", {
   lf1 <- lazy_frame(x = 1, y = 1, .name = "lf1")
   lf2 <- lazy_frame(y = 1, .name = "lf2")
   lf3 <- lazy_frame(z = 1, .name = "lf3")
 
-  expect_snapshot(
-    lf1 |>
-      union_all(lf2) |>
-      union(lf3)
-  )
+  with_cte <- sql_options(cte = TRUE)
+  lf_union <- lf1 |> union_all(lf2) |> union(lf3)
 
-  # cte works
-  expect_snapshot(
-    lf1 |>
-      union_all(lf2) |>
-      union(lf3) |>
-      left_join(lf1, by = "x") |>
-      show_query(sql_options = sql_options(cte = TRUE))
-  )
-
-  lf_union <- lf1 |>
-    union_all(lf2) |>
-    union(lf3)
+  expect_snapshot(lf_union |> show_query())
+  # and with cte
+  expect_snapshot(lf_union |> show_query(sql_options = with_cte))
 
   out <- lf_union |> mutate(a = x + y) |> sql_build()
   expect_equal(out$select, sql("`q01`.*", a = "`x` + `y`"))
+})
+
+test_that("set ops correctly quote reused queries in CTEs", {
+  lf <- lazy_frame(x = 1, .name = "lf") |> mutate(y = x + 1)
+  expect_snapshot(
+    union_all(lf, lf) |> show_query(sql_options = sql_options(cte = TRUE))
+  )
 })
 
 test_that("intersect and setdiff work for supported backends", {

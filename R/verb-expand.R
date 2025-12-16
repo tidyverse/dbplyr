@@ -32,8 +32,14 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
     cli_abort("Must supply variables in `...`")
   }
 
+  data_vars <- op_vars(data)
   distinct_tbl_vars <- with_indexed_errors(
-    purrr::map(dots, extract_expand_dot_vars, call = NULL),
+    purrr::map(
+      dots,
+      extract_expand_dot_vars,
+      data_vars = data_vars,
+      call = NULL
+    ),
     message = function(cnd) {
       dot <- as_label(dots[[cnd$location]])
       cli::format_inline("In expression {.code {dot}}:")
@@ -67,10 +73,12 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
   }
 }
 
-extract_expand_dot_vars <- function(dot, call) {
+extract_expand_dot_vars <- function(dot, data_vars, call) {
   # ugly hack to deal with `nesting()`
   if (!quo_is_call(dot, name = "nesting", ns = c("", "tidyr"))) {
-    return(list(quo_get_expr(dot)))
+    expr <- quo_get_expr(dot)
+    check_expand_expr(expr, data_vars, call = call)
+    return(list(expr))
   }
 
   x_expr <- quo_get_expr(dot)
@@ -80,8 +88,24 @@ extract_expand_dot_vars <- function(dot, call) {
   args[[".name_repair"]] <- NULL
 
   args_named <- exprs_auto_name(args)
+  for (expr in args_named) {
+    check_expand_expr(expr, data_vars, call = call)
+  }
   nms <- vctrs::vec_as_names(names(args_named), repair = repair, call = call)
   exprs(!!!set_names(args_named, nms))
+}
+
+check_expand_expr <- function(expr, data_vars, call = NULL) {
+  expr_vars <- all_names(expr)
+  if (length(intersect(expr_vars, data_vars)) == 0) {
+    cli_abort(
+      c(
+        "Every expression must use at least one data column",
+        i = "{.code {as_label(expr)}} doesn't use any columns."
+      ),
+      call = call
+    )
+  }
 }
 
 #' Complete a SQL table with missing combinations of data

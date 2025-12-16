@@ -74,3 +74,13 @@ test_that("can retrieve query, src and con metadata", {
   expect_s3_class(remote_query(mf), "sql")
   expect_type(remote_query_plan(mf), "character")
 })
+
+test_that("last_sql() retrieves the most recent query", {
+  lf <- lazy_frame(x = 1:3, y = c("a", "b", "c"))
+
+  lf |> filter(x > 1) |> show_query()
+  expect_match(last_sql(), "WHERE")
+
+  lf |> mutate(z = x + 1) |> show_query()
+  expect_match(last_sql(), "\\+ 1")
+})

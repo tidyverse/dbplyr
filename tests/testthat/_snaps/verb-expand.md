@@ -92,6 +92,25 @@
       Error in `tidyr::expand()`:
       ! Must supply variables in `...`
 
+# expand() errors for non-column expressions
+
+    Code
+      tidyr::expand(lf, x, 1:3)
+    Condition
+      Error in `tidyr::expand()`:
+      ! In expression `1:3`:
+      Caused by error:
+      ! Every expression must use at least one data column
+      i `1:3` doesn't use any columns.
+    Code
+      tidyr::expand(lazy_frame(x = 1, y = 1), nesting(x, 1))
+    Condition
+      Error in `tidyr::expand()`:
+      ! In expression `nesting(x, 1)`:
+      Caused by error:
+      ! Every expression must use at least one data column
+      i `1` doesn't use any columns.
+
 # nesting() respects .name_repair
 
     Code
