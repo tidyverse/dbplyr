@@ -37,8 +37,8 @@
 in_schema <- function(schema, table) {
   structure(
     list(
-      schema = as.sql(schema),
-      table = as.sql(table)
+      schema = as_ident_or_sql(schema),
+      table = as_ident_or_sql(table)
     ),
     class = "dbplyr_schema"
   )
@@ -49,9 +49,9 @@ in_schema <- function(schema, table) {
 in_catalog <- function(catalog, schema, table) {
   structure(
     list(
-      schema = as.sql(schema),
-      table = as.sql(table),
-      catalog = as.sql(catalog)
+      schema = as_ident_or_sql(schema),
+      table = as_ident_or_sql(table),
+      catalog = as_ident_or_sql(catalog)
     ),
     class = "dbplyr_catalog"
   )
@@ -81,30 +81,9 @@ print.dbplyr_catalog <- function(x, ...) {
   cat_line("<CATALOG> ", format(x))
 }
 
-#' @export
-as.sql.dbplyr_schema <- function(x, con) {
-  ident_q(paste0(escape(x$schema, con = con), ".", escape(x$table, con = con)))
-}
-
-#' @export
-as.sql.dbplyr_catalog <- function(x, con) {
-  ident_q(paste0(
-    escape(x$catalog, con = con),
-    ".",
-    escape(x$schema, con = con),
-    ".",
-    escape(x$table, con = con)
-  ))
-}
-
 is_schema <- function(x) inherits(x, "dbplyr_schema")
 
 is_catalog <- function(x) inherits(x, "dbplyr_catalog")
-
-# Support for DBI::Id() ---------------------------------------------------
-
-#' @export
-as.sql.Id <- function(x, con) ident_q(dbQuoteIdentifier(con, x))
 
 # Old dbplyr approach -----------------------------------------------------
 

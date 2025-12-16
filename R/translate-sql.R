@@ -192,8 +192,8 @@ sql_data_mask <- function(
 
   # Existing symbols in expression
   names <- all_names(expr)
-  idents <- lapply(names, ident)
-  name_env <- ceply(idents, escape, con = con, parent = special_calls2)
+  idents <- set_names(lapply(names, ident), names)
+  name_env <- list2env(idents, parent = special_calls2)
 
   new_data_mask(name_env, top_env)
 }
