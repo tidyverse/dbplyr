@@ -180,7 +180,7 @@ test_that("distinct can compute variables", {
 test_that("distinct ignores groups when computing variables (#1081)", {
   df <- tibble(g = c("a", "a", "b"), x = c(1, 2, 3))
 
-  db <- memdb_frame(g = c("a", "a", "b"), x = c(1, 2, 3))
+  db <- local_memdb_frame("df", g = c("a", "a", "b"), x = c(1, 2, 3))
   db_distinct <- db |> group_by(g) |> distinct(n = n()) |> ungroup()
 
   expect_snapshot(show_query(db_distinct))

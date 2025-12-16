@@ -18,7 +18,7 @@
     Output
       <SQL>
       SELECT DISTINCT `g`, COUNT(*) OVER () AS `n`
-      FROM `dbplyr_tmp_glBYhB7lzZ`
+      FROM `df`
 
 # distinct respects window_order when .keep_all is TRUE
 
