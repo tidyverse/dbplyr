@@ -968,7 +968,7 @@ sql_query_upsert.DBIConnection <- function(
     con = con
   )
 
-  update_values <- sql_table_prefix(con, update_cols, "...y")
+  update_values <- sql_table_prefix(con, "...y", update_cols)
   update_cols <- sql_escape_ident(con, update_cols)
 
   updated_cte <- list(
@@ -1053,7 +1053,7 @@ sql_named_cols <- function(con, cols, table = NULL) {
   nms <- names2(cols)
   nms[nms == cols] <- ""
 
-  cols <- sql_table_prefix(con, cols, table)
+  cols <- sql_table_prefix(con, table, cols)
   cols <- set_names(ident_q(cols), nms)
   escape(cols, collapse = NULL, con = con)
 }
