@@ -15,6 +15,8 @@ mutate(
   .data,
   ...,
   .by = NULL,
+  .order = NULL,
+  .frame = NULL,
   .keep = c("all", "used", "unused", "none"),
   .before = NULL,
   .after = NULL
@@ -44,6 +46,31 @@ mutate(
   [`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html).
   For details and examples, see
   [?dplyr_by](https://dplyr.tidyverse.org/reference/dplyr_by.html).
+
+- .order:
+
+  \<[`data-masking`](https://rlang.r-lib.org/reference/args_data_masking.html)\>
+  A selection of columns to control ordering for window functions within
+  this
+  [`dplyr::mutate()`](https://dplyr.tidyverse.org/reference/mutate.html)
+  call. Use [`c()`](https://rdrr.io/r/base/c.html) to order by multiple
+  columns, e.g. `.order = c(x, y)`. Each column can be wrapped in
+  [`dplyr::desc()`](https://dplyr.tidyverse.org/reference/desc.html) to
+  specify descending order. Equivalent to calling
+  [`window_order()`](https://dbplyr.tidyverse.org/dev/reference/window_order.md)
+  before and clearing it after the
+  [`dplyr::mutate()`](https://dplyr.tidyverse.org/reference/mutate.html).
+
+- .frame:
+
+  A length-2 numeric vector specifying the bounds for window function
+  frames. The first element is the lower bound (use `-Inf` for
+  "unbounded preceding") and the second is the upper bound (use `Inf`
+  for "unbounded following", `0` for "current row"). Equivalent to
+  calling
+  [`window_frame()`](https://dbplyr.tidyverse.org/dev/reference/window_order.md)
+  before and clearing it after the
+  [`dplyr::mutate()`](https://dplyr.tidyverse.org/reference/mutate.html).
 
 - .keep:
 
@@ -105,4 +132,18 @@ db |>
 #>   SELECT `dbplyr_tmp_I6Ojtgl00s`.*, `x` + 1.0 AS `x1`
 #>   FROM `dbplyr_tmp_I6Ojtgl00s`
 #> ) AS `q01`
+
+# `.order` and `.frame` control window functions
+db <- memdb_frame(g = c(1, 1, 2, 2, 2), x = c(5, 3, 1, 4, 2))
+db |>
+  mutate(rolling_sum = sum(x), .by = g, .order = x, .frame = c(-2, 2)) |>
+  show_query()
+#> Warning: Missing values are always removed in SQL aggregation functions.
+#> Use `na.rm = TRUE` to silence this warning
+#> This warning is displayed once every 8 hours.
+#> <SQL>
+#> SELECT
+#>   `dbplyr_tmp_IlBpEtJTVT`.*,
+#>   SUM(`x`) OVER (PARTITION BY `g` ORDER BY `x` ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING) AS `rolling_sum`
+#> FROM `dbplyr_tmp_IlBpEtJTVT`
 ```

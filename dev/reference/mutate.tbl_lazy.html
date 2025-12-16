@@ -72,6 +72,8 @@ the SQL query.</p>
 <span>  <span class="va">.data</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  .by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .order <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .frame <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  .keep <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"all"</span>, <span class="st">"used"</span>, <span class="st">"unused"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
 <span>  .before <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  .after <span class="op">=</span> <span class="cn">NULL</span></span>
@@ -97,6 +99,23 @@ order.</p></dd>
 <p>&lt;<code><a href="https://dplyr.tidyverse.org/reference/dplyr_tidy_select.html" class="external-link">tidy-select</a></code>&gt; Optionally, a selection of columns to
 group by for just this operation, functioning as an alternative to <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by()</a></code>. For
 details and examples, see <a href="https://dplyr.tidyverse.org/reference/dplyr_by.html" class="external-link">?dplyr_by</a>.</p></dd>
+
+
+<dt id="arg--order">.order<a class="anchor" aria-label="anchor" href="#arg--order"></a></dt>
+<dd><p>&lt;<code><a href="https://rlang.r-lib.org/reference/args_data_masking.html" class="external-link">data-masking</a></code>&gt; A selection of
+columns to control ordering for window functions within this
+<code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">dplyr::mutate()</a></code> call. Use <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code> to order by multiple columns, e.g.
+<code>.order = c(x, y)</code>. Each column can be wrapped in <code><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">dplyr::desc()</a></code> to specify
+descending order. Equivalent to calling <code><a href="window_order.html">window_order()</a></code> before and
+clearing it after the <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">dplyr::mutate()</a></code>.</p></dd>
+
+
+<dt id="arg--frame">.frame<a class="anchor" aria-label="anchor" href="#arg--frame"></a></dt>
+<dd><p>A length-2 numeric vector specifying the bounds for
+window function frames. The first element is the lower bound (use <code>-Inf</code>
+for "unbounded preceding") and the second is the upper bound (use <code>Inf</code>
+for "unbounded following", <code>0</code> for "current row"). Equivalent to calling
+<code><a href="window_order.html">window_frame()</a></code> before and clearing it after the <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">dplyr::mutate()</a></code>.</p></dd>
 
 
 <dt id="arg--keep">.keep<a class="anchor" aria-label="anchor" href="#arg--keep"></a></dt>
@@ -151,6 +170,20 @@ and return data to R.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span> `dbplyr_tmp_I6Ojtgl00s`.*, `x` + 1.0<span style="color: #0000BB;"> AS </span>`x1`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_I6Ojtgl00s`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ) <span style="color: #0000BB;">AS </span>`q01`</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># `.order` and `.frame` control window functions</span></span></span>
+<span class="r-in"><span><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu"><a href="memdb_frame.html">memdb_frame</a></span><span class="op">(</span>g <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">db</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>rolling_sum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, .by <span class="op">=</span> <span class="va">g</span>, .order <span class="op">=</span> <span class="va">x</span>, .frame <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Missing values are always removed in SQL aggregation functions.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> Use `na.rm = TRUE` to silence this warning</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   `dbplyr_tmp_IlBpEtJTVT`.*,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   SUM(`x`) OVER (PARTITION BY `g` ORDER BY `x` ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING)<span style="color: #0000BB;"> AS </span>`rolling_sum`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_IlBpEtJTVT`</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

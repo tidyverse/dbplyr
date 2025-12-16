@@ -37,7 +37,7 @@ db |>
   show_query()
 #> <SQL>
 #> SELECT `g`, `y`, SUM(`y`) OVER (ORDER BY `y` ROWS UNBOUNDED PRECEDING) AS `z`
-#> FROM `dbplyr_tmp_tOwABP7gyC`
+#> FROM `dbplyr_tmp_sWSoxdmpD9`
 
 db |>
   group_by(g) |>
@@ -50,5 +50,5 @@ db |>
 #>   `g`,
 #>   `y`,
 #>   SUM(`y`) OVER (PARTITION BY `g` ORDER BY `z` ROWS 3 PRECEDING) AS `z`
-#> FROM `dbplyr_tmp_tOwABP7gyC`
+#> FROM `dbplyr_tmp_sWSoxdmpD9`
 ```

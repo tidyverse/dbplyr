@@ -673,7 +673,8 @@ lf |> transmute(
   lag = lag(g)
 )
 #> Warning: Windowed expression `SUM(`g`)` does not have explicit order.
-#> ℹ Please use `arrange()` or `window_order()` to make deterministic.
+#> ℹ Please use `arrange()`, `window_order()`, or `.order` to make
+#>   deterministic.
 #> <SQL>
 #> SELECT
 #>   AVG(`g`) OVER () AS `mean`,

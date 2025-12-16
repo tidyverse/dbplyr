@@ -2,6 +2,11 @@
 
 ## dbplyr (development version)
 
+- [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html) gains
+  `.order` and `.frame` arguments for specifying window function
+  ordering and frame bounds within a single mutate call, similar to how
+  `.by` works for grouping
+  ([\#1542](https://github.com/tidyverse/dbplyr/issues/1542)).
 - The `copy` argument of join, set, and row operations now accepts
   `"inline"` to use
   [`copy_inline()`](https://dbplyr.tidyverse.org/dev/reference/copy_inline.md)

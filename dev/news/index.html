@@ -56,7 +56,9 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li>The <code>copy</code> argument of join, set, and row operations now accepts <code>"inline"</code> to use <code><a href="../reference/copy_inline.html">copy_inline()</a></code> instead of copying to a temporary table (<a href="https://github.com/tidyverse/dbplyr/issues/863" class="external-link">#863</a>).</li>
+<ul><li>
+<code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code> gains <code>.order</code> and <code>.frame</code> arguments for specifying window function ordering and frame bounds within a single mutate call, similar to how <code>.by</code> works for grouping (<a href="https://github.com/tidyverse/dbplyr/issues/1542" class="external-link">#1542</a>).</li>
+<li>The <code>copy</code> argument of join, set, and row operations now accepts <code>"inline"</code> to use <code><a href="../reference/copy_inline.html">copy_inline()</a></code> instead of copying to a temporary table (<a href="https://github.com/tidyverse/dbplyr/issues/863" class="external-link">#863</a>).</li>
 <li>
 <code><a href="../reference/as.sql.html">as.sql()</a></code> is now deprecated as part of major internal refactoring of how <code><a href="../reference/sql.html">sql()</a></code> and <code><a href="../reference/ident.html">ident()</a></code> are used.</li>
 <li>

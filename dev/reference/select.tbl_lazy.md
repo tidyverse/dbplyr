@@ -64,13 +64,13 @@ db <- memdb_frame(x = 1, y = 2, z = 3)
 db |> select(-y) |> show_query()
 #> <SQL>
 #> SELECT `x`, `z`
-#> FROM `dbplyr_tmp_aMbu5uyJ9l`
+#> FROM `dbplyr_tmp_d9QWhdDrot`
 db |> relocate(z) |> show_query()
 #> <SQL>
 #> SELECT `z`, `x`, `y`
-#> FROM `dbplyr_tmp_aMbu5uyJ9l`
+#> FROM `dbplyr_tmp_d9QWhdDrot`
 db |> rename(first = x, last = z) |> show_query()
 #> <SQL>
 #> SELECT `x` AS `first`, `y`, `z` AS `last`
-#> FROM `dbplyr_tmp_aMbu5uyJ9l`
+#> FROM `dbplyr_tmp_d9QWhdDrot`
 ```

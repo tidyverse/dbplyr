@@ -110,9 +110,6 @@ translate_sql_(list(x), con = simulate_dbi())
 # Windowed translation --------------------------------------------
 # Known window functions automatically get OVER()
 translate_sql(mpg > mean(mpg), con = con)
-#> Warning: Missing values are always removed in SQL aggregation functions.
-#> Use `na.rm = TRUE` to silence this warning
-#> This warning is displayed once every 8 hours.
 #> <SQL> `mpg` > AVG(`mpg`) OVER ()
 
 # Suppress this with window = FALSE
@@ -126,7 +123,8 @@ translate_sql(mpg > mean(mpg), vars_group = "cyl", con = con)
 # and vars_order controls ordering for those functions that need it
 translate_sql(cumsum(mpg), con = con)
 #> Warning: Windowed expression `SUM(`mpg`)` does not have explicit order.
-#> ℹ Please use `arrange()` or `window_order()` to make deterministic.
+#> ℹ Please use `arrange()`, `window_order()`, or `.order` to make
+#>   deterministic.
 #> <SQL> SUM(`mpg`) OVER (ROWS UNBOUNDED PRECEDING)
 translate_sql(cumsum(mpg), vars_order = "mpg", con = con)
 #> <SQL> SUM(`mpg`) OVER (ORDER BY `mpg` ROWS UNBOUNDED PRECEDING)

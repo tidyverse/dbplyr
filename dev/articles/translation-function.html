@@ -738,7 +738,8 @@ use <code><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="
 <span>  lag <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Windowed expression `SUM(`g`)` does not have explicit order.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `arrange()` or `window_order()` to make deterministic.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `arrange()`, `window_order()`, or `.order` to make</span></span>
+<span><span class="co">#&gt;   deterministic.</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span></span></span>
 <span><span class="co">#&gt;   AVG(`g`) OVER ()<span style="color: #0000BB;"> AS </span>`mean`,</span></span>
