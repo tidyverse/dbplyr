@@ -13,15 +13,24 @@
 #'
 #' @param x,y A pair of lazy data frames backed by database queries.
 #' @inheritParams dplyr::join
-#' @param copy If `x` and `y` are not from the same data source,
-#'   and `copy` is `TRUE`, then `y` will be copied into a
-#'   temporary table in same database as `x`. `*_join()` will automatically
-#'   run `ANALYZE` on the created table in the hope that this will make
-#'   you queries as efficient as possible by giving more data to the query
-#'   planner.
+#' @param copy If `x` and `y` are not from the same data source, `copy`
+#'   controls how `y` is copied into the same source as `x`. There are three
+#'   options:
 #'
-#'   This allows you to join tables across srcs, but it's potentially expensive
-#'   operation so you must opt into it.
+#'  * `"none"`, the default, will error if `y` needs to be copied. This ensures
+#'    that you don't accidentally copy large datasets from R to the database.
+#'
+#'   * `"temp-table"`: copies `y` into a temporary table in the same
+#'     database as `x`. `*_join()` will automatically run `ANALYZE` on the
+#'     created table in the hope that this will make your queries as efficient
+#'     as possible by giving more data to the query planner.
+#'
+#'   * `"inline"`: `y` will be inlined into the query using [copy_inline()].
+#'     This is should faster for small datasets and doesn't require write
+#'     access.
+#'
+#'   `TRUE` (`"temp-table"`) and `FALSE` (`"none"`) are also accepted for
+#'   backward compatibility.
 #' @param auto_index if `copy` is `TRUE`, automatically create
 #'   indices for the variables in `by`. This may speed up the join if
 #'   there are matching indexes in `x`.
@@ -74,7 +83,7 @@ inner_join.tbl_lazy <- function(
   x,
   y,
   by = NULL,
-  copy = FALSE,
+  copy = "none",
   suffix = NULL,
   ...,
   keep = NULL,
@@ -116,7 +125,7 @@ left_join.tbl_lazy <- function(
   x,
   y,
   by = NULL,
-  copy = FALSE,
+  copy = "none",
   suffix = NULL,
   ...,
   keep = NULL,
@@ -158,7 +167,7 @@ right_join.tbl_lazy <- function(
   x,
   y,
   by = NULL,
-  copy = FALSE,
+  copy = "none",
   suffix = NULL,
   ...,
   keep = NULL,
@@ -200,7 +209,7 @@ full_join.tbl_lazy <- function(
   x,
   y,
   by = NULL,
-  copy = FALSE,
+  copy = "none",
   suffix = NULL,
   ...,
   keep = NULL,
@@ -240,7 +249,7 @@ cross_join.tbl_lazy <- function(
   x,
   y,
   ...,
-  copy = FALSE,
+  copy = "none",
   suffix = c(".x", ".y"),
   x_as = NULL,
   y_as = NULL
@@ -271,7 +280,7 @@ semi_join.tbl_lazy <- function(
   x,
   y,
   by = NULL,
-  copy = FALSE,
+  copy = "none",
   ...,
   na_matches = c("never", "na"),
   sql_on = NULL,
@@ -303,7 +312,7 @@ anti_join.tbl_lazy <- function(
   x,
   y,
   by = NULL,
-  copy = FALSE,
+  copy = "none",
   ...,
   na_matches = c("never", "na"),
   sql_on = NULL,
@@ -333,7 +342,7 @@ add_join <- function(
   y,
   type,
   by = NULL,
-  copy = FALSE,
+  copy = "none",
   suffix = NULL,
   keep = NULL,
   na_matches = "never",
@@ -370,11 +379,12 @@ add_join <- function(
     call = call
   )
 
-  y <- auto_copy(
+  y <- dbplyr_auto_copy(
     x,
     y,
     copy = copy,
-    indexes = if (auto_index) list(by$y)
+    indexes = if (auto_index) list(by$y),
+    call = call
   )
 
   suffix <- suffix %||% sql_join_suffix(x$con, suffix)
@@ -677,7 +687,7 @@ add_semi_join <- function(
   anti = FALSE,
   by = NULL,
   sql_on = NULL,
-  copy = FALSE,
+  copy = "none",
   auto_index = FALSE,
   na_matches = "never",
   x_as = NULL,
@@ -698,11 +708,12 @@ add_semi_join <- function(
   check_join_by_supported(by, call = call)
   na_matches <- arg_match(na_matches, c("na", "never"), error_call = call)
 
-  y <- auto_copy(
+  y <- dbplyr_auto_copy(
     x,
     y,
-    copy,
-    indexes = if (auto_index) list(by$y)
+    copy = copy,
+    indexes = if (auto_index) list(by$y),
+    call = call
   )
 
   inline_result <- join_inline_select(x$lazy_query, by$x, sql_on)

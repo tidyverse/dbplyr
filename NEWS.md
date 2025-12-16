@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* The `copy` argument of join, set, and row operations now accepts `"inline"` to use `copy_inline()` instead of copying to a temporary table (#863).
 * `as.sql()` is now deprecated as part of major internal refactoring of how `sql()` and `ident()` are used.
 * `expand()` now errors when column expressions don't reference any columns in the data, instead of generating invalid SQL (#720).
 * CTEs now correctly quote table names when the same query is used multiple times (#1559).

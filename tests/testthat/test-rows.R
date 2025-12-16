@@ -1,3 +1,11 @@
+test_that("copy = 'inline' works", {
+  df1 <- memdb_frame(x = 1:3, y = c("a", "b", "c"))
+  df2 <- tibble(x = c(3:4), y = c("d", "d"))
+
+  out <- rows_insert(df1, df2, by = "x", copy = "inline", conflict = "ignore")
+  expect_equal(collect(out), tibble(x = 1:4, y = c(letters[1:4])))
+})
+
 # rows_insert -------------------------------------------------------------
 
 test_that("rows_insert() checks arguments", {
