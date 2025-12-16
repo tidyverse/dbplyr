@@ -40,9 +40,5 @@ sql_escape_string <- function(con, x) {
 }
 #' @export
 sql_escape_string.default <- function(con, x) {
-  dbQuoteString(con, x)
-}
-#' @export
-sql_escape_string.TestConnection <- function(con, x) {
   sql_quote(x, "'")
 }
