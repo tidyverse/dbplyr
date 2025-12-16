@@ -244,6 +244,73 @@ test_that("can `NULL` out the `.by` column", {
   expect_identical(remote_query(out), sql("SELECT `y`\nFROM `df`"))
 })
 
+# .order, .frame -----------------------------------------------------------
+
+test_that("can order transiently using `.order`", {
+  df <- memdb_frame(g = c(1, 1, 2, 2), x = c(1, 2, 3, 4))
+  df2 <- df |> mutate(r = cumsum(x), .by = g, .order = x)
+  out <- df2 |> collect()
+
+  expect_equal(op_sort(df2), NULL)
+  expect_equal(out$r, c(1, 3, 3, 7))
+})
+
+test_that("can specify window frame using `.frame`", {
+  df <- memdb_frame(g = c(1, 1, 1), x = c(1.0, 2.0, 3.0))
+  df2 <- df |> mutate(r = sum(x), .by = g, .order = x, .frame = c(-Inf, 0))
+  out <- df2 |> collect()
+
+  expect_equal(op_frame(df2), NULL)
+  expect_equal(out$r, c(1, 3, 6))
+})
+
+test_that(".order and .frame are scoped to mutate call", {
+  lf <- lazy_frame(g = 1, x = 1, y = 1)
+
+  # The second mutate should not have order/frame from the first
+  out <- lf |>
+    mutate(r1 = sum(x), .by = g, .order = y, .frame = c(-Inf, 0)) |>
+    mutate(r2 = mean(x), .by = g)
+
+  expect_snapshot(out)
+})
+
+test_that(".order generates correct SQL", {
+  lf <- lazy_frame(g = 1, x = 1, y = 1)
+
+  expect_snapshot({
+    lf |> mutate(r = cumsum(x), .by = g, .order = y)
+    lf |> mutate(r = cumsum(x), .by = g, .order = c(x, desc(y)))
+  })
+})
+
+test_that(".frame generates correct SQL", {
+  lf <- lazy_frame(g = 1, x = 1, y = 1)
+
+  expect_snapshot({
+    lf |> mutate(r = sum(x), .by = g, .order = y, .frame = c(-Inf, 0))
+    lf |> mutate(r = sum(x), .by = g, .order = y, .frame = c(-1, 1))
+  })
+})
+
+test_that(".order validates inputs", {
+  lf <- lazy_frame(x = 1, y = 1)
+
+  expect_snapshot(error = TRUE, {
+    lf |> mutate(r = cumsum(x), .order = x + y)
+    lf |> mutate(r = cumsum(x), .order = foo())
+  })
+})
+
+test_that(".frame validates inputs", {
+  lf <- lazy_frame(x = 1)
+
+  expect_snapshot(error = TRUE, {
+    lf |> mutate(r = sum(x), .frame = c(1, 2, 3))
+    lf |> mutate(r = sum(x), .frame = c("a", "b"))
+  })
+})
+
 # SQL generation -----------------------------------------------------------
 
 test_that("mutate generates new variables and replaces existing", {

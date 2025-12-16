@@ -7,6 +7,17 @@
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::mutate
 #' @inherit arrange.tbl_lazy return
+#' @param .order <[`data-masking`][rlang::args_data_masking]> A selection of
+#'   columns to control ordering for window functions within this
+#'   [mutate()] call. Use `c()` to order by multiple columns, e.g.
+#'   `.order = c(x, y)`. Each column can be wrapped in [desc()] to specify
+#'   descending order. Equivalent to calling [window_order()] before and
+#'   clearing it after the [mutate()].
+#' @param .frame A length-2 numeric vector specifying the bounds for
+#'   window function frames. The first element is the lower bound (use `-Inf`
+#'   for "unbounded preceding") and the second is the upper bound (use `Inf`
+#'   for "unbounded following", `0` for "current row"). Equivalent to calling
+#'   [window_frame()] before and clearing it after the [mutate()].
 #' @export
 #' @importFrom dplyr mutate
 #' @examples
@@ -21,10 +32,18 @@
 #' db |>
 #'   mutate(x1 = x + 1, x2 = x1 * 2) |>
 #'   show_query()
+#'
+#' # `.order` and `.frame` control window functions
+#' db <- memdb_frame(g = c(1, 1, 2, 2, 2), x = c(5, 3, 1, 4, 2))
+#' db |>
+#'   mutate(rolling_sum = sum(x), .by = g, .order = x, .frame = c(-2, 2)) |>
+#'   show_query()
 mutate.tbl_lazy <- function(
   .data,
   ...,
   .by = NULL,
+  .order = NULL,
+  .frame = NULL,
   .keep = c("all", "used", "unused", "none"),
   .before = NULL,
   .after = NULL
@@ -34,6 +53,20 @@ mutate.tbl_lazy <- function(
   by <- compute_by({{ .by }}, .data, by_arg = ".by", data_arg = ".data")
   if (by$from_by) {
     .data$lazy_query$group_vars <- by$names
+  }
+
+  names_original <- colnames(.data)
+
+  order <- compute_order(.data, {{ .order }})
+  old_order <- .data$lazy_query$order_vars
+  if (!is.null(order)) {
+    .data$lazy_query$order_vars <- order
+  }
+
+  frame <- compute_frame(.frame)
+  old_frame <- .data$lazy_query$frame
+  if (!is.null(frame)) {
+    .data$lazy_query$frame <- frame
   }
 
   layer_info <- get_mutate_layers(.data, ...)
@@ -51,7 +84,13 @@ mutate.tbl_lazy <- function(
     out$lazy_query$group_vars <- character()
   }
 
-  names_original <- colnames(.data)
+  if (!is.null(order)) {
+    out$lazy_query$order_vars <- old_order
+  }
+
+  if (!is.null(frame)) {
+    out$lazy_query$frame <- old_frame
+  }
 
   out <- mutate_relocate(
     out = out,
@@ -96,6 +135,35 @@ transmute.tbl_lazy <- function(.data, ...) {
 }
 
 # helpers -----------------------------------------------------------------
+
+compute_order <- function(.data, order, error_call = caller_env()) {
+  order <- enquo(order)
+  if (quo_is_null(order)) {
+    return(NULL)
+  }
+
+  # Expand c() calls to support multiple order columns
+  order_expr <- quo_get_expr(order)
+  if (is_call(order_expr, "c")) {
+    order_exprs <- call_args(order_expr)
+  } else {
+    order_exprs <- list(order_expr)
+  }
+
+  order <- partial_eval_dots(.data, !!!order_exprs, .named = FALSE)
+  names(order) <- NULL
+  check_window_order_dots(order, arg = "order", call = error_call)
+  order
+}
+
+compute_frame <- function(frame, error_call = caller_env()) {
+  if (is.null(frame)) {
+    return(NULL)
+  }
+
+  check_frame_range(frame, call = error_call)
+  list(range = frame)
+}
 
 add_mutate <- function(lazy_query, vars) {
   # drop NULLs

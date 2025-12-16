@@ -145,7 +145,7 @@
     Condition
       Warning:
       Windowed expression `SUM(`x_mean`)` does not have explicit order.
-      i Please use `arrange()` or `window_order()` to make deterministic.
+      i Please use `arrange()`, `window_order()`, or `.order` to make deterministic.
     Output
       <SQL>
       SELECT `g`, `h`, `x_mean`

@@ -50,7 +50,7 @@ win_over <- function(
     if (length(order) == 0) {
       cli::cli_warn(c(
         "Windowed expression `{expr}` does not have explicit order.",
-        i = "Please use {.fun arrange} or {.fun window_order} to make deterministic."
+        i = "Please use {.fun arrange}, {.fun window_order}, or {.arg .order} to make deterministic."
       ))
     }
 
