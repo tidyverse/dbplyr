@@ -11,6 +11,15 @@
         LIMIT 2
       ) AS `q01`
 
+# distinct ignores groups when computing variables (#1081)
+
+    Code
+      show_query(db_distinct)
+    Output
+      <SQL>
+      SELECT DISTINCT `g`, COUNT(*) OVER () AS `n`
+      FROM `dbplyr_tmp_glBYhB7lzZ`
+
 # distinct respects window_order when .keep_all is TRUE
 
     Code

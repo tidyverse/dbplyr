@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* `distinct()` with computed columns now ignores grouping, matching dplyr's behavior (#1081).
 * The `copy` argument of join, set, and row operations now accepts `"inline"` to use `copy_inline()` instead of copying to a temporary table (#863).
 * `as.sql()` is now deprecated as part of major internal refactoring of how `sql()` and `ident()` are used.
 * `expand()` now errors when column expressions don't reference any columns in the data, instead of generating invalid SQL (#720).
