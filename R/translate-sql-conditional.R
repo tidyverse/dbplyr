@@ -81,8 +81,7 @@ sql_case_match_clause <- function(f, x, con) {
 
   query <- NULL
   if (!is_empty(f_query)) {
-    f_query <- escape(f_query, con = con, parens = TRUE, collapse = ", ")
-    query <- translate_sql(!!x %in% !!f_query, con = sql_current_con())
+    query <- sql_glue("{x} IN {f_query*}")
   }
 
   if (has_na) {

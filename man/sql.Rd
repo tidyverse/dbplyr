@@ -3,23 +3,16 @@
 \name{sql}
 \alias{sql}
 \alias{is.sql}
-\alias{as.sql}
 \title{SQL escaping.}
 \usage{
 sql(...)
 
 is.sql(x)
-
-as.sql(x, con)
 }
 \arguments{
-\item{...}{Character vectors that will be combined into a single SQL
-expression.}
+\item{...}{Character vectors that will be combined into a single SQL vector.}
 
-\item{x}{Object to coerce}
-
-\item{con}{Needed when \code{x} is directly supplied from the user so that
-schema specifications can be quoted using the correct identifiers.}
+\item{x}{Object to check if it is an sql object.}
 }
 \description{
 These functions are critical when writing functions that translate R

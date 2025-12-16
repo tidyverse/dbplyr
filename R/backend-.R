@@ -65,7 +65,7 @@ base_scalar <- sql_translator(
   },
 
   `$` = function(x, name) {
-    if (is.sql(x)) {
+    if (is.ident(x)) {
       sql_glue("{x}.{name}")
     } else {
       eval(bquote(`$`(x, .(substitute(name)))))
@@ -97,7 +97,7 @@ base_scalar <- sql_translator(
   `>=` = sql_infix(">="),
 
   `%in%` = function(x, table) {
-    if (is.sql(table)) {
+    if (is.ident(table)) {
       return(sql_glue("{x} IN {table}"))
     }
 

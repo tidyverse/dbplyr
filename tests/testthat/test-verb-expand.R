@@ -59,6 +59,14 @@ test_that("expand() errors when expected", {
   expect_snapshot(error = TRUE, tidyr::expand(memdb_frame(x = 1), x = NULL))
 })
 
+test_that("expand() errors for non-column expressions", {
+  lf <- lazy_frame(x = 1, y = 1)
+  expect_snapshot(error = TRUE, {
+    tidyr::expand(lf, x, 1:3)
+    tidyr::expand(lazy_frame(x = 1, y = 1), nesting(x, 1))
+  })
+})
+
 test_that("nesting() respects .name_repair", {
   expect_snapshot(
     error = TRUE,

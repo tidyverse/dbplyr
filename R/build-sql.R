@@ -138,15 +138,10 @@ glue_transformer <- function(con, text, envir, call = caller_env()) {
   if (parsed$value == "...") {
     value <- eval(quote(list(...)), envir)
   } else {
-    withCallingHandlers(
-      value <- eval(parse(text = parsed$value, keep.source = FALSE), envir),
-      error = function(e) {
-        cli::cli_abort(
-          "Failed to interpolate {{{text}}.",
-          call = call,
-          parent = e
-        )
-      }
+    value <- wrap_glue_error(
+      eval(parse(text = parsed$value, keep.source = FALSE), envir),
+      text,
+      call
     )
   }
 
@@ -154,9 +149,9 @@ glue_transformer <- function(con, text, envir, call = caller_env()) {
   if (parsed$type == "sql") {
     value <- sql(value)
   } else if (parsed$type == "tbl") {
-    value <- as_table_path(value, con)
+    value <- wrap_glue_error(as_table_path(value, con), text, call)
   } else if (parsed$type == "id") {
-    value <- as_ident(value)
+    value <- wrap_glue_error(as_ident(value), text, call)
   }
 
   if (parsed$collapse) {
@@ -166,6 +161,19 @@ glue_transformer <- function(con, text, envir, call = caller_env()) {
   }
 
   unclass(value)
+}
+
+wrap_glue_error <- function(code, text, call = caller_env) {
+  withCallingHandlers(
+    code,
+    error = function(e) {
+      cli::cli_abort(
+        "Failed to interpolate {{{text}}.",
+        call = call,
+        parent = e
+      )
+    }
+  )
 }
 
 parse_glue_spec <- function(text) {
