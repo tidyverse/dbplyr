@@ -109,7 +109,6 @@ rows_insert.tbl_lazy <- function(
   conflict <- rows_check_conflict(conflict)
 
   rows_check_containment(x, y)
-  copy <- as_copy(copy)
   y <- rows_auto_copy(x, y, copy = copy)
 
   by <- rows_check_by(by, y)
