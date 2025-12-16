@@ -129,8 +129,8 @@ dbplyr_auto_copy <- function(
     cli_abort(
       c(
         "{.arg x} and {.arg y} must share the same source.",
-        i = "Set {.code copy = TRUE} to copy {.arg y} to a temporary table in the same database as {.arg x}.",
-        i = "Set {.code copy = \"inline\"} to use {.arg y} inline without creating a temporary table."
+        i = "Use {.code copy = \"temp-table\"} to copy {.arg y} to a temporary table.",
+        i = "USe {.code copy = \"inline\"} to convert {.arg y} to inline SQL."
       ),
       call = call
     )

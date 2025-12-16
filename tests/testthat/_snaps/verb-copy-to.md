@@ -21,8 +21,8 @@
     Condition
       Error:
       ! `x` and `y` must share the same source.
-      i Set `copy = TRUE` to copy `y` to a temporary table in the same database as `x`.
-      i Set `copy = "inline"` to use `y` inline without creating a temporary table.
+      i Use `copy = "temp-table"` to copy `y` to a temporary table.
+      i USe `copy = "inline"` to convert `y` to inline SQL.
 
 ---
 
@@ -31,6 +31,6 @@
     Condition
       Error:
       ! `x` and `y` must share the same source.
-      i Set `copy = TRUE` to copy `y` to a temporary table in the same database as `x`.
-      i Set `copy = "inline"` to use `y` inline without creating a temporary table.
+      i Use `copy = "temp-table"` to copy `y` to a temporary table.
+      i USe `copy = "inline"` to convert `y` to inline SQL.
 
