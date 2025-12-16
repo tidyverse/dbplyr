@@ -8,6 +8,8 @@
   .data,
   ...,
   .by = NULL,
+  .order = NULL,
+  .frame = NULL,
   .keep = c("all", "used", "unused", "none"),
   .before = NULL,
   .after = NULL
@@ -25,6 +27,19 @@ order.}
 <\code{\link[dplyr:dplyr_tidy_select]{tidy-select}}> Optionally, a selection of columns to
 group by for just this operation, functioning as an alternative to \code{\link[dplyr:group_by]{group_by()}}. For
 details and examples, see \link[dplyr:dplyr_by]{?dplyr_by}.}
+
+\item{.order}{<\code{\link[rlang:args_data_masking]{data-masking}}> A selection of
+columns to control ordering for window functions within this
+\code{\link[dplyr:mutate]{dplyr::mutate()}} call. Use \code{c()} to order by multiple columns, e.g.
+\code{.order = c(x, y)}. Each column can be wrapped in \code{\link[dplyr:desc]{dplyr::desc()}} to specify
+descending order. Equivalent to calling \code{\link[=window_order]{window_order()}} before and
+clearing it after the \code{\link[dplyr:mutate]{dplyr::mutate()}}.}
+
+\item{.frame}{A length-2 numeric vector specifying the bounds for
+window function frames. The first element is the lower bound (use \code{-Inf}
+for "unbounded preceding") and the second is the upper bound (use \code{Inf}
+for "unbounded following", \code{0} for "current row"). Equivalent to calling
+\code{\link[=window_frame]{window_frame()}} before and clearing it after the \code{\link[dplyr:mutate]{dplyr::mutate()}}.}
 
 \item{.keep}{Control which columns from \code{.data} are retained in the output. Grouping
 columns and columns created by \code{...} are always kept.
@@ -65,5 +80,11 @@ db |>
 # dbplyr automatically creates subqueries as needed
 db |>
   mutate(x1 = x + 1, x2 = x1 * 2) |>
+  show_query()
+
+# `.order` and `.frame` control window functions
+db <- memdb_frame(g = c(1, 1, 2, 2, 2), x = c(5, 3, 1, 4, 2))
+db |>
+  mutate(rolling_sum = sum(x), .by = g, .order = x, .frame = c(-2, 2)) |>
   show_query()
 }
