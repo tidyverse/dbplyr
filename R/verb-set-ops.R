@@ -9,7 +9,7 @@
 #' @param all If `TRUE`, includes all matches in output, not just unique rows.
 #' @exportS3Method dplyr::intersect
 #' @importFrom dplyr intersect
-intersect.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
+intersect.tbl_lazy <- function(x, y, copy = "none", ..., all = FALSE) {
   check_dots_empty()
   lazy_query <- add_set_op(x, y, "INTERSECT", copy = copy, all = all)
 
@@ -19,7 +19,7 @@ intersect.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
 #' @importFrom dplyr union
 #' @exportS3Method dplyr::union
 #' @rdname intersect.tbl_lazy
-union.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
+union.tbl_lazy <- function(x, y, copy = "none", ..., all = FALSE) {
   check_dots_empty()
   lazy_query <- add_union(x, y, all = all, copy = copy)
 
@@ -30,7 +30,7 @@ union.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
 #' @importFrom dplyr union_all
 #' @exportS3Method dplyr::union_all
 #' @rdname intersect.tbl_lazy
-union_all.tbl_lazy <- function(x, y, copy = FALSE, ...) {
+union_all.tbl_lazy <- function(x, y, copy = "none", ...) {
   check_dots_empty()
   lazy_query <- add_union(x, y, all = TRUE, copy = copy)
 
@@ -40,7 +40,7 @@ union_all.tbl_lazy <- function(x, y, copy = FALSE, ...) {
 #' @importFrom dplyr setdiff
 #' @exportS3Method dplyr::setdiff
 #' @rdname intersect.tbl_lazy
-setdiff.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
+setdiff.tbl_lazy <- function(x, y, copy = "none", ..., all = FALSE) {
   check_dots_empty()
   lazy_query <- add_set_op(x, y, "EXCEPT", copy = copy, all = all)
 
@@ -48,7 +48,7 @@ setdiff.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
   x
 }
 
-add_union <- function(x, y, all, copy = FALSE, call = caller_env()) {
+add_union <- function(x, y, all, copy = "none", call = caller_env()) {
   y <- dbplyr_auto_copy(x, y, copy = copy, call = call)
   check_set_op_sqlite(x, y, call = call)
 
@@ -89,7 +89,7 @@ add_set_op <- function(
   x,
   y,
   type,
-  copy = FALSE,
+  copy = "none",
   all = FALSE,
   call = caller_env()
 ) {

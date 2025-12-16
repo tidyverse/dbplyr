@@ -215,7 +215,7 @@ sql_values_subquery.Oracle <- function(con, df, types, lvl = 0, ...) {
 }
 
 #' @exportS3Method dplyr::setdiff
-setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
+setdiff.tbl_Oracle <- function(x, y, copy = "none", ...) {
   # Oracle uses MINUS instead of EXCEPT for this operation:
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries004.htm
   x$lazy_query <- add_set_op(x, y, "MINUS", copy = copy, ...)

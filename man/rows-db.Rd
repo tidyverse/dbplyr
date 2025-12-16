@@ -21,7 +21,7 @@
   method = NULL
 )
 
-\method{rows_append}{tbl_lazy}(x, y, ..., copy = FALSE, in_place = FALSE, returning = NULL)
+\method{rows_append}{tbl_lazy}(x, y, ..., copy = "none", in_place = FALSE, returning = NULL)
 
 \method{rows_update}{tbl_lazy}(
   x,
@@ -29,7 +29,7 @@
   by = NULL,
   ...,
   unmatched = c("error", "ignore"),
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL
 )
@@ -40,7 +40,7 @@
   by = NULL,
   ...,
   unmatched = c("error", "ignore"),
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL
 )
@@ -50,7 +50,7 @@
   y,
   by = NULL,
   ...,
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL,
   method = NULL
@@ -62,7 +62,7 @@
   by = NULL,
   ...,
   unmatched = c("error", "ignore"),
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL
 )

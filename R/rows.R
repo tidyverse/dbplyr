@@ -160,7 +160,7 @@ rows_append.tbl_lazy <- function(
   x,
   y,
   ...,
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL
 ) {
@@ -210,7 +210,7 @@ rows_update.tbl_lazy <- function(
   by = NULL,
   ...,
   unmatched = c("error", "ignore"),
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL
 ) {
@@ -291,7 +291,7 @@ rows_patch.tbl_lazy <- function(
   by = NULL,
   ...,
   unmatched = c("error", "ignore"),
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL
 ) {
@@ -388,7 +388,7 @@ rows_upsert.tbl_lazy <- function(
   y,
   by = NULL,
   ...,
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL,
   method = NULL
@@ -466,7 +466,7 @@ rows_delete.tbl_lazy <- function(
   by = NULL,
   ...,
   unmatched = c("error", "ignore"),
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL
 ) {

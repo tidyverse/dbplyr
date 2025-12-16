@@ -7,13 +7,13 @@
 \alias{setdiff.tbl_lazy}
 \title{SQL set operations}
 \usage{
-\method{intersect}{tbl_lazy}(x, y, copy = FALSE, ..., all = FALSE)
+\method{intersect}{tbl_lazy}(x, y, copy = "none", ..., all = FALSE)
 
-\method{union}{tbl_lazy}(x, y, copy = FALSE, ..., all = FALSE)
+\method{union}{tbl_lazy}(x, y, copy = "none", ..., all = FALSE)
 
-\method{union_all}{tbl_lazy}(x, y, copy = FALSE, ...)
+\method{union_all}{tbl_lazy}(x, y, copy = "none", ...)
 
-\method{setdiff}{tbl_lazy}(x, y, copy = FALSE, ..., all = FALSE)
+\method{setdiff}{tbl_lazy}(x, y, copy = "none", ..., all = FALSE)
 }
 \arguments{
 \item{x, y}{A pair of lazy data frames backed by database queries.}
