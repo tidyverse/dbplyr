@@ -106,13 +106,12 @@ copy_to.src_sql <- function(
 #' @importFrom dplyr auto_copy
 #' @export
 auto_copy.tbl_sql <- function(x, y, copy = FALSE, ..., types = NULL) {
-  # NOTE: copy must be TRUE here - dplyr's generic errors on copy = FALSE
-  # The caller should use dbplyr_auto_copy() to handle all copy values
+  # NB: copy is always TRUE here - dplyr's generic errors on copy = FALSE
   dbplyr_auto_copy(x, y, copy = "temp-table", ..., types = types)
 }
 
-# Handles all copy argument values including "inline"
-# Use this instead of calling auto_copy() directly
+# Use this instead of calling auto_copy() directly since auto_copy() expects
+# TRUE or FALSE
 dbplyr_auto_copy <- function(
   x,
   y,
