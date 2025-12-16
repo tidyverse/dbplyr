@@ -112,8 +112,8 @@ connect to a real database:</p>
 <code class="sourceCode R"><span><span class="va">lf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tbl_lazy.html">lazy_frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span>, y <span class="op">=</span> <span class="fl">2</span>, g <span class="op">=</span> <span class="st">"a"</span><span class="op">)</span></span>
 <span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>z <span class="op">=</span> <span class="op">(</span><span class="va">x</span> <span class="op">+</span> <span class="va">y</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `df`.*, (`x` + `y`) / 2.0<span style="color: #0000BB;"> AS </span>`z`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "df".*, ("x" + "y") / 2.0<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span></code></pre></div>
 <p>The default <code><a href="../reference/tbl_lazy.html">lazy_frame()</a></code> uses a generic database that
 generates (approximately) SQL-92 compliant SQL. You can use
 <code>simulate_*()</code> connections to see the translations used by
@@ -129,17 +129,23 @@ see <code><a href="../articles/new-backend.html">vignette("new-backend")</a></co
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
 <span><span class="va">lf_access</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>z <span class="op">=</span> <span class="va">x</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `x` ^ 2.0<span style="color: #0000BB;"> AS </span>`z`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span></code></pre></div>
-<p>Perfect translation is not possible because databases don’t have all
-the functions that R does. The goal of dbplyr is to provide a semantic
-rather than a literal translation: what you mean, rather than precisely
-what is done. In fact, even for functions that exist both in databases
-and in R, you shouldn’t expect results to be identical; database
-programmers have different priorities than R core programmers. For
-example, in R in order to get a higher level of numerical accuracy,
-<code><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean()</a></code> loops through the data twice. R’s
-<code><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean()</a></code> also provides a <code>trim</code> option for
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "x" ^ 2.0<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span></code></pre></div>
+<p>One key difference between dbplyr-generated SQL and hand-written SQL
+is that dbplyr always quotes all table and column names. This is verbose
+but necessary because column names in database tables can be any string,
+including SQL reserved words like <code>select</code> or
+<code>if</code>. Quoting all names ensures that dbplyr-generated SQL
+always works regardless of the table and column names involved.</p>
+<p>In general, perfect translation is not possible because databases
+don’t have all the functions that R does. The goal of dbplyr is to
+provide a semantic rather than a literal translation: what you mean,
+rather than precisely what is done. In fact, even for functions that
+exist both in databases and in R, you shouldn’t expect results to be
+identical; database programmers have different priorities than R core
+programmers. For example, in R in order to get a higher level of
+numerical accuracy, <code><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean()</a></code> loops through the data twice.
+R’s <code><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean()</a></code> also provides a <code>trim</code> option for
 computing trimmed means; this is something that databases do not
 provide.</p>
 <p>If you’re interested in how <code><a href="../reference/translate_sql.html">translate_sql()</a></code> is
@@ -159,9 +165,9 @@ used for strings.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"x"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `df`.*</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> (`x` = 'x')</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "df".*</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> ("x" = 'x')</span></span></code></pre></div>
 </li>
 <li>
 <p>R and SQL have different defaults for integers and reals. In R, 1
@@ -170,12 +176,12 @@ real.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>z <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> 1.0<span style="color: #0000BB;"> AS </span>`z`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> 1.0<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span>
 <span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>z <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> 1<span style="color: #0000BB;"> AS </span>`z`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> 1<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span></code></pre></div>
 </li>
 </ul>
 </div>
@@ -207,16 +213,16 @@ real.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span> <span class="op">/</span> <span class="fl">2</span>, y <span class="op">=</span> <span class="va">x</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">y</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `x`, (POWER(`x`, 2.0)) + POWER(`y`, 2.0)<span style="color: #0000BB;"> AS </span>`y`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "x", (POWER("x", 2.0)) + POWER("y", 2.0)<span style="color: #0000BB;"> AS </span>"y"</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> (</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> `x` / 2.0<span style="color: #0000BB;"> AS </span>`x`, `y`, `g`</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> `df`</span></span>
-<span><span class="co">#&gt; ) <span style="color: #0000BB;">AS </span>`q01`</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> "x" / 2.0<span style="color: #0000BB;"> AS </span>"x", "y", "g"</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> "df"</span></span>
+<span><span class="co">#&gt; ) <span style="color: #0000BB;">AS </span>"q01"</span></span>
 <span></span>
 <span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">y</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> LN(`x`)<span style="color: #0000BB;"> AS </span>`x`, ROUND(`y`, 1)<span style="color: #0000BB;"> AS </span>`y`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> LN("x")<span style="color: #0000BB;"> AS </span>"x", ROUND("y", 1)<span style="color: #0000BB;"> AS </span>"y"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="modulo-arithmetic">Modulo arithmetic<a class="anchor" aria-label="anchor" href="#modulo-arithmetic"></a>
@@ -268,21 +274,21 @@ robust cross-database translation available.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;</span> <span class="fl">5</span> <span class="op">|</span> <span class="va">y</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `df`.*</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> (`x` &gt; 5.0 OR `y` = 2.0)</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "df".*</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> ("x" &gt; 5.0 OR "y" = 2.0)</span></span>
 <span></span>
 <span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `df`.*</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> (`x` IN (1.0, 2.0, 3.0))</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "df".*</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> ("x" IN (1.0, 2.0, 3.0))</span></span>
 <span></span>
 <span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/between.html" class="external-link">between</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `df`.*</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> (`x` BETWEEN 1.0 AND 5.0)</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "df".*</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> ("x" BETWEEN 1.0 AND 5.0)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="bitwise-operations">Bitwise operations<a class="anchor" aria-label="anchor" href="#bitwise-operations"></a>
@@ -294,11 +300,11 @@ supported:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/bitwise.html" class="external-link">bitwAnd</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">3L</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/bitwise.html" class="external-link">bitwShiftL</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">2L</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `x`, `x` &lt;&lt; 2<span style="color: #0000BB;"> AS </span>`y`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "x", "x" &lt;&lt; 2<span style="color: #0000BB;"> AS </span>"y"</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> (</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> `x` &amp; 3<span style="color: #0000BB;"> AS </span>`x`, `y`, `g`</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> `df`</span></span>
-<span><span class="co">#&gt; ) <span style="color: #0000BB;">AS </span>`q01`</span></span></code></pre></div>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> "x" &amp; 3<span style="color: #0000BB;"> AS </span>"x", "y", "g"</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> "df"</span></span>
+<span><span class="co">#&gt; ) <span style="color: #0000BB;">AS </span>"q01"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="type-coercion">Type coercion<a class="anchor" aria-label="anchor" href="#type-coercion"></a>
@@ -308,11 +314,11 @@ call:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `x`, CAST(`x` AS TEXT)<span style="color: #0000BB;"> AS </span>`y`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "x", CAST("x" AS TEXT)<span style="color: #0000BB;"> AS </span>"y"</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> (</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> CAST(`y` AS INTEGER)<span style="color: #0000BB;"> AS </span>`x`, `y`, `g`</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> `df`</span></span>
-<span><span class="co">#&gt; ) <span style="color: #0000BB;">AS </span>`q01`</span></span></code></pre></div>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> CAST("y" AS INTEGER)<span style="color: #0000BB;"> AS </span>"x", "y", "g"</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> "df"</span></span>
+<span><span class="co">#&gt; ) <span style="color: #0000BB;">AS </span>"q01"</span></span></code></pre></div>
 <ul>
 <li>integer types: <code><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer()</a></code>,
 <code>as.integer64()</code>
@@ -345,19 +351,19 @@ value.</li>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `df`.*</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> (NOT((`x` IS NULL)))</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "df".*</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> (NOT(("x" IS NULL)))</span></span>
 <span></span>
 <span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/coalesce.html" class="external-link">coalesce</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">0L</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> COALESCE(`x`, 0)<span style="color: #0000BB;"> AS </span>`x`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> COALESCE("x", 0)<span style="color: #0000BB;"> AS </span>"x"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span>
 <span></span>
 <span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/na_if.html" class="external-link">na_if</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">0L</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> NULLIF(`x`, 0)<span style="color: #0000BB;"> AS </span>`x`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> NULLIF("x", 0)<span style="color: #0000BB;"> AS </span>"x"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="aggregation">Aggregation<a class="anchor" aria-label="anchor" href="#aggregation"></a>
@@ -373,27 +379,27 @@ functions warn you about this important difference:</p>
 <span><span class="co">#&gt; Use `na.rm = TRUE` to silence this warning</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> AVG(`x`)<span style="color: #0000BB;"> AS </span>`z`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> AVG("x")<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span>
 <span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> AVG(`x`)<span style="color: #0000BB;"> AS </span>`z`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> AVG("x")<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span></code></pre></div>
 <p>Note that aggregation functions used inside <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code> or
 <code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter()</a></code> generate a window translation:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `df`.*, AVG(`x`) OVER ()<span style="color: #0000BB;"> AS </span>`z`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "df".*, AVG("x") OVER ()<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span>
 <span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `x`, `y`, `g`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "x", "y", "g"</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> (</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> `df`.*, AVG(`x`) OVER ()<span style="color: #0000BB;"> AS </span>`col01`</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> `df`</span></span>
-<span><span class="co">#&gt; ) <span style="color: #0000BB;">AS </span>`q01`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> (`col01` &gt; 0.0)</span></span></code></pre></div>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> "df".*, AVG("x") OVER ()<span style="color: #0000BB;"> AS </span>"col01"</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> "df"</span></span>
+<span><span class="co">#&gt; ) <span style="color: #0000BB;">AS </span>"q01"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> ("col01" &gt; 0.0)</span></span></code></pre></div>
 <p>Most backends also support:</p>
 <ul>
 <li>
@@ -420,8 +426,8 @@ are translated to <code>CASE WHEN</code>:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;</span> <span class="fl">5</span>, <span class="st">"big"</span>, <span class="st">"small"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> CASE WHEN (`x` &gt; 5.0) THEN 'big' WHEN NOT (`x` &gt; 5.0) THEN 'small' END<span style="color: #0000BB;"> AS </span>`z`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> CASE WHEN ("x" &gt; 5.0) THEN 'big' WHEN NOT ("x" &gt; 5.0) THEN 'small' END<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span></code></pre></div>
 <p><code><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/case_match.html" class="external-link">case_match()</a></code>, and
 <code><a href="https://rdrr.io/r/base/switch.html" class="external-link">switch()</a></code> are also supported:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
@@ -433,20 +439,20 @@ are translated to <code>CASE WHEN</code>:</p>
 <span>  <span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span></span></span>
-<span><span class="co">#&gt;   `df`.*,</span></span>
+<span><span class="co">#&gt;   "df".*,</span></span>
 <span><span class="co">#&gt;   CASE</span></span>
-<span><span class="co">#&gt; WHEN (`x` &gt; 10.0) THEN 'medium'</span></span>
-<span><span class="co">#&gt; WHEN (`x` &gt; 30.0) THEN 'big'</span></span>
+<span><span class="co">#&gt; WHEN ("x" &gt; 10.0) THEN 'medium'</span></span>
+<span><span class="co">#&gt; WHEN ("x" &gt; 30.0) THEN 'big'</span></span>
 <span><span class="co">#&gt; ELSE 'small'</span></span>
-<span><span class="co">#&gt; END<span style="color: #0000BB;"> AS </span>`z`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
+<span><span class="co">#&gt; END<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span>
 <span></span>
 <span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>z <span class="op">=</span> <span class="kw"><a href="https://rdrr.io/r/base/switch.html" class="external-link">switch</a></span><span class="op">(</span><span class="va">g</span>, a <span class="op">=</span> <span class="fl">1L</span>, b <span class="op">=</span> <span class="fl">2L</span>, <span class="fl">3L</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span></span></span>
-<span><span class="co">#&gt;   `df`.*,</span></span>
-<span><span class="co">#&gt;   CASE `g` WHEN ('a') THEN (1) WHEN ('b') THEN (2) ELSE (3) END<span style="color: #0000BB;"> AS </span>`z`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span></code></pre></div>
+<span><span class="co">#&gt;   "df".*,</span></span>
+<span><span class="co">#&gt;   CASE "g" WHEN ('a') THEN (1) WHEN ('b') THEN (2) ELSE (3) END<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="string-functions">String functions<a class="anchor" aria-label="anchor" href="#string-functions"></a>
@@ -477,13 +483,13 @@ supported:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">g</span>, <span class="st">" dog"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> CONCAT_WS('', `g`, ' dog')<span style="color: #0000BB;"> AS </span>`x`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> CONCAT_WS('', "g", ' dog')<span style="color: #0000BB;"> AS </span>"x"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span>
 <span></span>
 <span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr</a></span><span class="op">(</span><span class="va">g</span>, <span class="fl">1L</span>, <span class="fl">2L</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> SUBSTR(`g`, 1, 2)<span style="color: #0000BB;"> AS </span>`x`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> SUBSTR("g", 1, 2)<span style="color: #0000BB;"> AS </span>"x"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span></code></pre></div>
 <p>Many backends also support regular expression functions like
 <code>str_detect()</code>, <code>str_replace()</code>,
 <code>str_replace_all()</code>, <code>str_remove()</code>,
@@ -516,10 +522,10 @@ components:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span></span></span>
-<span><span class="co">#&gt;   EXTRACT(year FROM `dt`)<span style="color: #0000BB;"> AS </span>`year`,</span></span>
-<span><span class="co">#&gt;   EXTRACT(month FROM `dt`)<span style="color: #0000BB;"> AS </span>`month`,</span></span>
-<span><span class="co">#&gt;   EXTRACT(day FROM `dt`)<span style="color: #0000BB;"> AS </span>`day`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span></code></pre></div>
+<span><span class="co">#&gt;   EXTRACT(year FROM "dt")<span style="color: #0000BB;"> AS </span>"year",</span></span>
+<span><span class="co">#&gt;   EXTRACT(month FROM "dt")<span style="color: #0000BB;"> AS </span>"month",</span></span>
+<span><span class="co">#&gt;   EXTRACT(day FROM "dt")<span style="color: #0000BB;"> AS </span>"day"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span></code></pre></div>
 <p>Some backends also support additional lubridate functions including
 <code>yday()</code>, <code>wday()</code>, <code>week()</code>,
 <code>isoweek()</code>, <code>quarter()</code>, <code>isoyear()</code>,
@@ -571,15 +577,15 @@ often be used directly.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>z <span class="op">=</span> <span class="fu">foofify</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `df`.*, foofify(`x`, `y`)<span style="color: #0000BB;"> AS </span>`z`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "df".*, foofify("x", "y")<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span></code></pre></div>
 <p>But to make it clear that you’re deliberately calling a SQL function,
 we recommend using the <code>.sql</code> pronoun:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>z <span class="op">=</span> <span class="va">.sql</span><span class="op">$</span><span class="fu">foofify</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> foofify(`x`, `y`)<span style="color: #0000BB;"> AS </span>`z`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> foofify("x", "y")<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span></code></pre></div>
 <p>If you’re working inside a package, this also makes it easier to
 avoid <code>R CMD CHECK</code> notes. Just import <code>.sql</code> from
 dbplyr using a roxygen2 tag like
@@ -595,32 +601,32 @@ limited form of pattern matching:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">x</span> <span class="op">%LIKE%</span> <span class="st">"%foo%"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `df`.*</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> (`x` LIKE '%foo%')</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "df".*</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> ("x" LIKE '%foo%')</span></span></code></pre></div>
 <p>You can also use <code>str_like()</code> for this common case:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">str_like</span><span class="op">(</span><span class="va">x</span>, <span class="st">"%foo%"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `df`.*</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> (`x` LIKE '%foo%')</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "df".*</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> ("x" LIKE '%foo%')</span></span></code></pre></div>
 <p>You could use <code>%||%</code> for string concatenation, but in most
 cases it’s more R-like to use <code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste()</a></code> or
 <code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0()</a></code>:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>z <span class="op">=</span> <span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/Control.html" class="external-link">%||%</a></span> <span class="va">y</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `x` || `y`<span style="color: #0000BB;"> AS </span>`z`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "x" || "y"<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span>
 <span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> CONCAT_WS('', `x`, `y`)<span style="color: #0000BB;"> AS </span>`z`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> CONCAT_WS('', "x", "y")<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span>
 <span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> CONCAT_WS(' ', `x`, `y`)<span style="color: #0000BB;"> AS </span>`z`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> CONCAT_WS(' ', "x", "y")<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="special-forms">Special forms<a class="anchor" aria-label="anchor" href="#special-forms"></a>
@@ -632,22 +638,22 @@ literal SQL inside <code><a href="../reference/sql.html">sql()</a></code>:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>z <span class="op">=</span> <span class="fu"><a href="../reference/sql.html">sql</a></span><span class="op">(</span><span class="st">"x!"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> x!<span style="color: #0000BB;"> AS </span>`z`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> x!<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span>
 <span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>z <span class="op">=</span> <span class="va">x</span> <span class="op">==</span> <span class="fu"><a href="../reference/sql.html">sql</a></span><span class="op">(</span><span class="st">"ANY VALUES(1, 2, 3)"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `x` = ANY VALUES(1, 2, 3)<span style="color: #0000BB;"> AS </span>`z`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "x" = ANY VALUES(1, 2, 3)<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span></code></pre></div>
 <p>This gives you a lot of freedom to generate the SQL you need:</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>factorial <span class="op">=</span> <span class="fu"><a href="../reference/sql.html">sql</a></span><span class="op">(</span><span class="st">"x!"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> x!<span style="color: #0000BB;"> AS </span>`factorial`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> x!<span style="color: #0000BB;"> AS </span>"factorial"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span>
 <span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>factorial <span class="op">=</span> <span class="fu"><a href="../reference/sql.html">sql</a></span><span class="op">(</span><span class="st">"CAST(x AS FLOAT)"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> CAST(x AS FLOAT)<span style="color: #0000BB;"> AS </span>`factorial`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> CAST(x AS FLOAT)<span style="color: #0000BB;"> AS </span>"factorial"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="error-for-unknown-translations">Error for unknown translations<a class="anchor" aria-label="anchor" href="#error-for-unknown-translations"></a>
@@ -737,31 +743,31 @@ use <code><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="
 <span>  cumsum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span>,</span>
 <span>  lag <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Windowed expression `SUM(`g`)` does not have explicit order.</span></span>
+<span><span class="co">#&gt; Warning: Windowed expression `SUM("g")` does not have explicit order.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `arrange()`, `window_order()`, or `.order` to make</span></span>
 <span><span class="co">#&gt;   deterministic.</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span></span></span>
-<span><span class="co">#&gt;   AVG(`g`) OVER ()<span style="color: #0000BB;"> AS </span>`mean`,</span></span>
+<span><span class="co">#&gt;   AVG("g") OVER ()<span style="color: #0000BB;"> AS </span>"mean",</span></span>
 <span><span class="co">#&gt;   CASE</span></span>
-<span><span class="co">#&gt; WHEN (NOT((`g` IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN ((`g` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `g`)</span></span>
-<span><span class="co">#&gt; END<span style="color: #0000BB;"> AS </span>`rank`,</span></span>
-<span><span class="co">#&gt;   SUM(`g`) OVER (ROWS UNBOUNDED PRECEDING)<span style="color: #0000BB;"> AS </span>`cumsum`,</span></span>
-<span><span class="co">#&gt;   LAG(`g`, 1, NULL) OVER ()<span style="color: #0000BB;"> AS </span>`lag`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span></code></pre></div>
+<span><span class="co">#&gt; WHEN (NOT(("g" IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN (("g" IS NULL)) THEN 1 ELSE 0 END) ORDER BY "g")</span></span>
+<span><span class="co">#&gt; END<span style="color: #0000BB;"> AS </span>"rank",</span></span>
+<span><span class="co">#&gt;   SUM("g") OVER (ROWS UNBOUNDED PRECEDING)<span style="color: #0000BB;"> AS </span>"cumsum",</span></span>
+<span><span class="co">#&gt;   LAG("g", 1, NULL) OVER ()<span style="color: #0000BB;"> AS </span>"lag"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span></code></pre></div>
 <p>If the lazy frame has been grouped or arranged previously in the
 pipeline, then dbplyr will use that information to set the “partition
 by” and “order by” clauses:</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>z <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/cumall.html" class="external-link">cummean</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `df`.*, AVG(`g`) OVER (ORDER BY `year` ROWS UNBOUNDED PRECEDING)<span style="color: #0000BB;"> AS </span>`z`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">ORDER BY</span> `year`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "df".*, AVG("g") OVER (ORDER BY "year" ROWS UNBOUNDED PRECEDING)<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">ORDER BY</span> "year"</span></span>
 <span><span class="va">lf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rank.html" class="external-link">rank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `df`.*, RANK() OVER (PARTITION BY `id`)<span style="color: #0000BB;"> AS </span>`z`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "df".*, RANK() OVER (PARTITION BY "id")<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span></code></pre></div>
 <p>There are some challenges when translating window functions between R
 and SQL, because dbplyr tries to keep the window functions as similar as
 possible to both the existing R analogues and to the SQL functions. This
@@ -790,11 +796,11 @@ to override the default ordering.</p></li>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span></span></span>
 <span><span class="co">#&gt;   CASE</span></span>
-<span><span class="co">#&gt; WHEN (NOT((`g` IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN ((`g` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `g`)</span></span>
-<span><span class="co">#&gt; END<span style="color: #0000BB;"> AS </span>`x1`,</span></span>
-<span><span class="co">#&gt;   SUM(`g`) OVER (ORDER BY `year` ROWS UNBOUNDED PRECEDING)<span style="color: #0000BB;"> AS </span>`x2`,</span></span>
-<span><span class="co">#&gt;   LEAD(`g`, 1, NULL) OVER (ORDER BY `year`)<span style="color: #0000BB;"> AS </span>`x3`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span></code></pre></div>
+<span><span class="co">#&gt; WHEN (NOT(("g" IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN (("g" IS NULL)) THEN 1 ELSE 0 END) ORDER BY "g")</span></span>
+<span><span class="co">#&gt; END<span style="color: #0000BB;"> AS </span>"x1",</span></span>
+<span><span class="co">#&gt;   SUM("g") OVER (ORDER BY "year" ROWS UNBOUNDED PRECEDING)<span style="color: #0000BB;"> AS </span>"x2",</span></span>
+<span><span class="co">#&gt;   LEAD("g", 1, NULL) OVER (ORDER BY "year")<span style="color: #0000BB;"> AS </span>"x3"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span></code></pre></div>
 <p>Currently there is no way to order by multiple variables, except by
 setting the default ordering with <code><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange()</a></code>. This will be
 added in a future release.</p>

@@ -50,7 +50,7 @@ escape_ansi("X")
 escape_ansi(sql("X"))
 #> <SQL> X
 escape_ansi(ident("X"))
-#> <SQL> `X`
+#> <SQL> "X"
 
 # Escaping is idempotent
 escape_ansi("X")

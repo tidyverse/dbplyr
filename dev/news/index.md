@@ -2,6 +2,13 @@
 
 ## dbplyr (development version)
 
+- `simulate_*()` now uses (approximately) correct quoting for all
+  backends, so the generated SQL looks more like what you’ll actually
+  get when connected to a real database
+  ([\#1464](https://github.com/tidyverse/dbplyr/issues/1464)).
+- [`sql_infix()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_scalar.md)
+  no longer has a `con` argument since the connection needs to be
+  determined at call time, not at definition time.
 - [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html) gains
   `.order` and `.frame` arguments for specifying window function
   ordering and frame bounds within a single mutate call, similar to how

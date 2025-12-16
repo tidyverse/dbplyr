@@ -141,7 +141,7 @@ the older forms like <code><a href="https://dbi.r-dbi.org/reference/Id.html" cla
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">tbl</span> <span class="op">&lt;-</span> <span class="st">"my_table"</span></span></span>
 <span class="r-in"><span><span class="fu">sql_glue2</span><span class="op">(</span><span class="va">con</span>, <span class="st">"SELECT * FROM {.tbl tbl}"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; SELECT * FROM `my_table`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; SELECT * FROM "my_table"</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Values are properly escaped</span></span></span>
 <span class="r-in"><span><span class="va">name</span> <span class="op">&lt;-</span> <span class="st">"Robert'); DROP TABLE students;--"</span></span></span>
@@ -151,7 +151,7 @@ the older forms like <code><a href="https://dbi.r-dbi.org/reference/Id.html" cla
 <span class="r-in"><span><span class="co"># Control wrapping with *</span></span></span>
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"name"</span>, <span class="st">"age"</span>, <span class="st">"grade"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">sql_glue2</span><span class="op">(</span><span class="va">con</span>, <span class="st">"SELECT {.id x} FROM students"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; SELECT `name`, `age`, `grade` FROM students</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; SELECT "name", "age", "grade" FROM students</span>
 <span class="r-in"><span><span class="fu">sql_glue2</span><span class="op">(</span><span class="va">con</span>, <span class="st">"SELECT * WHERE variable IN {x*}"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; SELECT * WHERE variable IN ('name', 'age', 'grade')</span>
 </code></pre></div>

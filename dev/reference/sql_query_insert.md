@@ -191,11 +191,11 @@ sql_query_upsert(
   by = "carrier",
   update_cols = "name"
 )
-#> <SQL> INSERT INTO `airlines` (`carrier`, `name`)
-#> SELECT `carrier`, `name`
-#> FROM `df` AS `...y`
+#> <SQL> INSERT INTO "airlines" ("carrier", "name")
+#> SELECT "carrier", "name"
+#> FROM "df" AS "...y"
 #> WHERE true
-#> ON CONFLICT  (`carrier`)
+#> ON CONFLICT  ("carrier")
 #> DO UPDATE
-#> SET `name` = `excluded`.`name`
+#> SET "name" = "excluded"."name"
 ```

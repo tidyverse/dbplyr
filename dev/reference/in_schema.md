@@ -26,9 +26,9 @@ in_catalog(catalog, schema, table)
 ``` r
 # Previously:
 in_schema("my_schema", "my_table")
-#> <SCHEMA> `my_schema`.`my_table`
+#> <SCHEMA> "my_schema"."my_table"
 in_catalog("my_catalog", "my_schema", "my_table")
-#> <CATALOG> `my_catalog`.`my_schema`.`my_table`
+#> <CATALOG> "my_catalog"."my_schema"."my_table"
 in_schema(sql("my_schema"), sql("my_table"))
 #> <SCHEMA> my_schema.my_table
 

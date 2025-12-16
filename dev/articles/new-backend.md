@@ -134,7 +134,7 @@ index_name <- "index"
 table <- I("schema.table")
 columns <- c("column1", "column2")
 sql_glue2(con, "CREATE INDEX {.id index_name} ON {.tbl table} {.id columns*}")
-#> <SQL> CREATE INDEX `index` ON schema.table (`column1`, `column2`)
+#> <SQL> CREATE INDEX "index" ON schema.table ("column1", "column2")
 
 # Insert values safely
 name <- "O'Brien"
@@ -145,7 +145,7 @@ sql_glue2(con, "INSERT INTO students (name) VALUES {name*}")
 table <- "my_table"
 cols <- c("id", "name", "value")
 sql_glue2(con, "SELECT {.id cols} FROM {.tbl table}")
-#> <SQL> SELECT `id`, `name`, `value` FROM `my_table`
+#> <SQL> SELECT "id", "name", "value" FROM "my_table"
 ```
 
 ## SQL translation: vectors

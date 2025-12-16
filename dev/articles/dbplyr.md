@@ -356,11 +356,11 @@ db |>
     b = a ^ 2,
   )
 #> <SQL>
-#> SELECT `q01`.*, POWER(`a`, 2.0) AS `b`
+#> SELECT "q01".*, POWER("a", 2.0) AS "b"
 #> FROM (
-#>   SELECT `df`.*, `y` * `x` AS `a`
-#>   FROM `df`
-#> ) AS `q01`
+#>   SELECT "df".*, "y" * "x" AS "a"
+#>   FROM "df"
+#> ) AS "q01"
 ```
 
 In general, it’s much easier to work iteratively in dbplyr. You can
@@ -385,15 +385,15 @@ Any function that dbplyr doesn’t know about will be left as is:
 db |>
   mutate(z = foofify(x, y))
 #> <SQL>
-#> SELECT `df`.*, foofify(`x`, `y`) AS `z`
-#> FROM `df`
+#> SELECT "df".*, foofify("x", "y") AS "z"
+#> FROM "df"
 
 db |>
   filter(x %LIKE% "%foo%")
 #> <SQL>
-#> SELECT `df`.*
-#> FROM `df`
-#> WHERE (`x` LIKE '%foo%')
+#> SELECT "df".*
+#> FROM "df"
+#> WHERE ("x" LIKE '%foo%')
 ```
 
 To make it more clear that you’re calling a SQL function, not an R
@@ -403,8 +403,8 @@ function, you can use the `.sql` pronoun:
 db |>
   mutate(z = .sql$foofify(x, y))
 #> <SQL>
-#> SELECT `df`.*, foofify(`x`, `y`) AS `z`
-#> FROM `df`
+#> SELECT "df".*, foofify("x", "y") AS "z"
+#> FROM "df"
 ```
 
 SQL functions tend to have a greater variety of syntax than R. That
@@ -417,14 +417,14 @@ literal SQL inside
 db |>
   transmute(factorial = sql("x!"))
 #> <SQL>
-#> SELECT x! AS `factorial`
-#> FROM `df`
+#> SELECT x! AS "factorial"
+#> FROM "df"
 
 db |>
   transmute(factorial = sql("CAST(x AS FLOAT)"))
 #> <SQL>
-#> SELECT CAST(x AS FLOAT) AS `factorial`
-#> FROM `df`
+#> SELECT CAST(x AS FLOAT) AS "factorial"
+#> FROM "df"
 ```
 
 Learn more in

@@ -29,6 +29,6 @@ library(dplyr, warn.conflicts = FALSE)
 lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_teradata())
 lf |> head()
 #> <SQL>
-#> SELECT TOP 6 `df`.*
-#> FROM `df`
+#> SELECT TOP 6 "df".*
+#> FROM "df"
 ```

@@ -55,7 +55,7 @@ sql_expr(f(x, y), con = con)
 
 x <- ident("x")
 sql_expr(f(!!x, y), con = con)
-#> <SQL> F(`x`, y)
+#> <SQL> F("x", y)
 
 sql_expr(cast("x" %as% DECIMAL), con = con)
 #> <SQL> CAST('x' AS DECIMAL)

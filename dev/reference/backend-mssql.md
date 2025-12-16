@@ -77,28 +77,42 @@ library(dplyr, warn.conflicts = FALSE)
 
 lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_mssql())
 lf |> head()
+#> Warning: EOF within quoted string
+#> Warning: EOF within quoted string
+#> Warning: EOF within quoted string
 #> <SQL>
-#> SELECT TOP 6 `df`.*
-#> FROM `df`
+#> SELECT TOP 6 [df]]
+#> ].*
+#> FROM [df]
 lf |> transmute(x = paste(b, c, d))
+#> Warning: EOF within quoted string
+#> Warning: EOF within quoted string
 #> <SQL>
-#> SELECT `b` + ' ' + `c` + ' ' + `d` AS `x`
-#> FROM `df`
+#> SELECT [b] + ' ' + [c] + ' ' + [d] AS [x]
+#> FROM [df]
 
 # Can use boolean as is:
 lf |> filter(c > d)
+#> Warning: EOF within quoted string
+#> Warning: EOF within quoted string
+#> Warning: EOF within quoted string
 #> <SQL>
-#> SELECT `df`.*
-#> FROM `df`
-#> WHERE (`c` > `d`)
+#> SELECT [df]]
+#> ].*
+#> FROM [df]
+#> WHERE ([c] > [d])
 # Need to convert from boolean to bit:
 lf |> transmute(x = c > d)
+#> Warning: EOF within quoted string
+#> Warning: EOF within quoted string
 #> <SQL>
-#> SELECT CAST(IIF(`c` > `d`, 1, 0) AS BIT) AS `x`
-#> FROM `df`
+#> SELECT CAST(IIF([c] > [d], 1, 0) AS BIT) AS [x]
+#> FROM [df]
 # Can use boolean as is:
 lf |> transmute(x = ifelse(c > d, "c", "d"))
+#> Warning: EOF within quoted string
+#> Warning: EOF within quoted string
 #> <SQL>
-#> SELECT CASE WHEN (`c` > `d`) THEN 'c' WHEN NOT (`c` > `d`) THEN 'd' END AS `x`
-#> FROM `df`
+#> SELECT CASE WHEN ([c] > [d]) THEN 'c' WHEN NOT ([c] > [d]) THEN 'd' END AS [x]
+#> FROM [df]
 ```

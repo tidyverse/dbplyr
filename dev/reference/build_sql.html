@@ -119,10 +119,10 @@ be needed in typical use.</p></dd>
 <span class="r-in"><span><span class="fu">build_sql</span><span class="op">(</span><span class="st">"SELECT * FROM "</span>, <span class="fu"><a href="ident.html">ident</a></span><span class="op">(</span><span class="st">"table"</span><span class="op">)</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>`build_sql()` was deprecated in dbplyr 2.6.0.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Please use `sql_glue2()` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; SELECT * FROM `table`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; SELECT * FROM "table"</span>
 <span class="r-in"><span><span class="co"># New:</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="sql_glue.html">sql_glue2</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"SELECT * FROM {.tbl 'table'}"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; SELECT * FROM `table`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; SELECT * FROM "table"</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Old:</span></span></span>
 <span class="r-in"><span><span class="va">name</span> <span class="op">&lt;-</span> <span class="st">"Robert"</span></span></span>

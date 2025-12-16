@@ -22,8 +22,8 @@ needing to connect to a real database:
 lf <- lazy_frame(x = 1, y = 2, g = "a")
 lf |> mutate(z = (x + y) / 2)
 #> <SQL>
-#> SELECT `df`.*, (`x` + `y`) / 2.0 AS `z`
-#> FROM `df`
+#> SELECT "df".*, ("x" + "y") / 2.0 AS "z"
+#> FROM "df"
 ```
 
 The default
@@ -45,17 +45,24 @@ lf_sqlite |> transmute(z = x^2)
 #> FROM `df`
 lf_access |> transmute(z = x^2)
 #> <SQL>
-#> SELECT `x` ^ 2.0 AS `z`
-#> FROM `df`
+#> SELECT "x" ^ 2.0 AS "z"
+#> FROM "df"
 ```
 
-Perfect translation is not possible because databases don’t have all the
-functions that R does. The goal of dbplyr is to provide a semantic
-rather than a literal translation: what you mean, rather than precisely
-what is done. In fact, even for functions that exist both in databases
-and in R, you shouldn’t expect results to be identical; database
-programmers have different priorities than R core programmers. For
-example, in R in order to get a higher level of numerical accuracy,
+One key difference between dbplyr-generated SQL and hand-written SQL is
+that dbplyr always quotes all table and column names. This is verbose
+but necessary because column names in database tables can be any string,
+including SQL reserved words like `select` or `if`. Quoting all names
+ensures that dbplyr-generated SQL always works regardless of the table
+and column names involved.
+
+In general, perfect translation is not possible because databases don’t
+have all the functions that R does. The goal of dbplyr is to provide a
+semantic rather than a literal translation: what you mean, rather than
+precisely what is done. In fact, even for functions that exist both in
+databases and in R, you shouldn’t expect results to be identical;
+database programmers have different priorities than R core programmers.
+For example, in R in order to get a higher level of numerical accuracy,
 [`mean()`](https://rdrr.io/r/base/mean.html) loops through the data
 twice. R’s [`mean()`](https://rdrr.io/r/base/mean.html) also provides a
 `trim` option for computing trimmed means; this is something that
@@ -79,9 +86,9 @@ There are two fundamental differences between R and SQL:
   ``` r
   lf |> filter(x == "x")
   #> <SQL>
-  #> SELECT `df`.*
-  #> FROM `df`
-  #> WHERE (`x` = 'x')
+  #> SELECT "df".*
+  #> FROM "df"
+  #> WHERE ("x" = 'x')
   ```
 
 - R and SQL have different defaults for integers and reals. In R, 1 is a
@@ -91,12 +98,12 @@ There are two fundamental differences between R and SQL:
   ``` r
   lf |> transmute(z = 1)
   #> <SQL>
-  #> SELECT 1.0 AS `z`
-  #> FROM `df`
+  #> SELECT 1.0 AS "z"
+  #> FROM "df"
   lf |> transmute(z = 1L)
   #> <SQL>
-  #> SELECT 1 AS `z`
-  #> FROM `df`
+  #> SELECT 1 AS "z"
+  #> FROM "df"
   ```
 
 ## Known functions
@@ -127,16 +134,16 @@ There are two fundamental differences between R and SQL:
 ``` r
 lf |> transmute(x = x / 2, y = x^2 + y^2)
 #> <SQL>
-#> SELECT `x`, (POWER(`x`, 2.0)) + POWER(`y`, 2.0) AS `y`
+#> SELECT "x", (POWER("x", 2.0)) + POWER("y", 2.0) AS "y"
 #> FROM (
-#>   SELECT `x` / 2.0 AS `x`, `y`, `g`
-#>   FROM `df`
-#> ) AS `q01`
+#>   SELECT "x" / 2.0 AS "x", "y", "g"
+#>   FROM "df"
+#> ) AS "q01"
 
 lf |> transmute(x = log(x), y = round(y, 1))
 #> <SQL>
-#> SELECT LN(`x`) AS `x`, ROUND(`y`, 1) AS `y`
-#> FROM `df`
+#> SELECT LN("x") AS "x", ROUND("y", 1) AS "y"
+#> FROM "df"
 ```
 
 ### Modulo arithmetic
@@ -186,21 +193,21 @@ cross-database translation available.
 ``` r
 lf |> filter(x > 5 | y == 2)
 #> <SQL>
-#> SELECT `df`.*
-#> FROM `df`
-#> WHERE (`x` > 5.0 OR `y` = 2.0)
+#> SELECT "df".*
+#> FROM "df"
+#> WHERE ("x" > 5.0 OR "y" = 2.0)
 
 lf |> filter(x %in% c(1, 2, 3))
 #> <SQL>
-#> SELECT `df`.*
-#> FROM `df`
-#> WHERE (`x` IN (1.0, 2.0, 3.0))
+#> SELECT "df".*
+#> FROM "df"
+#> WHERE ("x" IN (1.0, 2.0, 3.0))
 
 lf |> filter(between(x, 1, 5))
 #> <SQL>
-#> SELECT `df`.*
-#> FROM `df`
-#> WHERE (`x` BETWEEN 1.0 AND 5.0)
+#> SELECT "df".*
+#> FROM "df"
+#> WHERE ("x" BETWEEN 1.0 AND 5.0)
 ```
 
 ### Bitwise operations
@@ -215,11 +222,11 @@ lf |> filter(between(x, 1, 5))
 ``` r
 lf |> transmute(x = bitwAnd(x, 3L), y = bitwShiftL(x, 2L))
 #> <SQL>
-#> SELECT `x`, `x` << 2 AS `y`
+#> SELECT "x", "x" << 2 AS "y"
 #> FROM (
-#>   SELECT `x` & 3 AS `x`, `y`, `g`
-#>   FROM `df`
-#> ) AS `q01`
+#>   SELECT "x" & 3 AS "x", "y", "g"
+#>   FROM "df"
+#> ) AS "q01"
 ```
 
 ### Type coercion
@@ -229,11 +236,11 @@ Type coercion functions use the corresponding SQL `CAST()` call:
 ``` r
 lf |> transmute(x = as.integer(y), y = as.character(x))
 #> <SQL>
-#> SELECT `x`, CAST(`x` AS TEXT) AS `y`
+#> SELECT "x", CAST("x" AS TEXT) AS "y"
 #> FROM (
-#>   SELECT CAST(`y` AS INTEGER) AS `x`, `y`, `g`
-#>   FROM `df`
-#> ) AS `q01`
+#>   SELECT CAST("y" AS INTEGER) AS "x", "y", "g"
+#>   FROM "df"
+#> ) AS "q01"
 ```
 
 - integer types: [`as.integer()`](https://rdrr.io/r/base/integer.html),
@@ -257,19 +264,19 @@ lf |> transmute(x = as.integer(y), y = as.character(x))
 ``` r
 lf |> filter(!is.na(x))
 #> <SQL>
-#> SELECT `df`.*
-#> FROM `df`
-#> WHERE (NOT((`x` IS NULL)))
+#> SELECT "df".*
+#> FROM "df"
+#> WHERE (NOT(("x" IS NULL)))
 
 lf |> transmute(x = coalesce(x, 0L))
 #> <SQL>
-#> SELECT COALESCE(`x`, 0) AS `x`
-#> FROM `df`
+#> SELECT COALESCE("x", 0) AS "x"
+#> FROM "df"
 
 lf |> transmute(x = na_if(x, 0L))
 #> <SQL>
-#> SELECT NULLIF(`x`, 0) AS `x`
-#> FROM `df`
+#> SELECT NULLIF("x", 0) AS "x"
+#> FROM "df"
 ```
 
 ### Aggregation
@@ -289,12 +296,12 @@ lf |> summarise(z = mean(x))
 #> Use `na.rm = TRUE` to silence this warning
 #> This warning is displayed once every 8 hours.
 #> <SQL>
-#> SELECT AVG(`x`) AS `z`
-#> FROM `df`
+#> SELECT AVG("x") AS "z"
+#> FROM "df"
 lf |> summarise(z = mean(x, na.rm = TRUE))
 #> <SQL>
-#> SELECT AVG(`x`) AS `z`
-#> FROM `df`
+#> SELECT AVG("x") AS "z"
+#> FROM "df"
 ```
 
 Note that aggregation functions used inside
@@ -305,16 +312,16 @@ a window translation:
 ``` r
 lf |> mutate(z = mean(x, na.rm = TRUE))
 #> <SQL>
-#> SELECT `df`.*, AVG(`x`) OVER () AS `z`
-#> FROM `df`
+#> SELECT "df".*, AVG("x") OVER () AS "z"
+#> FROM "df"
 lf |> filter(mean(x, na.rm = TRUE) > 0)
 #> <SQL>
-#> SELECT `x`, `y`, `g`
+#> SELECT "x", "y", "g"
 #> FROM (
-#>   SELECT `df`.*, AVG(`x`) OVER () AS `col01`
-#>   FROM `df`
-#> ) AS `q01`
-#> WHERE (`col01` > 0.0)
+#>   SELECT "df".*, AVG("x") OVER () AS "col01"
+#>   FROM "df"
+#> ) AS "q01"
+#> WHERE ("col01" > 0.0)
 ```
 
 Most backends also support:
@@ -340,8 +347,8 @@ translated to `CASE WHEN`:
 ``` r
 lf |> transmute(z = ifelse(x > 5, "big", "small"))
 #> <SQL>
-#> SELECT CASE WHEN (`x` > 5.0) THEN 'big' WHEN NOT (`x` > 5.0) THEN 'small' END AS `z`
-#> FROM `df`
+#> SELECT CASE WHEN ("x" > 5.0) THEN 'big' WHEN NOT ("x" > 5.0) THEN 'small' END AS "z"
+#> FROM "df"
 ```
 
 [`case_when()`](https://dplyr.tidyverse.org/reference/case_when.html),
@@ -357,20 +364,20 @@ lf |>
   ))
 #> <SQL>
 #> SELECT
-#>   `df`.*,
+#>   "df".*,
 #>   CASE
-#> WHEN (`x` > 10.0) THEN 'medium'
-#> WHEN (`x` > 30.0) THEN 'big'
+#> WHEN ("x" > 10.0) THEN 'medium'
+#> WHEN ("x" > 30.0) THEN 'big'
 #> ELSE 'small'
-#> END AS `z`
-#> FROM `df`
+#> END AS "z"
+#> FROM "df"
 
 lf |> mutate(z = switch(g, a = 1L, b = 2L, 3L))
 #> <SQL>
 #> SELECT
-#>   `df`.*,
-#>   CASE `g` WHEN ('a') THEN (1) WHEN ('b') THEN (2) ELSE (3) END AS `z`
-#> FROM `df`
+#>   "df".*,
+#>   CASE "g" WHEN ('a') THEN (1) WHEN ('b') THEN (2) ELSE (3) END AS "z"
+#> FROM "df"
 ```
 
 ### String functions
@@ -391,13 +398,13 @@ supported:
 ``` r
 lf |> transmute(x = paste0(g, " dog"))
 #> <SQL>
-#> SELECT CONCAT_WS('', `g`, ' dog') AS `x`
-#> FROM `df`
+#> SELECT CONCAT_WS('', "g", ' dog') AS "x"
+#> FROM "df"
 
 lf |> transmute(x = substr(g, 1L, 2L))
 #> <SQL>
-#> SELECT SUBSTR(`g`, 1, 2) AS `x`
-#> FROM `df`
+#> SELECT SUBSTR("g", 1, 2) AS "x"
+#> FROM "df"
 ```
 
 Many backends also support regular expression functions like
@@ -423,10 +430,10 @@ lf_dt |> transmute(
 )
 #> <SQL>
 #> SELECT
-#>   EXTRACT(year FROM `dt`) AS `year`,
-#>   EXTRACT(month FROM `dt`) AS `month`,
-#>   EXTRACT(day FROM `dt`) AS `day`
-#> FROM `df`
+#>   EXTRACT(year FROM "dt") AS "year",
+#>   EXTRACT(month FROM "dt") AS "month",
+#>   EXTRACT(day FROM "dt") AS "day"
+#> FROM "df"
 ```
 
 Some backends also support additional lubridate functions including
@@ -470,8 +477,8 @@ Any function that dbplyr doesn’t know about will be left as is:
 ``` r
 lf |> mutate(z = foofify(x, y))
 #> <SQL>
-#> SELECT `df`.*, foofify(`x`, `y`) AS `z`
-#> FROM `df`
+#> SELECT "df".*, foofify("x", "y") AS "z"
+#> FROM "df"
 ```
 
 But to make it clear that you’re deliberately calling a SQL function, we
@@ -480,8 +487,8 @@ recommend using the `.sql` pronoun:
 ``` r
 lf |> transmute(z = .sql$foofify(x, y))
 #> <SQL>
-#> SELECT foofify(`x`, `y`) AS `z`
-#> FROM `df`
+#> SELECT foofify("x", "y") AS "z"
+#> FROM "df"
 ```
 
 If you’re working inside a package, this also makes it easier to avoid
@@ -498,9 +505,9 @@ matching:
 ``` r
 lf |> filter(x %LIKE% "%foo%")
 #> <SQL>
-#> SELECT `df`.*
-#> FROM `df`
-#> WHERE (`x` LIKE '%foo%')
+#> SELECT "df".*
+#> FROM "df"
+#> WHERE ("x" LIKE '%foo%')
 ```
 
 You can also use `str_like()` for this common case:
@@ -508,9 +515,9 @@ You can also use `str_like()` for this common case:
 ``` r
 lf |> filter(str_like(x, "%foo%"))
 #> <SQL>
-#> SELECT `df`.*
-#> FROM `df`
-#> WHERE (`x` LIKE '%foo%')
+#> SELECT "df".*
+#> FROM "df"
+#> WHERE ("x" LIKE '%foo%')
 ```
 
 You could use `%||%` for string concatenation, but in most cases it’s
@@ -520,16 +527,16 @@ more R-like to use [`paste()`](https://rdrr.io/r/base/paste.html) or
 ``` r
 lf |> transmute(z = x %||% y)
 #> <SQL>
-#> SELECT `x` || `y` AS `z`
-#> FROM `df`
+#> SELECT "x" || "y" AS "z"
+#> FROM "df"
 lf |> transmute(z = paste0(x, y))
 #> <SQL>
-#> SELECT CONCAT_WS('', `x`, `y`) AS `z`
-#> FROM `df`
+#> SELECT CONCAT_WS('', "x", "y") AS "z"
+#> FROM "df"
 lf |> transmute(z = paste(x, y))
 #> <SQL>
-#> SELECT CONCAT_WS(' ', `x`, `y`) AS `z`
-#> FROM `df`
+#> SELECT CONCAT_WS(' ', "x", "y") AS "z"
+#> FROM "df"
 ```
 
 ### Special forms
@@ -543,12 +550,12 @@ literal SQL inside
 ``` r
 lf |> transmute(z = sql("x!"))
 #> <SQL>
-#> SELECT x! AS `z`
-#> FROM `df`
+#> SELECT x! AS "z"
+#> FROM "df"
 lf |> transmute(z = x == sql("ANY VALUES(1, 2, 3)"))
 #> <SQL>
-#> SELECT `x` = ANY VALUES(1, 2, 3) AS `z`
-#> FROM `df`
+#> SELECT "x" = ANY VALUES(1, 2, 3) AS "z"
+#> FROM "df"
 ```
 
 This gives you a lot of freedom to generate the SQL you need:
@@ -556,12 +563,12 @@ This gives you a lot of freedom to generate the SQL you need:
 ``` r
 lf |> transmute(factorial = sql("x!"))
 #> <SQL>
-#> SELECT x! AS `factorial`
-#> FROM `df`
+#> SELECT x! AS "factorial"
+#> FROM "df"
 lf |> transmute(factorial = sql("CAST(x AS FLOAT)"))
 #> <SQL>
-#> SELECT CAST(x AS FLOAT) AS `factorial`
-#> FROM `df`
+#> SELECT CAST(x AS FLOAT) AS "factorial"
+#> FROM "df"
 ```
 
 ### Error for unknown translations
@@ -672,18 +679,18 @@ lf |> transmute(
   cumsum = cumsum(g),
   lag = lag(g)
 )
-#> Warning: Windowed expression `SUM(`g`)` does not have explicit order.
+#> Warning: Windowed expression `SUM("g")` does not have explicit order.
 #> ℹ Please use `arrange()`, `window_order()`, or `.order` to make
 #>   deterministic.
 #> <SQL>
 #> SELECT
-#>   AVG(`g`) OVER () AS `mean`,
+#>   AVG("g") OVER () AS "mean",
 #>   CASE
-#> WHEN (NOT((`g` IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN ((`g` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `g`)
-#> END AS `rank`,
-#>   SUM(`g`) OVER (ROWS UNBOUNDED PRECEDING) AS `cumsum`,
-#>   LAG(`g`, 1, NULL) OVER () AS `lag`
-#> FROM `df`
+#> WHEN (NOT(("g" IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN (("g" IS NULL)) THEN 1 ELSE 0 END) ORDER BY "g")
+#> END AS "rank",
+#>   SUM("g") OVER (ROWS UNBOUNDED PRECEDING) AS "cumsum",
+#>   LAG("g", 1, NULL) OVER () AS "lag"
+#> FROM "df"
 ```
 
 If the lazy frame has been grouped or arranged previously in the
@@ -693,13 +700,13 @@ by” and “order by” clauses:
 ``` r
 lf |> arrange(year) |> mutate(z = cummean(g))
 #> <SQL>
-#> SELECT `df`.*, AVG(`g`) OVER (ORDER BY `year` ROWS UNBOUNDED PRECEDING) AS `z`
-#> FROM `df`
-#> ORDER BY `year`
+#> SELECT "df".*, AVG("g") OVER (ORDER BY "year" ROWS UNBOUNDED PRECEDING) AS "z"
+#> FROM "df"
+#> ORDER BY "year"
 lf |> group_by(id) |> mutate(z = rank())
 #> <SQL>
-#> SELECT `df`.*, RANK() OVER (PARTITION BY `id`) AS `z`
-#> FROM `df`
+#> SELECT "df".*, RANK() OVER (PARTITION BY "id") AS "z"
+#> FROM "df"
 ```
 
 There are some challenges when translating window functions between R
@@ -736,11 +743,11 @@ lf |> transmute(
 #> <SQL>
 #> SELECT
 #>   CASE
-#> WHEN (NOT((`g` IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN ((`g` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `g`)
-#> END AS `x1`,
-#>   SUM(`g`) OVER (ORDER BY `year` ROWS UNBOUNDED PRECEDING) AS `x2`,
-#>   LEAD(`g`, 1, NULL) OVER (ORDER BY `year`) AS `x3`
-#> FROM `df`
+#> WHEN (NOT(("g" IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN (("g" IS NULL)) THEN 1 ELSE 0 END) ORDER BY "g")
+#> END AS "x1",
+#>   SUM("g") OVER (ORDER BY "year" ROWS UNBOUNDED PRECEDING) AS "x2",
+#>   LEAD("g", 1, NULL) OVER (ORDER BY "year") AS "x3"
+#> FROM "df"
 ```
 
 Currently there is no way to order by multiple variables, except by

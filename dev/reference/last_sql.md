@@ -21,12 +21,12 @@ library(dplyr, warn.conflicts = FALSE)
 df <- lazy_frame(x = 1:3)
 df |> filter(x > 1)
 #> <SQL>
-#> SELECT `df`.*
-#> FROM `df`
-#> WHERE (`x` > 1.0)
+#> SELECT "df".*
+#> FROM "df"
+#> WHERE ("x" > 1.0)
 
 last_sql()
-#> <SQL> SELECT `df`.*
-#> FROM `df`
-#> WHERE (`x` > 1.0)
+#> <SQL> SELECT "df".*
+#> FROM "df"
+#> WHERE ("x" > 1.0)
 ```

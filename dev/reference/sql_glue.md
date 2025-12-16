@@ -59,7 +59,7 @@ con <- simulate_dbi()
 
 tbl <- "my_table"
 sql_glue2(con, "SELECT * FROM {.tbl tbl}")
-#> <SQL> SELECT * FROM `my_table`
+#> <SQL> SELECT * FROM "my_table"
 
 # Values are properly escaped
 name <- "Robert'); DROP TABLE students;--"
@@ -69,7 +69,7 @@ sql_glue2(con, "INSERT INTO students (name) VALUES ({name})")
 # Control wrapping with *
 x <- c("name", "age", "grade")
 sql_glue2(con, "SELECT {.id x} FROM students")
-#> <SQL> SELECT `name`, `age`, `grade` FROM students
+#> <SQL> SELECT "name", "age", "grade" FROM students
 sql_glue2(con, "SELECT * WHERE variable IN {x*}")
 #> <SQL> SELECT * WHERE variable IN ('name', 'age', 'grade')
 ```

@@ -22,14 +22,14 @@ library(dplyr, warn.conflicts = FALSE)
 lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_redshift())
 lf |> transmute(x = paste(c, " times"))
 #> <SQL>
-#> SELECT `c` || ' ' || ' times' AS `x`
-#> FROM `df`
+#> SELECT "c" || ' ' || ' times' AS "x"
+#> FROM "df"
 lf |> transmute(x = substr(c, 2, 3))
 #> <SQL>
-#> SELECT SUBSTRING(`c`, 2, 2) AS `x`
-#> FROM `df`
+#> SELECT SUBSTRING("c", 2, 2) AS "x"
+#> FROM "df"
 lf |> transmute(x = str_replace_all(c, "a", "z"))
 #> <SQL>
-#> SELECT REGEXP_REPLACE(`c`, 'a', 'z') AS `x`
-#> FROM `df`
+#> SELECT REGEXP_REPLACE("c", 'a', 'z') AS "x"
+#> FROM "df"
 ```

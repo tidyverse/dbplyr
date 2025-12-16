@@ -22,6 +22,6 @@ library(dplyr, warn.conflicts = FALSE)
 db <- lazy_frame(x = 1, y = 2)
 db |> mutate(z = .sql$CUMULATIVE_SUM(x, 1))
 #> <SQL>
-#> SELECT `df`.*, CUMULATIVE_SUM(`x`, 1.0) AS `z`
-#> FROM `df`
+#> SELECT "df".*, CUMULATIVE_SUM("x", 1.0) AS "z"
+#> FROM "df"
 ```

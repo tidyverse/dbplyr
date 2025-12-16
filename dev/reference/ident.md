@@ -41,7 +41,7 @@ escape_ansi("x")
 ident("x")
 #> <IDENT> x
 escape_ansi(ident("x"))
-#> <SQL> `x`
+#> <SQL> "x"
 
 # You can supply multiple inputs
 ident(a = "x", b = "y")

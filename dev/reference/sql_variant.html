@@ -167,7 +167,7 @@ semantics:</p><ul><li><p><code>base_scalar</code> - scalar functions and operato
 <span class="r-in"><span><span class="co"># Any functions not explicitly listed in the converter will be translated</span></span></span>
 <span class="r-in"><span><span class="co"># to sql as is, so you don't need to convert all functions.</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu">regr_intercept</span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; regr_intercept(`y`, `x`)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; regr_intercept("y", "x")</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

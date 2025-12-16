@@ -102,5 +102,5 @@ translate_sql(sd(income / years), con = con, window = FALSE)
 # Any functions not explicitly listed in the converter will be translated
 # to sql as is, so you don't need to convert all functions.
 translate_sql(regr_intercept(y, x), con = con)
-#> <SQL> regr_intercept(`y`, `x`)
+#> <SQL> regr_intercept("y", "x")
 ```

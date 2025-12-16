@@ -17,7 +17,9 @@ sql_quote(x, quote)
 
 - quote:
 
-  Single quoting character.
+  Quote character. Either a length 1 character vector for symmetric
+  quotes (e.g., `"'"` or `'"'`), or a length 2 character vector for
+  asymmetric quotes (e.g., `c("[", "]")`).
 
 ## Examples
 
@@ -28,4 +30,7 @@ sql_quote("I've had a good day", "'")
 #> [1] "'I''ve had a good day'"
 sql_quote(c("abc", NA), "'")
 #> [1] "'abc'" "NULL" 
+
+sql_quote(c("abc", NA), c("[", "]"))
+#> [1] "[abc]" "NULL" 
 ```

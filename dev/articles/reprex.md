@@ -98,16 +98,23 @@ lazy_frame(x = x, con = simulate_postgres()) |>
   head(5) |> 
   show_query()
 #> <SQL>
-#> SELECT `df`.*
-#> FROM `df`
+#> SELECT "df".*
+#> FROM "df"
 #> LIMIT 5
 
 lazy_frame(x = x, con = simulate_mssql()) |> 
   head(5) |> 
   show_query()
+#> Warning in scan(text = x, what = character(), quote = quote_char,
+#> quiet = TRUE, : EOF within quoted string
+#> Warning in scan(text = x, what = character(), quote = quote_char,
+#> quiet = TRUE, : EOF within quoted string
+#> Warning in scan(text = x, what = character(), quote = quote_char,
+#> quiet = TRUE, : EOF within quoted string
 #> <SQL>
-#> SELECT TOP 5 `df`.*
-#> FROM `df`
+#> SELECT TOP 5 [df]]
+#> ].*
+#> FROM [df]
 ```
 
 If you isolate the problem to incorrect SQL generation, it would be very
@@ -122,7 +129,7 @@ your reprex even simpler with
 
 ``` r
 translate_sql(substr(x, 1, 2), con = simulate_postgres())
-#> <SQL> SUBSTR(`x`, 1, 2)
+#> <SQL> SUBSTR("x", 1, 2)
 translate_sql(substr(x, 1, 2), con = simulate_sqlite())
 #> <SQL> SUBSTR(`x`, 1, 2)
 ```

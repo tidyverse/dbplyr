@@ -60,7 +60,11 @@ db |> head() |> show_query()
 # Pretend we have data in a SQL server database
 db2 <- lazy_frame(x = 1:100, con = simulate_mssql())
 db2 |> head() |> show_query()
+#> Warning: EOF within quoted string
+#> Warning: EOF within quoted string
+#> Warning: EOF within quoted string
 #> <SQL>
-#> SELECT TOP 6 `df`.*
-#> FROM `df`
+#> SELECT TOP 6 [df]]
+#> ].*
+#> FROM [df]
 ```

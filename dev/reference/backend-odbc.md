@@ -25,14 +25,14 @@ library(dplyr, warn.conflicts = FALSE)
 lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = simulate_odbc())
 lf |> transmute(x = as.numeric(b))
 #> <SQL>
-#> SELECT CAST(`b` AS DOUBLE) AS `x`
-#> FROM `df`
+#> SELECT CAST("b" AS DOUBLE) AS "x"
+#> FROM "df"
 lf |> transmute(x = as.integer(b))
 #> <SQL>
-#> SELECT CAST(`b` AS INT) AS `x`
-#> FROM `df`
+#> SELECT CAST("b" AS INT) AS "x"
+#> FROM "df"
 lf |> transmute(x = as.character(b))
 #> <SQL>
-#> SELECT CAST(`b` AS STRING) AS `x`
-#> FROM `df`
+#> SELECT CAST("b" AS STRING) AS "x"
+#> FROM "df"
 ```
