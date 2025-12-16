@@ -2,6 +2,9 @@
 
 ## dbplyr (development version)
 
+- `expand()` now errors when column expressions don’t reference any
+  columns in the data, instead of generating invalid SQL
+  ([\#720](https://github.com/tidyverse/dbplyr/issues/720)).
 - CTEs now correctly quote table names when the same query is used
   multiple times
   ([\#1559](https://github.com/tidyverse/dbplyr/issues/1559)).
