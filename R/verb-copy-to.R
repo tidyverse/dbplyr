@@ -105,8 +105,51 @@ copy_to.src_sql <- function(
 
 #' @importFrom dplyr auto_copy
 #' @export
-auto_copy.tbl_sql <- function(x, y, copy = FALSE, ...) {
-  y <- as.data.frame(y)
-  tbl <- db_copy_to(x$con, table = unique_table_name(), values = y, ...)
-  new_tbl_sql(con = x$con, source = tbl, vars = colnames(y))
+auto_copy.tbl_sql <- function(x, y, copy = FALSE, ..., types = NULL) {
+  # NB: copy is always TRUE here - dplyr's generic errors on copy = FALSE
+  dbplyr_auto_copy(x, y, copy = "temp-table", ..., types = types)
+}
+
+# Use this instead of calling auto_copy() directly since auto_copy() expects
+# TRUE or FALSE
+dbplyr_auto_copy <- function(
+  x,
+  y,
+  copy,
+  ...,
+  types = NULL,
+  call = caller_env()
+) {
+  if (same_src(x, y)) {
+    return(y)
+  }
+
+  copy <- as_copy(copy, error_call = call)
+  if (copy == "none") {
+    cli_abort(
+      c(
+        "{.arg x} and {.arg y} must share the same source.",
+        i = "Use {.code copy = \"temp-table\"} to copy {.arg y} to a temporary table.",
+        i = "USe {.code copy = \"inline\"} to convert {.arg y} to inline SQL."
+      ),
+      call = call
+    )
+  } else if (copy == "inline") {
+    copy_inline(x$con, as.data.frame(y), types = types)
+  } else if (copy == "temp-table") {
+    y <- as.data.frame(y)
+    table <- unique_table_name()
+    table <- db_copy_to(x$con, table = table, values = y, ..., types = types)
+    new_tbl_sql(con = x$con, source = table, vars = colnames(y))
+  }
+}
+
+as_copy <- function(copy, error_call = caller_env()) {
+  if (isTRUE(copy)) {
+    "temp-table"
+  } else if (isFALSE(copy)) {
+    "none"
+  } else {
+    arg_match(copy, c("none", "temp-table", "inline"), error_call = error_call)
+  }
 }

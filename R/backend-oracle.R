@@ -92,12 +92,12 @@ sql_query_upsert.Oracle <- function(
   # https://oracle-base.com/articles/9i/merge-statement
   parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))
-  update_values <- sql_table_prefix(con, update_cols, ident("...y"))
+  update_values <- sql_table_prefix(con, "...y", update_cols)
   update_clause <- sql(paste0(update_cols_esc, " = ", update_values))
 
   insert_cols <- c(by, update_cols)
   insert_cols_esc <- escape(ident(insert_cols), parens = FALSE, con = con)
-  insert_values <- sql_table_prefix(con, insert_cols, "...y")
+  insert_values <- sql_table_prefix(con, "...y", insert_cols)
 
   clauses <- list(
     sql_clause("MERGE INTO", table),
@@ -191,7 +191,7 @@ sql_translation.Oracle <- function(con) {
 #' @export
 sql_query_explain.Oracle <- function(con, sql, ...) {
   # https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/generating-and-displaying-execution-plans.html
-  c(
+  sql(
     sql_glue2(con, "EXPLAIN PLAN FOR {sql}"),
     sql_glue2(con, "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())")
   )
@@ -215,7 +215,7 @@ sql_values_subquery.Oracle <- function(con, df, types, lvl = 0, ...) {
 }
 
 #' @exportS3Method dplyr::setdiff
-setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
+setdiff.tbl_Oracle <- function(x, y, copy = "none", ...) {
   # Oracle uses MINUS instead of EXCEPT for this operation:
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries004.htm
   x$lazy_query <- add_set_op(x, y, "MINUS", copy = copy, ...)

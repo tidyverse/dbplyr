@@ -50,26 +50,6 @@ escape.ident <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
 }
 
 #' @export
-escape.dbplyr_schema <- function(
-  x,
-  parens = FALSE,
-  collapse = ", ",
-  con = NULL
-) {
-  sql_vector(as.sql(x, con = con), parens, collapse, con = con)
-}
-
-#' @export
-escape.dbplyr_catalog <- function(
-  x,
-  parens = FALSE,
-  collapse = ", ",
-  con = NULL
-) {
-  sql_vector(as.sql(x, con = con), parens, collapse, con = con)
-}
-
-#' @export
 escape.logical <- function(x, parens = NA, collapse = ", ", con = NULL) {
   sql_vector(sql_escape_logical(con, x), parens, collapse, con = con)
 }
