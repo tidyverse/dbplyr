@@ -30,14 +30,14 @@ rows_insert(
   by = NULL,
   ...,
   conflict = c("error", "ignore"),
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL,
   method = NULL
 )
 
 # S3 method for class 'tbl_lazy'
-rows_append(x, y, ..., copy = FALSE, in_place = FALSE, returning = NULL)
+rows_append(x, y, ..., copy = "none", in_place = FALSE, returning = NULL)
 
 # S3 method for class 'tbl_lazy'
 rows_update(
@@ -46,7 +46,7 @@ rows_update(
   by = NULL,
   ...,
   unmatched = c("error", "ignore"),
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL
 )
@@ -58,7 +58,7 @@ rows_patch(
   by = NULL,
   ...,
   unmatched = c("error", "ignore"),
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL
 )
@@ -69,7 +69,7 @@ rows_upsert(
   y,
   by = NULL,
   ...,
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL,
   method = NULL
@@ -82,7 +82,7 @@ rows_delete(
   by = NULL,
   ...,
   unmatched = c("error", "ignore"),
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL
 )
@@ -139,10 +139,25 @@ rows_delete(
 
 - copy:
 
-  If `x` and `y` are not from the same data source, and `copy` is
-  `TRUE`, then `y` will be copied into the same src as `x`. This allows
-  you to join tables across srcs, but it is a potentially expensive
-  operation so you must opt into it.
+  If `x` and `y` are not from the same data source, `copy` controls how
+  `y` is copied into the same source as `x`. There are three options:
+
+  - `"none"`, the default, will error if `y` needs to be copied. This
+    ensures that you don't accidentally copy large datasets from R to
+    the database.
+
+  - `"temp-table"`: copies `y` into a temporary table in the same
+    database as `x`. `*_join()` will automatically run `ANALYZE` on the
+    created table in the hope that this will make your queries as
+    efficient as possible by giving more data to the query planner.
+
+  - `"inline"`: `y` will be inlined into the query using
+    [`copy_inline()`](https://dbplyr.tidyverse.org/dev/reference/copy_inline.md).
+    This is should faster for small datasets and doesn't require write
+    access.
+
+  `TRUE` (`"temp-table"`) and `FALSE` (`"none"`) are also accepted for
+  backward compatibility.
 
 - in_place:
 

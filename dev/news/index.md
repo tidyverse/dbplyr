@@ -2,6 +2,11 @@
 
 ## dbplyr (development version)
 
+- The `copy` argument of join, set, and row operations now accepts
+  `"inline"` to use
+  [`copy_inline()`](https://dbplyr.tidyverse.org/dev/reference/copy_inline.md)
+  instead of copying to a temporary table
+  ([\#863](https://github.com/tidyverse/dbplyr/issues/863)).
 - [`as.sql()`](https://dbplyr.tidyverse.org/dev/reference/as.sql.md) is
   now deprecated as part of major internal refactoring of how
   [`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md) and

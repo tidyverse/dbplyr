@@ -11,16 +11,16 @@ They are translated to `INTERSECT`, `UNION`, and `EXCEPT` respectively.
 
 ``` r
 # S3 method for class 'tbl_lazy'
-intersect(x, y, copy = FALSE, ..., all = FALSE)
+intersect(x, y, copy = "none", ..., all = FALSE)
 
 # S3 method for class 'tbl_lazy'
-union(x, y, copy = FALSE, ..., all = FALSE)
+union(x, y, copy = "none", ..., all = FALSE)
 
 # S3 method for class 'tbl_lazy'
-union_all(x, y, copy = FALSE, ...)
+union_all(x, y, copy = "none", ...)
 
 # S3 method for class 'tbl_lazy'
-setdiff(x, y, copy = FALSE, ..., all = FALSE)
+setdiff(x, y, copy = "none", ..., all = FALSE)
 ```
 
 ## Arguments
@@ -31,14 +31,25 @@ setdiff(x, y, copy = FALSE, ..., all = FALSE)
 
 - copy:
 
-  If `x` and `y` are not from the same data source, and `copy` is
-  `TRUE`, then `y` will be copied into a temporary table in same
-  database as `x`. `*_join()` will automatically run `ANALYZE` on the
-  created table in the hope that this will make you queries as efficient
-  as possible by giving more data to the query planner.
+  If `x` and `y` are not from the same data source, `copy` controls how
+  `y` is copied into the same source as `x`. There are three options:
 
-  This allows you to join tables across srcs, but it's potentially
-  expensive operation so you must opt into it.
+  - `"none"`, the default, will error if `y` needs to be copied. This
+    ensures that you don't accidentally copy large datasets from R to
+    the database.
+
+  - `"temp-table"`: copies `y` into a temporary table in the same
+    database as `x`. `*_join()` will automatically run `ANALYZE` on the
+    created table in the hope that this will make your queries as
+    efficient as possible by giving more data to the query planner.
+
+  - `"inline"`: `y` will be inlined into the query using
+    [`copy_inline()`](https://dbplyr.tidyverse.org/dev/reference/copy_inline.md).
+    This is should faster for small datasets and doesn't require write
+    access.
+
+  `TRUE` (`"temp-table"`) and `FALSE` (`"none"`) are also accepted for
+  backward compatibility.
 
 - ...:
 

@@ -56,7 +56,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li>
+<ul><li>The <code>copy</code> argument of join, set, and row operations now accepts <code>"inline"</code> to use <code><a href="../reference/copy_inline.html">copy_inline()</a></code> instead of copying to a temporary table (<a href="https://github.com/tidyverse/dbplyr/issues/863" class="external-link">#863</a>).</li>
+<li>
 <code><a href="../reference/as.sql.html">as.sql()</a></code> is now deprecated as part of major internal refactoring of how <code><a href="../reference/sql.html">sql()</a></code> and <code><a href="../reference/ident.html">ident()</a></code> are used.</li>
 <li>
 <code>expand()</code> now errors when column expressions don’t reference any columns in the data, instead of generating invalid SQL (<a href="https://github.com/tidyverse/dbplyr/issues/720" class="external-link">#720</a>).</li>

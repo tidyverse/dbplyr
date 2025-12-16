@@ -98,14 +98,14 @@ modifying the underlying table on the database.</p>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  conflict <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"error"</span>, <span class="st">"ignore"</span><span class="op">)</span>,</span>
-<span>  copy <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  copy <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  in_place <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  returning <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  method <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'tbl_lazy'</span></span>
-<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_append</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">...</span>, copy <span class="op">=</span> <span class="cn">FALSE</span>, in_place <span class="op">=</span> <span class="cn">FALSE</span>, returning <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_append</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">...</span>, copy <span class="op">=</span> <span class="st">"none"</span>, in_place <span class="op">=</span> <span class="cn">FALSE</span>, returning <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'tbl_lazy'</span></span>
 <span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
@@ -114,7 +114,7 @@ modifying the underlying table on the database.</p>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  unmatched <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"error"</span>, <span class="st">"ignore"</span><span class="op">)</span>,</span>
-<span>  copy <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  copy <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  in_place <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  returning <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
@@ -126,7 +126,7 @@ modifying the underlying table on the database.</p>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  unmatched <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"error"</span>, <span class="st">"ignore"</span><span class="op">)</span>,</span>
-<span>  copy <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  copy <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  in_place <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  returning <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
@@ -137,7 +137,7 @@ modifying the underlying table on the database.</p>
 <span>  <span class="va">y</span>,</span>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  copy <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  copy <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  in_place <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  returning <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  method <span class="op">=</span> <span class="cn">NULL</span></span>
@@ -150,7 +150,7 @@ modifying the underlying table on the database.</p>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  unmatched <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"error"</span>, <span class="st">"ignore"</span><span class="op">)</span>,</span>
-<span>  copy <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  copy <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  in_place <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  returning <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -197,10 +197,19 @@ same behaviour add a unique index on the <code>by</code> columns and use
 
 
 <dt id="arg-copy">copy<a class="anchor" aria-label="anchor" href="#arg-copy"></a></dt>
-<dd><p>If <code>x</code> and <code>y</code> are not from the same data source,
-and <code>copy</code> is <code>TRUE</code>, then <code>y</code> will be copied into the
-same src as <code>x</code>.  This allows you to join tables across srcs, but
-it is a potentially expensive operation so you must opt into it.</p></dd>
+<dd><p>If <code>x</code> and <code>y</code> are not from the same data source, <code>copy</code>
+controls how <code>y</code> is copied into the same source as <code>x</code>. There are three
+options:</p><ul><li><p><code>"none"</code>, the default, will error if <code>y</code> needs to be copied. This ensures
+that you don't accidentally copy large datasets from R to the database.</p></li>
+<li><p><code>"temp-table"</code>: copies <code>y</code> into a temporary table in the same
+database as <code>x</code>. <code>*_join()</code> will automatically run <code>ANALYZE</code> on the
+created table in the hope that this will make your queries as efficient
+as possible by giving more data to the query planner.</p></li>
+<li><p><code>"inline"</code>: <code>y</code> will be inlined into the query using <code><a href="copy_inline.html">copy_inline()</a></code>.
+This is should faster for small datasets and doesn't require write
+access.</p></li>
+</ul><p><code>TRUE</code> (<code>"temp-table"</code>) and <code>FALSE</code> (<code>"none"</code>) are also accepted for
+backward compatibility.</p></dd>
 
 
 <dt id="arg-in-place">in_place<a class="anchor" aria-label="anchor" href="#arg-in-place"></a></dt>

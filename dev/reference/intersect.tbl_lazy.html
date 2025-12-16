@@ -68,16 +68,16 @@ INTERSECT, UNION, and EXCEPT respectively."><meta property="og:image" content="h
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'tbl_lazy'</span></span>
-<span><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">intersect</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, copy <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span>, all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">intersect</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, copy <span class="op">=</span> <span class="st">"none"</span>, <span class="va">...</span>, all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'tbl_lazy'</span></span>
-<span><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">union</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, copy <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span>, all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">union</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, copy <span class="op">=</span> <span class="st">"none"</span>, <span class="va">...</span>, all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'tbl_lazy'</span></span>
-<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/setops.html" class="external-link">union_all</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, copy <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/setops.html" class="external-link">union_all</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, copy <span class="op">=</span> <span class="st">"none"</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'tbl_lazy'</span></span>
-<span><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, copy <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span>, all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, copy <span class="op">=</span> <span class="st">"none"</span>, <span class="va">...</span>, all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -89,14 +89,19 @@ INTERSECT, UNION, and EXCEPT respectively."><meta property="og:image" content="h
 
 
 <dt id="arg-copy">copy<a class="anchor" aria-label="anchor" href="#arg-copy"></a></dt>
-<dd><p>If <code>x</code> and <code>y</code> are not from the same data source,
-and <code>copy</code> is <code>TRUE</code>, then <code>y</code> will be copied into a
-temporary table in same database as <code>x</code>. <code>*_join()</code> will automatically
-run <code>ANALYZE</code> on the created table in the hope that this will make
-you queries as efficient as possible by giving more data to the query
-planner.</p>
-<p>This allows you to join tables across srcs, but it's potentially expensive
-operation so you must opt into it.</p></dd>
+<dd><p>If <code>x</code> and <code>y</code> are not from the same data source, <code>copy</code>
+controls how <code>y</code> is copied into the same source as <code>x</code>. There are three
+options:</p><ul><li><p><code>"none"</code>, the default, will error if <code>y</code> needs to be copied. This ensures
+that you don't accidentally copy large datasets from R to the database.</p></li>
+<li><p><code>"temp-table"</code>: copies <code>y</code> into a temporary table in the same
+database as <code>x</code>. <code>*_join()</code> will automatically run <code>ANALYZE</code> on the
+created table in the hope that this will make your queries as efficient
+as possible by giving more data to the query planner.</p></li>
+<li><p><code>"inline"</code>: <code>y</code> will be inlined into the query using <code><a href="copy_inline.html">copy_inline()</a></code>.
+This is should faster for small datasets and doesn't require write
+access.</p></li>
+</ul><p><code>TRUE</code> (<code>"temp-table"</code>) and <code>FALSE</code> (<code>"none"</code>) are also accepted for
+backward compatibility.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
