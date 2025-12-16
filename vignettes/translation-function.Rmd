@@ -39,7 +39,9 @@ lf_sqlite |> transmute(z = x^2)
 lf_access |> transmute(z = x^2)
 ```
 
-Perfect translation is not possible because databases don't have all the functions that R does. The goal of dbplyr is to provide a semantic rather than a literal translation: what you mean, rather than precisely what is done. In fact, even for functions that exist both in databases and in R, you shouldn't expect results to be identical; database programmers have different priorities than R core programmers. For example, in R in order to get a higher level of numerical accuracy, `mean()` loops through the data twice. R's `mean()` also provides a `trim` option for computing trimmed means; this is something that databases do not provide. 
+One key difference between dbplyr-generated SQL and hand-written SQL is that dbplyr always quotes all table and column names. This is verbose but necessary because column names in database tables can be any string, including SQL reserved words like `select` or `if`. Quoting all names ensures that dbplyr-generated SQL always works regardless of the table and column names involved.
+
+In general, perfect translation is not possible because databases don't have all the functions that R does. The goal of dbplyr is to provide a semantic rather than a literal translation: what you mean, rather than precisely what is done. In fact, even for functions that exist both in databases and in R, you shouldn't expect results to be identical; database programmers have different priorities than R core programmers. For example, in R in order to get a higher level of numerical accuracy, `mean()` loops through the data twice. R's `mean()` also provides a `trim` option for computing trimmed means; this is something that databases do not provide. 
 
 If you're interested in how `translate_sql()` is implemented, the basic techniques that underlie the implementation of `translate_sql()` are described in ["Advanced R"](https://adv-r.hadley.nz/translation.html). 
 

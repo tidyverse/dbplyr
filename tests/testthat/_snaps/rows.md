@@ -68,15 +68,15 @@
     Output
       <SQL>
       SELECT *
-      FROM `df_x`
+      FROM "df_x"
       
       UNION ALL
       
-      SELECT `df_y`.*
-      FROM `df_y`
+      SELECT "df_y".*
+      FROM "df_y"
       WHERE NOT EXISTS (
-        SELECT 1 FROM `df_x`
-        WHERE (`df_y`.`x` = `df_x`.`x`)
+        SELECT 1 FROM "df_x"
+        WHERE ("df_y"."x" = "df_x"."x")
       )
 
 # `rows_insert()` works with `in_place = TRUE`
@@ -129,17 +129,17 @@
         lvl = 1), insert_cols = colnames(df_y), by = c("a", "b"), conflict = "ignore",
       returning_cols = c("a", b2 = "b"))
     Output
-      <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
+      <SQL> INSERT INTO "df_x" ("a", "b", "c", "d")
       SELECT *
       FROM (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
-      ) AS `...y`
+        SELECT "a", "b", "c" + 1.0 AS "c", "d"
+        FROM "df_y"
+      ) AS "...y"
       WHERE NOT EXISTS (
-        SELECT 1 FROM `df_x`
-        WHERE (`df_x`.`a` = `...y`.`a`) AND (`df_x`.`b` = `...y`.`b`)
+        SELECT 1 FROM "df_x"
+        WHERE ("df_x"."a" = "...y"."a") AND ("df_x"."b" = "...y"."b")
       )
-      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
+      RETURNING "df_x"."a", "df_x"."b" AS "b2"
 
 # rows_append() checks arguments
 
@@ -166,12 +166,12 @@
     Output
       <SQL>
       SELECT *
-      FROM `df_x`
+      FROM "df_x"
       
       UNION ALL
       
       SELECT *
-      FROM `df_y`
+      FROM "df_y"
 
 # `rows_append()` works with `in_place = TRUE`
 
@@ -188,13 +188,13 @@
       sql_query_append(con = con, table = ident("df_x"), from = sql_render(df_y, con,
         lvl = 1), insert_cols = colnames(df_y), returning_cols = c("a", b2 = "b"))
     Output
-      <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
+      <SQL> INSERT INTO "df_x" ("a", "b", "c", "d")
       SELECT *
       FROM (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
-      ) AS `...y`
-      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
+        SELECT "a", "b", "c" + 1.0 AS "c", "d"
+        FROM "df_y"
+      ) AS "...y"
+      RETURNING "df_x"."a", "df_x"."b" AS "b2"
 
 # sql_query_append supports old interface works
 
@@ -205,13 +205,13 @@
       Warning:
       The `from` argument of `sql_query_append()` must be a table identifier or an SQL query, not a lazy table. as of dbplyr 2.3.2.
     Output
-      <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
+      <SQL> INSERT INTO "df_x" ("a", "b", "c", "d")
       SELECT *
       FROM (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
-      ) AS `...y`
-      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
+        SELECT "a", "b", "c" + 1.0 AS "c", "d"
+        FROM "df_y"
+      ) AS "...y"
+      RETURNING "df_x"."a", "df_x"."b" AS "b2"
 
 # arguments are checked
 
@@ -287,19 +287,19 @@
       y = 22:23, .name = "df_y"), by = "x", unmatched = "ignore", in_place = FALSE)
     Output
       <SQL>
-      SELECT `df_x`.*
-      FROM `df_x`
+      SELECT "df_x".*
+      FROM "df_x"
       WHERE NOT EXISTS (
-        SELECT 1 FROM `df_y`
-        WHERE (`df_x`.`x` = `df_y`.`x`)
+        SELECT 1 FROM "df_y"
+        WHERE ("df_x"."x" = "df_y"."x")
       )
       
       UNION ALL
       
-      SELECT `df_x`.`x` AS `x`, `df_y`.`y` AS `y`
-      FROM `df_x`
-      INNER JOIN `df_y`
-        ON (`df_x`.`x` = `df_y`.`x`)
+      SELECT "df_x"."x" AS "x", "df_y"."y" AS "y"
+      FROM "df_x"
+      INNER JOIN "df_y"
+        ON ("df_x"."x" = "df_y"."x")
 
 # `rows_update()` works with `in_place = TRUE`
 
@@ -317,14 +317,14 @@
         con, lvl = 1), by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
         d = "`...y`.`d`"), returning_cols = c("a", b2 = "b"))
     Output
-      <SQL> UPDATE `df_x`
-      SET `c` = COALESCE(`df_x`.`c`, `...y`.`c`), `d` = `...y`.`d`
+      <SQL> UPDATE "df_x"
+      SET "c" = COALESCE(`df_x`.`c`, `...y`.`c`), "d" = `...y`.`d`
       FROM (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
-      ) AS `...y`
-      WHERE (`...y`.`a` = `df_x`.`a`) AND (`...y`.`b` = `df_x`.`b`)
-      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
+        SELECT "a", "b", "c" + 1.0 AS "c", "d"
+        FROM "df_y"
+      ) AS "...y"
+      WHERE ("...y"."a" = "df_x"."a") AND ("...y"."b" = "df_x"."b")
+      RETURNING "df_x"."a", "df_x"."b" AS "b2"
 
 # `rows_patch()` returns early if no column to update
 
@@ -334,7 +334,7 @@
     Output
       <SQL>
       SELECT *
-      FROM `df_x`
+      FROM "df_x"
 
 # `rows_patch()` works with `in_place = FALSE`
 
@@ -344,22 +344,22 @@
       in_place = FALSE)
     Output
       <SQL>
-      SELECT `df_x`.*
-      FROM `df_x`
+      SELECT "df_x".*
+      FROM "df_x"
       WHERE NOT EXISTS (
-        SELECT 1 FROM `df_y`
-        WHERE (`df_x`.`x` = `df_y`.`x`)
+        SELECT 1 FROM "df_y"
+        WHERE ("df_x"."x" = "df_y"."x")
       )
       
       UNION ALL
       
-      SELECT `x`, COALESCE(`y`, `y...y`) AS `y`
+      SELECT "x", COALESCE("y", "y...y") AS "y"
       FROM (
-        SELECT `df_x`.*, `df_y`.`y` AS `y...y`
-        FROM `df_x`
-        INNER JOIN `df_y`
-          ON (`df_x`.`x` = `df_y`.`x`)
-      ) AS `q01`
+        SELECT "df_x".*, "df_y"."y" AS "y...y"
+        FROM "df_x"
+        INNER JOIN "df_y"
+          ON ("df_x"."x" = "df_y"."x")
+      ) AS "q01"
 
 # `rows_patch()` works with multiple columns to update
 
@@ -369,22 +369,22 @@
       in_place = FALSE)
     Output
       <SQL>
-      SELECT `df_x`.*
-      FROM `df_x`
+      SELECT "df_x".*
+      FROM "df_x"
       WHERE NOT EXISTS (
-        SELECT 1 FROM `df_y`
-        WHERE (`df_x`.`x` = `df_y`.`x`)
+        SELECT 1 FROM "df_y"
+        WHERE ("df_x"."x" = "df_y"."x")
       )
       
       UNION ALL
       
-      SELECT `x`, COALESCE(`y`, `y...y`) AS `y`, COALESCE(`z`, `z...y`) AS `z`
+      SELECT "x", COALESCE("y", "y...y") AS "y", COALESCE("z", "z...y") AS "z"
       FROM (
-        SELECT `df_x`.*, `df_y`.`y` AS `y...y`, `df_y`.`z` AS `z...y`
-        FROM `df_x`
-        INNER JOIN `df_y`
-          ON (`df_x`.`x` = `df_y`.`x`)
-      ) AS `q01`
+        SELECT "df_x".*, "df_y"."y" AS "y...y", "df_y"."z" AS "z...y"
+        FROM "df_x"
+        INNER JOIN "df_y"
+          ON ("df_x"."x" = "df_y"."x")
+      ) AS "q01"
 
 # `rows_patch()` works with `in_place = TRUE`
 
@@ -403,19 +403,19 @@
     Output
       <SQL>
       SELECT *
-      FROM `df_x`
+      FROM "df_x"
       
       UNION ALL
       
-      SELECT `q01`.*, NULL AS `y`
+      SELECT "q01".*, NULL AS "y"
       FROM (
-        SELECT `df_y`.*
-        FROM `df_y`
+        SELECT "df_y".*
+        FROM "df_y"
         WHERE NOT EXISTS (
-          SELECT 1 FROM `df_x`
-          WHERE (`df_y`.`x` = `df_x`.`x`)
+          SELECT 1 FROM "df_x"
+          WHERE ("df_y"."x" = "df_x"."x")
         )
-      ) AS `q01`
+      ) AS "q01"
 
 # `rows_upsert()` works with `in_place = FALSE`
 
@@ -424,27 +424,27 @@
       y = 22:23, .name = "df_y"), by = "x", in_place = FALSE)
     Output
       <SQL>
-      SELECT `df_x`.*
-      FROM `df_x`
+      SELECT "df_x".*
+      FROM "df_x"
       WHERE NOT EXISTS (
-        SELECT 1 FROM `df_y`
-        WHERE (`df_x`.`x` = `df_y`.`x`)
+        SELECT 1 FROM "df_y"
+        WHERE ("df_x"."x" = "df_y"."x")
       )
       
       UNION ALL
       
-      SELECT `df_x`.`x` AS `x`, `df_y`.`y` AS `y`
-      FROM `df_x`
-      INNER JOIN `df_y`
-        ON (`df_x`.`x` = `df_y`.`x`)
+      SELECT "df_x"."x" AS "x", "df_y"."y" AS "y"
+      FROM "df_x"
+      INNER JOIN "df_y"
+        ON ("df_x"."x" = "df_y"."x")
       
       UNION ALL
       
-      SELECT `df_y`.*
-      FROM `df_y`
+      SELECT "df_y".*
+      FROM "df_y"
       WHERE NOT EXISTS (
-        SELECT 1 FROM `df_x`
-        WHERE (`df_y`.`x` = `df_x`.`x`)
+        SELECT 1 FROM "df_x"
+        WHERE ("df_y"."x" = "df_x"."x")
       )
 
 # `rows_upsert()` works with `in_place = TRUE`
@@ -463,27 +463,27 @@
         lvl = 1), by = c("a", "b"), update_cols = c("c", "d"), returning_cols = c("a",
         b2 = "b"))
     Output
-      <SQL> WITH `updated` AS (
-        UPDATE `df_x`
-        SET `c` = `...y`.`c`, `d` = `...y`.`d`
+      <SQL> WITH "updated" AS (
+        UPDATE "df_x"
+        SET "c" = "...y"."c", "d" = "...y"."d"
         FROM (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
-      ) AS `...y`
-        WHERE (`...y`.`a` = `df_x`.`a`) AND (`...y`.`b` = `df_x`.`b`)
-        RETURNING `df_x`.*
+        SELECT "a", "b", "c" + 1.0 AS "c", "d"
+        FROM "df_y"
+      ) AS "...y"
+        WHERE ("...y"."a" = "df_x"."a") AND ("...y"."b" = "df_x"."b")
+        RETURNING "df_x".*
       )
-      INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
+      INSERT INTO "df_x" ("a", "b", "c", "d")
       SELECT *
       FROM (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
-      ) AS `...y`
+        SELECT "a", "b", "c" + 1.0 AS "c", "d"
+        FROM "df_y"
+      ) AS "...y"
       WHERE NOT EXISTS (
-        SELECT 1 FROM `updated`
-        WHERE (`updated`.`a` = `...y`.`a`) AND (`updated`.`b` = `...y`.`b`)
+        SELECT 1 FROM "updated"
+        WHERE ("updated"."a" = "...y"."a") AND ("updated"."b" = "...y"."b")
       )
-      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
+      RETURNING "df_x"."a", "df_x"."b" AS "b2"
 
 # `rows_delete()` works with `in_place = FALSE`
 
@@ -492,11 +492,11 @@
         x = 2:3, .name = "df_y"), by = "x", unmatched = "ignore", in_place = FALSE)
     Output
       <SQL>
-      SELECT `df_x`.*
-      FROM `df_x`
+      SELECT "df_x".*
+      FROM "df_x"
       WHERE NOT EXISTS (
-        SELECT 1 FROM `df_y`
-        WHERE (`df_x`.`x` = `df_y`.`x`)
+        SELECT 1 FROM "df_y"
+        WHERE ("df_x"."x" = "df_y"."x")
       )
 
 # `rows_delete()` works with `in_place = TRUE`
@@ -514,15 +514,15 @@
       sql_query_delete(con = simulate_dbi(), table = ident("df_x"), from = sql_render(
         df_y, simulate_dbi(), lvl = 2), by = c("a", "b"), returning_cols = c("a", b2 = "b"))
     Output
-      <SQL> DELETE FROM `df_x`
+      <SQL> DELETE FROM "df_x"
       WHERE EXISTS (
         SELECT 1 FROM (
-          SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-          FROM `df_y`
-        ) AS `...y`
-        WHERE (`...y`.`a` = `df_x`.`a`) AND (`...y`.`b` = `df_x`.`b`)
+          SELECT "a", "b", "c" + 1.0 AS "c", "d"
+          FROM "df_y"
+        ) AS "...y"
+        WHERE ("...y"."a" = "df_x"."a") AND ("...y"."b" = "df_x"."b")
       )
-      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
+      RETURNING "df_x"."a", "df_x"."b" AS "b2"
 
 # `get_returned_rows()` works
 
@@ -531,4 +531,3 @@
     Condition
       Error in `get_returned_rows()`:
       ! No returned rows available.
-

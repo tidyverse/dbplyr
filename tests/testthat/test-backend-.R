@@ -11,10 +11,10 @@ test_that("can translate both pipes", {
   expect_translation(
     con,
     x %>% mean() %>% sum(),
-    "SUM(AVG(`x`))",
+    'SUM(AVG("x"))',
     window = FALSE
   )
-  expect_translation(con, x |> mean() |> sum(), "SUM(AVG(`x`))", window = FALSE)
+  expect_translation(con, x |> mean() |> sum(), 'SUM(AVG("x"))', window = FALSE)
 })
 
 # mathematics --------------------------------------------------------
@@ -37,28 +37,28 @@ test_that("small numbers aren't converted to 0", {
 test_that("unary plus works with numbers", {
   con <- simulate_dbi()
   expect_translation(con, +10L, "10")
-  expect_translation(con, x == +10, '`x` = 10.0')
-  expect_translation(con, x %in% c(+1L, 0L), '`x` IN (1, 0)')
+  expect_translation(con, x == +10, '"x" = 10.0')
+  expect_translation(con, x %in% c(+1L, 0L), '"x" IN (1, 0)')
 })
 
 test_that("unary plus works for non-numeric expressions", {
   con <- simulate_dbi()
   expect_translation(con, +(1L + 2L), "(1 + 2)")
-  expect_translation(con, mean(x, na.rm = TRUE), 'AVG(`x`)', window = FALSE)
+  expect_translation(con, mean(x, na.rm = TRUE), 'AVG("x")', window = FALSE)
 })
 
 test_that("unary minus flips sign of number", {
   con <- simulate_dbi()
   expect_translation(con, -10L, "-10")
-  expect_translation(con, -10L + x, "-10 + `x`")
-  expect_translation(con, x == -10, '`x` = -10.0')
-  expect_translation(con, x %in% c(-1L, 0L), '`x` IN (-1, 0)')
+  expect_translation(con, -10L + x, '-10 + "x"')
+  expect_translation(con, x == -10, '"x" = -10.0')
+  expect_translation(con, x %in% c(-1L, 0L), '"x" IN (-1, 0)')
 })
 
 test_that("unary minus wraps non-numeric expressions", {
   con <- simulate_dbi()
   expect_translation(con, -(1L + 2L), "-(1 + 2)")
-  expect_translation(con, -mean(x, na.rm = TRUE), '-AVG(`x`)', window = FALSE)
+  expect_translation(con, -mean(x, na.rm = TRUE), '-AVG("x")', window = FALSE)
 })
 
 test_that("binary minus subtracts", {
@@ -68,20 +68,20 @@ test_that("binary minus subtracts", {
 
 test_that("log base comes first", {
   con <- simulate_dbi()
-  expect_translation(con, log(x, 10), 'LOG(10.0, `x`)')
+  expect_translation(con, log(x, 10), 'LOG(10.0, "x")')
 })
 
 test_that("log becomes ln", {
   con <- simulate_dbi()
-  expect_translation(con, log(x), 'LN(`x`)')
+  expect_translation(con, log(x), 'LN("x")')
 })
 
 test_that("can translate subsetting", {
   con <- simulate_dbi()
-  expect_translation(con, a$b, "`a`.`b`")
-  expect_translation(con, a[["b"]], "`a`.`b`")
-  expect_translation(con, f(a)[["b"]], "f(`a`).`b`")
-  expect_translation(con, a[["b"]][[1]], '`a`.`b`[1]')
+  expect_translation(con, a$b, '"a"."b"')
+  expect_translation(con, a[["b"]], '"a"."b"')
+  expect_translation(con, f(a)[["b"]], 'f("a")."b"')
+  expect_translation(con, a[["b"]][[1]], '"a"."b"[1]')
 
   expect_translation_snapshot(con, a[[x]], error = TRUE)
   expect_translation_snapshot(con, a[[TRUE]], error = TRUE)
@@ -103,15 +103,15 @@ test_that("useful error if $ used with inlined value", {
 
 test_that("lead and lag translate n to integers", {
   con <- simulate_dbi()
-  expect_translation(con, lead(x, 1), "LEAD(`x`, 1, NULL) OVER ()")
-  expect_translation(con, lag(x, 1), "LAG(`x`, 1, NULL) OVER ()")
+  expect_translation(con, lead(x, 1), 'LEAD("x", 1, NULL) OVER ()')
+  expect_translation(con, lag(x, 1), 'LAG("x", 1, NULL) OVER ()')
 })
 
 # strings -----------------------------------------------------------------
 
 test_that("can only translate case sensitive str_like", {
   con <- simulate_dbi()
-  expect_translation(con, str_like(x, "abc"), "`x` LIKE 'abc'")
+  expect_translation(con, str_like(x, "abc"), '"x" LIKE \'abc\'')
 
   expect_translation_snapshot(con, str_like(x, "abc", ignore_case = FALSE))
   expect_translation_snapshot(
@@ -128,13 +128,13 @@ test_that("can only translate case sensitive str_like", {
 
 test_that("can translate nzchar", {
   con <- simulate_dbi()
-  expect_translation(con, nzchar(y), "((`y` IS NULL) OR `y` != '')")
-  expect_translation(con, nzchar(y, TRUE), "`y` != ''")
+  expect_translation(con, nzchar(y), '(("y" IS NULL) OR "y" != \'\')')
+  expect_translation(con, nzchar(y, TRUE), '"y" != \'\'')
 
   # Uses individual translations from backend
   con <- simulate_access()
-  expect_translation(con, nzchar(y), "(ISNULL(`y`) OR `y` <> '')")
-  expect_translation(con, nzchar(y, TRUE), "`y` <> ''")
+  expect_translation(con, nzchar(y), '(ISNULL("y") OR "y" <> \'\')')
+  expect_translation(con, nzchar(y, TRUE), '"y" <> \'\'')
 })
 
 # aggregates --------------------------------------------------------------
@@ -173,12 +173,12 @@ test_that("all and any translated correctly", {
 
 test_that("bitwise operations", {
   con <- simulate_dbi()
-  expect_translation(con, bitwNot(x), "~(`x`)")
-  expect_translation(con, bitwAnd(x, 128L), "`x` & 128")
-  expect_translation(con, bitwOr(x, 128L), "`x` | 128")
-  expect_translation(con, bitwXor(x, 128L), "`x` ^ 128")
-  expect_translation(con, bitwShiftL(x, 2L), "`x` << 2")
-  expect_translation(con, bitwShiftR(x, 2L), "`x` >> 2")
+  expect_translation(con, bitwNot(x), '~("x")')
+  expect_translation(con, bitwAnd(x, 128L), '"x" & 128')
+  expect_translation(con, bitwOr(x, 128L), '"x" | 128')
+  expect_translation(con, bitwXor(x, 128L), '"x" ^ 128')
+  expect_translation(con, bitwShiftL(x, 2L), '"x" << 2')
+  expect_translation(con, bitwShiftR(x, 2L), '"x" >> 2')
 })
 
 test_that("default raw escapes translated correctly", {

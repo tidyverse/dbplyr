@@ -5,22 +5,22 @@
     Output
         <SQL SELECT>
         From:
-          <table_path> `lf1`
-        Select:   `lf1`.*, NULL
+          <table_path> "lf1"
+        Select:   "lf1".*, NULL
       
         UNION
       
         <SQL SELECT>
         From:
-          <table_path> `lf2`
-        Select:   `x`, NULL, `z`
+          <table_path> "lf2"
+        Select:   "x", NULL, "z"
       
         UNION ALL
       
         <SQL SELECT>
         From:
-          <table_path> `lf3`
-        Select:   `x`, NULL, `z`
+          <table_path> "lf3"
+        Select:   "x", NULL, "z"
 
 # generated sql doesn't change unexpectedly
 
@@ -29,12 +29,12 @@
     Output
       <SQL>
       SELECT *
-      FROM `df`
+      FROM "df"
       
       UNION
       
       SELECT *
-      FROM `df`
+      FROM "df"
 
 ---
 
@@ -44,12 +44,12 @@
       <SQL>
       (
         SELECT *
-        FROM `df`
+        FROM "df"
       )
       EXCEPT
       (
         SELECT *
-        FROM `df`
+        FROM "df"
       )
 
 ---
@@ -60,12 +60,12 @@
       <SQL>
       (
         SELECT *
-        FROM `df`
+        FROM "df"
       )
       INTERSECT
       (
         SELECT *
-        FROM `df`
+        FROM "df"
       )
 
 ---
@@ -75,12 +75,12 @@
     Output
       <SQL>
       SELECT *
-      FROM `df`
+      FROM "df"
       
       UNION ALL
       
       SELECT *
-      FROM `df`
+      FROM "df"
 
 ---
 
@@ -90,12 +90,12 @@
       <SQL>
       (
         SELECT *
-        FROM `df`
+        FROM "df"
       )
       EXCEPT ALL
       (
         SELECT *
-        FROM `df`
+        FROM "df"
       )
 
 ---
@@ -106,11 +106,10 @@
       <SQL>
       (
         SELECT *
-        FROM `df`
+        FROM "df"
       )
       INTERSECT ALL
       (
         SELECT *
-        FROM `df`
+        FROM "df"
       )
-

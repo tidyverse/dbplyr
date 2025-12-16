@@ -1,46 +1,46 @@
 test_that("custom scalar translated correctly", {
   con <- simulate_teradata()
 
-  expect_translation(con, x != y, "`x` <> `y`")
+  expect_translation(con, x != y, '"x" <> "y"')
   expect_translation(
     con,
     as.numeric(x),
-    "CAST(`x` AS DECIMAL(12, 9))"
+    'CAST("x" AS DECIMAL(12, 9))'
   )
   expect_translation(
     con,
     as.numeric(x, 8),
-    "CAST(`x` AS DECIMAL(12, 8))"
+    'CAST("x" AS DECIMAL(12, 8))'
   )
-  expect_translation(con, as.double(x), "CAST(`x` AS FLOAT)")
+  expect_translation(con, as.double(x), 'CAST("x" AS FLOAT)')
   expect_translation(
     con,
     as.character(x),
-    "CAST(`x` AS VARCHAR(255))"
+    'CAST("x" AS VARCHAR(255))'
   )
   expect_translation(
     con,
     as.character(x, 12),
-    "CAST(`x` AS VARCHAR(12))"
+    'CAST("x" AS VARCHAR(12))'
   )
-  expect_translation(con, log(x), "LN(`x`)")
-  expect_translation(con, cot(x), "1 / TAN(`x`)")
-  expect_translation(con, nchar(x), "CHARACTER_LENGTH(`x`)")
-  expect_translation(con, ceil(x), "CEILING(`x`)")
-  expect_translation(con, ceiling(x), "CEILING(`x`)")
-  expect_translation(con, atan2(x, y), "ATAN2(`y`, `x`)")
+  expect_translation(con, log(x), 'LN("x")')
+  expect_translation(con, cot(x), '1 / TAN("x")')
+  expect_translation(con, nchar(x), 'CHARACTER_LENGTH("x")')
+  expect_translation(con, ceil(x), 'CEILING("x")')
+  expect_translation(con, ceiling(x), 'CEILING("x")')
+  expect_translation(con, atan2(x, y), 'ATAN2("y", "x")')
   expect_translation(
     con,
     substr(x, 1, 2),
-    "SUBSTR(`x`, 1.0, 2.0)"
+    'SUBSTR("x", 1.0, 2.0)'
   )
   expect_translation(
     con,
     startsWith(x, "A"),
-    "CAST(CASE WHEN INSTR(`x`, 'A') = 1 THEN 1 ELSE 0 END AS INTEGER)"
+    'CAST(CASE WHEN INSTR("x", \'A\') = 1 THEN 1 ELSE 0 END AS INTEGER)'
   )
-  expect_translation(con, paste0(x, y), "`x` || `y`")
-  expect_translation(con, paste(x, y), "`x` || ' ' || `y`")
+  expect_translation(con, paste0(x, y), '"x" || "y"')
+  expect_translation(con, paste(x, y), '"x" || \' \' || "y"')
   expect_translation(
     con,
     as.Date("2020-01-01"),
@@ -51,7 +51,7 @@ test_that("custom scalar translated correctly", {
     as.Date(sql("x + 1")),
     "CAST(x + 1 AS DATE)"
   )
-  expect_translation(con, as.Date(x), "CAST(`x` AS DATE)")
+  expect_translation(con, as.Date(x), 'CAST("x" AS DATE)')
   expect_translation(
     con,
     week(as.Date("2020-01-01")),
@@ -67,12 +67,12 @@ test_that("custom scalar translated correctly", {
 test_that("custom bitwise operations translated correctly", {
   con <- simulate_teradata()
 
-  expect_translation(con, bitwNot(x), "BITNOT(`x`)")
-  expect_translation(con, bitwAnd(x, 128L), "BITAND(`x`, 128)")
-  expect_translation(con, bitwOr(x, 128L), "BITOR(`x`, 128)")
-  expect_translation(con, bitwXor(x, 128L), "BITXOR(`x`, 128)")
-  expect_translation(con, bitwShiftL(x, 2L), "SHIFTLEFT(`x`, 2)")
-  expect_translation(con, bitwShiftR(x, 2L), "SHIFTRIGHT(`x`, 2)")
+  expect_translation(con, bitwNot(x), 'BITNOT("x")')
+  expect_translation(con, bitwAnd(x, 128L), 'BITAND("x", 128)')
+  expect_translation(con, bitwOr(x, 128L), 'BITOR("x", 128)')
+  expect_translation(con, bitwXor(x, 128L), 'BITXOR("x", 128)')
+  expect_translation(con, bitwShiftL(x, 2L), 'SHIFTLEFT("x", 2)')
+  expect_translation(con, bitwShiftR(x, 2L), 'SHIFTRIGHT("x", 2)')
 })
 
 test_that("custom aggregators translated correctly", {
@@ -81,13 +81,13 @@ test_that("custom aggregators translated correctly", {
   expect_translation(
     con,
     var(x, na.rm = TRUE),
-    "VAR_SAMP(`x`)",
+    'VAR_SAMP("x")',
     window = FALSE
   )
   expect_translation(
     con,
     cumsum(x, order_by = c(A, B)),
-    "SUM(`x`) OVER (ORDER BY `A`, `B` ROWS UNBOUNDED PRECEDING)"
+    'SUM("x") OVER (ORDER BY "A", "B" ROWS UNBOUNDED PRECEDING)'
   )
 })
 
@@ -97,12 +97,12 @@ test_that("custom window functions translated correctly", {
   expect_translation(
     con,
     var(x, na.rm = TRUE),
-    "VAR_SAMP(`x`) OVER ()"
+    'VAR_SAMP("x") OVER ()'
   )
   expect_translation(
     con,
     cumsum(x, order_by = c(A, B)),
-    "SUM(`x`) OVER (ORDER BY `A`, `B` ROWS UNBOUNDED PRECEDING)"
+    'SUM("x") OVER (ORDER BY "A", "B" ROWS UNBOUNDED PRECEDING)'
   )
 })
 

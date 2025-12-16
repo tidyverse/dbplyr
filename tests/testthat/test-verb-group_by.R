@@ -93,7 +93,7 @@ test_that("group_by mutate is not optimised away", {
 
   expect_equal(
     lf |> group_by(x = x + 1) |> remote_query(),
-    sql("SELECT `x` + 1.0 AS `x`\nFROM `df`")
+    sql("SELECT \"x\" + 1.0 AS \"x\"\nFROM \"df\"")
   )
 })
 
@@ -106,7 +106,7 @@ test_that("ungroup drops PARTITION BY", {
     ungroup() |>
     mutate(x = sum(x)) |>
     sql_build()
-  expect_equal(out$select, sql(x = 'SUM(`x`) OVER ()'))
+  expect_equal(out$select, sql(x = 'SUM("x") OVER ()'))
 })
 
 # ops ---------------------------------------------------------------------
