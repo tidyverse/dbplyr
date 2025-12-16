@@ -6,8 +6,7 @@
     Output
       <SQL SELECT>
       From:
-        <table_path> `df`
+        <table_path> "df"
       Select:   x_mean = mean(x), y2 = y
       Where:    y > 1, x == y - 2
       Group by: "x"
-

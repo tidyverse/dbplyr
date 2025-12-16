@@ -28,9 +28,9 @@
       filter(lazy_frame(x = 1, y = 1), x == y$id)
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      WHERE (`x` = `y`.`id`)
+      SELECT "df".*
+      FROM "df"
+      WHERE ("x" = "y"."id")
 
 ---
 
@@ -38,9 +38,9 @@
       filter(lazy_frame(x = 1), x == y$id)
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      WHERE (`x` = 1.0)
+      SELECT "df".*
+      FROM "df"
+      WHERE ("x" = 1.0)
 
 # useful error if $ used with inlined value
 
@@ -60,7 +60,7 @@
       i `str_like()` is always case sensitive.
       i Use `str_ilike()` for case insensitive string matching.
     Output
-      <SQL> `x` LIKE 'abc'
+      <SQL> "x" LIKE 'abc'
 
 ---
 
@@ -118,7 +118,7 @@
     Code
       sql_table_analyze(con, in_schema("schema", "tbl"))
     Output
-      <SQL> ANALYZE `schema`.`tbl`
+      <SQL> ANALYZE "schema"."tbl"
 
 ---
 
@@ -132,35 +132,35 @@
     Code
       sql_query_wrap(con, ident("table"))
     Output
-      <table_path> `table`
+      <table_path> "table"
 
 ---
 
     Code
       sql_query_wrap(con, in_schema("schema", "tbl"))
     Output
-      <table_path> `schema`.`tbl`
+      <table_path> "schema"."tbl"
 
 ---
 
     Code
       sql_query_wrap(con, sql("SELECT * FROM foo"))
     Output
-      <SQL> (SELECT * FROM foo) AS `q01`
+      <SQL> (SELECT * FROM foo) AS "q01"
 
 ---
 
     Code
       sql_table_index(con, in_schema("schema", "tbl"), c("a", "b"))
     Output
-      <SQL> CREATE INDEX `tbl_a_b` ON `schema`.`tbl` (`a`, `b`)
+      <SQL> CREATE INDEX "tbl_a_b" ON "schema"."tbl" ("a", "b")
 
 ---
 
     Code
       sql_table_index(con, in_schema("schema", "tbl"), "c", unique = TRUE)
     Output
-      <SQL> CREATE UNIQUE INDEX `tbl_c` ON `schema`.`tbl` (`c`)
+      <SQL> CREATE UNIQUE INDEX "tbl_c" ON "schema"."tbl" ("c")
 
 ---
 
@@ -168,6 +168,5 @@
       sql_query_save(con, sql("SELECT * FROM foo"), in_schema("temp", "tbl"))
     Output
       <SQL> CREATE TEMPORARY TABLE
-      `temp`.`tbl` AS
+      "temp"."tbl" AS
       SELECT * FROM foo
-

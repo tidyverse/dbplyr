@@ -23,7 +23,7 @@
     Output
       <SQL>
       SELECT *
-      FROM `df`
+      FROM "df"
 
 # names() inform that they aren't meant to be used
 
@@ -39,4 +39,3 @@
 
     The `$` method of <tbl_lazy> is for internal use only.
     i Use `dplyr::pull()` to get the values in a column.
-

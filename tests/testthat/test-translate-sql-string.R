@@ -1,13 +1,13 @@
 test_that("sql_substr works as expected", {
   con <- simulate_dbi()
 
-  expect_translation(con, substr(x, 3, 4), "SUBSTR(`x`, 3, 2)")
-  expect_translation(con, substr(x, 3, 3), "SUBSTR(`x`, 3, 1)")
-  expect_translation(con, substr(x, 3, 2), "SUBSTR(`x`, 3, 0)")
-  expect_translation(con, substr(x, 3, 1), "SUBSTR(`x`, 3, 0)")
+  expect_translation(con, substr(x, 3, 4), "SUBSTR(\"x\", 3, 2)")
+  expect_translation(con, substr(x, 3, 3), "SUBSTR(\"x\", 3, 1)")
+  expect_translation(con, substr(x, 3, 2), "SUBSTR(\"x\", 3, 0)")
+  expect_translation(con, substr(x, 3, 1), "SUBSTR(\"x\", 3, 0)")
 
-  expect_translation(con, substr(x, 0, 1), "SUBSTR(`x`, 1, 1)")
-  expect_translation(con, substr(x, -1, 1), "SUBSTR(`x`, 1, 1)")
+  expect_translation(con, substr(x, 0, 1), "SUBSTR(\"x\", 1, 1)")
+  expect_translation(con, substr(x, -1, 1), "SUBSTR(\"x\", 1, 1)")
 
   # Missing arguments
   expect_translation_snapshot(con, substr("test"), error = TRUE)
@@ -20,22 +20,38 @@ test_that("sql_substr works as expected", {
 
 test_that("substring is also translated", {
   con <- simulate_dbi()
-  expect_translation(con, substring(x, 3, 4), "SUBSTR(`x`, 3, 2)")
+  expect_translation(con, substring(x, 3, 4), "SUBSTR(\"x\", 3, 2)")
 })
 
 test_that("sql_str_sub works as expected", {
   con <- simulate_dbi()
 
-  expect_translation(con, str_sub(x), "SUBSTR(`x`, 1)")
-  expect_translation(con, str_sub(x, 1), "SUBSTR(`x`, 1)")
-  expect_translation(con, str_sub(x, -1), "SUBSTR(`x`, LENGTH(`x`))")
-  expect_translation(con, str_sub(x, 2, 4), "SUBSTR(`x`, 2, 3)")
-  expect_translation(con, str_sub(x, 2, 2), "SUBSTR(`x`, 2, 1)")
-  expect_translation(con, str_sub(x, 2, 0), "SUBSTR(`x`, 2, 0)")
-  expect_translation(con, str_sub(x, 1, -2), "SUBSTR(`x`, 1, LENGTH(`x`) - 1)")
-  expect_translation(con, str_sub(x, 3, -3), "SUBSTR(`x`, 3, LENGTH(`x`) - 4)")
-  expect_translation(con, str_sub(x, -3, 0), "SUBSTR(`x`, LENGTH(`x`) - 2, 0)")
-  expect_translation(con, str_sub(x, -3, -3), "SUBSTR(`x`, LENGTH(`x`) - 2, 1)")
+  expect_translation(con, str_sub(x), "SUBSTR(\"x\", 1)")
+  expect_translation(con, str_sub(x, 1), "SUBSTR(\"x\", 1)")
+  expect_translation(con, str_sub(x, -1), "SUBSTR(\"x\", LENGTH(\"x\"))")
+  expect_translation(con, str_sub(x, 2, 4), "SUBSTR(\"x\", 2, 3)")
+  expect_translation(con, str_sub(x, 2, 2), "SUBSTR(\"x\", 2, 1)")
+  expect_translation(con, str_sub(x, 2, 0), "SUBSTR(\"x\", 2, 0)")
+  expect_translation(
+    con,
+    str_sub(x, 1, -2),
+    "SUBSTR(\"x\", 1, LENGTH(\"x\") - 1)"
+  )
+  expect_translation(
+    con,
+    str_sub(x, 3, -3),
+    "SUBSTR(\"x\", 3, LENGTH(\"x\") - 4)"
+  )
+  expect_translation(
+    con,
+    str_sub(x, -3, 0),
+    "SUBSTR(\"x\", LENGTH(\"x\") - 2, 0)"
+  )
+  expect_translation(
+    con,
+    str_sub(x, -3, -3),
+    "SUBSTR(\"x\", LENGTH(\"x\") - 2, 1)"
+  )
 })
 
 test_that("sql_str_sub can require length parameter", {
@@ -43,9 +59,9 @@ test_that("sql_str_sub can require length parameter", {
   x <- ident("x")
   str_sub <- sql_str_sub("SUBSTR", optional_length = FALSE)
 
-  expect_equal(str_sub(x), sql("SUBSTR(`x`, 1, LENGTH(`x`))"))
-  expect_equal(str_sub(x, 1), sql("SUBSTR(`x`, 1, LENGTH(`x`))"))
-  expect_equal(str_sub(x, -1), sql("SUBSTR(`x`, LENGTH(`x`), 1)"))
+  expect_equal(str_sub(x), sql("SUBSTR(\"x\", 1, LENGTH(\"x\"))"))
+  expect_equal(str_sub(x, 1), sql("SUBSTR(\"x\", 1, LENGTH(\"x\"))"))
+  expect_equal(str_sub(x, -1), sql("SUBSTR(\"x\", LENGTH(\"x\"), 1)"))
 })
 
 test_that("str_sub() returns consistent results", {
@@ -101,9 +117,13 @@ test_that("str_detect(), str_starts(), str_ends() support fixed patterns", {
 test_that("basic prefix paste", {
   con <- simulate_dbi()
 
-  expect_translation(con, paste0(x), "CONCAT_WS('', `x`)")
-  expect_translation(con, paste0(x, y), "CONCAT_WS('', `x`, `y`)")
-  expect_translation(con, paste0(x, y, sep = " "), "CONCAT_WS(' ', `x`, `y`)")
+  expect_translation(con, paste0(x), "CONCAT_WS('', \"x\")")
+  expect_translation(con, paste0(x, y), "CONCAT_WS('', \"x\", \"y\")")
+  expect_translation(
+    con,
+    paste0(x, y, sep = " "),
+    "CONCAT_WS(' ', \"x\", \"y\")"
+  )
 })
 
 test_that("basic infix paste", {
@@ -113,7 +133,7 @@ test_that("basic infix paste", {
   x <- ident("x")
   y <- ident("y")
 
-  expect_equal(paste(x), sql("CAST(`x` AS text)"))
-  expect_equal(paste(x, y), sql("`x` && `y`"))
-  expect_equal(paste(x, y, sep = " "), sql("`x` && ' ' && `y`"))
+  expect_equal(paste(x), sql("CAST(\"x\" AS text)"))
+  expect_equal(paste(x, y), sql("\"x\" && \"y\""))
+  expect_equal(paste(x, y, sep = " "), sql("\"x\" && ' ' && \"y\""))
 })

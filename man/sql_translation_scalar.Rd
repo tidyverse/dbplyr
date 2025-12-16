@@ -11,7 +11,7 @@
 \alias{sql_runif}
 \title{SQL helpers for scalar functions}
 \usage{
-sql_infix(f, pad = TRUE, con = sql_current_con())
+sql_infix(f, pad = TRUE)
 
 sql_prefix(f, n = NULL)
 
@@ -29,8 +29,6 @@ sql_runif(rand_expr, n = n(), min = 0, max = 1)
 \item{f}{The name of the SQL function as a string.}
 
 \item{pad}{If \code{TRUE}, the default, pad the infix operator with spaces.}
-
-\item{con}{The database connection.}
 
 \item{n}{For \code{sql_prefix()}, an optional number of arguments to expect.
 Will signal error if not correct.}

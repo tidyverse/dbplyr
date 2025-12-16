@@ -11,6 +11,6 @@ test_that("2nd edition uses sql methods", {
 test_that("sql_query_rows() works", {
   expect_equal(
     sql_query_rows(simulate_dbi(), ident("abc")),
-    sql("SELECT COUNT(*) FROM `abc` AS `master`")
+    sql('SELECT COUNT(*) FROM "abc" AS "master"')
   )
 })

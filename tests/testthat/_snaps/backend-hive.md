@@ -3,7 +3,7 @@
     Code
       sql_table_analyze(con, in_schema("schema", "tbl"))
     Output
-      <SQL> ANALYZE TABLE `schema`.`tbl` COMPUTE STATISTICS
+      <SQL> ANALYZE TABLE "schema"."tbl" COMPUTE STATISTICS
 
 ---
 
@@ -12,10 +12,9 @@
     Output
       <SQL>
       SELECT *
-      FROM `df`
+      FROM "df"
       
       UNION ALL
       
       SELECT *
-      FROM `df`
-
+      FROM "df"

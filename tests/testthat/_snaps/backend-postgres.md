@@ -78,17 +78,17 @@
       left_join(lf, lf, by = "x", na_matches = "na")
     Output
       <SQL>
-      SELECT `df_LHS`.`x` AS `x`
-      FROM `df` AS `df_LHS`
-      LEFT JOIN `df` AS `df_RHS`
-        ON (`df_LHS`.`x` IS NOT DISTINCT FROM `df_RHS`.`x`)
+      SELECT "df_LHS"."x" AS "x"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" IS NOT DISTINCT FROM "df_RHS"."x")
 
 ---
 
     Code
       remote_query(copy_inline(con, tibble(x = integer(), y = character())))
     Output
-      <SQL> SELECT CAST(NULL AS INTEGER) AS `x`, CAST(NULL AS TEXT) AS `y`
+      <SQL> SELECT CAST(NULL AS INTEGER) AS "x", CAST(NULL AS TEXT) AS "y"
       WHERE (0 = 1)
 
 ---
@@ -96,8 +96,8 @@
     Code
       remote_query(copy_inline(con, tibble(x = 1:2, y = letters[1:2])))
     Output
-      <SQL> SELECT CAST(`x` AS INTEGER) AS `x`, CAST(`y` AS TEXT) AS `y`
-      FROM (  VALUES (1, 'a'), (2, 'b')) AS drvd(`x`, `y`)
+      <SQL> SELECT CAST("x" AS INTEGER) AS "x", CAST("y" AS TEXT) AS "y"
+      FROM (  VALUES (1, 'a'), (2, 'b')) AS drvd("x", "y")
 
 # `sql_query_insert()` works
 
@@ -117,15 +117,15 @@
         lvl = 1), insert_cols = colnames(df_y), by = c("a", "b"), conflict = "ignore",
       returning_cols = c("a", b2 = "b"))
     Output
-      <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
+      <SQL> INSERT INTO "df_x" ("a", "b", "c", "d")
       SELECT *
       FROM (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
-      ) AS `...y`
-      ON CONFLICT (`a`, `b`)
+        SELECT "a", "b", "c" + 1.0 AS "c", "d"
+        FROM "df_y"
+      ) AS "...y"
+      ON CONFLICT ("a", "b")
       DO NOTHING
-      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
+      RETURNING "df_x"."a", "df_x"."b" AS "b2"
 
 # `sql_query_upsert()` with method = 'on_conflict' is correct
 
@@ -134,17 +134,17 @@
         lvl = 1), by = c("c", "d"), update_cols = c("a", "b"), returning_cols = c("a",
         b2 = "b"), method = "on_conflict")
     Output
-      <SQL> INSERT INTO `df_x` (`c`, `d`, `a`, `b`)
-      SELECT `c`, `d`, `a`, `b`
+      <SQL> INSERT INTO "df_x" ("c", "d", "a", "b")
+      SELECT "c", "d", "a", "b"
       FROM (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
-      ) AS `...y`
+        SELECT "a", "b", "c" + 1.0 AS "c", "d"
+        FROM "df_y"
+      ) AS "...y"
       WHERE true
-      ON CONFLICT  (`c`, `d`)
+      ON CONFLICT  ("c", "d")
       DO UPDATE
-      SET `a` = `excluded`.`a`, `b` = `excluded`.`b`
-      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
+      SET "a" = "excluded"."a", "b" = "excluded"."b"
+      RETURNING "df_x"."a", "df_x"."b" AS "b2"
 
 # can explain
 
@@ -182,4 +182,3 @@
       i Using SQL: INSERT INTO "df_x" ("a", "b", "c", "d") SELECT "a", "b", "c", "d" FROM ( SELECT "a", "b", "c" + 1.0 AS "c", "d" FROM "df_y" ) AS "...y" WHERE true ON CONFLICT ("a", "b") DO UPDATE SET "c" = "excluded"."c", "d" = "excluded"."d" RETURNING "df_x"."a", "df_x"."b", "df_x"."c", "df_x"."d"
       Caused by error:
       ! dummy DBI error
-

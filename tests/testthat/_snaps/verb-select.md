@@ -4,11 +4,11 @@
       select(distinct(lf), x)
     Output
       <SQL>
-      SELECT `x`
+      SELECT "x"
       FROM (
-        SELECT DISTINCT `df`.*
-        FROM `df`
-      ) AS `q01`
+        SELECT DISTINCT "df".*
+        FROM "df"
+      ) AS "q01"
 
 # rename/relocate after distinct is inlined #1141
 
@@ -16,14 +16,14 @@
       rename(distinct(lf), z = y)
     Output
       <SQL>
-      SELECT DISTINCT `x`, `y` AS `z`
-      FROM `df`
+      SELECT DISTINCT "x", "y" AS "z"
+      FROM "df"
     Code
       relocate(distinct(lf), y)
     Output
       <SQL>
-      SELECT DISTINCT `y`, `x`
-      FROM `df`
+      SELECT DISTINCT "y", "x"
+      FROM "df"
 
 # select preserves grouping vars
 
@@ -38,10 +38,10 @@
       (out <- select(left_join(lf1, lf2, by = "x"), b, x))
     Output
       <SQL>
-      SELECT `b`, `lf1`.`x` AS `x`
-      FROM `lf1`
-      LEFT JOIN `lf2`
-        ON (`lf1`.`x` = `lf2`.`x`)
+      SELECT "b", "lf1"."x" AS "x"
+      FROM "lf1"
+      LEFT JOIN "lf2"
+        ON ("lf1"."x" = "lf2"."x")
 
 ---
 
@@ -49,10 +49,10 @@
       (out <- relocate(left_join(lf1, lf2, by = "x"), b))
     Output
       <SQL>
-      SELECT `b`, `lf1`.*
-      FROM `lf1`
-      LEFT JOIN `lf2`
-        ON (`lf1`.`x` = `lf2`.`x`)
+      SELECT "b", "lf1".*
+      FROM "lf1"
+      LEFT JOIN "lf2"
+        ON ("lf1"."x" = "lf2"."x")
 
 # select() after semi_join() is inlined
 
@@ -60,11 +60,11 @@
       (out <- select(semi_join(lf1, lf2, by = "x"), x, a2 = a))
     Output
       <SQL>
-      SELECT `x`, `a` AS `a2`
-      FROM `lf1`
+      SELECT "x", "a" AS "a2"
+      FROM "lf1"
       WHERE EXISTS (
-        SELECT 1 FROM `lf2`
-        WHERE (`lf1`.`x` = `lf2`.`x`)
+        SELECT 1 FROM "lf2"
+        WHERE ("lf1"."x" = "lf2"."x")
       )
 
 ---
@@ -73,11 +73,11 @@
       (out <- relocate(anti_join(lf1, lf2, by = "x"), a))
     Output
       <SQL>
-      SELECT `a`, `x`
-      FROM `lf1`
+      SELECT "a", "x"
+      FROM "lf1"
       WHERE NOT EXISTS (
-        SELECT 1 FROM `lf2`
-        WHERE (`lf1`.`x` = `lf2`.`x`)
+        SELECT 1 FROM "lf2"
+        WHERE ("lf1"."x" = "lf2"."x")
       )
 
 # select() after join handles previous select
@@ -86,11 +86,11 @@
       print(lf)
     Output
       <SQL>
-      SELECT `x` AS `x2`, `y` AS `y3`, `z`
-      FROM `df` AS `df_LHS`
+      SELECT "x" AS "x2", "y" AS "y3", "z"
+      FROM "df" AS "df_LHS"
       WHERE EXISTS (
-        SELECT 1 FROM `df` AS `df_RHS`
-        WHERE (`df_LHS`.`x` = `df_RHS`.`x`)
+        SELECT 1 FROM "df" AS "df_RHS"
+        WHERE ("df_LHS"."x" = "df_RHS"."x")
       )
 
 ---
@@ -99,10 +99,10 @@
       print(lf2)
     Output
       <SQL>
-      SELECT `df_LHS`.`x` AS `x2`, `df_LHS`.`y` AS `y3`, `z`
-      FROM `df` AS `df_LHS`
-      LEFT JOIN `df` AS `df_RHS`
-        ON (`df_LHS`.`x` = `df_RHS`.`x`)
+      SELECT "df_LHS"."x" AS "x2", "df_LHS"."y" AS "y3", "z"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" = "df_RHS"."x")
 
 # select() produces nice error messages
 
@@ -191,11 +191,11 @@
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
-      SELECT `x`
+      SELECT "x"
       FROM (
-        SELECT `df`.*, 1.0 AS `z`
-        FROM `df`
-      ) AS `q01`
+        SELECT "df".*, 1.0 AS "z"
+        FROM "df"
+      ) AS "q01"
 
 # multiple selects are collapsed
 
@@ -203,8 +203,8 @@
       select(select(lf, 2:1), 2:1)
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
+      SELECT "df".*
+      FROM "df"
 
 ---
 
@@ -212,8 +212,8 @@
       select(select(select(lf, 2:1), 2:1), 2:1)
     Output
       <SQL>
-      SELECT `y`, `x`
-      FROM `df`
+      SELECT "y", "x"
+      FROM "df"
 
 ---
 
@@ -221,8 +221,8 @@
       select(select(lf, x1 = x), x2 = x1)
     Output
       <SQL>
-      SELECT `x` AS `x2`
-      FROM `df`
+      SELECT "x" AS "x2"
+      FROM "df"
 
 # mutate collapses over nested select
 
@@ -230,8 +230,8 @@
       select(mutate(lf, a = 1, b = 2), a)
     Output
       <SQL>
-      SELECT 1.0 AS `a`
-      FROM `df`
+      SELECT 1.0 AS "a"
+      FROM "df"
 
 ---
 
@@ -239,8 +239,8 @@
       select(mutate(lf, a = 1, b = 2), x)
     Output
       <SQL>
-      SELECT `x`
-      FROM `df`
+      SELECT "x"
+      FROM "df"
 
 # output is styled
 
@@ -248,22 +248,21 @@
       show_query(out, sql_options = sql_options(cte = TRUE))
     Output
       <SQL>
-      WITH `q01` AS (
-        [34mSELECT[39m `x`, AVG(`y`) OVER (PARTITION BY `x`)[34m AS [39m`y`, `z` + 1.0[34m AS [39m`z`
-        [34mFROM[39m `df`
+      WITH "q01" AS (
+        [34mSELECT[39m "x", AVG("y") OVER (PARTITION BY "x")[34m AS [39m"y", "z" + 1.0[34m AS [39m"z"
+        [34mFROM[39m "df"
       ),
-      `q02` AS (
-        [34mSELECT[39m `q01`.*
-        [34mFROM[39m `q01`
-        [34mWHERE[39m (`z` = 1.0)
+      "q02" AS (
+        [34mSELECT[39m "q01".*
+        [34mFROM[39m "q01"
+        [34mWHERE[39m ("z" = 1.0)
       )
       [34mSELECT[39m
-        `LHS`.`x`[34m AS [39m`x`,
-        `LHS`.`y`[34m AS [39m`y.x`,
-        `LHS`.`z`[34m AS [39m`z.x`,
-        `df`.`y`[34m AS [39m`y.y`,
-        `df`.`z`[34m AS [39m`z.y`
-      [34mFROM[39m `q02`[34m AS [39m`LHS`
-      [34mLEFT JOIN[39m `df`
-        [34mON[39m (`LHS`.`x` = `df`.`x`)
-
+        "LHS"."x"[34m AS [39m"x",
+        "LHS"."y"[34m AS [39m"y.x",
+        "LHS"."z"[34m AS [39m"z.x",
+        "df"."y"[34m AS [39m"y.y",
+        "df"."z"[34m AS [39m"z.y"
+      [34mFROM[39m "q02"[34m AS [39m"LHS"
+      [34mLEFT JOIN[39m "df"
+        [34mON[39m ("LHS"."x" = "df"."x")
