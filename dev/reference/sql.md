@@ -10,21 +10,14 @@ escape all its inputs and return an sql object.
 sql(...)
 
 is.sql(x)
-
-as.sql(x, con)
 ```
 
 ## Arguments
 
 - ...:
 
-  Character vectors that will be combined into a single SQL expression.
+  Character vectors that will be combined into a single SQL vector.
 
 - x:
 
-  Object to coerce
-
-- con:
-
-  Needed when `x` is directly supplied from the user so that schema
-  specifications can be quoted using the correct identifiers.
+  Object to check if it is an sql object.

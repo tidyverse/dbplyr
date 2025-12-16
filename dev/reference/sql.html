@@ -69,9 +69,7 @@ all its inputs and return an sql object.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sql</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">is.sql</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">as.sql</span><span class="op">(</span><span class="va">x</span>, <span class="va">con</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">is.sql</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -79,17 +77,11 @@ all its inputs and return an sql object.</p>
 
 
 <dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Character vectors that will be combined into a single SQL
-expression.</p></dd>
+<dd><p>Character vectors that will be combined into a single SQL vector.</p></dd>
 
 
 <dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>Object to coerce</p></dd>
-
-
-<dt id="arg-con">con<a class="anchor" aria-label="anchor" href="#arg-con"></a></dt>
-<dd><p>Needed when <code>x</code> is directly supplied from the user so that
-schema specifications can be quoted using the correct identifiers.</p></dd>
+<dd><p>Object to check if it is an sql object.</p></dd>
 
 </dl></div>
 

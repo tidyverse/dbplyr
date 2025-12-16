@@ -2,6 +2,11 @@
 
 ## dbplyr (development version)
 
+- [`as.sql()`](https://dbplyr.tidyverse.org/dev/reference/as.sql.md) is
+  now deprecated as part of major internal refactoring of how
+  [`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md) and
+  [`ident()`](https://dbplyr.tidyverse.org/dev/reference/ident.md) are
+  used.
 - `expand()` now errors when column expressions don’t reference any
   columns in the data, instead of generating invalid SQL
   ([\#720](https://github.com/tidyverse/dbplyr/issues/720)).
@@ -2934,7 +2939,7 @@ CRAN release: 2017-06-09
 
 ### Vector-level SQL generation
 
-- New [`as.sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md)
+- New [`as.sql()`](https://dbplyr.tidyverse.org/dev/reference/as.sql.md)
   safely coerces an input to SQL.
 
 - More translators for
