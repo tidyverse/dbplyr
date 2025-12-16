@@ -9,7 +9,9 @@ sql_quote(x, quote)
 \arguments{
 \item{x}{Character vector to escape.}
 
-\item{quote}{Single quoting character.}
+\item{quote}{Quote character. Either a length 1 character vector for
+symmetric quotes (e.g., \code{"'"} or \code{'"'}), or a length 2 character vector
+for asymmetric quotes (e.g., \code{c("[", "]")}).}
 }
 \description{
 If the quote character is present in the string, it will be doubled.
@@ -19,5 +21,7 @@ If the quote character is present in the string, it will be doubled.
 sql_quote("abc", "'")
 sql_quote("I've had a good day", "'")
 sql_quote(c("abc", NA), "'")
+
+sql_quote(c("abc", NA), c("[", "]"))
 }
 \keyword{internal}

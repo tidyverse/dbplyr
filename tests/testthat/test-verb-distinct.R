@@ -53,7 +53,7 @@ test_that("distinct can select variables via pick() #1125", {
   lf <- lazy_frame(x_1 = 1, x_2 = 1, y = 1)
   expect_equal(
     lf |> distinct(pick(starts_with("x_"))) |> remote_query(),
-    sql("SELECT DISTINCT `x_1`, `x_2`\nFROM `df`")
+    sql("SELECT DISTINCT \"x_1\", \"x_2\"\nFROM \"df\"")
   )
 })
 
@@ -67,7 +67,7 @@ test_that("distinct() produces optimized SQL", {
 
   expect_equal(
     remote_query(out),
-    sql("SELECT DISTINCT `x` AS `a`\nFROM `df`")
+    sql("SELECT DISTINCT \"x\" AS \"a\"\nFROM \"df\"")
   )
 
   expect_true(out$lazy_query$distinct)
@@ -91,7 +91,9 @@ test_that("distinct() produces optimized SQL", {
 
   expect_equal(
     remote_query(out),
-    sql("SELECT DISTINCT `x`, AVG(`y`) AS `y`\nFROM `df`\nGROUP BY `x`")
+    sql(
+      "SELECT DISTINCT \"x\", AVG(\"y\") AS \"y\"\nFROM \"df\"\nGROUP BY \"x\""
+    )
   )
 
   expect_true(out$lazy_query$distinct)
@@ -110,7 +112,7 @@ test_that("distinct() produces optimized SQL", {
 
   expect_equal(
     remote_query(out),
-    sql("SELECT DISTINCT `y`\nFROM `df`\nWHERE (`x` = 1)")
+    sql("SELECT DISTINCT \"y\"\nFROM \"df\"\nWHERE (\"x\" = 1)")
   )
 
   expect_true(out$lazy_query$distinct)
@@ -133,7 +135,7 @@ test_that("distinct() produces optimized SQL", {
   expect_equal(
     remote_query(out),
     sql(
-      "SELECT DISTINCT `x`, AVG(`y`) AS `y`\nFROM `df`\nGROUP BY `x`\nHAVING (`x` = 1.0)"
+      "SELECT DISTINCT \"x\", AVG(\"y\") AS \"y\"\nFROM \"df\"\nGROUP BY \"x\"\nHAVING (\"x\" = 1.0)"
     )
   )
   expect_true(out$lazy_query$distinct)
@@ -150,7 +152,7 @@ test_that("distinct() produces optimized SQL", {
 
   expect_equal(
     remote_query(out),
-    sql("SELECT DISTINCT `x`\nFROM `df`\nORDER BY `y`")
+    sql("SELECT DISTINCT \"x\"\nFROM \"df\"\nORDER BY \"y\"")
   )
 
   expect_snapshot(

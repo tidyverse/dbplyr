@@ -36,17 +36,17 @@ test_that("remote_table returns null for computed tables", {
   expect_null(lf |> group_by(x) |> remote_table())
 
   lf <- lazy_frame(x = 1)
-  expect_equal(lf |> remote_table(null_if_local = FALSE), table_path("`df`"))
+  expect_equal(lf |> remote_table(null_if_local = FALSE), table_path('"df"'))
   expect_equal(
     lf |> group_by(x) |> remote_table(null_if_local = FALSE),
-    table_path("`df`")
+    table_path('"df"')
   )
 })
 
 test_that("remote_name and remote_table can handle different table identifiers", {
   test_remote_table <- function(
     x,
-    exp_tbl = as_table_path(x, simulate_sqlite())
+    exp_tbl = as_table_path(x, simulate_dbi())
   ) {
     lf <- lazy_frame(x = 1, .name = x)
     expect_equal(remote_table(lf, null_if_local = FALSE), exp_tbl)

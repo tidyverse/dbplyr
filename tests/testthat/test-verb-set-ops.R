@@ -55,7 +55,7 @@ test_that("can combine multiple unions in one query", {
   expect_snapshot(lf_union |> show_query(sql_options = with_cte))
 
   out <- lf_union |> mutate(a = x + y) |> sql_build()
-  expect_equal(out$select, sql("`q01`.*", a = "`x` + `y`"))
+  expect_equal(out$select, sql("\"q01\".*", a = "\"x\" + \"y\""))
 })
 
 test_that("set ops correctly quote reused queries in CTEs", {

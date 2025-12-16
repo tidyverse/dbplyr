@@ -20,15 +20,15 @@ test_that("glue_sql() handles type casting", {
   x <- "x"
 
   expect_equal(sql_glue2(con, "{x}"), sql("'x'"))
-  expect_equal(sql_glue2(con, "{.id x}", ), sql("`x`"))
+  expect_equal(sql_glue2(con, "{.id x}", ), sql('"x"'))
   expect_equal(sql_glue2(con, "{.sql x}", ), sql("x"))
 
   tbl1 <- "table"
   tbl2 <- I("schema.table")
   tbl3 <- in_schema("schema", "table")
-  expect_equal(sql_glue2(con, "{.tbl tbl1}"), sql("`table`"))
+  expect_equal(sql_glue2(con, "{.tbl tbl1}"), sql('"table"'))
   expect_equal(sql_glue2(con, "{.tbl tbl2}"), sql("schema.table"))
-  expect_equal(sql_glue2(con, "{.tbl tbl3}"), sql("`schema`.`table`"))
+  expect_equal(sql_glue2(con, "{.tbl tbl3}"), sql('"schema"."table"'))
 })
 
 test_that("useful error if bad identified", {

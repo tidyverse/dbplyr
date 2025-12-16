@@ -59,9 +59,9 @@
     Message
       `summarise()` has grouped output by "x". You can override using the `.groups` argument.
     Output
-      <SQL> SELECT `x`, `y`
-      FROM `df`
-      GROUP BY `x`, `y`
+      <SQL> SELECT "x", "y"
+      FROM "df"
+      GROUP BY "x", "y"
 
 ---
 
@@ -78,9 +78,9 @@
       (result1 <- summarise(group_by(lf, g), g = g + 1))
     Output
       <SQL>
-      SELECT `g` + 1.0 AS `g`
-      FROM `df`
-      GROUP BY `g`
+      SELECT "g" + 1.0 AS "g"
+      FROM "df"
+      GROUP BY "g"
 
 ---
 
@@ -88,9 +88,9 @@
       (result2 <- summarise(group_by(lf, g), x = x + 1, g = g + 1))
     Output
       <SQL>
-      SELECT `g` + 1.0 AS `g`, `x` + 1.0 AS `x`
-      FROM `df`
-      GROUP BY `g`
+      SELECT "g" + 1.0 AS "g", "x" + 1.0 AS "x"
+      FROM "df"
+      GROUP BY "g"
 
 # across() does not select grouping variables
 
@@ -98,9 +98,9 @@
       summarise(group_by(df, g), across(.fns = ~0))
     Output
       <SQL>
-      SELECT `g`, 0.0 AS `x`
-      FROM `df`
-      GROUP BY `g`
+      SELECT "g", 0.0 AS "x"
+      FROM "df"
+      GROUP BY "g"
 
 # across doesn't select columns from `.by` #1493
 
@@ -108,9 +108,9 @@
       out
     Output
       <SQL>
-      SELECT `g`, SUM(`..x`) AS `x`
-      FROM `df`
-      GROUP BY `g`
+      SELECT "g", SUM("..x") AS "x"
+      FROM "df"
+      GROUP BY "g"
 
 # can't use `.by` with `.groups`
 
@@ -136,4 +136,3 @@
       <SQL> SELECT `x`, COUNT(*) AS `n`
       FROM `verb-summarise`
       GROUP BY `x`
-

@@ -99,17 +99,17 @@ test_that("all forms of if translated to case statement", {
   expect_translation(
     con,
     if (x) 1L else 2L,
-    "CASE WHEN `x` THEN 1 WHEN NOT `x` THEN 2 END"
+    "CASE WHEN \"x\" THEN 1 WHEN NOT \"x\" THEN 2 END"
   )
   expect_translation(
     con,
     ifelse(x, 1L, 2L),
-    "CASE WHEN `x` THEN 1 WHEN NOT `x` THEN 2 END"
+    "CASE WHEN \"x\" THEN 1 WHEN NOT \"x\" THEN 2 END"
   )
   expect_translation(
     con,
     if_else(x, 1L, 2L),
-    "CASE WHEN `x` THEN 1 WHEN NOT `x` THEN 2 END"
+    "CASE WHEN \"x\" THEN 1 WHEN NOT \"x\" THEN 2 END"
   )
 })
 
@@ -118,27 +118,27 @@ test_that("if_else can be simplified", {
   expect_translation(
     con,
     if_else(x, 1L, 2L, 2L),
-    "CASE WHEN `x` THEN 1 ELSE 2 END"
+    "CASE WHEN \"x\" THEN 1 ELSE 2 END"
   )
 })
 
 test_that("if translation adds parens", {
   con <- simulate_dbi()
-  expect_translation(con, if (x) y, "CASE WHEN `x` THEN `y` END")
+  expect_translation(con, if (x) y, "CASE WHEN \"x\" THEN \"y\" END")
   expect_translation(
     con,
     if (x > 1L) y + 1L,
-    "CASE WHEN (`x` > 1) THEN (`y` + 1) END"
+    "CASE WHEN (\"x\" > 1) THEN (\"y\" + 1) END"
   )
   expect_translation(
     con,
     if (x) y else z,
-    "CASE WHEN `x` THEN `y` WHEN NOT `x` THEN `z` END"
+    "CASE WHEN \"x\" THEN \"y\" WHEN NOT \"x\" THEN \"z\" END"
   )
   expect_translation(
     con,
     if (x > 1L) y + 1L else z + 1L,
-    "CASE WHEN (`x` > 1) THEN (`y` + 1) WHEN NOT (`x` > 1) THEN (`z` + 1) END"
+    "CASE WHEN (\"x\" > 1) THEN (\"y\" + 1) WHEN NOT (\"x\" > 1) THEN (\"z\" + 1) END"
   )
 })
 
@@ -147,7 +147,7 @@ test_that("if_else can translate missing", {
   expect_translation(
     con,
     if_else(x, 1L, 2L, 3L),
-    "CASE WHEN `x` THEN 1 WHEN NOT `x` THEN 2 ELSE 3 END"
+    "CASE WHEN \"x\" THEN 1 WHEN NOT \"x\" THEN 2 ELSE 3 END"
   )
 })
 
@@ -169,28 +169,32 @@ test_that("if and ifelse use correctly named arguments", {
       false = 2,
       missing = 3
     ),
-    "CASE WHEN `x` THEN 1.0 WHEN NOT `x` THEN 2.0 ELSE 3.0 END"
+    "CASE WHEN \"x\" THEN 1.0 WHEN NOT \"x\" THEN 2.0 ELSE 3.0 END"
   )
 })
 
 test_that("switch translated to CASE WHEN", {
   con <- simulate_dbi()
-  expect_translation(con, switch(x, a = 1L), "CASE `x` WHEN ('a') THEN (1) END")
+  expect_translation(
+    con,
+    switch(x, a = 1L),
+    "CASE \"x\" WHEN ('a') THEN (1) END"
+  )
   expect_translation(
     con,
     switch(x, a = 1L, 2L),
-    "CASE `x` WHEN ('a') THEN (1) ELSE (2) END"
+    "CASE \"x\" WHEN ('a') THEN (1) ELSE (2) END"
   )
 })
 
 test_that("is.na and is.null are equivalent", {
   con <- simulate_dbi()
   # Needs to be wrapped in parens to ensure correct precedence
-  expect_translation(con, is.na(x + y), "((`x` + `y`) IS NULL)")
-  expect_translation(con, is.null(x + y), "((`x` + `y`) IS NULL)")
+  expect_translation(con, is.na(x + y), "((\"x\" + \"y\") IS NULL)")
+  expect_translation(con, is.null(x + y), "((\"x\" + \"y\") IS NULL)")
 
-  expect_translation(con, x + is.na(x), "`x` + (`x` IS NULL)")
-  expect_translation(con, !is.na(x), "NOT((`x` IS NULL))")
+  expect_translation(con, x + is.na(x), "\"x\" + (\"x\" IS NULL)")
+  expect_translation(con, !is.na(x), "NOT((\"x\" IS NULL))")
 })
 
 test_that("magrittr pipe is translated in conditionals", {
@@ -198,7 +202,7 @@ test_that("magrittr pipe is translated in conditionals", {
   expect_translation(
     con,
     x |> ifelse(1L, 2L),
-    "CASE WHEN `x` THEN 1 WHEN NOT `x` THEN 2 END"
+    "CASE WHEN \"x\" THEN 1 WHEN NOT \"x\" THEN 2 END"
   )
 })
 
@@ -217,25 +221,25 @@ test_that("LHS can handle different types", {
   expect_translation(
     con,
     case_match(z, 1L ~ "a"),
-    "CASE WHEN (`z` IN (1)) THEN 'a' END"
+    "CASE WHEN (\"z\" IN (1)) THEN 'a' END"
   )
 
   expect_translation(
     con,
     case_match(z, "x" ~ "a"),
-    "CASE WHEN (`z` IN ('x')) THEN 'a' END"
+    "CASE WHEN (\"z\" IN ('x')) THEN 'a' END"
   )
 
   expect_translation(
     con,
     case_match(z, y ~ "a"),
-    "CASE WHEN (`z` IN (`y`)) THEN 'a' END"
+    "CASE WHEN (\"z\" IN (\"y\")) THEN 'a' END"
   )
 
   expect_translation(
     con,
     case_match(z, as.character(y) ~ "a"),
-    "CASE WHEN (`z` IN (CAST(`y` AS TEXT))) THEN 'a' END"
+    "CASE WHEN (\"z\" IN (CAST(\"y\" AS TEXT))) THEN 'a' END"
   )
 })
 
@@ -244,25 +248,25 @@ test_that("LHS can match multiple values", {
   expect_translation(
     con,
     case_match(z, 1:2 ~ "a"),
-    "CASE WHEN (`z` IN ((1, 2))) THEN 'a' END"
+    "CASE WHEN (\"z\" IN ((1, 2))) THEN 'a' END"
   )
 
   expect_translation(
     con,
     case_match(z, c(1L, 3L) ~ "a"),
-    "CASE WHEN (`z` IN (1, 3)) THEN 'a' END"
+    "CASE WHEN (\"z\" IN (1, 3)) THEN 'a' END"
   )
 
   expect_translation(
     con,
     case_match(z, c("x", "y") ~ "a"),
-    "CASE WHEN (`z` IN ('x', 'y')) THEN 'a' END"
+    "CASE WHEN (\"z\" IN ('x', 'y')) THEN 'a' END"
   )
 
   expect_translation(
     con,
     case_match(z, c(1L, y) ~ "a"),
-    "CASE WHEN (`z` IN (1, `y`)) THEN 'a' END"
+    "CASE WHEN (\"z\" IN (1, \"y\")) THEN 'a' END"
   )
 })
 
@@ -271,13 +275,13 @@ test_that("LHS can match NA", {
   expect_translation(
     con,
     case_match(z, NA ~ "a"),
-    "CASE WHEN (`z` IS NULL) THEN 'a' END"
+    "CASE WHEN (\"z\" IS NULL) THEN 'a' END"
   )
 
   expect_translation(
     con,
     case_match(z, c(1L, NA) ~ "a"),
-    "CASE WHEN (`z` IN (1) OR `z` IS NULL) THEN 'a' END"
+    "CASE WHEN (\"z\" IN (1) OR \"z\" IS NULL) THEN 'a' END"
   )
 })
 
@@ -295,7 +299,7 @@ test_that("`NULL` values in `...` are dropped", {
   expect_translation(
     con,
     case_match(x, 1L ~ "a", NULL, 2L ~ "b", NULL),
-    "CASE WHEN (`x` IN (1)) THEN 'a' WHEN (`x` IN (2)) THEN 'b' END"
+    "CASE WHEN (\"x\" IN (1)) THEN 'a' WHEN (\"x\" IN (2)) THEN 'b' END"
   )
 })
 
@@ -314,7 +318,7 @@ test_that("passes through `.default` correctly", {
   expect_translation(
     con,
     case_match(z, 3L ~ 1L, .default = 2L),
-    "CASE WHEN (`z` IN (3)) THEN 1 ELSE 2 END"
+    "CASE WHEN (\"z\" IN (3)) THEN 1 ELSE 2 END"
   )
 })
 
@@ -323,14 +327,14 @@ test_that("can handle multiple cases", {
   expect_translation(
     con,
     case_match(z, 1L ~ "a", 2L ~ "b"),
-    "CASE WHEN (`z` IN (1)) THEN 'a' WHEN (`z` IN (2)) THEN 'b' END"
+    "CASE WHEN (\"z\" IN (1)) THEN 'a' WHEN (\"z\" IN (2)) THEN 'b' END"
   )
 
   # also with .default
   expect_translation(
     con,
     case_match(z, 1L ~ "a", 2L ~ "b", .default = "default"),
-    "CASE WHEN (`z` IN (1)) THEN 'a' WHEN (`z` IN (2)) THEN 'b' ELSE 'default' END"
+    "CASE WHEN (\"z\" IN (1)) THEN 'a' WHEN (\"z\" IN (2)) THEN 'b' ELSE 'default' END"
   )
 })
 

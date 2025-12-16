@@ -7,22 +7,22 @@ test_that("logicals translated to integers", {
 test_that("vectorised translations", {
   con <- simulate_sqlite()
 
-  expect_translation(con, paste(x, y), "`x` || ' ' || `y`")
-  expect_translation(con, paste0(x, y), "`x` || `y`")
+  expect_translation(con, paste(x, y), '`x` || \' \' || `y`')
+  expect_translation(con, paste0(x, y), '`x` || `y`')
 })
 
 test_that("pmin and max become MIN and MAX", {
   con <- simulate_sqlite()
 
-  expect_translation(con, pmin(x, y, na.rm = TRUE), "MIN(`x`, `y`)")
-  expect_translation(con, pmax(x, y, na.rm = TRUE), "MAX(`x`, `y`)")
+  expect_translation(con, pmin(x, y, na.rm = TRUE), 'MIN(`x`, `y`)')
+  expect_translation(con, pmax(x, y, na.rm = TRUE), 'MAX(`x`, `y`)')
 })
 
 test_that("sqlite mimics two argument log", {
   con <- simulate_sqlite()
 
-  expect_translation(con, log(x), "LOG(`x`)")
-  expect_translation(con, log(x, 10), "LOG(`x`) / LOG(10.0)")
+  expect_translation(con, log(x), 'LOG(`x`)')
+  expect_translation(con, log(x, 10), 'LOG(`x`) / LOG(10.0)')
 })
 
 test_that("date-time", {
@@ -38,10 +38,10 @@ test_that("custom aggregates translated", {
   expect_translation(
     con,
     median(x, na.rm = TRUE),
-    "MEDIAN(`x`)",
+    'MEDIAN(`x`)',
     window = FALSE
   )
-  expect_translation(con, sd(x, na.rm = TRUE), "STDEV(`x`)", window = FALSE)
+  expect_translation(con, sd(x, na.rm = TRUE), 'STDEV(`x`)', window = FALSE)
   expect_error(
     translate_sql(quantile(x, 0.5, na.rm = TRUE), con = con, window = FALSE),
     class = "dbplyr_error_unsupported_fn"

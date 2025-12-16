@@ -61,7 +61,7 @@ test_that("sql_multi_join_vars generates expected SQL", {
       use_star = TRUE,
       qualify_all_columns = FALSE
     ),
-    sql("`left`.*", b = "`b`")
+    sql('"left".*', b = '"b"')
   )
 
   # full_join(lf(x, a), lf(x, b), by = "x")
@@ -82,10 +82,10 @@ test_that("sql_multi_join_vars generates expected SQL", {
       qualify_all_columns = FALSE
     ),
     sql(
-      x = "COALESCE(`left`.`x`, `right`.`x`)",
-      a.x = "`left`.`a`",
-      a.y = "`right`.`a`",
-      b = "`b`"
+      x = 'COALESCE("left"."x", "right"."x")',
+      a.x = '"left"."a"',
+      a.y = '"right"."a"',
+      b = '"b"'
     )
   )
 
@@ -107,9 +107,9 @@ test_that("sql_multi_join_vars generates expected SQL", {
       qualify_all_columns = FALSE
     ),
     sql(
-      a = "COALESCE(`left`.`a`, `right`.`a`)",
-      b.x = "`left`.`b`",
-      b.y = "`right`.`B`"
+      a = 'COALESCE("left"."a", "right"."a")',
+      b.x = '"left"."b"',
+      b.y = '"right"."B"'
     )
   )
 })

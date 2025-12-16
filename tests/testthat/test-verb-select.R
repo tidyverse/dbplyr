@@ -384,7 +384,7 @@ test_that("select picks variables", {
     select(x1:x2) |>
     sql_build()
 
-  expect_equal(out$select, sql("x1" = "`x1`", "x2" = "`x2`"))
+  expect_equal(out$select, sql("x1" = "\"x1\"", "x2" = "\"x2\""))
 })
 
 test_that("select renames variables", {
@@ -392,7 +392,7 @@ test_that("select renames variables", {
     select(y = x1, z = x2) |>
     sql_build()
 
-  expect_equal(out$select, sql("y" = "`x1`", "z" = "`x2`"))
+  expect_equal(out$select, sql("y" = "\"x1\"", "z" = "\"x2\""))
 })
 
 test_that("select can refer to variables in local env", {
@@ -401,7 +401,7 @@ test_that("select can refer to variables in local env", {
     select(dplyr::one_of(vars)) |>
     sql_build()
 
-  expect_equal(out$select, sql("x" = "`x`", "y" = "`y`"))
+  expect_equal(out$select, sql("x" = "\"x\"", "y" = "\"y\""))
 })
 
 test_that("rename preserves existing vars", {
@@ -409,7 +409,7 @@ test_that("rename preserves existing vars", {
     rename(z = y) |>
     sql_build()
 
-  expect_equal(out$select, sql("x" = "`x`", "z" = "`y`"))
+  expect_equal(out$select, sql("x" = "\"x\"", "z" = "\"y\""))
 })
 
 
