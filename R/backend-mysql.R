@@ -235,7 +235,7 @@ sql_query_update_from.MariaDBConnection <- function(
 
   # https://stackoverflow.com/a/19346375/946850
   parts <- rows_prep(con, table, from, by, lvl = 0)
-  update_cols <- sql_table_prefix(con, names(update_values), table)
+  update_cols <- sql_table_prefix(con, table, names(update_values))
 
   clauses <- list(
     sql_clause_update(table),

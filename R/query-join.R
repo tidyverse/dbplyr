@@ -261,7 +261,7 @@ sql_multi_join_var <- function(
   }
 
   if (tolower(var) %in% duplicated_vars) {
-    sql_table_prefix(con, var, table_names[[table_id]])
+    sql_table_prefix(con, table_names[[table_id]], var)
   } else {
     sql_escape_ident(con, var)
   }
@@ -289,8 +289,8 @@ sql_rf_join_vars <- function(
       vars$y,
       ~ {
         if (!is.na(.x) && !is.na(.y)) {
-          x_prefix <- sql_table_prefix(con, .x, table = x_as)
-          y_prefix <- sql_table_prefix(con, .y, table = y_as)
+          x_prefix <- sql_table_prefix(con, x_as, .x)
+          y_prefix <- sql_table_prefix(con, y_as, .y)
           out <- sql_glue2(con, "COALESCE({x_prefix}, {y_prefix})")
 
           return(out)
@@ -340,8 +340,8 @@ sql_join_tbls <- function(con, by, na_matches) {
   na_matches <- arg_match(na_matches, c("na", "never"))
 
   if (na_matches == "na" || length(by$x) + length(by$y) > 0) {
-    lhs <- sql_table_prefix(con, by$x, by$x_as %||% "LHS")
-    rhs <- sql_table_prefix(con, by$y, by$y_as %||% "RHS")
+    lhs <- sql_table_prefix(con, by$x_as %||% "LHS", by$x)
+    rhs <- sql_table_prefix(con, by$y_as %||% "RHS", by$y)
 
     if (na_matches == "na") {
       compare <- purrr::map_chr(seq_along(lhs), function(i) {
@@ -368,26 +368,17 @@ sql_join_tbls <- function(con, by, na_matches) {
   }
 }
 
-sql_table_prefix <- function(con, var, table = NULL) {
+sql_table_prefix <- function(con, table, var) {
   if (!is_bare_character(var)) {
     cli_abort("{.arg var} must be a bare character.", .internal = TRUE)
   }
-  sql_qualify_var(con, table, var)
-}
 
-sql_star <- function(con, table = NULL) {
-  sql_qualify_var(con, table, SQL("*"))
-}
-
-sql_qualify_var <- function(con, table, var) {
   var <- sql_escape_ident(con, var)
+  table <- sql_escape_ident(con, table_path_name(table, con))
+  sql(paste0(table, ".", var))
+}
 
-  if (!is.null(table)) {
-    table <- table_path_name(table, con)
-    table <- as_table_paths(table, con)
-
-    sql(paste0(table, ".", var))
-  } else {
-    sql(var)
-  }
+sql_star <- function(con, table) {
+  table <- table_path_name(table, con)
+  sql_glue2(con, "{.id table}.*")
 }

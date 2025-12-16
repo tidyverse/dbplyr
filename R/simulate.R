@@ -32,11 +32,7 @@ sql_escape_ident.default <- function(con, x) {
 }
 #' @export
 sql_escape_ident.TestConnection <- function(con, x) {
-  if (methods::is(x, "SQL")) {
-    x
-  } else {
-    sql_quote(x, "`")
-  }
+  sql_quote(x, "`")
 }
 
 sql_escape_string <- function(con, x) {
