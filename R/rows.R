@@ -16,12 +16,19 @@
 #' modifying the underlying table on the database.
 #'
 #' @export
+#' @inheritParams left_join.tbl_lazy
 #' @param x A lazy table.
 #'   For `in_place = TRUE`, this must be a table instantiated with [tbl()] or
 #'   [compute()], not to a lazy query. The [remote_name()] function is used to
 #'   determine the name of the table to be updated.
 #' @param y A lazy table, data frame, or data frame extensions (e.g. a tibble).
-#' @inheritParams dplyr::rows_insert
+#' @param by An unnamed character vector giving the key columns. The key columns
+#'   must exist in both `x` and `y`. Keys typically uniquely identify each row,
+#'   but this is only enforced for the key values of `y` when `rows_update()`,
+#'   `rows_patch()`, or `rows_upsert()` are used.
+#'
+#'   By default, we use the first column in `y`, since the first column is
+#'   a reasonable place to put an identifier variable.
 #' @param conflict For `rows_insert()`, how should keys in `y` that conflict
 #'   with keys in `x` be handled? A conflict arises if there is a key in `y`
 #'   that already exists in `x`.
@@ -90,7 +97,7 @@ rows_insert.tbl_lazy <- function(
   by = NULL,
   ...,
   conflict = c("error", "ignore"),
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL,
   method = NULL
@@ -102,6 +109,7 @@ rows_insert.tbl_lazy <- function(
   conflict <- rows_check_conflict(conflict)
 
   rows_check_containment(x, y)
+  copy <- as_copy(copy)
   y <- rows_auto_copy(x, y, copy = copy)
 
   by <- rows_check_by(by, y)
