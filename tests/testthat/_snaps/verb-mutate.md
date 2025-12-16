@@ -131,6 +131,86 @@
       Caused by error in `across()`:
       ! `.fns` must be a function, a formula, or list of functions/formulas.
 
+# .order and .frame are scoped to mutate call
+
+    Code
+      out
+    Output
+      <SQL>
+      SELECT `q01`.*, AVG(`x`) OVER (PARTITION BY `g`) AS `r2`
+      FROM (
+        SELECT
+          `df`.*,
+          SUM(`x`) OVER (PARTITION BY `g` ORDER BY `y` ROWS UNBOUNDED PRECEDING) AS `r1`
+        FROM `df`
+      ) AS `q01`
+
+# .order generates correct SQL
+
+    Code
+      mutate(lf, r = cumsum(x), .by = g, .order = y)
+    Output
+      <SQL>
+      SELECT
+        `df`.*,
+        SUM(`x`) OVER (PARTITION BY `g` ORDER BY `y` ROWS UNBOUNDED PRECEDING) AS `r`
+      FROM `df`
+    Code
+      mutate(lf, r = cumsum(x), .by = g, .order = c(x, desc(y)))
+    Output
+      <SQL>
+      SELECT
+        `df`.*,
+        SUM(`x`) OVER (PARTITION BY `g` ORDER BY `x`, `y` DESC ROWS UNBOUNDED PRECEDING) AS `r`
+      FROM `df`
+
+# .frame generates correct SQL
+
+    Code
+      mutate(lf, r = sum(x), .by = g, .order = y, .frame = c(-Inf, 0))
+    Output
+      <SQL>
+      SELECT
+        `df`.*,
+        SUM(`x`) OVER (PARTITION BY `g` ORDER BY `y` ROWS UNBOUNDED PRECEDING) AS `r`
+      FROM `df`
+    Code
+      mutate(lf, r = sum(x), .by = g, .order = y, .frame = c(-1, 1))
+    Output
+      <SQL>
+      SELECT
+        `df`.*,
+        SUM(`x`) OVER (PARTITION BY `g` ORDER BY `y` ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS `r`
+      FROM `df`
+
+# .order validates inputs
+
+    Code
+      mutate(lf, r = cumsum(x), .order = x + y)
+    Condition
+      Error in `mutate()`:
+      ! Every element of `order` must be a single column name or a column wrapped in `desc()`.
+      x Element 1 is `x + y`.
+    Code
+      mutate(lf, r = cumsum(x), .order = foo())
+    Condition
+      Error in `mutate()`:
+      ! Every element of `order` must be a single column name or a column wrapped in `desc()`.
+      x Element 1 is `foo()`.
+
+# .frame validates inputs
+
+    Code
+      mutate(lf, r = sum(x), .frame = c(1, 2, 3))
+    Condition
+      Error in `mutate()`:
+      ! `frame` must have size 2, not size 3.
+    Code
+      mutate(lf, r = sum(x), .frame = c("a", "b"))
+    Condition
+      Error in `mutate()`:
+      ! `frame` must be a whole number, not the string "a".
+
 # mutate generates subqueries as needed
 
     Code
