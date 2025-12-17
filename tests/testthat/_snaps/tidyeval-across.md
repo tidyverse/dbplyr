@@ -305,3 +305,4 @@
       Caused by error in `pick()`:
       ! Can't select columns that don't exist.
       x Column `a` doesn't exist.
+

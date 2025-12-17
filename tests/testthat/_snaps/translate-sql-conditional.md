@@ -137,3 +137,4 @@
       <error/rlang_error>
       Error in `case_match()`:
       ! `.x` must be a variable or function call, not a number.
+

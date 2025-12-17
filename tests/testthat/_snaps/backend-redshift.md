@@ -70,3 +70,4 @@
     Condition
       Error in `difftime()`:
       ! Argument `tz` isn't supported on database backends.
+

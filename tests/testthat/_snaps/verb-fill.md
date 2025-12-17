@@ -149,3 +149,4 @@
       Error in `tidyr::fill()`:
       ! Can't select columns that don't exist.
       x Column `non_existent` doesn't exist.
+

@@ -73,3 +73,4 @@
       
         SELECT 1, '{1,2,3}' FROM DUMMY
       ) AS "values_table"
+

@@ -33,3 +33,4 @@
       translate_sql(median(x, na.rm = TRUE), con = con, vars_group = "g")
     Output
       <SQL> PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY "x") OVER (PARTITION BY "g")
+

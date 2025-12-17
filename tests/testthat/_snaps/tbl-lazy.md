@@ -39,3 +39,4 @@
 
     The `$` method of <tbl_lazy> is for internal use only.
     i Use `dplyr::pull()` to get the values in a column.
+

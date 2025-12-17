@@ -11,3 +11,4 @@
       in_catalog("catalog", "schema", "table")
     Output
       <CATALOG> "catalog"."schema"."table"
+

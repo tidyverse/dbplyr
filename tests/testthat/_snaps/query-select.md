@@ -26,3 +26,4 @@
     Condition
       Error in `sql_clause_select()`:
       ! Query contains no columns
+

@@ -38,3 +38,4 @@
         FROM "df"
       ) AS "q01"
       WHERE ("col01" = 1)
+

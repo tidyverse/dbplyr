@@ -170,3 +170,4 @@
       <SQL> CREATE TEMPORARY TABLE
       "temp"."tbl" AS
       SELECT * FROM foo
+

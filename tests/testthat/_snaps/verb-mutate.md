@@ -282,3 +282,4 @@
         SELECT "df".*, 2.0 AS "y"
         FROM "df"
       ) AS "q01"
+

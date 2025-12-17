@@ -266,3 +266,4 @@
       [34mFROM[39m "q02"[34m AS [39m"LHS"
       [34mLEFT JOIN[39m "df"
         [34mON[39m ("LHS"."x" = "df"."x")
+

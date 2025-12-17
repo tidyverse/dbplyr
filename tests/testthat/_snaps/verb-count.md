@@ -55,3 +55,4 @@
     Condition
       Error in `add_count()`:
       ! Argument `.drop` isn't supported on database backends.
+

@@ -107,3 +107,4 @@
     Condition
       Error in `window_frame()`:
       ! `to` must be a whole number, not an integer vector.
+

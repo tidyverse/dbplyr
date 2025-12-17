@@ -44,3 +44,4 @@
         SELECT 1 FROM "df" AS "df_RHS"
         WHERE ("df_LHS"."x" = "df_RHS"."x") AND ("df_LHS"."y" = "df_RHS"."y")
       )
+

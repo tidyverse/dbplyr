@@ -79,3 +79,4 @@
       <SQL>
       SELECT "y", SUM("y") OVER (ORDER BY "y" DESC ROWS UNBOUNDED PRECEDING) AS "z"
       FROM "df"
+
