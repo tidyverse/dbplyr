@@ -5,7 +5,7 @@ test_that("reframe is not supported", {
 })
 
 test_that("summarise peels off a single layer of grouping", {
-  mf1 <- memdb_frame(x = 1, y = 1, z = 2) |> group_by(x, y)
+  mf1 <- local_memdb_frame("df", x = 1, y = 1, z = 2) |> group_by(x, y)
   mf2 <- mf1 |> summarise(n = n())
   expect_equal(group_vars(mf2), "x")
 
@@ -14,7 +14,7 @@ test_that("summarise peels off a single layer of grouping", {
 })
 
 test_that("summarise performs partial evaluation", {
-  mf1 <- memdb_frame(x = 1)
+  mf1 <- local_memdb_frame("df", x = 1)
 
   val <- 1
   mf2 <- mf1 |> summarise(y = x == val) |> collect()
@@ -112,7 +112,7 @@ test_that("across() does not select grouping variables", {
 })
 
 test_that("summarise() after select() works #985", {
-  df <- memdb_frame(g = 1, x = 1:3)
+  df <- local_memdb_frame("df", g = 1, x = 1:3)
   expect_equal(
     df |>
       select(x) |>
@@ -125,7 +125,7 @@ test_that("summarise() after select() works #985", {
 # .by ----------------------------------------------------------------------
 
 test_that("can group transiently using `.by`", {
-  df <- memdb_frame(g = c(1, 1, 2, 1, 2), x = c(5, 2, 1, 2, 3))
+  df <- local_memdb_frame("df", g = c(1, 1, 2, 1, 2), x = c(5, 2, 1, 2, 3))
 
   out <- summarise(df, x = mean(x, na.rm = TRUE), .by = g) |>
     arrange(g) |>
@@ -197,7 +197,7 @@ test_that("summarise replaces existing", {
 })
 
 test_that("summarised vars are always named", {
-  mf <- dbplyr::memdb_frame(a = 1)
+  mf <- local_memdb_frame("df", a = 1)
 
   out1 <- mf |> summarise(1) |> op_vars()
   expect_equal(out1, "1")

@@ -1,19 +1,19 @@
 test_that("select quotes correctly", {
-  out <- memdb_frame(x = 1, y = 1) |>
+  out <- local_memdb_frame("df", x = 1, y = 1) |>
     select(x) |>
     collect()
   expect_equal(out, tibble(x = 1))
 })
 
 test_that("select can rename", {
-  out <- memdb_frame(x = 1, y = 2) |>
+  out <- local_memdb_frame("df", x = 1, y = 2) |>
     select(y = x) |>
     collect()
   expect_equal(out, tibble(y = 1))
 })
 
 test_that("two selects equivalent to one", {
-  mf <- memdb_frame(a = 1, b = 1, c = 1, d = 2)
+  mf <- local_memdb_frame("df", a = 1, b = 1, c = 1, d = 2)
 
   out <- mf |>
     select(a:c) |>
@@ -81,7 +81,7 @@ test_that("rename/relocate after distinct is inlined #1141", {
 })
 
 test_that("select operates on mutated vars", {
-  mf <- memdb_frame(x = c(1, 2, 3), y = c(3, 2, 1))
+  mf <- local_memdb_frame("df", x = c(1, 2, 3), y = c(3, 2, 1))
 
   df1 <- mf |>
     mutate(x, z = x + y) |>
@@ -97,17 +97,17 @@ test_that("select operates on mutated vars", {
 })
 
 test_that("select renames variables (#317)", {
-  mf <- memdb_frame(x = 1, y = 2)
+  mf <- local_memdb_frame("df", x = 1, y = 2)
   compare_tbl(mf |> select(A = x), tibble(A = 1))
 })
 
 test_that("rename renames variables", {
-  mf <- memdb_frame(x = 1, y = 2)
+  mf <- local_memdb_frame("df", x = 1, y = 2)
   compare_tbl(mf |> rename(A = x), tibble(A = 1, y = 2))
 })
 
 test_that("can rename multiple vars", {
-  mf <- memdb_frame(a = 1, b = 2)
+  mf <- local_memdb_frame("df", a = 1, b = 2)
   exp <- tibble(c = 1, d = 2)
 
   compare_tbl(mf |> rename(c = a, d = b), exp)
@@ -115,14 +115,14 @@ test_that("can rename multiple vars", {
 })
 
 test_that("can rename with a function", {
-  mf <- memdb_frame(a = 1, b = 2)
+  mf <- local_memdb_frame("df", a = 1, b = 2)
 
   expect_named(mf |> rename_with(toupper) |> collect(), c("A", "B"))
   expect_named(mf |> rename_with(toupper, 1) |> collect(), c("A", "b"))
 })
 
 test_that("select preserves grouping vars", {
-  mf <- memdb_frame(a = 1, b = 2) |> group_by(b)
+  mf <- local_memdb_frame("df", a = 1, b = 2) |> group_by(b)
   expect_snapshot(out <- mf |> select(a) |> collect())
 
   expect_named(out, c("b", "a"))
@@ -153,12 +153,12 @@ test_that("select handles order vars", {
 })
 
 test_that("select doesn't relocate grouping vars to the front", {
-  mf <- memdb_frame(a = 1, b = 2) |> group_by(b)
+  mf <- local_memdb_frame("df", a = 1, b = 2) |> group_by(b)
   expect_equal(mf |> select(a, b) |> op_vars(), c("a", "b"))
 })
 
 test_that("relocate works", {
-  mf <- memdb_frame(a = 1, b = 2, c = 1) |> group_by(b)
+  mf <- local_memdb_frame("df", a = 1, b = 2, c = 1) |> group_by(b)
 
   out1 <- mf |> relocate(c) |> collect()
   expect_named(out1, c("c", "a", "b"))
@@ -167,7 +167,7 @@ test_that("relocate works", {
 })
 
 test_that("relocate can rename variables", {
-  mf <- memdb_frame(a = 1, b = 2, c = 1) |> group_by(b)
+  mf <- local_memdb_frame("df", a = 1, b = 2, c = 1) |> group_by(b)
 
   out1 <- mf |> relocate(d = b) |> collect()
   expect_named(out1, c("d", "a", "c"))

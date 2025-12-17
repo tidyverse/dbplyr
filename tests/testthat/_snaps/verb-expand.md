@@ -79,7 +79,7 @@
 # expand() errors when expected
 
     Code
-      tidyr::expand(memdb_frame(x = 1))
+      tidyr::expand(local_memdb_frame("df", x = 1))
     Condition
       Error in `tidyr::expand()`:
       ! Must supply variables in `...`
@@ -87,7 +87,7 @@
 ---
 
     Code
-      tidyr::expand(memdb_frame(x = 1), x = NULL)
+      tidyr::expand(local_memdb_frame("df", x = 1), x = NULL)
     Condition
       Error in `tidyr::expand()`:
       ! Must supply variables in `...`
@@ -114,7 +114,7 @@
 # nesting() respects .name_repair
 
     Code
-      tidyr::expand(memdb_frame(x = 1, y = 1), nesting(x, x = x + 1))
+      tidyr::expand(local_memdb_frame("df", x = 1, y = 1), nesting(x, x = x + 1))
     Condition
       Error in `tidyr::expand()`:
       ! In expression `nesting(x, x = x + 1)`:

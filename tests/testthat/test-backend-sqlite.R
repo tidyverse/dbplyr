@@ -79,7 +79,7 @@ test_that("case_when translates correctly to ELSE when TRUE ~ is used", {
 # live database -----------------------------------------------------------
 
 test_that("as.numeric()/as.double() get custom translation", {
-  mf <- dbplyr::memdb_frame(x = 1L)
+  mf <- local_memdb_frame("df", x = 1L)
 
   out <- mf |> mutate(x1 = as.numeric(x), x2 = as.double(x)) |> collect()
   expect_type(out$x1, "double")
@@ -87,7 +87,7 @@ test_that("as.numeric()/as.double() get custom translation", {
 })
 
 test_that("date extraction agrees with R", {
-  db <- memdb_frame(x = "2000-01-02 03:40:50.5")
+  db <- local_memdb_frame("df", x = "2000-01-02 03:40:50.5")
   out <- db |>
     transmute(
       year = year(x),

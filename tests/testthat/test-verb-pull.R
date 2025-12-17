@@ -1,11 +1,11 @@
 test_that("default extracts last var from data frame", {
-  df <- memdb_frame(x = 1:3, z = 4:6)
+  df <- local_memdb_frame("df", x = 1:3, z = 4:6)
   expect_equal(pull(df), 4:6)
 })
 
 test_that("can extract by name, or positive/negative position", {
   x <- 1:3
-  df <- memdb_frame(x = x, y = 4:6)
+  df <- local_memdb_frame("df", x = x, y = 4:6)
 
   expect_equal(pull(df, x), x)
   expect_equal(pull(df, 1L), x)
@@ -15,14 +15,14 @@ test_that("can extract by name, or positive/negative position", {
 })
 
 test_that("extracts correct column from grouped tbl", {
-  mf <- memdb_frame(id = "a", value = 42)
+  mf <- local_memdb_frame("df", id = "a", value = 42)
   gf <- mf |> group_by(id)
 
   expect_equal(pull(mf, value), 42)
 })
 
 test_that("doesn't unnecessarily select", {
-  mf <- memdb_frame(x = c(3, 1, 2))
+  mf <- local_memdb_frame("df", x = c(3, 1, 2))
   # no warning about select after arrange
   expect_warning(out <- mf |> arrange(x) |> pull(), NA)
   expect_equal(out, 1:3)
@@ -31,7 +31,7 @@ test_that("doesn't unnecessarily select", {
 test_that("can extract named vectors", {
   x <- 1:3
   y <- letters[x]
-  df <- memdb_frame(x = x, y = y)
+  df <- local_memdb_frame("df", x = x, y = y)
   xn <- set_names(x, y)
 
   expect_equal(pull(df, x), x)
@@ -43,10 +43,10 @@ test_that("can extract named vectors", {
 
 test_that("ungroup() produces nice error messages", {
   expect_snapshot(error = TRUE, {
-    memdb_frame(x = 1) |> pull(non_existent)
-    memdb_frame(x = 1) |> pull("non_existent")
-    memdb_frame(x = 1) |> pull(1000)
+    local_memdb_frame("df", x = 1) |> pull(non_existent)
+    local_memdb_frame("df", x = 1) |> pull("non_existent")
+    local_memdb_frame("df", x = 1) |> pull(1000)
 
-    memdb_frame(x = 1) |> pull(x, "name_non_existent")
+    local_memdb_frame("df", x = 1) |> pull(x, "name_non_existent")
   })
 })

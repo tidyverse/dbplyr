@@ -57,8 +57,8 @@ con |> tbl(I("temp.mtcars")) |> head(1)
 # You can also use pass raw SQL if you want a more sophisticated query
 con |> tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))
 
-# If you just want a temporary in-memory database, use src_memdb()
-src2 <- src_memdb()
+# If you just want a temporary in-memory database, use memdb()
+con2 <- memdb()
 
 # To show off the full features of dplyr's database integration,
 # we'll use the Lahman database. lahman_sqlite() takes care of

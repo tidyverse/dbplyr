@@ -39,11 +39,9 @@ squirrels <- tibble::tribble(
 )
 squirrels$id <- 1:12
 
-tbl_memdb(squirrels) |>
+squirrels_db <- copy_to(memdb(), squirrels)
+squirrels_db |>
   window_order(id) |>
-  tidyr::fill(
-    n_squirrels,
-    n_squirrels2,
-  )
+  tidyr::fill(n_squirrels, n_squirrels2)
 \dontshow{\}) # examplesIf}
 }

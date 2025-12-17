@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* `src_memdb()` and `tbl_memdb()` are deprecated; use `memdb()` and `copy_to(memdb(), df)` instead. New `local_memdb_frame()` for use in tests.
 * `distinct()` with computed columns now ignores grouping, matching dplyr's behavior (#1081).
 * `sql_escape_string()` now defaults to using `'`.
 * `simulate_*()` now uses (approximately) correct quoting for all backends, so the generated SQL looks more like what you'll actually get when connected to a real database (#1464).

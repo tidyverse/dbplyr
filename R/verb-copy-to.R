@@ -40,7 +40,7 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' df <- data.frame(x = 1:5, y = letters[5:1])
-#' db <- copy_to(src_memdb(), df)
+#' db <- copy_to(memdb(), df)
 #' db
 #'
 #' df2 <- data.frame(y = c("a", "d"), fruit = c("apple", "date"))

@@ -229,8 +229,8 @@ to the following SQL queries:
 \examples{
 library(dplyr, warn.conflicts = FALSE)
 
-band_db <- tbl_memdb(dplyr::band_members)
-instrument_db <- tbl_memdb(dplyr::band_instruments)
+band_db <- copy_to(memdb(), dplyr::band_members)
+instrument_db <- copy_to(memdb(), dplyr::band_instruments)
 band_db |> left_join(instrument_db) |> show_query()
 
 # Can join with local data frames by setting copy = TRUE
