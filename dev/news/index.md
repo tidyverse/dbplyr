@@ -2,6 +2,12 @@
 
 ## dbplyr (development version)
 
+- [`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html) now
+  applies consecutively, matching dplyr’s behavior:
+  `arrange(y) |> arrange(x)` is now equivalent to `arrange(x, y)`. Empty
+  [`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html) now
+  preserves existing ordering instead of clearing it
+  ([\#789](https://github.com/tidyverse/dbplyr/issues/789)).
 - [`distinct()`](https://dplyr.tidyverse.org/reference/distinct.html)
   with computed columns now ignores grouping, matching dplyr’s behavior
   ([\#1081](https://github.com/tidyverse/dbplyr/issues/1081)).
