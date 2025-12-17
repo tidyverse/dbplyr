@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* `arrange()` now applies consecutively, matching dplyr's behavior: `arrange(y) |> arrange(x)` is now equivalent to `arrange(x, y)`. Empty `arrange()` now preserves existing ordering instead of clearing it (#789).
 * `distinct()` with computed columns now ignores grouping, matching dplyr's behavior (#1081).
 * `sql_escape_string()` now defaults to using `'`.
 * `simulate_*()` now uses (approximately) correct quoting for all backends, so the generated SQL looks more like what you'll actually get when connected to a real database (#1464).
