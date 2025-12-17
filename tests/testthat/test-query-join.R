@@ -146,7 +146,7 @@ test_that("arrange after join is inlined", {
   expect_snapshot(left_join(lf1, lf2, by = "x") |> arrange(y))
 })
 
-test_that("mutate after join creates subquery", {
+test_that("mutate after join is inlined", {
   lf1 <- lazy_frame(x = 1, y = 2, .name = "df")
   lf2 <- lazy_frame(x = 1, z = 3, .name = "df")
 

@@ -10,7 +10,8 @@ select_query <- function(
   order_by = character(),
   limit = NULL,
   distinct = FALSE,
-  from_alias = NULL
+  from_alias = NULL,
+  join_col_mapping = NULL
 ) {
   check_character(select)
   check_character(where)
@@ -33,7 +34,8 @@ select_query <- function(
       order_by = order_by,
       distinct = distinct,
       limit = limit,
-      from_alias = from_alias
+      from_alias = from_alias,
+      join_col_mapping = join_col_mapping
     ),
     class = c("select_query", "query")
   )
@@ -70,7 +72,9 @@ print.select_query <- function(x, ...) {
 sql_optimise.select_query <- function(x, con = NULL, ..., subquery = FALSE) {
   from <- x$from
 
-  if (inherits(from, c("multi_join_query", "join_query"))) {
+  # Only optimize over multi_join_query (left/inner joins).
+  # join_query is used for right/full joins which have COALESCE columns.
+  if (inherits(from, "multi_join_query")) {
     return(sql_optimise_select_over_join(x, from, subquery = subquery))
   }
 
@@ -116,12 +120,6 @@ sql_optimise_select_over_join <- function(x, from, subquery = FALSE) {
     return(x)
   }
 
-  # Check if the outer select is just a pass-through (e.g., "q01".*)
-  outer_select_is_passthrough <- is_passthrough_select(x$select, x$from_alias)
-  if (!outer_select_is_passthrough) {
-    return(x)
-  }
-
   outer_has_where <- length(x$where) > 0
   outer_has_order_by <- length(x$order_by) > 0
   outer_has_distinct <- isTRUE(x$distinct)
@@ -142,8 +140,17 @@ sql_optimise_select_over_join <- function(x, from, subquery = FALSE) {
     return(x)
   }
 
+  # Replace SELECT if not a pass-through (e.g., for mutate)
+  # Column references in SELECT need translation using the stored mapping
+  if (!is_passthrough_select(x$select, x$from_alias)) {
+    if (!is.null(x$join_col_mapping)) {
+      from$select <- translate_select_with_mapping(x$select, x$join_col_mapping)
+    } else {
+      from$select <- x$select
+    }
+  }
+
   # Move clauses from select to join
-  # Column references are already translated at sql_build time
   if (outer_has_where) {
     from$where <- x$where
   }
@@ -177,6 +184,29 @@ is_passthrough_select <- function(select, from_alias) {
   select_str <- as.character(select)
   pattern <- paste0("^[`\"\\[]?", from_alias, "[`\"\\]]?\\.\\*$")
   grepl(pattern, select_str)
+}
+
+# Translate column references in SELECT from output names to qualified expressions
+# col_mapping is a named list of SQL expressions (from join_get_column_mapping)
+translate_select_with_mapping <- function(outer_select, col_mapping) {
+  result <- as.character(outer_select)
+  result_names <- names(outer_select) %||% rep("", length(outer_select))
+  col_names <- names(col_mapping)
+
+  for (i in seq_along(col_mapping)) {
+    col_name <- col_names[[i]]
+    expr <- as.character(col_mapping[[i]])
+
+    # Replace quoted column name with qualified expression
+    # Handle different quoting styles: "col", `col`, [col]
+    for (quote in c('"', '`', '\\[')) {
+      close_quote <- if (quote == '\\[') '\\]' else quote
+      pattern <- paste0(quote, col_name, close_quote)
+      result <- gsub(pattern, expr, result, fixed = (quote != '\\['))
+    }
+  }
+
+  sql(set_names(result, result_names))
 }
 
 # List clauses used by a query, in the order they are executed

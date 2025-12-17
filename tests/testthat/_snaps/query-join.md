@@ -237,19 +237,16 @@
         ON ("df_LHS"."x" = "df_RHS"."x")
       ORDER BY "df_LHS"."y"
 
-# mutate after join creates subquery
+# mutate after join is inlined
 
     Code
       mutate(left_join(lf1, lf2, by = "x"), y = y + 1)
     Output
       <SQL>
-      SELECT "x", "y" + 1.0 AS "y", "z"
-      FROM (
-        SELECT "df_LHS".*, "z"
-        FROM "df" AS "df_LHS"
-        LEFT JOIN "df" AS "df_RHS"
-          ON ("df_LHS"."x" = "df_RHS"."x")
-      ) AS "q01"
+      SELECT "df_LHS"."x" AS "x", "df_LHS"."y" + 1.0 AS "y", "df_RHS"."z" AS "z"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" = "df_RHS"."x")
 
 # group_by after join creates subquery
 

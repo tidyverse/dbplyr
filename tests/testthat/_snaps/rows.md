@@ -353,13 +353,10 @@
       
       UNION ALL
       
-      SELECT "x", COALESCE("y", "y...y") AS "y"
-      FROM (
-        SELECT "df_x".*, "df_y"."y" AS "y...y"
-        FROM "df_x"
-        INNER JOIN "df_y"
-          ON ("df_x"."x" = "df_y"."x")
-      ) AS "q01"
+      SELECT "df_x"."x" AS "x", COALESCE("df_x"."y", "df_y"."y") AS "y"
+      FROM "df_x"
+      INNER JOIN "df_y"
+        ON ("df_x"."x" = "df_y"."x")
 
 # `rows_patch()` works with multiple columns to update
 
@@ -378,13 +375,13 @@
       
       UNION ALL
       
-      SELECT "x", COALESCE("y", "y...y") AS "y", COALESCE("z", "z...y") AS "z"
-      FROM (
-        SELECT "df_x".*, "df_y"."y" AS "y...y", "df_y"."z" AS "z...y"
-        FROM "df_x"
-        INNER JOIN "df_y"
-          ON ("df_x"."x" = "df_y"."x")
-      ) AS "q01"
+      SELECT
+        "df_x"."x" AS "x",
+        COALESCE("df_x"."y", "df_y"."y") AS "y",
+        COALESCE("df_x"."z", "df_y"."z") AS "z"
+      FROM "df_x"
+      INNER JOIN "df_y"
+        ON ("df_x"."x" = "df_y"."x")
 
 # `rows_patch()` works with `in_place = TRUE`
 

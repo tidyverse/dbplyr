@@ -196,11 +196,15 @@ sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
   alias <- remote_name(op$x, null_if_local = FALSE) %||% unique_subquery_name()
   from <- sql_build(op$x, con, sql_options = sql_options)
 
-  # If wrapping a join, translate column references in WHERE/ORDER BY
-  # from output aliases to qualified column expressions
+  # If wrapping a simple join (multi_join = left/inner), get column mapping
+  # and translate WHERE/ORDER BY. SELECT expressions are translated at
+  # sql_optimise time (only when inlining). Store col_mapping for use there.
+  # Note: We don't optimize lazy_rf_join_query (right/full joins) because they
+  # have COALESCE columns that can't be simply mapped to source columns.
   where <- op$where
   order_by <- op$order_by
-  if (inherits(op$x, c("lazy_multi_join_query", "lazy_rf_join_query"))) {
+  col_mapping <- NULL
+  if (inherits(op$x, "lazy_multi_join_query")) {
     col_mapping <- join_get_column_mapping(op$x, con)
     if (length(col_mapping) > 0) {
       col_names <- names(col_mapping)
@@ -233,7 +237,8 @@ sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
     order_by = translate_sql_(order_by, con = con),
     distinct = op$distinct,
     limit = op$limit,
-    from_alias = alias
+    from_alias = alias,
+    join_col_mapping = col_mapping
   )
 }
 
