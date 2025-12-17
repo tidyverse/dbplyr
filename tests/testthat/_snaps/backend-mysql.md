@@ -39,7 +39,11 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY RAND()) AS `col01`
+        SELECT
+          `df`.*,
+          CASE
+      WHEN (NOT(((RAND()) IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN (((RAND()) IS NULL)) THEN 1 ELSE 0 END) ORDER BY RAND())
+      END AS `col01`
         FROM `df`
       ) AS `q01`
       WHERE (`col01` <= 1)

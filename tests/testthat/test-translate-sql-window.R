@@ -127,30 +127,25 @@ test_that("frame is checked", {
   )
 })
 
-test_that("win_rank works", {
+# win_rank() -------------------------------------------------------------------
+
+test_that("win_rank() correctly handles missing values", {
+  db <- local_memdb_frame("df2", x = c(1, 1, 2, NA), id = 1:4)
+  out <- db |> mutate(asc = rank(x), desc = rank(desc(x))) |> arrange(id)
+
+  # Need to test both asc and desc because NULLs can end up in different place
+  expect_equal(out |> pull(asc), c(1, 1, 3, NA))
+  expect_equal(out |> pull(desc), c(2, 2, 1, NA))
+})
+
+test_that("win_rank works in both directions", {
   con <- simulate_dbi()
   sql_row_number <- win_rank("ROW_NUMBER")
-  expect_translation(
-    con,
-    row_number(x),
-    "CASE
-WHEN (NOT((\"x\" IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN ((\"x\" IS NULL)) THEN 1 ELSE 0 END) ORDER BY \"x\")
-END"
-  )
+  expect_translation_snapshot(con, row_number(x))
+  expect_translation_snapshot(con, row_number(desc(x)))
 })
 
-test_that("win_rank(desc(x)) works", {
-  con <- simulate_dbi()
-  expect_translation(
-    con,
-    row_number(desc(x)),
-    "CASE
-WHEN (NOT((\"x\" IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN ((\"x\" IS NULL)) THEN 1 ELSE 0 END) ORDER BY \"x\" DESC)
-END"
-  )
-})
-
-test_that("win_rank(tibble()) works", {
+test_that("win_rank works with multiple variables", {
   con <- simulate_dbi()
 
   expect_equal(
@@ -162,13 +157,7 @@ test_that("win_rank(tibble()) works", {
     translate_sql(row_number(desc(x)), con = con)
   )
 
-  expect_translation(
-    con,
-    row_number(tibble(x, desc(y))),
-    "CASE
-WHEN (NOT((\"x\" IS NULL)) AND NOT((\"y\" IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN ((\"x\" IS NULL) OR (\"y\" IS NULL)) THEN 1 ELSE 0 END) ORDER BY \"x\", \"y\" DESC)
-END"
-  )
+  expect_translation_snapshot(con, row_number(tibble(x, desc(y))))
 })
 
 test_that("win_rank(c()) gives an informative error", {

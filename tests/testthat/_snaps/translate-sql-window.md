@@ -9,6 +9,33 @@
       Error in `rows()`:
       ! `from` (1) must be less than `to` (0)
 
+# win_rank works in both directions
+
+    Code
+      translate_sql(row_number(x), con = con)
+    Output
+      <SQL> CASE
+      WHEN (NOT(("x" IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN (("x" IS NULL)) THEN 1 ELSE 0 END) ORDER BY "x")
+      END
+
+---
+
+    Code
+      translate_sql(row_number(desc(x)), con = con)
+    Output
+      <SQL> CASE
+      WHEN (NOT(("x" IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN (("x" IS NULL)) THEN 1 ELSE 0 END) ORDER BY "x" DESC)
+      END
+
+# win_rank works with multiple variables
+
+    Code
+      translate_sql(row_number(tibble(x, desc(y))), con = con)
+    Output
+      <SQL> CASE
+      WHEN (NOT(("x" IS NULL) OR ("y" IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN (("x" IS NULL) OR ("y" IS NULL)) THEN 1 ELSE 0 END) ORDER BY "x", "y" DESC)
+      END
+
 # win_rank(c()) gives an informative error
 
     Code

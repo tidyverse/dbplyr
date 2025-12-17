@@ -151,6 +151,13 @@ win_rank <- function(f, empty_order = FALSE) {
     if (!is_null(order)) {
       order_over <- translate_sql_(order, con = con)
 
+      # Ensuring NULLs get a NULL rank in SQL requires two pieces:
+      # * We need to ensure that a NULL gets a rank of NULL. We can't do this
+      #   inside of RANK() so we use a CASE WHEN outside of it
+      # * We need to ensure those NULLs don't affect the ranks of other
+      #   values. We do this by PARTITIONING the NULLs into their own bucket
+      #   (NULLS LAST is not yet widely supported)
+
       order_symbols <- purrr::map_if(
         order,
         \(x) quo_is_call(x, "desc", n = 1L),
@@ -158,20 +165,17 @@ win_rank <- function(f, empty_order = FALSE) {
       )
 
       is_na_exprs <- purrr::map(order_symbols, \(sym) expr(is.na(!!sym)))
-      any_na_expr <- purrr::reduce(is_na_exprs, function(lhs, rhs) {
+      is_missing <- purrr::reduce(is_na_exprs, function(lhs, rhs) {
         call2("|", lhs, rhs)
       })
+      # e.g. X IS NULL OR Y IS NULL
+      not_missing <- call2("!", is_missing)
 
       cond <- translate_sql(
-        (case_when(!!any_na_expr ~ 1L, TRUE ~ 0L)),
+        (case_when(!!is_missing ~ 1L, TRUE ~ 0L)),
         con = con
       )
       group <- sql(group, cond)
-
-      not_is_na_exprs <- purrr::map(order_symbols, \(sym) expr(!is.na(!!sym)))
-      no_na_expr <- purrr::reduce(not_is_na_exprs, function(lhs, rhs) {
-        call2("&", lhs, rhs)
-      })
     } else {
       order_over <- win_current_order()
       if (empty_order & is_empty(order_over)) {
@@ -192,7 +196,7 @@ win_rank <- function(f, empty_order = FALSE) {
     if (is_null(order)) {
       rank_sql
     } else {
-      translate_sql(case_when(!!no_na_expr ~ !!rank_sql), con = con)
+      translate_sql(case_when(!!not_missing ~ !!rank_sql), con = con)
     }
   }
 }
