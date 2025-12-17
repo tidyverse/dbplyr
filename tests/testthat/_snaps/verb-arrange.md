@@ -196,14 +196,11 @@
       Joining with `by = join_by(a)`
     Output
       <SQL>
-      SELECT "q01".*
-      FROM (
-        SELECT "df_LHS".*, "c"
-        FROM "df" AS "df_LHS"
-        LEFT JOIN "df" AS "df_RHS"
-          ON ("df_LHS"."a" = "df_RHS"."a")
-      ) AS "q01"
-      ORDER BY "a"
+      SELECT "df_LHS".*, "c"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."a" = "df_RHS"."a")
+      ORDER BY "df_LHS"."a"
     Code
       arrange(semi_join(lf, rf), a)
     Message

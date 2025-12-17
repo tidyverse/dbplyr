@@ -10,7 +10,11 @@ join_query <- function(
   type = "inner",
   by = NULL,
   suffix = c(".x", ".y"),
-  na_matches = FALSE
+  na_matches = FALSE,
+  where = character(),
+  order_by = character(),
+  limit = NULL,
+  distinct = FALSE
 ) {
   structure(
     list(
@@ -19,19 +23,36 @@ join_query <- function(
       select = select,
       type = type,
       by = by,
-      na_matches = na_matches
+      na_matches = na_matches,
+      where = where,
+      order_by = order_by,
+      limit = limit,
+      distinct = distinct
     ),
     class = c("join_query", "query")
   )
 }
 
-multi_join_query <- function(x, joins, table_names, select) {
+multi_join_query <- function(
+  x,
+  joins,
+  table_names,
+  select,
+  where = character(),
+  order_by = character(),
+  limit = NULL,
+  distinct = FALSE
+) {
   structure(
     list(
       x = x,
       joins = joins,
       table_names = table_names,
-      select = select
+      select = select,
+      where = where,
+      order_by = order_by,
+      limit = limit,
+      distinct = distinct
     ),
     class = c("multi_join_query", "query")
   )
@@ -89,6 +110,10 @@ sql_render.join_query <- function(
     type = query$type,
     by = query$by,
     na_matches = query$na_matches,
+    where = query$where,
+    order_by = query$order_by,
+    limit = query$limit,
+    distinct = query$distinct,
     select = query$select,
     lvl = lvl
   )
@@ -116,6 +141,10 @@ sql_render.multi_join_query <- function(
     table_names = query$table_names,
     by_list = query$by_list,
     select = query$select,
+    where = query$where,
+    order_by = query$order_by,
+    limit = query$limit,
+    distinct = query$distinct,
     lvl = lvl
   )
 }

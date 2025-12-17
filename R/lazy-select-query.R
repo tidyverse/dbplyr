@@ -195,6 +195,20 @@ sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
 
   alias <- remote_name(op$x, null_if_local = FALSE) %||% unique_subquery_name()
   from <- sql_build(op$x, con, sql_options = sql_options)
+
+  # If wrapping a join, translate column references in WHERE/ORDER BY
+  # from output aliases to qualified column expressions
+  where <- op$where
+  order_by <- op$order_by
+  if (inherits(op$x, c("lazy_multi_join_query", "lazy_rf_join_query"))) {
+    col_mapping <- join_get_column_mapping(op$x, con)
+    if (length(col_mapping) > 0) {
+      col_names <- names(col_mapping)
+      where <- lapply(where, replace_sym, col_names, col_mapping)
+      order_by <- lapply(order_by, replace_sym, col_names, col_mapping)
+    }
+  }
+
   select_sql_list <- get_select_sql(
     select = op$select,
     select_operation = op$select_operation,
@@ -204,7 +218,7 @@ sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
     use_star = sql_options$use_star
   )
   where_sql <- translate_sql_(
-    op$where,
+    where,
     con = con,
     context = list(clause = "WHERE")
   )
@@ -216,7 +230,7 @@ sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
     group_by = translate_sql_(op$group_by, con = con),
     having = translate_sql_(op$having, con = con, window = FALSE),
     window = select_sql_list$window_sql,
-    order_by = translate_sql_(op$order_by, con = con),
+    order_by = translate_sql_(order_by, con = con),
     distinct = op$distinct,
     limit = op$limit,
     from_alias = alias

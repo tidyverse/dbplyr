@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* `filter()`, `arrange()`, `distinct()`, and `head()` after joins now produce flatter SQL without unnecessary subqueries (#722).
 * `distinct()` with computed columns now ignores grouping, matching dplyr's behavior (#1081).
 * `sql_escape_string()` now defaults to using `'`.
 * `simulate_*()` now uses (approximately) correct quoting for all backends, so the generated SQL looks more like what you'll actually get when connected to a real database (#1464).

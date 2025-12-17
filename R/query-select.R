@@ -68,11 +68,17 @@ print.select_query <- function(x, ...) {
 
 #' @export
 sql_optimise.select_query <- function(x, con = NULL, ..., subquery = FALSE) {
-  if (!inherits(x$from, "select_query")) {
+  from <- x$from
+
+  if (inherits(from, c("multi_join_query", "join_query"))) {
+    return(sql_optimise_select_over_join(x, from, subquery = subquery))
+  }
+
+  if (!inherits(from, "select_query")) {
     return(x)
   }
 
-  from <- sql_optimise(x$from, subquery = subquery)
+  from <- sql_optimise(from, subquery = subquery)
 
   # If all outer clauses are executed after the inner clauses, we
   # can drop them down a level
@@ -97,6 +103,80 @@ sql_optimise.select_query <- function(x, con = NULL, ..., subquery = FALSE) {
     x$from <- from
     x
   }
+}
+
+sql_optimise_select_over_join <- function(x, from, subquery = FALSE) {
+  # Join queries don't support GROUP BY, HAVING, or WINDOW clauses
+  # If the outer select has any of these, we can't squash
+  has_unsquashable <- length(x$group_by) > 0 ||
+    length(x$having) > 0 ||
+    length(x$window) > 0
+
+  if (has_unsquashable) {
+    return(x)
+  }
+
+  # Check if the outer select is just a pass-through (e.g., "q01".*)
+  outer_select_is_passthrough <- is_passthrough_select(x$select, x$from_alias)
+  if (!outer_select_is_passthrough) {
+    return(x)
+  }
+
+  outer_has_where <- length(x$where) > 0
+  outer_has_order_by <- length(x$order_by) > 0
+  outer_has_distinct <- isTRUE(x$distinct)
+  outer_has_limit <- !is.null(x$limit)
+
+  # Check if the join already has conflicting clauses
+  join_has_where <- length(from$where) > 0
+  join_has_order_by <- length(from$order_by) > 0
+  join_has_distinct <- isTRUE(from$distinct)
+  join_has_limit <- !is.null(from$limit)
+
+  can_squash <- !((outer_has_where && join_has_where) ||
+    (outer_has_order_by && join_has_order_by) ||
+    (outer_has_distinct && join_has_distinct) ||
+    (outer_has_limit && join_has_limit))
+
+  if (!can_squash) {
+    return(x)
+  }
+
+  # Move clauses from select to join
+  # Column references are already translated at sql_build time
+  if (outer_has_where) {
+    from$where <- x$where
+  }
+  if (outer_has_order_by) {
+    from$order_by <- x$order_by
+  }
+  if (outer_has_distinct) {
+    from$distinct <- x$distinct
+  }
+  if (outer_has_limit) {
+    from$limit <- x$limit
+  }
+
+  from
+}
+
+# Check if select is just "{alias}.*" - a pass-through that selects everything
+is_passthrough_select <- function(select, from_alias) {
+  if (is.null(from_alias) || length(select) != 1) {
+    return(FALSE)
+  }
+
+  select_name <- names(select)
+  is_unnamed <- is.null(select_name) || identical(select_name, "")
+  if (!is_unnamed) {
+    return(FALSE)
+  }
+
+  # Check if select is "{from_alias}.*" with any quoting style
+  # Handles: "alias".*, `alias`.*, [alias].*, alias.*
+  select_str <- as.character(select)
+  pattern <- paste0("^[`\"\\[]?", from_alias, "[`\"\\]]?\\.\\*$")
+  grepl(pattern, select_str)
 }
 
 # List clauses used by a query, in the order they are executed

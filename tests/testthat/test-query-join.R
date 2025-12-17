@@ -113,3 +113,53 @@ test_that("sql_multi_join_vars generates expected SQL", {
     )
   )
 })
+
+# Join inlining tests (#722) --------------------------------------------------
+# DISTINCT and LIMIT can be inlined into joins, but WHERE and ORDER BY cannot
+# because they may reference column aliases which aren't valid in WHERE/ORDER BY
+
+test_that("distinct after join is inlined", {
+  lf1 <- lazy_frame(x = 1, y = 2, .name = "df")
+  lf2 <- lazy_frame(x = 1, z = 3, .name = "df")
+
+  expect_snapshot(left_join(lf1, lf2, by = "x") |> distinct())
+})
+
+test_that("head after join is inlined", {
+  lf1 <- lazy_frame(x = 1, y = 2, .name = "df")
+  lf2 <- lazy_frame(x = 1, z = 3, .name = "df")
+
+  expect_snapshot(left_join(lf1, lf2, by = "x") |> head(10))
+})
+
+test_that("filter after join is inlined", {
+  lf1 <- lazy_frame(x = 1, y = 2, .name = "df")
+  lf2 <- lazy_frame(x = 1, z = 3, .name = "df")
+
+  expect_snapshot(left_join(lf1, lf2, by = "x") |> filter(y > 1))
+})
+
+test_that("arrange after join is inlined", {
+  lf1 <- lazy_frame(x = 1, y = 2, .name = "df")
+  lf2 <- lazy_frame(x = 1, z = 3, .name = "df")
+
+  expect_snapshot(left_join(lf1, lf2, by = "x") |> arrange(y))
+})
+
+test_that("mutate after join creates subquery", {
+  lf1 <- lazy_frame(x = 1, y = 2, .name = "df")
+  lf2 <- lazy_frame(x = 1, z = 3, .name = "df")
+
+  expect_snapshot(left_join(lf1, lf2, by = "x") |> mutate(y = y + 1))
+})
+
+test_that("group_by after join creates subquery", {
+  lf1 <- lazy_frame(x = 1, y = 2, .name = "df")
+  lf2 <- lazy_frame(x = 1, z = 3, .name = "df")
+
+  expect_snapshot(
+    left_join(lf1, lf2, by = "x") |>
+      group_by(x) |>
+      summarise(n = n())
+  )
+})

@@ -190,3 +190,79 @@
         WHERE (LHS.y < RHS.z)
       )
 
+# distinct after join is inlined
+
+    Code
+      distinct(left_join(lf1, lf2, by = "x"))
+    Output
+      <SQL>
+      SELECT DISTINCT "df_LHS".*, "z"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" = "df_RHS"."x")
+
+# head after join is inlined
+
+    Code
+      head(left_join(lf1, lf2, by = "x"), 10)
+    Output
+      <SQL>
+      SELECT "df_LHS".*, "z"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" = "df_RHS"."x")
+      LIMIT 10
+
+# filter after join is inlined
+
+    Code
+      filter(left_join(lf1, lf2, by = "x"), y > 1)
+    Output
+      <SQL>
+      SELECT "df_LHS".*, "z"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" = "df_RHS"."x")
+      WHERE ("df_LHS"."y" > 1.0)
+
+# arrange after join is inlined
+
+    Code
+      arrange(left_join(lf1, lf2, by = "x"), y)
+    Output
+      <SQL>
+      SELECT "df_LHS".*, "z"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" = "df_RHS"."x")
+      ORDER BY "df_LHS"."y"
+
+# mutate after join creates subquery
+
+    Code
+      mutate(left_join(lf1, lf2, by = "x"), y = y + 1)
+    Output
+      <SQL>
+      SELECT "x", "y" + 1.0 AS "y", "z"
+      FROM (
+        SELECT "df_LHS".*, "z"
+        FROM "df" AS "df_LHS"
+        LEFT JOIN "df" AS "df_RHS"
+          ON ("df_LHS"."x" = "df_RHS"."x")
+      ) AS "q01"
+
+# group_by after join creates subquery
+
+    Code
+      summarise(group_by(left_join(lf1, lf2, by = "x"), x), n = n())
+    Output
+      <SQL>
+      SELECT "x", COUNT(*) AS "n"
+      FROM (
+        SELECT "df_LHS".*, "z"
+        FROM "df" AS "df_LHS"
+        LEFT JOIN "df" AS "df_RHS"
+          ON ("df_LHS"."x" = "df_RHS"."x")
+      ) AS "q01"
+      GROUP BY "x"
+

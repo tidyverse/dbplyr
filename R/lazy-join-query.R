@@ -300,3 +300,37 @@ sql_build.lazy_semi_join_query <- function(op, con, ..., sql_options = NULL) {
     na_matches = op$by$na_matches
   )
 }
+
+# Build a mapping from output column names to qualified SQL expressions
+# for use in translating WHERE/ORDER BY clauses when inlining select over join
+join_get_column_mapping <- function(op, con) {
+  table_names <- generate_join_table_names(op$table_names, con)
+
+  if (inherits(op, "lazy_multi_join_query")) {
+    # vars has: name, table (index), var (source column name)
+    out <- purrr::map2(
+      op$vars$table,
+      op$vars$var,
+      function(tbl_idx, var) {
+        sql_table_prefix(con, table_names[[tbl_idx]], var)
+      }
+    )
+    set_names(out, op$vars$name)
+  } else if (inherits(op, "lazy_rf_join_query")) {
+    # vars has: name, x (source from x or NA), y (source from y or NA)
+    out <- purrr::map2(
+      op$vars$x,
+      op$vars$y,
+      function(x_var, y_var) {
+        if (!is.na(x_var)) {
+          sql_table_prefix(con, table_names[[1]], x_var)
+        } else {
+          sql_table_prefix(con, table_names[[2]], y_var)
+        }
+      }
+    )
+    set_names(out, op$vars$name)
+  } else {
+    list()
+  }
+}

@@ -401,7 +401,12 @@ sql_query_join <- function(
   select,
   type = "inner",
   by = NULL,
+
   na_matches = FALSE,
+  where = NULL,
+  order_by = NULL,
+  limit = NULL,
+  distinct = FALSE,
   ...,
   lvl = 0
 ) {
@@ -417,6 +422,10 @@ sql_query_join.DBIConnection <- function(
   type = "inner",
   by = NULL,
   na_matches = FALSE,
+  where = NULL,
+  order_by = NULL,
+  limit = NULL,
+  distinct = FALSE,
   ...,
   lvl = 0
 ) {
@@ -437,10 +446,13 @@ sql_query_join.DBIConnection <- function(
 
   # Wrap with SELECT since callers assume a valid query is returned
   clauses <- list(
-    sql_clause_select(con, select),
+    sql_clause_select(con, select, distinct),
     sql_clause_from(x),
     sql_clause(JOIN, y),
-    sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1)
+    sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1),
+    sql_clause_where(where),
+    sql_clause_order_by(order_by, subquery = FALSE, limit),
+    sql_clause_limit(con, limit)
   )
   sql_format_clauses(clauses, lvl, con)
 }
@@ -452,6 +464,10 @@ dbplyr_query_join <- function(
   type = "inner",
   by = NULL,
   na_matches = FALSE,
+  where = NULL,
+  order_by = NULL,
+  limit = NULL,
+  distinct = FALSE,
   ...,
   select = NULL,
   lvl = 0
@@ -465,6 +481,10 @@ dbplyr_query_join <- function(
     type = type,
     by = by,
     na_matches = na_matches,
+    where = where,
+    order_by = order_by,
+    limit = limit,
+    distinct = distinct,
     ...,
     lvl = lvl
   )
@@ -479,6 +499,10 @@ sql_query_multi_join <- function(
   table_names,
   by_list,
   select,
+  where = NULL,
+  order_by = NULL,
+  limit = NULL,
+  distinct = FALSE,
   ...,
   lvl = 0
 ) {
@@ -523,6 +547,10 @@ sql_query_multi_join.DBIConnection <- function(
   table_names,
   by_list,
   select,
+  where = NULL,
+  order_by = NULL,
+  limit = NULL,
+  distinct = FALSE,
   ...,
   lvl = 0
 ) {
@@ -548,9 +576,12 @@ sql_query_multi_join.DBIConnection <- function(
   }
 
   clauses <- list2(
-    sql_clause_select(con, select),
+    sql_clause_select(con, select, distinct),
     sql_clause_from(from),
-    !!!out
+    !!!out,
+    sql_clause_where(where),
+    sql_clause_order_by(order_by, subquery = FALSE, limit),
+    sql_clause_limit(con, limit)
   )
   sql_format_clauses(clauses, lvl = lvl, con = con)
 }
