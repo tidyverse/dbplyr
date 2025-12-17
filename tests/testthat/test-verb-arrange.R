@@ -89,7 +89,7 @@ test_that("arrange generates order_by", {
     arrange(x) |>
     sql_build()
 
-  expect_equal(out$order_by, sql('`x`'))
+  expect_equal(out$order_by, sql('"x"'))
 })
 
 test_that("arrange converts desc", {
@@ -97,7 +97,7 @@ test_that("arrange converts desc", {
     arrange(desc(x)) |>
     sql_build()
 
-  expect_equal(out$order_by, sql('`x` DESC'))
+  expect_equal(out$order_by, sql('"x" DESC'))
 })
 
 test_that("grouped arrange doesn't order by groups", {
@@ -106,7 +106,7 @@ test_that("grouped arrange doesn't order by groups", {
     arrange(y) |>
     sql_build()
 
-  expect_equal(out$order_by, sql('`y`'))
+  expect_equal(out$order_by, sql('"y"'))
 })
 
 test_that("grouped arrange order by groups when .by_group  is set to TRUE", {
@@ -115,7 +115,7 @@ test_that("grouped arrange order by groups when .by_group  is set to TRUE", {
     group_by(x) |>
     arrange(y, .by_group = TRUE) |>
     sql_build()
-  expect_equal(out$order_by, sql(c('`x`', '`y`')))
+  expect_equal(out$order_by, sql(c('"x"', '"y"')))
 })
 
 # ops ---------------------------------------------------------------------

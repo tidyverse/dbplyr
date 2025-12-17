@@ -4,7 +4,7 @@
       translate_sql(sum(x, na.rm = TRUE), con = con, vars_frame = c(1, 0))
     Condition
       Warning:
-      Windowed expression `SUM(`x`)` does not have explicit order.
+      Windowed expression `SUM("x")` does not have explicit order.
       i Please use `arrange()`, `window_order()`, or `.order` to make deterministic.
       Error in `rows()`:
       ! `from` (1) must be less than `to` (0)
@@ -24,8 +24,8 @@
       mutate(mf, rown = row_number())
     Output
       <SQL>
-      SELECT `df`.*, ROW_NUMBER() OVER () AS `rown`
-      FROM `df`
+      SELECT "df".*, ROW_NUMBER() OVER () AS "rown"
+      FROM "df"
 
 ---
 
@@ -33,8 +33,8 @@
       mutate(group_by(mf, y), rown = row_number())
     Output
       <SQL>
-      SELECT `df`.*, ROW_NUMBER() OVER (PARTITION BY `y`) AS `rown`
-      FROM `df`
+      SELECT "df".*, ROW_NUMBER() OVER (PARTITION BY "y") AS "rown"
+      FROM "df"
 
 ---
 
@@ -42,9 +42,9 @@
       mutate(arrange(group_by(mf, y), y), rown = row_number())
     Output
       <SQL>
-      SELECT `df`.*, ROW_NUMBER() OVER (PARTITION BY `y` ORDER BY `y`) AS `rown`
-      FROM `df`
-      ORDER BY `y`
+      SELECT "df".*, ROW_NUMBER() OVER (PARTITION BY "y" ORDER BY "y") AS "rown"
+      FROM "df"
+      ORDER BY "y"
 
 ---
 
@@ -52,9 +52,9 @@
       mutate(arrange(mf, y), rown = row_number())
     Output
       <SQL>
-      SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY `y`) AS `rown`
-      FROM `df`
-      ORDER BY `y`
+      SELECT "df".*, ROW_NUMBER() OVER (ORDER BY "y") AS "rown"
+      FROM "df"
+      ORDER BY "y"
 
 # window_frame()
 
@@ -62,8 +62,8 @@
       show_query(mutate(window_order(window_frame(lf, -3, 0), x), z = sum(y, na.rm = TRUE)))
     Output
       <SQL>
-      SELECT `df`.*, SUM(`y`) OVER (ORDER BY `x` ROWS 3 PRECEDING) AS `z`
-      FROM `df`
+      SELECT "df".*, SUM("y") OVER (ORDER BY "x" ROWS 3 PRECEDING) AS "z"
+      FROM "df"
 
 ---
 
@@ -72,9 +72,9 @@
     Output
       <SQL>
       SELECT
-        `df`.*,
-        SUM(`y`) OVER (ORDER BY `x` ROWS BETWEEN 3 PRECEDING AND UNBOUNDED FOLLOWING) AS `z`
-      FROM `df`
+        "df".*,
+        SUM("y") OVER (ORDER BY "x" ROWS BETWEEN 3 PRECEDING AND UNBOUNDED FOLLOWING) AS "z"
+      FROM "df"
 
 # window_frame() checks arguments
 

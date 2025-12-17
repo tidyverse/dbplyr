@@ -23,7 +23,7 @@
     Output
       <SQL>
       SELECT *
-      FROM `df`
+      FROM "df"
 
 # names() inform that they aren't meant to be used
 

@@ -152,7 +152,7 @@ test_that("across() uses original column rather than overridden one", {
       mutate(across(everything(), ~ .x / x)) |>
       remote_query(),
     sql(
-      "SELECT `x` / `x` AS `x`, `y` / `x` AS `y`, `z` / `x` AS `z`\nFROM `df`"
+      "SELECT \"x\" / \"x\" AS \"x\", \"y\" / \"x\" AS \"y\", \"z\" / \"x\" AS \"z\"\nFROM \"df\""
     )
   )
   expect_snapshot(
@@ -181,7 +181,7 @@ test_that("new columns take precedence over global variables", {
 test_that("constants do not need a new query", {
   expect_equal(
     lazy_frame(x = 1, y = 2) |> mutate(z = 2, z = 3) |> remote_query(),
-    sql("SELECT `df`.*, 3.0 AS `z`\nFROM `df`")
+    sql("SELECT \"df\".*, 3.0 AS \"z\"\nFROM \"df\"")
   )
 })
 
@@ -241,7 +241,7 @@ test_that("can `NULL` out the `.by` column", {
   out <- mutate(df, x = NULL, .by = x)
 
   expect_identical(op_vars(out), "y")
-  expect_identical(remote_query(out), sql("SELECT `y`\nFROM `df`"))
+  expect_identical(remote_query(out), sql("SELECT \"y\"\nFROM \"df\""))
 })
 
 # .order, .frame -----------------------------------------------------------
@@ -520,17 +520,17 @@ test_that("mutate() uses star", {
 
   expect_equal(
     lf |> mutate(z = 1L) |> remote_query(),
-    sql("SELECT `df`.*, 1 AS `z`\nFROM `df`")
+    sql("SELECT \"df\".*, 1 AS \"z\"\nFROM \"df\"")
   )
 
   expect_equal(
     lf |> mutate(a = 1L, .before = 1) |> remote_query(),
-    sql("SELECT 1 AS `a`, `df`.*\nFROM `df`")
+    sql("SELECT 1 AS \"a\", \"df\".*\nFROM \"df\"")
   )
 
   expect_equal(
     lf |> transmute(a = 1L, x, y, z = 2L) |> remote_query(),
-    sql("SELECT 1 AS `a`, `df`.*, 2 AS `z`\nFROM `df`")
+    sql("SELECT 1 AS \"a\", \"df\".*, 2 AS \"z\"\nFROM \"df\"")
   )
 
   # does not use * if `use_star = FALSE`
@@ -538,7 +538,7 @@ test_that("mutate() uses star", {
     lf |>
       mutate(z = 1L) |>
       remote_query(sql_options = sql_options(use_star = FALSE)),
-    sql("SELECT `x`, `y`, 1 AS `z`\nFROM `df`")
+    sql("SELECT \"x\", \"y\", 1 AS \"z\"\nFROM \"df\"")
   )
 })
 
@@ -549,7 +549,7 @@ test_that("mutate generates simple expressions", {
     mutate(y = x + 1L) |>
     sql_build()
 
-  expect_equal(out$select, sql('`df`.*', y = '`x` + 1'))
+  expect_equal(out$select, sql('"df".*', y = '"x" + 1'))
 })
 
 test_that("mutate can drop variables with NULL", {
@@ -562,21 +562,21 @@ test_that("mutate can drop variables with NULL", {
 
 test_that("var = NULL works when var is in original data", {
   lf <- lazy_frame(x = 1) |> mutate(x = 2, z = x * 2, x = NULL)
-  expect_equal(sql_build(lf)$select, sql(z = "`x` * 2.0"))
+  expect_equal(sql_build(lf)$select, sql(z = "\"x\" * 2.0"))
   expect_equal(op_vars(lf), "z")
   expect_snapshot(remote_query(lf))
 })
 
 test_that("var = NULL when var is in final output", {
   lf <- lazy_frame(x = 1) |> mutate(y = NULL, y = 3)
-  expect_equal(sql_build(lf)$select, sql("`df`.*", y = "3.0"))
+  expect_equal(sql_build(lf)$select, sql("\"df\".*", y = "3.0"))
   expect_equal(op_vars(lf), c("x", "y"))
   expect_snapshot(remote_query(lf))
 })
 
 test_that("temp var with nested arguments", {
   lf <- lazy_frame(x = 1) |> mutate(y = 2, z = y * 2, y = NULL)
-  expect_equal(sql_build(lf)$select, sql(x = "`x`", z = "`y` * 2.0"))
+  expect_equal(sql_build(lf)$select, sql(x = "\"x\"", z = "\"y\" * 2.0"))
   expect_equal(op_vars(lf), c("x", "z"))
   expect_snapshot(remote_query(lf))
 })
@@ -586,12 +586,12 @@ test_that("mutate_all generates correct sql", {
     dplyr::mutate_all(~ . + 1L) |>
     sql_build()
 
-  expect_equal(out$select, sql(x = '`x` + 1', y = '`y` + 1'))
+  expect_equal(out$select, sql(x = '"x" + 1', y = '"y" + 1'))
 
   out <- lazy_frame(x = 1) |>
     dplyr::mutate_all(list(one = ~ . + 1L, two = ~ . + 2L)) |>
     sql_build()
-  expect_equal(out$select, sql('`df`.*', one = '`x` + 1', two = '`x` + 2'))
+  expect_equal(out$select, sql('"df".*', one = '"x" + 1', two = '"x" + 2'))
 })
 
 test_that("mutate_all scopes nested quosures correctly", {
@@ -600,7 +600,7 @@ test_that("mutate_all scopes nested quosures correctly", {
     dplyr::mutate_all(~ . + num) |>
     sql_build()
 
-  expect_equal(out$select, sql(x = '`x` + 10', y = '`y` + 10'))
+  expect_equal(out$select, sql(x = '"x" + 10', y = '"y" + 10'))
 })
 
 

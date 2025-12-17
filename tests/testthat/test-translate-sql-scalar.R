@@ -1,25 +1,25 @@
 test_that("can translate infix expression without parentheses", {
   con <- simulate_dbi()
-  expect_translation(con, !!expr(2 - 1) * x, "(2.0 - 1.0) * `x`")
-  expect_translation(con, !!expr(2 / 1) * x, "(2.0 / 1.0) * `x`")
-  expect_translation(con, !!expr(2 * 1) - x, "(2.0 * 1.0) - `x`")
+  expect_translation(con, !!expr(2 - 1) * x, '(2.0 - 1.0) * "x"')
+  expect_translation(con, !!expr(2 / 1) * x, '(2.0 / 1.0) * "x"')
+  expect_translation(con, !!expr(2 * 1) - x, '(2.0 * 1.0) - "x"')
 })
 
 test_that("unary minus works with expressions", {
   con <- simulate_dbi()
-  expect_translation(con, -!!expr(x + 2), "-(`x` + 2.0)")
-  expect_translation(con, --x, "--`x`")
+  expect_translation(con, -!!expr(x + 2), '-("x" + 2.0)')
+  expect_translation(con, --x, '--"x"')
 })
 
 test_that("sql_infix generates expected output (#1345)", {
-  con <- simulate_dbi()
+  local_con(simulate_dbi())
   x <- ident_q("x")
   y <- ident_q("y")
 
-  expect_equal(sql_infix("-", pad = FALSE, con = con)(x, y), sql("x-y"))
-  expect_equal(sql_infix("-", pad = FALSE, con = con)(NULL, y), sql("-y"))
-  expect_equal(sql_infix("-", con = con)(x, y), sql("x - y"))
-  expect_equal(sql_infix("-", con = con)(NULL, y), sql("- y"))
+  expect_equal(sql_infix("-", pad = FALSE)(x, y), sql("x-y"))
+  expect_equal(sql_infix("-", pad = FALSE)(NULL, y), sql("-y"))
+  expect_equal(sql_infix("-")(x, y), sql("x - y"))
+  expect_equal(sql_infix("-")(NULL, y), sql("- y"))
 })
 
 test_that("sql_prefix checks arguments", {

@@ -146,7 +146,7 @@ test_that("across doesn't select columns from `.by` #1493", {
     )
 
   expect_snapshot(out)
-  expect_equal(sql_build(out)$select[1], sql("`g`"))
+  expect_equal(sql_build(out)$select[1], sql("\"g\""))
 })
 
 test_that("can't use `.by` with `.groups`", {
@@ -184,8 +184,8 @@ test_that("summarise generates group_by and select", {
     summarise(n = n()) |>
     sql_build()
 
-  expect_equal(out$group_by, sql('`g`'))
-  expect_equal(out$select, sql('`g`', 'COUNT(*) AS `n`'))
+  expect_equal(out$group_by, sql('"g"'))
+  expect_equal(out$select, sql('"g"', 'COUNT(*) AS "n"'))
 })
 
 

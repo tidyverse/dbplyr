@@ -72,7 +72,7 @@ test_that("filter() inlined after select()", {
 
   expect_equal(
     remote_query(out),
-    sql("SELECT `y`\nFROM `df`\nWHERE (`y` > 1.0)")
+    sql("SELECT \"y\"\nFROM \"df\"\nWHERE (\"y\" > 1.0)")
   )
 
   out <- lf |>
@@ -363,7 +363,7 @@ test_that("filter generates simple expressions", {
     filter(x > 1L) |>
     sql_build()
 
-  expect_equal(out$where, sql('`x` > 1'))
+  expect_equal(out$where, sql('"x" > 1'))
 })
 
 

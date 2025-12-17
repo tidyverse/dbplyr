@@ -1,10 +1,10 @@
 test_that("custom scalar translated correctly", {
   con <- simulate_odbc()
 
-  expect_translation(con, as.numeric(x), "CAST(`x` AS DOUBLE)")
-  expect_translation(con, as.double(x), "CAST(`x` AS DOUBLE)")
-  expect_translation(con, as.integer(x), "CAST(`x` AS INT)")
-  expect_translation(con, as.character(x), "CAST(`x` AS STRING)")
+  expect_translation(con, as.numeric(x), 'CAST("x" AS DOUBLE)')
+  expect_translation(con, as.double(x), 'CAST("x" AS DOUBLE)')
+  expect_translation(con, as.integer(x), 'CAST("x" AS INT)')
+  expect_translation(con, as.character(x), 'CAST("x" AS STRING)')
 })
 
 test_that("custom aggregators translated correctly", {
@@ -13,7 +13,7 @@ test_that("custom aggregators translated correctly", {
   expect_translation(
     con,
     sd(x, na.rm = TRUE),
-    "STDDEV_SAMP(`x`)",
+    'STDDEV_SAMP("x")',
     window = FALSE
   )
 })
@@ -24,6 +24,6 @@ test_that("custom window functions translated correctly", {
   expect_translation(
     con,
     sd(x, na.rm = TRUE),
-    "STDDEV_SAMP(`x`) OVER ()"
+    'STDDEV_SAMP("x") OVER ()'
   )
 })

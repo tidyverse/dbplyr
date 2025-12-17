@@ -4,11 +4,11 @@
       mutate(distinct(lf, x), x = 0)
     Output
       <SQL>
-      SELECT 0.0 AS `x`
+      SELECT 0.0 AS "x"
       FROM (
-        SELECT DISTINCT `df`.*
-        FROM `df`
-      ) AS `q01`
+        SELECT DISTINCT "df".*
+        FROM "df"
+      ) AS "q01"
 
 # can use window function after summarise and pure projection #1104
 
@@ -16,12 +16,12 @@
       (expect_no_error(mutate(lf, r = row_number())))
     Output
       <SQL>
-      SELECT `q01`.*, ROW_NUMBER() OVER () AS `r`
+      SELECT "q01".*, ROW_NUMBER() OVER () AS "r"
       FROM (
-        SELECT `g`
-        FROM `df`
-        GROUP BY `g`
-      ) AS `q01`
+        SELECT "g"
+        FROM "df"
+        GROUP BY "g"
+      ) AS "q01"
 
 # can refer to fresly created values
 
@@ -44,11 +44,11 @@
       out
     Output
       <SQL>
-      SELECT `x`, `x` + `y` AS `x2`
+      SELECT "x", "x" + "y" AS "x2"
       FROM (
-        SELECT `x` / 2.0 AS `x`, `y`
-        FROM `df`
-      ) AS `q01`
+        SELECT "x" / 2.0 AS "x", "y"
+        FROM "df"
+      ) AS "q01"
 
 # across() does not select grouping variables
 
@@ -56,8 +56,8 @@
       mutate(group_by(df, g), across(.fns = ~0))
     Output
       <SQL>
-      SELECT `g`, 0.0 AS `x`
-      FROM `df`
+      SELECT "g", 0.0 AS "x"
+      FROM "df"
 
 ---
 
@@ -65,19 +65,19 @@
       transmute(group_by(df, g), across(.fns = ~0))
     Output
       <SQL>
-      SELECT `g`, 0.0 AS `x`
-      FROM `df`
+      SELECT "g", 0.0 AS "x"
+      FROM "df"
 
 # across() can access previously created variables
 
     Code
       remote_query(lf)
     Output
-      <SQL> SELECT `x`, SQRT(`y`) AS `y`
+      <SQL> SELECT "x", SQRT("y") AS "y"
       FROM (
-        SELECT `df`.*, 2.0 AS `y`
-        FROM `df`
-      ) AS `q01`
+        SELECT "df".*, 2.0 AS "y"
+        FROM "df"
+      ) AS "q01"
 
 # across() uses original column rather than overridden one
 
@@ -85,25 +85,25 @@
       mutate(lf, x = -x, across(everything(), ~ .x / x), y = y + x)
     Output
       <SQL>
-      SELECT `x`, `y` + `x` AS `y`, `z`
+      SELECT "x", "y" + "x" AS "y", "z"
       FROM (
-        SELECT `x` / `x` AS `x`, `y` / `x` AS `y`, `z` / `x` AS `z`
+        SELECT "x" / "x" AS "x", "y" / "x" AS "y", "z" / "x" AS "z"
         FROM (
-          SELECT -`x` AS `x`, `y`, `z`
-          FROM `df`
-        ) AS `q01`
-      ) AS `q01`
+          SELECT -"x" AS "x", "y", "z"
+          FROM "df"
+        ) AS "q01"
+      ) AS "q01"
 
 # new columns take precedence over global variables
 
     Code
       remote_query(lf)
     Output
-      <SQL> SELECT `q01`.*, `y` + 1.0 AS `z`
+      <SQL> SELECT "q01".*, "y" + 1.0 AS "z"
       FROM (
-        SELECT `df`.*, 2.0 AS `y`
-        FROM `df`
-      ) AS `q01`
+        SELECT "df".*, 2.0 AS "y"
+        FROM "df"
+      ) AS "q01"
 
 # mutate() produces nice error messages
 
@@ -137,13 +137,13 @@
       out
     Output
       <SQL>
-      SELECT `q01`.*, AVG(`x`) OVER (PARTITION BY `g`) AS `r2`
+      SELECT "q01".*, AVG("x") OVER (PARTITION BY "g") AS "r2"
       FROM (
         SELECT
-          `df`.*,
-          SUM(`x`) OVER (PARTITION BY `g` ORDER BY `y` ROWS UNBOUNDED PRECEDING) AS `r1`
-        FROM `df`
-      ) AS `q01`
+          "df".*,
+          SUM("x") OVER (PARTITION BY "g" ORDER BY "y" ROWS UNBOUNDED PRECEDING) AS "r1"
+        FROM "df"
+      ) AS "q01"
 
 # .order generates correct SQL
 
@@ -152,17 +152,17 @@
     Output
       <SQL>
       SELECT
-        `df`.*,
-        SUM(`x`) OVER (PARTITION BY `g` ORDER BY `y` ROWS UNBOUNDED PRECEDING) AS `r`
-      FROM `df`
+        "df".*,
+        SUM("x") OVER (PARTITION BY "g" ORDER BY "y" ROWS UNBOUNDED PRECEDING) AS "r"
+      FROM "df"
     Code
       mutate(lf, r = cumsum(x), .by = g, .order = c(x, desc(y)))
     Output
       <SQL>
       SELECT
-        `df`.*,
-        SUM(`x`) OVER (PARTITION BY `g` ORDER BY `x`, `y` DESC ROWS UNBOUNDED PRECEDING) AS `r`
-      FROM `df`
+        "df".*,
+        SUM("x") OVER (PARTITION BY "g" ORDER BY "x", "y" DESC ROWS UNBOUNDED PRECEDING) AS "r"
+      FROM "df"
 
 # .frame generates correct SQL
 
@@ -171,17 +171,17 @@
     Output
       <SQL>
       SELECT
-        `df`.*,
-        SUM(`x`) OVER (PARTITION BY `g` ORDER BY `y` ROWS UNBOUNDED PRECEDING) AS `r`
-      FROM `df`
+        "df".*,
+        SUM("x") OVER (PARTITION BY "g" ORDER BY "y" ROWS UNBOUNDED PRECEDING) AS "r"
+      FROM "df"
     Code
       mutate(lf, r = sum(x), .by = g, .order = y, .frame = c(-1, 1))
     Output
       <SQL>
       SELECT
-        `df`.*,
-        SUM(`x`) OVER (PARTITION BY `g` ORDER BY `y` ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS `r`
-      FROM `df`
+        "df".*,
+        SUM("x") OVER (PARTITION BY "g" ORDER BY "y" ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS "r"
+      FROM "df"
 
 # .order validates inputs
 
@@ -241,8 +241,8 @@
       mutate(select(lf, x:y), x = x * 2, y = y * 2)
     Output
       <SQL>
-      SELECT `x` * 2.0 AS `x`, `y` * 2.0 AS `y`
-      FROM `df`
+      SELECT "x" * 2.0 AS "x", "y" * 2.0 AS "y"
+      FROM "df"
 
 ---
 
@@ -250,36 +250,36 @@
       mutate(select(lf, y:x), x = x * 2, y = y * 2)
     Output
       <SQL>
-      SELECT `y` * 2.0 AS `y`, `x` * 2.0 AS `x`
-      FROM `df`
+      SELECT "y" * 2.0 AS "y", "x" * 2.0 AS "x"
+      FROM "df"
 
 # var = NULL works when var is in original data
 
     Code
       remote_query(lf)
     Output
-      <SQL> SELECT `x` * 2.0 AS `z`
+      <SQL> SELECT "x" * 2.0 AS "z"
       FROM (
-        SELECT 2.0 AS `x`
-        FROM `df`
-      ) AS `q01`
+        SELECT 2.0 AS "x"
+        FROM "df"
+      ) AS "q01"
 
 # var = NULL when var is in final output
 
     Code
       remote_query(lf)
     Output
-      <SQL> SELECT `df`.*, 3.0 AS `y`
-      FROM `df`
+      <SQL> SELECT "df".*, 3.0 AS "y"
+      FROM "df"
 
 # temp var with nested arguments
 
     Code
       remote_query(lf)
     Output
-      <SQL> SELECT `x`, `y` * 2.0 AS `z`
+      <SQL> SELECT "x", "y" * 2.0 AS "z"
       FROM (
-        SELECT `df`.*, 2.0 AS `y`
-        FROM `df`
-      ) AS `q01`
+        SELECT "df".*, 2.0 AS "y"
+        FROM "df"
+      ) AS "q01"
 

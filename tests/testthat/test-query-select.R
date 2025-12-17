@@ -26,7 +26,7 @@ test_that("optimisation is turned on by default", {
   lf <- lazy_frame(x = 1, y = 2) |> arrange(x) |> head(5)
   qry <- lf |> sql_build()
 
-  expect_equal(qry$from, base_query(table_path("`df`")))
+  expect_equal(qry$from, base_query(table_path('"df"')))
 })
 
 test_that("group by then limit is collapsed", {
@@ -50,7 +50,7 @@ test_that("filter and rename are correctly composed", {
 
   qry <- lf |> sql_build()
   expect_equal(qry$select, sql(x = "`y`"))
-  expect_equal(qry$where, sql('`x` = 1.0'))
+  expect_equal(qry$where, sql("`x` = 1.0"))
 
   # It surprises me that this SQL works!
   expect_equal(collect(lf), tibble(x = 2))

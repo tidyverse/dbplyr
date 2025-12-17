@@ -1,13 +1,15 @@
 #' Simulate database connections
 #'
+#' @description
 #' These functions generate S3 objects that have been designed to simulate
 #' the action of a database connection, without actually having the database
 #' available. Obviously, this simulation can only be incomplete, but most
 #' importantly it allows us to simulate SQL generation for any database without
 #' actually connecting to it.
 #'
-#' Simulated SQL always quotes identifies with `` `x` ``, and strings with
-#' `'x'`.
+#' Simulated SQL quotes identifiers with `"x"` (double quotes) by default,
+#' `` `x` `` (backticks) for MySQL/MariaDB/SQLite, and `[x]` (square brackets)
+#' for SQL Server. Strings are quoted with `'x'`.
 #'
 #' @keywords internal
 #' @export
@@ -32,7 +34,17 @@ sql_escape_ident.default <- function(con, x) {
 }
 #' @export
 sql_escape_ident.TestConnection <- function(con, x) {
-  sql_quote(x, "`")
+  if (inherits(con, "Microsoft SQL Server")) {
+    sql_quote(x, c("[", "]"))
+  } else if (
+    inherits(con, "MySQLConnection") ||
+      inherits(con, "MariaDBConnection") ||
+      inherits(con, "SQLiteConnection")
+  ) {
+    sql_quote(x, "`")
+  } else {
+    sql_quote(x, '"')
+  }
 }
 
 sql_escape_string <- function(con, x) {
@@ -40,9 +52,5 @@ sql_escape_string <- function(con, x) {
 }
 #' @export
 sql_escape_string.default <- function(con, x) {
-  dbQuoteString(con, x)
-}
-#' @export
-sql_escape_string.TestConnection <- function(con, x) {
   sql_quote(x, "'")
 }

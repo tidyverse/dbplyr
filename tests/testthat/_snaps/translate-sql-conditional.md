@@ -3,14 +3,14 @@
     Code
       translate_sql(case_when(x > 1L ~ "a"), con = con)
     Output
-      <SQL> CASE WHEN (`x` > 1) THEN 'a' END
+      <SQL> CASE WHEN ("x" > 1) THEN 'a' END
 
 # even inside mutate
 
     Code
       out$select[[2]]
     Output
-      <SQL> CASE WHEN (`x` > 1) THEN 'a' END
+      <SQL> CASE WHEN ("x" > 1) THEN 'a' END
 
 # case_when translates correctly to ELSE when TRUE ~ is used 2
 
@@ -18,7 +18,7 @@
       translate_sql(case_when(x == 1L ~ "yes", x == 0L ~ "no", TRUE ~ "undefined"),
       con = con)
     Output
-      <SQL> CASE WHEN (`x` = 1) THEN 'yes' WHEN (`x` = 0) THEN 'no' ELSE 'undefined' END
+      <SQL> CASE WHEN ("x" = 1) THEN 'yes' WHEN ("x" = 0) THEN 'no' ELSE 'undefined' END
 
 # case_when uses the .default arg
 
@@ -26,7 +26,7 @@
       translate_sql(case_when(x == 1L ~ "yes", x == 0L ~ "no", .default = "undefined"),
       con = con)
     Output
-      <SQL> CASE WHEN (`x` = 1) THEN 'yes' WHEN (`x` = 0) THEN 'no' ELSE 'undefined' END
+      <SQL> CASE WHEN ("x" = 1) THEN 'yes' WHEN ("x" = 0) THEN 'no' ELSE 'undefined' END
 
 ---
 
@@ -34,7 +34,7 @@
       translate_sql(case_when(x == 1L ~ "yes", x == 0L ~ "no", .default = x + 1),
       con = con)
     Output
-      <SQL> CASE WHEN (`x` = 1) THEN 'yes' WHEN (`x` = 0) THEN 'no' ELSE `x` + 1.0 END
+      <SQL> CASE WHEN ("x" = 1) THEN 'yes' WHEN ("x" = 0) THEN 'no' ELSE "x" + 1.0 END
 
 ---
 
@@ -42,7 +42,7 @@
       translate_sql(case_when(x == 1L ~ "yes", x == 0L ~ "no", TRUE ~ "true",
       .default = "undefined"), con = con)
     Output
-      <SQL> CASE WHEN (`x` = 1) THEN 'yes' WHEN (`x` = 0) THEN 'no' ELSE 'true' END
+      <SQL> CASE WHEN ("x" = 1) THEN 'yes' WHEN ("x" = 0) THEN 'no' ELSE 'true' END
 
 # case_when does not support .ptype and .size
 
@@ -67,8 +67,8 @@
       TRUE ~ "be wrapped"), con = con)
     Output
       <SQL> CASE
-      WHEN (`x` = 1) THEN 'this is long'
-      WHEN (`x` = 0) THEN 'so it should'
+      WHEN ("x" = 1) THEN 'this is long'
+      WHEN ("x" = 0) THEN 'so it should'
       ELSE 'be wrapped'
       END
 
@@ -93,15 +93,15 @@
     Code
       translate_sql(case_match(x, !!1L ~ "x"), con = con)
     Output
-      <SQL> CASE WHEN (`x` IN (1)) THEN 'x' END
+      <SQL> CASE WHEN ("x" IN (1)) THEN 'x' END
     Code
       translate_sql(case_match(x, !!c(1L, 2L) ~ "x"), con = con)
     Output
-      <SQL> CASE WHEN (`x` IN (1, 2)) THEN 'x' END
+      <SQL> CASE WHEN ("x" IN (1, 2)) THEN 'x' END
     Code
       translate_sql(case_match(x, !!c(NA, 1L) ~ "x"), con = con)
     Output
-      <SQL> CASE WHEN (`x` IN (1) OR `x` IS NULL) THEN 'x' END
+      <SQL> CASE WHEN ("x" IN (1) OR "x" IS NULL) THEN 'x' END
 
 # requires at least one condition
 

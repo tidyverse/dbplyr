@@ -12,9 +12,9 @@ the action of a database connection, without actually having the database
 available. Obviously, this simulation can only be incomplete, but most
 importantly it allows us to simulate SQL generation for any database without
 actually connecting to it.
-}
-\details{
-Simulated SQL always quotes identifies with \code{`x`}, and strings with
-\code{'x'}.
+
+Simulated SQL quotes identifiers with \code{"x"} (double quotes) by default,
+\code{`x`} (backticks) for MySQL/MariaDB/SQLite, and \verb{[x]} (square brackets)
+for SQL Server. Strings are quoted with \code{'x'}.
 }
 \keyword{internal}

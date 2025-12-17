@@ -4,9 +4,9 @@
       count(db, g)
     Output
       <SQL>
-      SELECT `g`, COUNT(*) AS `n`
-      FROM `df`
-      GROUP BY `g`
+      SELECT "g", COUNT(*) AS "n"
+      FROM "df"
+      GROUP BY "g"
 
 ---
 
@@ -14,9 +14,9 @@
       count(db, g, wt = x)
     Output
       <SQL>
-      SELECT `g`, SUM(`x`) AS `n`
-      FROM `df`
-      GROUP BY `g`
+      SELECT "g", SUM("x") AS "n"
+      FROM "df"
+      GROUP BY "g"
 
 ---
 
@@ -24,10 +24,10 @@
       count(db, g, sort = TRUE)
     Output
       <SQL>
-      SELECT `g`, COUNT(*) AS `n`
-      FROM `df`
-      GROUP BY `g`
-      ORDER BY `n` DESC
+      SELECT "g", COUNT(*) AS "n"
+      FROM "df"
+      GROUP BY "g"
+      ORDER BY "n" DESC
 
 ---
 
@@ -35,9 +35,9 @@
       add_count(db, g, sort = TRUE)
     Output
       <SQL>
-      SELECT `df`.*, COUNT(*) OVER (PARTITION BY `g`) AS `n`
-      FROM `df`
-      ORDER BY `n` DESC
+      SELECT "df".*, COUNT(*) OVER (PARTITION BY "g") AS "n"
+      FROM "df"
+      ORDER BY "n" DESC
 
 ---
 
@@ -45,8 +45,8 @@
       add_count(group_by(db, g))
     Output
       <SQL>
-      SELECT `df`.*, COUNT(*) OVER (PARTITION BY `g`) AS `n`
-      FROM `df`
+      SELECT "df".*, COUNT(*) OVER (PARTITION BY "g") AS "n"
+      FROM "df"
 
 # .drop is not supported
 

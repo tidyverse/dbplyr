@@ -1,21 +1,21 @@
 test_that("custom scalar translated correctly", {
   con <- simulate_snowflake()
-  expect_translation(con, log10(x), "LOG(10, `x`)")
+  expect_translation(con, log10(x), 'LOG(10, "x")')
   expect_translation(
     con,
     round(x, digits = 1.1),
-    "ROUND((`x`)::FLOAT, 1)"
+    'ROUND(("x")::FLOAT, 1)'
   )
   expect_translation(
     con,
     grepl("exp", x),
-    "REGEXP_INSTR(`x`, 'exp', 1, 1, 0, 'c') != 0"
+    "REGEXP_INSTR(\"x\", 'exp', 1, 1, 0, 'c') != 0"
   )
 
   expect_translation(
     con,
     grepl("exp", x, ignore.case = TRUE),
-    "REGEXP_INSTR(`x`, 'exp', 1, 1, 0, 'i') != 0"
+    "REGEXP_INSTR(\"x\", 'exp', 1, 1, 0, 'i') != 0"
   )
 })
 
@@ -25,18 +25,18 @@ test_that("pasting translated correctly", {
   expect_translation(
     con,
     paste(x, y),
-    "ARRAY_TO_STRING(ARRAY_CONSTRUCT_COMPACT(`x`, `y`), ' ')"
+    "ARRAY_TO_STRING(ARRAY_CONSTRUCT_COMPACT(\"x\", \"y\"), ' ')"
   )
   expect_translation(
     con,
     paste0(x, y),
-    "ARRAY_TO_STRING(ARRAY_CONSTRUCT_COMPACT(`x`, `y`), '')"
+    "ARRAY_TO_STRING(ARRAY_CONSTRUCT_COMPACT(\"x\", \"y\"), '')"
   )
-  expect_translation(con, str_c(x, y), "CONCAT_WS('', `x`, `y`)")
+  expect_translation(con, str_c(x, y), "CONCAT_WS('', \"x\", \"y\")")
   expect_translation(
     con,
     str_c(x, y, sep = "|"),
-    "CONCAT_WS('|', `x`, `y`)"
+    "CONCAT_WS('|', \"x\", \"y\")"
   )
 
   expect_snapshot(
@@ -47,19 +47,19 @@ test_that("pasting translated correctly", {
   expect_translation(
     con,
     str_flatten(x),
-    "LISTAGG(`x`, '') OVER ()",
+    "LISTAGG(\"x\", '') OVER ()",
     window = TRUE
   )
   expect_translation(
     con,
     str_flatten(x, collapse = "|"),
-    "LISTAGG(`x`, '|') OVER ()",
+    "LISTAGG(\"x\", '|') OVER ()",
     window = TRUE
   )
   expect_translation(
     con,
     str_flatten(x, collapse = "|"),
-    "LISTAGG(`x`, '|')",
+    "LISTAGG(\"x\", '|')",
     window = FALSE
   )
 })
@@ -67,71 +67,71 @@ test_that("pasting translated correctly", {
 test_that("custom stringr functions translated correctly", {
   con <- simulate_snowflake()
 
-  expect_translation(con, str_locate(x, y), "POSITION(`y`, `x`)")
+  expect_translation(con, str_locate(x, y), "POSITION(\"y\", \"x\")")
   expect_translation(
     con,
     str_detect(x, y),
-    "REGEXP_INSTR(`x`, `y`) != 0"
+    "REGEXP_INSTR(\"x\", \"y\") != 0"
   )
   expect_translation(
     con,
     str_detect(x, y, negate = TRUE),
-    "REGEXP_INSTR(`x`, `y`) = 0"
+    "REGEXP_INSTR(\"x\", \"y\") = 0"
   )
   expect_translation(
     con,
     str_replace(x, y, z),
-    "REGEXP_REPLACE(`x`, `y`, `z`, 1, 1)"
+    "REGEXP_REPLACE(\"x\", \"y\", \"z\", 1, 1)"
   )
   expect_translation(
     con,
     str_replace(x, "\\d", z),
-    "REGEXP_REPLACE(`x`, '\\\\d', `z`, 1, 1)"
+    "REGEXP_REPLACE(\"x\", '\\\\d', \"z\", 1, 1)"
   )
   expect_translation(
     con,
     str_replace_all(x, y, z),
-    "REGEXP_REPLACE(`x`, `y`, `z`)"
+    "REGEXP_REPLACE(\"x\", \"y\", \"z\")"
   )
   expect_translation(
     con,
     str_squish(x),
-    "REGEXP_REPLACE(TRIM(`x`), '\\\\s+', ' ')"
+    "REGEXP_REPLACE(TRIM(\"x\"), '\\\\s+', ' ')"
   )
   expect_translation(
     con,
     str_remove(x, y),
-    "REGEXP_REPLACE(`x`, `y`, '', 1, 1)"
+    "REGEXP_REPLACE(\"x\", \"y\", '', 1, 1)"
   )
   expect_translation(
     con,
     str_remove_all(x, y),
-    "REGEXP_REPLACE(`x`, `y`)"
+    "REGEXP_REPLACE(\"x\", \"y\")"
   )
-  expect_translation(con, str_trim(x), "TRIM(`x`)")
+  expect_translation(con, str_trim(x), "TRIM(\"x\")")
   expect_translation(
     con,
     str_starts(x, y),
-    "REGEXP_INSTR(`x`, `y`) = 1"
+    "REGEXP_INSTR(\"x\", \"y\") = 1"
   )
   expect_translation(
     con,
     str_starts(x, y, negate = TRUE),
-    "REGEXP_INSTR(`x`, `y`) != 1"
+    "REGEXP_INSTR(\"x\", \"y\") != 1"
   )
   expect_translation(
     con,
     str_ends(x, y),
-    "REGEXP_INSTR(`x`, `y`, 1, 1, 1) = (LENGTH(`x`) + 1)"
+    "REGEXP_INSTR(\"x\", \"y\", 1, 1, 1) = (LENGTH(\"x\") + 1)"
   )
   expect_translation(
     con,
     str_ends(x, y, negate = TRUE),
-    "REGEXP_INSTR(`x`, `y`, 1, 1, 1) != (LENGTH(`x`) + 1)"
+    "REGEXP_INSTR(\"x\", \"y\", 1, 1, 1) != (LENGTH(\"x\") + 1)"
   )
 
-  expect_translation(con, str_like(x, y), "`x` LIKE `y`")
-  expect_translation(con, str_ilike(x, y), "`x` ILIKE `y`")
+  expect_translation(con, str_like(x, y), "\"x\" LIKE \"y\"")
+  expect_translation(con, str_ilike(x, y), "\"x\" ILIKE \"y\"")
 })
 
 test_that("aggregates are translated correctly", {
@@ -140,65 +140,65 @@ test_that("aggregates are translated correctly", {
   expect_translation(
     con,
     cor(x, y),
-    "CORR(`x`, `y`)",
+    "CORR(\"x\", \"y\")",
     window = FALSE
   )
   expect_translation(
     con,
     cor(x, y),
-    "CORR(`x`, `y`) OVER ()",
+    "CORR(\"x\", \"y\") OVER ()",
     window = TRUE
   )
 
   expect_translation(
     con,
     cov(x, y),
-    "COVAR_SAMP(`x`, `y`)",
+    "COVAR_SAMP(\"x\", \"y\")",
     window = FALSE
   )
   expect_translation(
     con,
     cov(x, y),
-    "COVAR_SAMP(`x`, `y`) OVER ()",
+    "COVAR_SAMP(\"x\", \"y\") OVER ()",
     window = TRUE
   )
 
   expect_translation(
     con,
     all(x, na.rm = TRUE),
-    "BOOLAND_AGG(`x`)",
+    "BOOLAND_AGG(\"x\")",
     window = FALSE
   )
   expect_translation(
     con,
     all(x, na.rm = TRUE),
-    "BOOLAND_AGG(`x`) OVER ()",
+    "BOOLAND_AGG(\"x\") OVER ()",
     window = TRUE
   )
 
   expect_translation(
     con,
     any(x, na.rm = TRUE),
-    "BOOLOR_AGG(`x`)",
+    "BOOLOR_AGG(\"x\")",
     window = FALSE
   )
   expect_translation(
     con,
     any(x, na.rm = TRUE),
-    "BOOLOR_AGG(`x`) OVER ()",
+    "BOOLOR_AGG(\"x\") OVER ()",
     window = TRUE
   )
 
   expect_translation(
     con,
     sd(x, na.rm = TRUE),
-    "STDDEV(`x`)",
+    "STDDEV(\"x\")",
     window = FALSE
   )
   expect_translation(
     con,
     sd(x, na.rm = TRUE),
-    "STDDEV(`x`) OVER ()",
+    "STDDEV(\"x\") OVER ()",
     window = TRUE
   )
 })
@@ -206,74 +206,74 @@ test_that("aggregates are translated correctly", {
 test_that("snowflake mimics two argument log", {
   con <- simulate_snowflake()
 
-  expect_translation(con, log(x), "LN(`x`)")
-  expect_translation(con, log(x, 10), "LOG(10.0, `x`)")
-  expect_translation(con, log(x, 10L), "LOG(10, `x`)")
+  expect_translation(con, log(x), "LN(\"x\")")
+  expect_translation(con, log(x, 10), "LOG(10.0, \"x\")")
+  expect_translation(con, log(x, 10L), "LOG(10, \"x\")")
 })
 
 test_that("custom lubridate functions translated correctly", {
   con <- simulate_snowflake()
 
-  expect_translation(con, day(x), "EXTRACT(DAY FROM `x`)")
-  expect_translation(con, mday(x), "EXTRACT(DAY FROM `x`)")
-  expect_translation(con, yday(x), "EXTRACT('dayofyear', `x`)")
+  expect_translation(con, day(x), "EXTRACT(DAY FROM \"x\")")
+  expect_translation(con, mday(x), "EXTRACT(DAY FROM \"x\")")
+  expect_translation(con, yday(x), "EXTRACT('dayofyear', \"x\")")
   expect_translation(
     con,
     wday(x),
-    "EXTRACT('dayofweek', DATE(`x`) + 0) + 1"
+    "EXTRACT('dayofweek', DATE(\"x\") + 0) + 1"
   )
-  expect_translation(con, wday(x, label = TRUE), "DAYNAME(`x`)")
+  expect_translation(con, wday(x, label = TRUE), "DAYNAME(\"x\")")
   expect_translation(
     con,
     wday(x, label = TRUE, abbr = FALSE),
-    "DECODE(EXTRACT('dayofweek', `x`), 1, 'Monday', 2, 'Tuesday', 3, 'Wednesday', 4, 'Thursday', 5, 'Friday', 6, 'Saturday', 0, 'Sunday')"
+    "DECODE(EXTRACT('dayofweek', \"x\"), 1, 'Monday', 2, 'Tuesday', 3, 'Wednesday', 4, 'Thursday', 5, 'Friday', 6, 'Saturday', 0, 'Sunday')"
   )
   expect_translation(
     con,
     week(x),
-    "FLOOR((EXTRACT('dayofyear', `x`) - 1) / 7) + 1"
+    "FLOOR((EXTRACT('dayofyear', \"x\") - 1) / 7) + 1"
   )
-  expect_translation(con, isoweek(x), "EXTRACT('weekiso', `x`)")
-  expect_translation(con, month(x), "EXTRACT('month', `x`)")
+  expect_translation(con, isoweek(x), "EXTRACT('weekiso', \"x\")")
+  expect_translation(con, month(x), "EXTRACT('month', \"x\")")
   expect_translation(
     con,
     month(x, label = TRUE),
-    "MONTHNAME(`x`)"
+    "MONTHNAME(\"x\")"
   )
   expect_translation(
     con,
     month(x, label = TRUE, abbr = FALSE),
-    "DECODE(EXTRACT('month', `x`), 1, 'January', 2, 'February', 3, 'March', 4, 'April', 5, 'May', 6, 'June', 7, 'July', 8, 'August', 9, 'September', 10, 'October', 11, 'November', 12, 'December')"
+    "DECODE(EXTRACT('month', \"x\"), 1, 'January', 2, 'February', 3, 'March', 4, 'April', 5, 'May', 6, 'June', 7, 'July', 8, 'August', 9, 'September', 10, 'October', 11, 'November', 12, 'December')"
   )
-  expect_translation(con, quarter(x), "EXTRACT('quarter', `x`)")
+  expect_translation(con, quarter(x), "EXTRACT('quarter', \"x\")")
   expect_translation(
     con,
     quarter(x, with_year = TRUE),
-    "(EXTRACT('year', `x`) || '.' || EXTRACT('quarter', `x`))"
+    "(EXTRACT('year', \"x\") || '.' || EXTRACT('quarter', \"x\"))"
   )
   expect_error(
     translate_sql(quarter(x, fiscal_start = 2), con = con),
     class = "dbplyr_error_unsupported_arg"
   )
-  expect_translation(con, isoyear(x), "EXTRACT('year', `x`)")
+  expect_translation(con, isoyear(x), "EXTRACT('year', \"x\")")
 
-  expect_translation(con, seconds(x), "INTERVAL '`x` second'")
-  expect_translation(con, minutes(x), "INTERVAL '`x` minute'")
-  expect_translation(con, hours(x), "INTERVAL '`x` hour'")
-  expect_translation(con, days(x), "INTERVAL '`x` day'")
-  expect_translation(con, weeks(x), "INTERVAL '`x` week'")
-  expect_translation(con, months(x), "INTERVAL '`x` month'")
-  expect_translation(con, years(x), "INTERVAL '`x` year'")
+  expect_translation(con, seconds(x), "INTERVAL '\"x\" second'")
+  expect_translation(con, minutes(x), "INTERVAL '\"x\" minute'")
+  expect_translation(con, hours(x), "INTERVAL '\"x\" hour'")
+  expect_translation(con, days(x), "INTERVAL '\"x\" day'")
+  expect_translation(con, weeks(x), "INTERVAL '\"x\" week'")
+  expect_translation(con, months(x), "INTERVAL '\"x\" month'")
+  expect_translation(con, years(x), "INTERVAL '\"x\" year'")
 
   expect_translation(
     con,
     floor_date(x, "month"),
-    "DATE_TRUNC('month', `x`)"
+    "DATE_TRUNC('month', \"x\")"
   )
   expect_translation(
     con,
     floor_date(x, "week"),
-    "DATE_TRUNC('week', `x`)"
+    "DATE_TRUNC('week', \"x\")"
   )
 })
 
@@ -282,12 +282,12 @@ test_that("custom clock functions translated correctly", {
   expect_translation(
     con,
     add_years(x, 1),
-    "DATEADD(YEAR, 1.0, `x`)"
+    "DATEADD(YEAR, 1.0, \"x\")"
   )
   expect_translation(
     con,
     add_days(x, 1),
-    "DATEADD(DAY, 1.0, `x`)"
+    "DATEADD(DAY, 1.0, \"x\")"
   )
   expect_error(
     translate_sql(add_days(x, 1, "dots", "must", "be empty"), con = con),
@@ -301,27 +301,27 @@ test_that("custom clock functions translated correctly", {
   expect_translation(
     con,
     date_build(year_column, 1L, 1L),
-    "DATE_FROM_PARTS(`year_column`, 1, 1)"
+    "DATE_FROM_PARTS(\"year_column\", 1, 1)"
   )
   expect_translation(
     con,
     get_year(date_column),
-    "DATE_PART(YEAR, `date_column`)"
+    "DATE_PART(YEAR, \"date_column\")"
   )
   expect_translation(
     con,
     get_month(date_column),
-    "DATE_PART(MONTH, `date_column`)"
+    "DATE_PART(MONTH, \"date_column\")"
   )
   expect_translation(
     con,
     get_day(date_column),
-    "DATE_PART(DAY, `date_column`)"
+    "DATE_PART(DAY, \"date_column\")"
   )
   expect_translation(
     con,
     date_count_between(date_column_1, date_column_2, "day"),
-    "DATEDIFF(DAY, `date_column_1`, `date_column_2`)"
+    "DATEDIFF(DAY, \"date_column_1\", \"date_column_2\")"
   )
   expect_error(
     translate_sql(
@@ -353,12 +353,12 @@ test_that("difftime is translated correctly", {
   expect_translation(
     con,
     difftime(start_date, end_date, units = "days"),
-    "DATEDIFF(DAY, `end_date`, `start_date`)"
+    "DATEDIFF(DAY, \"end_date\", \"start_date\")"
   )
   expect_translation(
     con,
     difftime(start_date, end_date),
-    "DATEDIFF(DAY, `end_date`, `start_date`)"
+    "DATEDIFF(DAY, \"end_date\", \"start_date\")"
   )
 
   expect_error(
@@ -385,12 +385,12 @@ test_that("min() and max()", {
   expect_translation(
     con,
     min(x, na.rm = TRUE),
-    "MIN(`x`) OVER ()"
+    "MIN(\"x\") OVER ()"
   )
   expect_translation(
     con,
     max(x, na.rm = TRUE),
-    "MAX(`x`) OVER ()"
+    "MAX(\"x\") OVER ()"
   )
 
   # na.rm = FALSE is ignored
@@ -400,13 +400,13 @@ test_that("min() and max()", {
   expect_translation(
     con,
     min(x, na.rm = TRUE),
-    "MIN(`x`) OVER ()"
+    "MIN(\"x\") OVER ()"
   )
 
   expect_translation(
     con,
     max(x, na.rm = TRUE),
-    "MAX(`x`) OVER ()"
+    "MAX(\"x\") OVER ()"
   )
 })
 
@@ -421,12 +421,12 @@ test_that("pmin() and pmax() respect na.rm", {
   expect_translation(
     con,
     pmin(x, y, na.rm = TRUE),
-    "COALESCE(IFF(`x` <= `y`, `x`, `y`), `x`, `y`)"
+    "COALESCE(IFF(\"x\" <= \"y\", \"x\", \"y\"), \"x\", \"y\")"
   )
   expect_translation(
     con,
     pmax(x, y, na.rm = TRUE),
-    "COALESCE(IFF(`x` >= `y`, `x`, `y`), `x`, `y`)"
+    "COALESCE(IFF(\"x\" >= \"y\", \"x\", \"y\"), \"x\", \"y\")"
   )
 
   expect_snapshot(translate_sql(pmin(x, y, z, na.rm = TRUE), con = con))
@@ -436,12 +436,12 @@ test_that("pmin() and pmax() respect na.rm", {
   expect_translation(
     con,
     pmin(x, y, z, na.rm = FALSE),
-    "LEAST(`x`, `y`, `z`)"
+    "LEAST(\"x\", \"y\", \"z\")"
   )
   expect_translation(
     con,
     pmax(x, y, z, na.rm = FALSE),
-    "GREATEST(`x`, `y`, `z`)"
+    "GREATEST(\"x\", \"y\", \"z\")"
   )
 })
 
@@ -454,5 +454,5 @@ test_that("row_number() with and without group_by() and arrange(): unordered def
 
 test_that("correctly translates $", {
   con <- simulate_snowflake()
-  expect_translation(con, x$y, "`x`:`y`")
+  expect_translation(con, x$y, "\"x\":\"y\"")
 })

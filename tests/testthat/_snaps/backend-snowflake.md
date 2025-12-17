@@ -12,14 +12,14 @@
     Code
       translate_sql(pmin(x, y, z, na.rm = TRUE), con = con)
     Output
-      <SQL> COALESCE(IFF(COALESCE(IFF(`x` <= `y`, `x`, `y`), `x`, `y`) <= `z`, COALESCE(IFF(`x` <= `y`, `x`, `y`), `x`, `y`), `z`), COALESCE(IFF(`x` <= `y`, `x`, `y`), `x`, `y`), `z`)
+      <SQL> COALESCE(IFF(COALESCE(IFF("x" <= "y", "x", "y"), "x", "y") <= "z", COALESCE(IFF("x" <= "y", "x", "y"), "x", "y"), "z"), COALESCE(IFF("x" <= "y", "x", "y"), "x", "y"), "z")
 
 ---
 
     Code
       translate_sql(pmax(x, y, z, na.rm = TRUE), con = con)
     Output
-      <SQL> COALESCE(IFF(COALESCE(IFF(`x` >= `y`, `x`, `y`), `x`, `y`) >= `z`, COALESCE(IFF(`x` >= `y`, `x`, `y`), `x`, `y`), `z`), COALESCE(IFF(`x` >= `y`, `x`, `y`), `x`, `y`), `z`)
+      <SQL> COALESCE(IFF(COALESCE(IFF("x" >= "y", "x", "y"), "x", "y") >= "z", COALESCE(IFF("x" >= "y", "x", "y"), "x", "y"), "z"), COALESCE(IFF("x" >= "y", "x", "y"), "x", "y"), "z")
 
 # row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per empty_order)
 
@@ -27,8 +27,8 @@
       mutate(mf, rown = row_number())
     Output
       <SQL>
-      SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS `rown`
-      FROM `df`
+      SELECT "df".*, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS "rown"
+      FROM "df"
 
 ---
 
@@ -37,9 +37,9 @@
     Output
       <SQL>
       SELECT
-        `df`.*,
-        ROW_NUMBER() OVER (PARTITION BY `y` ORDER BY (SELECT NULL)) AS `rown`
-      FROM `df`
+        "df".*,
+        ROW_NUMBER() OVER (PARTITION BY "y" ORDER BY (SELECT NULL)) AS "rown"
+      FROM "df"
 
 ---
 
@@ -47,7 +47,7 @@
       mutate(arrange(mf, y), rown = row_number())
     Output
       <SQL>
-      SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY `y`) AS `rown`
-      FROM `df`
-      ORDER BY `y`
+      SELECT "df".*, ROW_NUMBER() OVER (ORDER BY "y") AS "rown"
+      FROM "df"
+      ORDER BY "y"
 

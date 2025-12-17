@@ -22,10 +22,10 @@
     Output
       <SQL>
       SELECT
-        `id`,
-        `group`,
-        LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY `id` DESC ROWS UNBOUNDED PRECEDING) AS `n1`
-      FROM `df`
+        "id",
+        "group",
+        LAST_VALUE("n1" IGNORE NULLS) OVER (ORDER BY "id" DESC ROWS UNBOUNDED PRECEDING) AS "n1"
+      FROM "df"
 
 ---
 
@@ -34,16 +34,16 @@
     Output
       <SQL>
       SELECT
-        `id`,
-        `group`,
-        LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY `id` ROWS UNBOUNDED PRECEDING) AS `n1`
+        "id",
+        "group",
+        LAST_VALUE("n1" IGNORE NULLS) OVER (ORDER BY "id" ROWS UNBOUNDED PRECEDING) AS "n1"
       FROM (
         SELECT
-          `id`,
-          `group`,
-          LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY `id` DESC ROWS UNBOUNDED PRECEDING) AS `n1`
-        FROM `df`
-      ) AS `q01`
+          "id",
+          "group",
+          LAST_VALUE("n1" IGNORE NULLS) OVER (ORDER BY "id" DESC ROWS UNBOUNDED PRECEDING) AS "n1"
+        FROM "df"
+      ) AS "q01"
 
 ---
 
@@ -52,16 +52,16 @@
     Output
       <SQL>
       SELECT
-        `id`,
-        `group`,
-        LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY `id` DESC ROWS UNBOUNDED PRECEDING) AS `n1`
+        "id",
+        "group",
+        LAST_VALUE("n1" IGNORE NULLS) OVER (ORDER BY "id" DESC ROWS UNBOUNDED PRECEDING) AS "n1"
       FROM (
         SELECT
-          `id`,
-          `group`,
-          LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY `id` ROWS UNBOUNDED PRECEDING) AS `n1`
-        FROM `df`
-      ) AS `q01`
+          "id",
+          "group",
+          LAST_VALUE("n1" IGNORE NULLS) OVER (ORDER BY "id" ROWS UNBOUNDED PRECEDING) AS "n1"
+        FROM "df"
+      ) AS "q01"
 
 # up-direction works with descending
 
@@ -87,10 +87,10 @@
     Output
       <SQL>
       SELECT
-        `id`,
-        `group`,
-        LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY `id` ROWS UNBOUNDED PRECEDING) AS `n1`
-      FROM `df`
+        "id",
+        "group",
+        LAST_VALUE("n1" IGNORE NULLS) OVER (ORDER BY "id" ROWS UNBOUNDED PRECEDING) AS "n1"
+      FROM "df"
 
 # groups are respected
 
@@ -116,10 +116,10 @@
     Output
       <SQL>
       SELECT
-        `id`,
-        `group`,
-        LAST_VALUE(`n1` IGNORE NULLS) OVER (PARTITION BY `group` ORDER BY `id` ROWS UNBOUNDED PRECEDING) AS `n1`
-      FROM `df`
+        "id",
+        "group",
+        LAST_VALUE("n1" IGNORE NULLS) OVER (PARTITION BY "group" ORDER BY "id" ROWS UNBOUNDED PRECEDING) AS "n1"
+      FROM "df"
 
 # fill errors on unsorted data
 
