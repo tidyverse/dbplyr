@@ -2,6 +2,8 @@
 
 ## dbplyr (development version)
 
+- [`sql_escape_string()`](https://dplyr.tidyverse.org/reference/backend_dbplyr.html)
+  now defaults to using `'`.
 - `simulate_*()` now uses (approximately) correct quoting for all
   backends, so the generated SQL looks more like what you’ll actually
   get when connected to a real database
