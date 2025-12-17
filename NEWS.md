@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* `distinct()` with computed columns now ignores grouping, matching dplyr's behavior (#1081).
 * `sql_escape_string()` now defaults to using `'`.
 * `simulate_*()` now uses (approximately) correct quoting for all backends, so the generated SQL looks more like what you'll actually get when connected to a real database (#1464).
 * `sql_infix()` no longer has a `con` argument since the connection needs to be determined at call time, not at definition time. 

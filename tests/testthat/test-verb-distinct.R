@@ -179,6 +179,16 @@ test_that("distinct can compute variables", {
   expect_equal(out |> collect(), tibble(z = 3))
 })
 
+test_that("distinct ignores groups when computing variables (#1081)", {
+  df <- tibble(g = c("a", "a", "b"), x = c(1, 2, 3))
+
+  db <- local_memdb_frame("df", g = c("a", "a", "b"), x = c(1, 2, 3))
+  db_distinct <- db |> group_by(g) |> distinct(n = n()) |> ungroup()
+
+  expect_snapshot(show_query(db_distinct))
+  expect_equal(collect(db_distinct), tibble(g = c("a", "b"), n = 3))
+})
+
 test_that("distinct can compute variables when .keep_all is TRUE", {
   out <- memdb_frame(x = c(2, 1), y = c(1, 2)) |>
     distinct(z = x + y, .keep_all = TRUE) |>

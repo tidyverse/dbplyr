@@ -112,7 +112,13 @@ add_computed_columns <- function(.data, vars, error_call = caller_env()) {
   needs_mutate <- have_name(vars) | !is_symbol
 
   if (any(needs_mutate)) {
-    out <- mutate(.data, !!!vars)
+    # Ungroup before mutate to match dplyr behavior: distinct() calculations
+    # apply to the entire dataset, not per-group (#1081)
+    grps <- op_grps(.data)
+    out <- .data |>
+      ungroup() |>
+      mutate(!!!vars) |>
+      group_by(!!!syms(grps))
     col_names <- names(exprs_auto_name(vars))
   } else {
     out <- .data
