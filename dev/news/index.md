@@ -2,6 +2,9 @@
 
 ## dbplyr (development version)
 
+- [`distinct()`](https://dplyr.tidyverse.org/reference/distinct.html)
+  with computed columns now ignores grouping, matching dplyr’s behavior
+  ([\#1081](https://github.com/tidyverse/dbplyr/issues/1081)).
 - [`sql_escape_string()`](https://dplyr.tidyverse.org/reference/backend_dbplyr.html)
   now defaults to using `'`.
 - `simulate_*()` now uses (approximately) correct quoting for all
