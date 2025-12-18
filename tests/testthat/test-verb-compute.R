@@ -8,25 +8,18 @@ test_that("compute doesn't change representation", {
 })
 
 test_that("compute can create indexes", {
-  mfs <- test_frame(x = 5:1, y = 1:5, z = 10)
+  # integration test to ensure that indexes argument passed all the way through
+  db <- local_memdb_frame("db1", x = 5:1, y = 1:5, z = 10)
 
-  mfs |>
-    lapply(\(df) df |> compute(indexes = c("x", "y"))) |>
-    expect_equal_tbls()
+  db |> compute(indexes = c("x", "y"), name = "db2")
+  indices <- DBI::dbGetQuery(memdb(), "PRAGMA index_list('db2');")
+  expect_equal(indices$name, c("db2_y", "db2_x"))
+  expect_equal(indices$unique, c(0, 0))
 
-  mfs |>
-    lapply(\(df) df |> compute(indexes = list("x", "y", c("x", "y")))) |>
-    expect_equal_tbls()
-
-  mfs |>
-    lapply(\(df) df |> compute(indexes = "x", unique_indexes = "y")) |>
-    expect_equal_tbls()
-
-  mfs |>
-    lapply(\(df) {
-      df |> compute(unique_indexes = list(c("x", "z"), c("y", "z")))
-    }) |>
-    expect_equal_tbls()
+  db |> compute(unique_indexes = c("x", "y"), name = "db3")
+  indices <- DBI::dbGetQuery(memdb(), "PRAGMA index_list('db3');")
+  expect_equal(indices$name, c("db3_y", "db3_x"))
+  expect_equal(indices$unique, c(1, 1))
 })
 
 test_that("unique index fails if values are duplicated", {
