@@ -91,7 +91,11 @@
       <SQL>
       SELECT "x"
       FROM (
-        SELECT "df".*, ROW_NUMBER() OVER (ORDER BY DBMS_RANDOM.VALUE()) AS "col01"
+        SELECT
+          "df".*,
+          CASE
+      WHEN (NOT(((DBMS_RANDOM.VALUE()) IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN (((DBMS_RANDOM.VALUE()) IS NULL)) THEN 1 ELSE 0 END) ORDER BY DBMS_RANDOM.VALUE())
+      END AS "col01"
         FROM "df"
       ) "q01"
       WHERE ("col01" <= 1)

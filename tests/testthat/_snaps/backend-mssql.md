@@ -430,7 +430,9 @@
         SELECT
           [df]]
       ].*,
-          ROW_NUMBER() OVER (ORDER BY RAND(CHECKSUM(NEWID()))) AS [col01]
+          CASE
+      WHEN (NOT(((RAND(CHECKSUM(NEWID()))) IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN (((RAND(CHECKSUM(NEWID()))) IS NULL)) THEN 1 ELSE 0 END) ORDER BY RAND(CHECKSUM(NEWID())))
+      END AS [col01]
         FROM [df]
       ) AS [q01]
       WHERE ([col01] <= 1)
