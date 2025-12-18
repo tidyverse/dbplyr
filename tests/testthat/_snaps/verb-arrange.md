@@ -26,7 +26,7 @@
       <SQL>
       SELECT "df".*
       FROM "df"
-      ORDER BY "b"
+      ORDER BY "b", "a"
     Code
       # remove ordered by
       select(arrange(lf, a), -a)
@@ -49,12 +49,14 @@
       <SQL>
       SELECT "df".*
       FROM "df"
+      ORDER BY "a"
     Code
       arrange(select(arrange(lf, a), -a))
     Output
       <SQL>
       SELECT "b"
       FROM "df"
+      ORDER BY "a"
     Code
       # use order
       mutate(select(arrange(lf, a), -a), c = lag(b))
@@ -98,7 +100,7 @@
         ORDER BY "a"
         LIMIT 1
       ) AS "q01"
-      ORDER BY "b"
+      ORDER BY "b", "a"
     Code
       # mutate
       arrange(mutate(lf, a = b), a)
@@ -121,7 +123,7 @@
       <SQL>
       SELECT 1.0 AS "a", "b"
       FROM "df"
-      ORDER BY "b"
+      ORDER BY "b", "a"
     Code
       mutate(arrange(mutate(lf, a = -a), a), a = -a)
     Condition

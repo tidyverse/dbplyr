@@ -7,12 +7,6 @@ test_that("remote_table returns name when it makes sense", {
     table_path("`refxiudlph`")
   )
 
-  # produces name after unarranging
-  expect_equal(
-    mf |> arrange(x) |> arrange() |> remote_table(),
-    table_path("`refxiudlph`")
-  )
-
   # produces name after compute()
   expect_false(is_null(
     mf |> mutate(x = x + 1) |> compute() |> remote_table()

@@ -43,17 +43,19 @@ add_arrange <- function(.data, dots, .by_group) {
   if (.by_group) {
     dots <- c(syms(op_grps(lazy_query)), dots)
   }
-  if (identical(dots, lazy_query$order_vars)) {
+
+  # Empty arrange() preserves existing ordering (like dplyr)
+  if (is_empty(dots)) {
     return(lazy_query)
   }
 
-  # `dots` must be an empty list so that `arrange()` removes the `order_vars`
-  dots <- dots %||% list()
+  # Prepend new ordering to existing ordering (like dplyr)
+  order_vars <- c(dots, op_sort(lazy_query))
 
   new_lazy_query <- lazy_select_query(
     x = lazy_query,
-    order_by = dots,
-    order_vars = dots
+    order_by = order_vars,
+    order_vars = order_vars
   )
 
   if (!is_lazy_select_query(lazy_query)) {
@@ -65,8 +67,8 @@ add_arrange <- function(.data, dots, .by_group) {
     return(new_lazy_query)
   }
 
-  lazy_query$order_vars <- dots
-  lazy_query$order_by <- dots
+  lazy_query$order_vars <- order_vars
+  lazy_query$order_by <- order_vars
   lazy_query
 }
 

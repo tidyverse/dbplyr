@@ -9,20 +9,21 @@ tbl_sql(subclass, src, from, ..., vars = NULL, check_from = deprecated())
 \arguments{
 \item{subclass}{name of subclass}
 
-\item{src}{A \code{DBIConnection} object produced by \code{DBI::dbConnect()}.}
+\item{src}{A \code{DBIConnection} object produced by \code{\link[DBI:dbConnect]{DBI::dbConnect()}}.}
 
 \item{from}{Either a table identifier or a literal \code{\link[=sql]{sql()}} string.
 
-Use a string to identify a table in the current schema/catalog. We
-recommend using \code{I()} to identify a table outside the default catalog or
-schema, e.g. \code{I("schema.table")} or \code{I("catalog.schema.table")}. You can
-also use \code{\link[=in_schema]{in_schema()}}/\code{\link[=in_catalog]{in_catalog()}} or \code{\link[DBI:Id]{DBI::Id()}}.}
+Use a string to identify a table in the current schema/catalog or
+\code{I()} for a table elsewhere, e.g. \code{I("schema.table")} or
+\code{I("catalog.schema.table")}. For backward compatibility, you can also use
+\code{\link[=in_schema]{in_schema()}}/\code{\link[=in_catalog]{in_catalog()}} or \code{\link[DBI:Id]{DBI::Id()}}.}
 
 \item{...}{needed for agreement with generic. Not otherwise used.}
 
 \item{vars}{Optionally, provide a character vector of column names. If
 not supplied, will be retrieved from the database by running a simple
-query. Mainly useful for better performance when creating many \code{tbl}s.}
+query. This argument is mainly useful for better performance when creating
+many \code{tbl}s with known variables.}
 
 \item{check_from}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}}
 }
