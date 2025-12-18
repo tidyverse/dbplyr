@@ -161,11 +161,8 @@ many <code>tbl</code>s with known variables.</p></dd>
 <span class="r-in"><span>  <span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `cyl`, AVG(`mpg`)<span style="color: #0000BB;"> AS </span>`mpg`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> (</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span> `mtcars`.*</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `mtcars`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">WHERE</span> (`vs` = 1.0)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ) <span style="color: #0000BB;">AS </span>`q01`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `mtcars`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">WHERE</span> (`vs` = 1.0)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">GROUP BY</span> `cyl`</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

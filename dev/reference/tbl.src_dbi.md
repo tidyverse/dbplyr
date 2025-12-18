@@ -103,10 +103,7 @@ mtcars_db |>
   show_query()
 #> <SQL>
 #> SELECT `cyl`, AVG(`mpg`) AS `mpg`
-#> FROM (
-#>   SELECT `mtcars`.*
-#>   FROM `mtcars`
-#>   WHERE (`vs` = 1.0)
-#> ) AS `q01`
+#> FROM `mtcars`
+#> WHERE (`vs` = 1.0)
 #> GROUP BY `cyl`
 ```

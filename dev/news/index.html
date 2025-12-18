@@ -56,7 +56,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li>
+<ul><li>A <code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter()</a></code> followed by a <code><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise()</a></code> is once again inlined correctly (<a href="https://github.com/tidyverse/dbplyr/issues/1707" class="external-link">#1707</a>).</li>
+<li>
 <code><a href="../reference/src_memdb.html">src_memdb()</a></code> and <code><a href="../reference/src_memdb.html">tbl_memdb()</a></code> are deprecated; use <code><a href="../reference/memdb.html">memdb()</a></code> and <code>copy_to(memdb(), df)</code> instead. New <code><a href="../reference/memdb.html">local_memdb_frame()</a></code> for use in tests.</li>
 <li>
 <code><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange()</a></code> now applies consecutively, matching dplyr’s behavior: <code>arrange(y) |&gt; arrange(x)</code> is now equivalent to <code>arrange(x, y)</code>. Empty <code><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange()</a></code> now preserves existing ordering instead of clearing it (<a href="https://github.com/tidyverse/dbplyr/issues/789" class="external-link">#789</a>).</li>

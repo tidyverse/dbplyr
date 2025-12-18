@@ -2,6 +2,11 @@
 
 ## dbplyr (development version)
 
+- A [`filter()`](https://dplyr.tidyverse.org/reference/filter.html)
+  followed by a
+  [`summarise()`](https://dplyr.tidyverse.org/reference/summarise.html)
+  is once again inlined correctly
+  ([\#1707](https://github.com/tidyverse/dbplyr/issues/1707)).
 - [`src_memdb()`](https://dbplyr.tidyverse.org/dev/reference/src_memdb.md)
   and
   [`tbl_memdb()`](https://dbplyr.tidyverse.org/dev/reference/src_memdb.md)
