@@ -86,7 +86,17 @@ sql_query_join(
   lvl = 0
 )
 
-sql_query_multi_join(con, x, joins, table_names, by_list, select, ..., lvl = 0)
+sql_query_multi_join(
+  con,
+  x,
+  joins,
+  table_names,
+  by_list,
+  select,
+  ...,
+  distinct = FALSE,
+  lvl = 0
+)
 
 sql_query_semi_join(con, x, y, anti, by, where, vars, ..., lvl = 0)
 

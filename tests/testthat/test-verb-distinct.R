@@ -151,6 +151,17 @@ test_that("distinct() produces optimized SQL", {
   expect_equal(out$lazy_query$x$limit, 2)
 })
 
+test_that("distinct() after join is inlined", {
+  lf1 <- lazy_frame(x = 1, y = 1)
+  lf2 <- lazy_frame(x = 1, z = 2)
+
+  out <- lf1 |>
+    left_join(lf2, by = "x") |>
+    distinct()
+  expect_s3_class(out$lazy_query, "lazy_multi_join_query")
+  expect_snapshot(show_query(out))
+})
+
 # sql-render --------------------------------------------------------------
 
 test_that("distinct adds DISTINCT suffix", {
