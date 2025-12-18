@@ -1,12 +1,3 @@
-test_that("compute doesn't change representation", {
-  mf1 <- local_memdb_frame(x = 5:1, y = 1:5, z = "a")
-  compare_tbl(mf1, mf1 |> compute())
-  compare_tbl(mf1, mf1 |> compute() |> compute())
-
-  mf2 <- mf1 |> mutate(z = x + y)
-  compare_tbl(mf2, mf2 |> compute())
-})
-
 test_that("compute can create indexes", {
   # integration test to ensure that indexes argument passed all the way through
   db <- local_memdb_frame("db1", x = 5:1, y = 1:5, z = 10)

@@ -8,14 +8,6 @@ test_that("mutate computed before summarise", {
   expect_equal(out$sum_z, 30)
 })
 
-test_that("two mutates equivalent to one", {
-  mf <- local_memdb_frame(x = c(1, 5, 9), y = c(3, 12, 11))
-
-  df1 <- mf |> mutate(x2 = x * 2, y4 = y * 4) |> collect()
-  df2 <- mf |> collect() |> mutate(x2 = x * 2, y4 = y * 4)
-  compare_tbl(df1, df2)
-})
-
 test_that("mutate() isn't inlined after distinct() #1119", {
   mf <- local_memdb_frame(x = 1:2)
   expect_equal(

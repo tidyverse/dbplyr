@@ -31,7 +31,7 @@
     Code
       sql_query_wrap(con, sql("SELECT * FROM foo"))
     Output
-      <SQL> (SELECT * FROM foo) AS "q04"
+      <SQL> (SELECT * FROM foo) AS "q01"
 
 # sql_table_index generates expected SQL
 

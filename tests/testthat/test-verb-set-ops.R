@@ -21,7 +21,7 @@ test_that("basic set ops work as expected", {
   db2 <- local_memdb_frame("db2", x = c(1, 2))
 
   expect_equal(sort(pull(union(db1, db2))), c(1, 2, 3))
-  expect_equal(sort(pull(union_all(db1, db2))), c(1, 2, 2, 3))
+  expect_equal(sort(pull(union_all(db1, db2))), c(1, 1, 2, 3))
   expect_equal(sort(pull(intersect(db1, db2))), 1)
   expect_equal(sort(pull(setdiff(db1, db2))), 3)
   expect_equal(sort(pull(setdiff(db2, db1))), 2)

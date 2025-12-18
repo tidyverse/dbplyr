@@ -22,6 +22,8 @@ test_that("analyse/explain sql generates expected SQL", {
 })
 
 test_that("sql_query_wrap generates expected SQL", {
+  unique_subquery_name_reset()
+
   con <- simulate_dbi()
   expect_snapshot(sql_query_wrap(con, ident("table")))
   expect_snapshot(sql_query_wrap(con, in_schema("schema", "tbl")))
