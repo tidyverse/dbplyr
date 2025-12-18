@@ -25,6 +25,7 @@ lazy_multi_join_query(
   joins,
   table_names,
   vars,
+  where = list(),
   group_vars = op_grps(x),
   order_vars = op_sort(x),
   frame = op_frame(x),
@@ -38,6 +39,7 @@ lazy_rf_join_query(
   by,
   table_names,
   vars,
+  where = list(),
   group_vars = op_grps(x),
   order_vars = op_sort(x),
   frame = op_frame(x),
@@ -107,7 +109,8 @@ join_query(
   type = "inner",
   by = NULL,
   suffix = c(".x", ".y"),
-  na_matches = FALSE
+  na_matches = FALSE,
+  where = NULL
 )
 
 select_query(

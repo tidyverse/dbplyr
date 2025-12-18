@@ -83,10 +83,21 @@ sql_query_join(
   by = NULL,
   na_matches = FALSE,
   ...,
+  where = NULL,
   lvl = 0
 )
 
-sql_query_multi_join(con, x, joins, table_names, by_list, select, ..., lvl = 0)
+sql_query_multi_join(
+  con,
+  x,
+  joins,
+  table_names,
+  by_list,
+  select,
+  ...,
+  where = NULL,
+  lvl = 0
+)
 
 sql_query_semi_join(con, x, y, anti, by, where, vars, ..., lvl = 0)
 
