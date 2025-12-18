@@ -72,9 +72,9 @@ test_that("can retrieve query, src and con metadata", {
 test_that("last_sql() retrieves the most recent query", {
   lf <- lazy_frame(x = 1:3, y = c("a", "b", "c"))
 
-  lf |> filter(x > 1) |> show_query()
+  capture.output(lf |> filter(x > 1) |> show_query())
   expect_match(last_sql(), "WHERE")
 
-  lf |> mutate(z = x + 1) |> show_query()
+  capture.output(lf |> mutate(z = x + 1) |> show_query())
   expect_match(last_sql(), "\\+ 1")
 })
