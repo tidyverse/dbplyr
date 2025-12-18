@@ -5,7 +5,7 @@
 ### Connecting, copying, and retrieving data
 
 - [`tbl(`*`<src_dbi>`*`)`](https://dbplyr.tidyverse.org/dev/reference/tbl.src_dbi.md)
-  : Use dplyr verbs with a remote database table
+  : Create a lazy query backed by a database
 - [`collapse(`*`<tbl_sql>`*`)`](https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.md)
   : Collapse a query into a subquery
 - [`collect(`*`<tbl_sql>`*`)`](https://dbplyr.tidyverse.org/dev/reference/collect.tbl_sql.md)

@@ -87,10 +87,10 @@ method.</p>
 
 <dt id="arg-from">from<a class="anchor" aria-label="anchor" href="#arg-from"></a></dt>
 <dd><p>Either a table identifier or a literal <code><a href="sql.html">sql()</a></code> string.</p>
-<p>Use a string to identify a table in the current schema/catalog. We
-recommend using <code><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I()</a></code> to identify a table outside the default catalog or
-schema, e.g. <code>I("schema.table")</code> or <code>I("catalog.schema.table")</code>. You can
-also use <code><a href="in_schema.html">in_schema()</a></code>/<code><a href="in_schema.html">in_catalog()</a></code> or <code><a href="https://dbi.r-dbi.org/reference/Id.html" class="external-link">DBI::Id()</a></code>.</p></dd>
+<p>Use a string to identify a table in the current schema/catalog or
+<code><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I()</a></code> for a table elsewhere, e.g. <code>I("schema.table")</code> or
+<code>I("catalog.schema.table")</code>. For backward compatibility, you can also use
+<code><a href="in_schema.html">in_schema()</a></code>/<code><a href="in_schema.html">in_catalog()</a></code> or <code><a href="https://dbi.r-dbi.org/reference/Id.html" class="external-link">DBI::Id()</a></code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -100,7 +100,8 @@ also use <code><a href="in_schema.html">in_schema()</a></code>/<code><a href="in
 <dt id="arg-vars">vars<a class="anchor" aria-label="anchor" href="#arg-vars"></a></dt>
 <dd><p>Optionally, provide a character vector of column names. If
 not supplied, will be retrieved from the database by running a simple
-query. Mainly useful for better performance when creating many <code>tbl</code>s.</p></dd>
+query. This argument is mainly useful for better performance when creating
+many <code>tbl</code>s with known variables.</p></dd>
 
 
 <dt id="arg-check-from">check_from<a class="anchor" aria-label="anchor" href="#arg-check-from"></a></dt>

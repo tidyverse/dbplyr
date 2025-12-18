@@ -28,10 +28,10 @@ tbl_sql(subclass, src, from, ..., vars = NULL, check_from = deprecated())
   Either a table identifier or a literal
   [`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md) string.
 
-  Use a string to identify a table in the current schema/catalog. We
-  recommend using [`I()`](https://rdrr.io/r/base/AsIs.html) to identify
-  a table outside the default catalog or schema, e.g.
-  `I("schema.table")` or `I("catalog.schema.table")`. You can also use
+  Use a string to identify a table in the current schema/catalog or
+  [`I()`](https://rdrr.io/r/base/AsIs.html) for a table elsewhere, e.g.
+  `I("schema.table")` or `I("catalog.schema.table")`. For backward
+  compatibility, you can also use
   [`in_schema()`](https://dbplyr.tidyverse.org/dev/reference/in_schema.md)/[`in_catalog()`](https://dbplyr.tidyverse.org/dev/reference/in_schema.md)
   or [`DBI::Id()`](https://dbi.r-dbi.org/reference/Id.html).
 
@@ -43,7 +43,8 @@ tbl_sql(subclass, src, from, ..., vars = NULL, check_from = deprecated())
 
   Optionally, provide a character vector of column names. If not
   supplied, will be retrieved from the database by running a simple
-  query. Mainly useful for better performance when creating many `tbl`s.
+  query. This argument is mainly useful for better performance when
+  creating many `tbl`s with known variables.
 
 - check_from:
 
