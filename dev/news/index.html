@@ -56,7 +56,9 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li>Internal testing functions <code>src_test()</code>, <code>test_frame()</code> and <code>test_load()</code>, <code>test_register_src()</code> and <code>test_register_con()</code> have been removed.</li>
+<ul><li>
+<code>slice_*()</code> now handles missing values in line with the documentation, i.e. they are always removed (<a href="https://github.com/tidyverse/dbplyr/issues/1599" class="external-link">#1599</a>).</li>
+<li>Internal testing functions <code>src_test()</code>, <code>test_frame()</code> and <code>test_load()</code>, <code>test_register_src()</code> and <code>test_register_con()</code> have been removed.</li>
 <li>A <code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter()</a></code> followed by a <code><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise()</a></code> is once again inlined correctly (<a href="https://github.com/tidyverse/dbplyr/issues/1707" class="external-link">#1707</a>).</li>
 <li>
 <code><a href="../reference/src_memdb.html">src_memdb()</a></code> and <code><a href="../reference/src_memdb.html">tbl_memdb()</a></code> are deprecated; use <code><a href="../reference/memdb.html">memdb()</a></code> and <code>copy_to(memdb(), df)</code> instead. New <code><a href="../reference/memdb.html">local_memdb_frame()</a></code> for use in tests.</li>

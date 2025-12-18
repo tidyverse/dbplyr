@@ -2,6 +2,9 @@
 
 ## dbplyr (development version)
 
+- `slice_*()` now handles missing values in line with the documentation,
+  i.e. they are always removed
+  ([\#1599](https://github.com/tidyverse/dbplyr/issues/1599)).
 - Internal testing functions `src_test()`, `test_frame()` and
   `test_load()`, `test_register_src()` and `test_register_con()` have
   been removed.
