@@ -2,6 +2,9 @@
 
 ## dbplyr (development version)
 
+- Internal testing functions `src_test()`, `test_frame()` and
+  `test_load()`, `test_register_src()` and `test_register_con()` have
+  been removed.
 - A [`filter()`](https://dplyr.tidyverse.org/reference/filter.html)
   followed by a
   [`summarise()`](https://dplyr.tidyverse.org/reference/summarise.html)
