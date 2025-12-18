@@ -1,5 +1,5 @@
 test_that("copy = 'inline' works", {
-  df1 <- local_memdb_frame("df", x = 1:3, y = c("a", "b", "c"))
+  df1 <- local_memdb_frame(x = 1:3, y = c("a", "b", "c"))
   df2 <- tibble(x = c(3:4), y = c("d", "d"))
 
   out <- rows_insert(df1, df2, by = "x", copy = "inline", conflict = "ignore")
@@ -37,7 +37,7 @@ test_that("rows_insert() checks arguments", {
     ))
   )
 
-  df <- local_memdb_frame("df", x = 1)
+  df <- local_memdb_frame(x = 1)
   expect_snapshot(
     error = TRUE,
     (df |>
@@ -56,8 +56,8 @@ test_that("rows_insert() checks arguments", {
 test_that("`rows_insert()` works with empty `by`", {
   expect_message(
     rows_insert(
-      lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
-      lazy_frame(x = 1:3, .name = "df_y"),
+      lazy_frame(x = 1:3, y = 11:13),
+      lazy_frame(x = 1:3),
       in_place = FALSE,
       conflict = "ignore"
     ),
@@ -91,11 +91,11 @@ test_that("`rows_insert()` works with `in_place = FALSE`", {
     )
   )
 
-  df <- local_memdb_frame("df", x = 1:3, y = 11:13)
+  df <- local_memdb_frame(x = 1:3, y = 11:13)
   expect_equal(
     rows_insert(
       df,
-      local_memdb_frame("df2", x = 3:4, y = 23:24),
+      local_memdb_frame(x = 3:4, y = 23:24),
       by = "x",
       conflict = "ignore",
       in_place = FALSE
@@ -110,8 +110,8 @@ test_that("`rows_insert()` works with `in_place = FALSE`", {
 test_that("`rows_insert()` works with `in_place = FALSE` and `returning`", {
   expect_equal(
     rows_insert(
-      local_memdb_frame("df1", x = 1:3, y = 11:13),
-      local_memdb_frame("df2", x = 3:4, y = 23:24),
+      local_memdb_frame(x = 1:3, y = 11:13),
+      local_memdb_frame(x = 3:4, y = 23:24),
       by = "x",
       conflict = "ignore",
       in_place = FALSE,
@@ -124,8 +124,8 @@ test_that("`rows_insert()` works with `in_place = FALSE` and `returning`", {
   # all `x` columns are present
   expect_equal(
     rows_insert(
-      local_memdb_frame("df3", x = 1:3, y = 11:13),
-      local_memdb_frame("df4", x = 3:4),
+      local_memdb_frame(x = 1:3, y = 11:13),
+      local_memdb_frame(x = 3:4),
       by = "x",
       conflict = "ignore",
       in_place = FALSE,
@@ -147,10 +147,10 @@ test_that("`rows_insert()` works with `in_place = TRUE`", {
     ))
   )
 
-  df <- local_memdb_frame("df5", x = 1:3, y = 11:13)
+  df <- local_memdb_frame(x = 1:3, y = 11:13)
   rows_insert(
     df,
-    local_memdb_frame("df6", x = 3:4, y = 23:24),
+    local_memdb_frame(x = 3:4, y = 23:24),
     by = "x",
     conflict = "ignore",
     in_place = TRUE
@@ -161,10 +161,10 @@ test_that("`rows_insert()` works with `in_place = TRUE`", {
 test_that("`rows_insert()` with `in_place = TRUE` and `returning`", {
   skip_if_not_installed("RSQLite", "2.2.8")
 
-  df <- local_memdb_frame("df1", x = 1:3, y = 11:13)
+  df <- local_memdb_frame(x = 1:3, y = 11:13)
   df_inserted <- rows_insert(
     df,
-    local_memdb_frame("df2", x = 3:4, y = 23:24),
+    local_memdb_frame(x = 3:4, y = 23:24),
     by = "x",
     conflict = "ignore",
     in_place = TRUE,
@@ -264,11 +264,11 @@ test_that("`rows_append()` works with `in_place = FALSE`", {
     )
   )
 
-  df <- local_memdb_frame("df1", x = 1:3, y = 11:13)
+  df <- local_memdb_frame(x = 1:3, y = 11:13)
   expect_equal(
     rows_append(
       df,
-      local_memdb_frame("df2", x = 3:4, y = 23:24),
+      local_memdb_frame(x = 3:4, y = 23:24),
       in_place = FALSE
     ) |>
       collect(),
@@ -281,8 +281,8 @@ test_that("`rows_append()` works with `in_place = FALSE`", {
 test_that("`rows_append()` works with `in_place = FALSE` and `returning`", {
   expect_equal(
     rows_append(
-      local_memdb_frame("df1", x = 1:3, y = 11:13),
-      local_memdb_frame("df2", x = 3:4, y = 23:24),
+      local_memdb_frame(x = 1:3, y = 11:13),
+      local_memdb_frame(x = 3:4, y = 23:24),
       in_place = FALSE,
       returning = everything()
     ) |>
@@ -293,8 +293,8 @@ test_that("`rows_append()` works with `in_place = FALSE` and `returning`", {
   # all `x` columns are present
   expect_equal(
     rows_append(
-      local_memdb_frame("df3", x = 1:3, y = 11:13),
-      local_memdb_frame("df4", x = 3:4),
+      local_memdb_frame(x = 1:3, y = 11:13),
+      local_memdb_frame(x = 3:4),
       in_place = FALSE,
       returning = everything()
     ) |>
@@ -313,10 +313,10 @@ test_that("`rows_append()` works with `in_place = TRUE`", {
     ))
   )
 
-  df <- local_memdb_frame("df1", x = 1:3, y = 11:13)
+  df <- local_memdb_frame(x = 1:3, y = 11:13)
   rows_append(
     df,
-    local_memdb_frame("df2", x = 3:4, y = 23:24),
+    local_memdb_frame(x = 3:4, y = 23:24),
     in_place = TRUE
   )
   expect_equal(df |> collect(), tibble(x = c(1:3, 3:4), y = c(11:13, 23:24)))
@@ -325,10 +325,10 @@ test_that("`rows_append()` works with `in_place = TRUE`", {
 test_that("`rows_append()` with `in_place = TRUE` and `returning`", {
   skip_if_not_installed("RSQLite", "2.2.8")
 
-  df <- local_memdb_frame("df1", x = 1:3, y = 11:13)
+  df <- local_memdb_frame(x = 1:3, y = 11:13)
   df_inserted <- rows_append(
     df,
-    local_memdb_frame("df2", x = 3:4, y = 23:24),
+    local_memdb_frame(x = 3:4, y = 23:24),
     in_place = TRUE,
     returning = everything()
   )
@@ -432,7 +432,7 @@ test_that("arguments are checked", {
     ))
   )
 
-  df <- local_memdb_frame("df", x = 1)
+  df <- local_memdb_frame(x = 1)
   expect_snapshot(
     error = TRUE,
     (df |>
@@ -442,11 +442,11 @@ test_that("arguments are checked", {
 })
 
 test_that("`rows_update()` returns early if no column to update", {
-  lf <- lazy_frame(x = 1:3, y = 11:13, .name = "df_x")
+  lf <- lazy_frame(x = 1:3, y = 11:13)
   expect_equal(
     rows_update(
       lf,
-      lazy_frame(x = 1:3, .name = "df_y"),
+      lazy_frame(x = 1:3),
       by = "x",
       unmatched = "ignore",
       in_place = FALSE
@@ -454,11 +454,11 @@ test_that("`rows_update()` returns early if no column to update", {
     lf
   )
 
-  db <- local_memdb_frame("df1", x = 1:3, y = 11:13)
+  db <- local_memdb_frame(x = 1:3, y = 11:13)
   expect_equal(
     rows_update(
       db,
-      local_memdb_frame("df2", x = 1:3),
+      local_memdb_frame(x = 1:3),
       by = "x",
       unmatched = "ignore",
       in_place = FALSE
@@ -470,7 +470,7 @@ test_that("`rows_update()` returns early if no column to update", {
   expect_equal(
     rows_update(
       db,
-      local_memdb_frame("df3", x = 1:3),
+      local_memdb_frame(x = 1:3),
       by = "x",
       unmatched = "ignore",
       in_place = TRUE
@@ -483,8 +483,8 @@ test_that("`rows_update()` returns early if no column to update", {
 test_that("`rows_update()` works with empty `by`", {
   expect_message(
     rows_update(
-      lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
-      lazy_frame(x = 1:3, .name = "df_y"),
+      lazy_frame(x = 1:3, y = 11:13),
+      lazy_frame(x = 1:3),
       unmatched = "ignore",
       in_place = FALSE
     ),
@@ -503,11 +503,11 @@ test_that("`rows_update()` works with `in_place = FALSE`", {
     )
   )
 
-  df <- local_memdb_frame("df1", x = 1:3, y = 11:13)
+  df <- local_memdb_frame(x = 1:3, y = 11:13)
   expect_equal(
     rows_update(
       df,
-      local_memdb_frame("df2", x = 2:3, y = 22:23),
+      local_memdb_frame(x = 2:3, y = 22:23),
       by = "x",
       unmatched = "ignore",
       in_place = FALSE
@@ -522,8 +522,8 @@ test_that("`rows_update()` works with `in_place = FALSE`", {
 test_that("`rows_update()` works with `in_place = FALSE` and `returning`", {
   expect_equal(
     rows_update(
-      local_memdb_frame("df1", x = 1:3, y = 11:13),
-      local_memdb_frame("df2", x = 2:3, y = 22:23),
+      local_memdb_frame(x = 1:3, y = 11:13),
+      local_memdb_frame(x = 2:3, y = 22:23),
       by = "x",
       unmatched = "ignore",
       in_place = FALSE,
@@ -546,10 +546,10 @@ test_that("`rows_update()` works with `in_place = TRUE`", {
     ))
   )
 
-  df <- local_memdb_frame("df1", x = 1:3, y = 11:13)
+  df <- local_memdb_frame(x = 1:3, y = 11:13)
   rows_update(
     df,
-    local_memdb_frame("df2", x = 2:3, y = 22:23),
+    local_memdb_frame(x = 2:3, y = 22:23),
     by = "x",
     unmatched = "ignore",
     in_place = TRUE
@@ -561,10 +561,10 @@ test_that("`rows_update()` works with `in_place = TRUE`", {
 test_that("`rows_update()` with `in_place = TRUE` and `returning`", {
   skip_if_not_installed("RSQLite", "2.2.8")
 
-  df <- local_memdb_frame("df1", x = 1:3, y = 11:13)
+  df <- local_memdb_frame(x = 1:3, y = 11:13)
   df_updated <- rows_update(
     df,
-    local_memdb_frame("df2", x = 2:4, y = 22:24),
+    local_memdb_frame(x = 2:4, y = 22:24),
     by = "x",
     unmatched = "ignore",
     in_place = TRUE,
@@ -618,8 +618,8 @@ test_that("`rows_patch()` returns early if no column to update", {
 
   expect_equal(
     rows_patch(
-      local_memdb_frame("df1", x = 1:3, y = c(11, 12, NA)),
-      local_memdb_frame("df2", x = 1:3),
+      local_memdb_frame(x = 1:3, y = c(11, 12, NA)),
+      local_memdb_frame(x = 1:3),
       by = "x",
       unmatched = "ignore",
       in_place = FALSE
@@ -630,8 +630,8 @@ test_that("`rows_patch()` returns early if no column to update", {
 
   expect_equal(
     rows_patch(
-      local_memdb_frame("df3", x = 1:3, y = c(11, 12, NA)),
-      local_memdb_frame("df4", x = 1:3),
+      local_memdb_frame(x = 1:3, y = c(11, 12, NA)),
+      local_memdb_frame(x = 1:3),
       by = "x",
       unmatched = "ignore",
       in_place = TRUE
@@ -644,8 +644,8 @@ test_that("`rows_patch()` returns early if no column to update", {
 test_that("`rows_patch()` works with empty `by`", {
   expect_message(
     rows_patch(
-      lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"),
-      lazy_frame(x = 1:3, .name = "df_y"),
+      lazy_frame(x = 1:3, y = c(11, 12, NA)),
+      lazy_frame(x = 1:3),
       unmatched = "ignore",
       in_place = FALSE
     ),
@@ -664,11 +664,11 @@ test_that("`rows_patch()` works with `in_place = FALSE`", {
     )
   )
 
-  df <- local_memdb_frame("df1", x = 1:3, y = c(11, 12, NA))
+  df <- local_memdb_frame(x = 1:3, y = c(11, 12, NA))
   expect_equal(
     rows_patch(
       df,
-      local_memdb_frame("df2", x = 2:3, y = 22:23),
+      local_memdb_frame(x = 2:3, y = 22:23),
       by = "x",
       unmatched = "ignore",
       in_place = FALSE
@@ -691,11 +691,11 @@ test_that("`rows_patch()` works with multiple columns to update", {
     )
   )
 
-  df <- local_memdb_frame("df1", x = 1:3, y = c(11, 12, NA), z = c(31, NA, 33))
+  df <- local_memdb_frame(x = 1:3, y = c(11, 12, NA), z = c(31, NA, 33))
   expect_equal(
     rows_patch(
       df,
-      local_memdb_frame("df2", x = 2:3, y = 22:23, z = 42:43),
+      local_memdb_frame(x = 2:3, y = 22:23, z = 42:43),
       by = "x",
       unmatched = "ignore",
       in_place = FALSE
@@ -713,8 +713,8 @@ test_that("`rows_patch()` works with multiple columns to update", {
 test_that("`rows_patch()` works with `in_place = FALSE` and `returning`", {
   expect_equal(
     rows_patch(
-      local_memdb_frame("df1", x = 1:3, y = c(11, 12, NA)),
-      local_memdb_frame("df2", x = 2:3, y = 22:23),
+      local_memdb_frame(x = 1:3, y = c(11, 12, NA)),
+      local_memdb_frame(x = 2:3, y = 22:23),
       by = "x",
       unmatched = "ignore",
       in_place = FALSE,
@@ -737,10 +737,10 @@ test_that("`rows_patch()` works with `in_place = TRUE`", {
     ))
   )
 
-  df <- local_memdb_frame("df1", x = 1:3, y = c(11, 12, NA))
+  df <- local_memdb_frame(x = 1:3, y = c(11, 12, NA))
   rows_patch(
     df,
-    local_memdb_frame("df2", x = 2:3, y = 22:23),
+    local_memdb_frame(x = 2:3, y = 22:23),
     by = "x",
     unmatched = "ignore",
     in_place = TRUE
@@ -752,10 +752,10 @@ test_that("`rows_patch()` works with `in_place = TRUE`", {
 test_that("`rows_patch()` works with `in_place = TRUE` and `returning`", {
   skip_if_not_installed("RSQLite", "2.2.8")
 
-  df <- local_memdb_frame("df1", x = 1:3, y = c(11, 12, NA))
+  df <- local_memdb_frame(x = 1:3, y = c(11, 12, NA))
   df_patched <- rows_patch(
     df,
-    local_memdb_frame("df2", x = 2:4, y = 22:24),
+    local_memdb_frame(x = 2:4, y = 22:24),
     by = "x",
     unmatched = "ignore",
     in_place = TRUE,
@@ -782,8 +782,8 @@ test_that("`rows_upsert()` returns early if no column to update", {
 
   expect_equal(
     rows_upsert(
-      local_memdb_frame("df1", x = 1:3, y = 11:13),
-      local_memdb_frame("df2", x = 2:4),
+      local_memdb_frame(x = 1:3, y = 11:13),
+      local_memdb_frame(x = 2:4),
       by = "x",
       in_place = FALSE
     ) |>
@@ -793,8 +793,8 @@ test_that("`rows_upsert()` returns early if no column to update", {
 
   expect_equal(
     rows_upsert(
-      local_memdb_frame("df3", x = 1:3, y = 11:13),
-      local_memdb_frame("df4", x = 2:4),
+      local_memdb_frame(x = 1:3, y = 11:13),
+      local_memdb_frame(x = 2:4),
       by = "x",
       in_place = TRUE
     ) |>
@@ -806,8 +806,8 @@ test_that("`rows_upsert()` returns early if no column to update", {
 test_that("`rows_upsert()` works with empty `by`", {
   expect_message(
     rows_upsert(
-      lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
-      lazy_frame(x = 1:3, .name = "df_y"),
+      lazy_frame(x = 1:3, y = 11:13),
+      lazy_frame(x = 1:3),
       in_place = FALSE
     ),
     regexp = 'Matching, by = "x"'
@@ -824,11 +824,11 @@ test_that("`rows_upsert()` works with `in_place = FALSE`", {
     )
   )
 
-  df <- local_memdb_frame("df1", x = 1:3, y = 11:13)
+  df <- local_memdb_frame(x = 1:3, y = 11:13)
   expect_equal(
     rows_upsert(
       df,
-      local_memdb_frame("df2", x = 2:4, y = 22:24),
+      local_memdb_frame(x = 2:4, y = 22:24),
       by = "x",
       in_place = FALSE
     ) |>
@@ -842,8 +842,8 @@ test_that("`rows_upsert()` works with `in_place = FALSE`", {
 test_that("`rows_upsert()` works with `in_place = FALSE` and `returning`", {
   expect_equal(
     rows_upsert(
-      local_memdb_frame("df1", x = 1:3, y = 11:13),
-      local_memdb_frame("df2", x = 2:4, y = 22:24),
+      local_memdb_frame(x = 1:3, y = 11:13),
+      local_memdb_frame(x = 2:4, y = 22:24),
       by = "x",
       in_place = FALSE,
       returning = everything()
@@ -943,8 +943,8 @@ test_that("`sql_query_upsert()` is correct", {
 test_that("`rows_delete()` works with empty `by`", {
   expect_message(
     rows_delete(
-      lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"),
-      lazy_frame(x = 1:3, .name = "df_y"),
+      lazy_frame(x = 1:3, y = c(11, 12, NA)),
+      lazy_frame(x = 1:3),
       unmatched = "ignore",
       in_place = FALSE
     ),
@@ -955,8 +955,8 @@ test_that("`rows_delete()` works with empty `by`", {
 test_that("`rows_delete()` ignores extra `y` columns", {
   expect_message(
     rows_delete(
-      lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"),
-      lazy_frame(x = 1:3, y = 11, .name = "df_y"),
+      lazy_frame(x = 1:3, y = c(11, 12, NA)),
+      lazy_frame(x = 1:3, y = 11),
       by = "x",
       unmatched = "ignore",
       in_place = FALSE
@@ -976,11 +976,11 @@ test_that("`rows_delete()` works with `in_place = FALSE`", {
     )
   )
 
-  df <- local_memdb_frame("df1", x = 1:3, y = c(11, 12, NA))
+  df <- local_memdb_frame(x = 1:3, y = c(11, 12, NA))
   expect_equal(
     rows_delete(
       df,
-      local_memdb_frame("df2", x = 2:3),
+      local_memdb_frame(x = 2:3),
       by = "x",
       unmatched = "ignore",
       in_place = FALSE
@@ -995,8 +995,8 @@ test_that("`rows_delete()` works with `in_place = FALSE`", {
 test_that("`rows_delete()` works with `in_place = FALSE` with `returning`", {
   expect_equal(
     rows_delete(
-      local_memdb_frame("df1", x = 1:3, y = c(11, 12, 13)),
-      local_memdb_frame("df2", x = 2:3),
+      local_memdb_frame(x = 1:3, y = c(11, 12, 13)),
+      local_memdb_frame(x = 2:3),
       by = "x",
       unmatched = "ignore",
       in_place = FALSE,
@@ -1019,10 +1019,10 @@ test_that("`rows_delete()` works with `in_place = TRUE`", {
     ))
   )
 
-  df <- local_memdb_frame("df1", x = 1:3, y = 11:13)
+  df <- local_memdb_frame(x = 1:3, y = 11:13)
   rows_delete(
     df,
-    local_memdb_frame("df2", x = 2:3),
+    local_memdb_frame(x = 2:3),
     by = "x",
     unmatched = "ignore",
     in_place = TRUE
@@ -1034,10 +1034,10 @@ test_that("`rows_delete()` works with `in_place = TRUE`", {
 test_that("`rows_delete()` works with `in_place = TRUE` and `returning`", {
   skip_if_not_installed("RSQLite", "2.2.8")
 
-  df <- local_memdb_frame("df1", x = 1:3, y = 11:13)
+  df <- local_memdb_frame(x = 1:3, y = 11:13)
   df_deleted <- rows_delete(
     df,
-    local_memdb_frame("df2", x = 2:4),
+    local_memdb_frame(x = 2:4),
     by = "x",
     unmatched = "ignore",
     in_place = TRUE,

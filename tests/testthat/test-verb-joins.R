@@ -1,11 +1,11 @@
 test_that("complete join pipeline works with SQLite", {
-  df1 <- local_memdb_frame("df", x = 1:5)
-  df2 <- local_memdb_frame("df2", x = c(1, 3, 5), y = c("a", "b", "c"))
+  df1 <- local_memdb_frame(x = 1:5)
+  df2 <- local_memdb_frame(x = c(1, 3, 5), y = c("a", "b", "c"))
 
   out <- collect(left_join(df1, df2, by = "x"))
   expect_equal(out, tibble(x = 1:5, y = c("a", NA, "b", NA, "c")))
 
-  df1 <- local_memdb_frame("df3", x = 1:3, y = c("x", "y", "z"))
+  df1 <- local_memdb_frame(x = 1:3, y = c("x", "y", "z"))
   df2 <- local_memdb_frame(
     "df4",
     x = c(1, 3, 5),
@@ -25,8 +25,8 @@ test_that("complete join pipeline works with SQLite", {
 })
 
 test_that("complete join pipeline works with SQLite and table alias", {
-  df1 <- local_memdb_frame("df1", x = 1:5)
-  df2 <- local_memdb_frame("df2", x = c(1, 3, 5), y = c("a", "b", "c"))
+  df1 <- local_memdb_frame(x = 1:5)
+  df2 <- local_memdb_frame(x = c(1, 3, 5), y = c("a", "b", "c"))
 
   out <- left_join(df1, df2, by = "x", x_as = "df1", y_as = "df2")
   expect_equal(out |> collect(), tibble(x = 1:5, y = c("a", NA, "b", NA, "c")))
@@ -37,8 +37,8 @@ test_that("complete join pipeline works with SQLite and table alias", {
 })
 
 test_that("complete semi join works with SQLite", {
-  lf1 <- local_memdb_frame("df1", x = c(1, 2), y = c(2, 3))
-  lf2 <- local_memdb_frame("df2", x = 1)
+  lf1 <- local_memdb_frame(x = c(1, 2), y = c(2, 3))
+  lf2 <- local_memdb_frame(x = 1)
 
   lf3 <- inner_join(lf1, lf2, by = "x")
   expect_equal(op_vars(lf3), c("x", "y"))
@@ -48,8 +48,8 @@ test_that("complete semi join works with SQLite", {
 })
 
 test_that("complete semi join works with SQLite and table alias", {
-  df1 <- local_memdb_frame("df1", x = c(1, 2), y = c(2, 3))
-  df2 <- local_memdb_frame("df2", x = 1)
+  df1 <- local_memdb_frame(x = c(1, 2), y = c(2, 3))
+  df2 <- local_memdb_frame(x = 1)
 
   out <- inner_join(df1, df2, by = "x", x_as = "df1", y_as = "df2")
   expect_equal(out |> collect(), tibble(x = 1, y = 2))
@@ -188,8 +188,8 @@ test_that("alias truncates long table names at database limit", {
 })
 
 test_that("cross join via by = character() is deprecated", {
-  df1 <- local_memdb_frame("df1", x = 1:5)
-  df2 <- local_memdb_frame("df2", y = 1:5)
+  df1 <- local_memdb_frame(x = 1:5)
+  df2 <- local_memdb_frame(y = 1:5)
 
   expect_snapshot({
     out_inner <- collect(inner_join(df1, df2, by = character()))
@@ -200,10 +200,10 @@ test_that("cross join via by = character() is deprecated", {
   expect_equal(nrow(out_full), 25)
 })
 
-df1 <- local_memdb_frame("global_df1", x = 1:5, y = 1:5)
-df2 <- local_memdb_frame("global_df2", a = 5:1, b = 1:5)
-df3 <- local_memdb_frame("global_df3", x = 1:5, z = 1:5)
-df4 <- local_memdb_frame("global_df4", a = 5:1, z = 5:1)
+df1 <- local_memdb_frame(x = 1:5, y = 1:5)
+df2 <- local_memdb_frame(a = 5:1, b = 1:5)
+df3 <- local_memdb_frame(x = 1:5, z = 1:5)
+df4 <- local_memdb_frame(a = 5:1, z = 5:1)
 
 test_that("named by join by different x and y vars", {
   j1 <- collect(inner_join(df1, df2, c("x" = "a")))
@@ -306,8 +306,8 @@ test_that("suffix modifies duplicated variable names", {
 
 test_that("join variables always disambiguated (#2823)", {
   # Even if the new variable conflicts with an existing variable
-  df1 <- local_memdb_frame("df1", a = 1, b.x = 1, b = 1)
-  df2 <- local_memdb_frame("df2", a = 1, b = 1)
+  df1 <- local_memdb_frame(a = 1, b.x = 1, b = 1)
+  df2 <- local_memdb_frame(a = 1, b = 1)
 
   both <- collect(left_join(df1, df2, by = "a"))
   expect_named(both, c("a", "b.x", "b.x.x", "b.y"))
@@ -317,24 +317,24 @@ test_that("join functions error on column not found for SQL sources #1928", {
   # Rely on dplyr to test precise code
   expect_error(
     left_join(
-      local_memdb_frame("df1", x = 1:5),
-      local_memdb_frame("df2", y = 1:5),
+      local_memdb_frame(x = 1:5),
+      local_memdb_frame(y = 1:5),
       by = "x"
     ),
     "present"
   )
   expect_error(
     left_join(
-      local_memdb_frame("df3", x = 1:5),
-      local_memdb_frame("df4", y = 1:5),
+      local_memdb_frame(x = 1:5),
+      local_memdb_frame(y = 1:5),
       by = "y"
     ),
     "present"
   )
   expect_error(
     left_join(
-      local_memdb_frame("df5", x = 1:5),
-      local_memdb_frame("df6", y = 1:5)
+      local_memdb_frame(x = 1:5),
+      local_memdb_frame(y = 1:5)
     ),
     "[Nn]o common variables"
   )
@@ -513,8 +513,8 @@ test_that("select() before join is inlined", {
 })
 
 test_that("select() before join works for tables with same column name", {
-  lf <- lazy_frame(id = 1, x = 1, .name = "lf1")
-  lf2 <- lazy_frame(id = 12, x = 2, .name = "lf2")
+  lf <- lazy_frame(id = 1, x = 1)
+  lf2 <- lazy_frame(id = 12, x = 2)
 
   out <- left_join(
     lf |> rename(id1 = id),
@@ -529,8 +529,8 @@ test_that("select() before join works for tables with same column name", {
 })
 
 test_that("named by works in combination with inlined select", {
-  lf <- lazy_frame(id_x = 1, x = 1, .name = "lf1")
-  lf2 <- lazy_frame(id_y = 12, x = 2, .name = "lf2")
+  lf <- lazy_frame(id_x = 1, x = 1)
+  lf2 <- lazy_frame(id_y = 12, x = 2)
 
   out <- left_join(
     lf |> select(id_x, x.x = x),
@@ -562,8 +562,8 @@ test_that("rename works with duplicate column names in join_by (#1572)", {
 })
 
 test_that("suffix works in combination with inlined select", {
-  lf <- lazy_frame(id = 1, x = 1, .name = "lf1")
-  lf2 <- lazy_frame(id = 12, x = 2, .name = "lf2")
+  lf <- lazy_frame(id = 1, x = 1)
+  lf2 <- lazy_frame(id = 12, x = 2)
 
   out <- left_join(
     lf |> rename(x2 = x),
@@ -578,8 +578,8 @@ test_that("suffix works in combination with inlined select", {
 })
 
 test_that("select() before join is not inlined when using `sql_on`", {
-  lf <- lazy_frame(x1 = 10, a = 1, y = 3, .name = "lf1")
-  lf2 <- lazy_frame(x2 = 10, b = 2, z = 4, .name = "lf2")
+  lf <- lazy_frame(x1 = 10, a = 1, y = 3)
+  lf2 <- lazy_frame(x2 = 10, b = 2, z = 4)
 
   out <- left_join(
     lf |> select(a2 = a, x = x1),
@@ -910,15 +910,15 @@ test_that("multi joins work with x_as", {
 
 test_that("when keep = TRUE, left_join() preserves both sets of keys", {
   # when keys have different names
-  df1 <- local_memdb_frame("df1", a = c(2, 3), b = c(1, 2))
-  df2 <- local_memdb_frame("df2", x = c(3, 4), y = c(3, 4))
+  df1 <- local_memdb_frame(a = c(2, 3), b = c(1, 2))
+  df2 <- local_memdb_frame(x = c(3, 4), y = c(3, 4))
   out <- left_join(df1, df2, by = c("a" = "x"), keep = TRUE) |> collect()
   expect_equal(out$a, c(2, 3))
   expect_equal(out$x, c(NA, 3))
 
   # when keys have same name
-  df3 <- local_memdb_frame("df3", a = c(2, 3), b = c(1, 2))
-  df4 <- local_memdb_frame("df4", a = c(3, 4), y = c(3, 4))
+  df3 <- local_memdb_frame(a = c(2, 3), b = c(1, 2))
+  df4 <- local_memdb_frame(a = c(3, 4), y = c(3, 4))
   out <- left_join(df3, df4, by = c("a"), keep = TRUE) |> collect()
   expect_equal(out$a.x, c(2, 3))
   expect_equal(out$a.y, c(NA, 3))
@@ -926,15 +926,15 @@ test_that("when keep = TRUE, left_join() preserves both sets of keys", {
 
 test_that("when keep = TRUE, right_join() preserves both sets of keys", {
   # when keys have different names
-  df1 <- local_memdb_frame("df1", a = c(2, 3), b = c(1, 2))
-  df2 <- local_memdb_frame("df2", x = c(3, 4), y = c(3, 4))
+  df1 <- local_memdb_frame(a = c(2, 3), b = c(1, 2))
+  df2 <- local_memdb_frame(x = c(3, 4), y = c(3, 4))
   out <- right_join(df1, df2, by = c("a" = "x"), keep = TRUE) |> collect()
   expect_equal(out$a, c(3, NA))
   expect_equal(out$x, c(3, 4))
 
   # when keys have same name
-  df3 <- local_memdb_frame("df3", a = c(2, 3), b = c(1, 2))
-  df4 <- local_memdb_frame("df4", a = c(3, 4), y = c(3, 4))
+  df3 <- local_memdb_frame(a = c(2, 3), b = c(1, 2))
+  df4 <- local_memdb_frame(a = c(3, 4), y = c(3, 4))
   out <- right_join(df3, df4, by = c("a"), keep = TRUE) |> collect()
   expect_equal(out$a.x, c(3, NA))
   expect_equal(out$a.y, c(3, 4))
@@ -942,8 +942,8 @@ test_that("when keep = TRUE, right_join() preserves both sets of keys", {
 
 test_that("when keep = TRUE, full_join() preserves both sets of keys", {
   # when keys have different names
-  df1 <- local_memdb_frame("df1", a = c(2, 3), b = c(1, 2))
-  df2 <- local_memdb_frame("df2", x = c(3, 4), y = c(3, 4))
+  df1 <- local_memdb_frame(a = c(2, 3), b = c(1, 2))
+  df2 <- local_memdb_frame(x = c(3, 4), y = c(3, 4))
   out <- full_join(df1, df2, by = c("a" = "x"), keep = TRUE) |>
     collect() |>
     arrange(a)
@@ -951,8 +951,8 @@ test_that("when keep = TRUE, full_join() preserves both sets of keys", {
   expect_equal(out$x, c(NA, 3, 4))
 
   # when keys have same name
-  df3 <- local_memdb_frame("df3", a = c(2, 3), b = c(1, 2))
-  df4 <- local_memdb_frame("df4", a = c(3, 4), y = c(3, 4))
+  df3 <- local_memdb_frame(a = c(2, 3), b = c(1, 2))
+  df4 <- local_memdb_frame(a = c(3, 4), y = c(3, 4))
   out <- full_join(df3, df4, by = c("a"), keep = TRUE) |>
     collect() |>
     arrange(a.x)
@@ -962,15 +962,15 @@ test_that("when keep = TRUE, full_join() preserves both sets of keys", {
 
 test_that("when keep = TRUE, inner_join() preserves both sets of keys (#5581)", {
   # when keys have different names
-  df1 <- local_memdb_frame("df1", a = c(2, 3), b = c(1, 2))
-  df2 <- local_memdb_frame("df2", x = c(3, 4), y = c(3, 4))
+  df1 <- local_memdb_frame(a = c(2, 3), b = c(1, 2))
+  df2 <- local_memdb_frame(x = c(3, 4), y = c(3, 4))
   out <- inner_join(df1, df2, by = c("a" = "x"), keep = TRUE) |> collect()
   expect_equal(out$a, c(3))
   expect_equal(out$x, c(3))
 
   # when keys have same name
-  df3 <- local_memdb_frame("df3", a = c(2, 3), b = c(1, 2))
-  df4 <- local_memdb_frame("df4", a = c(3, 4), y = c(3, 4))
+  df3 <- local_memdb_frame(a = c(2, 3), b = c(1, 2))
+  df4 <- local_memdb_frame(a = c(3, 4), y = c(3, 4))
   out <- inner_join(df3, df4, by = c("a"), keep = TRUE) |> collect()
   expect_equal(out$a.x, c(3))
   expect_equal(out$a.y, c(3))
@@ -978,8 +978,8 @@ test_that("when keep = TRUE, inner_join() preserves both sets of keys (#5581)", 
 
 test_that("can't use `keep = FALSE` with non-equi conditions (#6499)", {
   join_by <- dplyr::join_by
-  df1 <- local_memdb_frame("df1", xl = c(1, 3), xu = c(4, 7))
-  df2 <- local_memdb_frame("df2", yl = c(2, 5, 8), yu = c(6, 8, 9))
+  df1 <- local_memdb_frame(xl = c(1, 3), xu = c(4, 7))
+  df2 <- local_memdb_frame(yl = c(2, 5, 8), yu = c(6, 8, 9))
 
   expect_snapshot(error = TRUE, {
     left_join(df1, df2, join_by(overlaps(xl, xu, yl, yu)), keep = FALSE)
@@ -1043,8 +1043,8 @@ test_that("can translate join conditions", {
 })
 
 test_that("joins using `between(bounds =)` work as expected", {
-  df1 <- local_memdb_frame("df1", x = 1:5)
-  df2 <- local_memdb_frame("df2", lower = 2, upper = 4)
+  df1 <- local_memdb_frame(x = 1:5)
+  df2 <- local_memdb_frame(lower = 2, upper = 4)
 
   out <- left_join(
     df1,
@@ -1094,7 +1094,7 @@ test_that("joins using `overlaps(bounds =)` work as expected", {
     x_lower = c(1, 1, 3, 4),
     x_upper = c(2, 3, 4, 5)
   )
-  mf2 <- local_memdb_frame("df2", y_lower = 2, y_upper = 4)
+  mf2 <- local_memdb_frame(y_lower = 2, y_upper = 4)
 
   out <- left_join(
     mf1,

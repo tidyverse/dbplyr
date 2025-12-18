@@ -1,14 +1,14 @@
 test_that("column order is matched", {
-  df1 <- local_memdb_frame("df1", x = 1, y = 2)
-  df2 <- local_memdb_frame("df2", y = 1, x = 2)
+  df1 <- local_memdb_frame(x = 1, y = 2)
+  df2 <- local_memdb_frame(y = 1, x = 2)
 
   out <- collect(union(df1, df2))
   expect_equal(out, tibble(x = c(1, 2), y = c(2, 1)))
 })
 
 test_that("missing columns filled with NULL", {
-  df1 <- local_memdb_frame("df1", x = 1)
-  df2 <- local_memdb_frame("df2", y = 2)
+  df1 <- local_memdb_frame(x = 1)
+  df2 <- local_memdb_frame(y = 2)
 
   out <- collect(union_all(df1, df2))
   expect_equal(out, tibble(x = c(1, NA), y = c(NA, 2)))
@@ -17,8 +17,8 @@ test_that("missing columns filled with NULL", {
 # SQL generation ----------------------------------------------------------
 
 test_that("set ops generates correct sql", {
-  lf1 <- local_memdb_frame("df1", x = 1)
-  lf2 <- local_memdb_frame("df2", x = c(1, 2))
+  lf1 <- local_memdb_frame(x = 1)
+  lf2 <- local_memdb_frame(x = c(1, 2))
 
   out <- lf1 |>
     union(lf2) |>
