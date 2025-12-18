@@ -27,3 +27,56 @@
       Error in `sql_clause_select()`:
       ! Query contains no columns
 
+# can generate SELECT query with all clauses
+
+    Code
+      show_query(lf)
+    Output
+      <SQL>
+      SELECT DISTINCT `all-clauses`.*, `a` + 1.0 AS `b`
+      FROM `all-clauses`
+      WHERE (`a` > 1.0)
+      ORDER BY `a`
+
+# summarise + head is collapsed
+
+    Code
+      show_query(lf)
+    Output
+      <SQL>
+      SELECT `x`, SUM(`y`) AS `y`
+      FROM `df`
+      GROUP BY `x`
+      LIMIT 1
+
+# select + arrange/filter is collapsed
+
+    Code
+      show_query(lf_filter)
+    Output
+      <SQL>
+      SELECT `y`
+      FROM `df`
+      WHERE (`x` = 1.0)
+
+---
+
+    Code
+      show_query(lf_arrange)
+    Output
+      <SQL>
+      SELECT `y`
+      FROM `df`
+      ORDER BY `x`
+
+# filter + summarise is collapsed
+
+    Code
+      show_query(lf)
+    Output
+      <SQL>
+      SELECT `g`, AVG(`y`) AS `y`
+      FROM `df`
+      WHERE (`x` = 1.0)
+      GROUP BY `g`
+
