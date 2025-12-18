@@ -268,7 +268,7 @@ test_that("inner join doesn't result in duplicated columns ", {
 })
 
 test_that("self-joins allowed with named by", {
-  fam <- local_memdb_frame("df", id = 1:5, parent = c(NA, 1, 2, 2, 4))
+  fam <- local_memdb_frame(id = 1:5, parent = c(NA, 1, 2, 2, 4))
 
   j1 <- fam |> left_join(fam, by = c("parent" = "id"))
   j2 <- fam |> inner_join(fam, by = c("parent" = "id"))
@@ -286,7 +286,7 @@ test_that("self-joins allowed with named by", {
 })
 
 test_that("suffix modifies duplicated variable names", {
-  fam <- local_memdb_frame("df", id = 1:5, parent = c(NA, 1, 2, 2, 4))
+  fam <- local_memdb_frame(id = 1:5, parent = c(NA, 1, 2, 2, 4))
   j1 <- collect(inner_join(
     fam,
     fam,
@@ -1283,7 +1283,7 @@ test_that("suffix arg is checked", {
 })
 
 test_that("copy = TRUE works", {
-  lf <- local_memdb_frame("df", x = 1, y = 2)
+  lf <- local_memdb_frame(x = 1, y = 2)
   df <- tibble(x = 1, z = 3)
 
   expect_equal(
@@ -1293,7 +1293,7 @@ test_that("copy = TRUE works", {
 })
 
 test_that("copy = 'inline' works", {
-  df1 <- local_memdb_frame("df", x = 1:3, y = c("a", "b", "c"))
+  df1 <- local_memdb_frame(x = 1:3, y = c("a", "b", "c"))
   df2 <- tibble(x = 1L)
 
   out <- semi_join(df1, df2, by = "x", copy = "inline")

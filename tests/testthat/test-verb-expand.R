@@ -1,6 +1,6 @@
 test_that("expand completes all values", {
   expect_equal(
-    local_memdb_frame("df", x = 1:2, y = 1:2) |>
+    local_memdb_frame(x = 1:2, y = 1:2) |>
       tidyr::expand(x, y) |>
       collect(),
     tibble(x = c(1, 1, 2, 2), y = c(1, 2, 1, 2))
@@ -12,7 +12,7 @@ test_that("expand completes all values", {
 test_that("nesting doesn't expand values", {
   df <- tibble(x = 1:2, y = 1:2)
   expect_equal(
-    tidyr::expand(local_memdb_frame("df", !!!df), nesting(x, y)) |>
+    tidyr::expand(local_memdb_frame(!!!df), nesting(x, y)) |>
       collect(),
     df
   )
@@ -39,7 +39,7 @@ test_that("expand respects groups", {
     c = c("b", "a", "a")
   )
   expect_equal(
-    local_memdb_frame("df", !!!df) |>
+    local_memdb_frame(!!!df) |>
       group_by(a) |>
       tidyr::expand(b, c) |>
       collect(),
@@ -60,10 +60,10 @@ test_that("NULL inputs", {
 })
 
 test_that("expand() errors when expected", {
-  expect_snapshot(error = TRUE, tidyr::expand(local_memdb_frame("df", x = 1)))
+  expect_snapshot(error = TRUE, tidyr::expand(local_memdb_frame(x = 1)))
   expect_snapshot(
     error = TRUE,
-    tidyr::expand(local_memdb_frame("df", x = 1), x = NULL)
+    tidyr::expand(local_memdb_frame(x = 1), x = NULL)
   )
 })
 
@@ -79,14 +79,14 @@ test_that("nesting() respects .name_repair", {
   expect_snapshot(
     error = TRUE,
     tidyr::expand(
-      local_memdb_frame("df", x = 1, y = 1),
+      local_memdb_frame(x = 1, y = 1),
       nesting(x, x = x + 1)
     )
   )
 
   vars <- suppressMessages(
     tidyr::expand(
-      local_memdb_frame("df", x = 1, y = 1),
+      local_memdb_frame(x = 1, y = 1),
       nesting(x, x = x + 1, .name_repair = "unique")
     ) |>
       op_vars()
@@ -97,7 +97,7 @@ test_that("nesting() respects .name_repair", {
 
 test_that("expand respect .name_repair", {
   vars <- suppressMessages(
-    local_memdb_frame("df", x = integer(), z = integer()) |>
+    local_memdb_frame(x = integer(), z = integer()) |>
       tidyr::expand(
         x,
         z = x,
@@ -115,7 +115,7 @@ test_that("expand respect .name_repair", {
 
 test_that("replace_na replaces missing values", {
   expect_equal(
-    local_memdb_frame("df", x = c(1, NA), y = c(NA, "b")) |>
+    local_memdb_frame(x = c(1, NA), y = c(NA, "b")) |>
       tidyr::replace_na(list(x = 0, y = "unknown")) |>
       collect(),
     tibble(
@@ -143,7 +143,7 @@ test_that("complete completes missing combinations", {
   )
 
   expect_equal(
-    local_memdb_frame("df", !!!df) |>
+    local_memdb_frame(!!!df) |>
       tidyr::complete(x, y, fill = list(z = "c")) |>
       collect(),
     tibble(

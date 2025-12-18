@@ -20,7 +20,7 @@
         `a`,
         MAX(CASE WHEN (`key` = 'x') THEN `val` END) AS `x`,
         MAX(CASE WHEN (`key` = 'y') THEN `val` END) AS `y`
-      FROM `df2`
+      FROM `df`
       GROUP BY `a`
 
 # error when overwriting existing column

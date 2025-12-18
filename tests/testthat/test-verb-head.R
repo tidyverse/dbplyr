@@ -1,5 +1,5 @@
 test_that("head limits rows", {
-  db <- head(local_memdb_frame("df", x = 1:100), 10)
+  db <- head(local_memdb_frame(x = 1:100), 10)
 
   expect_equal(sql_build(db)$limit, 10)
   expect_equal(nrow(collect(db)), 10)
@@ -16,13 +16,13 @@ test_that("non-integer automatically truncated", {
 })
 
 test_that("can get 0 rows", {
-  db <- local_memdb_frame("df", x = 1)
+  db <- local_memdb_frame(x = 1)
   out <- collect(head(db, 0))
   expect_equal(out, tibble(x = double()))
 })
 
 test_that("n must be valid", {
-  db <- local_memdb_frame("df", x = 1)
+  db <- local_memdb_frame(x = 1)
 
   expect_error(head(db, "x"), "non-negative integer")
   expect_error(head(db, 1:2), "non-negative integer")

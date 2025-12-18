@@ -91,12 +91,12 @@ test_that("as_copy() errors on invalid values", {
 # dbplyr_auto_copy() ----------------------------------------------------
 
 test_that("dbplyr_auto_copy() returns y if same source", {
-  df <- local_memdb_frame("df", x = 1:3)
+  df <- local_memdb_frame(x = 1:3)
   expect_identical(dbplyr_auto_copy(df, df, copy = FALSE), df)
 })
 
 test_that("dbplyr_auto_copy() errors when copy = FALSE and different sources", {
-  df <- local_memdb_frame("df", x = 1:3)
+  df <- local_memdb_frame(x = 1:3)
   local_df <- tibble(x = 1:3)
 
   expect_snapshot(dbplyr_auto_copy(df, local_df, copy = FALSE), error = TRUE)
@@ -104,7 +104,7 @@ test_that("dbplyr_auto_copy() errors when copy = FALSE and different sources", {
 })
 
 test_that("dbplyr_auto_copy() with copy = TRUE copies to temp table", {
-  df <- local_memdb_frame("df", x = 1:3)
+  df <- local_memdb_frame(x = 1:3)
   local_df <- tibble(x = 1:3)
 
   out <- dbplyr_auto_copy(df, local_df, copy = TRUE)
@@ -113,7 +113,7 @@ test_that("dbplyr_auto_copy() with copy = TRUE copies to temp table", {
 })
 
 test_that("dbplyr_auto_copy() with copy = 'inline' uses copy_inline", {
-  df <- local_memdb_frame("df", x = 1:3)
+  df <- local_memdb_frame(x = 1:3)
   local_df <- tibble(x = 1:3)
 
   out <- dbplyr_auto_copy(df, local_df, copy = "inline")

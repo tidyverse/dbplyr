@@ -8,7 +8,7 @@ spec1 <- tibble(.name = "x", .value = "val", key = "x")
 
 test_that("can pivot all cols to wide", {
   expect_equal(
-    local_memdb_frame("df", key = c("x", "y", "z"), val = 1:3) |>
+    local_memdb_frame(key = c("x", "y", "z"), val = 1:3) |>
       tidyr::pivot_wider(names_from = key, values_from = val) |>
       collect(),
     tibble(x = 1, y = 2, z = 3)
@@ -36,7 +36,7 @@ test_that("non-pivoted cols are preserved", {
 })
 
 test_that("implicit missings turn into explicit missings", {
-  df <- local_memdb_frame("df2", a = 1:2, key = c("x", "y"), val = 1:2)
+  df <- local_memdb_frame("df", a = 1:2, key = c("x", "y"), val = 1:2)
 
   expect_equal(
     df |>
@@ -53,7 +53,7 @@ test_that("implicit missings turn into explicit missings", {
 })
 
 test_that("error when overwriting existing column", {
-  df <- local_memdb_frame("df", a = c(1, 1), key = c("a", "b"), val = c(1, 2))
+  df <- local_memdb_frame(a = c(1, 1), key = c("a", "b"), val = c(1, 2))
   expect_snapshot(
     error = TRUE,
     tidyr::pivot_wider(df, names_from = key, values_from = val)
@@ -62,7 +62,6 @@ test_that("error when overwriting existing column", {
 
 test_that("`names_repair` happens after spec column reorganization (#1107)", {
   df <- local_memdb_frame(
-    "df",
     test = c("a", "b"),
     name = c("test", "test2"),
     value = c(1, 2)
@@ -80,7 +79,6 @@ test_that("minimal `names_repair` doesn't overwrite a value column that collides
   skip("`grouped_df()` needs a `name_repair` argument")
   # `collect.tbl_sql()` does not work with duplicated names
   df <- local_memdb_frame(
-    "df",
     test = c("a", "b"),
     name = c("test", "test2"),
     value = c(1, 2)
@@ -108,7 +106,7 @@ test_that("grouping is preserved", {
 
 # https://github.com/tidyverse/tidyr/issues/804
 test_that("column with `...j` name can be used as `names_from`", {
-  df <- local_memdb_frame("df", ...8 = c("x", "y", "z"), val = 1:3)
+  df <- local_memdb_frame(...8 = c("x", "y", "z"), val = 1:3)
   pv <- tidyr::pivot_wider(df, names_from = ...8, values_from = val) |>
     collect()
   expect_named(pv, c("x", "y", "z"))
@@ -118,7 +116,7 @@ test_that("column with `...j` name can be used as `names_from`", {
 # column names -------------------------------------------------------------
 
 test_that("dbplyr_build_wider_spec can handle multiple columns", {
-  df <- local_memdb_frame("df", x = c("X", "Y"), y = 1:2, a = 1:2, b = 1:2)
+  df <- local_memdb_frame(x = c("X", "Y"), y = 1:2, a = 1:2, b = 1:2)
 
   expect_equal(
     dbplyr_build_wider_spec(df, x:y, a:b),
@@ -133,7 +131,7 @@ test_that("dbplyr_build_wider_spec can handle multiple columns", {
 })
 
 test_that("pivot_wider handles NA column names consistent with tidyr", {
-  df <- local_memdb_frame("df", id = "id", x = 1:3, y = c("A", NA, "B"))
+  df <- local_memdb_frame(id = "id", x = 1:3, y = c("A", NA, "B"))
 
   expect_equal(
     df |> tidyr::pivot_wider(names_from = y, values_from = x) |> collect(),
@@ -144,14 +142,12 @@ test_that("pivot_wider handles NA column names consistent with tidyr", {
 # keys ---------------------------------------------------------
 
 test_that("can override default keys", {
-  df <- tibble::tribble(
-    ~row , ~name , ~var     , ~value ,
-       1 , "Sam" , "age"    , 10     ,
-       2 , "Sam" , "height" ,  1.5   ,
-       3 , "Bob" , "age"    , 20     ,
+  df_db <- local_memdb_frame(
+    row = c(1, 2, 3),
+    name = c("Sam", "Sam", "Bob"),
+    var = c("age", "height", "age"),
+    value = c(10, 1.5, 20)
   )
-
-  df_db <- local_memdb_frame("df", !!!df)
 
   expect_equal(
     df_db |>
@@ -170,7 +166,7 @@ test_that("can override default keys", {
 })
 
 test_that("`id_cols = everything()` excludes `names_from` and `values_from`", {
-  df <- local_memdb_frame("df", key = "x", name = "a", value = 1L)
+  df <- local_memdb_frame(key = "x", name = "a", value = 1L)
 
   expect_identical(
     tidyr::pivot_wider(df, id_cols = everything()) |> collect(),
@@ -187,7 +183,6 @@ test_that("`id_cols = everything()` excludes `names_from` and `values_from`", {
 
 test_that("pivoting a zero row data frame drops `names_from` and `values_from` (#1249)", {
   df <- local_memdb_frame(
-    "df",
     key = character(),
     name = character(),
     value = integer()
@@ -205,7 +200,6 @@ test_that("known bug - building a wider spec with a zero row data frame loses `v
   # for fear of breaking backwards compatibility
 
   df <- local_memdb_frame(
-    "df",
     key = character(),
     name = character(),
     value = integer()
@@ -298,7 +292,6 @@ test_that("values_fn cannot be NULL", {
 
 test_that("`unused_fn` can summarize unused columns (#990)", {
   df <- local_memdb_frame(
-    "df",
     id = c(1, 1, 2, 2),
     unused1 = c(1, 2, 4, 3),
     unused2 = c(11, 12, 14, 13),
@@ -330,7 +323,6 @@ test_that("`unused_fn` can summarize unused columns (#990)", {
 
 test_that("`unused_fn` works with anonymous functions", {
   df <- local_memdb_frame(
-    "df",
     id = c(1, 1, 2, 2),
     unused = c(1, NA, 4, 3),
     name = c("a", "b", "a", "b"),
@@ -363,7 +355,6 @@ test_that("can fill in missing cells", {
     name = c("x", "y")
   )
   df <- local_memdb_frame(
-    "df",
     g = c(1, 2),
     name = c("x", "y"),
     value = c(1, 2)
@@ -391,7 +382,6 @@ test_that("can fill in missing cells", {
 
 test_that("values_fill only affects missing cells", {
   df <- local_memdb_frame(
-    "df",
     g = c(1, 2),
     name = c("x", "y"),
     value = c(1, NA)
@@ -418,7 +408,7 @@ test_that("values_fill is checked", {
 # multiple values ----------------------------------------------------------
 
 test_that("can pivot from multiple measure cols", {
-  df <- local_memdb_frame("df", row = 1, var = c("x", "y"), a = 1:2, b = 3:4)
+  df <- local_memdb_frame(row = 1, var = c("x", "y"), a = 1:2, b = 3:4)
   pv <- tidyr::pivot_wider(df, names_from = var, values_from = c(a, b)) |>
     collect()
 
@@ -464,7 +454,7 @@ test_that("can pivot multiple from multiple names", {
   )
 
   expect_equal(
-    local_memdb_frame("df", x) |>
+    local_memdb_frame(!!!x) |>
       tidyr::pivot_wider(
         names_from = c(name, seq),
         values_from = value
@@ -479,7 +469,6 @@ test_that("can pivot multiple from multiple names", {
 
 test_that("can vary `names_from` values slowest (#839)", {
   df <- local_memdb_frame(
-    "df",
     name = c("name1", "name2"),
     value1 = c(1, 2),
     value2 = c(4, 5)
@@ -511,7 +500,6 @@ test_that("can vary `names_from` values slowest (#839)", {
 
 test_that("`names_expand` does a cartesian expansion of `names_from` columns (#770)", {
   df <- local_memdb_frame(
-    "df",
     name1 = c("a", "b"),
     name2 = c("c", "d"),
     value = c(1, 2)

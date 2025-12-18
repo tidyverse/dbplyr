@@ -24,7 +24,7 @@
       ! Can't copy query to table `main`.`db1`.
       Caused by error in `dbplyr_save_query()`:
       ! Can't save query to table `main`.`db1`.
-      i Using SQL: CREATE TABLE `main`.`db1` AS SELECT * FROM `df`
+      i Using SQL: CREATE TABLE `main`.`db1` AS SELECT * FROM `db1`
       Caused by error:
       ! dummy DBI error
 

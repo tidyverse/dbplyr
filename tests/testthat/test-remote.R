@@ -67,7 +67,7 @@ test_that("remote_name and remote_table can handle different table identifiers",
 })
 
 test_that("can retrieve query, src and con metadata", {
-  mf <- local_memdb_frame("df", x = 5)
+  mf <- local_memdb_frame(x = 5)
 
   expect_s4_class(remote_con(mf), "DBIConnection")
   expect_s3_class(remote_src(mf), "src_sql")

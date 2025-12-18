@@ -36,7 +36,7 @@ test_that("has nice print method", {
 # tbl ---------------------------------------------------------------------
 
 test_that("can generate sql tbls with raw sql", {
-  mf1 <- local_memdb_frame("df", x = 1:3, y = 3:1)
+  mf1 <- local_memdb_frame(x = 1:3, y = 3:1)
   mf2 <- tbl(mf1$src, sql(glue("SELECT * FROM {remote_name(mf1)}")))
 
   expect_equal(collect(mf1), collect(mf2))
@@ -83,7 +83,7 @@ test_that("check_from is deprecated", {
 # n_groups ----------------------------------------------------------------
 
 test_that("check basic group size implementation", {
-  db <- local_memdb_frame("df", x = rep(1:3, each = 10), y = rep(1:6, each = 5))
+  db <- local_memdb_frame(x = rep(1:3, each = 10), y = rep(1:6, each = 5))
   expect_equal(n_groups(db), 1L)
   expect_equal(group_size(db), 30)
 

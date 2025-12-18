@@ -54,7 +54,7 @@ test_that("can generate variant SQL", {
 })
 
 test_that("fill errors on unsorted data", {
-  df <- local_memdb_frame("df", x = 1)
+  df <- local_memdb_frame(x = 1)
 
   expect_snapshot(tidyr::fill(df), error = TRUE)
 })

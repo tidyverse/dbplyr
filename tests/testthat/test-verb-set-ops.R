@@ -82,7 +82,7 @@ test_that("intersect and setdiff work for supported backends", {
 })
 
 test_that("SQLite warns if set op attempted when tbl has LIMIT", {
-  mf <- local_memdb_frame("df", x = 1:2)
+  mf <- local_memdb_frame(x = 1:2)
   m1 <- head(mf, 1)
 
   expect_error(union(mf, m1), "does not support")
@@ -108,7 +108,7 @@ test_that("other backends can combine with a limit", {
 })
 
 test_that("intersect works with copy = 'temp-table'", {
-  df1 <- local_memdb_frame("df", x = 1:3)
+  df1 <- local_memdb_frame(x = 1:3)
   df2 <- tibble(x = 2:4)
 
   out <- intersect(df1, df2, copy = "temp-table") |> collect()
@@ -116,7 +116,7 @@ test_that("intersect works with copy = 'temp-table'", {
 })
 
 test_that("intersect works with copy = 'inline'", {
-  df1 <- local_memdb_frame("df", x = 1:3)
+  df1 <- local_memdb_frame(x = 1:3)
   df2 <- tibble(x = 2:4)
 
   out <- intersect(df1, df2, copy = "inline") |> collect()

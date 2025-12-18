@@ -1,5 +1,5 @@
 test_that("mutate computed before summarise", {
-  mf <- local_memdb_frame("df", x = c(1, 2, 3), y = c(9, 8, 7))
+  mf <- local_memdb_frame(x = c(1, 2, 3), y = c(9, 8, 7))
 
   out <- mutate(mf, z = x + y) |>
     summarise(sum_z = sum(z, na.rm = TRUE)) |>
@@ -9,7 +9,7 @@ test_that("mutate computed before summarise", {
 })
 
 test_that("two mutates equivalent to one", {
-  mf <- local_memdb_frame("df", x = c(1, 5, 9), y = c(3, 12, 11))
+  mf <- local_memdb_frame(x = c(1, 5, 9), y = c(3, 12, 11))
 
   df1 <- mf |> mutate(x2 = x * 2, y4 = y * 4) |> collect()
   df2 <- mf |> collect() |> mutate(x2 = x * 2, y4 = y * 4)
@@ -17,7 +17,7 @@ test_that("two mutates equivalent to one", {
 })
 
 test_that("mutate() isn't inlined after distinct() #1119", {
-  mf <- local_memdb_frame("df", x = 1:2)
+  mf <- local_memdb_frame(x = 1:2)
   expect_equal(
     mf |>
       distinct(x) |>
@@ -46,7 +46,7 @@ test_that("can use window function after summarise and pure projection #1104", {
 })
 
 test_that("can refer to fresly created values", {
-  out1 <- local_memdb_frame("df", x1 = 1) |>
+  out1 <- local_memdb_frame(x1 = 1) |>
     mutate(x2 = x1 + 1, x3 = x2 + 1, x4 = x3 + 1) |>
     collect()
   expect_equal(out1, tibble(x1 = 1, x2 = 2, x3 = 3, x4 = 4))
@@ -66,7 +66,7 @@ test_that("transmute includes all needed variables", {
 
 test_that("queries are not nested unnecessarily", {
   # Should only be one query deep
-  sql <- local_memdb_frame("df", x = 1) |>
+  sql <- local_memdb_frame(x = 1) |>
     mutate(y = x + 1, a = y + 1, b = y + 1) |>
     sql_build()
 
@@ -82,17 +82,17 @@ test_that("maintains order of existing columns (#3216, #3223)", {
 })
 
 test_that("supports overwriting variables (#3222)", {
-  df <- local_memdb_frame("df1", x = 1, y = 2) |>
+  df <- local_memdb_frame(x = 1, y = 2) |>
     mutate(y = 4, y = 5) |>
     collect()
   expect_equal(df, tibble(x = 1, y = 5))
 
-  df <- local_memdb_frame("df2", x = 1, y = 2) |>
+  df <- local_memdb_frame(x = 1, y = 2) |>
     mutate(y = 4, y = y + 1) |>
     collect()
   expect_equal(df, tibble(x = 1, y = 5))
 
-  df <- local_memdb_frame("df3", x = 1, y = 2) |>
+  df <- local_memdb_frame(x = 1, y = 2) |>
     mutate(y = 4, y = x + 4) |>
     collect()
   expect_equal(df, tibble(x = 1, y = 5))
@@ -113,7 +113,7 @@ test_that("transmute() keeps grouping variables", {
 })
 
 test_that("across() can access previously created variables", {
-  out <- local_memdb_frame("df", x = 1) |> mutate(y = 2, across(y, sqrt))
+  out <- local_memdb_frame(x = 1) |> mutate(y = 2, across(y, sqrt))
   lf <- lazy_frame(x = 1) |> mutate(y = 2, across(y, sqrt))
 
   expect_equal(
@@ -130,7 +130,7 @@ test_that("across() can access previously created variables", {
 })
 
 test_that("across() uses original column rather than overridden one", {
-  db <- local_memdb_frame("df", x = 2, y = 4, z = 6)
+  db <- local_memdb_frame(x = 2, y = 4, z = 6)
   expect_equal(
     db |> mutate(across(everything(), ~ .x / x)) |> collect(),
     tibble(x = 1, y = 2, z = 3)
@@ -167,8 +167,8 @@ test_that("across() uses original column rather than overridden one", {
 
 test_that("new columns take precedence over global variables", {
   y <- "global var"
-  db <- local_memdb_frame("df", data.frame(x = 1)) |> mutate(y = 2, z = y + 1)
-  lf <- lazy_frame(data.frame(x = 1)) |> mutate(y = 2, z = y + 1)
+  db <- local_memdb_frame(x = 1) |> mutate(y = 2, z = y + 1)
+  lf <- lazy_frame(x = 1) |> mutate(y = 2, z = y + 1)
 
   expect_equal(
     collect(db),
@@ -225,7 +225,7 @@ test_that("can use .sql pronoun", {
 # .by -------------------------------------------------------------------------
 
 test_that("can group transiently using `.by`", {
-  df <- local_memdb_frame("df", g = c(1, 1, 2, 1, 2), x = c(5, 2, 1, 2, 3))
+  df <- local_memdb_frame(g = c(1, 1, 2, 1, 2), x = c(5, 2, 1, 2, 3))
 
   out <- mutate(df, x = mean(x), .by = g) |>
     arrange(g) |>
@@ -247,7 +247,7 @@ test_that("can `NULL` out the `.by` column", {
 # .order, .frame -----------------------------------------------------------
 
 test_that("can order transiently using `.order`", {
-  df <- local_memdb_frame("df", g = c(1, 1, 2, 2), x = c(1, 2, 3, 4))
+  df <- local_memdb_frame(g = c(1, 1, 2, 2), x = c(1, 2, 3, 4))
   df2 <- df |> mutate(r = cumsum(x), .by = g, .order = x)
   out <- df2 |> collect()
 
@@ -256,7 +256,7 @@ test_that("can order transiently using `.order`", {
 })
 
 test_that("can specify window frame using `.frame`", {
-  df <- local_memdb_frame("df", g = c(1, 1, 1), x = c(1.0, 2.0, 3.0))
+  df <- local_memdb_frame(g = c(1, 1, 1), x = c(1.0, 2.0, 3.0))
   df2 <- df |> mutate(r = sum(x), .by = g, .order = x, .frame = c(-Inf, 0))
   out <- df2 |> collect()
 
@@ -314,26 +314,25 @@ test_that(".frame validates inputs", {
 # SQL generation -----------------------------------------------------------
 
 test_that("mutate generates new variables and replaces existing", {
-  df1 <- local_memdb_frame("df", x = 1)
+  df1 <- local_memdb_frame(x = 1)
   out <- df1 |> mutate(x = 2, y = 3) |> collect()
   expect_equal(out, tibble(x = 2, y = 3))
 })
 
 test_that("transmute only returns new variables", {
-  df1 <- local_memdb_frame("df", x = 1)
+  df1 <- local_memdb_frame(x = 1)
   out <- df1 |> transmute(y = 3) |> collect()
   expect_equal(out, tibble(y = 3))
 })
 
 test_that("mutate calls windowed versions of sql functions", {
-  df1 <- local_memdb_frame("df", x = 1:4, g = rep(c(1, 2), each = 2))
+  df1 <- local_memdb_frame(x = 1:4, g = rep(c(1, 2), each = 2))
   out <- df1 |> group_by(g) |> mutate(r = row_number(x)) |> collect()
   expect_equal(out$r, c(1, 2, 1, 2))
 })
 
 test_that("recycled aggregates generate window function", {
   df1 <- local_memdb_frame(
-    "df",
     x = as.numeric(1:4),
     g = rep(c(1, 2), each = 2)
   )
@@ -346,7 +345,7 @@ test_that("recycled aggregates generate window function", {
 })
 
 test_that("cumulative aggregates generate window function", {
-  df1 <- local_memdb_frame("df", x = 1:4, g = rep(c(1, 2), each = 2))
+  df1 <- local_memdb_frame(x = 1:4, g = rep(c(1, 2), each = 2))
   out <- df1 |>
     group_by(g) |>
     arrange(x) |>
@@ -357,7 +356,7 @@ test_that("cumulative aggregates generate window function", {
 })
 
 test_that("mutate overwrites previous variables", {
-  df <- local_memdb_frame("df", x = 1:5) |>
+  df <- local_memdb_frame(x = 1:5) |>
     mutate(x = x + 1) |>
     mutate(x = x + 1) |>
     collect()
@@ -367,7 +366,7 @@ test_that("mutate overwrites previous variables", {
 })
 
 test_that("sequence of operations work", {
-  out <- local_memdb_frame("df", x = c(1, 2, 3, 4)) |>
+  out <- local_memdb_frame(x = c(1, 2, 3, 4)) |>
     select(y = x) |>
     mutate(z = 2 * y) |>
     filter(z == 2) |>
@@ -500,7 +499,7 @@ test_that(".keep= always retains grouping variables (#5582)", {
 # sql_render --------------------------------------------------------------
 
 test_that("quoting for rendering mutated grouped table", {
-  out <- local_memdb_frame("df", x = 1, y = 2) |> mutate(y = x)
+  out <- local_memdb_frame(x = 1, y = 2) |> mutate(y = x)
   expect_match(out |> sql_render(), "^SELECT `x`, `x` AS `y`\nFROM `[^`]*`$")
   expect_equal(out |> collect(), tibble(x = 1, y = 1))
 })
@@ -616,7 +615,7 @@ test_that("mutate adds new", {
 })
 
 test_that("mutated vars are always named", {
-  mf <- local_memdb_frame("df", a = 1)
+  mf <- local_memdb_frame(a = 1)
 
   out2 <- mf |> mutate(1) |> op_vars()
   expect_equal(out2, c("a", "1"))

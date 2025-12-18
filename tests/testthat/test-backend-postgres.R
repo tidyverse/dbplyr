@@ -429,7 +429,7 @@ test_that("casts `y` column for local df", {
   con <- src_test("postgres")
 
   DBI::dbExecute(con, "CREATE SCHEMA dbplyr_test_schema")
-  withr::defer(DBI::dbExecute(con, "DROP SCHEMA dbplyr_test_schema"))
+  withr::defer(DBI::dbExecute(con, "DROP SCHEMA dbplyr_test_schema CASCADE"))
   df <- tibble(id = 1L, val = 10L, arr = "{1,2}")
   types <- c(id = "bigint", val = "bigint", arr = "integer[]")
   local_db_table(con, value = df, types = types, temporary = FALSE, "df_x")

@@ -25,7 +25,6 @@ test_that("preserves group of input", {
 test_that("count() does not create groups", {
   # https://github.com/tidyverse/dbplyr/issues/940
   db <- local_memdb_frame(
-    "df",
     x = c(1, 1, 1, 2, 2),
     y = c("a", "a", "b", "c", "c")
   )
