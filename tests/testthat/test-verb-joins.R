@@ -123,7 +123,7 @@ test_that("join works with in_schema", {
 test_that("alias truncates long table names at database limit", {
   # Postgres has max identifier length of 63; ensure it's not exceeded when generating table alias
   # Source: https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
-  con <- src_test("postgres")
+  con <- test_postgres()
 
   nm1 <- table_path(paste0("a", paste0(0:61 %% 10, collapse = "")))
   mf1 <- local_db_table(con, tibble(x = 1:3, y = "a"), unclass(nm1))

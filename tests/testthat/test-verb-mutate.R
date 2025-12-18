@@ -8,14 +8,6 @@ test_that("mutate computed before summarise", {
   expect_equal(out$sum_z, 30)
 })
 
-test_that("two mutates equivalent to one", {
-  mf <- local_memdb_frame(x = c(1, 5, 9), y = c(3, 12, 11))
-
-  df1 <- mf |> mutate(x2 = x * 2, y4 = y * 4) |> collect()
-  df2 <- mf |> collect() |> mutate(x2 = x * 2, y4 = y * 4)
-  compare_tbl(df1, df2)
-})
-
 test_that("mutate() isn't inlined after distinct() #1119", {
   mf <- local_memdb_frame(x = 1:2)
   expect_equal(
@@ -51,7 +43,12 @@ test_that("can refer to fresly created values", {
     collect()
   expect_equal(out1, tibble(x1 = 1, x2 = 2, x3 = 3, x4 = 4))
 
-  out2 <- copy_to_test("sqlite", tibble(x = 1), name = "multi_mutate") |>
+  out2 <- copy_to(
+    test_sqlite(),
+    tibble(x = 1),
+    name = "multi_mutate",
+    overwrite = TRUE
+  ) |>
     mutate(x = x + 1, x = x + 2, x = x + 4)
   expect_equal(collect(out2), tibble(x = 8))
   expect_snapshot(show_query(out2))

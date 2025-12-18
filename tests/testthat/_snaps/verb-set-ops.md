@@ -1,3 +1,54 @@
+# basic set ops generate expected SQL
+
+    Code
+      union(db1, db2)
+    Output
+      <SQL>
+      SELECT *
+      FROM "db1"
+      
+      UNION
+      
+      SELECT *
+      FROM "db2"
+    Code
+      union_all(db1, db2)
+    Output
+      <SQL>
+      SELECT *
+      FROM "db1"
+      
+      UNION ALL
+      
+      SELECT *
+      FROM "db2"
+    Code
+      intersect(db1, db2)
+    Output
+      <SQL>
+      (
+        SELECT *
+        FROM "db1"
+      )
+      INTERSECT
+      (
+        SELECT *
+        FROM "db2"
+      )
+    Code
+      setdiff(db1, db2)
+    Output
+      <SQL>
+      (
+        SELECT *
+        FROM "db1"
+      )
+      EXCEPT
+      (
+        SELECT *
+        FROM "db2"
+      )
+
 # can combine multiple unions in one query
 
     Code

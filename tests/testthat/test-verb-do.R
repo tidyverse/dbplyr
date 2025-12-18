@@ -13,11 +13,9 @@ test_that("named argument become list columns", {
 })
 
 test_that("unnamed results bound together by row", {
-  mf <- local_memdb_frame(g = c(1, 1, 2, 2), x = c(3, 9, 4, 9)) |>
-    group_by(g)
-
-  first <- mf |> do(head(., 1)) |> ungroup()
-  compare_tbl(first, tibble(g = c(1, 2), x = c(3, 4)))
+  mf <- local_memdb_frame(g = c(1, 1, 2, 2), x = c(3, 9, 4, 9))
+  first <- mf |> group_by(g) |> do(head(., 1)) |> ungroup() |> collect()
+  expect_equal(first, tibble(g = c(1, 2), x = c(3, 4)))
 })
 
 test_that("unnamed results must be data frames", {

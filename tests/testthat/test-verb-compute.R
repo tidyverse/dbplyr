@@ -1,37 +1,21 @@
-test_that("compute doesn't change representation", {
-  mf1 <- local_memdb_frame(x = 5:1, y = 1:5, z = "a")
-  compare_tbl(mf1, mf1 |> compute())
-  compare_tbl(mf1, mf1 |> compute() |> compute())
-
-  mf2 <- mf1 |> mutate(z = x + y)
-  compare_tbl(mf2, mf2 |> compute())
-})
-
 test_that("compute can create indexes", {
-  mfs <- test_frame(x = 5:1, y = 1:5, z = 10)
+  # integration test to ensure that indexes argument passed all the way through
+  db <- local_memdb_frame("db1", x = 5:1, y = 1:5, z = 10)
 
-  mfs |>
-    lapply(\(df) df |> compute(indexes = c("x", "y"))) |>
-    expect_equal_tbls()
+  db |> compute(indexes = c("x", "y"), name = "db2")
+  indices <- DBI::dbGetQuery(memdb(), "PRAGMA index_list('db2');")
+  expect_equal(indices$name, c("db2_y", "db2_x"))
+  expect_equal(indices$unique, c(0, 0))
 
-  mfs |>
-    lapply(\(df) df |> compute(indexes = list("x", "y", c("x", "y")))) |>
-    expect_equal_tbls()
-
-  mfs |>
-    lapply(\(df) df |> compute(indexes = "x", unique_indexes = "y")) |>
-    expect_equal_tbls()
-
-  mfs |>
-    lapply(\(df) {
-      df |> compute(unique_indexes = list(c("x", "z"), c("y", "z")))
-    }) |>
-    expect_equal_tbls()
+  db |> compute(unique_indexes = c("x", "y"), name = "db3")
+  indices <- DBI::dbGetQuery(memdb(), "PRAGMA index_list('db3');")
+  expect_equal(indices$name, c("db3_y", "db3_x"))
+  expect_equal(indices$unique, c(1, 1))
 })
 
 test_that("unique index fails if values are duplicated", {
-  mfs <- test_frame(x = 5:1, y = "a", ignore = "df")
-  lapply(mfs, function(.) expect_error(compute(., unique_indexes = "y")))
+  mf <- local_memdb_frame(x = 5:1, y = "a")
+  expect_error(compute(mf, unique_indexes = "y"))
 })
 
 test_that("index fails if columns are missing", {

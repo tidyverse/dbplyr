@@ -1,49 +1,34 @@
 test_that("filter captures local variables", {
-  mf <- local_memdb_frame(x = 1:5, y = 5:1)
+  mf <- local_memdb_frame(x = 1:5, y = 5:1, id = 1:5)
 
   z <- 3
-  df1 <- mf |> filter(x > z) |> collect()
-  df2 <- mf |> collect() |> filter(x > z)
-
-  compare_tbl(df1, df2)
+  expect_equal(mf |> filter(x > z) |> pull(), c(4, 5))
 })
 
 test_that("two filters equivalent to one", {
-  mf <- local_memdb_frame(x = 1:5, y = 5:1)
-  lf <- lazy_frame(x = 1:5, y = 5:1)
+  unique_column_name_reset()
+  mf <- local_memdb_frame("df", x = 1:5, y = 5:1, id = 1:5)
 
   df1 <- mf |> filter(x > 3) |> filter(y < 3)
-  df2 <- mf |> filter(x > 3, y < 3)
-  compare_tbl(df1, df2)
+  expect_equal(df1 |> pull(), c(4, 5))
+  expect_snapshot(df1 |> show_query())
 
-  lf1 <- lf |> filter(x > 3) |> filter(y < 3)
-  lf2 <- lf |> filter(x > 3, y < 3)
-  expect_equal(lf1 |> remote_query(), lf2 |> remote_query())
-  expect_snapshot(lf1 |> remote_query())
-
-  df1 <- mf |> filter(mean(x, na.rm = TRUE) > 3) |> filter(y < 3)
-  df2 <- mf |> filter(mean(x, na.rm = TRUE) > 3, y < 3)
-  compare_tbl(df1, df2)
-
-  unique_column_name_reset()
-  lf1 <- lf |> filter(mean(x, na.rm = TRUE) > 3) |> filter(y < 3)
-  unique_column_name_reset()
-  lf2 <- lf |> filter(mean(x, na.rm = TRUE) > 3, y < 3)
-  expect_equal(lf1 |> remote_query(), lf2 |> remote_query())
-  expect_snapshot(lf1 |> remote_query())
+  df2 <- mf |> filter(mean(x, na.rm = TRUE) > 2) |> filter(y < 3)
+  expect_equal(df2 |> pull(), c(4, 5))
+  expect_snapshot(df2 |> show_query())
 })
-
 
 test_that("each argument gets implicit parens", {
   mf <- local_memdb_frame(
     v1 = c("a", "b", "a", "b"),
     v2 = c("b", "a", "a", "b"),
-    v3 = c("a", "b", "c", "d")
+    v3 = c("a", "b", "c", "d"),
+    id = 1:4
   )
 
-  mf1 <- mf |> filter((v1 == "a" | v2 == "a") & v3 == "a")
-  mf2 <- mf |> filter(v1 == "a" | v2 == "a", v3 == "a")
-  compare_tbl(mf1, mf2)
+  # want (v1 == "a" | v2 == "a") & v3 == "a"
+  # NOT (v1 == "a" | v2 == "a" & v3 == "a")
+  expect_equal(mf |> filter(v1 == "a" | v2 == "a", v3 == "a") |> pull(), 1)
 })
 
 test_that("only add step if necessary", {

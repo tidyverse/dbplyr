@@ -13,20 +13,6 @@ test_that("can copy to from remote sources", {
   expect_equal(collect(df_3), df)
 })
 
-test_that("can round trip basic data frame", {
-  df <- test_frame(x = c(1, 10, 9, NA), y = letters[1:4])
-  expect_equal_tbls(df)
-})
-
-test_that("NAs in character fields handled by db sources (#2256)", {
-  df <- test_frame(
-    x = c("a", "aa", NA),
-    y = c(NA, "b", "bb"),
-    z = c("cc", NA, "c")
-  )
-  expect_equal_tbls(df)
-})
-
 test_that("only overwrite existing table if explicitly requested", {
   con <- local_sqlite_connection()
   local_db_table(con, data.frame(x = 1:5), "df")

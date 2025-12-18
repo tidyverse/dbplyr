@@ -30,10 +30,10 @@ test_that("support colwise variants", {
     mf1 <- dplyr::mutate_if(mf, is.factor, as.character),
     "on the first 100 rows"
   )
-  compare_tbl(mf1, exp)
+  expect_equal(collect(mf1), exp)
 
   mf2 <- dplyr::mutate_at(mf, "y", as.character)
-  compare_tbl(mf2, exp)
+  expect_equal(collect(mf2), exp)
 })
 
 test_that("base source of tbl_lazy is always 'df'", {

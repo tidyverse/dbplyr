@@ -82,36 +82,28 @@ test_that("rename/relocate after distinct is inlined #1141", {
 
 test_that("select operates on mutated vars", {
   mf <- local_memdb_frame(x = c(1, 2, 3), y = c(3, 2, 1))
-
-  df1 <- mf |>
-    mutate(x, z = x + y) |>
-    select(z) |>
-    collect()
-
-  df2 <- mf |>
-    collect() |>
-    mutate(x, z = x + y) |>
-    select(z)
-
-  compare_tbl(df1, df2)
+  expect_equal(mf |> mutate(x, z = x + y) |> select(z) |> pull(), c(4, 4, 4))
 })
 
 test_that("select renames variables (#317)", {
   mf <- local_memdb_frame(x = 1, y = 2)
-  compare_tbl(mf |> select(A = x), tibble(A = 1))
+  expect_equal(mf |> select(A = x) |> collect(), tibble(A = 1))
 })
 
 test_that("rename renames variables", {
   mf <- local_memdb_frame(x = 1, y = 2)
-  compare_tbl(mf |> rename(A = x), tibble(A = 1, y = 2))
+  expect_equal(mf |> rename(A = x) |> collect(), tibble(A = 1, y = 2))
 })
 
 test_that("can rename multiple vars", {
   mf <- local_memdb_frame(a = 1, b = 2)
   exp <- tibble(c = 1, d = 2)
 
-  compare_tbl(mf |> rename(c = a, d = b), exp)
-  compare_tbl(mf |> group_by(a) |> rename(c = a, d = b), exp |> group_by(c))
+  expect_equal(mf |> rename(c = a, d = b) |> collect(), exp)
+  expect_equal(
+    mf |> group_by(a) |> rename(c = a, d = b) |> collect(),
+    exp |> group_by(c)
+  )
 })
 
 test_that("can rename with a function", {
