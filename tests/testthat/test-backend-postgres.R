@@ -317,19 +317,24 @@ test_that("`sql_query_upsert()` with method = 'on_conflict' is correct", {
 # live database -----------------------------------------------------------
 
 test_that("can explain", {
-  db <- copy_to_test("postgres", data.frame(x = 1:3))
+  db <- copy_to(
+    test_postgres(),
+    data.frame(x = 1:3),
+    name = "test",
+    overwrite = TRUE
+  )
   expect_snapshot(db |> mutate(y = x + 1) |> explain())
 })
 
 test_that("can overwrite temp tables", {
-  src <- src_test("postgres")
+  src <- test_postgres()
   copy_to(src, mtcars, "mtcars", overwrite = TRUE)
   withr::defer(DBI::dbRemoveTable(src, "mtcars"))
   expect_no_error(copy_to(src, mtcars, "mtcars", overwrite = TRUE))
 })
 
 test_that("copy_inline works", {
-  src <- src_test("postgres")
+  src <- test_postgres()
   df <- tibble(
     lgl = TRUE,
     int = 1L,
@@ -343,7 +348,7 @@ test_that("copy_inline works", {
 })
 
 test_that("can insert with returning", {
-  con <- src_test("postgres")
+  con <- test_postgres()
 
   df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
   x <- local_db_table(con, df_x, "df_x")
@@ -410,7 +415,7 @@ test_that("can insert with returning", {
 })
 
 test_that("can use `rows_*()` inside a transaction #1183", {
-  con <- src_test("postgres")
+  con <- test_postgres()
 
   local_db_table(con, tibble(a = 1:2e3, b = 2, x = "a"), "df_x")
 
@@ -426,10 +431,10 @@ test_that("can use `rows_*()` inside a transaction #1183", {
 })
 
 test_that("casts `y` column for local df", {
-  con <- src_test("postgres")
+  con <- test_postgres()
 
   DBI::dbExecute(con, "CREATE SCHEMA dbplyr_test_schema")
-  withr::defer(DBI::dbExecute(con, "DROP SCHEMA dbplyr_test_schema"))
+  withr::defer(DBI::dbExecute(con, "DROP SCHEMA dbplyr_test_schema CASCADE"))
   df <- tibble(id = 1L, val = 10L, arr = "{1,2}")
   types <- c(id = "bigint", val = "bigint", arr = "integer[]")
   local_db_table(con, value = df, types = types, temporary = FALSE, "df_x")
@@ -481,7 +486,7 @@ test_that("casts `y` column for local df", {
 })
 
 test_that("can upsert with returning", {
-  con <- src_test("postgres")
+  con <- test_postgres()
 
   df_x <- tibble(a = 1:2, b = 11:12, c = 1:2, d = c("a", "b"))
   x <- local_db_table(con, df_x, "df_x")
@@ -547,7 +552,7 @@ test_that("can upsert with returning", {
 })
 
 test_that("correctly escapes dates", {
-  con <- src_test("postgres")
+  con <- test_postgres()
 
   dd <- as.Date("2022-03-04")
   expect_equal(escape(dd, con = con), sql("'2022-03-04'::date"))

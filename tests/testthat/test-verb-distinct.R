@@ -1,24 +1,18 @@
-df <- tibble(
-  x = c(1, 1, 1, 1),
-  y = c(1, 1, 2, 2),
-  z = c(1, 2, 1, 2)
-)
-dfs <- test_load(df)
+test_that("basic distinct behaviour is as expected", {
+  db <- local_memdb_frame(x = c(1, 1, 1, 1), y = c(1, 1, 2, 2))
 
-test_that("distinct equivalent to local unique when keep_all is TRUE", {
-  dfs |>
-    lapply(\(df) df |> distinct()) |>
-    expect_equal_tbls(unique(df))
+  expect_equal(db |> distinct() |> collect(), tibble(x = c(1, 1), y = c(1, 2)))
+  expect_equal(db |> distinct(x) |> collect(), tibble(x = 1))
+  expect_equal(db |> distinct(y) |> collect(), tibble(y = c(1, 2)))
 })
 
-test_that("distinct for single column equivalent to local unique (#1937)", {
-  dfs |>
-    lapply(\(df) df |> distinct(x, .keep_all = FALSE)) |>
-    expect_equal_tbls(unique(df["x"]))
+test_that("distinct returns all columns when .keep_all is TRUE", {
+  mf <- local_memdb_frame(x = c(1, 1, 2, 2), y = 1:4)
 
-  dfs |>
-    lapply(\(df) df |> distinct(y, .keep_all = FALSE)) |>
-    expect_equal_tbls(unique(df["y"]))
+  result <- mf |> distinct(x, .keep_all = TRUE) |> collect()
+  expect_named(result, c("x", "y"))
+  expect_equal(result$x, c(1, 2))
+  expect_equal(group_vars(result), character())
 })
 
 test_that("distinct doesn't duplicate column names if grouped (#354)", {
@@ -27,21 +21,13 @@ test_that("distinct doesn't duplicate column names if grouped (#354)", {
 })
 
 test_that("distinct respects groups", {
-  df <- memdb_frame(a = 1:2, b = 1) |> group_by(a)
+  df <- local_memdb_frame(a = 1:2, b = 1) |> group_by(a)
   expect_equal(df |> group_by(a) |> distinct() |> op_vars(), c("a", "b"))
 })
 
-test_that("distinct returns all columns when .keep_all is TRUE", {
-  mf <- memdb_frame(x = c(1, 1, 2, 2), y = 1:4)
-
-  result <- mf |> distinct(x, .keep_all = TRUE) |> collect()
-  expect_named(result, c("x", "y"))
-  expect_equal(result$x, c(1, 2))
-  expect_equal(group_vars(result), character())
-})
 
 test_that("distinct respects groups when .keep_all is TRUE", {
-  mf <- memdb_frame(x = c(1, 1, 2, 2), y = 1:4)
+  mf <- local_memdb_frame(x = c(1, 1, 2, 2), y = 1:4)
 
   result <- mf |> group_by(x) |> distinct(.keep_all = TRUE) |> collect()
   expect_named(result, c("x", "y"))
@@ -168,19 +154,30 @@ test_that("distinct() produces optimized SQL", {
 # sql-render --------------------------------------------------------------
 
 test_that("distinct adds DISTINCT suffix", {
-  out <- memdb_frame(x = c(1, 1)) |> distinct()
+  out <- local_memdb_frame(x = c(1, 1)) |> distinct()
 
   expect_match(out |> sql_render(), "SELECT DISTINCT")
   expect_equal(out |> collect(), tibble(x = 1))
 })
 
 test_that("distinct can compute variables", {
-  out <- memdb_frame(x = c(2, 1), y = c(1, 2)) |> distinct(z = x + y)
+  out <- local_memdb_frame(x = c(2, 1), y = c(1, 2)) |>
+    distinct(z = x + y)
   expect_equal(out |> collect(), tibble(z = 3))
 })
 
+test_that("distinct ignores groups when computing variables (#1081)", {
+  df <- tibble(g = c("a", "a", "b"), x = c(1, 2, 3))
+
+  db <- local_memdb_frame("df", g = c("a", "a", "b"), x = c(1, 2, 3))
+  db_distinct <- db |> group_by(g) |> distinct(n = n()) |> ungroup()
+
+  expect_snapshot(show_query(db_distinct))
+  expect_equal(collect(db_distinct), tibble(g = c("a", "b"), n = 3))
+})
+
 test_that("distinct can compute variables when .keep_all is TRUE", {
-  out <- memdb_frame(x = c(2, 1), y = c(1, 2)) |>
+  out <- local_memdb_frame(x = c(2, 1), y = c(1, 2)) |>
     distinct(z = x + y, .keep_all = TRUE) |>
     collect()
 
@@ -189,7 +186,7 @@ test_that("distinct can compute variables when .keep_all is TRUE", {
 })
 
 test_that("distinct respects window_order when .keep_all is TRUE", {
-  mf <- memdb_frame(x = c(1, 1, 2, 2), y = 1:4)
+  mf <- local_memdb_frame(x = c(1, 1, 2, 2), y = 1:4)
   out <- mf |>
     window_order(desc(y)) |>
     distinct(x, .keep_all = TRUE)

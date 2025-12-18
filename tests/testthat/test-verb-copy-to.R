@@ -13,20 +13,6 @@ test_that("can copy to from remote sources", {
   expect_equal(collect(df_3), df)
 })
 
-test_that("can round trip basic data frame", {
-  df <- test_frame(x = c(1, 10, 9, NA), y = letters[1:4])
-  expect_equal_tbls(df)
-})
-
-test_that("NAs in character fields handled by db sources (#2256)", {
-  df <- test_frame(
-    x = c("a", "aa", NA),
-    y = c(NA, "b", "bb"),
-    z = c("cc", NA, "c")
-  )
-  expect_equal_tbls(df)
-})
-
 test_that("only overwrite existing table if explicitly requested", {
   con <- local_sqlite_connection()
   local_db_table(con, data.frame(x = 1:5), "df")
@@ -91,12 +77,12 @@ test_that("as_copy() errors on invalid values", {
 # dbplyr_auto_copy() ----------------------------------------------------
 
 test_that("dbplyr_auto_copy() returns y if same source", {
-  df <- memdb_frame(x = 1:3)
+  df <- local_memdb_frame(x = 1:3)
   expect_identical(dbplyr_auto_copy(df, df, copy = FALSE), df)
 })
 
 test_that("dbplyr_auto_copy() errors when copy = FALSE and different sources", {
-  df <- memdb_frame(x = 1:3)
+  df <- local_memdb_frame(x = 1:3)
   local_df <- tibble(x = 1:3)
 
   expect_snapshot(dbplyr_auto_copy(df, local_df, copy = FALSE), error = TRUE)
@@ -104,7 +90,7 @@ test_that("dbplyr_auto_copy() errors when copy = FALSE and different sources", {
 })
 
 test_that("dbplyr_auto_copy() with copy = TRUE copies to temp table", {
-  df <- memdb_frame(x = 1:3)
+  df <- local_memdb_frame(x = 1:3)
   local_df <- tibble(x = 1:3)
 
   out <- dbplyr_auto_copy(df, local_df, copy = TRUE)
@@ -113,7 +99,7 @@ test_that("dbplyr_auto_copy() with copy = TRUE copies to temp table", {
 })
 
 test_that("dbplyr_auto_copy() with copy = 'inline' uses copy_inline", {
-  df <- memdb_frame(x = 1:3)
+  df <- local_memdb_frame(x = 1:3)
   local_df <- tibble(x = 1:3)
 
   out <- dbplyr_auto_copy(df, local_df, copy = "inline")

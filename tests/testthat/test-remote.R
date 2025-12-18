@@ -1,15 +1,14 @@
 test_that("remote_table returns name when it makes sense", {
-  mf <- copy_to_test("sqlite", tibble(x = 5), name = "refxiudlph")
+  mf <- copy_to(
+    test_sqlite(),
+    tibble(x = 5),
+    name = "refxiudlph",
+    overwrite = TRUE
+  )
 
   # produces name after `group_by()`
   expect_equal(
     mf |> group_by(x) |> remote_table(),
-    table_path("`refxiudlph`")
-  )
-
-  # produces name after unarranging
-  expect_equal(
-    mf |> arrange(x) |> arrange() |> remote_table(),
     table_path("`refxiudlph`")
   )
 
@@ -20,7 +19,12 @@ test_that("remote_table returns name when it makes sense", {
 })
 
 test_that("remote_table returns null for computed tables", {
-  mf <- copy_to_test("sqlite", tibble(x = 5, y = 1), name = "refxiudlph")
+  mf <- copy_to(
+    test_sqlite(),
+    tibble(x = 5, y = 1),
+    name = "refxiudlph",
+    overwrite = TRUE
+  )
   expect_equal(remote_table(mf), table_path("`refxiudlph`"))
 
   expect_null(mf |> filter(x == 3) |> remote_table())
@@ -67,7 +71,7 @@ test_that("remote_name and remote_table can handle different table identifiers",
 })
 
 test_that("can retrieve query, src and con metadata", {
-  mf <- memdb_frame(x = 5)
+  mf <- local_memdb_frame(x = 5)
 
   expect_s4_class(remote_con(mf), "DBIConnection")
   expect_s3_class(remote_src(mf), "src_sql")
@@ -78,9 +82,9 @@ test_that("can retrieve query, src and con metadata", {
 test_that("last_sql() retrieves the most recent query", {
   lf <- lazy_frame(x = 1:3, y = c("a", "b", "c"))
 
-  lf |> filter(x > 1) |> show_query()
+  capture.output(lf |> filter(x > 1) |> show_query())
   expect_match(last_sql(), "WHERE")
 
-  lf |> mutate(z = x + 1) |> show_query()
+  capture.output(lf |> mutate(z = x + 1) |> show_query())
   expect_match(last_sql(), "\\+ 1")
 })

@@ -593,7 +593,7 @@ test_that("count_big", {
 # Live database -----------------------------------------------------------
 
 test_that("can copy_to() and compute() with temporary tables (#438)", {
-  con <- src_test("mssql")
+  con <- test_mssql()
   df <- tibble(x = 1:3)
 
   # converts to name automatically with message
@@ -625,12 +625,12 @@ test_that("add prefix to temporary table", {
 
 test_that("bit conversion works for important cases", {
   df <- tibble(x = 1:3, y = 3:1)
-  db <- copy_to(src_test("mssql"), df, name = unique_table_name("#"))
+  db <- copy_to(test_mssql(), df, name = unique_table_name("#"))
   expect_equal(db |> mutate(z = x == y) |> pull(), c(FALSE, TRUE, FALSE))
   expect_equal(db |> filter(x == y) |> pull(), 2)
 
   df <- tibble(x = c(TRUE, FALSE, FALSE), y = c(TRUE, FALSE, TRUE))
-  db <- copy_to(src_test("mssql"), df, name = unique_table_name("#"))
+  db <- copy_to(test_mssql(), df, name = unique_table_name("#"))
   expect_equal(db |> filter(x == 1) |> pull(), TRUE)
   expect_equal(db |> mutate(z = TRUE) |> pull(), c(1, 1, 1))
 
@@ -643,7 +643,7 @@ test_that("bit conversion works for important cases", {
 
 test_that("as.integer and as.integer64 translations if parsing failures", {
   df <- data.frame(x = c("1.3", "2x"))
-  db <- copy_to(src_test("mssql"), df, name = unique_table_name("#"))
+  db <- copy_to(test_mssql(), df, name = unique_table_name("#"))
 
   out <- db |>
     mutate(
@@ -659,7 +659,7 @@ test_that("as.integer and as.integer64 translations if parsing failures", {
 })
 
 test_that("can insert", {
-  con <- src_test("mssql")
+  con <- test_mssql()
 
   df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
   x <- local_db_table(con, df_x, "df_x")
@@ -686,7 +686,7 @@ test_that("can insert", {
 })
 
 test_that("can insert with returning", {
-  con <- src_test("mssql")
+  con <- test_mssql()
 
   df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
   x <- local_db_table(con, df_x, "df_x")
@@ -714,7 +714,7 @@ test_that("can insert with returning", {
 })
 
 test_that("can append", {
-  con <- src_test("mssql")
+  con <- test_mssql()
 
   df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
   x <- local_db_table(con, df_x, "df_x")
@@ -739,7 +739,7 @@ test_that("can append", {
 })
 
 test_that("can append with returning", {
-  con <- src_test("mssql")
+  con <- test_mssql()
 
   df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
   x <- local_db_table(con, df_x, "df_x")
@@ -765,7 +765,7 @@ test_that("can append with returning", {
 })
 
 test_that("can update", {
-  con <- src_test("mssql")
+  con <- test_mssql()
 
   df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
   x <- local_db_table(con, df_x, "df_x")
@@ -792,7 +792,7 @@ test_that("can update", {
 })
 
 test_that("can update with returning", {
-  con <- src_test("mssql")
+  con <- test_mssql()
 
   df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
   x <- local_db_table(con, df_x, "df_x")
@@ -820,7 +820,7 @@ test_that("can update with returning", {
 })
 
 test_that("can upsert", {
-  con <- src_test("mssql")
+  con <- test_mssql()
 
   df_x <- tibble(a = 1:2, b = 11:12, c = 1:2, d = c("a", "b"))
   x <- local_db_table(con, df_x, "df_x")
@@ -846,7 +846,7 @@ test_that("can upsert", {
 })
 
 test_that("can upsert with returning", {
-  con <- src_test("mssql")
+  con <- test_mssql()
 
   df_x <- tibble(a = 1:2, b = 11:12, c = 1:2, d = c("a", "b"))
   x <- local_db_table(con, df_x, "df_x")
@@ -874,7 +874,7 @@ test_that("can upsert with returning", {
 })
 
 test_that("can delete", {
-  con <- src_test("mssql")
+  con <- test_mssql()
 
   df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
   x <- local_db_table(con, df_x, "df_x")
@@ -900,7 +900,7 @@ test_that("can delete", {
 })
 
 test_that("can delete with returning", {
-  con <- src_test("mssql")
+  con <- test_mssql()
 
   df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
   x <- local_db_table(con, df_x, "df_x")

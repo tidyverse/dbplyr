@@ -1,6 +1,12 @@
 # dbplyr (development version)
 
 * `slice_*()` now handles missing values in line with the documentation, i.e. they are always removed (#1599).
+* Internal testing functions `src_test()`, `test_frame()` and `test_load()`, `test_register_src()` and `test_register_con()` have been removed.
+* A `filter()` followed by a `summarise()` is once again inlined correctly (#1707).
+* `src_memdb()` and `tbl_memdb()` are deprecated; use `memdb()` and `copy_to(memdb(), df)` instead. New `local_memdb_frame()` for use in tests.
+* `arrange()` now applies consecutively, matching dplyr's behavior: `arrange(y) |> arrange(x)` is now equivalent to `arrange(x, y)`. Empty `arrange()` now preserves existing ordering instead of clearing it (#789).
+* `distinct()` with computed columns now ignores grouping, matching dplyr's behavior (#1081).
+* `sql_escape_string()` now defaults to using `'`.
 * `simulate_*()` now uses (approximately) correct quoting for all backends, so the generated SQL looks more like what you'll actually get when connected to a real database (#1464).
 * `sql_infix()` no longer has a `con` argument since the connection needs to be determined at call time, not at definition time. 
 * `mutate()` gains `.order` and `.frame` arguments for specifying window function ordering and frame bounds within a single mutate call, similar to how `.by` works for grouping (#1542).

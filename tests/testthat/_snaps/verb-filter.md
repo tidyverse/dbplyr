@@ -1,23 +1,25 @@
 # two filters equivalent to one
 
     Code
-      remote_query(lf1)
+      show_query(df1)
     Output
-      <SQL> SELECT "df".*
-      FROM "df"
-      WHERE ("x" > 3.0) AND ("y" < 3.0)
+      <SQL>
+      SELECT `df`.*
+      FROM `df`
+      WHERE (`x` > 3.0) AND (`y` < 3.0)
 
 ---
 
     Code
-      remote_query(lf1)
+      show_query(df2)
     Output
-      <SQL> SELECT "x", "y"
+      <SQL>
+      SELECT `x`, `y`, `id`
       FROM (
-        SELECT "df".*, AVG("x") OVER () AS "col01"
-        FROM "df"
-      ) AS "q01"
-      WHERE ("col01" > 3.0) AND ("y" < 3.0)
+        SELECT `df`.*, AVG(`x`) OVER () AS `col01`
+        FROM `df`
+      ) AS `q01`
+      WHERE (`col01` > 2.0) AND (`y` < 3.0)
 
 # errors for named input
 

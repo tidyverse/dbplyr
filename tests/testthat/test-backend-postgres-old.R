@@ -1,5 +1,5 @@
 test_that("works with RPostgreSQL backend", {
-  skip_if_not(identical(Sys.getenv("GITHUB_POSTGRES"), "true"))
+  skip_if_not(on_github_postgres(), "No postgres")
 
   src <- withr::local_db_connection(
     DBI::dbConnect(

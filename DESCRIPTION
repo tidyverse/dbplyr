@@ -131,8 +131,6 @@ Collate:
     'table-name.R'
     'tbl-lazy.R'
     'tbl-sql.R'
-    'test-frame.R'
-    'testthat.R'
     'tidyeval-across.R'
     'tidyeval.R'
     'translate-sql.R'

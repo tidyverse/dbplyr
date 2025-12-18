@@ -65,7 +65,7 @@ test_that("sql_str_sub can require length parameter", {
 })
 
 test_that("str_sub() returns consistent results", {
-  mf <- memdb_frame(t = "abcde")
+  mf <- local_memdb_frame(t = "abcde")
 
   expect_equal(mf |> transmute(str_sub(t, -3, -1)) |> pull(1), "cde")
   expect_equal(mf |> transmute(str_sub(t, 0, -1)) |> pull(1), "abcde")
@@ -81,7 +81,9 @@ test_that("str_sub() returns consistent results", {
 })
 
 test_that("str_detect(), str_starts(), str_ends() support fixed patterns", {
-  mf <- memdb_frame(x = c("%0 start", "end %0", "detect %0 detect", "no", NA))
+  mf <- local_memdb_frame(
+    x = c("%0 start", "end %0", "detect %0 detect", "no", NA)
+  )
 
   # detects fixed pattern
   expect_equal(

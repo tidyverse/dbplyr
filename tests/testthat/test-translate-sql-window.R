@@ -186,7 +186,7 @@ test_that("win_cumulative works", {
   )
 
   # NA values results in NA rank
-  db <- memdb_frame(x = c(1, 2, NA, 3))
+  db <- local_memdb_frame(x = c(1, 2, NA, 3))
   expect_equal(
     db |> mutate(rank = dense_rank(x)) |> collect() |> arrange(x),
     tibble(x = c(1:3, NA), rank = c(1:3, NA))

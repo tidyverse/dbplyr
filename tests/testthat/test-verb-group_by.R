@@ -1,5 +1,5 @@
 test_that("group_by with .add = TRUE adds groups", {
-  mf <- memdb_frame(x = 1:3, y = 1:3)
+  mf <- local_memdb_frame(x = 1:3, y = 1:3)
   gf1 <- mf |> group_by(x, y)
   gf2 <- mf |> group_by(x) |> group_by(y, .add = TRUE)
 
@@ -30,7 +30,7 @@ test_that("group_by() produces nice error messages", {
 })
 
 test_that("collect, collapse and compute preserve grouping", {
-  g <- memdb_frame(x = 1:3, y = 1:3) |> group_by(x, y)
+  g <- local_memdb_frame(x = 1:3, y = 1:3) |> group_by(x, y)
 
   expect_equal(group_vars(compute(g)), c("x", "y"))
   expect_equal(group_vars(collapse(g)), c("x", "y"))
@@ -38,7 +38,7 @@ test_that("collect, collapse and compute preserve grouping", {
 })
 
 test_that("joins preserve grouping", {
-  g <- memdb_frame(x = 1:3, y = 1:3) |> group_by(x)
+  g <- local_memdb_frame(x = 1:3, y = 1:3) |> group_by(x)
 
   expect_equal(group_vars(inner_join(g, g, by = c("x", "y"))), "x")
   expect_equal(group_vars(left_join(g, g, by = c("x", "y"))), "x")
@@ -47,7 +47,7 @@ test_that("joins preserve grouping", {
 })
 
 test_that("group_by can perform mutate", {
-  mf <- memdb_frame(x = 3:1, y = 1:3)
+  mf <- local_memdb_frame(x = 3:1, y = 1:3)
   out <- mf |>
     group_by(z = x + y) |>
     summarise(n = n()) |>
