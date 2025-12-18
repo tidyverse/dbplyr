@@ -5,40 +5,32 @@ on_github_postgres <- function() {
 }
 on_github_mssql <- function() identical(Sys.getenv("GITHUB_MSSQL"), "true")
 
+con_cache <- new_environment()
+reg.finalizer(con_cache, function(e) {
+  for (con in env_names(con_cache)) {
+    DBI::dbDisconnect(con_cache[[con]])
+  }
+})
+
 cache_test_con <- function(name, get_args) {
-  cache <- cache()
-  cache_name <- paste0("test_con_", name)
-
-  if (env_has(cache, cache_name)) {
-    con <- env_get(cache, cache_name)
-    if (is.null(con)) {
-      testthat::skip(paste0("No ", name))
+  if (!env_has(con_cache, name)) {
+    args <- get_args()
+    if (is.null(args)) {
+      con <- NULL
+    } else {
+      con <- tryCatch(exec(DBI::dbConnect, !!!args), error = \(e) NULL)
     }
-    return(con)
+
+    env_poke(con_cache, name, con)
+  } else {
+    con <- env_get(con_cache, name)
   }
 
-  args <- get_args()
-  if (is.null(args)) {
-    env_poke(cache, cache_name, NULL)
+  if (is.null(con)) {
     testthat::skip(paste0("No ", name))
+  } else {
+    con
   }
-
-  tryCatch(
-    {
-      con <- exec(DBI::dbConnect, !!!args)
-      env_poke(cache, cache_name, con)
-      con
-    },
-    error = function(e) {
-      env_poke(cache, cache_name, NULL)
-      testthat::skip(paste0(
-        "Can't connect to ",
-        name,
-        ": ",
-        conditionMessage(e)
-      ))
-    }
-  )
 }
 
 test_sqlite <- function() {
