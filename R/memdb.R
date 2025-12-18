@@ -7,11 +7,11 @@
 #'
 #' `memdb_frame()` works like [tibble::tibble()], but instead of creating a new
 #' data frame in R, it creates a table in `memdb()`. `local_memdb_frame()`
-#' is like `memdb_frame()` but it creates a table with specified name that is
-#' automatically deleted when the current scope ends. It's useful for tests.
+#' is like `memdb_frame()` but the table will be automatically deleted when
+#' the current scope ends. It's useful for tests.
 #'
 #' @inheritParams tibble::tibble
-#' @param name,.name Name of table in database: defaults to a random name that's
+#' @param .name Name of table in database: defaults to a random name that's
 #'   unlikely to conflict with an existing table.
 #' @export
 #' @examples
@@ -31,7 +31,7 @@ memdb <- function() {
 
 #' @rdname memdb
 #' @export
-memdb_frame <- function(..., .name = unique_table_name()) {
+memdb_frame <- function(.name = unique_table_name(), ...) {
   x <- copy_to(memdb(), tibble(...), name = .name)
   x
 }
@@ -40,10 +40,12 @@ memdb_frame <- function(..., .name = unique_table_name()) {
 #' @param frame The created table is bound to this execution frame and will
 #'   be deleted when it ends. For expert use only.
 #' @export
-local_memdb_frame <- function(.name, ..., frame = caller_env()) {
-  df <- tibble::tibble(...)
-
-  tbl <- copy_to(memdb(), df, .name)
+local_memdb_frame <- function(
+  .name = unique_table_name(),
+  ...,
+  frame = caller_env()
+) {
+  tbl <- copy_to(memdb(), tibble(...), .name)
   withr::defer(DBI::dbRemoveTable(memdb(), .name), envir = frame)
   tbl
 }

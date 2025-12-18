@@ -8,11 +8,14 @@
 \usage{
 memdb()
 
-memdb_frame(..., .name = unique_table_name())
+memdb_frame(.name = unique_table_name(), ...)
 
-local_memdb_frame(.name, ..., frame = caller_env())
+local_memdb_frame(.name = unique_table_name(), ..., frame = caller_env())
 }
 \arguments{
+\item{.name}{Name of table in database: defaults to a random name that's
+unlikely to conflict with an existing table.}
+
 \item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}>
 A set of name-value pairs. These arguments are
 processed with \code{\link[rlang:defusing-advanced]{rlang::quos()}} and support unquote via \code{\link[rlang:injection-operator]{rlang::!!}} and
@@ -27,9 +30,6 @@ named \code{.data}.}
 
 \item{frame}{The created table is bound to this execution frame and will
 be deleted when it ends. For expert use only.}
-
-\item{name, .name}{Name of table in database: defaults to a random name that's
-unlikely to conflict with an existing table.}
 }
 \description{
 \code{memdb()} creates a temporary in-memory database that disappears when the
@@ -38,8 +38,8 @@ dbplyr without having to connect to a "real" database.
 
 \code{memdb_frame()} works like \code{\link[tibble:tibble]{tibble::tibble()}}, but instead of creating a new
 data frame in R, it creates a table in \code{memdb()}. \code{local_memdb_frame()}
-is like \code{memdb_frame()} but it creates a table with specified name that is
-automatically deleted when the current scope ends. It's useful for tests.
+is like \code{memdb_frame()} but the table will be automatically deleted when
+the current scope ends. It's useful for tests.
 }
 \examples{
 library(dplyr)
