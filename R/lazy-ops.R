@@ -86,7 +86,7 @@ sql_render.base_query <- function(
     from
   } else {
     from <- escape(from, con = con)
-    dbplyr_query_select(con, sql("*"), from, lvl = lvl)
+    sql_query_select(con, sql("*"), from, lvl = lvl)
   }
 }
 
