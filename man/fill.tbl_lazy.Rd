@@ -22,6 +22,8 @@ Fill in missing values with previous or next value
 }
 \examples{
 \dontshow{if (rlang::is_installed("tidyr", version = "1.0.0")) withAutoprint(\{ # examplesIf}
+library(dplyr, warn.conflicts = FALSE)
+
 squirrels <- tibble::tribble(
   ~group,    ~name,     ~role,     ~n_squirrels, ~ n_squirrels2,
   1,      "Sam",    "Observer",   NA,                 1,
