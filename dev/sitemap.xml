@@ -64,7 +64,7 @@
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/lahman.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/last_sql.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/lazy_ops.html</loc></url>
-<url><loc>https://dbplyr.tidyverse.org/dev/reference/memdb_frame.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/memdb.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/mutate.tbl_lazy.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/named_commas.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/nycflights13.html</loc></url>
@@ -91,6 +91,7 @@
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_translation_window.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_variant.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/src_dbi.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/src_memdb.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/summarise.tbl_lazy.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/tbl.src_dbi.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/tbl_lazy.html</loc></url>

@@ -88,7 +88,9 @@ yourself beforehand; for example replace <code>arrange(x, desc(y))</code> by
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">squirrels</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span>, warn.conflicts <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">squirrels</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="op">~</span><span class="va">group</span>,    <span class="op">~</span><span class="va">name</span>,     <span class="op">~</span><span class="va">role</span>,     <span class="op">~</span><span class="va">n_squirrels</span>, <span class="op">~</span> <span class="va">n_squirrels2</span>,</span></span>
 <span class="r-in"><span>  <span class="fl">1</span>,      <span class="st">"Sam"</span>,    <span class="st">"Observer"</span>,   <span class="cn">NA</span>,                 <span class="fl">1</span>,</span></span>
 <span class="r-in"><span>  <span class="fl">1</span>,     <span class="st">"Mara"</span>, <span class="st">"Scorekeeper"</span>,    <span class="fl">8</span>,                <span class="cn">NA</span>,</span></span>
@@ -105,12 +107,10 @@ yourself beforehand; for example replace <code>arrange(x, desc(y))</code> by
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">squirrels</span><span class="op">$</span><span class="va">id</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fl">12</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="memdb_frame.html">tbl_memdb</a></span><span class="op">(</span><span class="va">squirrels</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span><span class="va">squirrels_db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to</a></span><span class="op">(</span><span class="fu"><a href="memdb.html">memdb</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">squirrels</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">squirrels_db</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="window_order.html">window_order</a></span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/fill.html" class="external-link">fill</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="va">n_squirrels</span>,</span></span>
-<span class="r-in"><span>    <span class="va">n_squirrels2</span>,</span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/fill.html" class="external-link">fill</a></span><span class="op">(</span><span class="va">n_squirrels</span>, <span class="va">n_squirrels2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A query:    ?? x 6</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database:   sqlite 3.51.1 [:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Ordered by: id</span></span>

@@ -111,7 +111,7 @@ to use small data in an SQL query without actually writing to a table.
 library(dplyr, warn.conflicts = FALSE)
 
 df <- data.frame(x = 1:5, y = letters[5:1])
-db <- copy_to(src_memdb(), df)
+db <- copy_to(memdb(), df)
 db
 #> # A query:  ?? x 2
 #> # Database: sqlite 3.51.1 [:memory:]

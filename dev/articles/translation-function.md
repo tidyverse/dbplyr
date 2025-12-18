@@ -159,7 +159,7 @@ df <- tibble(
   x = c(10L, 10L, -10L, -10L),
   y = c(3L, -3L, 3L, -3L)
 )
-db <- tbl_memdb(df)
+db <- copy_to(memdb(), df)
 
 df |> mutate(x %% y)
 #> # A tibble: 4 × 3

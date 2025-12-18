@@ -30,6 +30,8 @@ fill(.data, ..., .direction = c("down", "up", "updown", "downup"))
 ## Examples
 
 ``` r
+library(dplyr, warn.conflicts = FALSE)
+
 squirrels <- tibble::tribble(
   ~group,    ~name,     ~role,     ~n_squirrels, ~ n_squirrels2,
   1,      "Sam",    "Observer",   NA,                 1,
@@ -47,12 +49,10 @@ squirrels <- tibble::tribble(
 )
 squirrels$id <- 1:12
 
-tbl_memdb(squirrels) |>
+squirrels_db <- copy_to(memdb(), squirrels)
+squirrels_db |>
   window_order(id) |>
-  tidyr::fill(
-    n_squirrels,
-    n_squirrels2,
-  )
+  tidyr::fill(n_squirrels, n_squirrels2)
 #> # A query:    ?? x 6
 #> # Database:   sqlite 3.51.1 [:memory:]
 #> # Ordered by: id

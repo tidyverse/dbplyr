@@ -2,6 +2,14 @@
 
 ## dbplyr (development version)
 
+- [`src_memdb()`](https://dbplyr.tidyverse.org/dev/reference/src_memdb.md)
+  and
+  [`tbl_memdb()`](https://dbplyr.tidyverse.org/dev/reference/src_memdb.md)
+  are deprecated; use
+  [`memdb()`](https://dbplyr.tidyverse.org/dev/reference/memdb.md) and
+  `copy_to(memdb(), df)` instead. New
+  [`local_memdb_frame()`](https://dbplyr.tidyverse.org/dev/reference/memdb.md)
+  for use in tests.
 - [`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html) now
   applies consecutively, matching dplyr’s behavior:
   `arrange(y) |> arrange(x)` is now equivalent to `arrange(x, y)`. Empty
@@ -2219,7 +2227,7 @@ CRAN release: 2019-04-23
   gives some hints on creating reprexes that work anywhere
   ([\#117](https://github.com/tidyverse/dbplyr/issues/117)). This is
   supported by a new
-  [`tbl_memdb()`](https://dbplyr.tidyverse.org/dev/reference/memdb_frame.md)
+  [`tbl_memdb()`](https://dbplyr.tidyverse.org/dev/reference/src_memdb.md)
   that matches the existing
   [`tbl_lazy()`](https://dbplyr.tidyverse.org/dev/reference/tbl_lazy.md).
 

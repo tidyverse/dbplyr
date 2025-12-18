@@ -255,10 +255,10 @@ contributing to this project, you agree to abide by its terms.
 
 ## Database connection
 
-- [`memdb_frame()`](https://dbplyr.tidyverse.org/dev/reference/memdb_frame.md)
-  [`tbl_memdb()`](https://dbplyr.tidyverse.org/dev/reference/memdb_frame.md)
-  [`src_memdb()`](https://dbplyr.tidyverse.org/dev/reference/memdb_frame.md)
-  : Create a database table in temporary in-memory database.
+- [`memdb()`](https://dbplyr.tidyverse.org/dev/reference/memdb.md)
+  [`memdb_frame()`](https://dbplyr.tidyverse.org/dev/reference/memdb.md)
+  [`local_memdb_frame()`](https://dbplyr.tidyverse.org/dev/reference/memdb.md)
+  : A temporary in-memory database
 - [`remote_name()`](https://dbplyr.tidyverse.org/dev/reference/remote_name.md)
   [`remote_table()`](https://dbplyr.tidyverse.org/dev/reference/remote_name.md)
   [`remote_src()`](https://dbplyr.tidyverse.org/dev/reference/remote_name.md)

@@ -12,7 +12,7 @@ This vignette outlines three approaches for creating reprexes that will
 work anywhere:
 
 - Use
-  [`memdb_frame()`](https://dbplyr.tidyverse.org/dev/reference/memdb_frame.md)/[`tbl_memdb()`](https://dbplyr.tidyverse.org/dev/reference/memdb_frame.md)
+  [`memdb_frame()`](https://dbplyr.tidyverse.org/dev/reference/memdb.md)/[`tbl_memdb()`](https://dbplyr.tidyverse.org/dev/reference/src_memdb.md)
   to easily create datasets that live in an in-memory SQLite database.
 
 - Use
@@ -37,7 +37,7 @@ and simple, so it can’t demonstrate all problems, but it’s easy to try
 out and a great place to start.
 
 You can easily create a SQLite in-memory database table using
-[`memdb_frame()`](https://dbplyr.tidyverse.org/dev/reference/memdb_frame.md):
+[`memdb_frame()`](https://dbplyr.tidyverse.org/dev/reference/memdb.md):
 
 ``` r
 mf <- memdb_frame(g = c(1, 1, 2, 2, 2), x = 1:5, y = 5:1)
@@ -65,10 +65,11 @@ mf |>
 
 Reprexes are easiest to understand if you create very small custom data,
 but if you do want to use an existing data frame you can use
-[`tbl_memdb()`](https://dbplyr.tidyverse.org/dev/reference/memdb_frame.md):
+[`copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html) +
+[`memdb()`](https://dbplyr.tidyverse.org/dev/reference/memdb.md):
 
 ``` r
-mtcars_db <- tbl_memdb(mtcars)
+mtcars_db <- copy_to(memdb(), mtcars)
 mtcars_db |> 
   group_by(cyl) |> 
   summarise(n = n()) |> 
