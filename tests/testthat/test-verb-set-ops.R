@@ -16,30 +16,27 @@ test_that("missing columns filled with NULL", {
 
 # SQL generation ----------------------------------------------------------
 
-test_that("set ops generates correct sql", {
-  lf1 <- local_memdb_frame(x = 1)
-  lf2 <- local_memdb_frame(x = c(1, 2))
+test_that("basic set ops work as expected", {
+  db1 <- local_memdb_frame("db1", x = c(1, 3))
+  db2 <- local_memdb_frame("db2", x = c(1, 2))
 
-  out <- lf1 |>
-    union(lf2) |>
-    collect()
-
-  expect_equal(out, tibble(x = c(1, 2)))
+  expect_equal(sort(pull(union(db1, db2))), c(1, 2, 3))
+  expect_equal(sort(pull(union_all(db1, db2))), c(1, 2, 2, 3))
+  expect_equal(sort(pull(intersect(db1, db2))), 1)
+  expect_equal(sort(pull(setdiff(db1, db2))), 3)
+  expect_equal(sort(pull(setdiff(db2, db1))), 2)
 })
 
-test_that("union and union all work for all backends", {
-  df <- tibble(x = 1:10, y = x %% 2)
+test_that("basic set ops generate expected SQL", {
+  db1 <- lazy_frame(x = 1, .name = "db1")
+  db2 <- lazy_frame(x = 1, .name = "db2")
 
-  tbls_full <- test_load(df)
-  tbls_filter <- test_load(filter(df, y == 0))
-
-  tbls_full |>
-    purrr::map2(tbls_filter, union) |>
-    expect_equal_tbls()
-
-  tbls_full |>
-    purrr::map2(tbls_filter, union_all) |>
-    expect_equal_tbls()
+  expect_snapshot({
+    union(db1, db2)
+    union_all(db1, db2)
+    intersect(db1, db2)
+    setdiff(db1, db2)
+  })
 })
 
 test_that("can combine multiple unions in one query", {
@@ -65,22 +62,6 @@ test_that("set ops correctly quote reused queries in CTEs", {
   )
 })
 
-test_that("intersect and setdiff work for supported backends", {
-  df <- tibble(x = 1:10, y = x %% 2)
-
-  # MySQL doesn't support EXCEPT or INTERSECT
-  tbls_full <- test_load(df, ignore = c("mysql", "MariaDB"))
-  tbls_filter <- test_load(filter(df, y == 0), ignore = c("mysql", "MariaDB"))
-
-  tbls_full |>
-    purrr::map2(tbls_filter, intersect) |>
-    expect_equal_tbls()
-
-  tbls_full |>
-    purrr::map2(tbls_filter, setdiff) |>
-    expect_equal_tbls()
-})
-
 test_that("SQLite warns if set op attempted when tbl has LIMIT", {
   mf <- local_memdb_frame(x = 1:2)
   m1 <- head(mf, 1)
@@ -89,22 +70,12 @@ test_that("SQLite warns if set op attempted when tbl has LIMIT", {
   expect_error(union(m1, mf), "does not support")
 })
 
-test_that("other backends can combine with a limit", {
-  df <- tibble(x = 1:2)
+test_that("but it can work with another backend", {
+  con <- src_test("postgres")
+  db <- local_db_table(con, tibble(x = 1:2), "db")
 
-  ignore <- c(
-    "sqlite", # only allows limit at top level
-    "mssql" # unusual execution order gives unintuitive result
-  )
-  tbls_full <- test_load(df, ignore = ignore)
-  tbls_head <- lapply(test_load(df, ignore = ignore), head, n = 1)
-
-  tbls_full |>
-    purrr::map2(tbls_head, union) |>
-    expect_equal_tbls(head(df, 1))
-  tbls_full |>
-    purrr::map2(tbls_head, union_all) |>
-    expect_equal_tbls(head(df, 1))
+  out <- collect(head(union_all(db, db), 2))
+  expect_equal(nrow(out), 2)
 })
 
 test_that("intersect works with copy = 'temp-table'", {
