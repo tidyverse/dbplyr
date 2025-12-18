@@ -139,6 +139,17 @@ END"
   )
 })
 
+# win_rank() -------------------------------------------------------------------
+
+test_that("win_rank() correctly handles missing values", {
+  db <- local_memdb_frame(x = c(1, 1, 2, NA), id = 1:4)
+  out <- db |> mutate(asc = rank(x), desc = rank(desc(x))) |> arrange(id)
+
+  # Need to test both asc and desc because NULLs can end up in different place
+  expect_equal(out |> pull(asc), c(1, 1, 3, NA))
+  expect_equal(out |> pull(desc), c(2, 2, 1, NA))
+})
+
 test_that("win_rank(desc(x)) works", {
   con <- simulate_dbi()
   expect_translation(
@@ -197,7 +208,7 @@ test_that("win_cumulative works", {
   )
 
   # NA values results in NA rank
-  db <- memdb_frame(x = c(1, 2, NA, 3))
+  db <- local_memdb_frame(x = c(1, 2, NA, 3))
   expect_equal(
     db |> mutate(rank = dense_rank(x)) |> collect() |> arrange(x),
     tibble(x = c(1:3, NA), rank = c(1:3, NA))

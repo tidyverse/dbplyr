@@ -30,7 +30,7 @@ test_that("optimisation is turned on by default", {
 })
 
 test_that("group by then limit is collapsed", {
-  lf <- memdb_frame(x = 1:10, y = 2) |>
+  lf <- local_memdb_frame(x = 1:10, y = 2) |>
     group_by(x) |>
     summarise(y = sum(y, na.rm = TRUE)) |>
     head(1)
@@ -44,7 +44,7 @@ test_that("group by then limit is collapsed", {
 })
 
 test_that("filter and rename are correctly composed", {
-  lf <- memdb_frame(x = 1, y = 2) |>
+  lf <- local_memdb_frame(x = 1, y = 2) |>
     filter(x == 1) |>
     select(x = y)
 
@@ -57,7 +57,7 @@ test_that("filter and rename are correctly composed", {
 })
 
 test_that("trivial subqueries are collapsed", {
-  lf <- memdb_frame(a = 1:3) |>
+  lf <- local_memdb_frame(a = 1:3) |>
     mutate(b = a + 1) |>
     distinct() |>
     arrange()

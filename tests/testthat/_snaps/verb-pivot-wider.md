@@ -13,15 +13,15 @@
 # implicit missings turn into explicit missings
 
     Code
-      dbplyr_pivot_wider_spec(lazy_frame(a = 1:2, key = c("x", "y"), val = 1:2), spec)
+      show_query(dbplyr_pivot_wider_spec(df, spec))
     Output
       <SQL>
       SELECT
-        "a",
-        MAX(CASE WHEN ("key" = 'x') THEN "val" END) AS "x",
-        MAX(CASE WHEN ("key" = 'y') THEN "val" END) AS "y"
-      FROM "df"
-      GROUP BY "a"
+        `a`,
+        MAX(CASE WHEN (`key` = 'x') THEN `val` END) AS `x`,
+        MAX(CASE WHEN (`key` = 'y') THEN `val` END) AS `y`
+      FROM `df`
+      GROUP BY `a`
 
 # error when overwriting existing column
 

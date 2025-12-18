@@ -140,7 +140,11 @@ test_that("can translate nzchar", {
 # aggregates --------------------------------------------------------------
 
 test_that("all and any translated correctly", {
-  db <- memdb_frame(g = c(1, 1, 2, 2, 3, 3), x = c(0, 0, 0, 1, 1, 1))
+  db <- local_memdb_frame(
+    "df",
+    g = c(1, 1, 2, 2, 3, 3),
+    x = c(0, 0, 0, 1, 1, 1)
+  )
 
   sum_all_g <- db |>
     group_by(g) |>

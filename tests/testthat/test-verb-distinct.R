@@ -27,12 +27,12 @@ test_that("distinct doesn't duplicate column names if grouped (#354)", {
 })
 
 test_that("distinct respects groups", {
-  df <- memdb_frame(a = 1:2, b = 1) |> group_by(a)
+  df <- local_memdb_frame(a = 1:2, b = 1) |> group_by(a)
   expect_equal(df |> group_by(a) |> distinct() |> op_vars(), c("a", "b"))
 })
 
 test_that("distinct returns all columns when .keep_all is TRUE", {
-  mf <- memdb_frame(x = c(1, 1, 2, 2), y = 1:4)
+  mf <- local_memdb_frame(x = c(1, 1, 2, 2), y = 1:4)
 
   result <- mf |> distinct(x, .keep_all = TRUE) |> collect()
   expect_named(result, c("x", "y"))
@@ -41,7 +41,7 @@ test_that("distinct returns all columns when .keep_all is TRUE", {
 })
 
 test_that("distinct respects groups when .keep_all is TRUE", {
-  mf <- memdb_frame(x = c(1, 1, 2, 2), y = 1:4)
+  mf <- local_memdb_frame(x = c(1, 1, 2, 2), y = 1:4)
 
   result <- mf |> group_by(x) |> distinct(.keep_all = TRUE) |> collect()
   expect_named(result, c("x", "y"))
@@ -168,14 +168,15 @@ test_that("distinct() produces optimized SQL", {
 # sql-render --------------------------------------------------------------
 
 test_that("distinct adds DISTINCT suffix", {
-  out <- memdb_frame(x = c(1, 1)) |> distinct()
+  out <- local_memdb_frame(x = c(1, 1)) |> distinct()
 
   expect_match(out |> sql_render(), "SELECT DISTINCT")
   expect_equal(out |> collect(), tibble(x = 1))
 })
 
 test_that("distinct can compute variables", {
-  out <- memdb_frame(x = c(2, 1), y = c(1, 2)) |> distinct(z = x + y)
+  out <- local_memdb_frame(x = c(2, 1), y = c(1, 2)) |>
+    distinct(z = x + y)
   expect_equal(out |> collect(), tibble(z = 3))
 })
 
@@ -190,7 +191,7 @@ test_that("distinct ignores groups when computing variables (#1081)", {
 })
 
 test_that("distinct can compute variables when .keep_all is TRUE", {
-  out <- memdb_frame(x = c(2, 1), y = c(1, 2)) |>
+  out <- local_memdb_frame(x = c(2, 1), y = c(1, 2)) |>
     distinct(z = x + y, .keep_all = TRUE) |>
     collect()
 
@@ -199,7 +200,7 @@ test_that("distinct can compute variables when .keep_all is TRUE", {
 })
 
 test_that("distinct respects window_order when .keep_all is TRUE", {
-  mf <- memdb_frame(x = c(1, 1, 2, 2), y = 1:4)
+  mf <- local_memdb_frame(x = c(1, 1, 2, 2), y = 1:4)
   out <- mf |>
     window_order(desc(y)) |>
     distinct(x, .keep_all = TRUE)

@@ -1,5 +1,5 @@
 test_that("can pivot all cols to long", {
-  pv <- memdb_frame(x = 1:2, y = 3:4) |>
+  pv <- local_memdb_frame(x = 1:2, y = 3:4) |>
     tidyr::pivot_longer(x:y)
 
   expect_equal(
@@ -48,13 +48,13 @@ test_that("can drop missing values", {
 })
 
 test_that("can handle missing combinations", {
-  df <- tibble::tribble(
-    ~id , ~x_1 , ~x_2 , ~y_2 ,
-    "A" ,    1 ,    2 , "a"  ,
-    "B" ,    3 ,    4 , "b"  ,
+  df_db <- local_memdb_frame(
+    "df",
+    id = c("A", "B"),
+    x_1 = c(1, 3),
+    x_2 = c(2, 4),
+    y_2 = c("a", "b")
   )
-
-  df_db <- memdb_frame(!!!df)
 
   pv_db <- tidyr::pivot_longer(
     df_db,
@@ -69,12 +69,12 @@ test_that("can handle missing combinations", {
   expect_equal(pv$y, c(NA, NA, "a", "b"))
 
   sql <- tidyr::pivot_longer(
-    lazy_frame(!!!df),
+    df_db,
     -id,
     names_to = c(".value", "n"),
     names_sep = "_"
   )
-  expect_snapshot(sql)
+  expect_snapshot(show_query(sql))
 })
 
 test_that("can override default output column type", {
@@ -95,7 +95,7 @@ test_that("values_transform can be a formula", {
 })
 
 test_that("`values_transform` works with single functions (#1284)", {
-  df <- memdb_frame(x_1 = 1L, y_1 = 2L)
+  df <- local_memdb_frame(x_1 = 1L, y_1 = 2L)
 
   res <- tidyr::pivot_longer(
     data = df,
@@ -111,7 +111,7 @@ test_that("`values_transform` works with single functions (#1284)", {
 })
 
 test_that("`names_ptypes` and `names_transform`", {
-  df <- memdb_frame(`1x2` = 1)
+  df <- local_memdb_frame(`1x2` = 1)
 
   res <- tidyr::pivot_longer(
     data = df,
@@ -140,7 +140,7 @@ test_that("`names_ptypes` and `names_transform`", {
 })
 
 test_that("`values_transform` is validated", {
-  df <- memdb_frame(x = 1)
+  df <- local_memdb_frame(x = 1)
 
   expect_snapshot({
     (expect_error(tidyr::pivot_longer(df, x, values_transform = 1)))
@@ -218,7 +218,7 @@ test_that(".value can be at any position in `names_to`", {
 })
 
 test_that("grouping is preserved", {
-  df <- memdb_frame(g = 1, x1 = 1, x2 = 2)
+  df <- local_memdb_frame(g = 1, x1 = 1, x2 = 2)
   out <- df |>
     group_by(g) |>
     tidyr::pivot_longer(x1:x2, names_to = "x", values_to = "v")
@@ -226,7 +226,7 @@ test_that("grouping is preserved", {
 })
 
 test_that("can pivot column with name equal to `names_to`", {
-  df <- memdb_frame(id = 1:2, name2 = c("x", "y"))
+  df <- local_memdb_frame(id = 1:2, name2 = c("x", "y"))
   expect_equal(
     df |>
       tidyr::pivot_longer(name2, names_to = "name2") |>
@@ -240,7 +240,13 @@ test_that("can pivot column with name equal to `names_to`", {
 })
 
 test_that("can repair names", {
-  df <- memdb_frame(id = 1, x = "a", y = "r", name = "nm", value = "val")
+  df <- local_memdb_frame(
+    id = 1,
+    x = "a",
+    y = "r",
+    name = "nm",
+    value = "val"
+  )
 
   expect_snapshot(
     out <- df |> tidyr::pivot_longer(c(x, y), names_repair = "unique")

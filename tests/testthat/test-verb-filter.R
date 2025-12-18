@@ -1,5 +1,5 @@
 test_that("filter captures local variables", {
-  mf <- memdb_frame(x = 1:5, y = 5:1)
+  mf <- local_memdb_frame(x = 1:5, y = 5:1)
 
   z <- 3
   df1 <- mf |> filter(x > z) |> collect()
@@ -9,7 +9,7 @@ test_that("filter captures local variables", {
 })
 
 test_that("two filters equivalent to one", {
-  mf <- memdb_frame(x = 1:5, y = 5:1)
+  mf <- local_memdb_frame(x = 1:5, y = 5:1)
   lf <- lazy_frame(x = 1:5, y = 5:1)
 
   df1 <- mf |> filter(x > 3) |> filter(y < 3)
@@ -35,7 +35,7 @@ test_that("two filters equivalent to one", {
 
 
 test_that("each argument gets implicit parens", {
-  mf <- memdb_frame(
+  mf <- local_memdb_frame(
     v1 = c("a", "b", "a", "b"),
     v2 = c("b", "a", "a", "b"),
     v3 = c("a", "b", "c", "d")
@@ -159,7 +159,7 @@ test_that("filter isn't inlined after mutate with window function #1135", {
 # .by -------------------------------------------------------------------------
 
 test_that("can group transiently using `.by`", {
-  df <- memdb_frame(g = c(1, 1, 2, 1, 2), x = c(5, 10, 1, 2, 3))
+  df <- local_memdb_frame(g = c(1, 1, 2, 1, 2), x = c(5, 10, 1, 2, 3))
 
   out <- filter(df, x > mean(x), .by = g) |>
     arrange(g, x) |>
@@ -182,7 +182,7 @@ test_that("catches `.by` with grouped-df", {
 # SQL generation --------------------------------------------------------
 
 test_that("filter calls windowed versions of sql functions", {
-  df1 <- memdb_frame(x = 1:10, g = rep(c(1, 2), each = 5))
+  df1 <- local_memdb_frame(x = 1:10, g = rep(c(1, 2), each = 5))
 
   out <- df1 |> group_by(g) |> filter(dplyr::row_number(x) < 3) |> collect()
   expect_equal(out$x, c(1L, 2L, 6L, 7L))
@@ -197,7 +197,7 @@ test_that("filter() can use window function and external vector - #1048", {
 })
 
 test_that("recycled aggregates generate window function", {
-  df1 <- memdb_frame(x = 1:10, g = rep(c(1, 2), each = 5))
+  df1 <- local_memdb_frame(x = 1:10, g = rep(c(1, 2), each = 5))
 
   out <- df1 |>
     group_by(g) |>
@@ -207,7 +207,7 @@ test_that("recycled aggregates generate window function", {
 })
 
 test_that("cumulative aggregates generate window function", {
-  df1 <- memdb_frame(x = c(1:3, 2:4), g = rep(c(1, 2), each = 3))
+  df1 <- local_memdb_frame(x = c(1:3, 2:4), g = rep(c(1, 2), each = 3))
   out <- df1 |>
     group_by(g) |>
     window_order(x) |>
@@ -220,7 +220,7 @@ test_that("filter() after summarise() uses `HAVING`", {
   lf <- lazy_frame(g = 1, h = 1, x = 1) |>
     group_by(g, h) |>
     summarise(x_mean = mean(x, na.rm = TRUE), .groups = "drop_last")
-  mf <- memdb_frame(g = c(1, 1, 1, 2, 2), h = 1, x = 1:5) |>
+  mf <- local_memdb_frame(g = c(1, 1, 1, 2, 2), h = 1, x = 1:5) |>
     group_by(g, h) |>
     summarise(x_mean = mean(x, na.rm = TRUE), .groups = "drop_last")
 

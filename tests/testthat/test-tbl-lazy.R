@@ -23,7 +23,7 @@ test_that("has print method", {
 })
 
 test_that("support colwise variants", {
-  mf <- memdb_frame(x = 1:5, y = factor(letters[1:5]))
+  mf <- local_memdb_frame(x = 1:5, y = factor(letters[1:5]))
   exp <- mf |> collect() |> mutate(y = as.character(y))
 
   expect_message(

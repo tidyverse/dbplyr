@@ -62,19 +62,19 @@
 # can handle missing combinations
 
     Code
-      sql
+      show_query(sql)
     Output
       <SQL>
-      SELECT "q01".*, NULL AS "y"
+      SELECT `q01`.*, NULL AS `y`
       FROM (
-        SELECT "id", '1' AS "n", "x_1" AS "x"
-        FROM "df"
-      ) AS "q01"
+        SELECT `id`, '1' AS `n`, `x_1` AS `x`
+        FROM `df`
+      ) AS `q01`
       
       UNION ALL
       
-      SELECT "id", '2' AS "n", "x_2" AS "x", "y_2" AS "y"
-      FROM "df"
+      SELECT `id`, '2' AS `n`, `x_2` AS `x`, `y_2` AS `y`
+      FROM `df`
 
 # can override default output column type
 

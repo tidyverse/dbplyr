@@ -1,5 +1,5 @@
 test_that("two arranges equivalent to one", {
-  mf <- local_memdb_frame("df", x = c(2, 2, 1), y = c(1, -1, 1))
+  mf <- local_memdb_frame(x = c(2, 2, 1), y = c(1, -1, 1))
 
   mf1 <- mf |> arrange(x, y)
   mf2 <- mf |> arrange(y) |> arrange(x)

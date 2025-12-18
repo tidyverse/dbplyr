@@ -1,14 +1,14 @@
 test_that("column order is matched", {
-  df1 <- memdb_frame(x = 1, y = 2)
-  df2 <- memdb_frame(y = 1, x = 2)
+  df1 <- local_memdb_frame(x = 1, y = 2)
+  df2 <- local_memdb_frame(y = 1, x = 2)
 
   out <- collect(union(df1, df2))
   expect_equal(out, tibble(x = c(1, 2), y = c(2, 1)))
 })
 
 test_that("missing columns filled with NULL", {
-  df1 <- memdb_frame(x = 1)
-  df2 <- memdb_frame(y = 2)
+  df1 <- local_memdb_frame(x = 1)
+  df2 <- local_memdb_frame(y = 2)
 
   out <- collect(union_all(df1, df2))
   expect_equal(out, tibble(x = c(1, NA), y = c(NA, 2)))
@@ -17,8 +17,8 @@ test_that("missing columns filled with NULL", {
 # SQL generation ----------------------------------------------------------
 
 test_that("set ops generates correct sql", {
-  lf1 <- memdb_frame(x = 1)
-  lf2 <- memdb_frame(x = c(1, 2))
+  lf1 <- local_memdb_frame(x = 1)
+  lf2 <- local_memdb_frame(x = c(1, 2))
 
   out <- lf1 |>
     union(lf2) |>
@@ -82,7 +82,7 @@ test_that("intersect and setdiff work for supported backends", {
 })
 
 test_that("SQLite warns if set op attempted when tbl has LIMIT", {
-  mf <- memdb_frame(x = 1:2)
+  mf <- local_memdb_frame(x = 1:2)
   m1 <- head(mf, 1)
 
   expect_error(union(mf, m1), "does not support")
@@ -108,7 +108,7 @@ test_that("other backends can combine with a limit", {
 })
 
 test_that("intersect works with copy = 'temp-table'", {
-  df1 <- memdb_frame(x = 1:3)
+  df1 <- local_memdb_frame(x = 1:3)
   df2 <- tibble(x = 2:4)
 
   out <- intersect(df1, df2, copy = "temp-table") |> collect()
@@ -116,7 +116,7 @@ test_that("intersect works with copy = 'temp-table'", {
 })
 
 test_that("intersect works with copy = 'inline'", {
-  df1 <- memdb_frame(x = 1:3)
+  df1 <- local_memdb_frame(x = 1:3)
   df2 <- tibble(x = 2:4)
 
   out <- intersect(df1, df2, copy = "inline") |> collect()
