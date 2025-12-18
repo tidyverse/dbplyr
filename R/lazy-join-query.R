@@ -5,6 +5,7 @@ lazy_multi_join_query <- function(
   joins,
   table_names,
   vars,
+  where = list(),
   group_vars = op_grps(x),
   order_vars = op_sort(x),
   frame = op_frame(x),
@@ -30,6 +31,7 @@ lazy_multi_join_query <- function(
     joins = joins,
     table_names = table_names,
     vars = vars,
+    where = where,
     group_vars = group_vars,
     order_vars = order_vars,
     frame = frame
@@ -45,6 +47,7 @@ lazy_rf_join_query <- function(
   by,
   table_names,
   vars,
+  where = list(),
   group_vars = op_grps(x),
   order_vars = op_sort(x),
   frame = op_frame(x),
@@ -72,6 +75,7 @@ lazy_rf_join_query <- function(
     by = by,
     table_names = table_names,
     vars = vars,
+    where = where,
     group_vars = group_vars,
     order_vars = order_vars,
     frame = frame
@@ -188,11 +192,21 @@ sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
     }
   )
 
+  # Column names in WHERE don't need to be qualified with table names/aliases
+  # because we know that the join has already generated aliases for ambiguous
+  # variables
+  where_sql <- translate_sql_(
+    op$where,
+    con = con,
+    context = list(clause = "WHERE")
+  )
+
   multi_join_query(
     x = sql_optimise(sql_build(op$x, con, sql_options = sql_options), con),
     joins = op$joins,
     table_names = table_names_out,
-    select = select_sql
+    select = select_sql,
+    where = where_sql
   )
 }
 

@@ -1,3 +1,17 @@
+test_that("sql_build.lazy_multi_join_query() includes where", {
+  lf1 <- lazy_frame(x = 1, y = 1)
+  lf2 <- lazy_frame(x = 1, z = 2)
+
+  out <- lf1 |>
+    left_join(lf2, by = "x") |>
+    filter(y == 1, z == 2)
+  query <- out$lazy_query
+
+  expect_s3_class(query, "lazy_multi_join_query")
+  built <- sql_build(query, simulate_dbi())
+  expect_equal(built$where, sql('"y" = 1.0', '"z" = 2.0'))
+})
+
 test_that("lazy_semi_join_query() checks arguments", {
   by0 <- list(
     x = "x",

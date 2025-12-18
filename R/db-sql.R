@@ -403,6 +403,7 @@ sql_query_join <- function(
   by = NULL,
   na_matches = FALSE,
   ...,
+  where = NULL,
   lvl = 0
 ) {
   check_dots_used()
@@ -418,6 +419,7 @@ sql_query_join.DBIConnection <- function(
   by = NULL,
   na_matches = FALSE,
   ...,
+  where = NULL,
   lvl = 0
 ) {
   JOIN <- switch(
@@ -440,7 +442,8 @@ sql_query_join.DBIConnection <- function(
     sql_clause_select(con, select),
     sql_clause_from(x),
     sql_clause(JOIN, y),
-    sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1)
+    sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1),
+    sql_clause_where(where)
   )
   sql_format_clauses(clauses, lvl, con)
 }
@@ -454,6 +457,7 @@ dbplyr_query_join <- function(
   na_matches = FALSE,
   ...,
   select = NULL,
+  where = NULL,
   lvl = 0
 ) {
   check_2ed(con)
@@ -465,6 +469,7 @@ dbplyr_query_join <- function(
     type = type,
     by = by,
     na_matches = na_matches,
+    where = where,
     ...,
     lvl = lvl
   )
@@ -480,6 +485,7 @@ sql_query_multi_join <- function(
   by_list,
   select,
   ...,
+  where = NULL,
   lvl = 0
 ) {
   check_dots_used()
@@ -524,6 +530,7 @@ sql_query_multi_join.DBIConnection <- function(
   by_list,
   select,
   ...,
+  where = NULL,
   lvl = 0
 ) {
   if (vctrs::vec_duplicate_any(table_names)) {
@@ -550,7 +557,8 @@ sql_query_multi_join.DBIConnection <- function(
   clauses <- list2(
     sql_clause_select(con, select),
     sql_clause_from(from),
-    !!!out
+    !!!out,
+    sql_clause_where(where)
   )
   sql_format_clauses(clauses, lvl = lvl, con = con)
 }

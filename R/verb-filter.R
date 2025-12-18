@@ -78,12 +78,17 @@ add_filter <- function(.data, dots) {
     # WHERE happens before SELECT so can't refer to aliases
     dots <- rename_aliases(dots, lazy_query$select)
 
+    # might be either a lazy_select_query or a lazy_multi_join_query
     lazy_query$where <- c(lazy_query$where, dots)
     lazy_query
   }
 }
 
 filter_needs_new_query <- function(dots, lazy_query, con) {
+  if (inherits(lazy_query, "lazy_multi_join_query")) {
+    return(FALSE)
+  }
+
   if (!is_lazy_select_query(lazy_query)) {
     return(TRUE)
   }

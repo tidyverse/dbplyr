@@ -114,6 +114,40 @@ test_that("filter() inlined after mutate()", {
   expect_equal(lq3$where, list(quo(y == sql("1"))), ignore_formula_env = TRUE)
 })
 
+test_that("filter() inlined after join", {
+  lf1 <- lazy_frame(x = 1, y = 1)
+  lf2 <- lazy_frame(x = 1, z = 2)
+
+  out <- lf1 |>
+    left_join(lf2, by = "x") |>
+    filter(z == 1)
+  expect_s3_class(out$lazy_query, "lazy_multi_join_query")
+  expect_snapshot(show_query(out))
+
+  # multiple filters are combined
+  out <- lf1 |>
+    left_join(lf2, by = "x") |>
+    filter(y == 1) |>
+    filter(z == 2)
+  expect_s3_class(out$lazy_query, "lazy_multi_join_query")
+  expect_snapshot(show_query(out))
+
+  # Handles aliasing from join
+  lf3 <- lazy_frame(x = 1, y = 2)
+  out <- lf1 |>
+    left_join(lf3, by = "x") |>
+    filter(y.y == 1)
+  expect_snapshot(show_query(out))
+})
+
+test_that("inlined join works", {
+  # single integration test of the most complicated case
+  lf1 <- memdb_frame(x = 1:2, y = 1:2)
+  lf2 <- memdb_frame(x = 1:2, y = 3:4)
+  jf <- lf1 |> left_join(lf2, by = "x") |> filter(y.x == 1)
+  expect_equal(collect(jf), tibble(x = 1, y.x = 1, y.y = 3))
+})
+
 test_that("filter isn't inlined after mutate with window function #1135", {
   lf <- lazy_frame(x = 1L, y = 1:2)
   out <- lf |>
