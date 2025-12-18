@@ -10,7 +10,12 @@ test_that("two arranges equivalent to one", {
 # sql_render --------------------------------------------------------------
 
 test_that("quoting for rendering ordered grouped table", {
-  db <- copy_to_test("sqlite", tibble(x = 1, y = 2), name = "test-verb-arrange")
+  db <- copy_to(
+    test_sqlite(),
+    tibble(x = 1, y = 2),
+    name = "test-verb-arrange",
+    overwrite = TRUE
+  )
   out <- db |> group_by(x) |> arrange(y) |> ungroup()
   expect_snapshot(sql_render(out))
   expect_equal(collect(out), tibble(x = 1, y = 2))

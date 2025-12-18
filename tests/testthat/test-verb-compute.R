@@ -14,8 +14,8 @@ test_that("compute can create indexes", {
 })
 
 test_that("unique index fails if values are duplicated", {
-  mfs <- test_frame(x = 5:1, y = "a", ignore = "df")
-  lapply(mfs, function(.) expect_error(compute(., unique_indexes = "y")))
+  mf <- local_memdb_frame(x = 5:1, y = "a")
+  expect_error(compute(mf, unique_indexes = "y"))
 })
 
 test_that("index fails if columns are missing", {

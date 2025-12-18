@@ -1,5 +1,10 @@
 test_that("symbols weights are dropped in output", {
-  df <- copy_to_test("sqlite", tibble(x = 1, w = 1))
+  df <- copy_to(
+    test_sqlite(),
+    tibble(x = 1, w = 1),
+    name = "test",
+    overwrite = TRUE
+  )
   expect_equal(dbplyr_uncount(df, w) |> collect(), tibble(x = 1))
 
   expect_snapshot(

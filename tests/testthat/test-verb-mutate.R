@@ -43,7 +43,12 @@ test_that("can refer to fresly created values", {
     collect()
   expect_equal(out1, tibble(x1 = 1, x2 = 2, x3 = 3, x4 = 4))
 
-  out2 <- copy_to_test("sqlite", tibble(x = 1), name = "multi_mutate") |>
+  out2 <- copy_to(
+    test_sqlite(),
+    tibble(x = 1),
+    name = "multi_mutate",
+    overwrite = TRUE
+  ) |>
     mutate(x = x + 1, x = x + 2, x = x + 4)
   expect_equal(collect(out2), tibble(x = 8))
   expect_snapshot(show_query(out2))

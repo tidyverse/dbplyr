@@ -125,17 +125,27 @@ test_that("`sql_query_update_from()` is correct", {
 # live database -----------------------------------------------------------
 
 test_that("logicals converted to integer correctly", {
-  db <- copy_to_test("MariaDB", data.frame(x = c(TRUE, FALSE, NA)))
+  db <- copy_to(
+    test_mariadb(),
+    data.frame(x = c(TRUE, FALSE, NA)),
+    name = "test",
+    overwrite = TRUE
+  )
   expect_identical(db |> pull(), c(1L, 0L, NA))
 })
 
 test_that("can explain", {
-  db <- copy_to_test("MariaDB", data.frame(x = 1:3))
+  db <- copy_to(
+    test_mariadb(),
+    data.frame(x = 1:3),
+    name = "test",
+    overwrite = TRUE
+  )
   expect_snapshot(db |> mutate(y = x + 1) |> explain())
 })
 
 test_that("can overwrite temp tables", {
-  con <- src_test("MariaDB")
+  con <- test_mariadb()
 
   df1 <- tibble(x = 1)
   copy_to(con, df1, "test-df", temporary = TRUE)
@@ -147,7 +157,7 @@ test_that("can overwrite temp tables", {
 })
 
 test_that("can update", {
-  con <- src_test("MariaDB")
+  con <- test_mariadb()
 
   df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
   x <- local_db_table(con, df_x, "df_x")
@@ -169,7 +179,7 @@ test_that("can update", {
 })
 
 test_that("casts integer, bigint, and longtext columns", {
-  con <- src_test("MariaDB")
+  con <- test_mariadb()
 
   df1 <- tibble(id = 1L, val = 10L, ltext = strrep("a", times = 65535 + 2))
   df2 <- tibble(id = "2", val = 20, ltext = strrep("b", times = 65535 + 2))

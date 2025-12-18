@@ -116,6 +116,12 @@ test_that("date extraction agrees with R", {
 })
 
 test_that("can explain a query", {
-  db <- copy_to_test("sqlite", data.frame(x = 1:5), indexes = list("x"))
+  db <- copy_to(
+    test_sqlite(),
+    data.frame(x = 1:5),
+    name = "test",
+    indexes = list("x"),
+    overwrite = TRUE
+  )
   expect_snapshot(db |> filter(x > 2) |> explain())
 })

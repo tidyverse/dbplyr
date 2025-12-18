@@ -169,7 +169,12 @@ test_that("catches `.by` with grouped-df", {
 # sql-render --------------------------------------------------------------
 
 test_that("quoting for rendering summarized grouped table", {
-  out <- copy_to_test("sqlite", tibble(x = 1), name = "verb-summarise") |>
+  out <- copy_to(
+    test_sqlite(),
+    tibble(x = 1),
+    name = "verb-summarise",
+    overwrite = TRUE
+  ) |>
     group_by(x) |>
     summarise(n = n())
   expect_snapshot(out |> sql_render())

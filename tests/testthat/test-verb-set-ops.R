@@ -17,8 +17,8 @@ test_that("missing columns filled with NULL", {
 # SQL generation ----------------------------------------------------------
 
 test_that("basic set ops work as expected", {
-  db1 <- local_memdb_frame("db1", x = c(1, 3))
-  db2 <- local_memdb_frame("db2", x = c(1, 2))
+  db1 <- local_memdb_frame(x = c(1, 3))
+  db2 <- local_memdb_frame(x = c(1, 2))
 
   expect_equal(sort(pull(union(db1, db2))), c(1, 2, 3))
   expect_equal(sort(pull(union_all(db1, db2))), c(1, 1, 2, 3))
@@ -71,7 +71,7 @@ test_that("SQLite warns if set op attempted when tbl has LIMIT", {
 })
 
 test_that("but it can work with another backend", {
-  con <- src_test("postgres")
+  con <- test_postgres()
   db <- local_db_table(con, tibble(x = 1:2), "db")
 
   out <- collect(head(union_all(db, db), 2))
