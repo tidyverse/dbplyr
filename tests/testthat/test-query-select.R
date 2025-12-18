@@ -29,43 +29,55 @@ test_that("optimisation is turned on by default", {
   expect_equal(qry$from, base_query(table_path('"df"')))
 })
 
-test_that("group by then limit is collapsed", {
-  lf <- local_memdb_frame(x = 1:10, y = 2) |>
-    group_by(x) |>
-    summarise(y = sum(y, na.rm = TRUE)) |>
-    head(1)
+test_that("can generate SELECT query with all clauses", {
+  lf <- local_memdb_frame("all-clauses", a = 1:3) |>
+    mutate(b = a + 1) |>
+    distinct() |>
+    filter(a > 1) |>
+    arrange(a)
 
-  qry <- lf |> sql_build()
-  expect_equal(qry$limit, 1L)
-  expect_equal(qry$group_by, sql('`x`'))
+  expect_snapshot(lf |> show_query())
+
+  # And check that it returns the correct value
+  expect_equal(collect(lf), tibble(a = 2:3, b = a + 1.0))
+})
+
+test_that("summarise + head is collapsed", {
+  lf <- local_memdb_frame("df", x = 1:10, y = 2) |>
+    summarise(y = sum(y, na.rm = TRUE), .by = x) |>
+    head(1)
+  expect_snapshot(lf |> show_query())
 
   # And check that it returns the correct value
   expect_equal(collect(lf), tibble(x = 1L, y = 2))
 })
 
-test_that("filter and rename are correctly composed", {
-  lf <- local_memdb_frame(x = 1, y = 2) |>
-    filter(x == 1) |>
-    select(x = y)
+test_that("select + arrange/filter is collapsed", {
+  lf <- local_memdb_frame("df", x = 1:2, y = 2:1)
 
-  qry <- lf |> sql_build()
-  expect_equal(qry$select, sql(x = "`y`"))
-  expect_equal(qry$where, sql("`x` = 1.0"))
+  lf_filter <- lf |> filter(x == 1) |> select(y)
+  lf_arrange <- lf |> arrange(x) |> select(y)
 
-  # It surprises me that this SQL works!
-  expect_equal(collect(lf), tibble(x = 2))
+  expect_snapshot(lf_filter |> show_query())
+  expect_snapshot(lf_arrange |> show_query())
+
+  expect_equal(collect(lf_filter), tibble(y = 2))
+  expect_equal(collect(lf_arrange), tibble(y = 2:1))
 })
 
-test_that("trivial subqueries are collapsed", {
-  lf <- local_memdb_frame(a = 1:3) |>
-    mutate(b = a + 1) |>
-    distinct() |>
-    arrange()
+test_that("filter + summarise is collapsed", {
+  lf <- local_memdb_frame("df", x = 1:2, y = c(1, 10), g = c(1, 1)) |>
+    filter(x == 1) |>
+    summarise(y = mean(y), .by = g)
 
-  qry <- lf |> sql_build()
-  expect_s3_class(qry$from, "base_query")
-  expect_true(qry$distinct)
+  expect_snapshot(lf |> show_query())
+  expect_equal(collect(lf), tibble(g = 1, y = 1))
+})
 
-  # And check that it returns the correct value
-  expect_equal(collect(lf), tibble(a = 1:3, b = a + 1.0))
+test_that("is_select_star() correctly identifies star selects", {
+  expect_true(is_select_star("`df`.*"))
+  expect_true(is_select_star("*"))
+
+  expect_false(is_select_star(c("`x`", "`y`")))
+  expect_false(is_select_star("`stars`"))
 })

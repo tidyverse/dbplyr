@@ -108,7 +108,7 @@ select_query_clauses <- function(x, subquery = FALSE) {
     where = length(x$where) > 0,
     group_by = length(x$group_by) > 0,
     having = length(x$having) > 0,
-    select = !identical(unname(x$select), sql("*")),
+    select = !is_select_star(x$select),
     distinct = x$distinct,
     window = length(x$window) > 0,
     order_by = (!subquery || !is.null(x$limit)) && length(x$order_by) > 0,
@@ -116,6 +116,15 @@ select_query_clauses <- function(x, subquery = FALSE) {
   )
 
   ordered(names(present)[present], levels = names(present))
+}
+
+is_select_star <- function(x) {
+  if (length(x) != 1) {
+    return(FALSE)
+  } else {
+    # * is never quoted and always comes at the end
+    grepl("\\*$", x)
+  }
 }
 
 #' @export
