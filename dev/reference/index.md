@@ -66,6 +66,8 @@
 
 ### Verbs that work with multiple tables
 
+- [`bind_queries()`](https://dbplyr.tidyverse.org/dev/reference/bind_queries.md)
+  : Combine multiple lazy queries
 - [`inner_join(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/join.tbl_sql.md)
   [`left_join(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/join.tbl_sql.md)
   [`right_join(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/join.tbl_sql.md)

@@ -70,17 +70,17 @@ db <- memdb_frame(g = c(1, 1, 1, 2, 2), x = c(4, 3, 6, 9, 2))
 db |> count(g) |> show_query()
 #> <SQL>
 #> SELECT `g`, COUNT(*) AS `n`
-#> FROM `dbplyr_tmp_9H5PXKstDn`
+#> FROM `dbplyr_tmp_XKstDnH0Kf`
 #> GROUP BY `g`
 db |> count(g, wt = x) |> show_query()
 #> <SQL>
 #> SELECT `g`, SUM(`x`) AS `n`
-#> FROM `dbplyr_tmp_9H5PXKstDn`
+#> FROM `dbplyr_tmp_XKstDnH0Kf`
 #> GROUP BY `g`
 db |> count(g, wt = x, sort = TRUE) |> show_query()
 #> <SQL>
 #> SELECT `g`, SUM(`x`) AS `n`
-#> FROM `dbplyr_tmp_9H5PXKstDn`
+#> FROM `dbplyr_tmp_XKstDnH0Kf`
 #> GROUP BY `g`
 #> ORDER BY `n` DESC
 ```

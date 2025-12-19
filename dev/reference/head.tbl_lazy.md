@@ -53,8 +53,8 @@ library(dplyr, warn.conflicts = FALSE)
 db <- memdb_frame(x = 1:100)
 db |> head() |> show_query()
 #> <SQL>
-#> SELECT `dbplyr_tmp_CzqTiZvfqQ`.*
-#> FROM `dbplyr_tmp_CzqTiZvfqQ`
+#> SELECT `dbplyr_tmp_zqTiZvfqQI`.*
+#> FROM `dbplyr_tmp_zqTiZvfqQI`
 #> LIMIT 6
 
 # Pretend we have data in a SQL server database

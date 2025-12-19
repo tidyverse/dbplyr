@@ -2,6 +2,10 @@
 
 ## dbplyr (development version)
 
+- New
+  [`bind_queries()`](https://dbplyr.tidyverse.org/dev/reference/bind_queries.md)
+  makes it easy to combine multiple lazy queries using `UNION ALL`
+  ([\#1342](https://github.com/tidyverse/dbplyr/issues/1342)).
 - `slice_*()` now handles missing values in line with the documentation,
   i.e. they are always removed
   ([\#1599](https://github.com/tidyverse/dbplyr/issues/1599)).

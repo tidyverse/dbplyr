@@ -29,6 +29,7 @@
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-spark-sql.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-sqlite.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-teradata.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/bind_queries.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/build_sql.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/collect.tbl_sql.html</loc></url>
