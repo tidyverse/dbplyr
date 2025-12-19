@@ -17,6 +17,7 @@ test_that("correctly inlines across all verbs", {
   # two table verbs
   lf3 <- lazy_frame(x = 1)
   expect_selects(lf |> left_join(lf2, by = "x") |> left_join(lf3, by = "x"), 1)
+  expect_selects(lf |> right_join(lf2, by = "x") |> left_join(lf3, by = "x"), 2)
   expect_selects(lf |> semi_join(lf2, by = "x") |> left_join(lf3, by = "x"), 3)
   expect_selects(lf |> union(lf3) |> left_join(lf2, by = "x"), 3)
 })
