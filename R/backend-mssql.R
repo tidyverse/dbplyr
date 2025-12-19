@@ -74,6 +74,19 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
+`table_path_components.Microsoft SQL Server` <- function(x, con) {
+  # SQL Server uses asymmetric quotes [identifier], which scan() can't handle
+  lapply(x, function(path) {
+    # Split on . but not inside []
+    # Pattern: match either [anything] or non-dot characters
+    matches <- gregexpr("\\[[^]]*\\]|[^.]+", path)
+    components <- regmatches(path, matches)[[1]]
+    # Remove the brackets from each component
+    gsub("^\\[|\\]$", "", components)
+  })
+}
+
+#' @export
 `sql_query_select.Microsoft SQL Server` <- function(
   con,
   select,

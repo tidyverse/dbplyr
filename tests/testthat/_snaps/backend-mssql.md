@@ -2,34 +2,18 @@
 
     Code
       mutate(lf, detected = str_detect(x, "abc"))
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
-      SELECT [df]]
-      ].*, CAST(IIF(REGEXP_LIKE([x], 'abc'), 1, 0) AS BIT) AS [detected]
+      SELECT [df].*, CAST(IIF(REGEXP_LIKE([x], 'abc'), 1, 0) AS BIT) AS [detected]
       FROM [df]
 
 ---
 
     Code
       filter(lf, str_detect(x, "abc"))
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
-      SELECT [df]]
-      ].*
+      SELECT [df].*
       FROM [df]
       WHERE (REGEXP_LIKE([x], 'abc'))
 
@@ -116,17 +100,9 @@
 
     Code
       filter(mf, is.na(x))
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
-      SELECT [df]]
-      ].*
+      SELECT [df].*
       FROM [df]
       WHERE (([x] IS NULL))
 
@@ -134,17 +110,9 @@
 
     Code
       filter(mf, !is.na(x))
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
-      SELECT [df]]
-      ].*
+      SELECT [df].*
       FROM [df]
       WHERE (NOT(([x] IS NULL)))
 
@@ -152,17 +120,9 @@
 
     Code
       filter(mf, x == 1L || x == 2L)
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
-      SELECT [df]]
-      ].*
+      SELECT [df].*
       FROM [df]
       WHERE ([x] = 1 OR [x] = 2)
 
@@ -170,64 +130,33 @@
 
     Code
       mutate(mf, z = ifelse(x == 1L, 1L, 2L))
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
-      SELECT
-        [df]]
-      ].*,
-        CASE WHEN ([x] = 1) THEN 1 WHEN NOT ([x] = 1) THEN 2 END AS [z]
+      SELECT [df].*, CASE WHEN ([x] = 1) THEN 1 WHEN NOT ([x] = 1) THEN 2 END AS [z]
       FROM [df]
 
 ---
 
     Code
       mutate(mf, z = case_when(x == 1L ~ 1L))
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
-      SELECT [df]]
-      ].*, CASE WHEN ([x] = 1) THEN 1 END AS [z]
+      SELECT [df].*, CASE WHEN ([x] = 1) THEN 1 END AS [z]
       FROM [df]
 
 ---
 
     Code
       mutate(mf, z = !is.na(x))
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
-      SELECT [df]]
-      ].*, ~CAST(IIF(([x] IS NULL), 1, 0) AS BIT) AS [z]
+      SELECT [df].*, ~CAST(IIF(([x] IS NULL), 1, 0) AS BIT) AS [z]
       FROM [df]
 
 ---
 
     Code
       mutate(mf, x = x == 1L)
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
       SELECT CAST(IIF([x] = 1, 1, 0) AS BIT) AS [x]
@@ -237,11 +166,6 @@
 
     Code
       mutate(mf, x = x == 1L || x == 2L)
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
       SELECT CAST(IIF([x] = 1 OR [x] = 2, 1, 0) AS BIT) AS [x]
@@ -251,11 +175,6 @@
 
     Code
       mutate(mf, x = x == 1L || x == 2L || x == 3L)
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
       SELECT CAST(IIF([x] = 1 OR [x] = 2 OR [x] = 3, 1, 0) AS BIT) AS [x]
@@ -265,11 +184,6 @@
 
     Code
       mutate(mf, x = !(x == 1L || x == 2L || x == 3L))
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
       SELECT ~CAST(IIF(([x] = 1 OR [x] = 2 OR [x] = 3), 1, 0) AS BIT) AS [x]
@@ -302,17 +216,9 @@
 
     Code
       filter(mf, x == a)
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
-      SELECT [df]]
-      ].*
+      SELECT [df].*
       FROM [df]
       WHERE ([x] = 0x616263)
 
@@ -320,17 +226,9 @@
 
     Code
       filter(mf, x %in% L)
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
-      SELECT [df]]
-      ].*
+      SELECT [df].*
       FROM [df]
       WHERE ([x] IN (0x616263, 0x0102))
 
@@ -338,17 +236,9 @@
 
     Code
       qry
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
-      SELECT [df]]
-      ].*
+      SELECT [df].*
       FROM [df]
       WHERE ([x] IN (0x616263, 0x0102))
 
@@ -356,17 +246,9 @@
 
     Code
       filter(mf, x == TRUE)
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
-      SELECT [df]]
-      ].*
+      SELECT [df].*
       FROM [df]
       WHERE ([x] = 1)
 
@@ -374,11 +256,6 @@
 
     Code
       mutate(mf, x = TRUE)
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
       SELECT 1 AS [x]
@@ -414,22 +291,12 @@
 
     Code
       slice_sample(lf, n = 1)
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
       SELECT [x]
       FROM (
         SELECT
-          [df]]
-      ].*,
+          [df].*,
           CASE
       WHEN (NOT(((RAND(CHECKSUM(NEWID()))) IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN (((RAND(CHECKSUM(NEWID()))) IS NULL)) THEN 1 ELSE 0 END) ORDER BY RAND(CHECKSUM(NEWID())))
       END AS [col01]
@@ -497,28 +364,9 @@
       sql_query_insert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
         lvl = 1), insert_cols = colnames(df_y), by = c("a", "b"), conflict = "ignore",
       returning_cols = c("a", b2 = "b"))
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL> INSERT INTO [df_x] ([a], [b], [c], [d])
-      OUTPUT [INSERTED]]
-      ].[a], [INSERTED]]
-      ].[b] AS [b2]
+      OUTPUT [INSERTED].[a], [INSERTED].[b] AS [b2]
       SELECT *
       FROM (
         SELECT [a], [b], [c] + 1.0 AS [c], [d]
@@ -526,11 +374,7 @@
       ) AS [...y]
       WHERE NOT EXISTS (
         SELECT 1 FROM [df_x]
-        WHERE ([df_x]]
-      ].[a] = [...y]]
-      ].[a]) AND ([df_x]]
-      ].[b] = [...y]]
-      ].[b])
+        WHERE ([df_x].[a] = [...y].[a]) AND ([df_x].[b] = [...y].[b])
       )
 
 # `sql_query_append()` is correct
@@ -538,20 +382,9 @@
     Code
       sql_query_append(con = con, table = ident("df_x"), from = sql_render(df_y, con,
         lvl = 1), insert_cols = colnames(df_y), returning_cols = c("a", b2 = "b"))
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL> INSERT INTO [df_x] ([a], [b], [c], [d])
-      OUTPUT [INSERTED]]
-      ].[a], [INSERTED]]
-      ].[b] AS [b2]
+      OUTPUT [INSERTED].[a], [INSERTED].[b] AS [b2]
       SELECT *
       FROM (
         SELECT [a], [b], [c] + 1.0 AS [c], [d]
@@ -564,35 +397,16 @@
       sql_query_update_from(con = con, table = ident("df_x"), from = sql_render(df_y,
         con, lvl = 1), by = c("a", "b"), update_values = sql(c = "COALESCE([df_x].[c], [...y].[c])",
         d = "[...y].[d]"), returning_cols = c("a", b2 = "b"))
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL> UPDATE [df_x]
       SET [c] = COALESCE([df_x].[c], [...y].[c]), [d] = [...y].[d]
-      OUTPUT [INSERTED]]
-      ].[a], [INSERTED]]
-      ].[b] AS [b2]
+      OUTPUT [INSERTED].[a], [INSERTED].[b] AS [b2]
       FROM [df_x]
       INNER JOIN (
         SELECT [a], [b], [c] + 1.0 AS [c], [d]
         FROM [df_y]
       ) AS [...y]
-        ON [...y]]
-      ].[a] = [df_x]]
-      ].[a] AND [...y]]
-      ].[b] = [df_x]]
-      ].[b]
+        ON [...y].[a] = [df_x].[a] AND [...y].[b] = [df_x].[b]
 
 # `sql_query_delete()` is correct
 
@@ -600,34 +414,15 @@
       sql_query_delete(con = simulate_mssql(), table = ident("df_x"), from = sql_render(
         df_y, simulate_mssql(), lvl = 2), by = c("a", "b"), returning_cols = c("a",
         b2 = "b"))
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL> DELETE FROM [df_x]
-      OUTPUT [DELETED]]
-      ].[a], [DELETED]]
-      ].[b] AS [b2]
+      OUTPUT [DELETED].[a], [DELETED].[b] AS [b2]
       WHERE EXISTS (
         SELECT 1 FROM (
           SELECT [a], [b], [c] + 1.0 AS [c], [d]
           FROM [df_y]
       ) AS [...y]
-        WHERE ([...y]]
-      ].[a] = [df_x]]
-      ].[a]) AND ([...y]]
-      ].[b] = [df_x]]
-      ].[b])
+        WHERE ([...y].[a] = [df_x].[a]) AND ([...y].[b] = [df_x].[b])
       )
 
 # `sql_query_upsert()` is correct
@@ -636,65 +431,28 @@
       sql_query_upsert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
         lvl = 1), by = c("a", "b"), update_cols = c("c", "d"), returning_cols = c("a",
         b2 = "b"))
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL> MERGE INTO [df_x]
       USING (
         SELECT [a], [b], [c] + 1.0 AS [c], [d]
         FROM [df_y]
       ) AS [...y]
-        ON [...y]]
-      ].[a] = [df_x]]
-      ].[a] AND [...y]]
-      ].[b] = [df_x]]
-      ].[b]
+        ON [...y].[a] = [df_x].[a] AND [...y].[b] = [df_x].[b]
       WHEN MATCHED THEN
-        UPDATE SET [c] = [...y]]
-      ].[c], [d] = [...y]]
-      ].[d]
+        UPDATE SET [c] = [...y].[c], [d] = [...y].[d]
       WHEN NOT MATCHED THEN
         INSERT ([a], [b], [c], [d])
-        VALUES ([...y]]
-      ].[a], [...y]]
-      ].[b], [...y]]
-      ].[c], [...y]]
-      ].[d])
-      OUTPUT [INSERTED]]
-      ].[a], [INSERTED]]
-      ].[b] AS [b2]
+        VALUES ([...y].[a], [...y].[b], [...y].[c], [...y].[d])
+      OUTPUT [INSERTED].[a], [INSERTED].[b] AS [b2]
       ;
 
 # atoms and symbols are cast to bit in `filter`
 
     Code
       filter(mf, x)
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
-      SELECT [df]]
-      ].*
+      SELECT [df].*
       FROM [df]
       WHERE (cast([x] AS [BIT]) = 1)
 
@@ -702,17 +460,9 @@
 
     Code
       filter(mf, TRUE)
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
-      SELECT [df]]
-      ].*
+      SELECT [df].*
       FROM [df]
       WHERE (cast(1 AS [BIT]) = 1)
 
@@ -720,17 +470,9 @@
 
     Code
       filter(mf, (!x) | FALSE)
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
-      SELECT [df]]
-      ].*
+      SELECT [df].*
       FROM [df]
       WHERE ((NOT(cast([x] AS [BIT]) = 1)) OR cast(0 AS [BIT]) = 1)
 
@@ -738,78 +480,34 @@
 
     Code
       inner_join(filter(mf, x), mf, by = "x")
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
-      SELECT [LHS]]
-      ].[x] AS [x]
+      SELECT [LHS].[x] AS [x]
       FROM (
-        SELECT [df]]
-      ].*
+        SELECT [df].*
         FROM [df]
         WHERE (cast([x] AS [BIT]) = 1)
       ) AS [LHS]
-      INNER JOIN [df] AS [df]]]]
-      ]]
-      ]
-        ON ([LHS]]
-      ].[x] = [df]]]]
-      ]]
-      ].[x])
+      INNER JOIN [df]
+        ON ([LHS].[x] = [df].[x])
 
 # row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per empty_order)
 
     Code
       mutate(mf, rown = row_number())
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
-      SELECT [df]]
-      ].*, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS [rown]
+      SELECT [df].*, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS [rown]
       FROM [df]
 
 ---
 
     Code
       mutate(group_by(mf, y), rown = row_number())
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
       SELECT
-        [df]]
-      ].*,
+        [df].*,
         ROW_NUMBER() OVER (PARTITION BY [y] ORDER BY (SELECT NULL)) AS [rown]
       FROM [df]
 
@@ -817,17 +515,9 @@
 
     Code
       mutate(arrange(mf, y), rown = row_number())
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
-      SELECT [df]]
-      ].*, ROW_NUMBER() OVER (ORDER BY [y]) AS [rown]
+      SELECT [df].*, ROW_NUMBER() OVER (ORDER BY [y]) AS [rown]
       FROM [df]
       ORDER BY [y]
 
@@ -835,11 +525,6 @@
 
     Code
       count(mf)
-    Condition
-      Warning in `scan()`:
-      EOF within quoted string
-      Warning in `scan()`:
-      EOF within quoted string
     Output
       <SQL>
       SELECT COUNT_BIG(*) AS [n]
