@@ -35,6 +35,12 @@ test_that("correctly inlines across all verbs", {
   expect_selects(lf |> left_join(lf2, by = "x") |> filter(x == 1), 2)
   expect_selects(lf |> semi_join(lf2, by = "x") |> filter(x == 1), 3)
   expect_selects(lf |> union(lf2) |> filter(x == 1), 3)
+
+  # special cases
+  expect_selects(lf |> filter(mean(x) == 1), 2)
+  expect_selects(lf |> mutate(x2 = mean(x)) |> filter(x == 1), 2)
+  expect_selects(lf |> mutate(z = sql("x")) |> filter(z == 1), 2)
+  expect_selects(lf |> mutate(z = x + 1) |> filter(z == 1), 2)
 })
 
 test_that("each argument gets implicit parens", {
@@ -369,7 +375,6 @@ test_that("filter generates simple expressions", {
 
   expect_equal(out$where, sql('"x" > 1'))
 })
-
 
 # lazy_select_query -------------------------------------------------------
 
