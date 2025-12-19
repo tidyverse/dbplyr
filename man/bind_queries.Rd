@@ -15,13 +15,17 @@ A lazy query.
 \description{
 Combine multiple lazy queries into a single query using \verb{UNION ALL}.
 This is a convenient wrapper around \code{purrr::reduce(tables, union_all)}.
+Like \code{\link[dplyr:bind_rows]{dplyr::bind_rows()}} (and unlike \verb{UNION ALL}), \code{bind_queries()} will
+automatically align columns based on their name, and fill in any missing
+columns with missing values.
 }
 \examples{
 lf1 <- lazy_frame(x = 1, y = "a")
 lf2 <- lazy_frame(x = 2, y = "b")
-lf3 <- lazy_frame(x = 3, y = "c")
+bind_queries(lf1, lf2)
 
-bind_queries(lf1, lf2, lf3)
+lf3 <- lazy_frame(y = "c", x = 3, z = 10)
+bind_queries(lf2, lf3)
 
 # If you already have a list, you can use splice operator
 queries <- list(lf1, lf2)
