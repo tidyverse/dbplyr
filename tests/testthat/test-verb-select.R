@@ -23,6 +23,25 @@ test_that("two selects equivalent to one", {
   expect_named(out, c("b", "c"))
 })
 
+test_that("correctly inlines across all verbs", {
+  lf <- lazy_frame(x = 1, y = 2)
+
+  # single table verbs
+  expect_selects(lf |> arrange(x) |> select(x), 1)
+  expect_selects(lf |> distinct() |> select(x), 2)
+  expect_selects(lf |> filter(x == 1) |> select(x), 1)
+  expect_selects(lf |> head(1) |> select(x), 1)
+  expect_selects(lf |> mutate(z = x + 1) |> select(x), 1)
+  expect_selects(lf |> select(y = x) |> select(y), 1)
+  expect_selects(lf |> summarise(y = mean(x)) |> select(y), 1)
+
+  # two table verbs
+  lf2 <- lazy_frame(x = 1)
+  expect_selects(lf |> left_join(lf2, by = "x") |> select(x), 1)
+  expect_selects(lf |> semi_join(lf2, by = "x") |> select(x), 2)
+  expect_selects(lf |> union(lf2) |> select(x), 3)
+})
+
 test_that("select after distinct produces subquery", {
   lf <- lazy_frame(x = 1, y = 1:2)
   expect_snapshot(

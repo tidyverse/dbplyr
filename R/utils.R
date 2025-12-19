@@ -152,3 +152,9 @@ local_sqlite_connection <- function(envir = parent.frame()) {
 is_testing <- function() {
   identical(Sys.getenv("TESTTHAT"), "true")
 }
+
+# Counts the number of SELECT statements in the rendered SQL
+n_selects <- function(x) {
+  sql <- as.character(sql_render(x))
+  length(gregexpr("SELECT", sql)[[1]])
+}

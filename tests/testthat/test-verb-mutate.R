@@ -8,6 +8,25 @@ test_that("mutate computed before summarise", {
   expect_equal(out$sum_z, 30)
 })
 
+test_that("correctly inlines across all verbs", {
+  lf <- lazy_frame(x = 1, y = 2)
+
+  # single table verbs
+  expect_selects(lf |> arrange(x) |> mutate(z = 1), 1)
+  expect_selects(lf |> distinct() |> mutate(z = 1), 2)
+  expect_selects(lf |> filter(x == 1) |> mutate(z = 1), 1)
+  expect_selects(lf |> head(1) |> mutate(z = 1), 1)
+  expect_selects(lf |> mutate(z = x + 1) |> mutate(z = 1), 2)
+  expect_selects(lf |> select(y = x) |> mutate(z = 1), 2)
+  expect_selects(lf |> summarise(y = mean(x)) |> mutate(z = 1), 2)
+
+  # two table verbs
+  lf2 <- lazy_frame(x = 1)
+  expect_selects(lf |> left_join(lf2, by = "x") |> mutate(z = 1), 2)
+  expect_selects(lf |> semi_join(lf2, by = "x") |> mutate(z = 1), 3)
+  expect_selects(lf |> union(lf2) |> mutate(z = 1), 3)
+})
+
 test_that("mutate() isn't inlined after distinct() #1119", {
   mf <- local_memdb_frame(x = 1:2)
   expect_equal(
