@@ -1,3 +1,23 @@
+test_that("correctly inlines across all verbs", {
+  lf <- lazy_frame(x = 1, y = 2)
+  lf2 <- lazy_frame(x = 1, y = 2)
+
+  # single table verbs
+  expect_selects(lf |> arrange(x) |> union(lf2), 2)
+  expect_selects(lf |> distinct() |> union(lf2), 2)
+  expect_selects(lf |> filter(x == 1) |> union(lf2), 2)
+  expect_selects(lf |> head(1) |> union(lf2), 2)
+  expect_selects(lf |> mutate(z = x + 1) |> select(-z) |> union(lf2), 2)
+  expect_selects(lf |> select(x, y) |> union(lf2), 2)
+  expect_selects(lf |> summarise(x = mean(x), y = mean(y)) |> union(lf2), 2)
+
+  # two table verbs
+  lf3 <- lazy_frame(x = 1)
+  expect_selects(lf |> left_join(lf3, by = "x") |> union(lf2), 2)
+  expect_selects(lf |> semi_join(lf3, by = "x") |> union(lf2), 3)
+  expect_selects(lf |> union(lf2) |> union(lf2), 3)
+})
+
 test_that("column order is matched", {
   df1 <- local_memdb_frame(x = 1, y = 2)
   df2 <- local_memdb_frame(y = 1, x = 2)

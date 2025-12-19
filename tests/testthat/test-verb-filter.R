@@ -18,6 +18,31 @@ test_that("two filters equivalent to one", {
   expect_snapshot(df2 |> show_query())
 })
 
+test_that("correctly inlines across all verbs", {
+  lf <- lazy_frame(x = 1, y = 2)
+
+  # single table verbs
+  expect_selects(lf |> arrange(x) |> filter(x == 1), 1)
+  expect_selects(lf |> distinct() |> filter(x == 1), 1)
+  expect_selects(lf |> filter(x == 1) |> filter(y == 1), 1)
+  expect_selects(lf |> head(1) |> filter(x == 1), 1)
+  expect_selects(lf |> mutate(z = x + 1) |> filter(x == 1), 1)
+  expect_selects(lf |> select(y = x) |> filter(y == 1), 1)
+  expect_selects(lf |> summarise(y = mean(x)) |> filter(y == 1), 1)
+
+  # two table verbs
+  lf2 <- lazy_frame(x = 1)
+  expect_selects(lf |> left_join(lf2, by = "x") |> filter(x == 1), 2)
+  expect_selects(lf |> semi_join(lf2, by = "x") |> filter(x == 1), 3)
+  expect_selects(lf |> union(lf2) |> filter(x == 1), 3)
+
+  # special cases
+  expect_selects(lf |> filter(mean(x) == 1), 2)
+  expect_selects(lf |> mutate(x2 = mean(x)) |> filter(x == 1), 2)
+  expect_selects(lf |> mutate(z = sql("x")) |> filter(z == 1), 2)
+  expect_selects(lf |> mutate(z = x + 1) |> filter(z == 1), 2)
+})
+
 test_that("each argument gets implicit parens", {
   mf <- local_memdb_frame(
     v1 = c("a", "b", "a", "b"),
@@ -350,7 +375,6 @@ test_that("filter generates simple expressions", {
 
   expect_equal(out$where, sql('"x" > 1'))
 })
-
 
 # lazy_select_query -------------------------------------------------------
 

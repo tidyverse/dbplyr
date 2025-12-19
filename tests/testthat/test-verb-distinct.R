@@ -6,6 +6,25 @@ test_that("basic distinct behaviour is as expected", {
   expect_equal(db |> distinct(y) |> collect(), tibble(y = c(1, 2)))
 })
 
+test_that("correctly inlines across all verbs", {
+  lf <- lazy_frame(x = 1, y = 2)
+
+  # single table verbs
+  expect_selects(lf |> arrange(x) |> distinct(), 1)
+  expect_selects(lf |> distinct() |> distinct(), 1)
+  expect_selects(lf |> filter(x == 1) |> distinct(), 1)
+  expect_selects(lf |> head(1) |> distinct(), 2)
+  expect_selects(lf |> mutate(z = x + 1) |> distinct(), 1)
+  expect_selects(lf |> select(y = x) |> distinct(), 1)
+  expect_selects(lf |> summarise(y = mean(x)) |> distinct(), 1)
+
+  # two table verbs
+  lf2 <- lazy_frame(x = 1)
+  expect_selects(lf |> left_join(lf2, by = "x") |> distinct(), 2)
+  expect_selects(lf |> semi_join(lf2, by = "x") |> distinct(), 3)
+  expect_selects(lf |> union(lf2) |> distinct(), 3)
+})
+
 test_that("distinct returns all columns when .keep_all is TRUE", {
   mf <- local_memdb_frame(x = c(1, 1, 2, 2), y = 1:4)
 

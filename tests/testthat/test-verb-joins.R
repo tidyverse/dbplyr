@@ -1,3 +1,26 @@
+test_that("correctly inlines across all verbs", {
+  lf <- lazy_frame(x = 1, y = 2)
+  lf2 <- lazy_frame(x = 1, z = 3)
+
+  # single table verbs
+  suppressWarnings(expect_selects(
+    lf |> arrange(x) |> left_join(lf2, by = "x"),
+    2
+  ))
+  expect_selects(lf |> distinct() |> left_join(lf2, by = "x"), 2)
+  expect_selects(lf |> filter(x == 1) |> left_join(lf2, by = "x"), 2)
+  expect_selects(lf |> head(1) |> left_join(lf2, by = "x"), 2)
+  expect_selects(lf |> mutate(a = x + 1) |> left_join(lf2, by = "x"), 2)
+  expect_selects(lf |> select(x) |> left_join(lf2, by = "x"), 1)
+  expect_selects(lf |> summarise(x = mean(x)) |> left_join(lf2, by = "x"), 2)
+
+  # two table verbs
+  lf3 <- lazy_frame(x = 1)
+  expect_selects(lf |> left_join(lf2, by = "x") |> left_join(lf3, by = "x"), 1)
+  expect_selects(lf |> semi_join(lf2, by = "x") |> left_join(lf3, by = "x"), 3)
+  expect_selects(lf |> union(lf3) |> left_join(lf2, by = "x"), 3)
+})
+
 test_that("complete join pipeline works with SQLite", {
   df1 <- local_memdb_frame(x = 1:5)
   df2 <- local_memdb_frame(x = c(1, 3, 5), y = c("a", "b", "c"))

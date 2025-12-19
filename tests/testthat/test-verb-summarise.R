@@ -13,6 +13,24 @@ test_that("summarise peels off a single layer of grouping", {
   expect_equal(group_vars(mf3), character())
 })
 
+test_that("correctly inlines across all verbs", {
+  lf <- lazy_frame(x = 1, y = 2)
+
+  # single table verbs
+  expect_selects(lf |> arrange(x) |> summarise(y = mean(x)), 1)
+  expect_selects(lf |> distinct() |> summarise(y = mean(x)), 2)
+  expect_selects(lf |> filter(x == 1) |> summarise(y = mean(x)), 1)
+  expect_selects(lf |> head(1) |> summarise(y = mean(x)), 2)
+  expect_selects(lf |> mutate(z = x + 1) |> summarise(y = mean(x)), 2)
+  expect_selects(lf |> select(y = x) |> summarise(z = mean(y)), 2)
+  expect_selects(lf |> summarise(y = mean(x)) |> summarise(z = mean(y)), 2)
+
+  # two table verbs
+  lf2 <- lazy_frame(x = 1)
+  expect_selects(lf |> left_join(lf2, by = "x") |> summarise(y = mean(x)), 2)
+  expect_selects(lf |> semi_join(lf2, by = "x") |> summarise(y = mean(x)), 3)
+})
+
 test_that("summarise performs partial evaluation", {
   mf1 <- local_memdb_frame(x = 1)
 
