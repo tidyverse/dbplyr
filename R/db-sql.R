@@ -185,7 +185,7 @@ sql_query_fields <- function(con, sql, ...) {
 #' @export
 sql_query_fields.DBIConnection <- function(con, sql, ...) {
   sql <- as_table_source(sql, con)
-  dbplyr_query_select(
+  sql_query_select(
     con,
     sql("*"),
     dbplyr_sql_subquery(con, sql),
@@ -361,34 +361,6 @@ sql_query_select.DBIConnection <- function(
     order_by = sql_clause_order_by(order_by, subquery, limit),
     limit = sql_clause_limit(con, limit),
     lvl = lvl
-  )
-}
-dbplyr_query_select <- function(
-  con,
-  select,
-  from,
-  where = NULL,
-  group_by = NULL,
-  having = NULL,
-  order_by = NULL,
-  limit = NULL,
-  distinct = FALSE,
-  ...
-) {
-  check_2ed(con)
-  # TODO should add argument `window` after tidyverse/dplyr#4663
-  # TODO should add argument `subquery` after tidyverse/dplyr#4663
-  sql_query_select(
-    con,
-    select,
-    from,
-    where = where,
-    group_by = group_by,
-    having = having,
-    order_by = order_by,
-    limit = limit,
-    distinct = distinct,
-    ...
   )
 }
 

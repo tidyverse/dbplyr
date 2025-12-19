@@ -143,7 +143,7 @@ sql_render.select_query <- function(
     lvl = lvl
   )
 
-  dbplyr_query_select(
+  sql_query_select(
     con,
     query$select,
     from,

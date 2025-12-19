@@ -4,6 +4,10 @@ expect_translation <- function(con, expr, expected, ...) {
   expect_equal(actual_sql, sql(expected))
 }
 
+expect_selects <- function(code, n) {
+  expect_equal(n_selects(code), n)
+}
+
 expect_translation_snapshot <- function(con, expr, ..., error = FALSE) {
   expr <- substitute(expr)
   dots <- exprs(...)
