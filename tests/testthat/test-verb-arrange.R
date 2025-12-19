@@ -7,6 +7,26 @@ test_that("two arranges equivalent to one", {
   expect_equal(mf1 |> collect(), mf2 |> collect())
 })
 
+test_that("correctly inlines across all verbs", {
+  lf <- lazy_frame(x = 1, y = 2)
+
+  # single table verbs
+  expect_selects(lf |> arrange(x) |> arrange(y), 1)
+  expect_selects(lf |> distinct() |> arrange(y), 1)
+  expect_selects(lf |> filter(x) |> arrange(y), 1)
+  expect_selects(lf |> head(1) |> arrange(y), 2) # TODO: 1?
+  expect_selects(lf |> mutate(y = x + 1) |> arrange(y), 1)
+  expect_selects(lf |> select(y = x) |> arrange(y), 1)
+  expect_selects(lf |> summarise(y = mean(x)) |> arrange(y), 1)
+
+  # two table verbs
+  lf2 <- lazy_frame(x = 1)
+  expect_selects(lf |> left_join(lf2, by = "x") |> arrange(y), 2)
+  expect_selects(lf |> right_join(lf2, by = "x") |> arrange(y), 2)
+  expect_selects(lf |> semi_join(lf2, by = "x") |> arrange(y), 3)
+  expect_selects(lf |> union(lf2) |> arrange(y), 3)
+})
+
 # sql_render --------------------------------------------------------------
 
 test_that("quoting for rendering ordered grouped table", {
