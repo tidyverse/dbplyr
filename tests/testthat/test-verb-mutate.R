@@ -25,6 +25,10 @@ test_that("correctly inlines across all verbs", {
   expect_selects(lf |> left_join(lf2, by = "x") |> mutate(z = 1), 2)
   expect_selects(lf |> semi_join(lf2, by = "x") |> mutate(z = 1), 3)
   expect_selects(lf |> union(lf2) |> mutate(z = 1), 3)
+
+  # Special cases
+  expect_selects(lf |> mutate(x2 = x + 1, x3 = x2 + 1), 2)
+  expect_selects(lf |> mutate(x) |> mutate(y = 1), 1)
 })
 
 test_that("mutate() isn't inlined after distinct() #1119", {
