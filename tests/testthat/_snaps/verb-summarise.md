@@ -6,6 +6,23 @@
       Error in `reframe()`:
       ! `reframe()` is not supported on database backends.
 
+# generates minimal sql when possible
+
+    Code
+      summarise(arrange(lf, x), y = mean(x))
+    Output
+      <SQL>
+      SELECT AVG("x") AS "y"
+      FROM "df"
+      ORDER BY "x"
+    Code
+      summarise(filter(lf, x < 1), y = mean(x))
+    Output
+      <SQL>
+      SELECT AVG("x") AS "y"
+      FROM "df"
+      WHERE ("x" < 1.0)
+
 # can't refer to freshly created variables
 
     Code

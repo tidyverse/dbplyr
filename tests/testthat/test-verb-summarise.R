@@ -32,6 +32,15 @@ test_that("correctly inlines across all verbs", {
   expect_selects(lf |> semi_join(lf2, by = "x") |> summarise(y = mean(x)), 3)
 })
 
+test_that("generates minimal sql when possible", {
+  lf <- lazy_frame(x = 1, y = 2)
+
+  expect_snapshot({
+    lf |> arrange(x) |> summarise(y = mean(x))
+    lf |> filter(x < 1) |> summarise(y = mean(x))
+  })
+})
+
 test_that("summarise performs partial evaluation", {
   mf1 <- local_memdb_frame(x = 1)
 

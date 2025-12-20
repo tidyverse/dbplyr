@@ -172,14 +172,53 @@ add_summarise <- function(.data, dots, .groups, env_caller) {
   select <- syms(set_names(vars))
   select[names(dots)] <- dots
 
-  lazy_select_query(
-    x = lazy_query,
-    select = select,
-    group_by = syms(grps),
-    group_vars = groups_out,
-    select_operation = "summarise",
-    message_summarise = message_summarise
-  )
+  if (summarise_can_inline(lazy_query)) {
+    lazy_query$select <- new_lazy_select(
+      select,
+      group_vars = groups_out,
+      order_vars = NULL,
+      frame = NULL
+    )
+    lazy_query$group_by <- syms(grps)
+    lazy_query$select_operation <- "summarise"
+    lazy_query$message_summarise <- message_summarise
+    lazy_query$group_vars <- groups_out
+
+    lazy_query
+  } else {
+    lazy_select_query(
+      x = lazy_query,
+      select = select,
+      group_by = syms(grps),
+      group_vars = groups_out,
+      select_operation = "summarise",
+      message_summarise = message_summarise
+    )
+  }
+}
+
+summarise_can_inline <- function(lazy_query) {
+  if (!is_lazy_select_query(lazy_query)) {
+    return(FALSE)
+  }
+
+  # Inline: GROUP BY is executed after WHERE but before SELECT, DISTINCT,
+  # ORDER BY, and LIMIT. So we can inline if the previous query only has
+  # WHERE or ORDER BY
+
+  if (is_true(lazy_query$distinct)) {
+    return(FALSE)
+  }
+  if (!is_null(lazy_query$limit)) {
+    return(FALSE)
+  }
+
+  # Can only inline if previous SELECT is a pure projection
+  if (!is_pure_projection(lazy_query$select$expr, lazy_query$select$name)) {
+    return(FALSE)
+  }
+
+  TRUE
 }
 
 summarise_message <- function(grps, .groups, env_caller) {
