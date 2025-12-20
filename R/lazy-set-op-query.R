@@ -35,8 +35,8 @@ op_vars.lazy_set_op_query <- function(op) {
 sql_build.lazy_set_op_query <- function(op, con, ..., sql_options = NULL) {
   # add_op_set_op() ensures that both have same variables
   set_op_query(
-    sql_optimise(sql_build(op$x, con, sql_options = sql_options), con),
-    sql_optimise(sql_build(op$y, con, sql_options = sql_options), con),
+    sql_build(op$x, con, sql_options = sql_options),
+    sql_build(op$y, con, sql_options = sql_options),
     type = op$type,
     all = op$all
   )
@@ -81,14 +81,14 @@ sql_build.lazy_union_query <- function(op, con, ..., sql_options = NULL) {
     table = purrr::map(
       op$unions$table,
       function(table) {
-        sql_optimise(sql_build(table, con, sql_options = sql_options), con)
+        sql_build(table, con, sql_options = sql_options)
       }
     ),
     all = op$unions$all
   )
 
   union_query(
-    sql_optimise(sql_build(op$x, con, sql_options = sql_options), con),
+    sql_build(op$x, con, sql_options = sql_options),
     unions
   )
 }

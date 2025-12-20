@@ -12,7 +12,6 @@
 \alias{lazy_union_query}
 \alias{sql_build}
 \alias{sql_render}
-\alias{sql_optimise}
 \alias{join_query}
 \alias{select_query}
 \alias{semi_join_query}
@@ -96,8 +95,6 @@ sql_render(
   subquery = FALSE,
   lvl = 0
 )
-
-sql_optimise(x, con = NULL, ..., subquery = FALSE)
 
 join_query(
   x,

@@ -114,16 +114,12 @@ If you're working with large data, it maybe also be helpful to set `auto_index =
 
 ## Behind the scenes
 
-The verb level SQL translation is implemented on top of `tbl_lazy`, which basically tracks the operations you perform in a pipeline (see `lazy-ops.R`). Turning that into a SQL query takes place in three steps:
+The verb level SQL translation is implemented on top of `tbl_lazy`, which basically tracks the operations you perform in a pipeline (see `lazy-ops.R`). Turning that into a SQL query takes place in two steps:
 
-* `sql_build()` recurses over the lazy op data structure building up query 
-  objects (`select_query()`, `join_query()`, `set_op_query()` etc) 
+* `sql_build()` recurses over the lazy op data structure building up query
+  objects (`select_query()`, `join_query()`, `set_op_query()` etc)
   that represent the different subtypes of `SELECT` queries that we might
   generate.
-
-* `sql_optimise()` takes a pass over these SQL objects, looking for potential
-  optimisations. Currently this only involves removing subqueries where
-  possible.
 
 * `sql_render()` calls an SQL generation function (`sql_query_select()`,
   `sql_query_join()`, `sql_query_semi_join()`, `sql_query_set_op()`, ...)
