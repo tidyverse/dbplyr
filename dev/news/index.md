@@ -2,6 +2,9 @@
 
 ## dbplyr (development version)
 
+- [`distinct()`](https://dplyr.tidyverse.org/reference/distinct.html)
+  after a join no longer creates a subquery
+  ([\#722](https://github.com/tidyverse/dbplyr/issues/722)).
 - New
   [`bind_queries()`](https://dbplyr.tidyverse.org/dev/reference/bind_queries.md)
   makes it easy to combine multiple lazy queries using `UNION ALL`

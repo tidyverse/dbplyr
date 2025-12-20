@@ -261,7 +261,17 @@ queries.</p></li>
 <span>  lvl <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">sql_query_multi_join</span><span class="op">(</span><span class="va">con</span>, <span class="va">x</span>, <span class="va">joins</span>, <span class="va">table_names</span>, <span class="va">by_list</span>, <span class="va">select</span>, <span class="va">...</span>, lvl <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="fu">sql_query_multi_join</span><span class="op">(</span></span>
+<span>  <span class="va">con</span>,</span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">joins</span>,</span>
+<span>  <span class="va">table_names</span>,</span>
+<span>  <span class="va">by_list</span>,</span>
+<span>  <span class="va">select</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  distinct <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  lvl <span class="op">=</span> <span class="fl">0</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">sql_query_semi_join</span><span class="op">(</span><span class="va">con</span>, <span class="va">x</span>, <span class="va">y</span>, <span class="va">anti</span>, <span class="va">by</span>, <span class="va">where</span>, <span class="va">vars</span>, <span class="va">...</span>, lvl <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span></span>
