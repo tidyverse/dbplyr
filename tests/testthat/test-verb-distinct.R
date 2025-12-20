@@ -24,6 +24,13 @@ test_that("correctly inlines across all verbs", {
   expect_selects(lf |> right_join(lf2, by = "x") |> distinct(), 2)
   expect_selects(lf |> semi_join(lf2, by = "x") |> distinct(), 3)
   expect_selects(lf |> union(lf2) |> distinct(), 3)
+
+  # special cases
+  # doesn't inline if .keep_all is TRUE, since that requires a window function
+  expect_selects(
+    lf |> left_join(lf2, by = "x") |> distinct(y, .keep_all = TRUE),
+    3
+  )
 })
 
 test_that("distinct returns all columns when .keep_all is TRUE", {
@@ -178,6 +185,12 @@ test_that("distinct() after join is inlined", {
   out <- lf1 |>
     left_join(lf2, by = "x") |>
     distinct()
+  expect_s3_class(out$lazy_query, "lazy_multi_join_query")
+  expect_snapshot(show_query(out))
+
+  out <- lf1 |>
+    left_join(lf2, by = "x") |>
+    distinct(x)
   expect_s3_class(out$lazy_query, "lazy_multi_join_query")
   expect_snapshot(show_query(out))
 })
