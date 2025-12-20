@@ -28,6 +28,7 @@ test_that("correctly inlines across all verbs", {
   # two table verbs
   lf2 <- lazy_frame(x = 1)
   expect_selects(lf |> left_join(lf2, by = "x") |> summarise(y = mean(x)), 2)
+  expect_selects(lf |> right_join(lf2, by = "x") |> summarise(y = mean(x)), 2)
   expect_selects(lf |> semi_join(lf2, by = "x") |> summarise(y = mean(x)), 3)
 })
 

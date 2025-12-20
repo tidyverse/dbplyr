@@ -93,6 +93,7 @@ Collate:
     'backend-spark-sql.R'
     'backend-sqlite.R'
     'backend-teradata.R'
+    'bind-queries.R'
     'build-sql.R'
     'data-cache.R'
     'data-lahman.R'
