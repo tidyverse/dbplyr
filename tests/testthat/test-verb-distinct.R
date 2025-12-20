@@ -20,10 +20,17 @@ test_that("correctly inlines across all verbs", {
 
   # two table verbs
   lf2 <- lazy_frame(x = 1)
-  expect_selects(lf |> left_join(lf2, by = "x") |> distinct(), 2)
+  expect_selects(lf |> left_join(lf2, by = "x") |> distinct(), 1)
   expect_selects(lf |> right_join(lf2, by = "x") |> distinct(), 2)
   expect_selects(lf |> semi_join(lf2, by = "x") |> distinct(), 3)
   expect_selects(lf |> union(lf2) |> distinct(), 3)
+
+  # special cases
+  # doesn't inline if .keep_all is TRUE, since that requires a window function
+  expect_selects(
+    lf |> left_join(lf2, by = "x") |> distinct(y, .keep_all = TRUE),
+    3
+  )
 })
 
 test_that("distinct returns all columns when .keep_all is TRUE", {
@@ -169,6 +176,23 @@ test_that("distinct() produces optimized SQL", {
 
   expect_s3_class(out$lazy_query$x, "lazy_select_query")
   expect_equal(out$lazy_query$x$limit, 2)
+})
+
+test_that("distinct() after join is inlined", {
+  lf1 <- lazy_frame(x = 1, y = 1)
+  lf2 <- lazy_frame(x = 1, z = 2)
+
+  out <- lf1 |>
+    left_join(lf2, by = "x") |>
+    distinct()
+  expect_s3_class(out$lazy_query, "lazy_multi_join_query")
+  expect_snapshot(show_query(out))
+
+  out <- lf1 |>
+    left_join(lf2, by = "x") |>
+    distinct(x)
+  expect_s3_class(out$lazy_query, "lazy_multi_join_query")
+  expect_snapshot(show_query(out))
 })
 
 # sql-render --------------------------------------------------------------
