@@ -106,26 +106,26 @@ sql_glue2(con, "SELECT {.id cols} FROM {.tbl table}")
 
 ### Behind the scenes
 
-The high-level translation from R code to SQL takes place in a few steps, using two intermediate representations a "lazy query" and a "query". A lazy query is closer to R and a query is closer to SQL. This continuum of representation allows us to work with expressions when trying to reason about the transformation pipeline then later switch to strings of SQL when we get closer to generating a query.
+The high-level translation from R code to SQL takes place in a few steps, using two intermediate representations: a "lazy query" and a "query". A lazy query is closer to R and a query is closer to SQL. This continuum of representation allows us to work with expressions when trying to reason about the transformation pipeline, then later switch to strings of SQL when we get closer to generating a query.
 
-All dbplyr pipelines are built on top of the the `tbl_lazy` data structure, which is the only data structure that the user will ever see. It has two fields:
+All dbplyr pipelines are built on top of the `tbl_lazy` data structure, which is the only data structure that the user will ever see. It has two fields:
 
 * A database `con`nection which is used to specialise SQL translation.
 * A `lazy_query` which represents the lazy computation described by the pipeline. It always starts off as a `lazy_base_query` which represents a remote table or SQL query.
 
-Each verb verb takes a `tbl_lazy` as input and returns a modified `tbl_lazy`, modifying the `lazy_query` with the new requirements. At the simplest level, this involves wrapping the existing lazy query within a new lazy query, such as `lazy_query_select()` or `lazy_query_multi_join()`. These represent what later will become a subquery so that (e.g.) `filter()`, `mutate()`, `select()`, `arrange()`, and `summarise()` all use `lazy_select_query()`, where as `left_join()` and `inner_join()` uses `lazy_query_multi_join()`. 
+Each verb takes a `tbl_lazy` as input and returns a modified `tbl_lazy`, modifying the `lazy_query` with the new requirements. At the simplest level, this involves wrapping the existing lazy query within a new lazy query, such as `lazy_query_select()` or `lazy_query_multi_join()`. These represent what later will become a subquery so that (e.g.) `filter()`, `mutate()`, `select()`, `arrange()`, and `summarise()` all use `lazy_select_query()`, whereas `left_join()` and `inner_join()` use `lazy_query_multi_join()`. 
 
 These lazy queries are typically created by a helper function like `add_select()`, `add_mutate()`, and `add_filter()`. These helpers have two roles:
 
-1. They abstract away repeated code for substantially similar dplyr verbs. For example `select()`, `rename()`, `rename_with()` and `relocate()` all use `add_select()`. 
+1. They abstract away repeated code for substantially similar dplyr verbs. For example, `select()`, `rename()`, `rename_with()` and `relocate()` all use `add_select()`. 
 
 2. They are responsible for figuring out if we can re-use the existing query or we need to wrap in a subquery. Typically this work is done by a function called `select_can_inline()` which will use what we know about SQL and the verb to determine whether or not we have to introduce a subquery.
 
 The lazy query gives us a representation of the data manipulation pipeline with enough detail that we can reason about when we need a subquery. Then when the user calls `collect()`, we need to generate an SQL query. This happens in two steps: building and rendering.
 
-First, `sql_build()` recurses over the lazy query building up query objects  like `select_query()` and `join_query()` that represent the different subtypes of `SELECT` queries. Compared to the previous "lazy" query representation these are much closer to SQL than R. They can be much simpler because we no longer need to reason about subqueries, but we still need some structure to faciliate backend-specific tranlations.
+First, `sql_build()` recurses over the lazy query, building up query objects like `select_query()` and `join_query()` that represent the different subtypes of `SELECT` queries. Compared to the previous "lazy" query representation, these are much closer to SQL than R. They can be much simpler because we no longer need to reason about subqueries, but we still need some structure to facilitate backend-specific translations.
 
-This is the next step: `sql_render()` is called on the result of `sql_build()`, dispatches to generics like `sql_query_select()`, `sql_query_join()`, `sql_query_semi_join()`, `sql_query_set_op()`. This generics have methods for each backend that are responsible for creating the needed SQL.
+Next, `sql_render()` is called on the result of `sql_build()` and dispatches to generics like `sql_query_select()`, `sql_query_join()`, `sql_query_semi_join()`, and `sql_query_set_op()`. These generics have methods for each backend that are responsible for creating the needed SQL.
 
 ## SQL translation: vectors
 
