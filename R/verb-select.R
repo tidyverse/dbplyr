@@ -86,6 +86,7 @@ add_select <- function(lazy_query, vars) {
     return(lazy_query)
   }
 
+  # Update grouping/ordering with new variable names
   lazy_query$group_vars <- rename_groups(op_grps(lazy_query), vars)
   lazy_query$order_vars <- rename_order(op_sort(lazy_query), vars)
 
