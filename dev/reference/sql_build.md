@@ -87,8 +87,6 @@ sql_render(
   lvl = 0
 )
 
-sql_optimise(x, con = NULL, ..., subquery = FALSE)
-
 join_query(
   x,
   y,

@@ -2,6 +2,10 @@
 
 ## dbplyr (development version)
 
+- `sql_optimise()` has been removed. It was only used for two cases
+  (filter + summarise and arrange + summarise), and these are now
+  handled at a higher level
+  ([\#1720](https://github.com/tidyverse/dbplyr/issues/1720)).
 - [`distinct()`](https://dplyr.tidyverse.org/reference/distinct.html)
   after a join no longer creates a subquery
   ([\#722](https://github.com/tidyverse/dbplyr/issues/722)).
@@ -1814,9 +1818,8 @@ CRAN release: 2020-11-03
   deterministic which helps some query optimisers/cachers
   ([\#336](https://github.com/tidyverse/dbplyr/issues/336)).
 
-- [`sql_optimise()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)
-  now can partially optimise a pipeline; due to an unfortunate bug it
-  previously gave up too easily.
+- `sql_optimise()` now can partially optimise a pipeline; due to an
+  unfortunate bug it previously gave up too easily.
 
 - [`in_schema()`](https://dbplyr.tidyverse.org/dev/reference/in_schema.md)
   quotes each input individually

@@ -286,16 +286,13 @@ the join variables to the temporary table.</p>
 <p>The verb level SQL translation is implemented on top of
 <code>tbl_lazy</code>, which basically tracks the operations you perform
 in a pipeline (see <code>lazy-ops.R</code>). Turning that into a SQL
-query takes place in three steps:</p>
+query takes place in two steps:</p>
 <ul>
 <li><p><code><a href="../reference/sql_build.html">sql_build()</a></code> recurses over the lazy op data structure
 building up query objects (<code><a href="../reference/sql_build.html">select_query()</a></code>,
 <code><a href="../reference/sql_build.html">join_query()</a></code>, <code><a href="../reference/sql_build.html">set_op_query()</a></code> etc) that
 represent the different subtypes of <code>SELECT</code> queries that we
 might generate.</p></li>
-<li><p><code><a href="../reference/sql_build.html">sql_optimise()</a></code> takes a pass over these SQL objects,
-looking for potential optimisations. Currently this only involves
-removing subqueries where possible.</p></li>
 <li><p><code><a href="../reference/sql_build.html">sql_render()</a></code> calls an SQL generation function
 (<code><a href="../reference/db-sql.html">sql_query_select()</a></code>, <code><a href="../reference/db-sql.html">sql_query_join()</a></code>,
 <code><a href="../reference/db-sql.html">sql_query_semi_join()</a></code>, <code><a href="../reference/db-sql.html">sql_query_set_op()</a></code>, …)

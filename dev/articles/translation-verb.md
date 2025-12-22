@@ -166,7 +166,7 @@ variables to the temporary table.
 
 The verb level SQL translation is implemented on top of `tbl_lazy`,
 which basically tracks the operations you perform in a pipeline (see
-`lazy-ops.R`). Turning that into a SQL query takes place in three steps:
+`lazy-ops.R`). Turning that into a SQL query takes place in two steps:
 
 - [`sql_build()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)
   recurses over the lazy op data structure building up query objects
@@ -175,11 +175,6 @@ which basically tracks the operations you perform in a pipeline (see
   [`set_op_query()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)
   etc) that represent the different subtypes of `SELECT` queries that we
   might generate.
-
-- [`sql_optimise()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)
-  takes a pass over these SQL objects, looking for potential
-  optimisations. Currently this only involves removing subqueries where
-  possible.
 
 - [`sql_render()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)
   calls an SQL generation function
