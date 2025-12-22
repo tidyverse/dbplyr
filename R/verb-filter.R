@@ -72,40 +72,41 @@ add_filter <- function(.data, dots) {
 
     lazy_query$having <- c(lazy_query$having, dots)
     lazy_query
-  } else if (filter_needs_new_query(dots, lazy_query, con)) {
-    lazy_select_query(x = lazy_query, where = dots)
-  } else {
+  } else if (filter_can_inline(dots, lazy_query, con)) {
     # WHERE happens before SELECT so can't refer to aliases
     dots <- rename_aliases(dots, lazy_query$select)
 
     # might be either a lazy_select_query or a lazy_multi_join_query
     lazy_query$where <- c(lazy_query$where, dots)
     lazy_query
+  } else {
+    lazy_select_query(x = lazy_query, where = dots)
   }
 }
 
-filter_needs_new_query <- function(dots, lazy_query, con) {
+filter_can_inline <- function(dots, lazy_query, con) {
   if (inherits(lazy_query, "lazy_multi_join_query")) {
-    return(FALSE)
+    # can't use mutated variables, window funs, or SQL
+    return(TRUE)
   }
 
   if (!is_lazy_select_query(lazy_query)) {
-    return(TRUE)
+    return(FALSE)
   }
 
   if (uses_mutated_vars(dots, lazy_query$select)) {
-    return(TRUE)
+    return(FALSE)
   }
 
   if (uses_window_fun(lazy_query$select$expr, con)) {
-    return(TRUE)
+    return(FALSE)
   }
 
   if (any_expr_uses_sql(lazy_query$select$expr)) {
-    return(TRUE)
+    return(FALSE)
   }
 
-  FALSE
+  TRUE
 }
 
 filter_can_use_having <- function(lazy_query) {
