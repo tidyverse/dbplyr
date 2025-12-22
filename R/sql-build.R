@@ -49,13 +49,12 @@ sql_build.tbl_lazy <- function(op, con = op$src$con, ..., sql_options = NULL) {
   sql_options <- sql_options %||% sql_options()
 
   # only used for testing
-  qry <- sql_build(
+  sql_build(
     op$lazy_query,
     con = con,
     ...,
     sql_options = sql_options
   )
-  sql_optimise(qry, con = con, ...)
 }
 
 
@@ -122,7 +121,6 @@ sql_render.lazy_query <- function(
   lvl = 0
 ) {
   qry <- sql_build(query, con = con, sql_options = sql_options)
-  qry <- sql_optimise(qry, con = con, subquery = subquery)
 
   if (sql_options$cte) {
     query_list <- flatten_query(
@@ -215,13 +213,4 @@ flatten_query_2_tables <- function(qry, query_list, con) {
   qry$y <- get_subquery_name(y, query_list_y)
 
   querylist_reuse_query(qry, query_list_y, con)
-}
-
-
-# Optimise ----------------------------------------------------------------
-
-#' @export
-#' @rdname sql_build
-sql_optimise <- function(x, con = NULL, ..., subquery = FALSE) {
-  UseMethod("sql_optimise")
 }

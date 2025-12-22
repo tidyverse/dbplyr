@@ -458,6 +458,7 @@ sql_query_multi_join <- function(
   select,
   ...,
   where = NULL,
+  distinct = FALSE,
   lvl = 0
 ) {
   check_dots_used()
@@ -503,6 +504,7 @@ sql_query_multi_join.DBIConnection <- function(
   select,
   ...,
   where = NULL,
+  distinct = FALSE,
   lvl = 0
 ) {
   if (vctrs::vec_duplicate_any(table_names)) {
@@ -527,7 +529,7 @@ sql_query_multi_join.DBIConnection <- function(
   }
 
   clauses <- list2(
-    sql_clause_select(con, select),
+    sql_clause_select(con, select, distinct),
     sql_clause_from(from),
     !!!out,
     sql_clause_where(where)

@@ -27,14 +27,22 @@ join_query <- function(
   )
 }
 
-multi_join_query <- function(x, joins, table_names, select, where = NULL) {
+multi_join_query <- function(
+  x,
+  joins,
+  table_names,
+  select,
+  where = NULL,
+  distinct = FALSE
+) {
   structure(
     list(
       x = x,
       joins = joins,
       table_names = table_names,
       select = select,
-      where = where
+      where = where,
+      distinct = distinct
     ),
     class = c("multi_join_query", "query")
   )
@@ -121,6 +129,7 @@ sql_render.multi_join_query <- function(
     by_list = query$by_list,
     select = query$select,
     where = query$where,
+    distinct = query$distinct,
     lvl = lvl
   )
 }

@@ -96,6 +96,7 @@ sql_query_multi_join(
   select,
   ...,
   where = NULL,
+  distinct = FALSE,
   lvl = 0
 )
 

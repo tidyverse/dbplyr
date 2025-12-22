@@ -6,6 +6,7 @@ lazy_multi_join_query <- function(
   table_names,
   vars,
   where = list(),
+  distinct = FALSE,
   group_vars = op_grps(x),
   order_vars = op_sort(x),
   frame = op_frame(x),
@@ -32,6 +33,7 @@ lazy_multi_join_query <- function(
     table_names = table_names,
     vars = vars,
     where = where,
+    distinct = distinct,
     group_vars = group_vars,
     order_vars = order_vars,
     frame = frame
@@ -180,7 +182,7 @@ sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
 
   op$joins$table <- purrr::map(
     op$joins$table,
-    \(table) sql_optimise(sql_build(table, con, sql_options = sql_options), con)
+    \(table) sql_build(table, con, sql_options = sql_options)
   )
   op$joins$by <- purrr::map2(
     op$joins$by,
@@ -202,11 +204,12 @@ sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
   )
 
   multi_join_query(
-    x = sql_optimise(sql_build(op$x, con, sql_options = sql_options), con),
+    x = sql_build(op$x, con, sql_options = sql_options),
     joins = op$joins,
     table_names = table_names_out,
     select = select_sql,
-    where = where_sql
+    where = where_sql,
+    distinct = op$distinct
   )
 }
 
@@ -269,8 +272,8 @@ sql_build.lazy_rf_join_query <- function(op, con, ..., sql_options = NULL) {
   )
 
   join_query(
-    sql_optimise(sql_build(op$x, con, sql_options = sql_options), con),
-    sql_optimise(sql_build(op$y, con, sql_options = sql_options), con),
+    sql_build(op$x, con, sql_options = sql_options),
+    sql_build(op$y, con, sql_options = sql_options),
     select = select,
     type = op$type,
     by = by,
@@ -305,8 +308,8 @@ sql_build.lazy_semi_join_query <- function(op, con, ..., sql_options = NULL) {
   )
 
   semi_join_query(
-    sql_optimise(sql_build(op$x, con, sql_options = sql_options), con),
-    sql_optimise(sql_build(op$y, con, sql_options = sql_options), con),
+    sql_build(op$x, con, sql_options = sql_options),
+    sql_build(op$y, con, sql_options = sql_options),
     vars = vars,
     anti = op$anti,
     by = op$by,

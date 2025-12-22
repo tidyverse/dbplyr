@@ -28,7 +28,28 @@ test_that("correctly inlines across all verbs", {
   # two table verbs
   lf2 <- lazy_frame(x = 1)
   expect_selects(lf |> left_join(lf2, by = "x") |> summarise(y = mean(x)), 2)
+  expect_selects(lf |> right_join(lf2, by = "x") |> summarise(y = mean(x)), 2)
   expect_selects(lf |> semi_join(lf2, by = "x") |> summarise(y = mean(x)), 3)
+
+  #
+  expect_selects(lf |> summarise(.by = x) |> summarise(n = n()), 2)
+})
+
+test_that("can performed grouped summarise with no inputs", {
+  # used in n_groups()
+  db <- local_memdb_frame("empty-summarise", x = c(1, 1, 1, 2, 2, 3))
+  out <- db |> summarise(.by = x)
+  expect_snapshot(out |> show_query())
+  expect_equal(out |> collect(), tibble(x = c(1, 2, 3)))
+})
+
+test_that("generates minimal sql when possible", {
+  lf <- lazy_frame(x = 1, y = 2)
+
+  expect_snapshot({
+    lf |> arrange(x) |> summarise(y = mean(x))
+    lf |> filter(x < 1) |> summarise(y = mean(x))
+  })
 })
 
 test_that("summarise performs partial evaluation", {
