@@ -532,7 +532,7 @@ test_that("select() before join is inlined", {
     by = "x"
   )
   expect_equal(op_grps(out_left), "a")
-  expect_equal(op_sort(out_left), list(expr(a)))
+  expect_equal(op_sort(out_left), list(quo(a)))
   expect_equal(op_frame(out_left), list(range = c(0, 1)))
 })
 
@@ -655,7 +655,7 @@ test_that("select() before semi_join is inlined", {
     by = "x"
   )
   expect_equal(op_grps(out_semi), "a")
-  expect_equal(op_sort(out_semi), list(expr(a)))
+  expect_equal(op_sort(out_semi), list(quo(a)))
   expect_equal(op_frame(out_semi), list(range = c(0, 1)))
 })
 

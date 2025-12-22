@@ -151,16 +151,16 @@ test_that("select handles order vars", {
   # can rename order vars
   expect_equal(
     lf |> window_order(y) |> select(y2 = y) |> op_sort(),
-    list(expr(y2))
+    list(quo(y2))
   )
   expect_equal(
     lf |> window_order(desc(y)) |> select(y2 = y) |> op_sort(),
-    list(expr(desc(y2)))
+    list(quo(desc(y2)))
   )
   # keeps sort order
   expect_equal(
     lf |> window_order(x, y) |> select(y2 = y, x) |> op_sort(),
-    list(expr(x), expr(y2))
+    list(quo(x), quo(y2))
   )
 })
 

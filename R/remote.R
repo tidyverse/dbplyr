@@ -74,13 +74,7 @@ remote_table.lazy_base_local_query <- function(x, null_if_local = TRUE) {
 
 #' @export
 remote_table.lazy_query <- function(x, null_if_local = TRUE) {
-  if (
-    !is_lazy_select_query_simple(x, ignore_group_by = TRUE, select = "identity")
-  ) {
-    return()
-  }
-
-  remote_table(x$x)
+  NULL
 }
 
 #' @export

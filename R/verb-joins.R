@@ -494,8 +494,7 @@ join_inline_select <- function(lq, by, on, semi = FALSE) {
   can_inline <- is_lazy_select_query_simple(
     lq,
     ignore_where = semi,
-    ignore_group_by = semi,
-    select = "projection"
+    ignore_group_by = semi
   )
 
   if (is_empty(on) && can_inline) {

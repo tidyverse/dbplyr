@@ -80,8 +80,7 @@ lazy_select_query(
   group_vars = NULL,
   order_vars = NULL,
   frame = NULL,
-  select_operation = c("select", "mutate", "summarise"),
-  message_summarise = NULL
+  select_operation = c("select", "mutate", "summarise")
 )
 
 lazy_set_op_query(x, y, type, all, call = caller_env())
