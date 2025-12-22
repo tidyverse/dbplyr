@@ -52,6 +52,42 @@
       ! `.preserve = TRUE` isn't supported on database backends.
       i It must be FALSE instead.
 
+# filter() inlined after join
+
+    Code
+      show_query(out)
+    Output
+      <SQL>
+      SELECT "df1".*, "z"
+      FROM "df1"
+      LEFT JOIN "df2"
+        ON ("df1"."x" = "df2"."x")
+      WHERE ("z" = 1.0)
+
+---
+
+    Code
+      show_query(out)
+    Output
+      <SQL>
+      SELECT "df1".*, "z"
+      FROM "df1"
+      LEFT JOIN "df2"
+        ON ("df1"."x" = "df2"."x")
+      WHERE ("y" = 1.0) AND ("z" = 2.0)
+
+---
+
+    Code
+      show_query(out)
+    Output
+      <SQL>
+      SELECT "df1"."x" AS "x", "df1"."y" AS "y.x", "df3"."y" AS "y.y"
+      FROM "df1"
+      LEFT JOIN "df3"
+        ON ("df1"."x" = "df3"."x")
+      WHERE ("df3"."y" = 1.0)
+
 # catches `.by` with grouped-df
 
     Code

@@ -5,6 +5,7 @@ lazy_multi_join_query <- function(
   joins,
   table_names,
   vars,
+  where = list(),
   distinct = FALSE,
   group_vars = op_grps(x),
   order_vars = op_sort(x),
@@ -31,6 +32,7 @@ lazy_multi_join_query <- function(
     joins = joins,
     table_names = table_names,
     vars = vars,
+    where = where,
     distinct = distinct,
     group_vars = group_vars,
     order_vars = order_vars,
@@ -47,6 +49,7 @@ lazy_rf_join_query <- function(
   by,
   table_names,
   vars,
+  where = list(),
   group_vars = op_grps(x),
   order_vars = op_sort(x),
   frame = op_frame(x),
@@ -74,6 +77,7 @@ lazy_rf_join_query <- function(
     by = by,
     table_names = table_names,
     vars = vars,
+    where = where,
     group_vars = group_vars,
     order_vars = order_vars,
     frame = frame
@@ -190,11 +194,34 @@ sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
     }
   )
 
+  join_vars <- sql_multi_join_vars(
+    con,
+    op$vars,
+    table_vars,
+    use_star = FALSE,
+    qualify_all_columns = sql_options$qualify_all_columns
+  )
+  # WHERE happens after SELECT, but columns names are disambiguated using
+  # SELECT expressions, so need to backtransform
+  where <- lapply(op$where, \(expr) {
+    replace_sym(
+      expr,
+      names(join_vars),
+      lapply(unname(join_vars), \(x) sql(x[[1]]))
+    )
+  })
+  where_sql <- translate_sql_(
+    where,
+    con = con,
+    context = list(clause = "WHERE")
+  )
+
   multi_join_query(
     x = sql_build(op$x, con, sql_options = sql_options),
     joins = op$joins,
     table_names = table_names_out,
     select = select_sql,
+    where = where_sql,
     distinct = op$distinct
   )
 }

@@ -83,6 +83,7 @@ sql_query_join(
   by = NULL,
   na_matches = FALSE,
   ...,
+  where = NULL,
   lvl = 0
 )
 
@@ -94,6 +95,7 @@ sql_query_multi_join(
   by_list,
   select,
   ...,
+  where = NULL,
   distinct = FALSE,
   lvl = 0
 )

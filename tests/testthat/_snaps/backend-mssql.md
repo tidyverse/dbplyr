@@ -759,6 +759,8 @@
       EOF within quoted string
       Warning in `scan()`:
       EOF within quoted string
+      Warning in `scan()`:
+      EOF within quoted string
     Output
       <SQL>
       SELECT [LHS]]

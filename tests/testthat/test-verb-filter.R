@@ -32,7 +32,7 @@ test_that("correctly inlines across all verbs", {
 
   # two table verbs
   lf2 <- lazy_frame(x = 1)
-  expect_selects(lf |> left_join(lf2, by = "x") |> filter(x == 1), 2)
+  expect_selects(lf |> left_join(lf2, by = "x") |> filter(x == 1), 1)
   expect_selects(lf |> right_join(lf2, by = "x") |> filter(x == 1), 2)
   expect_selects(lf |> semi_join(lf2, by = "x") |> filter(x == 1), 3)
   expect_selects(lf |> union(lf2) |> filter(x == 1), 3)
@@ -138,6 +138,40 @@ test_that("filter() inlined after mutate()", {
   expect_equal(lq3$select$expr, syms(c("x", "y")))
   expect_s3_class(lq3$x, "lazy_select_query")
   expect_equal(lq3$where, list(quo(y == sql("1"))), ignore_formula_env = TRUE)
+})
+
+test_that("filter() inlined after join", {
+  lf1 <- lazy_frame(x = 1, y = 1, .name = "df1")
+  lf2 <- lazy_frame(x = 1, z = 2, .name = "df2")
+
+  out <- lf1 |>
+    left_join(lf2, by = "x") |>
+    filter(z == 1)
+  expect_s3_class(out$lazy_query, "lazy_multi_join_query")
+  expect_snapshot(show_query(out))
+
+  # multiple filters are combined
+  out <- lf1 |>
+    left_join(lf2, by = "x") |>
+    filter(y == 1) |>
+    filter(z == 2)
+  expect_s3_class(out$lazy_query, "lazy_multi_join_query")
+  expect_snapshot(show_query(out))
+
+  # Handles aliasing from join
+  lf3 <- lazy_frame(x = 1, y = 2, .name = "df3")
+  out <- lf1 |>
+    left_join(lf3, by = "x") |>
+    filter(y.y == 1)
+  expect_snapshot(show_query(out))
+})
+
+test_that("inlined join works", {
+  # single integration test of the most complicated case
+  lf1 <- memdb_frame(x = 1:2, y = 1:2)
+  lf2 <- memdb_frame(x = 1:2, y = 3:4)
+  jf <- lf1 |> left_join(lf2, by = "x") |> filter(y.x == 1)
+  expect_equal(collect(jf), tibble(x = 1, y.x = 1, y.y = 3))
 })
 
 test_that("filter isn't inlined after mutate with window function #1135", {
