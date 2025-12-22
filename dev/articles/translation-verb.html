@@ -43,7 +43,7 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a></li>
+<li><a class="dropdown-item" href="../articles/new-backend.html">Developing a dbplyr backend</a></li>
     <li><a class="dropdown-item" href="../articles/reprex.html">Reprexes for dbplyr</a></li>
     <li><a class="dropdown-item" href="../articles/translation-function.html">Function translation</a></li>
     <li><a class="dropdown-item" href="../articles/translation-verb.html">Verb translation</a></li>
@@ -281,27 +281,6 @@ and then perform a efficient semi join in the database.</p>
 <p>If you’re working with large data, it maybe also be helpful to set
 <code>auto_index = TRUE</code>. That will automatically add an index on
 the join variables to the temporary table.</p>
-</div>
-<div class="section level2">
-<h2 id="behind-the-scenes">Behind the scenes<a class="anchor" aria-label="anchor" href="#behind-the-scenes"></a>
-</h2>
-<p>The verb level SQL translation is implemented on top of
-<code>tbl_lazy</code>, which basically tracks the operations you perform
-in a pipeline (see <code>lazy-ops.R</code>). Turning that into a SQL
-query takes place in two steps:</p>
-<ul>
-<li><p><code><a href="../reference/sql_build.html">sql_build()</a></code> recurses over the lazy op data structure
-building up query objects (<code><a href="../reference/sql_build.html">select_query()</a></code>,
-<code><a href="../reference/sql_build.html">join_query()</a></code>, <code><a href="../reference/sql_build.html">set_op_query()</a></code> etc) that
-represent the different subtypes of <code>SELECT</code> queries that we
-might generate.</p></li>
-<li><p><code><a href="../reference/sql_build.html">sql_render()</a></code> calls an SQL generation function
-(<code><a href="../reference/db-sql.html">sql_query_select()</a></code>, <code><a href="../reference/db-sql.html">sql_query_join()</a></code>,
-<code><a href="../reference/db-sql.html">sql_query_semi_join()</a></code>, <code><a href="../reference/db-sql.html">sql_query_set_op()</a></code>, …)
-to produce the actual SQL. Each of these functions is a generic, taking
-the connection as an argument, so that the translation can be customised
-for different databases.</p></li>
-</ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

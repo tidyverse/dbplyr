@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Adding a new DBI backend • dbplyr</title>
+<title>Developing a dbplyr backend • dbplyr</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Adding a new DBI backend">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Developing a dbplyr backend">
 <meta name="robots" content="noindex">
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js" data-max-height="43" data-light-bg="#666f76" data-light-fg="#f9f9f9"></script><script defer data-domain="dbplyr.tidyverse.org,all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script>
 </head>
@@ -43,7 +43,7 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a></li>
+<li><a class="dropdown-item" href="../articles/new-backend.html">Developing a dbplyr backend</a></li>
     <li><a class="dropdown-item" href="../articles/reprex.html">Reprexes for dbplyr</a></li>
     <li><a class="dropdown-item" href="../articles/translation-function.html">Function translation</a></li>
     <li><a class="dropdown-item" href="../articles/translation-verb.html">Verb translation</a></li>
@@ -85,7 +85,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>Adding a new DBI backend</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Developing a dbplyr backend</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/tidyverse/dbplyr/blob/main/vignettes/new-backend.Rmd" class="external-link"><code>vignettes/new-backend.Rmd</code></a></small>
@@ -219,6 +219,71 @@ SQL generation:</p>
 <span><span class="va">cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id"</span>, <span class="st">"name"</span>, <span class="st">"value"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/sql_glue.html">sql_glue2</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"SELECT {.id cols} FROM {.tbl table}"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt; SELECT "id", "name", "value" FROM "my_table"</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="behind-the-scenes">Behind the scenes<a class="anchor" aria-label="anchor" href="#behind-the-scenes"></a>
+</h3>
+<p>The high-level translation from R code to SQL takes place in a few
+steps, using two intermediate representations: a “lazy query” and a
+“query”. A lazy query is closer to R and a query is closer to SQL. This
+continuum of representation allows us to work with expressions when
+trying to reason about the transformation pipeline, then later switch to
+strings of SQL when we get closer to generating a query.</p>
+<p>All dbplyr pipelines are built on top of the <code>tbl_lazy</code>
+data structure, which is the only data structure that the user will ever
+see. It has two fields:</p>
+<ul>
+<li>A database <code>con</code>nection which is used to specialise SQL
+translation.</li>
+<li>A <code>lazy_query</code> which represents the lazy computation
+described by the pipeline. It always starts off as a
+<code>lazy_base_query</code> which represents a remote table or SQL
+query.</li>
+</ul>
+<p>Each verb takes a <code>tbl_lazy</code> as input and returns a
+modified <code>tbl_lazy</code>, modifying the <code>lazy_query</code>
+with the new requirements. At the simplest level, this involves wrapping
+the existing lazy query within a new lazy query, such as
+<code>lazy_query_select()</code> or
+<code>lazy_query_multi_join()</code>. These represent what later will
+become a subquery so that (e.g.) <code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter()</a></code>,
+<code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange()</a></code>,
+and <code><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise()</a></code> all use <code><a href="../reference/sql_build.html">lazy_select_query()</a></code>,
+whereas <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join()</a></code> use
+<code>lazy_query_multi_join()</code>.</p>
+<p>These lazy queries are typically created by a helper function like
+<code>add_select()</code>, <code>add_mutate()</code>, and
+<code>add_filter()</code>. These helpers have two roles:</p>
+<ol style="list-style-type: decimal">
+<li><p>They abstract away repeated code for substantially similar dplyr
+verbs. For example, <code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename()</a></code>,
+<code><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename_with()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/relocate.html" class="external-link">relocate()</a></code> all use
+<code>add_select()</code>.</p></li>
+<li><p>They are responsible for figuring out if we can re-use the
+existing query or we need to wrap in a subquery. Typically this work is
+done by a function called <code>select_can_inline()</code> which will
+use what we know about SQL and the verb to determine whether or not we
+have to introduce a subquery.</p></li>
+</ol>
+<p>The lazy query gives us a representation of the data manipulation
+pipeline with enough detail that we can reason about when we need a
+subquery. Then when the user calls <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect()</a></code>, we need to
+generate an SQL query. This happens in two steps: building and
+rendering.</p>
+<p>First, <code><a href="../reference/sql_build.html">sql_build()</a></code> recurses over the lazy query,
+building up query objects like <code><a href="../reference/sql_build.html">select_query()</a></code> and
+<code><a href="../reference/sql_build.html">join_query()</a></code> that represent the different subtypes of
+<code>SELECT</code> queries. Compared to the previous “lazy” query
+representation, these are much closer to SQL than R. They can be much
+simpler because we no longer need to reason about subqueries, but we
+still need some structure to facilitate backend-specific
+translations.</p>
+<p>Next, <code><a href="../reference/sql_build.html">sql_render()</a></code> is called on the result of
+<code><a href="../reference/sql_build.html">sql_build()</a></code> and dispatches to generics like
+<code><a href="../reference/db-sql.html">sql_query_select()</a></code>, <code><a href="../reference/db-sql.html">sql_query_join()</a></code>,
+<code><a href="../reference/db-sql.html">sql_query_semi_join()</a></code>, and <code><a href="../reference/db-sql.html">sql_query_set_op()</a></code>.
+These generics have methods for each backend that are responsible for
+creating the needed SQL.</p>
 </div>
 </div>
 <div class="section level2">

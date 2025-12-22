@@ -163,27 +163,3 @@ and then perform a efficient semi join in the database.
 If you’re working with large data, it maybe also be helpful to set
 `auto_index = TRUE`. That will automatically add an index on the join
 variables to the temporary table.
-
-## Behind the scenes
-
-The verb level SQL translation is implemented on top of `tbl_lazy`,
-which basically tracks the operations you perform in a pipeline (see
-`lazy-ops.R`). Turning that into a SQL query takes place in two steps:
-
-- [`sql_build()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)
-  recurses over the lazy op data structure building up query objects
-  ([`select_query()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md),
-  [`join_query()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md),
-  [`set_op_query()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)
-  etc) that represent the different subtypes of `SELECT` queries that we
-  might generate.
-
-- [`sql_render()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)
-  calls an SQL generation function
-  ([`sql_query_select()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md),
-  [`sql_query_join()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md),
-  [`sql_query_semi_join()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md),
-  [`sql_query_set_op()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md),
-  …) to produce the actual SQL. Each of these functions is a generic,
-  taking the connection as an argument, so that the translation can be
-  customised for different databases.
