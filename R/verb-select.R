@@ -27,22 +27,6 @@ select.tbl_lazy <- function(.data, ...) {
   .data
 }
 
-ensure_group_vars <- function(loc, data, notify = TRUE) {
-  group_loc <- match(group_vars(data), colnames(data))
-  missing <- setdiff(group_loc, loc)
-
-  if (length(missing) > 0) {
-    vars <- colnames(data)[missing]
-    if (notify) {
-      cli::cli_inform("Adding missing grouping variables: {.var {vars}}")
-    }
-    loc <- c(set_names(missing, vars), loc)
-  }
-
-  loc
-}
-
-
 #' @rdname select.tbl_lazy
 #' @importFrom dplyr rename
 #' @export
@@ -187,10 +171,14 @@ rename_order <- function(lazy_query, vars) {
   lazy_query
 }
 
+# Helpers ----------------------------------------------------------------------
+
+# Selection, rename, or relocation
 is_projection <- function(exprs) {
   purrr::every(exprs, is_symbol)
 }
 
+# Selection or relocation
 is_pure_projection <- function(exprs, names) {
   if (!is_projection(exprs)) {
     return(FALSE)
@@ -200,10 +188,26 @@ is_pure_projection <- function(exprs, names) {
   identical(expr_vars, names)
 }
 
+# Selects all variables
 is_identity <- function(exprs, names, names_prev) {
   if (!is_pure_projection(exprs, names)) {
     return(FALSE)
   }
 
   identical(names, names_prev)
+}
+
+ensure_group_vars <- function(loc, data, notify = TRUE) {
+  group_loc <- match(group_vars(data), colnames(data))
+  missing <- setdiff(group_loc, loc)
+
+  if (length(missing) > 0) {
+    vars <- colnames(data)[missing]
+    if (notify) {
+      cli::cli_inform("Adding missing grouping variables: {.var {vars}}")
+    }
+    loc <- c(set_names(missing, vars), loc)
+  }
+
+  loc
 }
