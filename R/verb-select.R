@@ -86,8 +86,8 @@ add_select <- function(lazy_query, vars) {
     return(lazy_query)
   }
 
-  lazy_query$group_vars <- rename_groups(lazy_query, vars)
-  lazy_query$order_vars <- rename_order(lazy_query, vars)
+  lazy_query$group_vars <- rename_groups(op_grps(lazy_query), vars)
+  lazy_query$order_vars <- rename_order(op_sort(lazy_query), vars)
 
   is_join <- inherits(lazy_query, "lazy_multi_join_query") ||
     inherits(lazy_query, "lazy_rf_join_query") ||
@@ -135,24 +135,23 @@ select_can_inline <- function(lazy_query, vars) {
   ordered_present && distinct_is_bijective
 }
 
-rename_groups <- function(lazy_query, vars) {
-  old2new <- set_names(names(vars), vars)
-  grps <- op_grps(lazy_query)
-  renamed <- grps %in% names(old2new)
-  grps[renamed] <- old2new[grps[renamed]]
-  grps
+rename_groups <- function(group_vars, select_vars) {
+  old2new <- set_names(names(select_vars), select_vars)
+  renamed <- group_vars %in% names(old2new)
+  group_vars[renamed] <- old2new[group_vars[renamed]]
+  group_vars
 }
 
-rename_order <- function(lazy_query, vars) {
-  order <- op_sort(lazy_query)
-
+rename_order <- function(order_vars, select_vars) {
   # Drop any ordering variables not used in the output
-  order_names <- purrr::map_chr(order, \(var) all_names(var)[[1]])
-  order <- order[order_names %in% vars]
+  order_names <- purrr::map_chr(order_vars, \(var) all_names(var)[[1]])
+  order_vars <- order_vars[order_names %in% select_vars]
 
   # Rename the remaining
-  order[] <- lapply(order, \(expr) replace_sym(expr, vars, syms(names(vars))))
-  order
+  order_vars[] <- lapply(order_vars, \(expr) {
+    replace_sym(expr, select_vars, syms(names(select_vars)))
+  })
+  order_vars
 }
 
 # Helpers ----------------------------------------------------------------------
