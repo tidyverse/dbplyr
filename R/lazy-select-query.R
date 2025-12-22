@@ -103,23 +103,16 @@ new_lazy_select <- function(
 }
 
 # projection = only select (including rename) from parent query
-# identity = selects exactly the same variable as the parent query
 is_lazy_select_query_simple <- function(
   x,
   ignore_where = FALSE,
-  ignore_group_by = FALSE,
-  select = c("projection", "identity")
+  ignore_group_by = FALSE
 ) {
   if (!is_lazy_select_query(x)) {
     return(FALSE)
   }
 
-  select <- arg_match(select, c("projection", "identity"))
-  if (select == "projection" && !is_projection(x$select$expr)) {
-    return(FALSE)
-  }
-
-  if (select == "identity" && !is_select_identity(x$select, op_vars(x$x))) {
+  if (!is_projection(x$select$expr)) {
     return(FALSE)
   }
 
