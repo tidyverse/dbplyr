@@ -109,12 +109,11 @@ filter_needs_new_query <- function(dots, lazy_query, con) {
 }
 
 filter_can_use_having <- function(lazy_query) {
-  # From the Postgres documentation:
-  # https://www.postgresql.org/docs/current/sql-select.html#SQL-HAVING
+  # From the Postgres documentation: https://www.postgresql.org/docs/current/sql-select.html#SQL-HAVING
   # Each column referenced in condition must unambiguously reference a grouping
   # column, unless the reference appears within an aggregate function or the
   # ungrouped column is functionally dependent on the grouping columns.
-  #
+
   # After `summarise()` every column is either
   # * a grouping column
   # * or an aggregated column
