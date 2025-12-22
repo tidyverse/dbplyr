@@ -173,16 +173,10 @@ add_summarise <- function(.data, dots, .groups, env_caller) {
   select[names(dots)] <- dots
 
   if (summarise_can_inline(lazy_query)) {
-    lazy_query$select <- new_lazy_select(
-      select,
-      group_vars = new_grps,
-      order_vars = NULL,
-      frame = NULL
-    )
+    lazy_query$select <- new_lazy_select(select, group_vars = new_grps)
     lazy_query$select_operation <- "summarise"
     lazy_query$message_summarise <- message_summarise
     lazy_query$group_vars <- new_grps
-
     lazy_query
   } else {
     lazy_select_query(
