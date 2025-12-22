@@ -157,40 +157,39 @@ check_groups <- function(.groups) {
 add_summarise <- function(.data, dots, .groups, env_caller) {
   lazy_query <- .data$lazy_query
 
-  grps <- op_grps(lazy_query)
-  message_summarise <- summarise_message(grps, .groups, env_caller)
+  cur_grps <- op_grps(lazy_query)
+  message_summarise <- summarise_message(cur_grps, .groups, env_caller)
 
-  .groups <- .groups %||% "drop_last"
-  groups_out <- switch(
-    .groups,
-    drop_last = grps[-length(grps)],
-    keep = grps,
+  new_grps <- switch(
+    .groups %||% "drop_last",
+    drop_last = cur_grps[-length(cur_grps)],
+    keep = cur_grps,
     drop = character()
   )
 
-  vars <- c(grps, setdiff(names(dots), grps))
+  # ensure grouping variables are listed first
+  vars <- c(cur_grps, setdiff(names(dots), cur_grps))
   select <- syms(set_names(vars))
   select[names(dots)] <- dots
 
   if (summarise_can_inline(lazy_query)) {
     lazy_query$select <- new_lazy_select(
       select,
-      group_vars = groups_out,
+      group_vars = new_grps,
       order_vars = NULL,
       frame = NULL
     )
-    lazy_query$group_by <- syms(grps)
     lazy_query$select_operation <- "summarise"
     lazy_query$message_summarise <- message_summarise
-    lazy_query$group_vars <- groups_out
+    lazy_query$group_vars <- new_grps
 
     lazy_query
   } else {
     lazy_select_query(
       x = lazy_query,
       select = select,
-      group_by = syms(grps),
-      group_vars = groups_out,
+      group_by = syms(cur_grps),
+      group_vars = new_grps,
       select_operation = "summarise",
       message_summarise = message_summarise
     )
