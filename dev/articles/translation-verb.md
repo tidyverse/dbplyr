@@ -77,8 +77,10 @@ airports <- copy_to(con, nycflights13::airports)
     group_by(month, day) |>
     summarise(delay = mean(dep_delay, na.rm = TRUE)) |>
     show_query()
-  #> `summarise()` has grouped output by "month". You can override using
-  #> the `.groups` argument.
+  #> ! Grouped output by "month".
+  #> ℹ Override behaviour and silence this message with the `.groups`
+  #>   argument.
+  #> ℹ Or use `.by` instead of `group_by()`.
   #> <SQL>
   #> SELECT `month`, `day`, AVG(`dep_delay`) AS `delay`
   #> FROM `nycflights13::flights`

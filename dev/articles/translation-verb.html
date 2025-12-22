@@ -162,8 +162,10 @@ together to generate a <code>GROUP BY</code> clause:</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">month</span>, <span class="va">day</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>delay <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">dep_delay</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; `summarise()` has grouped output by <span style="color: #0000BB;">"month"</span>. You can override using</span></span>
-<span><span class="co">#&gt; the `.groups` argument.</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Grouped output by <span style="color: #0000BB;">"month"</span>.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Override behaviour and silence this message with the `.groups`</span></span>
+<span><span class="co">#&gt;   argument.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Or use `.by` instead of `group_by()`.</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `month`, `day`, AVG(`dep_delay`)<span style="color: #0000BB;"> AS </span>`delay`</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `nycflights13::flights`</span></span>
