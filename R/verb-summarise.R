@@ -157,29 +157,66 @@ check_groups <- function(.groups) {
 add_summarise <- function(.data, dots, .groups, env_caller) {
   lazy_query <- .data$lazy_query
 
-  grps <- op_grps(lazy_query)
-  message_summarise <- summarise_message(grps, .groups, env_caller)
+  cur_grps <- op_grps(lazy_query)
+  message_summarise <- summarise_message(cur_grps, .groups, env_caller)
 
-  .groups <- .groups %||% "drop_last"
-  groups_out <- switch(
-    .groups,
-    drop_last = grps[-length(grps)],
-    keep = grps,
+  new_grps <- switch(
+    .groups %||% "drop_last",
+    drop_last = cur_grps[-length(cur_grps)],
+    keep = cur_grps,
     drop = character()
   )
 
-  vars <- c(grps, setdiff(names(dots), grps))
+  # ensure grouping variables are listed first
+  vars <- c(cur_grps, setdiff(names(dots), cur_grps))
   select <- syms(set_names(vars))
   select[names(dots)] <- dots
 
-  lazy_select_query(
-    x = lazy_query,
-    select = select,
-    group_by = syms(grps),
-    group_vars = groups_out,
-    select_operation = "summarise",
-    message_summarise = message_summarise
-  )
+  if (summarise_can_inline(lazy_query)) {
+    lazy_query$select <- new_lazy_select(select, group_vars = new_grps)
+    lazy_query$select_operation <- "summarise"
+    lazy_query$message_summarise <- message_summarise
+    lazy_query$group_by <- syms(cur_grps)
+    lazy_query$group_vars <- new_grps
+    lazy_query
+  } else {
+    lazy_select_query(
+      x = lazy_query,
+      select = select,
+      group_by = syms(cur_grps),
+      group_vars = new_grps,
+      select_operation = "summarise",
+      message_summarise = message_summarise
+    )
+  }
+}
+
+summarise_can_inline <- function(lazy_query) {
+  if (!is_lazy_select_query(lazy_query)) {
+    return(FALSE)
+  }
+
+  if (lazy_query$select_operation == "summarise") {
+    return(FALSE)
+  }
+
+  # Inline: GROUP BY is executed after WHERE but before SELECT, DISTINCT,
+  # ORDER BY, and LIMIT. So we can inline if the previous query only has
+  # WHERE or ORDER BY
+
+  if (is_true(lazy_query$distinct)) {
+    return(FALSE)
+  }
+  if (!is_null(lazy_query$limit)) {
+    return(FALSE)
+  }
+
+  # Can only inline if previous SELECT is a pure projection
+  if (!is_pure_projection(lazy_query$select$expr, lazy_query$select$name)) {
+    return(FALSE)
+  }
+
+  TRUE
 }
 
 summarise_message <- function(grps, .groups, env_caller) {

@@ -67,67 +67,6 @@ print.select_query <- function(x, ...) {
 }
 
 #' @export
-sql_optimise.select_query <- function(x, con = NULL, ..., subquery = FALSE) {
-  if (!inherits(x$from, "select_query")) {
-    return(x)
-  }
-
-  from <- sql_optimise(x$from, subquery = subquery)
-
-  # If all outer clauses are executed after the inner clauses, we
-  # can drop them down a level
-  outer <- select_query_clauses(x, subquery = subquery)
-  inner <- select_query_clauses(from, subquery = TRUE)
-
-  can_squash <- length(outer) == 0 ||
-    length(inner) == 0 ||
-    min(outer) > max(inner)
-
-  if (can_squash) {
-    # Have we optimised away an ORDER BY
-    if (length(from$order_by) > 0 && length(x$order_by) > 0) {
-      if (!identical(x$order_by, from$order_by)) {
-        warn_drop_order_by()
-      }
-    }
-
-    from[as.character(outer)] <- x[as.character(outer)]
-    from
-  } else {
-    x$from <- from
-    x
-  }
-}
-
-# List clauses used by a query, in the order they are executed
-# https://sqlbolt.com/lesson/select_queries_order_of_execution
-
-# List clauses used by a query, in the order they are executed in
-select_query_clauses <- function(x, subquery = FALSE) {
-  present <- c(
-    where = length(x$where) > 0,
-    group_by = length(x$group_by) > 0,
-    having = length(x$having) > 0,
-    select = !is_select_star(x$select),
-    distinct = x$distinct,
-    window = length(x$window) > 0,
-    order_by = (!subquery || !is.null(x$limit)) && length(x$order_by) > 0,
-    limit = !is.null(x$limit)
-  )
-
-  ordered(names(present)[present], levels = names(present))
-}
-
-is_select_star <- function(x) {
-  if (length(x) != 1) {
-    return(FALSE)
-  } else {
-    # * is never quoted and always comes at the end
-    grepl("\\*$", x)
-  }
-}
-
-#' @export
 sql_render.select_query <- function(
   query,
   con,
