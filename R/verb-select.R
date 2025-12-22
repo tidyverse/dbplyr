@@ -113,25 +113,26 @@ add_select <- function(lazy_query, vars) {
     return(lazy_query)
   }
 
-  is_select <- is_lazy_select_query(lazy_query)
-  select_can_be_inlined <- select_can_be_inlined(lazy_query, vars)
-  if (is_select && select_can_be_inlined) {
+  if (select_can_inline(lazy_query, vars)) {
     idx <- vctrs::vec_match(vars, vars_data)
 
     lazy_query$select <- vctrs::vec_slice(lazy_query$select, idx)
     lazy_query$select$name <- names(vars)
-
-    return(lazy_query)
+    lazy_query
+  } else {
+    lazy_select_query(
+      x = lazy_query,
+      select_operation = "select",
+      select = syms(vars)
+    )
   }
-
-  lazy_select_query(
-    x = lazy_query,
-    select_operation = "select",
-    select = syms(vars)
-  )
 }
 
-select_can_be_inlined <- function(lazy_query, vars) {
+select_can_inline <- function(lazy_query, vars) {
+  if (!is_lazy_select_query(lazy_query)) {
+    return(FALSE)
+  }
+
   # all computed columns used for ordering (if any) must be present
   computed_flag <- purrr::map_lgl(lazy_query$select$expr, is_quosure)
   computed_columns <- lazy_query$select$name[computed_flag]
