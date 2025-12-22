@@ -86,8 +86,8 @@ add_select <- function(lazy_query, vars) {
     return(lazy_query)
   }
 
-  lazy_query <- rename_groups(lazy_query, vars)
-  lazy_query <- rename_order(lazy_query, vars)
+  lazy_query$group_vars <- rename_groups(lazy_query, vars)
+  lazy_query$order_vars <- rename_order(lazy_query, vars)
 
   is_join <- inherits(lazy_query, "lazy_multi_join_query") ||
     inherits(lazy_query, "lazy_rf_join_query") ||
@@ -140,35 +140,19 @@ rename_groups <- function(lazy_query, vars) {
   grps <- op_grps(lazy_query)
   renamed <- grps %in% names(old2new)
   grps[renamed] <- old2new[grps[renamed]]
-
-  lazy_query$group_vars <- grps
-  lazy_query
+  grps
 }
 
 rename_order <- function(lazy_query, vars) {
-  old2new <- set_names(names(vars), vars)
   order <- op_sort(lazy_query)
 
-  is_desc <- purrr::map_lgl(
-    order,
-    function(x) {
-      if (is_quosure(x)) {
-        quo_is_call(x, "desc", n = 1L)
-      } else {
-        is_call(x, "desc", n = 1L)
-      }
-    }
-  )
+  # Drop any ordering variables not used in the output
+  order_names <- purrr::map_chr(order, \(var) all_names(var)[[1]])
+  order <- order[order_names %in% vars]
 
-  order <- purrr::map_if(order, is_desc, \(x) call_args(x)[[1L]])
-  order <- purrr::map_chr(order, as_name)
-
-  keep <- order %in% names(old2new)
-  order[keep] <- syms(old2new[order[keep]])
-
-  order <- purrr::map_if(order, is_desc, \(x) call2("desc", x))
-  lazy_query$order_vars <- order[keep]
-  lazy_query
+  # Rename the remaining
+  order[] <- lapply(order, \(expr) replace_sym(expr, vars, syms(names(vars))))
+  order
 }
 
 # Helpers ----------------------------------------------------------------------
