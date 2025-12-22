@@ -138,10 +138,6 @@ is_lazy_select_query_simple <- function(
   TRUE
 }
 
-is_select_identity <- function(select, vars_prev) {
-  is_identity(select$expr, select$name, vars_prev)
-}
-
 
 #' @export
 print.lazy_select_query <- function(x, ...) {
@@ -241,15 +237,17 @@ get_select_sql <- function(
     return(list(select_sql = select_sql, window_sql = character()))
   }
 
-  if (use_star && is_select_identity(select, in_vars)) {
-    out <- list(
-      select_sql = sql_star(con, table_alias),
-      window_sql = character()
-    )
-    return(out)
+  if (use_star) {
+    if (is_identity(select$expr, select$name, in_vars)) {
+      out <- list(
+        select_sql = sql_star(con, table_alias),
+        window_sql = character()
+      )
+      return(out)
+    } else {
+      select <- select_use_star(select, in_vars, table_alias, con)
+    }
   }
-
-  select <- select_use_star(select, in_vars, table_alias, con, use_star)
 
   # translate once just to register windows
   win_register_activate()
@@ -277,11 +275,7 @@ get_select_sql <- function(
   )
 }
 
-select_use_star <- function(select, vars_prev, table_alias, con, use_star) {
-  if (!use_star) {
-    return(select)
-  }
-
+select_use_star <- function(select, vars_prev, table_alias, con) {
   first_match <- vctrs::vec_match(vars_prev[[1]], select$name)
   if (is.na(first_match)) {
     return(select)
@@ -296,7 +290,7 @@ select_use_star <- function(select, vars_prev, table_alias, con, use_star) {
 
   test_cols <- vctrs::vec_slice(select, seq2(first_match, last))
 
-  if (is_select_identity(test_cols, vars_prev)) {
+  if (is_identity(test_cols$expr, test_cols$name, vars_prev)) {
     idx_start <- seq2(1, first_match - 1)
     idx_end <- seq2(last + 1, n)
     vctrs::vec_rbind(
