@@ -86,7 +86,10 @@ relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
     after_arg = ".after"
   )
 
-  dplyr::select(.data, !!!loc)
+  new_vars <- set_names(colnames(.data)[loc], names(loc))
+
+  .data$lazy_query <- add_select(.data$lazy_query, new_vars)
+  .data
 }
 
 # op_select ---------------------------------------------------------------
