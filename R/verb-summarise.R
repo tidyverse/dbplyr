@@ -158,7 +158,7 @@ add_summarise <- function(.data, dots, .groups, env_caller) {
   lazy_query <- .data$lazy_query
 
   cur_grps <- op_grps(lazy_query)
-  message_summarise <- summarise_message(cur_grps, .groups, env_caller)
+  summarise_message(cur_grps, .groups, env_caller)
 
   new_grps <- switch(
     .groups %||% "drop_last",
@@ -175,7 +175,6 @@ add_summarise <- function(.data, dots, .groups, env_caller) {
   if (summarise_can_inline(lazy_query)) {
     lazy_query$select <- new_lazy_select(select, group_vars = new_grps)
     lazy_query$select_operation <- "summarise"
-    lazy_query$message_summarise <- message_summarise
     lazy_query$group_by <- syms(cur_grps)
     lazy_query$group_vars <- new_grps
     lazy_query
@@ -185,8 +184,7 @@ add_summarise <- function(.data, dots, .groups, env_caller) {
       select = select,
       group_by = syms(cur_grps),
       group_vars = new_grps,
-      select_operation = "summarise",
-      message_summarise = message_summarise
+      select_operation = "summarise"
     )
   }
 }
@@ -221,14 +219,21 @@ summarise_can_inline <- function(lazy_query) {
 
 summarise_message <- function(grps, .groups, env_caller) {
   verbose <- summarise_verbose(.groups, env_caller)
-  n <- length(grps)
-  if (!verbose || n <= 1) {
-    return(NULL)
+  if (!verbose) {
+    return(invisible())
   }
 
-  summarise_message <- cli::format_message(
-    "{.fun summarise} has grouped output by {.val {grps[-n]}}. You can override using the {.arg .groups} argument."
-  )
+  n <- length(grps)
+  if (n <= 1) {
+    return(invisible())
+  }
+
+  cli::cli_inform(c(
+    "!" = "Grouped output by {.val {grps[-n]}}.",
+    i = "Override behaviour and silence this message with the {.arg .groups} argument.",
+    i = "Or use {.arg .by} instead of {.fun group_by}."
+  ))
+  invisible()
 }
 
 summarise_verbose <- function(.groups, .env) {

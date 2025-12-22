@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* `summarise()` now reports grouping immediately, rather than when you summarise.
 * `sql_optimise()` has been removed. It was only used for two cases (filter + summarise and arrange + summarise), and these are now handled at a higher level (#1720).
 * `distinct()` after a join no longer creates a subquery (#722).
 * New `bind_queries()` makes it easy to combine multiple lazy queries using   `UNION ALL` (#1342).

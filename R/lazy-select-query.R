@@ -12,8 +12,7 @@ lazy_select_query <- function(
   group_vars = NULL,
   order_vars = NULL,
   frame = NULL,
-  select_operation = c("select", "mutate", "summarise"),
-  message_summarise = NULL
+  select_operation = c("select", "mutate", "summarise")
 ) {
   check_lazy_query(x, call = call)
   stopifnot(is.null(select) || is_lazy_sql_part(select))
@@ -28,8 +27,6 @@ lazy_select_query <- function(
     select_operation,
     c("select", "mutate", "summarise")
   )
-
-  check_string(message_summarise, allow_null = TRUE)
 
   # inherit `group_vars`, `order_vars`, and `frame` from `from`
   group_vars <- group_vars %||% op_grps(x)
@@ -57,7 +54,6 @@ lazy_select_query <- function(
     distinct = distinct,
     limit = limit,
     select_operation = select_operation,
-    message_summarise = message_summarise,
     group_vars = group_vars,
     order_vars = order_vars,
     frame = frame
@@ -189,10 +185,6 @@ op_vars.lazy_select_query <- function(op) {
 
 #' @export
 sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
-  if (!is.null(op$message_summarise)) {
-    inform(op$message_summarise)
-  }
-
   alias <- remote_name(op$x, null_if_local = FALSE) %||% unique_subquery_name()
   from <- sql_build(op$x, con, sql_options = sql_options)
   select_sql_list <- get_select_sql(
