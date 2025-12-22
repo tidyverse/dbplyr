@@ -58,10 +58,10 @@
       show_query(out)
     Output
       <SQL>
-      SELECT "df_LHS".*, "z"
-      FROM "df" AS "df_LHS"
-      LEFT JOIN "df" AS "df_RHS"
-        ON ("df_LHS"."x" = "df_RHS"."x")
+      SELECT "df1".*, "z"
+      FROM "df1"
+      LEFT JOIN "df2"
+        ON ("df1"."x" = "df2"."x")
       WHERE ("z" = 1.0)
 
 ---
@@ -70,10 +70,10 @@
       show_query(out)
     Output
       <SQL>
-      SELECT "df_LHS".*, "z"
-      FROM "df" AS "df_LHS"
-      LEFT JOIN "df" AS "df_RHS"
-        ON ("df_LHS"."x" = "df_RHS"."x")
+      SELECT "df1".*, "z"
+      FROM "df1"
+      LEFT JOIN "df2"
+        ON ("df1"."x" = "df2"."x")
       WHERE ("y" = 1.0) AND ("z" = 2.0)
 
 ---
@@ -82,11 +82,11 @@
       show_query(out)
     Output
       <SQL>
-      SELECT "df_LHS"."x" AS "x", "df_LHS"."y" AS "y.x", "df_RHS"."y" AS "y.y"
-      FROM "df" AS "df_LHS"
-      LEFT JOIN "df" AS "df_RHS"
-        ON ("df_LHS"."x" = "df_RHS"."x")
-      WHERE ("y.y" = 1.0)
+      SELECT "df1"."x" AS "x", "df1"."y" AS "y.x", "df3"."y" AS "y.y"
+      FROM "df1"
+      LEFT JOIN "df3"
+        ON ("df1"."x" = "df3"."x")
+      WHERE ("df3"."y" = 1.0)
 
 # catches `.by` with grouped-df
 

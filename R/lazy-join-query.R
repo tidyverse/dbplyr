@@ -194,11 +194,24 @@ sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
     }
   )
 
-  # Column names in WHERE don't need to be qualified with table names/aliases
-  # because we know that the join has already generated aliases for ambiguous
-  # variables
+  join_vars <- sql_multi_join_vars(
+    con,
+    op$vars,
+    table_vars,
+    use_star = FALSE,
+    qualify_all_columns = sql_options$qualify_all_columns
+  )
+  # WHERE happens after SELECT, but columns names are disambiguated using
+  # SELECT expressions, so need to backtransform
+  where <- lapply(op$where, \(expr) {
+    replace_sym(
+      expr,
+      names(join_vars),
+      lapply(unname(join_vars), \(x) sql(x[[1]]))
+    )
+  })
   where_sql <- translate_sql_(
-    op$where,
+    where,
     con = con,
     context = list(clause = "WHERE")
   )

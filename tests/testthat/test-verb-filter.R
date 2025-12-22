@@ -141,8 +141,8 @@ test_that("filter() inlined after mutate()", {
 })
 
 test_that("filter() inlined after join", {
-  lf1 <- lazy_frame(x = 1, y = 1)
-  lf2 <- lazy_frame(x = 1, z = 2)
+  lf1 <- lazy_frame(x = 1, y = 1, .name = "df1")
+  lf2 <- lazy_frame(x = 1, z = 2, .name = "df2")
 
   out <- lf1 |>
     left_join(lf2, by = "x") |>
@@ -159,7 +159,7 @@ test_that("filter() inlined after join", {
   expect_snapshot(show_query(out))
 
   # Handles aliasing from join
-  lf3 <- lazy_frame(x = 1, y = 2)
+  lf3 <- lazy_frame(x = 1, y = 2, .name = "df3")
   out <- lf1 |>
     left_join(lf3, by = "x") |>
     filter(y.y == 1)
