@@ -6,6 +6,16 @@
       Error in `reframe()`:
       ! `reframe()` is not supported on database backends.
 
+# can performed grouped summarise with no inputs
+
+    Code
+      show_query(out)
+    Output
+      <SQL>
+      SELECT `x`
+      FROM `empty-summarise`
+      GROUP BY `x`
+
 # generates minimal sql when possible
 
     Code

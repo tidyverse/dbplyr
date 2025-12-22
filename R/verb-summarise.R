@@ -202,6 +202,10 @@ summarise_can_inline <- function(lazy_query) {
     return(FALSE)
   }
 
+  if (lazy_query$select_operation == "summarise") {
+    return(FALSE)
+  }
+
   # Inline: GROUP BY is executed after WHERE but before SELECT, DISTINCT,
   # ORDER BY, and LIMIT. So we can inline if the previous query only has
   # WHERE or ORDER BY
