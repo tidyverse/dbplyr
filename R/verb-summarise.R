@@ -176,6 +176,7 @@ add_summarise <- function(.data, dots, .groups, env_caller) {
     lazy_query$select <- new_lazy_select(select, group_vars = new_grps)
     lazy_query$select_operation <- "summarise"
     lazy_query$message_summarise <- message_summarise
+    lazy_query$group_by <- syms(cur_grps)
     lazy_query$group_vars <- new_grps
     lazy_query
   } else {
