@@ -39,8 +39,8 @@ window_order <- function(.data, ...) {
 
 # We want to preserve this ordering (for window functions) without
 # imposing an additional arrange, so we have a special op_order
-add_order <- function(lazy_query, dots) {
-  lazy_query$order_vars <- unname(dots)
+add_order <- function(lazy_query, exprs) {
+  lazy_query$order_vars <- unname(exprs)
   lazy_query
 }
 

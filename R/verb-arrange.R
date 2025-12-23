@@ -37,18 +37,18 @@ arrange.tbl_lazy <- function(.data, ..., .by_group = FALSE) {
   .data
 }
 
-add_arrange <- function(lazy_query, dots, .by_group) {
+add_arrange <- function(lazy_query, exprs, .by_group) {
   # Empty arrange() preserves existing ordering (like dplyr)
-  if (is_empty(dots)) {
+  if (is_empty(exprs)) {
     return(lazy_query)
   }
 
   if (.by_group) {
-    dots <- c(syms(op_grps(lazy_query)), dots)
+    exprs <- c(syms(op_grps(lazy_query)), exprs)
   }
 
   # Prepend new ordering to existing ordering (like dplyr)
-  order_vars <- c(dots, op_sort(lazy_query))
+  order_vars <- c(exprs, op_sort(lazy_query))
 
   if (can_inline_arrange(lazy_query)) {
     lazy_query$order_vars <- order_vars

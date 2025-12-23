@@ -64,7 +64,7 @@ ungroup.tbl_lazy <- function(x, ...) {
   }
 }
 
-add_group_by <- function(lazy_query, group_vars) {
-  lazy_query$group_vars <- unname(group_vars)
+add_group_by <- function(lazy_query, vars) {
+  lazy_query$group_vars <- unname(vars)
   lazy_query
 }

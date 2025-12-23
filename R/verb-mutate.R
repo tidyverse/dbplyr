@@ -165,17 +165,17 @@ compute_frame <- function(frame, error_call = caller_env()) {
   list(range = frame)
 }
 
-add_mutate <- function(lazy_query, vars) {
+add_mutate <- function(lazy_query, exprs) {
   # drop NULLs
-  vars <- purrr::discard(vars, \(expr) is_quosure(expr) && quo_is_null(expr))
+  exprs <- purrr::discard(exprs, \(expr) is_quosure(expr) && quo_is_null(expr))
 
-  if (is_projection(vars)) {
+  if (is_projection(exprs)) {
     # Special case selecting/renaming/reordering done in mutate
-    sel_vars <- purrr::map_chr(vars, as_string)
+    sel_vars <- purrr::map_chr(exprs, as_string)
     add_select(lazy_query, sel_vars)
   } else if (can_inline_mutate(lazy_query)) {
     lazy_query$select <- new_lazy_select(
-      vars,
+      exprs,
       group_vars = op_grps(lazy_query),
       order_vars = op_sort(lazy_query),
       frame = op_frame(lazy_query)
@@ -185,7 +185,7 @@ add_mutate <- function(lazy_query, vars) {
     lazy_select_query(
       x = lazy_query,
       select_operation = "mutate",
-      select = vars
+      select = exprs
     )
   }
 }

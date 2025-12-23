@@ -154,7 +154,7 @@ check_groups <- function(.groups) {
   )
 }
 
-add_summarise <- function(lazy_query, dots, .groups, env_caller) {
+add_summarise <- function(lazy_query, exprs, .groups, env_caller) {
   cur_grps <- op_grps(lazy_query)
   summarise_message(cur_grps, .groups, env_caller)
 
@@ -166,9 +166,9 @@ add_summarise <- function(lazy_query, dots, .groups, env_caller) {
   )
 
   # ensure grouping variables are listed first
-  vars <- c(cur_grps, setdiff(names(dots), cur_grps))
+  vars <- c(cur_grps, setdiff(names(exprs), cur_grps))
   select <- syms(set_names(vars))
-  select[names(dots)] <- dots
+  select[names(exprs)] <- exprs
 
   if (can_inline_summarise(lazy_query)) {
     lazy_query$select <- new_lazy_select(select, group_vars = new_grps)
