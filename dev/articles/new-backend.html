@@ -261,7 +261,7 @@ verbs. For example, <code><a href="https://dplyr.tidyverse.org/reference/select.
 <code>add_select()</code>.</p></li>
 <li><p>They are responsible for figuring out if we can re-use the
 existing query or we need to wrap in a subquery. Typically this work is
-done by a function called <code>select_can_inline()</code> which will
+done by a function called <code>can_inline_select()</code> which will
 use what we know about SQL and the verb to determine whether or not we
 have to introduce a subquery.</p></li>
 </ol>

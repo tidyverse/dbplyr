@@ -199,7 +199,7 @@ two roles:
 
 2.  They are responsible for figuring out if we can re-use the existing
     query or we need to wrap in a subquery. Typically this work is done
-    by a function called `select_can_inline()` which will use what we
+    by a function called `can_inline_select()` which will use what we
     know about SQL and the verb to determine whether or not we have to
     introduce a subquery.
 
