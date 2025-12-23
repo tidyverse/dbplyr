@@ -172,7 +172,7 @@ add_summarise <- function(.data, dots, .groups, env_caller) {
   select <- syms(set_names(vars))
   select[names(dots)] <- dots
 
-  if (summarise_can_inline(lazy_query)) {
+  if (can_inline_summarise(lazy_query)) {
     lazy_query$select <- new_lazy_select(select, group_vars = new_grps)
     lazy_query$select_operation <- "summarise"
     lazy_query$group_by <- syms(cur_grps)
@@ -189,7 +189,7 @@ add_summarise <- function(.data, dots, .groups, env_caller) {
   }
 }
 
-summarise_can_inline <- function(lazy_query) {
+can_inline_summarise <- function(lazy_query) {
   if (!is_lazy_select_query(lazy_query)) {
     return(FALSE)
   }

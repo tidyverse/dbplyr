@@ -119,7 +119,7 @@ These lazy queries are typically created by a helper function like `add_select()
 
 1. They abstract away repeated code for substantially similar dplyr verbs. For example, `select()`, `rename()`, `rename_with()` and `relocate()` all use `add_select()`. 
 
-2. They are responsible for figuring out if we can re-use the existing query or we need to wrap in a subquery. Typically this work is done by a function called `select_can_inline()` which will use what we know about SQL and the verb to determine whether or not we have to introduce a subquery.
+2. They are responsible for figuring out if we can re-use the existing query or we need to wrap in a subquery. Typically this work is done by a function called `can_inline_select()` which will use what we know about SQL and the verb to determine whether or not we have to introduce a subquery.
 
 The lazy query gives us a representation of the data manipulation pipeline with enough detail that we can reason about when we need a subquery. Then when the user calls `collect()`, we need to generate an SQL query. This happens in two steps: building and rendering.
 

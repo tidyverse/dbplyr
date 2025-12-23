@@ -176,7 +176,7 @@ add_mutate <- function(lazy_query, vars) {
     # Special case selecting/renaming/reordering done in mutate
     sel_vars <- purrr::map_chr(vars, as_string)
     add_select(lazy_query, sel_vars)
-  } else if (mutate_can_inline(lazy_query)) {
+  } else if (can_inline_mutate(lazy_query)) {
     lazy_query$select <- new_lazy_select(
       vars,
       group_vars = op_grps(lazy_query),
@@ -196,7 +196,7 @@ add_mutate <- function(lazy_query, vars) {
 # Special optimisation when applied to pure projection() - this is
 # conservative and we could expand to any op_select() if combined with
 # the logic in get_mutate_layers()
-mutate_can_inline <- function(lazy_query) {
+can_inline_mutate <- function(lazy_query) {
   if (!is_lazy_select_query(lazy_query)) {
     return(FALSE)
   }

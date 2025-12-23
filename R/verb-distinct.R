@@ -157,7 +157,7 @@ quo_is_variable_reference <- function(quo) {
 add_distinct <- function(.data) {
   lazy_query <- .data$lazy_query
 
-  if (distinct_can_inline(lazy_query)) {
+  if (can_inline_distinct(lazy_query)) {
     lazy_query$distinct <- TRUE
     lazy_query
   } else {
@@ -174,7 +174,7 @@ add_distinct <- function(.data) {
 #      should not matter
 # * `LIMIT` are executed after `SELECT`
 #   => needs a subquery
-distinct_can_inline <- function(lazy_query) {
+can_inline_distinct <- function(lazy_query) {
   if (inherits(lazy_query, "lazy_multi_join_query")) {
     return(TRUE)
   }

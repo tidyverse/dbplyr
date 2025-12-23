@@ -101,7 +101,7 @@ add_select <- function(lazy_query, vars) {
     return(lazy_query)
   }
 
-  if (select_can_inline(lazy_query, vars)) {
+  if (can_inline_select(lazy_query, vars)) {
     idx <- vctrs::vec_match(vars, vars_data)
 
     lazy_query$select <- vctrs::vec_slice(lazy_query$select, idx)
@@ -116,7 +116,7 @@ add_select <- function(lazy_query, vars) {
   }
 }
 
-select_can_inline <- function(lazy_query, vars) {
+can_inline_select <- function(lazy_query, vars) {
   if (!is_lazy_select_query(lazy_query)) {
     return(FALSE)
   }

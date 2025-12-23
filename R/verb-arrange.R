@@ -52,7 +52,7 @@ add_arrange <- function(.data, dots, .by_group) {
   # Prepend new ordering to existing ordering (like dplyr)
   order_vars <- c(dots, op_sort(lazy_query))
 
-  if (arrange_can_inline(lazy_query)) {
+  if (can_inline_arrange(lazy_query)) {
     lazy_query$order_vars <- order_vars
     lazy_query$order_by <- order_vars
     lazy_query
@@ -65,7 +65,7 @@ add_arrange <- function(.data, dots, .by_group) {
   }
 }
 
-arrange_can_inline <- function(lazy_query) {
+can_inline_arrange <- function(lazy_query) {
   if (!is_lazy_select_query(lazy_query)) {
     return(FALSE)
   }

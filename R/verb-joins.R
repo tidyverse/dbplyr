@@ -445,7 +445,7 @@ add_join <- function(
     return(out)
   }
 
-  can_inline <- join_can_inline(x$lazy_query, join_alias, type)
+  can_inline <- can_inline_join(x$lazy_query, join_alias, type)
   vars <- multi_join_vars(
     x_lq = x_lq,
     x_vars = x_vars,
@@ -525,7 +525,7 @@ join_inline_select <- function(lq, by, on, semi = FALSE) {
   )
 }
 
-join_can_inline <- function(x_lq, join_alias, type) {
+can_inline_join <- function(x_lq, join_alias, type) {
   if (!inherits(x_lq, "lazy_multi_join_query")) {
     return(FALSE)
   }
