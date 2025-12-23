@@ -1,3 +1,10 @@
+query <- function(query_type, ...) {
+  structure(
+    list(...),
+    class = c(paste0(query_type, "_query"), "query")
+  )
+}
+
 #' @export
 #' @rdname sql_build
 lazy_query <- function(

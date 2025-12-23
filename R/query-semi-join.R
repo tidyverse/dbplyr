@@ -122,17 +122,15 @@ semi_join_query <- function(
   where = NULL,
   na_matches = FALSE
 ) {
-  structure(
-    list(
-      x = x,
-      y = y,
-      vars = vars,
-      anti = anti,
-      by = by,
-      where = where,
-      na_matches = na_matches
-    ),
-    class = c("semi_join_query", "query")
+  query(
+    "semi_join",
+    x = x,
+    y = y,
+    vars = vars,
+    anti = anti,
+    by = by,
+    where = where,
+    na_matches = na_matches
   )
 }
 

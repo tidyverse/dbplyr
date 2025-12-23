@@ -306,20 +306,18 @@ select_query <- function(
   check_bool(distinct)
   check_string(from_alias, allow_null = TRUE)
 
-  structure(
-    list(
-      from = from,
-      select = select,
-      where = where,
-      group_by = group_by,
-      having = having,
-      window = window,
-      order_by = order_by,
-      distinct = distinct,
-      limit = limit,
-      from_alias = from_alias
-    ),
-    class = c("select_query", "query")
+  query(
+    "select",
+    from = from,
+    select = select,
+    where = where,
+    group_by = group_by,
+    having = having,
+    window = window,
+    order_by = order_by,
+    distinct = distinct,
+    limit = limit,
+    from_alias = from_alias
   )
 }
 

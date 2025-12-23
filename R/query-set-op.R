@@ -98,15 +98,7 @@ sql_build.lazy_union_query <- function(op, con, ..., sql_options = NULL) {
 #' @export
 #' @rdname sql_build
 set_op_query <- function(x, y, type, all = FALSE) {
-  structure(
-    list(
-      x = x,
-      y = y,
-      type = type,
-      all = all
-    ),
-    class = c("set_op_query", "query")
-  )
+  query("set_op", x = x, y = y, type = type, all = all)
 }
 
 #' @export
@@ -140,13 +132,7 @@ sql_render.set_op_query <- function(
 #' @export
 #' @rdname sql_build
 union_query <- function(x, unions) {
-  structure(
-    list(
-      x = x,
-      unions = unions
-    ),
-    class = c("union_query", "query")
-  )
+  query("union", x = x, unions = unions)
 }
 
 #' @export

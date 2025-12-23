@@ -37,10 +37,7 @@ lazy_query_remote <- function(x, vars) {
 
 base_query <- function(from) {
   check_table_source(from)
-  structure(
-    list(from = from),
-    class = c("base_query", "query")
-  )
+  query("base", from = from)
 }
 
 #' @export
