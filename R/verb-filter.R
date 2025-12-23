@@ -73,6 +73,11 @@ add_filter <- function(.data, dots) {
   }
 }
 
+# filter() adds the WHERE clause
+# * WHERE is executed before SELECT
+#   => can't reference columns computed in SELECT
+#   => can't inline if SELECT uses window functions (evaluated after WHERE)
+#   => can't inline if SELECT uses sql() (can't extract column references)
 can_inline_filter <- function(dots, lazy_query, con) {
   if (!is_lazy_select_query(lazy_query)) {
     return(FALSE)

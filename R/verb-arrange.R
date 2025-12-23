@@ -65,12 +65,14 @@ add_arrange <- function(.data, dots, .by_group) {
   }
 }
 
+# arrange() adds/modifies the ORDER BY clause
+# * ORDER BY is executed after LIMIT
+#   => can't inline if LIMIT is set
 can_inline_arrange <- function(lazy_query) {
   if (!is_lazy_select_query(lazy_query)) {
     return(FALSE)
   }
 
-  # Needed because `ORDER BY` is evaluated before `LIMIT`
   if (!is.null(lazy_query$limit)) {
     return(FALSE)
   }

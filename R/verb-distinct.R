@@ -174,6 +174,7 @@ add_distinct <- function(.data) {
 #      should not matter
 # * `LIMIT` are executed after `SELECT`
 #   => needs a subquery
+
 can_inline_distinct <- function(lazy_query) {
   if (inherits(lazy_query, "lazy_multi_join_query")) {
     return(TRUE)

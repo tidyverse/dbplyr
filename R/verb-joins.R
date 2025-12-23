@@ -525,6 +525,9 @@ join_inline_select <- function(lq, by, on, semi = FALSE) {
   )
 }
 
+# Joins add tables to the FROM clause
+# * Can only inline into an existing multi-join query
+# * Table aliases must not conflict with existing aliases
 can_inline_join <- function(x_lq, join_alias, type) {
   if (!inherits(x_lq, "lazy_multi_join_query")) {
     return(FALSE)

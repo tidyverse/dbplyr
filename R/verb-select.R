@@ -116,19 +116,22 @@ add_select <- function(lazy_query, vars) {
   }
 }
 
+# select() modifies the SELECT clause
+# * ORDER BY can reference SELECT columns by name
+#   => computed columns used in ORDER BY must be preserved
+# * DISTINCT operates on the SELECT result
+#   => can only inline bijective projections (same columns, different order)
 can_inline_select <- function(lazy_query, vars) {
   if (!is_lazy_select_query(lazy_query)) {
     return(FALSE)
   }
 
-  # all computed columns used for ordering (if any) must be present
   computed_flag <- purrr::map_lgl(lazy_query$select$expr, is_quosure)
   computed_columns <- lazy_query$select$name[computed_flag]
 
   order_vars <- purrr::map_chr(lazy_query$order_by, as_label)
   ordered_present <- all(intersect(computed_columns, order_vars) %in% vars)
 
-  # if the projection is distinct, it must be bijective
   is_distinct <- is_true(lazy_query$distinct)
   is_bijective_projection <- identical(sort(unname(vars)), op_vars(lazy_query))
   distinct_is_bijective <- !is_distinct || is_bijective_projection
