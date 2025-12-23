@@ -12,7 +12,6 @@
 \alias{lazy_union_query}
 \alias{sql_build}
 \alias{sql_render}
-\alias{sql_optimise}
 \alias{join_query}
 \alias{select_query}
 \alias{semi_join_query}
@@ -25,6 +24,7 @@ lazy_multi_join_query(
   joins,
   table_names,
   vars,
+  distinct = FALSE,
   group_vars = op_grps(x),
   order_vars = op_sort(x),
   frame = op_frame(x),
@@ -78,8 +78,7 @@ lazy_select_query(
   group_vars = NULL,
   order_vars = NULL,
   frame = NULL,
-  select_operation = c("select", "mutate", "summarise"),
-  message_summarise = NULL
+  select_operation = c("select", "mutate", "summarise")
 )
 
 lazy_set_op_query(x, y, type, all, call = caller_env())
@@ -96,8 +95,6 @@ sql_render(
   subquery = FALSE,
   lvl = 0
 )
-
-sql_optimise(x, con = NULL, ..., subquery = FALSE)
 
 join_query(
   x,

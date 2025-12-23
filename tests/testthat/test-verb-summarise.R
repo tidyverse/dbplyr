@@ -30,6 +30,26 @@ test_that("correctly inlines across all verbs", {
   expect_selects(lf |> left_join(lf2, by = "x") |> summarise(y = mean(x)), 2)
   expect_selects(lf |> right_join(lf2, by = "x") |> summarise(y = mean(x)), 2)
   expect_selects(lf |> semi_join(lf2, by = "x") |> summarise(y = mean(x)), 3)
+
+  #
+  expect_selects(lf |> summarise(.by = x) |> summarise(n = n()), 2)
+})
+
+test_that("can performed grouped summarise with no inputs", {
+  # used in n_groups()
+  db <- local_memdb_frame("empty-summarise", x = c(1, 1, 1, 2, 2, 3))
+  out <- db |> summarise(.by = x)
+  expect_snapshot(out |> show_query())
+  expect_equal(out |> collect(), tibble(x = c(1, 2, 3)))
+})
+
+test_that("generates minimal sql when possible", {
+  lf <- lazy_frame(x = 1, y = 2)
+
+  expect_snapshot({
+    lf |> arrange(x) |> summarise(y = mean(x))
+    lf |> filter(x < 1) |> summarise(y = mean(x))
+  })
 })
 
 test_that("summarise performs partial evaluation", {
@@ -72,44 +92,31 @@ test_that("can't refer to freshly created variables", {
 test_that("summarise(.groups=)", {
   df <- lazy_frame(x = 1, y = 2) |> group_by(x, y)
 
-  # the `dplyr::` prefix is needed for `check()`
-  # should produce a message when called directly by user
-  expect_message(eval_bare(
-    expr(
-      lazy_frame(x = 1, y = 2) |>
-        dplyr::group_by(x, y) |>
-        dplyr::summarise() |>
-        remote_query()
-    ),
-    env(global_env())
-  ))
-  expect_snapshot(eval_bare(
-    expr(
-      lazy_frame(x = 1, y = 2) |>
-        dplyr::group_by(x, y) |>
-        dplyr::summarise() |>
-        remote_query()
-    ),
-    env(global_env())
-  ))
-
-  # should be silent when called in another package
-  expect_silent(eval_bare(
-    expr(
-      lazy_frame(x = 1, y = 2) |>
-        dplyr::group_by(x, y) |>
-        dplyr::summarise() |>
-        remote_query()
-    ),
-    asNamespace("testthat")
-  ))
-
   expect_equal(df |> summarise() |> group_vars(), "x")
   expect_equal(df |> summarise(.groups = "drop_last") |> group_vars(), "x")
   expect_equal(df |> summarise(.groups = "drop") |> group_vars(), character())
   expect_equal(df |> summarise(.groups = "keep") |> group_vars(), c("x", "y"))
 
   expect_snapshot(error = TRUE, df |> summarise(.groups = "rowwise"))
+})
+
+test_that("summarise produces informative message about grouping", {
+  local_mocked_bindings(summarise_verbose = function(...) TRUE)
+  lf <- lazy_frame(x = 1, y = 2) |> group_by(x, y)
+  expect_snapshot(. <- lf |> summarise())
+})
+
+test_that("summarise_verbose() detects caller environment correctly", {
+  call <- quote(
+    lazy_frame(x = 1, y = 2) |>
+      dplyr::group_by(x, y) |>
+      dplyr::summarise()
+  )
+
+  # should produce a message when called directly by user
+  expect_message(eval_bare(call, env(global_env())))
+  # should be silent when called in another package
+  expect_no_message(eval_bare(call, asNamespace("testthat")))
 })
 
 test_that("summarise can modify grouping variables", {

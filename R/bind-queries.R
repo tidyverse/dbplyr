@@ -13,7 +13,7 @@
 #' lf1 <- lazy_frame(x = 1, y = "a")
 #' lf2 <- lazy_frame(x = 2, y = "b")
 #' bind_queries(lf1, lf2)
-#' 
+#'
 #' lf3 <- lazy_frame(y = "c", x = 3, z = 10)
 #' bind_queries(lf2, lf3)
 #'

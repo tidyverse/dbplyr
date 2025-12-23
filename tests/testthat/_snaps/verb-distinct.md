@@ -11,6 +11,28 @@
         LIMIT 2
       ) AS "q01"
 
+# distinct() after join is inlined
+
+    Code
+      show_query(out)
+    Output
+      <SQL>
+      SELECT DISTINCT "df_LHS".*, "z"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" = "df_RHS"."x")
+
+---
+
+    Code
+      show_query(out)
+    Output
+      <SQL>
+      SELECT DISTINCT "df_LHS"."x" AS "x"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" = "df_RHS"."x")
+
 # distinct ignores groups when computing variables (#1081)
 
     Code

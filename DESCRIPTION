@@ -119,7 +119,6 @@ Collate:
     'query-select.R'
     'query-semi-join.R'
     'query-set-op.R'
-    'query.R'
     'reexport.R'
     'remote.R'
     'rows.R'

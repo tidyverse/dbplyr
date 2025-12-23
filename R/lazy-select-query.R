@@ -12,8 +12,7 @@ lazy_select_query <- function(
   group_vars = NULL,
   order_vars = NULL,
   frame = NULL,
-  select_operation = c("select", "mutate", "summarise"),
-  message_summarise = NULL
+  select_operation = c("select", "mutate", "summarise")
 ) {
   check_lazy_query(x, call = call)
   stopifnot(is.null(select) || is_lazy_sql_part(select))
@@ -28,8 +27,6 @@ lazy_select_query <- function(
     select_operation,
     c("select", "mutate", "summarise")
   )
-
-  check_string(message_summarise, allow_null = TRUE)
 
   # inherit `group_vars`, `order_vars`, and `frame` from `from`
   group_vars <- group_vars %||% op_grps(x)
@@ -57,7 +54,6 @@ lazy_select_query <- function(
     distinct = distinct,
     limit = limit,
     select_operation = select_operation,
-    message_summarise = message_summarise,
     group_vars = group_vars,
     order_vars = order_vars,
     frame = frame
@@ -103,23 +99,16 @@ new_lazy_select <- function(
 }
 
 # projection = only select (including rename) from parent query
-# identity = selects exactly the same variable as the parent query
 is_lazy_select_query_simple <- function(
   x,
   ignore_where = FALSE,
-  ignore_group_by = FALSE,
-  select = c("projection", "identity")
+  ignore_group_by = FALSE
 ) {
   if (!is_lazy_select_query(x)) {
     return(FALSE)
   }
 
-  select <- arg_match(select, c("projection", "identity"))
-  if (select == "projection" && !is_projection(x$select$expr)) {
-    return(FALSE)
-  }
-
-  if (select == "identity" && !is_select_identity(x$select, op_vars(x$x))) {
+  if (!is_projection(x$select$expr)) {
     return(FALSE)
   }
 
@@ -143,10 +132,6 @@ is_lazy_select_query_simple <- function(
   }
 
   TRUE
-}
-
-is_select_identity <- function(select, vars_prev) {
-  is_identity(select$expr, select$name, vars_prev)
 }
 
 
@@ -189,10 +174,6 @@ op_vars.lazy_select_query <- function(op) {
 
 #' @export
 sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
-  if (!is.null(op$message_summarise)) {
-    inform(op$message_summarise)
-  }
-
   alias <- remote_name(op$x, null_if_local = FALSE) %||% unique_subquery_name()
   from <- sql_build(op$x, con, sql_options = sql_options)
   select_sql_list <- get_select_sql(
@@ -248,15 +229,17 @@ get_select_sql <- function(
     return(list(select_sql = select_sql, window_sql = character()))
   }
 
-  if (use_star && is_select_identity(select, in_vars)) {
-    out <- list(
-      select_sql = sql_star(con, table_alias),
-      window_sql = character()
-    )
-    return(out)
+  if (use_star) {
+    if (is_identity(select$expr, select$name, in_vars)) {
+      out <- list(
+        select_sql = sql_star(con, table_alias),
+        window_sql = character()
+      )
+      return(out)
+    } else {
+      select <- select_use_star(select, in_vars, table_alias, con)
+    }
   }
-
-  select <- select_use_star(select, in_vars, table_alias, con, use_star)
 
   # translate once just to register windows
   win_register_activate()
@@ -284,11 +267,7 @@ get_select_sql <- function(
   )
 }
 
-select_use_star <- function(select, vars_prev, table_alias, con, use_star) {
-  if (!use_star) {
-    return(select)
-  }
-
+select_use_star <- function(select, vars_prev, table_alias, con) {
   first_match <- vctrs::vec_match(vars_prev[[1]], select$name)
   if (is.na(first_match)) {
     return(select)
@@ -303,7 +282,7 @@ select_use_star <- function(select, vars_prev, table_alias, con, use_star) {
 
   test_cols <- vctrs::vec_slice(select, seq2(first_match, last))
 
-  if (is_select_identity(test_cols, vars_prev)) {
+  if (is_identity(test_cols$expr, test_cols$name, vars_prev)) {
     idx_start <- seq2(1, first_match - 1)
     idx_end <- seq2(last + 1, n)
     vctrs::vec_rbind(
