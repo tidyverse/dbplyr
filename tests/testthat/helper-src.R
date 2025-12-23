@@ -33,12 +33,6 @@ cache_test_con <- function(name, get_args) {
   }
 }
 
-test_sqlite <- function() {
-  cache_test_con("sqlite", function() {
-    list(drv = RSQLite::SQLite(), dbname = ":memory:")
-  })
-}
-
 test_postgres <- function() {
   cache_test_con("postgres", function() {
     if (on_github_postgres()) {

@@ -25,12 +25,7 @@ test_that("same_src distinguishes srcs", {
 })
 
 test_that("has nice print method", {
-  mf <- copy_to(
-    test_sqlite(),
-    tibble(x = 1, y = 1),
-    name = "tbl_sum_test",
-    overwrite = TRUE
-  )
+  mf <- local_memdb_frame("tbl_sum_test", x = 1, y = 1)
   expect_snapshot(mf, transform = scrub_sqlite_version)
 
   out2 <- mf |> group_by(x, y) |> arrange(x) |> mutate(z = x + y)
