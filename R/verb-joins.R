@@ -491,7 +491,7 @@ add_join <- function(
 }
 
 join_inline_select <- function(lq, by, on, semi = FALSE) {
-  can_inline <- is_lazy_select_query_simple(
+  can_inline <- can_inline_join_select(
     lq,
     ignore_where = semi,
     ignore_group_by = semi
@@ -523,6 +523,42 @@ join_inline_select <- function(lq, by, on, semi = FALSE) {
     by = by,
     where = where
   )
+}
+
+# projection = only select (including rename) from parent query
+can_inline_join_select <- function(
+  x,
+  ignore_where = FALSE,
+  ignore_group_by = FALSE
+) {
+  if (!is_lazy_select_query(x)) {
+    return(FALSE)
+  }
+
+  if (!is_projection(x$select$expr)) {
+    return(FALSE)
+  }
+
+  if (!ignore_where && !is_empty(x$where)) {
+    return(FALSE)
+  }
+  if (!ignore_group_by && !is_empty(x$group_by)) {
+    return(FALSE)
+  }
+  if (!is_empty(x$order_by)) {
+    return(FALSE)
+  }
+  if (is_true(x$distinct)) {
+    return(FALSE)
+  }
+  if (!is_empty(x$limit)) {
+    return(FALSE)
+  }
+  if (!is_empty(x$having)) {
+    return(FALSE)
+  }
+
+  TRUE
 }
 
 # Joins add tables to the FROM clause
