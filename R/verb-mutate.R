@@ -167,10 +167,7 @@ compute_frame <- function(frame, error_call = caller_env()) {
 
 add_mutate <- function(lazy_query, vars) {
   # drop NULLs
-  vars <- purrr::discard(
-    vars,
-    ~ (is_quosure(.x) && quo_is_null(.x)) || is.null(.x)
-  )
+  vars <- purrr::discard(vars, \(expr) is_quosure(expr) && quo_is_null(expr))
 
   if (is_projection(vars)) {
     # Special case selecting/renaming/reordering done in mutate
