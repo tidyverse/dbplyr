@@ -272,7 +272,7 @@ generate an SQL query. This happens in two steps: building and
 rendering.</p>
 <p>First, <code><a href="../reference/sql_build.html">sql_build()</a></code> recurses over the lazy query,
 building up query objects like <code><a href="../reference/sql_build.html">select_query()</a></code> and
-<code><a href="../reference/sql_build.html">join_query()</a></code> that represent the different subtypes of
+<code>multi_join_query()</code> that represent the different subtypes of
 <code>SELECT</code> queries. Compared to the previous “lazy” query
 representation, these are much closer to SQL than R. They can be much
 simpler because we no longer need to reason about subqueries, but we

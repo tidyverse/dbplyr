@@ -21,6 +21,15 @@ lazy_multi_join_query(
   call = caller_env()
 )
 
+lazy_query(
+  query_type,
+  x,
+  ...,
+  group_vars = op_grps(x),
+  order_vars = op_sort(x),
+  frame = op_frame(x)
+)
+
 lazy_rf_join_query(
   x,
   y,
@@ -32,28 +41,6 @@ lazy_rf_join_query(
   order_vars = op_sort(x),
   frame = op_frame(x),
   call = caller_env()
-)
-
-lazy_semi_join_query(
-  x,
-  y,
-  vars,
-  anti,
-  by,
-  where,
-  group_vars = op_grps(x),
-  order_vars = op_sort(x),
-  frame = op_frame(x),
-  call = caller_env()
-)
-
-lazy_query(
-  query_type,
-  x,
-  ...,
-  group_vars = op_grps(x),
-  order_vars = op_sort(x),
-  frame = op_frame(x)
 )
 
 lazy_select_query(
@@ -71,6 +58,19 @@ lazy_select_query(
   select_operation = c("select", "mutate", "summarise")
 )
 
+lazy_semi_join_query(
+  x,
+  y,
+  vars,
+  anti,
+  by,
+  where,
+  group_vars = op_grps(x),
+  order_vars = op_sort(x),
+  frame = op_frame(x),
+  call = caller_env()
+)
+
 lazy_set_op_query(x, y, type, all, call = caller_env())
 
 lazy_union_query(x, unions, call = caller_env())
@@ -86,7 +86,7 @@ sql_render(
   lvl = 0
 )
 
-join_query(
+rf_join_query(
   x,
   y,
   select,

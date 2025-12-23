@@ -214,13 +214,11 @@ First,
 [`sql_build()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)
 recurses over the lazy query, building up query objects like
 [`select_query()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)
-and
-[`join_query()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)
-that represent the different subtypes of `SELECT` queries. Compared to
-the previous “lazy” query representation, these are much closer to SQL
-than R. They can be much simpler because we no longer need to reason
-about subqueries, but we still need some structure to facilitate
-backend-specific translations.
+and `multi_join_query()` that represent the different subtypes of
+`SELECT` queries. Compared to the previous “lazy” query representation,
+these are much closer to SQL than R. They can be much simpler because we
+no longer need to reason about subqueries, but we still need some
+structure to facilitate backend-specific translations.
 
 Next,
 [`sql_render()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)

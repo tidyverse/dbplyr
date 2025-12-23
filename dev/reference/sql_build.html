@@ -59,7 +59,7 @@ always call sql_render()."><meta property="og:image" content="https://dbplyr.tid
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Build and render SQL from a sequence of lazy operations</h1>
-      <small class="dont-index">Source: <a href="https://github.com/tidyverse/dbplyr/blob/main/R/lazy-join-query.R" class="external-link"><code>R/lazy-join-query.R</code></a>, <a href="https://github.com/tidyverse/dbplyr/blob/main/R/lazy-query.R" class="external-link"><code>R/lazy-query.R</code></a>, <a href="https://github.com/tidyverse/dbplyr/blob/main/R/lazy-select-query.R" class="external-link"><code>R/lazy-select-query.R</code></a>, and 6 more</small>
+      <small class="dont-index">Source: <a href="https://github.com/tidyverse/dbplyr/blob/main/R/lazy-join-query.R" class="external-link"><code>R/lazy-join-query.R</code></a>, <a href="https://github.com/tidyverse/dbplyr/blob/main/R/lazy-query.R" class="external-link"><code>R/lazy-query.R</code></a>, <a href="https://github.com/tidyverse/dbplyr/blob/main/R/lazy-rf-join-query.R" class="external-link"><code>R/lazy-rf-join-query.R</code></a>, and 8 more</small>
       <div class="d-none name"><code>sql_build.Rd</code></div>
     </div>
 
@@ -85,6 +85,15 @@ always call <code>sql_render()</code>.</p>
 <span>  call <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu">lazy_query</span><span class="op">(</span></span>
+<span>  <span class="va">query_type</span>,</span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  group_vars <span class="op">=</span> <span class="fu"><a href="lazy_ops.html">op_grps</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>  order_vars <span class="op">=</span> <span class="fu"><a href="lazy_ops.html">op_sort</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>  frame <span class="op">=</span> <span class="fu"><a href="lazy_ops.html">op_frame</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">lazy_rf_join_query</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">y</span>,</span>
@@ -96,28 +105,6 @@ always call <code>sql_render()</code>.</p>
 <span>  order_vars <span class="op">=</span> <span class="fu"><a href="lazy_ops.html">op_sort</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
 <span>  frame <span class="op">=</span> <span class="fu"><a href="lazy_ops.html">op_frame</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
 <span>  call <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">lazy_semi_join_query</span><span class="op">(</span></span>
-<span>  <span class="va">x</span>,</span>
-<span>  <span class="va">y</span>,</span>
-<span>  <span class="va">vars</span>,</span>
-<span>  <span class="va">anti</span>,</span>
-<span>  <span class="va">by</span>,</span>
-<span>  <span class="va">where</span>,</span>
-<span>  group_vars <span class="op">=</span> <span class="fu"><a href="lazy_ops.html">op_grps</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
-<span>  order_vars <span class="op">=</span> <span class="fu"><a href="lazy_ops.html">op_sort</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
-<span>  frame <span class="op">=</span> <span class="fu"><a href="lazy_ops.html">op_frame</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
-<span>  call <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">lazy_query</span><span class="op">(</span></span>
-<span>  <span class="va">query_type</span>,</span>
-<span>  <span class="va">x</span>,</span>
-<span>  <span class="va">...</span>,</span>
-<span>  group_vars <span class="op">=</span> <span class="fu"><a href="lazy_ops.html">op_grps</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
-<span>  order_vars <span class="op">=</span> <span class="fu"><a href="lazy_ops.html">op_sort</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
-<span>  frame <span class="op">=</span> <span class="fu"><a href="lazy_ops.html">op_frame</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">lazy_select_query</span><span class="op">(</span></span>
@@ -135,6 +122,19 @@ always call <code>sql_render()</code>.</p>
 <span>  select_operation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"select"</span>, <span class="st">"mutate"</span>, <span class="st">"summarise"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu">lazy_semi_join_query</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">y</span>,</span>
+<span>  <span class="va">vars</span>,</span>
+<span>  <span class="va">anti</span>,</span>
+<span>  <span class="va">by</span>,</span>
+<span>  <span class="va">where</span>,</span>
+<span>  group_vars <span class="op">=</span> <span class="fu"><a href="lazy_ops.html">op_grps</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>  order_vars <span class="op">=</span> <span class="fu"><a href="lazy_ops.html">op_sort</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>  frame <span class="op">=</span> <span class="fu"><a href="lazy_ops.html">op_frame</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>  call <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">lazy_set_op_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">type</span>, <span class="va">all</span>, call <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">lazy_union_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">unions</span>, call <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
@@ -150,7 +150,7 @@ always call <code>sql_render()</code>.</p>
 <span>  lvl <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">join_query</span><span class="op">(</span></span>
+<span><span class="fu">rf_join_query</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">y</span>,</span>
 <span>  <span class="va">select</span>,</span>
