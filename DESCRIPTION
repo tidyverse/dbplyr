@@ -118,6 +118,7 @@ Collate:
     'progress.R'
     'sql-build.R'
     'query-join.R'
+    'query-rf-join.R'
     'query-select.R'
     'query-semi-join.R'
     'query-set-op.R'
