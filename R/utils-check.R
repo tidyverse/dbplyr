@@ -10,6 +10,9 @@ check_list <- function(
   if (vctrs::vec_is_list(x)) {
     return()
   }
+  if (allow_null && is_null(x)) {
+    return()
+  }
   stop_input_type(
     x,
     c("a list"),

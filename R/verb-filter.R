@@ -66,22 +66,8 @@ add_filter <- function(.data, dots) {
   } else if (filter_can_use_having(lazy_query)) {
     filter_via_having(lazy_query, dots)
   } else if (filter_can_inline(dots, lazy_query, con)) {
-    exprs <- lazy_query$select$expr
-    nms <- lazy_query$select$name
-    projection <- purrr::map2_lgl(
-      exprs,
-      nms,
-      \(expr, name) is_symbol(expr) && !identical(expr, sym(name))
-    )
-
-    if (any(projection)) {
-      dots <- purrr::map(
-        dots,
-        replace_sym,
-        nms[projection],
-        exprs[projection]
-      )
-    }
+    # WHERE processed before SELECT
+    dots <- replace_sym(dots, lazy_query$select$name, lazy_query$select$expr)
 
     lazy_query$where <- c(lazy_query$where, dots)
     lazy_query
@@ -131,9 +117,8 @@ filter_can_use_having <- function(lazy_query) {
 }
 
 filter_via_having <- function(lazy_query, dots) {
-  names <- lazy_query$select$name
-  exprs <- purrr::map_if(lazy_query$select$expr, is_quosure, quo_get_expr)
-  dots <- purrr::map(dots, replace_sym, names, exprs)
+  # ANSI SQL processes HAVING before SELECT
+  dots <- replace_sym(dots, lazy_query$select$name, lazy_query$select$expr)
 
   lazy_query$having <- c(lazy_query$having, dots)
   lazy_query

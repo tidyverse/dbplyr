@@ -149,9 +149,7 @@ rename_order <- function(order_vars, select_vars) {
   order_vars <- order_vars[order_names %in% select_vars]
 
   # Rename the remaining
-  order_vars[] <- lapply(order_vars, \(expr) {
-    replace_sym(expr, select_vars, syms(names(select_vars)))
-  })
+  order_vars[] <- replace_sym(order_vars, select_vars, syms(names(select_vars)))
   order_vars
 }
 
