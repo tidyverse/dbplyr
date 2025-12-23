@@ -106,15 +106,8 @@ lazy_frame(x = x, con = simulate_postgres()) |>
 lazy_frame(x = x, con = simulate_mssql()) |> 
   head(5) |> 
   show_query()
-#> Warning in scan(text = x, what = character(), quote = quote_char,
-#> quiet = TRUE, : EOF within quoted string
-#> Warning in scan(text = x, what = character(), quote = quote_char,
-#> quiet = TRUE, : EOF within quoted string
-#> Warning in scan(text = x, what = character(), quote = quote_char,
-#> quiet = TRUE, : EOF within quoted string
 #> <SQL>
-#> SELECT TOP 5 [df]]
-#> ].*
+#> SELECT TOP 5 [df].*
 #> FROM [df]
 ```
 

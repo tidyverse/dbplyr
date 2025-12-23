@@ -183,15 +183,8 @@ etc.</p>
 <span><span class="fu"><a href="../reference/tbl_lazy.html">lazy_frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, con <span class="op">=</span> <span class="fu"><a href="../reference/backend-mssql.html">simulate_mssql</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in scan(text = x, what = character(), quote = quote_char,</span></span>
-<span><span class="co">#&gt; quiet = TRUE, : EOF within quoted string</span></span>
-<span><span class="co">#&gt; Warning in scan(text = x, what = character(), quote = quote_char,</span></span>
-<span><span class="co">#&gt; quiet = TRUE, : EOF within quoted string</span></span>
-<span><span class="co">#&gt; Warning in scan(text = x, what = character(), quote = quote_char,</span></span>
-<span><span class="co">#&gt; quiet = TRUE, : EOF within quoted string</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT TOP 5</span> [df]]</span></span>
-<span><span class="co">#&gt; ].*</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT TOP 5</span> [df].*</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> [df]</span></span></code></pre></div>
 <p>If you isolate the problem to incorrect SQL generation, it would be
 very helpful if you could also suggest more appropriate SQL.</p>
