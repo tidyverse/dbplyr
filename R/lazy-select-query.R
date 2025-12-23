@@ -98,43 +98,6 @@ new_lazy_select <- function(
   )
 }
 
-# projection = only select (including rename) from parent query
-is_lazy_select_query_simple <- function(
-  x,
-  ignore_where = FALSE,
-  ignore_group_by = FALSE
-) {
-  if (!is_lazy_select_query(x)) {
-    return(FALSE)
-  }
-
-  if (!is_projection(x$select$expr)) {
-    return(FALSE)
-  }
-
-  if (!ignore_where && !is_empty(x$where)) {
-    return(FALSE)
-  }
-  if (!ignore_group_by && !is_empty(x$group_by)) {
-    return(FALSE)
-  }
-  if (!is_empty(x$order_by)) {
-    return(FALSE)
-  }
-  if (is_true(x$distinct)) {
-    return(FALSE)
-  }
-  if (!is_empty(x$limit)) {
-    return(FALSE)
-  }
-  if (!is_empty(x$having)) {
-    return(FALSE)
-  }
-
-  TRUE
-}
-
-
 #' @export
 print.lazy_select_query <- function(x, ...) {
   cat_line("<SQL SELECT", if (x$distinct) " DISTINCT", ">")

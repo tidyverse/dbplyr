@@ -47,7 +47,7 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
   prep <- distinct_prepare_compat(.data, dots, group_vars = group_vars(.data))
   out <- dplyr::select(prep$data, prep$keep)
 
-  out$lazy_query <- add_distinct(out)
+  out$lazy_query <- add_distinct(out$lazy_query)
   out
 }
 
@@ -154,36 +154,36 @@ quo_is_variable_reference <- function(quo) {
 }
 
 
-add_distinct <- function(.data) {
-  lazy_query <- .data$lazy_query
-
-  out <- lazy_select_query(
-    x = lazy_query,
-    distinct = TRUE
-  )
-
-  if (inherits(lazy_query, "lazy_multi_join_query")) {
+add_distinct <- function(lazy_query) {
+  if (can_inline_distinct(lazy_query)) {
     lazy_query$distinct <- TRUE
-    return(lazy_query)
+    lazy_query
+  } else {
+    lazy_select_query(x = lazy_query, distinct = TRUE)
+  }
+}
+
+# Optimisation overview
+# * `distinct()` adds the `DISTINCT` clause to `SELECT`
+# * `WHERE`, `GROUP BY`, and `HAVING` are executed before `SELECT`
+#   => they do not matter
+# * `ORDER BY`
+#   => but `arrange()` should not have an influence on `distinct()` so it
+#      should not matter
+# * `LIMIT` are executed after `SELECT`
+#   => needs a subquery
+can_inline_distinct <- function(lazy_query) {
+  if (inherits(lazy_query, "lazy_multi_join_query")) {
+    return(TRUE)
   }
 
   if (!is_lazy_select_query(lazy_query)) {
-    return(out)
+    return(FALSE)
   }
 
-  # Optimisation overview
-  # * `distinct()` adds the `DISTINCT` clause to `SELECT`
-  # * `WHERE`, `GROUP BY`, and `HAVING` are executed before `SELECT`
-  #   => they do not matter
-  # * `ORDER BY`
-  #   => but `arrange()` should not have an influence on `distinct()` so it
-  #      should not matter
-  # * `LIMIT` are executed after `SELECT`
-  #   => needs a subquery
   if (!is_null(lazy_query$limit)) {
-    return(out)
+    return(FALSE)
   }
 
-  lazy_query$distinct <- TRUE
-  lazy_query
+  TRUE
 }

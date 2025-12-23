@@ -34,51 +34,57 @@ filter.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
     .data$lazy_query$group_vars <- by$names
   }
   dots <- partial_eval_dots(.data, ..., .named = FALSE)
-  .data$lazy_query <- add_filter(.data, dots)
+  .data$lazy_query <- add_filter(.data$lazy_query, remote_con(.data), dots)
   if (by$from_by) {
     .data$lazy_query$group_vars <- character()
   }
   .data
 }
 
-add_filter <- function(.data, dots) {
-  con <- remote_con(.data)
-  lazy_query <- .data$lazy_query
-  dots <- unname(dots)
+add_filter <- function(lazy_query, con, exprs) {
+  exprs <- unname(exprs)
 
-  if (uses_window_fun(dots, con)) {
-    # Do partial evaluation, then extract out window functions
-    where <- translate_window_where_all(dots, window_funs(con))
+  if (uses_window_fun(exprs, con)) {
+    # Extract out window functions into new mutate layer
+    where <- translate_window_where_all(exprs, window_funs(con))
 
-    # Add extracted window expressions as columns
-    mutated <- mutate(.data, !!!where$comp)
+    # add_mutate() always creates a subquery, so we need to bring all
+    # existing variables along for the ride
+    original_vars <- op_vars(lazy_query)
+    comp_quos <- purrr::map(where$comp, new_quosure)
+    new_exprs <- c(syms(set_names(original_vars)), comp_quos)
+    mutated <- add_mutate(lazy_query, new_exprs)
 
-    # And filter with the modified `where` using the new columns
-    original_vars <- op_vars(.data)
+    # filter with the modified `where` using the new columns
     lazy_select_query(
-      x = mutated$lazy_query,
+      x = mutated,
       select = syms(set_names(original_vars)),
       where = where$expr
     )
   } else if (filter_can_use_having(lazy_query)) {
-    filter_via_having(lazy_query, dots)
-  } else if (filter_can_inline(dots, lazy_query, con)) {
+    filter_via_having(lazy_query, exprs)
+  } else if (can_inline_filter(exprs, lazy_query, con)) {
     # WHERE processed before SELECT
-    dots <- replace_sym(dots, lazy_query$select$name, lazy_query$select$expr)
+    exprs <- replace_sym(exprs, lazy_query$select$name, lazy_query$select$expr)
 
-    lazy_query$where <- c(lazy_query$where, dots)
+    lazy_query$where <- c(lazy_query$where, exprs)
     lazy_query
   } else {
-    lazy_select_query(x = lazy_query, where = dots)
+    lazy_select_query(x = lazy_query, where = exprs)
   }
 }
 
-filter_can_inline <- function(dots, lazy_query, con) {
+# filter() adds the WHERE clause
+# * WHERE is executed before SELECT
+#   => can't reference columns computed in SELECT
+#   => can't inline if SELECT uses window functions (evaluated after WHERE)
+#   => can't inline if SELECT uses sql() (can't extract column references)
+can_inline_filter <- function(exprs, lazy_query, con) {
   if (!is_lazy_select_query(lazy_query)) {
     return(FALSE)
   }
 
-  if (uses_mutated_vars(dots, lazy_query$select)) {
+  if (uses_mutated_vars(exprs, lazy_query$select)) {
     return(FALSE)
   }
 
@@ -113,11 +119,11 @@ filter_can_use_having <- function(lazy_query) {
   }
 }
 
-filter_via_having <- function(lazy_query, dots) {
+filter_via_having <- function(lazy_query, exprs) {
   # ANSI SQL processes HAVING before SELECT
-  dots <- replace_sym(dots, lazy_query$select$name, lazy_query$select$expr)
+  exprs <- replace_sym(exprs, lazy_query$select$name, lazy_query$select$expr)
 
-  lazy_query$having <- c(lazy_query$having, dots)
+  lazy_query$having <- c(lazy_query$having, exprs)
   lazy_query
 }
 

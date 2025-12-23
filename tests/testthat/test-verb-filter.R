@@ -42,6 +42,9 @@ test_that("correctly inlines across all verbs", {
   expect_selects(lf |> mutate(x2 = mean(x)) |> filter(x == 1), 2)
   expect_selects(lf |> mutate(z = sql("x")) |> filter(z == 1), 2)
   expect_selects(lf |> mutate(z = x + 1) |> filter(z == 1), 2)
+
+  # flag add_filter() for update if add_mutate ever gains inlining
+  expect_selects(lf |> mutate(z = x + 1) |> filter(n() == 1), 3)
 })
 
 test_that("each argument gets implicit parens", {

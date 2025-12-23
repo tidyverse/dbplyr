@@ -51,7 +51,7 @@ summarise.tbl_lazy <- function(.data, ..., .by = NULL, .groups = NULL) {
 
   dots <- summarise_eval_dots(.data, ...)
   .data$lazy_query <- add_summarise(
-    .data,
+    .data$lazy_query,
     dots,
     .groups = .groups,
     env_caller = caller_env()
@@ -154,9 +154,7 @@ check_groups <- function(.groups) {
   )
 }
 
-add_summarise <- function(.data, dots, .groups, env_caller) {
-  lazy_query <- .data$lazy_query
-
+add_summarise <- function(lazy_query, exprs, .groups, env_caller) {
   cur_grps <- op_grps(lazy_query)
   summarise_message(cur_grps, .groups, env_caller)
 
@@ -168,11 +166,11 @@ add_summarise <- function(.data, dots, .groups, env_caller) {
   )
 
   # ensure grouping variables are listed first
-  vars <- c(cur_grps, setdiff(names(dots), cur_grps))
+  vars <- c(cur_grps, setdiff(names(exprs), cur_grps))
   select <- syms(set_names(vars))
-  select[names(dots)] <- dots
+  select[names(exprs)] <- exprs
 
-  if (summarise_can_inline(lazy_query)) {
+  if (can_inline_summarise(lazy_query)) {
     lazy_query$select <- new_lazy_select(select, group_vars = new_grps)
     lazy_query$select_operation <- "summarise"
     lazy_query$group_by <- syms(cur_grps)
@@ -189,7 +187,12 @@ add_summarise <- function(.data, dots, .groups, env_caller) {
   }
 }
 
-summarise_can_inline <- function(lazy_query) {
+# summarise() adds GROUP BY and modifies SELECT
+# * GROUP BY is executed after WHERE but before SELECT, DISTINCT, ORDER BY, LIMIT
+#   => can inline if previous query only has WHERE or ORDER BY
+# * Can't inline after another summarise (would need to re-aggregate)
+# * Can only inline if previous SELECT is a pure projection
+can_inline_summarise <- function(lazy_query) {
   if (!is_lazy_select_query(lazy_query)) {
     return(FALSE)
   }
@@ -198,10 +201,6 @@ summarise_can_inline <- function(lazy_query) {
     return(FALSE)
   }
 
-  # Inline: GROUP BY is executed after WHERE but before SELECT, DISTINCT,
-  # ORDER BY, and LIMIT. So we can inline if the previous query only has
-  # WHERE or ORDER BY
-
   if (is_true(lazy_query$distinct)) {
     return(FALSE)
   }
@@ -209,7 +208,6 @@ summarise_can_inline <- function(lazy_query) {
     return(FALSE)
   }
 
-  # Can only inline if previous SELECT is a pure projection
   if (!is_pure_projection(lazy_query$select$expr, lazy_query$select$name)) {
     return(FALSE)
   }

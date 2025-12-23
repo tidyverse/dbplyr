@@ -101,7 +101,7 @@ add_select <- function(lazy_query, vars) {
     return(lazy_query)
   }
 
-  if (select_can_inline(lazy_query, vars)) {
+  if (can_inline_select(lazy_query, vars)) {
     idx <- vctrs::vec_match(vars, vars_data)
 
     lazy_query$select <- vctrs::vec_slice(lazy_query$select, idx)
@@ -116,24 +116,29 @@ add_select <- function(lazy_query, vars) {
   }
 }
 
-select_can_inline <- function(lazy_query, vars) {
+# select() modifies the SELECT clause
+# * ORDER BY can reference SELECT columns by name
+#   => computed columns used in ORDER BY must be preserved
+# * DISTINCT operates on the SELECT result
+#   => can only inline bijective projections (same columns, different order)
+can_inline_select <- function(lazy_query, vars) {
   if (!is_lazy_select_query(lazy_query)) {
     return(FALSE)
   }
 
-  # all computed columns used for ordering (if any) must be present
-  computed_flag <- purrr::map_lgl(lazy_query$select$expr, is_quosure)
-  computed_columns <- lazy_query$select$name[computed_flag]
-
+  is_mutate <- purrr::map_lgl(lazy_query$select$expr, is_quosure)
+  computed_columns <- lazy_query$select$name[is_mutate]
   order_vars <- purrr::map_chr(lazy_query$order_by, as_label)
   ordered_present <- all(intersect(computed_columns, order_vars) %in% vars)
+  if (!ordered_present) {
+    return(FALSE)
+  }
 
-  # if the projection is distinct, it must be bijective
-  is_distinct <- is_true(lazy_query$distinct)
-  is_bijective_projection <- identical(sort(unname(vars)), op_vars(lazy_query))
-  distinct_is_bijective <- !is_distinct || is_bijective_projection
-
-  ordered_present && distinct_is_bijective
+  if (is_true(lazy_query$distinct)) {
+    identical(sort(unname(vars)), op_vars(lazy_query))
+  } else {
+    TRUE
+  }
 }
 
 rename_groups <- function(group_vars, select_vars) {

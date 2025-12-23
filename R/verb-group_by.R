@@ -45,7 +45,7 @@ group_by.tbl_lazy <- function(
     return(groups$data)
   }
 
-  groups$data$lazy_query <- add_group_by(groups$data, names)
+  groups$data$lazy_query <- add_group_by(groups$data$lazy_query, names)
   groups$data
 }
 
@@ -64,7 +64,7 @@ ungroup.tbl_lazy <- function(x, ...) {
   }
 }
 
-add_group_by <- function(.data, group_vars) {
-  .data$lazy_query$group_vars <- unname(group_vars)
-  .data$lazy_query
+add_group_by <- function(lazy_query, vars) {
+  lazy_query$group_vars <- unname(vars)
+  lazy_query
 }
