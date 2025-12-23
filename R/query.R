@@ -1,16 +1,3 @@
-query <- function(query_type, ...) {
-  structure(
-    list(...),
-    class = c(paste0(query_type, "_query"), "query")
-  )
-}
-
-#' @export
-print.query <- function(x, ...) {
-  cat_line("-- <", class(x)[1], "> -------------------------")
-  cat_line(sql_render(x, simulate_dbi()))
-}
-
 #' @export
 #' @rdname sql_build
 lazy_query <- function(
@@ -43,6 +30,21 @@ lazy_query <- function(
 
 #' @export
 print.lazy_query <- function(x, ...) {
+  cat_line("-- <", class(x)[1], "> -------------------------")
+  cat_line(sql_render(x, simulate_dbi()))
+}
+
+# query -----------------------------------------------------------------------
+
+query <- function(query_type, ...) {
+  structure(
+    list(...),
+    class = c(paste0(query_type, "_query"), "query")
+  )
+}
+
+#' @export
+print.query <- function(x, ...) {
   cat_line("-- <", class(x)[1], "> -------------------------")
   cat_line(sql_render(x, simulate_dbi()))
 }
