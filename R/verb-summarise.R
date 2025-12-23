@@ -51,7 +51,7 @@ summarise.tbl_lazy <- function(.data, ..., .by = NULL, .groups = NULL) {
 
   dots <- summarise_eval_dots(.data, ...)
   .data$lazy_query <- add_summarise(
-    .data,
+    .data$lazy_query,
     dots,
     .groups = .groups,
     env_caller = caller_env()
@@ -154,9 +154,7 @@ check_groups <- function(.groups) {
   )
 }
 
-add_summarise <- function(.data, dots, .groups, env_caller) {
-  lazy_query <- .data$lazy_query
-
+add_summarise <- function(lazy_query, dots, .groups, env_caller) {
   cur_grps <- op_grps(lazy_query)
   summarise_message(cur_grps, .groups, env_caller)
 

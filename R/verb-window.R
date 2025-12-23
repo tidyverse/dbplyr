@@ -33,15 +33,15 @@ window_order <- function(.data, ...) {
   names(dots) <- NULL
   check_window_order_dots(dots)
 
-  .data$lazy_query <- add_order(.data, dots)
+  .data$lazy_query <- add_order(.data$lazy_query, dots)
   .data
 }
 
 # We want to preserve this ordering (for window functions) without
 # imposing an additional arrange, so we have a special op_order
-add_order <- function(.data, dots) {
-  .data$lazy_query$order_vars <- unname(dots)
-  .data$lazy_query
+add_order <- function(lazy_query, dots) {
+  lazy_query$order_vars <- unname(dots)
+  lazy_query
 }
 
 check_window_order_dots <- function(dots, arg = "...", call = caller_env()) {

@@ -47,7 +47,7 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
   prep <- distinct_prepare_compat(.data, dots, group_vars = group_vars(.data))
   out <- dplyr::select(prep$data, prep$keep)
 
-  out$lazy_query <- add_distinct(out)
+  out$lazy_query <- add_distinct(out$lazy_query)
   out
 }
 
@@ -154,9 +154,7 @@ quo_is_variable_reference <- function(quo) {
 }
 
 
-add_distinct <- function(.data) {
-  lazy_query <- .data$lazy_query
-
+add_distinct <- function(lazy_query) {
   if (can_inline_distinct(lazy_query)) {
     lazy_query$distinct <- TRUE
     lazy_query

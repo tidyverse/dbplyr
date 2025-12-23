@@ -33,13 +33,11 @@ arrange.tbl_lazy <- function(.data, ..., .by_group = FALSE) {
   dots <- partial_eval_dots(.data, ..., .named = FALSE)
   names(dots) <- NULL
 
-  .data$lazy_query <- add_arrange(.data, dots, .by_group)
+  .data$lazy_query <- add_arrange(.data$lazy_query, dots, .by_group)
   .data
 }
 
-add_arrange <- function(.data, dots, .by_group) {
-  lazy_query <- .data$lazy_query
-
+add_arrange <- function(lazy_query, dots, .by_group) {
   # Empty arrange() preserves existing ordering (like dplyr)
   if (is_empty(dots)) {
     return(lazy_query)

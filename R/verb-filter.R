@@ -34,16 +34,14 @@ filter.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
     .data$lazy_query$group_vars <- by$names
   }
   dots <- partial_eval_dots(.data, ..., .named = FALSE)
-  .data$lazy_query <- add_filter(.data, dots)
+  .data$lazy_query <- add_filter(.data$lazy_query, remote_con(.data), dots)
   if (by$from_by) {
     .data$lazy_query$group_vars <- character()
   }
   .data
 }
 
-add_filter <- function(.data, dots) {
-  con <- remote_con(.data)
-  lazy_query <- .data$lazy_query
+add_filter <- function(lazy_query, con, dots) {
   dots <- unname(dots)
 
   if (uses_window_fun(dots, con)) {
@@ -51,12 +49,14 @@ add_filter <- function(.data, dots) {
     where <- translate_window_where_all(dots, window_funs(con))
 
     # Add extracted window expressions as columns
-    mutated <- mutate(.data, !!!where$comp)
+    original_vars <- op_vars(lazy_query)
+    comp_quos <- purrr::map(where$comp, new_quosure)
+    new_vars <- c(syms(set_names(original_vars)), comp_quos)
+    mutated <- add_mutate(lazy_query, new_vars)
 
     # And filter with the modified `where` using the new columns
-    original_vars <- op_vars(.data)
     lazy_select_query(
-      x = mutated$lazy_query,
+      x = mutated,
       select = syms(set_names(original_vars)),
       where = where$expr
     )
