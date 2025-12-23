@@ -1,19 +1,3 @@
-join_check_by <- function(by, call) {
-  if (!vctrs::vec_is_list(by) && !inherits(by, "dplyr_join_by")) {
-    cli_abort("{.arg by} must be a list", .internal = TRUE)
-  }
-  check_character(by$x, call = call)
-  check_character(by$y, call = call)
-  if (vctrs::vec_size(by$x) != vctrs::vec_size(by$y)) {
-    cli_abort(
-      "{.arg by$x} and {.arg by$y} must have the same size",
-      .internal = TRUE
-    )
-  }
-  check_string(by$x_as, arg = "by$x_as", call = call)
-  check_string(by$y_as, arg = "by$y_as", call = call)
-}
-
 #' @export
 #' @rdname sql_build
 lazy_semi_join_query <- function(
@@ -31,7 +15,7 @@ lazy_semi_join_query <- function(
   check_lazy_query(x, call = call)
   check_lazy_query(y, call = call)
   check_bool(anti, call = call)
-  join_check_by(by, call)
+  check_semi_join_by(by, call)
 
   lazy_query(
     query_type = "semi_join",
@@ -46,6 +30,23 @@ lazy_semi_join_query <- function(
     frame = frame
   )
 }
+
+check_semi_join_by <- function(by, call) {
+  if (!vctrs::vec_is_list(by) && !inherits(by, "dplyr_join_by")) {
+    cli_abort("{.arg by} must be a list", .internal = TRUE)
+  }
+  check_character(by$x, call = call)
+  check_character(by$y, call = call)
+  if (vctrs::vec_size(by$x) != vctrs::vec_size(by$y)) {
+    cli_abort(
+      "{.arg by$x} and {.arg by$y} must have the same size",
+      .internal = TRUE
+    )
+  }
+  check_string(by$x_as, arg = "by$x_as", call = call)
+  check_string(by$y_as, arg = "by$y_as", call = call)
+}
+
 
 #' @export
 print.lazy_semi_join_query <- function(x, ...) {
