@@ -41,25 +41,6 @@ base_query <- function(from) {
 }
 
 #' @export
-print.lazy_base_remote_query <- function(x, ...) {
-  if (is_table_path(x$x)) {
-    cat_line("From: ", format(x$x))
-  } else {
-    cat_line("From: <derived table>")
-  }
-}
-
-#' @export
-print.lazy_base_local_query <- function(x, ...) {
-  cat_line("<Local data frame> ", dplyr::dim_desc(x$x))
-}
-
-#' @export
-print.base_query <- function(x, ...) {
-  print(x$from)
-}
-
-#' @export
 sql_build.lazy_base_remote_query <- function(op, con, ...) {
   base_query(op$x)
 }

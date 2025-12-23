@@ -49,26 +49,6 @@ check_semi_join_by <- function(by, call) {
 
 
 #' @export
-print.lazy_semi_join_query <- function(x, ...) {
-  cat_line("<SQL ", if (x$anti) "ANTI" else "SEMI", " JOIN>")
-
-  cat_line("By:")
-  cat_line(indent(paste0(x$by$x, "-", x$by$y)))
-
-  if (length(x$where)) {
-    cat_line("Where:")
-    where <- purrr::map_chr(x$where, as_label)
-    cat_line(indent(paste0(where)))
-  }
-
-  cat_line("X:")
-  cat_line(indent_print(sql_build(x$x, simulate_dbi())))
-
-  cat_line("Y:")
-  cat_line(indent_print(sql_build(x$y, simulate_dbi())))
-}
-
-#' @export
 op_vars.lazy_semi_join_query <- function(op) {
   op$vars$name
 }
@@ -132,11 +112,6 @@ semi_join_query <- function(
     where = where,
     na_matches = na_matches
   )
-}
-
-#' @export
-print.semi_join_query <- function(x, ...) {
-  cat_line(sql_render(x, simulate_dbi()))
 }
 
 #' @export

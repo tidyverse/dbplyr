@@ -103,11 +103,6 @@ rf_join_query <- function(
 }
 
 #' @export
-print.rf_join_query <- function(x, ...) {
-  cat_line(sql_render(x, simulate_dbi()))
-}
-
-#' @export
 sql_render.rf_join_query <- function(
   query,
   con = NULL,

@@ -4,12 +4,10 @@
       lazy_select_query(x = lf$lazy_query, select = quos(x_mean = mean(x), y2 = y),
       where = quos(y > 1, x == y - 2), group_by = quos("x"))
     Output
-      <SQL SELECT>
-      From:
-        <table_path> "df"
-      Select:   x_mean = mean(x), y2 = y
-      Where:    y > 1, x == y - 2
-      Group by: "x"
+      SELECT AVG("x") OVER () AS "x_mean", "y" AS "y2"
+      FROM "df"
+      WHERE ("y" > 1.0) AND ("x" = ("y" - 2.0))
+      GROUP BY 'x'
 
 # select_query() print method output is as expected
 

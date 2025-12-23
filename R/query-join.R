@@ -130,11 +130,6 @@ multi_join_query <- function(x, joins, table_names, select, distinct = FALSE) {
 }
 
 #' @export
-print.multi_join_query <- function(x, ...) {
-  cat_line(sql_render(x, simulate_dbi()))
-}
-
-#' @export
 sql_render.multi_join_query <- function(
   query,
   con = NULL,

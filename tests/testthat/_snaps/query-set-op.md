@@ -3,18 +3,18 @@
     Code
       sql_build(union_all(union(lf1, lf2), lf3))
     Output
-        SELECT "lf1".*, NULL AS "z"
-        FROM "lf1"
+      SELECT "lf1".*, NULL AS "z"
+      FROM "lf1"
       
-        UNION
+      UNION
       
-        SELECT "x", NULL AS "y", "z"
-        FROM "lf2"
+      SELECT "x", NULL AS "y", "z"
+      FROM "lf2"
       
-        UNION ALL
+      UNION ALL
       
-        SELECT "x", NULL AS "y", "z"
-        FROM "lf3"
+      SELECT "x", NULL AS "y", "z"
+      FROM "lf3"
 
 # generated sql doesn't change unexpectedly
 

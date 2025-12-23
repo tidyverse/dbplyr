@@ -6,6 +6,16 @@ query <- function(query_type, ...) {
 }
 
 #' @export
+print.query <- function(x, ...) {
+  cat_line(sql_render(x, simulate_dbi()))
+}
+
+#' @export
+print.lazy_query <- function(x, ...) {
+  cat_line(sql_render(x, simulate_dbi()))
+}
+
+#' @export
 #' @rdname sql_build
 lazy_query <- function(
   query_type,
