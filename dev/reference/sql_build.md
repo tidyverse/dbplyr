@@ -9,6 +9,15 @@ structure. Outside of testing, however, you should always call
 ## Usage
 
 ``` r
+lazy_query(
+  query_type,
+  x,
+  ...,
+  group_vars = op_grps(x),
+  order_vars = op_sort(x),
+  frame = op_frame(x)
+)
+
 lazy_multi_join_query(
   x,
   joins,
@@ -19,15 +28,6 @@ lazy_multi_join_query(
   order_vars = op_sort(x),
   frame = op_frame(x),
   call = caller_env()
-)
-
-lazy_query(
-  query_type,
-  x,
-  ...,
-  group_vars = op_grps(x),
-  order_vars = op_sort(x),
-  frame = op_frame(x)
 )
 
 lazy_rf_join_query(
@@ -41,6 +41,17 @@ lazy_rf_join_query(
   order_vars = op_sort(x),
   frame = op_frame(x),
   call = caller_env()
+)
+
+rf_join_query(
+  x,
+  y,
+  select,
+  ...,
+  type = "inner",
+  by = NULL,
+  suffix = c(".x", ".y"),
+  na_matches = FALSE
 )
 
 lazy_select_query(
@@ -58,45 +69,6 @@ lazy_select_query(
   select_operation = c("select", "mutate", "summarise")
 )
 
-lazy_semi_join_query(
-  x,
-  y,
-  vars,
-  anti,
-  by,
-  where,
-  group_vars = op_grps(x),
-  order_vars = op_sort(x),
-  frame = op_frame(x),
-  call = caller_env()
-)
-
-lazy_set_op_query(x, y, type, all, call = caller_env())
-
-lazy_union_query(x, unions, call = caller_env())
-
-sql_build(op, con = NULL, ..., sql_options = NULL)
-
-sql_render(
-  query,
-  con = NULL,
-  ...,
-  sql_options = NULL,
-  subquery = FALSE,
-  lvl = 0
-)
-
-rf_join_query(
-  x,
-  y,
-  select,
-  ...,
-  type = "inner",
-  by = NULL,
-  suffix = c(".x", ".y"),
-  na_matches = FALSE
-)
-
 select_query(
   from,
   select = sql("*"),
@@ -110,6 +82,19 @@ select_query(
   from_alias = NULL
 )
 
+lazy_semi_join_query(
+  x,
+  y,
+  vars,
+  anti,
+  by,
+  where,
+  group_vars = op_grps(x),
+  order_vars = op_sort(x),
+  frame = op_frame(x),
+  call = caller_env()
+)
+
 semi_join_query(
   x,
   y,
@@ -120,9 +105,24 @@ semi_join_query(
   na_matches = FALSE
 )
 
+lazy_set_op_query(x, y, type, all, call = caller_env())
+
+lazy_union_query(x, unions, call = caller_env())
+
 set_op_query(x, y, type, all = FALSE)
 
 union_query(x, unions)
+
+sql_build(op, con = NULL, ..., sql_options = NULL)
+
+sql_render(
+  query,
+  con = NULL,
+  ...,
+  sql_options = NULL,
+  subquery = FALSE,
+  lvl = 0
+)
 ```
 
 ## Arguments
