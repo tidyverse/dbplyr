@@ -40,36 +40,42 @@ arrange.tbl_lazy <- function(.data, ..., .by_group = FALSE) {
 add_arrange <- function(.data, dots, .by_group) {
   lazy_query <- .data$lazy_query
 
-  if (.by_group) {
-    dots <- c(syms(op_grps(lazy_query)), dots)
-  }
-
   # Empty arrange() preserves existing ordering (like dplyr)
   if (is_empty(dots)) {
     return(lazy_query)
   }
 
+  if (.by_group) {
+    dots <- c(syms(op_grps(lazy_query)), dots)
+  }
+
   # Prepend new ordering to existing ordering (like dplyr)
   order_vars <- c(dots, op_sort(lazy_query))
 
-  new_lazy_query <- lazy_select_query(
-    x = lazy_query,
-    order_by = order_vars,
-    order_vars = order_vars
-  )
+  if (arrange_can_inline(lazy_query)) {
+    lazy_query$order_vars <- order_vars
+    lazy_query$order_by <- order_vars
+    lazy_query
+  } else {
+    lazy_select_query(
+      x = lazy_query,
+      order_by = order_vars,
+      order_vars = order_vars
+    )
+  }
+}
 
+arrange_can_inline <- function(lazy_query) {
   if (!is_lazy_select_query(lazy_query)) {
-    return(new_lazy_query)
+    return(FALSE)
   }
 
   # Needed because `ORDER BY` is evaluated before `LIMIT`
   if (!is.null(lazy_query$limit)) {
-    return(new_lazy_query)
+    return(FALSE)
   }
 
-  lazy_query$order_vars <- order_vars
-  lazy_query$order_by <- order_vars
-  lazy_query
+  TRUE
 }
 
 unwrap_order_expr <- function(order_by, f, error_call = caller_env()) {
