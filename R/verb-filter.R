@@ -47,40 +47,7 @@ add_filter <- function(.data, dots) {
   lazy_query <- .data$lazy_query
   dots <- unname(dots)
 
-  dots_use_window_fun <- uses_window_fun(dots, con)
-
-  if (filter_can_use_having(lazy_query, dots_use_window_fun)) {
-    return(filter_via_having(lazy_query, dots))
-  }
-
-  if (!dots_use_window_fun) {
-    if (filter_needs_new_query(dots, lazy_query, con)) {
-      lazy_select_query(
-        x = lazy_query,
-        where = dots
-      )
-    } else {
-      exprs <- lazy_query$select$expr
-      nms <- lazy_query$select$name
-      projection <- purrr::map2_lgl(
-        exprs,
-        nms,
-        \(expr, name) is_symbol(expr) && !identical(expr, sym(name))
-      )
-
-      if (any(projection)) {
-        dots <- purrr::map(
-          dots,
-          replace_sym,
-          nms[projection],
-          exprs[projection]
-        )
-      }
-
-      lazy_query$where <- c(lazy_query$where, dots)
-      lazy_query
-    }
-  } else {
+  if (uses_window_fun(dots, con)) {
     # Do partial evaluation, then extract out window functions
     where <- translate_window_where_all(
       dots,
@@ -97,30 +64,54 @@ add_filter <- function(.data, dots) {
       select = syms(set_names(original_vars)),
       where = where$expr
     )
+  } else if (filter_can_use_having(lazy_query)) {
+    filter_via_having(lazy_query, dots)
+  } else if (filter_can_inline(dots, lazy_query, con)) {
+    exprs <- lazy_query$select$expr
+    nms <- lazy_query$select$name
+    projection <- purrr::map2_lgl(
+      exprs,
+      nms,
+      \(expr, name) is_symbol(expr) && !identical(expr, sym(name))
+    )
+
+    if (any(projection)) {
+      dots <- purrr::map(
+        dots,
+        replace_sym,
+        nms[projection],
+        exprs[projection]
+      )
+    }
+
+    lazy_query$where <- c(lazy_query$where, dots)
+    lazy_query
+  } else {
+    lazy_select_query(x = lazy_query, where = dots)
   }
 }
 
-filter_needs_new_query <- function(dots, lazy_query, con) {
+filter_can_inline <- function(dots, lazy_query, con) {
   if (!is_lazy_select_query(lazy_query)) {
-    return(TRUE)
+    return(FALSE)
   }
 
   if (uses_mutated_vars(dots, lazy_query$select)) {
-    return(TRUE)
+    return(FALSE)
   }
 
   if (uses_window_fun(lazy_query$select$expr, con)) {
-    return(TRUE)
+    return(FALSE)
   }
 
   if (any_expr_uses_sql(lazy_query$select$expr)) {
-    return(TRUE)
+    return(FALSE)
   }
 
-  FALSE
+  TRUE
 }
 
-filter_can_use_having <- function(lazy_query, dots_use_window_fun) {
+filter_can_use_having <- function(lazy_query) {
   # From the Postgres documentation: https://www.postgresql.org/docs/current/sql-select.html#SQL-HAVING
   # Each column referenced in condition must unambiguously reference a grouping
   # column, unless the reference appears within an aggregate function or the
@@ -133,16 +124,11 @@ filter_can_use_having <- function(lazy_query, dots_use_window_fun) {
   #
   # Therefore, if `filter()` does not use a window function, then we only use
   # grouping or aggregated columns
-
-  if (dots_use_window_fun) {
-    return(FALSE)
-  }
-
   if (!is_lazy_select_query(lazy_query)) {
-    return(FALSE)
+    FALSE
+  } else {
+    lazy_query$select_operation == "summarise"
   }
-
-  lazy_query$select_operation == "summarise"
 }
 
 filter_via_having <- function(lazy_query, dots) {
