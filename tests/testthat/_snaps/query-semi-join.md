@@ -27,20 +27,6 @@
       Error in `my_lazy_semi_join_query()`:
       ! `anti` must be `TRUE` or `FALSE`, not `NA`.
 
-# print method doesn't change unexpectedly
-
-    Code
-      sql_build(semi_join(lf1, filter(lf2, z == 2)))
-    Message
-      Joining with `by = join_by(x)`
-    Output
-      SELECT "df_LHS".*
-      FROM "df" AS "df_LHS"
-      WHERE EXISTS (
-        SELECT 1 FROM "df" AS "df_RHS"
-        WHERE ("df_LHS"."x" = "df_RHS"."x") AND ("df_RHS"."z" = 2.0)
-      )
-
 # generated sql doesn't change unexpectedly
 
     Code

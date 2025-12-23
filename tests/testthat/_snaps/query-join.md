@@ -1,15 +1,3 @@
-# print method doesn't change unexpectedly
-
-    Code
-      sql_build(left_join(left_join(lf1, lf2, by = "x"), lf3, by = "x"))
-    Output
-      SELECT "lf1".*, "lf2"."z" AS "z.x", "lf3"."z" AS "z.y"
-      FROM "lf1"
-      LEFT JOIN "lf2"
-        ON ("lf1"."x" = "lf2"."x")
-      LEFT JOIN "lf3"
-        ON ("lf1"."x" = "lf3"."x")
-
 # generated sql doesn't change unexpectedly
 
     Code

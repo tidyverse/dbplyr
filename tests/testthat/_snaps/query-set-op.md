@@ -1,21 +1,3 @@
-# print method doesn't change unexpectedly
-
-    Code
-      sql_build(union_all(union(lf1, lf2), lf3))
-    Output
-      SELECT "lf1".*, NULL AS "z"
-      FROM "lf1"
-      
-      UNION
-      
-      SELECT "x", NULL AS "y", "z"
-      FROM "lf2"
-      
-      UNION ALL
-      
-      SELECT "x", NULL AS "y", "z"
-      FROM "lf3"
-
 # generated sql doesn't change unexpectedly
 
     Code
