@@ -14,13 +14,7 @@ set_op_query <- function(x, y, type, all = FALSE) {
 
 #' @export
 print.set_op_query <- function(x, ...) {
-  cat_line("<SQL ", toupper(x$type), ">")
-
-  cat_line("X:")
-  cat_line(indent_print(x$x))
-
-  cat_line("Y:")
-  cat_line(indent_print(x$y))
+  cat_line(sql_render(x, simulate_dbi()))
 }
 
 #' @export

@@ -25,21 +25,7 @@ semi_join_query <- function(
 
 #' @export
 print.semi_join_query <- function(x, ...) {
-  cat_line("<SQL ", if (x$anti) "ANTI" else "SEMI", " JOIN>")
-
-  cat_line("By:")
-  cat_line(indent(paste0(x$by$x, "-", x$by$y)))
-
-  if (length(x$where)) {
-    cat_line("Where:")
-    cat_line(indent(x$where))
-  }
-
-  cat_line("X:")
-  cat_line(indent_print(x$x))
-
-  cat_line("Y:")
-  cat_line(indent_print(x$y))
+  cat_line(sql_render(x, simulate_dbi()))
 }
 
 #' @export

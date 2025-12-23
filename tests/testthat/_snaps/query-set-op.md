@@ -3,24 +3,18 @@
     Code
       sql_build(union_all(union(lf1, lf2), lf3))
     Output
-        <SQL SELECT>
-        From:
-          <table_path> "lf1"
-        Select:   "lf1".*, NULL
+        SELECT "lf1".*, NULL AS "z"
+        FROM "lf1"
       
         UNION
       
-        <SQL SELECT>
-        From:
-          <table_path> "lf2"
-        Select:   "x", NULL, "z"
+        SELECT "x", NULL AS "y", "z"
+        FROM "lf2"
       
         UNION ALL
       
-        <SQL SELECT>
-        From:
-          <table_path> "lf3"
-        Select:   "x", NULL, "z"
+        SELECT "x", NULL AS "y", "z"
+        FROM "lf3"
 
 # generated sql doesn't change unexpectedly
 
