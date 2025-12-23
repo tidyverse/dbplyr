@@ -1,5 +1,3 @@
-#' @include sql-build.R
-
 #' @export
 #' @rdname sql_build
 lazy_multi_join_query <- function(

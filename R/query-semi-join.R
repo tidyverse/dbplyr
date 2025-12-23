@@ -165,4 +165,6 @@ sql_render.semi_join_query <- function(
 }
 
 #' @export
-flatten_query.semi_join_query <- flatten_query_2_tables
+flatten_query.semi_join_query <- function(qry, query_list, con) {
+  flatten_query_2_tables(qry, query_list, con)
+}
