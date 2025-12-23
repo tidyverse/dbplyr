@@ -157,33 +157,35 @@ quo_is_variable_reference <- function(quo) {
 add_distinct <- function(.data) {
   lazy_query <- .data$lazy_query
 
-  out <- lazy_select_query(
-    x = lazy_query,
-    distinct = TRUE
-  )
-
-  if (inherits(lazy_query, "lazy_multi_join_query")) {
+  if (distinct_can_inline(lazy_query)) {
     lazy_query$distinct <- TRUE
-    return(lazy_query)
+    lazy_query
+  } else {
+    lazy_select_query(x = lazy_query, distinct = TRUE)
+  }
+}
+
+# Optimisation overview
+# * `distinct()` adds the `DISTINCT` clause to `SELECT`
+# * `WHERE`, `GROUP BY`, and `HAVING` are executed before `SELECT`
+#   => they do not matter
+# * `ORDER BY`
+#   => but `arrange()` should not have an influence on `distinct()` so it
+#      should not matter
+# * `LIMIT` are executed after `SELECT`
+#   => needs a subquery
+distinct_can_inline <- function(lazy_query) {
+  if (inherits(lazy_query, "lazy_multi_join_query")) {
+    return(TRUE)
   }
 
   if (!is_lazy_select_query(lazy_query)) {
-    return(out)
+    return(FALSE)
   }
 
-  # Optimisation overview
-  # * `distinct()` adds the `DISTINCT` clause to `SELECT`
-  # * `WHERE`, `GROUP BY`, and `HAVING` are executed before `SELECT`
-  #   => they do not matter
-  # * `ORDER BY`
-  #   => but `arrange()` should not have an influence on `distinct()` so it
-  #      should not matter
-  # * `LIMIT` are executed after `SELECT`
-  #   => needs a subquery
   if (!is_null(lazy_query$limit)) {
-    return(out)
+    return(FALSE)
   }
 
-  lazy_query$distinct <- TRUE
-  lazy_query
+  TRUE
 }
