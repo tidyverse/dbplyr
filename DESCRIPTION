@@ -115,6 +115,7 @@ Collate:
     'query-select.R'
     'query-semi-join.R'
     'query-set-op.R'
+    'query-union.R'
     'query.R'
     'reexport.R'
     'remote.R'
