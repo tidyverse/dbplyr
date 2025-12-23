@@ -3,10 +3,16 @@ test_that("table_path_components parses SQL Server bracket syntax", {
     table_path_components(table_path(x), simulate_mssql())
   }
 
+  # Bracket quoting
   expect_equal(components("[df]"), list("df"))
   expect_equal(components("[schema].[table]"), list(c("schema", "table")))
   expect_equal(components("[x.y].[z]"), list(c("x.y", "z")))
   expect_equal(components(c("[a]", "[b].[c]")), list("a", c("b", "c")))
+
+  # Double-quote quoting
+  expect_equal(components('"df"'), list("df"))
+  expect_equal(components('"schema"."table"'), list(c("schema", "table")))
+  expect_equal(components('"x.y"."z"'), list(c("x.y", "z")))
 })
 
 # function translation ----------------------------------------------------
