@@ -67,13 +67,12 @@ sql_build.lazy_rf_join_query <- function(op, con, ..., sql_options = NULL) {
     qualify_all_columns = sql_options$qualify_all_columns
   )
 
-  join_query(
+  rf_join_query(
     sql_build(op$x, con, sql_options = sql_options),
     sql_build(op$y, con, sql_options = sql_options),
     select = select,
     type = op$type,
     by = by,
-    suffix = NULL, # it seems like the suffix is not used for rendering
     na_matches = by$na_matches
   )
 }

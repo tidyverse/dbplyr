@@ -2,7 +2,7 @@
 
 #' @export
 #' @rdname sql_build
-join_query <- function(
+rf_join_query <- function(
   x,
   y,
   select,
@@ -21,7 +21,7 @@ join_query <- function(
       by = by,
       na_matches = na_matches
     ),
-    class = c("join_query", "query")
+    class = c("rf_join_query", "query")
   )
 }
 
@@ -39,7 +39,7 @@ multi_join_query <- function(x, joins, table_names, select, distinct = FALSE) {
 }
 
 #' @export
-print.join_query <- function(x, ...) {
+print.rf_join_query <- function(x, ...) {
   cat_line(sql_render(x, simulate_dbi()))
 }
 
@@ -49,7 +49,7 @@ print.multi_join_query <- function(x, ...) {
 }
 
 #' @export
-sql_render.join_query <- function(
+sql_render.rf_join_query <- function(
   query,
   con = NULL,
   ...,
@@ -101,7 +101,7 @@ sql_render.multi_join_query <- function(
 }
 
 #' @export
-flatten_query.join_query <- flatten_query_2_tables
+flatten_query.rf_join_query <- flatten_query_2_tables
 
 #' @export
 flatten_query.multi_join_query <- function(qry, query_list, con) {

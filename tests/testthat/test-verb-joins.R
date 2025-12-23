@@ -839,7 +839,7 @@ test_that("multiple joins produce separate queries if using right/full join", {
     right_join(lf3, by = "x")
 
   out_build <- out |> sql_build()
-  expect_s3_class(out_build, "join_query")
+  expect_s3_class(out_build, "rf_join_query")
   expect_s3_class(out_build$x, "multi_join_query")
 
   expect_snapshot(remote_query(out))
@@ -848,7 +848,7 @@ test_that("multiple joins produce separate queries if using right/full join", {
     full_join(lf3, by = "x") |>
     sql_build()
 
-  expect_s3_class(out_build, "join_query")
+  expect_s3_class(out_build, "rf_join_query")
   expect_s3_class(out_build$x, "multi_join_query")
 })
 

@@ -123,7 +123,7 @@ These lazy queries are typically created by a helper function like `add_select()
 
 The lazy query gives us a representation of the data manipulation pipeline with enough detail that we can reason about when we need a subquery. Then when the user calls `collect()`, we need to generate an SQL query. This happens in two steps: building and rendering.
 
-First, `sql_build()` recurses over the lazy query, building up query objects like `select_query()` and `join_query()` that represent the different subtypes of `SELECT` queries. Compared to the previous "lazy" query representation, these are much closer to SQL than R. They can be much simpler because we no longer need to reason about subqueries, but we still need some structure to facilitate backend-specific translations.
+First, `sql_build()` recurses over the lazy query, building up query objects like `select_query()` and `multi_join_query()` that represent the different subtypes of `SELECT` queries. Compared to the previous "lazy" query representation, these are much closer to SQL than R. They can be much simpler because we no longer need to reason about subqueries, but we still need some structure to facilitate backend-specific translations.
 
 Next, `sql_render()` is called on the result of `sql_build()` and dispatches to generics like `sql_query_select()`, `sql_query_join()`, `sql_query_semi_join()`, and `sql_query_set_op()`. These generics have methods for each backend that are responsible for creating the needed SQL.
 
