@@ -59,7 +59,7 @@ always call sql_render()."><meta property="og:image" content="https://dbplyr.tid
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Build and render SQL from a sequence of lazy operations</h1>
-      <small class="dont-index">Source: <a href="https://github.com/tidyverse/dbplyr/blob/main/R/query-join.R" class="external-link"><code>R/query-join.R</code></a>, <a href="https://github.com/tidyverse/dbplyr/blob/main/R/query-rf-join.R" class="external-link"><code>R/query-rf-join.R</code></a>, <a href="https://github.com/tidyverse/dbplyr/blob/main/R/query-select.R" class="external-link"><code>R/query-select.R</code></a>, and 4 more</small>
+      <small class="dont-index">Source: <a href="https://github.com/tidyverse/dbplyr/blob/main/R/query-join.R" class="external-link"><code>R/query-join.R</code></a>, <a href="https://github.com/tidyverse/dbplyr/blob/main/R/query-rf-join.R" class="external-link"><code>R/query-rf-join.R</code></a>, <a href="https://github.com/tidyverse/dbplyr/blob/main/R/query-select.R" class="external-link"><code>R/query-select.R</code></a>, and 5 more</small>
       <div class="d-none name"><code>sql_build.Rd</code></div>
     </div>
 
@@ -162,9 +162,9 @@ always call <code>sql_render()</code>.</p>
 <span></span>
 <span><span class="fu">lazy_set_op_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">type</span>, <span class="va">all</span>, call <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">lazy_union_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">unions</span>, call <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
 <span><span class="fu">set_op_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">type</span>, all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">lazy_union_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">unions</span>, call <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">union_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">unions</span><span class="op">)</span></span>
 <span></span>
