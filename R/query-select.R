@@ -99,38 +99,6 @@ new_lazy_select <- function(
 }
 
 #' @export
-print.lazy_select_query <- function(x, ...) {
-  cat_line("<SQL SELECT", if (x$distinct) " DISTINCT", ">")
-  cat_line("From:")
-  cat_line(indent_print(sql_build(x$x, simulate_dbi())))
-
-  select <- purrr::set_names(x$select$expr, x$select$name)
-  if (length(select)) {
-    cat_line("Select:   ", named_commas(select))
-  }
-  if (length(x$where)) {
-    cat_line("Where:    ", named_commas(x$where))
-  }
-  if (length(x$group_by)) {
-    cat_line("Group by: ", named_commas(x$group_by))
-  }
-  if (length(x$order_by)) {
-    cat_line("Order by: ", named_commas(x$order_by))
-  }
-  if (length(x$limit)) {
-    cat_line("Limit:    ", x$limit)
-  }
-
-  if (length(x$group_vars)) {
-    cat_line("Group vars: ", named_commas(x$group_vars))
-  }
-  if (length(x$order_vars)) {
-    cat_line("Order vars: ", named_commas(x$order_vars))
-  }
-  if (length(x$frame)) cat_line("Frame:      ", x$frame)
-}
-
-#' @export
 op_vars.lazy_select_query <- function(op) {
   op$select$name
 }
@@ -306,26 +274,19 @@ select_query <- function(
   check_bool(distinct)
   check_string(from_alias, allow_null = TRUE)
 
-  structure(
-    list(
-      from = from,
-      select = select,
-      where = where,
-      group_by = group_by,
-      having = having,
-      window = window,
-      order_by = order_by,
-      distinct = distinct,
-      limit = limit,
-      from_alias = from_alias
-    ),
-    class = c("select_query", "query")
+  query(
+    "select",
+    from = from,
+    select = select,
+    where = where,
+    group_by = group_by,
+    having = having,
+    window = window,
+    order_by = order_by,
+    distinct = distinct,
+    limit = limit,
+    from_alias = from_alias
   )
-}
-
-#' @export
-print.select_query <- function(x, ...) {
-  cat_line(sql_render(x, simulate_dbi()))
 }
 
 #' @export

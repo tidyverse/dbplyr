@@ -119,21 +119,14 @@ generate_join_table_names <- function(table_names, con) {
 # Built query -------------------------------------------------------------
 
 multi_join_query <- function(x, joins, table_names, select, distinct = FALSE) {
-  structure(
-    list(
-      x = x,
-      joins = joins,
-      table_names = table_names,
-      select = select,
-      distinct = distinct
-    ),
-    class = c("multi_join_query", "query")
+  query(
+    "multi_join",
+    x = x,
+    joins = joins,
+    table_names = table_names,
+    select = select,
+    distinct = distinct
   )
-}
-
-#' @export
-print.multi_join_query <- function(x, ...) {
-  cat_line(sql_render(x, simulate_dbi()))
 }
 
 #' @export

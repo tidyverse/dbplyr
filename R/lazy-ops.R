@@ -37,29 +37,7 @@ lazy_query_remote <- function(x, vars) {
 
 base_query <- function(from) {
   check_table_source(from)
-  structure(
-    list(from = from),
-    class = c("base_query", "query")
-  )
-}
-
-#' @export
-print.lazy_base_remote_query <- function(x, ...) {
-  if (is_table_path(x$x)) {
-    cat_line("From: ", format(x$x))
-  } else {
-    cat_line("From: <derived table>")
-  }
-}
-
-#' @export
-print.lazy_base_local_query <- function(x, ...) {
-  cat_line("<Local data frame> ", dplyr::dim_desc(x$x))
-}
-
-#' @export
-print.base_query <- function(x, ...) {
-  print(x$from)
+  query("base", from = from)
 }
 
 #' @export

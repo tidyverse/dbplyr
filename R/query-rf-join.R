@@ -91,22 +91,15 @@ rf_join_query <- function(
   suffix = c(".x", ".y"),
   na_matches = FALSE
 ) {
-  structure(
-    list(
-      x = x,
-      y = y,
-      select = select,
-      type = type,
-      by = by,
-      na_matches = na_matches
-    ),
-    class = c("rf_join_query", "query")
+  query(
+    "rf_join",
+    x = x,
+    y = y,
+    select = select,
+    type = type,
+    by = by,
+    na_matches = na_matches
   )
-}
-
-#' @export
-print.rf_join_query <- function(x, ...) {
-  cat_line(sql_render(x, simulate_dbi()))
 }
 
 #' @export

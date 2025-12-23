@@ -16,17 +16,6 @@ lazy_set_op_query <- function(x, y, type, all, call = caller_env()) {
 }
 
 #' @export
-print.lazy_set_op_query <- function(x, ...) {
-  cat_line("<SQL ", toupper(x$type), ">")
-
-  cat_line("X:")
-  cat_line(indent_print(sql_build(x$x, simulate_dbi())))
-
-  cat_line("Y:")
-  cat_line(indent_print(sql_build(x$y, simulate_dbi())))
-}
-
-#' @export
 op_vars.lazy_set_op_query <- function(op) {
   union(op_vars(op$x), op_vars(op$y))
 }
@@ -52,17 +41,6 @@ lazy_union_query <- function(x, unions, call = caller_env()) {
     x = x,
     unions = unions
   )
-}
-
-#' @export
-print.lazy_union_query <- function(x, ...) {
-  cat_line("<SQL ", toupper(x$type), ">")
-
-  cat_line("X:")
-  cat_line(indent_print(sql_build(x$x, simulate_dbi())))
-
-  cat_line("Y:")
-  cat_line(indent_print(sql_build(x$y, simulate_dbi())))
 }
 
 #' @export
@@ -98,20 +76,7 @@ sql_build.lazy_union_query <- function(op, con, ..., sql_options = NULL) {
 #' @export
 #' @rdname sql_build
 set_op_query <- function(x, y, type, all = FALSE) {
-  structure(
-    list(
-      x = x,
-      y = y,
-      type = type,
-      all = all
-    ),
-    class = c("set_op_query", "query")
-  )
-}
-
-#' @export
-print.set_op_query <- function(x, ...) {
-  cat_line(sql_render(x, simulate_dbi()))
+  query("set_op", x = x, y = y, type = type, all = all)
 }
 
 #' @export
@@ -140,31 +105,7 @@ sql_render.set_op_query <- function(
 #' @export
 #' @rdname sql_build
 union_query <- function(x, unions) {
-  structure(
-    list(
-      x = x,
-      unions = unions
-    ),
-    class = c("union_query", "query")
-  )
-}
-
-#' @export
-print.union_query <- function(x, ...) {
-  cat_line(indent_print(x$x))
-
-  for (i in seq_along(x$unions$table)) {
-    if (x$unions$all[[i]]) {
-      method <- "UNION ALL"
-    } else {
-      method <- "UNION"
-    }
-    cat_line()
-    cat_line(indent(sql(method)))
-    cat_line()
-
-    cat_line(indent_print(x$unions$table[[i]]))
-  }
+  query("union", x = x, unions = unions)
 }
 
 #' @export
