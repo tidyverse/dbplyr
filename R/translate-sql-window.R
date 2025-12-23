@@ -403,8 +403,11 @@ uses_window_fun <- function(x, con, lq) {
   check_list(x)
 
   calls <- unlist(lapply(x, all_calls))
-  win_f <- env_names(dbplyr_sql_translation(con)$window)
-  any(calls %in% win_f)
+  any(calls %in% window_funs(con))
+}
+
+window_funs <- function(con = simulate_dbi()) {
+  env_names(sql_translation(con)$window)
 }
 
 is_aggregating <- function(x, non_group_cols, agg_f) {
@@ -429,10 +432,6 @@ is_aggregating <- function(x, non_group_cols, agg_f) {
   return(TRUE)
 }
 
-common_window_funs <- function() {
-  env_names(dbplyr_sql_translation(NULL)$window) # nocov
-}
-
 #' @noRd
 #' @examples
 #' translate_window_where(quote(1))
@@ -441,7 +440,9 @@ common_window_funs <- function() {
 #' translate_window_where(quote(x == 1 && y == 2))
 #' translate_window_where(quote(n() > 10))
 #' translate_window_where(quote(rank() > cumsum(AB)))
-translate_window_where <- function(expr, window_funs = common_window_funs()) {
+translate_window_where <- function(expr, window_funs = NULL) {
+  window_funs <- window_funs %||% window_funs()
+
   switch(
     typeof(expr),
     logical = ,
@@ -475,12 +476,12 @@ translate_window_where <- function(expr, window_funs = common_window_funs()) {
   )
 }
 
-
 #' @noRd
 #' @examples
 #' translate_window_where_all(list(quote(x == 1), quote(n() > 2)))
 #' translate_window_where_all(list(quote(cumsum(x) == 10), quote(n() > 2)))
-translate_window_where_all <- function(x, window_funs = common_window_funs()) {
+translate_window_where_all <- function(x, window_funs = NULL) {
+  window_funs <- window_funs %||% window_funs()
   out <- lapply(x, translate_window_where, window_funs = window_funs)
 
   list(
