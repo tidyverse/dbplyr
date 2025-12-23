@@ -9,15 +9,6 @@ structure. Outside of testing, however, you should always call
 ## Usage
 
 ``` r
-lazy_query(
-  query_type,
-  x,
-  ...,
-  group_vars = op_grps(x),
-  order_vars = op_sort(x),
-  frame = op_frame(x)
-)
-
 lazy_multi_join_query(
   x,
   joins,
@@ -112,6 +103,15 @@ lazy_union_query(x, unions, call = caller_env())
 set_op_query(x, y, type, all = FALSE)
 
 union_query(x, unions)
+
+lazy_query(
+  query_type,
+  x,
+  ...,
+  group_vars = op_grps(x),
+  order_vars = op_sort(x),
+  frame = op_frame(x)
+)
 
 sql_build(op, con = NULL, ..., sql_options = NULL)
 
