@@ -62,7 +62,7 @@ add_filter <- function(.data, dots) {
     )
   } else if (filter_can_use_having(lazy_query)) {
     filter_via_having(lazy_query, dots)
-  } else if (filter_can_inline(dots, lazy_query, con)) {
+  } else if (can_inline_filter(dots, lazy_query, con)) {
     # WHERE processed before SELECT
     dots <- replace_sym(dots, lazy_query$select$name, lazy_query$select$expr)
 
@@ -73,7 +73,7 @@ add_filter <- function(.data, dots) {
   }
 }
 
-filter_can_inline <- function(dots, lazy_query, con) {
+can_inline_filter <- function(dots, lazy_query, con) {
   if (!is_lazy_select_query(lazy_query)) {
     return(FALSE)
   }
