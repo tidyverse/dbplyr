@@ -25,16 +25,15 @@ filter.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
     data_arg = ".data",
     error_call = caller_env()
   )
-  if (by$from_by) {
-    .data$lazy_query$group_vars <- by$names
-  }
 
-  dots <- partial_eval_dots(.data, ..., .named = FALSE)
-
-  if (is_empty(dots)) {
+  if (missing(...)) {
     return(.data)
   }
 
+  if (by$from_by) {
+    .data$lazy_query$group_vars <- by$names
+  }
+  dots <- partial_eval_dots(.data, ..., .named = FALSE)
   .data$lazy_query <- add_filter(.data, dots)
   if (by$from_by) {
     .data$lazy_query$group_vars <- character()
