@@ -41,29 +41,7 @@ select_query <- function(
 
 #' @export
 print.select_query <- function(x, ...) {
-  cat_line("<SQL SELECT", if (x$distinct) " DISTINCT", ">")
-  cat_line("From:")
-  cat_line(indent_print(x$from))
-
-  if (length(x$select)) {
-    cat_line("Select:   ", named_commas(x$select))
-  }
-  if (length(x$where)) {
-    cat_line("Where:    ", named_commas(x$where))
-  }
-  if (length(x$group_by)) {
-    cat_line("Group by: ", named_commas(x$group_by))
-  }
-  if (length(x$window)) {
-    cat_line("Window:   ", named_commas(x$window))
-  }
-  if (length(x$order_by)) {
-    cat_line("Order by: ", named_commas(x$order_by))
-  }
-  if (length(x$having)) {
-    cat_line("Having:   ", named_commas(x$having))
-  } # nocov
-  if (length(x$limit)) cat_line("Limit:    ", x$limit)
+  cat_line(sql_render(x, simulate_dbi()))
 }
 
 #' @export

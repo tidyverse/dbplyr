@@ -40,34 +40,12 @@ multi_join_query <- function(x, joins, table_names, select, distinct = FALSE) {
 
 #' @export
 print.join_query <- function(x, ...) {
-  cat_line("<SQL JOIN (", toupper(x$type), ")>")
-
-  cat_line("By:")
-  cat_line(indent(paste0(x$by$x, "-", x$by$y)))
-
-  cat_line("X:")
-  cat_line(indent_print(x$x))
-
-  cat_line("Y:")
-  cat_line(indent_print(x$y))
+  cat_line(sql_render(x, simulate_dbi()))
 }
 
 #' @export
 print.multi_join_query <- function(x, ...) {
-  cat_line("<SQL JOINS>")
-
-  cat_line("X:")
-  cat_line(indent_print(x$x))
-
-  for (i in vctrs::vec_seq_along(x$joins)) {
-    cat_line("Type: ", paste0(x$joins$type[[i]]))
-
-    cat_line("By:")
-    cat_line(indent(paste0(x$joins$by[[i]]$x, "-", x$joins$by[[i]]$y)))
-
-    cat_line("Y:")
-    cat_line(indent_print(x$joins$table[[i]]))
-  }
+  cat_line(sql_render(x, simulate_dbi()))
 }
 
 #' @export

@@ -5,15 +5,12 @@
     Message
       Joining with `by = join_by(x)`
     Output
-      <SQL SEMI JOIN>
-      By:
-        x-x
-      Where:
-        "df_RHS"."z" = 2.0
-      X:
-        <table_path> "df"
-      Y:
-        <table_path> "df"
+      SELECT "df_LHS".*
+      FROM "df" AS "df_LHS"
+      WHERE EXISTS (
+        SELECT 1 FROM "df" AS "df_RHS"
+        WHERE ("df_LHS"."x" = "df_RHS"."x") AND ("df_RHS"."z" = 2.0)
+      )
 
 # generated sql doesn't change unexpectedly
 
