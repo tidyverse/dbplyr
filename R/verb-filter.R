@@ -45,16 +45,17 @@ add_filter <- function(lazy_query, con, exprs) {
   exprs <- unname(exprs)
 
   if (uses_window_fun(exprs, con)) {
-    # Do partial evaluation, then extract out window functions
+    # Extract out window functions into new mutate layer
     where <- translate_window_where_all(exprs, window_funs(con))
 
-    # Add extracted window expressions as columns
+    # add_mutate() always creates a subquery, so we need to bring all
+    # existing variables along for the ride
     original_vars <- op_vars(lazy_query)
     comp_quos <- purrr::map(where$comp, new_quosure)
     new_exprs <- c(syms(set_names(original_vars)), comp_quos)
     mutated <- add_mutate(lazy_query, new_exprs)
 
-    # And filter with the modified `where` using the new columns
+    # filter with the modified `where` using the new columns
     lazy_select_query(
       x = mutated,
       select = syms(set_names(original_vars)),
