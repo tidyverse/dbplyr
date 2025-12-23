@@ -173,38 +173,48 @@ add_mutate <- function(lazy_query, vars) {
   )
 
   if (is_projection(vars)) {
+    # Special case selecting/renaming/reordering done in mutate
     sel_vars <- purrr::map_chr(vars, as_string)
-    out <- add_select(lazy_query, sel_vars)
+    add_select(lazy_query, sel_vars)
+  } else if (mutate_can_inline(lazy_query)) {
+    lazy_query$select <- new_lazy_select(
+      vars,
+      group_vars = op_grps(lazy_query),
+      order_vars = op_sort(lazy_query),
+      frame = op_frame(lazy_query)
+    )
+    lazy_query
+  } else {
+    lazy_select_query(
+      x = lazy_query,
+      select_operation = "mutate",
+      select = vars
+    )
+  }
+}
 
-    return(out)
+# Special optimisation when applied to pure projection() - this is
+# conservative and we could expand to any op_select() if combined with
+# the logic in get_mutate_layers()
+mutate_can_inline <- function(lazy_query) {
+  if (!is_lazy_select_query(lazy_query)) {
+    return(FALSE)
   }
 
-  if (is_lazy_select_query(lazy_query)) {
-    # Special optimisation when applied to pure projection() - this is
-    # conservative and we could expand to any op_select() if combined with
-    # the logic in get_mutate_layers()
-    select <- lazy_query$select
-    is_select_op <- lazy_query$select_operation %in% c("select", "mutate")
-    if (
-      is_pure_projection(select$expr, select$name) &&
-        is_select_op &&
-        !is_true(lazy_query$distinct)
-    ) {
-      lazy_query$select <- new_lazy_select(
-        vars,
-        group_vars = op_grps(lazy_query),
-        order_vars = op_sort(lazy_query),
-        frame = op_frame(lazy_query)
-      )
-      return(lazy_query)
-    }
+  select <- lazy_query$select
+  if (!is_pure_projection(select$expr, select$name)) {
+    return(FALSE)
   }
 
-  lazy_select_query(
-    x = lazy_query,
-    select_operation = "mutate",
-    select = vars
-  )
+  if (!lazy_query$select_operation %in% c("select", "mutate")) {
+    return(FALSE)
+  }
+
+  if (is_true(lazy_query$distinct)) {
+    return(FALSE)
+  }
+
+  TRUE
 }
 
 # Split mutate expressions in independent layers, e.g.
