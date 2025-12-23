@@ -210,7 +210,7 @@ partial_eval_call <- function(call, data, env) {
   if (inherits(fun, "inline_colwise_function")) {
     vars <- colnames(tidyselect_data_proxy(data))
     dot_var <- vars[[attr(call, "position")]]
-    call <- replace_sym(attr(fun, "formula")[[2]], c(".", ".x"), sym(dot_var))
+    call <- replace_sym1(attr(fun, "formula")[[2]], c(".", ".x"), sym(dot_var))
     env <- get_env(attr(fun, "formula"))
   } else if (is.function(fun)) {
     fun_name <- find_fun(fun)
@@ -306,7 +306,18 @@ fun_name <- function(fun) {
   NULL
 }
 
-replace_sym <- function(call, sym, replace) {
+
+replace_sym <- function(exprs, old, new) {
+  check_list(exprs, allow_null = TRUE)
+  check_character(old)
+  check_list(new)
+  # Allow new to be a list of quosures too
+  new <- purrr::map_if(new, is_quosure, quo_get_expr)
+
+  purrr::map(exprs, \(expr) replace_sym1(expr, old, new))
+}
+
+replace_sym1 <- function(call, sym, replace) {
   if (is_symbol(call, sym)) {
     if (is_list(replace)) {
       replace[[match(as_string(call), sym)]]
@@ -314,7 +325,7 @@ replace_sym <- function(call, sym, replace) {
       replace
     }
   } else if (is_call(call)) {
-    call[] <- lapply(call, replace_sym, sym = sym, replace = replace)
+    call[] <- lapply(call, replace_sym1, sym = sym, replace = replace)
     call
   } else {
     call
