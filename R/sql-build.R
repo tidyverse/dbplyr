@@ -163,13 +163,7 @@ cte_render <- function(query_list, con) {
       sql_glue2(con, "{.tbl name} AS (\n{query}\n)")
     }
   )
-  cte_query <- sql_vector(
-    unname(ctes),
-    parens = FALSE,
-    collapse = ",\n",
-    con = con
-  )
-
+  cte_query <- paste(ctes, collapse = ",\n")
   sql_glue2(con, " WITH {.sql cte_query}\n{query_list[[n]]}")
 }
 

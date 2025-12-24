@@ -288,7 +288,7 @@ sql_values_cast_clauses <- function(con, df, types, na) {
     })
   }
 
-  sql_vector(typed_cols, parens = FALSE, collapse = NULL, con = con)
+  sql(typed_cols)
 }
 
 values_prepare <- function(con, df) {
