@@ -257,7 +257,8 @@ sql_indent_subquery <- function(from, con, lvl = 0) {
       "(\n",
       from,
       "\n",
-      indent_lvl(")", lvl)
+      lvl_indent(lvl),
+      ")"
     )
   } else {
     # Strip indent
@@ -280,7 +281,7 @@ sql_query_rows <- function(con, sql, ...) {
 sql_query_rows.DBIConnection <- function(con, sql, ...) {
   sql <- as_table_source(sql, con)
   from <- dbplyr_sql_subquery(con, sql, "master")
-  sql_glue2(con, "SELECT COUNT(*) FROM {.from from}")
+  sql_glue2(con, "SELECT COUNT(*) FROM {.tbl from}")
 }
 
 #' @rdname db-sql
@@ -437,13 +438,13 @@ sql_query_insert.DBIConnection <- function(
 
   clauses <- list2(
     parts$insert_clause,
-    sql_clause_select(con, sql("*")),
-    sql_clause_from(parts$from),
+    sql_clause_select(sql("*")),
+    sql_clause_from(sql_escape_table_source(con, parts$from)),
     !!!parts$conflict_clauses,
     sql_returning_cols(con, returning_cols, table)
   )
 
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -501,12 +502,12 @@ sql_query_append.DBIConnection <- function(
 
   clauses <- list2(
     sql_clause_insert(con, insert_cols, table),
-    sql_clause_select(con, sql("*")),
-    sql_clause_from(parts$from),
+    sql_clause_select(sql("*")),
+    sql_clause_from(sql_escape_table_source(con, parts$from)),
     sql_returning_cols(con, returning_cols, table)
   )
 
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -550,13 +551,13 @@ sql_query_update_from.DBIConnection <- function(
 
   # avoid CTEs for the general case as they do not work everywhere
   clauses <- list(
-    sql_clause_update(table),
+    sql_clause_update(sql_escape_table_source(con, table)),
     sql_clause_set(update_cols, update_values),
-    sql_clause_from(parts$from),
+    sql_clause_from(sql_escape_table_source(con, parts$from)),
     sql_clause_where(parts$where),
     sql_returning_cols(con, returning_cols, table)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 
@@ -609,30 +610,30 @@ sql_query_upsert.DBIConnection <- function(
   update_cols <- sql_escape_ident(con, update_cols)
 
   updated_cte <- list(
-    sql_clause_update(table),
+    sql_clause_update(sql_escape_table_source(con, table)),
     sql_clause_set(update_cols, update_values),
-    sql_clause_from(parts$from),
+    sql_clause_from(sql_escape_table_source(con, parts$from)),
     sql_clause_where(parts$where),
     sql(paste0("RETURNING ", sql_star(con, table)))
   )
-  updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
-  update_name <- sql(escape(ident("updated"), con = con))
+  updated_sql <- sql_format_clauses(updated_cte, lvl = 1)
+  updated <- sql(sql_escape_ident(con, "updated"))
 
   join_by <- new_join_by(by, x_as = "updated", y_as = "...y")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
 
   clauses <- list2(
-    sql(paste0("WITH ", update_name, " AS (")),
+    sql_glue2(con, "WITH {.sql updated} AS ("),
     updated_sql,
     sql(")"),
     sql_clause_insert(con, insert_cols, table),
-    sql_clause_select(con, sql("*")),
-    sql_clause_from(parts$from),
-    !!!sql_clause_where_exists(update_name, where, not = TRUE),
+    sql_clause_select(sql("*")),
+    sql_clause_from(sql_escape_table_source(con, parts$from)),
+    !!!sql_clause_where_exists(updated, where, not = TRUE),
     sql_returning_cols(con, returning_cols, table)
   )
 
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -661,11 +662,11 @@ sql_query_delete.DBIConnection <- function(
   parts <- rows_prep(con, table, from, by, lvl = 1)
 
   clauses <- list2(
-    sql_clause("DELETE FROM", table),
+    sql_clause("DELETE FROM", sql_escape_table_source(con, table)),
     !!!sql_clause_where_exists(parts$from, parts$where, not = FALSE),
     sql_returning_cols(con, returning_cols, table)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -691,8 +692,7 @@ sql_named_cols <- function(con, cols, table = NULL) {
   nms[nms == cols] <- ""
 
   cols <- sql_table_prefix(con, table, cols)
-  cols <- set_names(ident_q(cols), nms)
-  escape(cols, collapse = NULL, con = con)
+  sql(names_to_as(con, cols, nms))
 }
 
 # dplyr fallbacks ---------------------------------------------------------

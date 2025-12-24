@@ -390,19 +390,18 @@ sql_query_insert.PqConnection <- function(
   conflict <- rows_check_conflict(conflict)
 
   parts <- rows_insert_prep(con, table, from, insert_cols, by, lvl = 0)
-  by_sql <- escape(ident(by), parens = TRUE, collapse = ", ", con = con)
 
   clauses <- list(
     parts$insert_clause,
-    sql_clause_select(con, sql("*")),
-    sql_clause_from(parts$from),
-    sql_clause("ON CONFLICT", by_sql),
+    sql_clause_select(sql("*")),
+    sql_clause_from(sql_escape_table_source(con, parts$from)),
+    sql_clause("ON CONFLICT", sql(sql_escape_ident(con, by)), parens = TRUE),
     {
       if (conflict == "ignore") sql("DO NOTHING")
     },
     sql_returning_cols(con, returning_cols, table)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 #' @export
 sql_query_insert.PostgreSQL <- sql_query_insert.PqConnection
@@ -431,7 +430,7 @@ sql_query_upsert.PqConnection <- function(
   parts <- rows_prep(con, table, from, by, lvl = 0)
 
   insert_cols <- c(by, update_cols)
-  select_cols <- ident(insert_cols)
+  select_cols <- sql(sql_escape_ident(con, insert_cols))
 
   update_values <- set_names(
     sql_table_prefix(con, "excluded", update_cols),
@@ -439,19 +438,18 @@ sql_query_upsert.PqConnection <- function(
   )
   update_cols <- sql_escape_ident(con, update_cols)
 
-  by_sql <- escape(ident(by), parens = TRUE, collapse = ", ", con = con)
   clauses <- list(
     sql_clause_insert(con, insert_cols, into = table),
-    sql_clause_select(con, select_cols),
-    sql_clause_from(parts$from),
+    sql_clause_select(select_cols),
+    sql_clause_from(sql_escape_table_source(con, parts$from)),
     # `WHERE true` is required for SQLite
     sql("WHERE true"),
-    sql_clause("ON CONFLICT ", by_sql),
+    sql_clause("ON CONFLICT ", sql(sql_escape_ident(con, by)), parens = TRUE),
     sql("DO UPDATE"),
     sql_clause_set(update_cols, update_values),
     sql_returning_cols(con, returning_cols, table)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export

@@ -81,8 +81,8 @@
 # `sql_query_update_from()` is correct
 
     Code
-      sql_query_update_from(con = con, table = ident("df_x"), from = sql_render(df_y,
-        con, lvl = 1), by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
+      sql_query_update_from(con = con, table = table_path("`df_x`"), from = sql_render(
+        df_y, con, lvl = 1), by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
         d = "`...y`.`d`"))
     Output
       <SQL> UPDATE `df_x`

@@ -386,9 +386,9 @@ test_that("handles ORDER BY in subqueries", {
   expect_snapshot(
     sql_query_select(
       simulate_mssql(),
-      ident("x"),
-      ident("y"),
-      order_by = "z",
+      sql("x"),
+      table_path("[y]"),
+      order_by = sql("z"),
       subquery = TRUE
     )
   )
@@ -398,9 +398,9 @@ test_that("custom limit translation", {
   expect_snapshot(
     sql_query_select(
       simulate_mssql(),
-      ident("x"),
-      ident("y"),
-      order_by = ident("z"),
+      sql("x"),
+      table_path("[y]"),
+      order_by = sql("[z]"),
       limit = 10
     )
   )
@@ -523,7 +523,7 @@ test_that("`sql_query_update_from()` is correct", {
   expect_snapshot(
     sql_query_update_from(
       con = con,
-      table = ident("df_x"),
+      table = table_path("[df_x]"),
       from = sql_render(df_y, con, lvl = 1),
       by = c("a", "b"),
       update_values = sql(

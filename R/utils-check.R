@@ -110,6 +110,22 @@ check_scalar_sql <- function(x, ..., arg = caller_arg(x), call = caller_env()) {
   )
 }
 
+check_sql <- function(
+  x,
+  allow_null = FALSE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
+  if (is.sql(x)) {
+    return()
+  }
+  if (allow_null && is.null(x)) {
+    return()
+  }
+  what <- if (allow_null) c("a SQL object", "NULL") else "a SQL object"
+  stop_input_type(x, what, arg = arg, call = call)
+}
+
 
 # Other checks ------------------------------------------------------------
 

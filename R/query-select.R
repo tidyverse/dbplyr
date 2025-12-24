@@ -292,6 +292,7 @@ sql_render.select_query <- function(
   subquery = FALSE,
   lvl = 0
 ) {
+  select <- sql(names_to_as(con, query$select))
   from <- dbplyr_sql_subquery(
     con,
     sql_render(query$from, con, ..., subquery = TRUE, lvl = lvl + 1),
@@ -301,7 +302,7 @@ sql_render.select_query <- function(
 
   sql_query_select(
     con,
-    query$select,
+    select,
     from,
     where = query$where,
     group_by = query$group_by,
@@ -379,15 +380,14 @@ sql_query_select.DBIConnection <- function(
   lvl = 0
 ) {
   sql_select_clauses(
-    con,
-    select = sql_clause_select(con, select, distinct),
-    from = sql_clause_from(from),
+    select = sql_clause_select(select, distinct),
+    from = sql_clause_from(sql_escape_table_source(con, from)),
     where = sql_clause_where(where),
     group_by = sql_clause_group_by(group_by),
     having = sql_clause_having(having),
     window = sql_clause_window(window),
     order_by = sql_clause_order_by(order_by, subquery, limit),
-    limit = sql_clause_limit(con, limit),
+    limit = sql_clause_limit(limit),
     lvl = lvl
   )
 }

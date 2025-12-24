@@ -192,23 +192,23 @@
 # handles ORDER BY in subqueries
 
     Code
-      sql_query_select(simulate_mssql(), ident("x"), ident("y"), order_by = "z",
-      subquery = TRUE)
+      sql_query_select(simulate_mssql(), sql("x"), table_path("[y]"), order_by = sql(
+        "z"), subquery = TRUE)
     Condition
       Warning:
       ORDER BY is ignored in subqueries without LIMIT
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
-      <SQL> SELECT [x]
+      <SQL> SELECT x
       FROM [y]
 
 # custom limit translation
 
     Code
-      sql_query_select(simulate_mssql(), ident("x"), ident("y"), order_by = ident("z"),
-      limit = 10)
+      sql_query_select(simulate_mssql(), sql("x"), table_path("[y]"), order_by = sql(
+        "[z]"), limit = 10)
     Output
-      <SQL> SELECT TOP 10 [x]
+      <SQL> SELECT TOP 10 x
       FROM [y]
       ORDER BY [z]
 
@@ -394,8 +394,8 @@
 # `sql_query_update_from()` is correct
 
     Code
-      sql_query_update_from(con = con, table = ident("df_x"), from = sql_render(df_y,
-        con, lvl = 1), by = c("a", "b"), update_values = sql(c = "COALESCE([df_x].[c], [...y].[c])",
+      sql_query_update_from(con = con, table = table_path("[df_x]"), from = sql_render(
+        df_y, con, lvl = 1), by = c("a", "b"), update_values = sql(c = "COALESCE([df_x].[c], [...y].[c])",
         d = "[...y].[d]"), returning_cols = c("a", b2 = "b"))
     Output
       <SQL> UPDATE [df_x]

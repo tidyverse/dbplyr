@@ -55,9 +55,8 @@ sql_query_select.Oracle <- function(
   lvl = 0
 ) {
   sql_select_clauses(
-    con,
-    select = sql_clause_select(con, select, distinct),
-    from = sql_clause_from(from),
+    select = sql_clause_select(select, distinct),
+    from = sql_clause_from(sql_escape_table_source(con, from)),
     where = sql_clause_where(where),
     group_by = sql_clause_group_by(group_by),
     having = sql_clause_having(having),
@@ -89,6 +88,8 @@ sql_query_upsert.Oracle <- function(
     return(NextMethod("sql_query_upsert"))
   }
 
+  table <- as_table_path(table, con)
+
   # https://oracle-base.com/articles/9i/merge-statement
   parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))
@@ -99,7 +100,7 @@ sql_query_upsert.Oracle <- function(
   insert_values <- sql_table_prefix(con, "...y", insert_cols)
 
   clauses <- list(
-    sql_clause("MERGE INTO", table),
+    sql_clause("MERGE INTO", sql_escape_table_source(con, table)),
     sql_clause("USING", parts$from),
     sql_clause_on(parts$where, lvl = 1, parens = TRUE),
     sql("WHEN MATCHED THEN"),
@@ -110,7 +111,7 @@ sql_query_upsert.Oracle <- function(
     sql_returning_cols(con, returning_cols, table),
     sql(";")
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export

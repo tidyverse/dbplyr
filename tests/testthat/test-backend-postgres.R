@@ -278,7 +278,7 @@ test_that("`sql_query_insert()` works", {
   expect_snapshot(
     sql_query_insert(
       con = con,
-      table = ident("df_x"),
+      table = table_path('"df_x"'),
       from = sql_render(df_y, con, lvl = 1),
       insert_cols = colnames(df_y),
       by = c("a", "b"),

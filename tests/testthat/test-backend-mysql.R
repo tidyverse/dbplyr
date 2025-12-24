@@ -97,7 +97,7 @@ test_that("`sql_query_update_from()` is correct", {
   expect_snapshot(
     sql_query_update_from(
       con = con,
-      table = ident("df_x"),
+      table = table_path("`df_x`"),
       from = sql_render(df_y, con, lvl = 1),
       by = c("a", "b"),
       update_values = sql(

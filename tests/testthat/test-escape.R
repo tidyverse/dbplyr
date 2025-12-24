@@ -155,14 +155,14 @@ test_that("names_to_as() doesn't alias when ident name and value are identical",
   x <- ident(name = "name")
   y <- sql('"name"')
 
-  expect_equal(names_to_as(y, names2(x), con = simulate_dbi()), '"name"')
+  expect_equal(names_to_as(simulate_dbi(), y, names2(x)), '"name"')
 })
 
 test_that("names_to_as() doesn't alias when ident name is missing", {
   x <- ident("*")
   y <- sql('"*"')
 
-  expect_equal(names_to_as(y, names2(x), con = simulate_dbi()), '"*"')
+  expect_equal(names_to_as(simulate_dbi(), y, names2(x)), '"*"')
 })
 
 test_that("names_to_as() aliases when ident name and value are different", {
@@ -170,7 +170,7 @@ test_that("names_to_as() aliases when ident name and value are different", {
   y <- sql(new_name = '"name"')
 
   expect_equal(
-    names_to_as(y, names2(x), con = simulate_dbi()),
+    names_to_as(simulate_dbi(), y, names2(x)),
     '"name" AS "new_name"'
   )
 })

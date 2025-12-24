@@ -97,7 +97,7 @@ sql_query_union <- function(con, x, unions, ..., lvl = 0) {
 #' @export
 sql_query_union.DBIConnection <- function(con, x, unions, ..., lvl = 0) {
   methods <- ifelse(unions$all, "UNION ALL", "UNION")
-  methods <- indent_lvl(style_kw(methods), lvl)
+  methods <- paste0(lvl_indent(lvl), style_kw(methods))
   tables <- unlist(unions$table)
 
   union_clauses <- vctrs::vec_interleave(as.character(methods), tables)

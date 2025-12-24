@@ -148,16 +148,15 @@ glue_transformer <- function(con, text, envir, call = caller_env()) {
   # Coerce types that need coercion
   if (parsed$type == "sql") {
     value <- sql(value)
+    value <- escape(value, collapse = ", ", parens = parsed$collapse, con = con)
   } else if (parsed$type == "tbl") {
     value <- wrap_glue_error(as_table_path(value, con), text, call)
+    value <- sql_escape_table_source(con, value)
   } else if (parsed$type == "id") {
     value <- wrap_glue_error(as_ident(value), text, call)
-  }
-
-  if (parsed$collapse) {
-    value <- escape(value, collapse = ", ", parens = TRUE, con = con)
+    value <- escape(value, collapse = ", ", parens = parsed$collapse, con = con)
   } else {
-    value <- escape(value, collapse = ", ", parens = FALSE, con = con)
+    value <- escape(value, collapse = ", ", parens = parsed$collapse, con = con)
   }
 
   unclass(value)

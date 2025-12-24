@@ -1,5 +1,4 @@
 sql_select_clauses <- function(
-  con,
   select,
   from,
   where,
@@ -8,22 +7,18 @@ sql_select_clauses <- function(
   window,
   order_by,
   limit = NULL,
-  lvl
+  lvl = 0
 ) {
-  out <- list(
-    select = select,
-    from = from,
-    where = where,
-    group_by = group_by,
-    having = having,
-    window = window,
-    order_by = order_by,
-    limit = limit
-  )
-  sql_format_clauses(out, lvl, con)
+  out <- list(select, from, where, group_by, having, window, order_by, limit)
+  sql_format_clauses(out, lvl)
 }
 
 sql_clause <- function(kw, parts, sep = ",", parens = FALSE, lvl = 0) {
+  if (length(parts) == 0) {
+    return()
+  }
+  check_sql(parts)
+
   clause <- list(
     kw = kw,
     parts = parts,
@@ -37,57 +32,56 @@ sql_clause <- function(kw, parts, sep = ",", parens = FALSE, lvl = 0) {
 }
 
 sql_clause_select <- function(
-  con,
   select,
   distinct = FALSE,
   top = NULL,
-  lvl = 0,
-  call = caller_env()
+  lvl = 0
 ) {
-  check_character(select, call = call)
+  check_sql(select)
+  check_bool(distinct)
+  check_number_whole(top, allow_null = TRUE, allow_infinite = TRUE, min = 0)
+
   if (is_empty(select)) {
     cli_abort("Query contains no columns")
   }
 
-  if (!is.null(top)) {
-    top <- as.integer(top)
-    top <- sql_glue2(con, " TOP {top}")
-  }
-
-  clause <- paste0("SELECT", if (distinct) " DISTINCT", top)
-  sql_clause(clause, select)
+  clause <- paste0(
+    "SELECT",
+    if (distinct) " DISTINCT",
+    if (!is.null(top)) paste0(" TOP ", top)
+  )
+  sql_clause(clause, select, lvl = lvl)
 }
 
 sql_clause_from <- function(from, lvl = 0) {
+  check_sql(from)
   sql_clause("FROM", from, lvl = lvl)
 }
 
-sql_clause_where <- function(where, lvl = 0, call = caller_env()) {
-  if (length(where) == 0L) {
-    return()
-  }
+sql_clause_where <- function(where, lvl = 0) {
+  check_sql(where, allow_null = TRUE)
+  check_character(where, allow_null = TRUE)
 
-  check_character(where, call = call)
-  where_paren <- sql(paste0("(", where, ")"))
-  sql_clause("WHERE", where_paren, sep = " AND", lvl = lvl)
+  # wrap each clause in parens
+  where <- sql(paste0("(", where, ")", recycle0 = TRUE))
+  sql_clause("WHERE", where, sep = " AND", lvl = lvl)
 }
 
 sql_clause_group_by <- function(group_by, lvl = 0) {
-  sql_clause("GROUP BY", group_by)
+  check_sql(group_by, allow_null = TRUE)
+  sql_clause("GROUP BY", group_by, lvl = lvl)
 }
 
-sql_clause_having <- function(having, lvl = 0, call = caller_env()) {
-  if (length(having) == 0L) {
-    return()
-  }
+sql_clause_having <- function(having, lvl = 0) {
+  check_sql(having, allow_null = TRUE)
 
-  check_character(having, call = call)
-  having_paren <- sql(paste0("(", having, ")"))
-  sql_clause("HAVING", having_paren, sep = " AND")
+  # wrap each clause in parens
+  having <- sql(paste0("(", having, ")", recycle0 = TRUE))
+  sql_clause("HAVING", having, sep = " AND", lvl = lvl)
 }
 
-sql_clause_window <- function(window) {
-  sql_clause("WINDOW", window)
+sql_clause_window <- function(window, lvl = 0) {
+  sql_clause("WINDOW", window, lvl = lvl)
 }
 
 sql_clause_order_by <- function(
@@ -96,28 +90,32 @@ sql_clause_order_by <- function(
   limit = NULL,
   lvl = 0
 ) {
+  check_sql(order_by, allow_null = TRUE)
+
   if (subquery && length(order_by) > 0 && is.null(limit)) {
     warn_drop_order_by()
     NULL
   } else {
-    sql_clause("ORDER BY", order_by)
+    sql_clause("ORDER BY", order_by, lvl = lvl)
   }
 }
 
-sql_clause_limit <- function(con, limit, lvl = 0) {
+sql_clause_limit <- function(limit, lvl = 0) {
+  check_number_whole(limit, allow_null = TRUE, allow_infinite = TRUE, min = 0)
+
   if (!is.null(limit) && !identical(limit, Inf)) {
-    sql_clause("LIMIT", sql(format(limit, scientific = FALSE)))
+    sql_clause("LIMIT", sql(format(limit, scientific = FALSE)), lvl = lvl)
   }
 }
 
-sql_clause_update <- function(table) {
-  sql_clause("UPDATE", table)
+sql_clause_update <- function(table, lvl = 0) {
+  sql_clause("UPDATE", table, lvl = lvl)
 }
 
-sql_clause_set <- function(lhs, rhs) {
+sql_clause_set <- function(lhs, rhs, lvl = 0) {
   update_clauses <- sql(paste0(lhs, " = ", rhs))
 
-  sql_clause("SET", update_clauses)
+  sql_clause("SET", update_clauses, lvl = lvl)
 }
 
 sql_clause_insert <- function(con, cols, into = NULL, lvl = 0) {
@@ -147,73 +145,65 @@ sql_clause_where_exists <- function(table, where, not) {
 
 #' @export
 print.sql_clause <- function(x, ...) {
-  out <- sql_format_clause(x, lvl = 0, con = simulate_dbi())
-  cat("<sql clause>", out)
+  cat("<sql clause>", format(x))
+  invisible()
 }
+
+#' @export
+format.sql_clause <- function(x, ...) {
+  unclass(sql_format_clause(x, lvl = 0))
+}
+
 
 # helpers -----------------------------------------------------------------
 
-sql_format_clauses <- function(clauses, lvl, con) {
-  clauses <- unname(clauses)
-  clauses <- purrr::discard(clauses, ~ !is.sql(.x) && is_empty(.x$parts))
+sql_format_clauses <- function(clauses, lvl) {
+  clauses <- purrr::compact(unname(clauses))
 
-  formatted_clauses <- purrr::map(
-    clauses,
-    sql_format_clause,
-    lvl = lvl,
-    con = con
-  )
+  formatted_clauses <- purrr::map_chr(clauses, sql_format_clause, lvl = lvl)
   clause_level <- purrr::map_dbl(clauses, "lvl", .default = 0)
-  out <- indent_lvl(formatted_clauses, lvl + clause_level)
+  out <- paste0(lvl_indent(lvl + clause_level), formatted_clauses)
 
   sql(paste0(out, collapse = "\n"))
 }
 
-sql_format_clause <- function(x, lvl, con, nchar_max = 80) {
+sql_format_clause <- function(x, lvl, nchar_max = 80) {
   if (is.sql(x)) {
     return(x)
   }
 
   lvl <- lvl + x$lvl
-
-  # check length without starting a new line
   if (x$sep == " AND") {
     x$sep <- style_kw(x$sep)
   }
 
-  fields_same_line <- escape(x$parts, collapse = paste0(x$sep, " "), con = con)
+  # check length without starting a new line
+
+  one_line <- paste(x$parts, collapse = paste0(x$sep, " "))
   if (x$parens) {
-    fields_same_line <- paste0("(", fields_same_line, ")")
+    one_line <- paste0("(", one_line, ")")
   }
 
   x$kw <- style_kw(x$kw)
-  same_line_clause <- paste0(x$kw, " ", fields_same_line)
-  nchar_same_line <- cli::ansi_nchar(lvl_indent(lvl)) +
-    cli::ansi_nchar(same_line_clause)
+  one_line <- paste0(x$kw, " ", one_line)
+  nchar_same_line <- lvl * 2 + cli::ansi_nchar(one_line)
 
   if (length(x$parts) == 1 || nchar_same_line <= nchar_max) {
-    return(sql(same_line_clause))
+    return(one_line)
   }
 
   indent <- lvl_indent(lvl + 1)
   collapse <- paste0(x$sep, "\n", indent)
 
-  field_string <- paste0(
+  paste0(
     x$kw,
     if (x$parens) " (",
     "\n",
-    indent,
-    escape(x$parts, collapse = collapse, con = con),
-    if (x$parens) paste0("\n", indent_lvl(")", lvl))
+    paste0(indent, x$parts, collapse = paste0(x$sep, "\n")),
+    if (x$parens) paste0("\n", lvl_indent(lvl), ")")
   )
-
-  sql(field_string)
 }
 
-lvl_indent <- function(times, char = "  ") {
-  strrep(char, times)
-}
-
-indent_lvl <- function(x, lvl) {
-  sql(paste0(lvl_indent(lvl), x))
+lvl_indent <- function(times) {
+  strrep("  ", times)
 }
