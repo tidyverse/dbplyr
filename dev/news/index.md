@@ -2,6 +2,10 @@
 
 ## dbplyr (development version)
 
+- PostgreSQL: uses improved translation for `seconds()`, `minutes()`,
+  `hours()`, `days()`, `weeks()`,
+  [`months()`](https://rdrr.io/r/base/weekday.POSIXt.html), and
+  `years()`.
 - `escape_ansi()` has been removed. Use
   `escape(x, con = simulate_dbi())` instead.
 - [`summarise()`](https://dplyr.tidyverse.org/reference/summarise.html)
