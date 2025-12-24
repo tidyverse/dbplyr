@@ -173,39 +173,35 @@ sql_format_clause <- function(x, lvl, nchar_max = 80) {
   }
 
   lvl <- lvl + x$lvl
-
-  # check length without starting a new line
   if (x$sep == " AND") {
     x$sep <- style_kw(x$sep)
   }
 
-  fields_same_line <- paste(x$parts, collapse = paste0(x$sep, " "))
+  # check length without starting a new line
+
+  one_line <- paste(x$parts, collapse = paste0(x$sep, " "))
   if (x$parens) {
-    fields_same_line <- paste0("(", fields_same_line, ")")
+    one_line <- paste0("(", one_line, ")")
   }
 
   x$kw <- style_kw(x$kw)
-  same_line_clause <- paste0(x$kw, " ", fields_same_line)
-  nchar_same_line <- cli::ansi_nchar(lvl_indent(lvl)) +
-    cli::ansi_nchar(same_line_clause)
+  one_line <- paste0(x$kw, " ", one_line)
+  nchar_same_line <- lvl * 2 + cli::ansi_nchar(one_line)
 
   if (length(x$parts) == 1 || nchar_same_line <= nchar_max) {
-    return(sql(same_line_clause))
+    return(one_line)
   }
 
   indent <- lvl_indent(lvl + 1)
   collapse <- paste0(x$sep, "\n", indent)
 
-  field_string <- paste0(
+  paste0(
     x$kw,
     if (x$parens) " (",
     "\n",
-    indent,
-    paste(x$parts, collapse = collapse),
+    paste0(indent, x$parts, collapse = paste0(x$sep, "\n")),
     if (x$parens) paste0("\n", indent_lvl(")", lvl))
   )
-
-  sql(field_string)
 }
 
 lvl_indent <- function(times, char = "  ") {
