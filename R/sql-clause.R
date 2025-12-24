@@ -164,7 +164,7 @@ sql_format_clauses <- function(clauses, lvl, con) {
   clause_level <- purrr::map_dbl(clauses, "lvl", .default = 0)
   out <- indent_lvl(formatted_clauses, lvl + clause_level)
 
-  sql_vector(out, collapse = "\n", parens = FALSE, con = con)
+  sql(paste0(out, collapse = "\n"))
 }
 
 sql_format_clause <- function(x, lvl, con, nchar_max = 80) {

@@ -145,17 +145,11 @@ get_select_sql <- function(
 ) {
   if (select_operation == "summarise") {
     select_expr <- set_names(select$expr, select$name)
-    select_sql_list <- translate_sql_(
+    select_sql <- translate_sql_(
       select_expr,
       con,
       window = FALSE,
       context = list(clause = "SELECT")
-    )
-    select_sql <- sql_vector(
-      select_sql_list,
-      parens = FALSE,
-      collapse = NULL,
-      con = con
     )
     return(list(select_sql = select_sql, window_sql = character()))
   }
