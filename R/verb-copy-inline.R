@@ -166,7 +166,8 @@ sql_values_subquery_column_alias <- function(con, df, types, lvl, ...) {
       "(\n",
       rows_query,
       "\n",
-      indent_lvl(") AS ", lvl),
+      lvl_indent(lvl),
+      ") AS ",
       table_alias_sql
     ))
   } else {

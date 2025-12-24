@@ -257,7 +257,8 @@ sql_indent_subquery <- function(from, con, lvl = 0) {
       "(\n",
       from,
       "\n",
-      indent_lvl(")", lvl)
+      lvl_indent(lvl),
+      ")"
     )
   } else {
     # Strip indent

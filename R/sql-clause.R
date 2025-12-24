@@ -162,7 +162,7 @@ sql_format_clauses <- function(clauses, lvl) {
 
   formatted_clauses <- purrr::map_chr(clauses, sql_format_clause, lvl = lvl)
   clause_level <- purrr::map_dbl(clauses, "lvl", .default = 0)
-  out <- indent_lvl(formatted_clauses, lvl + clause_level)
+  out <- paste0(lvl_indent(lvl + clause_level), formatted_clauses)
 
   sql(paste0(out, collapse = "\n"))
 }
@@ -200,14 +200,10 @@ sql_format_clause <- function(x, lvl, nchar_max = 80) {
     if (x$parens) " (",
     "\n",
     paste0(indent, x$parts, collapse = paste0(x$sep, "\n")),
-    if (x$parens) paste0("\n", indent_lvl(")", lvl))
+    if (x$parens) paste0("\n", lvl_indent(lvl), ")")
   )
 }
 
-lvl_indent <- function(times, char = "  ") {
-  strrep(char, times)
-}
-
-indent_lvl <- function(x, lvl) {
-  sql(paste0(lvl_indent(lvl), x))
+lvl_indent <- function(times) {
+  strrep("  ", times)
 }
