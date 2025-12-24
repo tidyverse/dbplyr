@@ -15,12 +15,14 @@
 #' @keywords internal
 #' @export
 #' @examples
+#' con <- simulate_dbi()
+#'
 #' # SQL92 quotes strings with '
-#' escape_ansi("x")
+#' escape("x", con = con)
 #'
 #' # And identifiers with "
 #' ident("x")
-#' escape_ansi(ident("x"))
+#' escape(ident("x"), con = con)
 #'
 #' # You can supply multiple inputs
 #' ident(a = "x", b = "y")

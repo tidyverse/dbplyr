@@ -59,7 +59,8 @@ in_catalog <- function(catalog, schema, table) {
 
 #' @export
 format.dbplyr_schema <- function(x, ...) {
-  paste0(escape_ansi(x$schema), ".", escape_ansi(x$table))
+  con <- simulate_dbi()
+  paste0(escape(x$schema, con = con), ".", escape(x$table, con = con))
 }
 #' @export
 print.dbplyr_schema <- function(x, ...) {
@@ -68,12 +69,13 @@ print.dbplyr_schema <- function(x, ...) {
 
 #' @export
 format.dbplyr_catalog <- function(x, ...) {
+  con <- simulate_dbi()
   paste0(
-    escape_ansi(x$catalog),
+    escape(x$catalog, con = con),
     ".",
-    escape_ansi(x$schema),
+    escape(x$schema, con = con),
     ".",
-    escape_ansi(x$table)
+    escape(x$table, con = con)
   )
 }
 #' @export
