@@ -438,7 +438,7 @@ sql_query_insert.DBIConnection <- function(
   clauses <- list2(
     parts$insert_clause,
     sql_clause_select(sql("*")),
-    sql_clause_from(parts$from),
+    sql_clause_from(escape(parts$from, con = con)),
     !!!parts$conflict_clauses,
     sql_returning_cols(con, returning_cols, table)
   )
@@ -502,7 +502,7 @@ sql_query_append.DBIConnection <- function(
   clauses <- list2(
     sql_clause_insert(con, insert_cols, table),
     sql_clause_select(sql("*")),
-    sql_clause_from(parts$from),
+    sql_clause_from(escape(parts$from, con = con)),
     sql_returning_cols(con, returning_cols, table)
   )
 
@@ -552,7 +552,7 @@ sql_query_update_from.DBIConnection <- function(
   clauses <- list(
     sql_clause_update(table),
     sql_clause_set(update_cols, update_values),
-    sql_clause_from(parts$from),
+    sql_clause_from(escape(parts$from, con = con)),
     sql_clause_where(parts$where),
     sql_returning_cols(con, returning_cols, table)
   )
@@ -611,7 +611,7 @@ sql_query_upsert.DBIConnection <- function(
   updated_cte <- list(
     sql_clause_update(table),
     sql_clause_set(update_cols, update_values),
-    sql_clause_from(parts$from),
+    sql_clause_from(escape(parts$from, con = con)),
     sql_clause_where(parts$where),
     sql(paste0("RETURNING ", sql_star(con, table)))
   )
@@ -627,7 +627,7 @@ sql_query_upsert.DBIConnection <- function(
     sql(")"),
     sql_clause_insert(con, insert_cols, table),
     sql_clause_select(sql("*")),
-    sql_clause_from(parts$from),
+    sql_clause_from(escape(parts$from, con = con)),
     !!!sql_clause_where_exists(update_name, where, not = TRUE),
     sql_returning_cols(con, returning_cols, table)
   )

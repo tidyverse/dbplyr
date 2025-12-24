@@ -4,7 +4,7 @@
       sql_format_clauses(clauses, 0, con)
     Output
       <SQL> SELECT a, b, c
-      FROM "table"
+      FROM table
       WHERE (x > 1) AND (y < 2)
       GROUP BY "a", "b"
       HAVING (COUNT(*) > 5)
@@ -26,5 +26,5 @@
         variable6,
         variable7,
         variable8
-      FROM "table"
+      FROM table
 

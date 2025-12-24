@@ -59,7 +59,7 @@ sql_query_select.Teradata <- function(
     unlimited_query <- sql_select_clauses(
       con,
       select = sql_clause_select(select, distinct, top = NULL),
-      from = sql_clause_from(from),
+      from = sql_clause_from(escape(from, con = con)),
       where = sql_clause_where(where),
       group_by = sql_clause_group_by(group_by),
       having = sql_clause_having(having),
@@ -78,7 +78,7 @@ sql_query_select.Teradata <- function(
         distinct = FALSE,
         top = limit
       ),
-      from = sql_clause_from(from),
+      from = sql_clause_from(escape(from, con = con)),
       where = NULL,
       group_by = NULL,
       having = NULL,
@@ -93,7 +93,7 @@ sql_query_select.Teradata <- function(
   sql_select_clauses(
     con,
     select = sql_clause_select(select, distinct, top = limit),
-    from = sql_clause_from(from),
+    from = sql_clause_from(escape(from, con = con)),
     where = sql_clause_where(where),
     group_by = sql_clause_group_by(group_by),
     having = sql_clause_having(having),

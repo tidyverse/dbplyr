@@ -54,10 +54,12 @@ sql_clause_select <- function(
 }
 
 sql_clause_from <- function(from, lvl = 0) {
+  check_sql(from)
   sql_clause("FROM", from, lvl = lvl)
 }
 
 sql_clause_where <- function(where, lvl = 0) {
+  check_sql(where, allow_null = TRUE)
   check_character(where, allow_null = TRUE)
 
   where_paren <- sql(paste0("(", where, ")", recycle0 = TRUE))
@@ -65,11 +67,12 @@ sql_clause_where <- function(where, lvl = 0) {
 }
 
 sql_clause_group_by <- function(group_by, lvl = 0) {
+  check_sql(group_by, allow_null = TRUE)
   sql_clause("GROUP BY", group_by)
 }
 
 sql_clause_having <- function(having, lvl = 0) {
-  check_character(having, allow_null = TRUE)
+  check_sql(having, allow_null = TRUE)
   having_paren <- sql(paste0("(", having, ")", recycle0 = TRUE))
   sql_clause("HAVING", having_paren, sep = " AND")
 }
@@ -84,6 +87,8 @@ sql_clause_order_by <- function(
   limit = NULL,
   lvl = 0
 ) {
+  check_sql(order_by, allow_null = TRUE)
+
   if (subquery && length(order_by) > 0 && is.null(limit)) {
     warn_drop_order_by()
     NULL
@@ -93,6 +98,8 @@ sql_clause_order_by <- function(
 }
 
 sql_clause_limit <- function(limit, lvl = 0) {
+  check_number_whole(limit, allow_null = TRUE, allow_infinite = TRUE, min = 0)
+
   if (!is.null(limit) && !identical(limit, Inf)) {
     sql_clause("LIMIT", sql(format(limit, scientific = FALSE)))
   }

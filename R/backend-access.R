@@ -55,7 +55,7 @@ sql_query_select.ACCESS <- function(
   sql_select_clauses(
     con,
     select = sql_clause_select(select, distinct, top = limit),
-    from = sql_clause_from(from),
+    from = sql_clause_from(escape(from, con = con)),
     where = sql_clause_where(where),
     group_by = sql_clause_group_by(group_by),
     having = sql_clause_having(having),
@@ -247,7 +247,7 @@ sql_query_multi_join.ACCESS <- function(
 
   clauses <- list(
     sql_clause_select(select),
-    sql_clause_from(from)
+    sql_clause_from(escape(from, con = con))
   )
   sql_format_clauses(clauses, lvl = lvl, con = con)
 }

@@ -106,7 +106,7 @@ simulate_mssql <- function(version = "15.0") {
   sql_select_clauses(
     con,
     select = sql_clause_select(select, distinct, top = limit),
-    from = sql_clause_from(from),
+    from = sql_clause_from(escape(from, con = con)),
     where = sql_clause_where(where),
     group_by = sql_clause_group_by(group_by),
     having = sql_clause_having(having),
@@ -143,7 +143,7 @@ simulate_mssql <- function(version = "15.0") {
     parts$insert_clause,
     sql_returning_cols(con, returning_cols, "INSERTED"),
     sql_clause_select(sql("*")),
-    sql_clause_from(parts$from),
+    sql_clause_from(escape(parts$from, con = con)),
     !!!parts$conflict_clauses
   )
 
@@ -165,7 +165,7 @@ simulate_mssql <- function(version = "15.0") {
     sql_clause_insert(con, insert_cols, into = table),
     sql_returning_cols(con, returning_cols, "INSERTED"),
     sql_clause_select(sql("*")),
-    sql_clause_from(parts$from)
+    sql_clause_from(escape(parts$from, con = con))
   )
 
   sql_format_clauses(clauses, lvl = 0, con)
@@ -189,7 +189,7 @@ simulate_mssql <- function(version = "15.0") {
     sql_clause_update(table),
     sql_clause_set(update_cols, update_values),
     sql_returning_cols(con, returning_cols, "INSERTED"),
-    sql_clause_from(table),
+    sql_clause_from(escape(table, con = con)),
     sql_clause("INNER JOIN", parts$from),
     sql_clause_on(parts$where, lvl = 1)
   )

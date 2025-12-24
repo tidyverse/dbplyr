@@ -3,7 +3,7 @@ test_that("sql_select_clauses generates expected SQL", {
 
   clauses <- list(
     sql_clause_select(sql("a", "b", "c")),
-    sql_clause_from(ident("table")),
+    sql_clause_from(sql("table")),
     sql_clause_where(sql("x > 1", "y < 2")),
     sql_clause_group_by(sql('"a"', '"b"')),
     sql_clause_having(sql("COUNT(*) > 5")),
@@ -19,7 +19,7 @@ test_that("sql_select_clauses can generate multiple lines", {
 
   clauses <- list(
     sql_clause_select(sql(paste0("variable", 1:8))),
-    sql_clause_from(ident("table"))
+    sql_clause_from(sql("table"))
   )
 
   expect_snapshot(sql_format_clauses(clauses, 0, con))

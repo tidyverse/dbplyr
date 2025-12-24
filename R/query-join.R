@@ -261,7 +261,7 @@ sql_query_multi_join.DBIConnection <- function(
 
   clauses <- list2(
     sql_clause_select(select, distinct),
-    sql_clause_from(from),
+    sql_clause_from(escape(from, con = con)),
     !!!out
   )
   sql_format_clauses(clauses, lvl = lvl, con = con)

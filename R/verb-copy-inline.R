@@ -205,7 +205,7 @@ sql_values_subquery_union <- function(con, df, types, lvl, row, from = NULL) {
 
   clauses <- list(
     select = sql_clause_select(cols_clause),
-    from = if (!is.null(from)) sql_clause_from(ident(from)),
+    from = if (!is.null(from)) sql_clause_from(escape(ident(from), con = con)),
     where = sql_clause_where(sql("0 = 1"))
   )
   null_row_query <- sql_format_clauses(clauses, lvl + 1, con)
@@ -264,7 +264,7 @@ sql_values_zero_rows <- function(con, df, types, lvl, from = NULL) {
 
   clauses <- list(
     select = sql_clause_select(typed_cols),
-    from = if (!is.null(from)) sql_clause_from(ident(from)),
+    from = if (!is.null(from)) sql_clause_from(escape(ident(from), con = con)),
     where = sql_clause_where(sql("0 = 1"))
   )
   sql_format_clauses(clauses, lvl, con)
