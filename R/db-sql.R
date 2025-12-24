@@ -617,19 +617,19 @@ sql_query_upsert.DBIConnection <- function(
     sql(paste0("RETURNING ", sql_star(con, table)))
   )
   updated_sql <- sql_format_clauses(updated_cte, lvl = 1)
-  update_name <- sql(escape(ident("updated"), con = con))
+  updated <- sql(sql_escape_ident(con, "updated"))
 
   join_by <- new_join_by(by, x_as = "updated", y_as = "...y")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
 
   clauses <- list2(
-    sql(paste0("WITH ", update_name, " AS (")),
+    sql_glue2(con, "WITH {.sql updated} AS ("),
     updated_sql,
     sql(")"),
     sql_clause_insert(con, insert_cols, table),
     sql_clause_select(sql("*")),
     sql_clause_from(sql_escape_table_source(con, parts$from)),
-    !!!sql_clause_where_exists(update_name, where, not = TRUE),
+    !!!sql_clause_where_exists(updated, where, not = TRUE),
     sql_returning_cols(con, returning_cols, table)
   )
 
@@ -692,8 +692,7 @@ sql_named_cols <- function(con, cols, table = NULL) {
   nms[nms == cols] <- ""
 
   cols <- sql_table_prefix(con, table, cols)
-  cols <- set_names(ident_q(cols), nms)
-  escape(cols, collapse = NULL, con = con)
+  sql(names_to_as(con, cols, nms))
 }
 
 # dplyr fallbacks ---------------------------------------------------------

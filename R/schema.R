@@ -59,8 +59,7 @@ in_catalog <- function(catalog, schema, table) {
 
 #' @export
 format.dbplyr_schema <- function(x, ...) {
-  con <- simulate_dbi()
-  paste0(escape(x$schema, con = con), ".", escape(x$table, con = con))
+  sql_glue2(simulate_dbi(), "{.id x$schema}.{.id x$table}")
 }
 #' @export
 print.dbplyr_schema <- function(x, ...) {
@@ -69,14 +68,7 @@ print.dbplyr_schema <- function(x, ...) {
 
 #' @export
 format.dbplyr_catalog <- function(x, ...) {
-  con <- simulate_dbi()
-  paste0(
-    escape(x$catalog, con = con),
-    ".",
-    escape(x$schema, con = con),
-    ".",
-    escape(x$table, con = con)
-  )
+  sql_glue2(simulate_dbi(), "{.id x$catalog}.{.id x$schema}.{.id x$table}")
 }
 #' @export
 print.dbplyr_catalog <- function(x, ...) {
