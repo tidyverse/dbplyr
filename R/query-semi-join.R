@@ -142,3 +142,65 @@ sql_render.semi_join_query <- function(
 flatten_query.semi_join_query <- function(qry, query_list, con) {
   flatten_query_2_tables(qry, query_list, con)
 }
+
+# SQL generation ----------------------------------------------------------
+
+#' @rdname db-sql
+#' @export
+sql_query_semi_join <- function(
+  con,
+  x,
+  y,
+  anti,
+  by,
+  where,
+  vars,
+  ...,
+  lvl = 0
+) {
+  check_dots_used()
+  UseMethod("sql_query_semi_join")
+}
+#' @export
+sql_query_semi_join.DBIConnection <- function(
+  con,
+  x,
+  y,
+  anti,
+  by,
+  where,
+  vars,
+  ...,
+  lvl = 0
+) {
+  x <- dbplyr_sql_subquery(con, x, name = by$x_as)
+  y <- dbplyr_sql_subquery(con, y, name = by$y_as)
+
+  on <- sql_join_tbls(con, by, na_matches = by$na_matches)
+
+  exists <- if (anti) "NOT EXISTS" else "EXISTS"
+
+  lines <- list(
+    sql_clause_select(con, vars),
+    sql_clause_from(x),
+    sql_glue2(con, "WHERE {.sql exists} ("),
+    # lvl = 1 because they are basically in a subquery
+    sql_clause("SELECT 1 FROM", y, lvl = 1),
+    sql_clause_where(c(on, where), lvl = 1),
+    sql(")")
+  )
+  sql_format_clauses(lines, lvl, con)
+}
+
+dbplyr_query_semi_join <- function(
+  con,
+  x,
+  y,
+  anti = FALSE,
+  by = NULL,
+  ...,
+  lvl = 0
+) {
+  check_2ed(con)
+  sql_query_semi_join(con, x, y, anti = anti, by = by, ..., lvl = lvl)
+}

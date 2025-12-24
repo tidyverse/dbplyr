@@ -132,6 +132,88 @@ flatten_query.rf_join_query <- function(qry, query_list, con) {
   flatten_query_2_tables(qry, query_list, con)
 }
 
+# SQL generation ----------------------------------------------------------
+
+#' @rdname db-sql
+#' @export
+sql_query_join <- function(
+  con,
+  x,
+  y,
+  select,
+  type = "inner",
+  by = NULL,
+  na_matches = FALSE,
+  ...,
+  lvl = 0
+) {
+  check_dots_used()
+  UseMethod("sql_query_join")
+}
+#' @export
+sql_query_join.DBIConnection <- function(
+  con,
+  x,
+  y,
+  select,
+  type = "inner",
+  by = NULL,
+  na_matches = FALSE,
+  ...,
+  lvl = 0
+) {
+  JOIN <- switch(
+    type,
+    left = sql("LEFT JOIN"),
+    inner = sql("INNER JOIN"),
+    right = sql("RIGHT JOIN"),
+    full = sql("FULL JOIN"),
+    cross = sql("CROSS JOIN"),
+    cli_abort("Unknown join type: {.val {type}}")
+  )
+
+  x <- dbplyr_sql_subquery(con, x, name = by$x_as, lvl = lvl)
+  y <- dbplyr_sql_subquery(con, y, name = by$y_as, lvl = lvl)
+
+  on <- sql_join_tbls(con, by, na_matches = na_matches)
+
+  # Wrap with SELECT since callers assume a valid query is returned
+  clauses <- list(
+    sql_clause_select(con, select),
+    sql_clause_from(x),
+    sql_clause(JOIN, y),
+    sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1)
+  )
+  sql_format_clauses(clauses, lvl, con)
+}
+dbplyr_query_join <- function(
+  con,
+  x,
+  y,
+  vars,
+  type = "inner",
+  by = NULL,
+  na_matches = FALSE,
+  ...,
+  select = NULL,
+  lvl = 0
+) {
+  check_2ed(con)
+  sql_query_join(
+    con,
+    x,
+    y,
+    select,
+    type = type,
+    by = by,
+    na_matches = na_matches,
+    ...,
+    lvl = lvl
+  )
+}
+
+# Helpers ----------------------------------------------------------------------
+
 sql_rf_join_vars <- function(
   con,
   type,
