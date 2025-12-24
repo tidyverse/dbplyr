@@ -380,14 +380,14 @@ sql_query_select.DBIConnection <- function(
 ) {
   sql_select_clauses(
     con,
-    select = sql_clause_select(con, select, distinct),
+    select = sql_clause_select(select, distinct),
     from = sql_clause_from(from),
     where = sql_clause_where(where),
     group_by = sql_clause_group_by(group_by),
     having = sql_clause_having(having),
     window = sql_clause_window(window),
     order_by = sql_clause_order_by(order_by, subquery, limit),
-    limit = sql_clause_limit(con, limit),
+    limit = sql_clause_limit(limit),
     lvl = lvl
   )
 }

@@ -260,7 +260,7 @@ sql_query_multi_join.DBIConnection <- function(
   }
 
   clauses <- list2(
-    sql_clause_select(con, select, distinct),
+    sql_clause_select(select, distinct),
     sql_clause_from(from),
     !!!out
   )

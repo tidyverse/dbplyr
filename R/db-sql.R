@@ -437,7 +437,7 @@ sql_query_insert.DBIConnection <- function(
 
   clauses <- list2(
     parts$insert_clause,
-    sql_clause_select(con, sql("*")),
+    sql_clause_select(sql("*")),
     sql_clause_from(parts$from),
     !!!parts$conflict_clauses,
     sql_returning_cols(con, returning_cols, table)
@@ -501,7 +501,7 @@ sql_query_append.DBIConnection <- function(
 
   clauses <- list2(
     sql_clause_insert(con, insert_cols, table),
-    sql_clause_select(con, sql("*")),
+    sql_clause_select(sql("*")),
     sql_clause_from(parts$from),
     sql_returning_cols(con, returning_cols, table)
   )
@@ -626,7 +626,7 @@ sql_query_upsert.DBIConnection <- function(
     updated_sql,
     sql(")"),
     sql_clause_insert(con, insert_cols, table),
-    sql_clause_select(con, sql("*")),
+    sql_clause_select(sql("*")),
     sql_clause_from(parts$from),
     !!!sql_clause_where_exists(update_name, where, not = TRUE),
     sql_returning_cols(con, returning_cols, table)

@@ -8,22 +8,17 @@ sql_select_clauses <- function(
   window,
   order_by,
   limit = NULL,
-  lvl
+  lvl = 0
 ) {
-  out <- list(
-    select = select,
-    from = from,
-    where = where,
-    group_by = group_by,
-    having = having,
-    window = window,
-    order_by = order_by,
-    limit = limit
-  )
+  out <- list(select, from, where, group_by, having, window, order_by, limit)
   sql_format_clauses(out, lvl, con)
 }
 
 sql_clause <- function(kw, parts, sep = ",", parens = FALSE, lvl = 0) {
+  if (length(parts) == 0) {
+    return()
+  }
+
   clause <- list(
     kw = kw,
     parts = parts,
@@ -37,7 +32,6 @@ sql_clause <- function(kw, parts, sep = ",", parens = FALSE, lvl = 0) {
 }
 
 sql_clause_select <- function(
-  con,
   select,
   distinct = FALSE,
   top = NULL,
@@ -50,8 +44,7 @@ sql_clause_select <- function(
   }
 
   if (!is.null(top)) {
-    top <- as.integer(top)
-    top <- sql_glue2(con, " TOP {top}")
+    top <- paste0(" TOP ", as.integer(top))
   }
 
   clause <- paste0("SELECT", if (distinct) " DISTINCT", top)
@@ -62,13 +55,10 @@ sql_clause_from <- function(from, lvl = 0) {
   sql_clause("FROM", from, lvl = lvl)
 }
 
-sql_clause_where <- function(where, lvl = 0, call = caller_env()) {
-  if (length(where) == 0L) {
-    return()
-  }
+sql_clause_where <- function(where, lvl = 0) {
+  check_character(where, allow_null = TRUE)
 
-  check_character(where, call = call)
-  where_paren <- sql(paste0("(", where, ")"))
+  where_paren <- sql(paste0("(", where, ")", recycle0 = TRUE))
   sql_clause("WHERE", where_paren, sep = " AND", lvl = lvl)
 }
 
@@ -76,13 +66,9 @@ sql_clause_group_by <- function(group_by, lvl = 0) {
   sql_clause("GROUP BY", group_by)
 }
 
-sql_clause_having <- function(having, lvl = 0, call = caller_env()) {
-  if (length(having) == 0L) {
-    return()
-  }
-
-  check_character(having, call = call)
-  having_paren <- sql(paste0("(", having, ")"))
+sql_clause_having <- function(having, lvl = 0) {
+  check_character(having, allow_null = TRUE)
+  having_paren <- sql(paste0("(", having, ")", recycle0 = TRUE))
   sql_clause("HAVING", having_paren, sep = " AND")
 }
 
@@ -104,7 +90,7 @@ sql_clause_order_by <- function(
   }
 }
 
-sql_clause_limit <- function(con, limit, lvl = 0) {
+sql_clause_limit <- function(limit, lvl = 0) {
   if (!is.null(limit) && !identical(limit, Inf)) {
     sql_clause("LIMIT", sql(format(limit, scientific = FALSE)))
   }
@@ -154,10 +140,9 @@ print.sql_clause <- function(x, ...) {
 # helpers -----------------------------------------------------------------
 
 sql_format_clauses <- function(clauses, lvl, con) {
-  clauses <- unname(clauses)
-  clauses <- purrr::discard(clauses, ~ !is.sql(.x) && is_empty(.x$parts))
+  clauses <- purrr::compact(unname(clauses))
 
-  formatted_clauses <- purrr::map(
+  formatted_clauses <- purrr::map_chr(
     clauses,
     sql_format_clause,
     lvl = lvl,
