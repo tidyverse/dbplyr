@@ -186,8 +186,8 @@ unmatched values are then inserted outside of the CTE.
 ``` r
 sql_query_upsert(
   con = simulate_postgres(),
-  table = ident("airlines"),
-  from = ident("df"),
+  table = "airlines",
+  from = "df",
   by = "carrier",
   update_cols = "name"
 )
@@ -195,7 +195,7 @@ sql_query_upsert(
 #> SELECT "carrier", "name"
 #> FROM "df" AS "...y"
 #> WHERE true
-#> ON CONFLICT  ("carrier")
+#> ON CONFLICT ("carrier")
 #> DO UPDATE
 #> SET "name" = "excluded"."name"
 ```
