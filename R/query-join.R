@@ -144,13 +144,15 @@ sql_render.multi_join_query <- function(
     \(table) sql_render(table, con, ..., subquery = TRUE, lvl = lvl + 1)
   )
 
+  select <- sql(names_to_as(con, query$select))
+
   sql_query_multi_join(
     con = con,
     x = x,
     joins = query$joins,
     table_names = query$table_names,
     by_list = query$by_list,
-    select = query$select,
+    select = select,
     distinct = query$distinct,
     lvl = lvl
   )
@@ -261,8 +263,6 @@ sql_query_multi_join.DBIConnection <- function(
     on <- sql_join_tbls(con, by = by, na_matches = by$na_matches)
     out[[2 * i]] <- sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1)
   }
-
-  select <- sql(names_to_as(con, select))
 
   clauses <- list2(
     sql_clause_select(select, distinct),

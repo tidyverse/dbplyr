@@ -114,6 +114,8 @@ sql_render.rf_join_query <- function(
   from_x <- sql_render(query$x, con, ..., subquery = TRUE, lvl = lvl + 1)
   from_y <- sql_render(query$y, con, ..., subquery = TRUE, lvl = lvl + 1)
 
+  select <- sql(names_to_as(con, query$select))
+
   dbplyr_query_join(
     con,
     from_x,
@@ -122,7 +124,7 @@ sql_render.rf_join_query <- function(
     type = query$type,
     by = query$by,
     na_matches = query$na_matches,
-    select = query$select,
+    select = select,
     lvl = lvl
   )
 }
@@ -176,8 +178,6 @@ sql_query_join.DBIConnection <- function(
   y <- dbplyr_sql_subquery(con, y, name = by$y_as, lvl = lvl)
 
   on <- sql_join_tbls(con, by, na_matches = na_matches)
-
-  select <- sql(names_to_as(con, select))
 
   # Wrap with SELECT since callers assume a valid query is returned
   clauses <- list(

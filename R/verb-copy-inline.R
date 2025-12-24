@@ -129,9 +129,12 @@ sql_values_subquery_default <- function(con, df, types, lvl, row) {
     lvl = lvl + 1
   )
 
+  cast <- sql_values_cast_clauses(con, df, types, na = FALSE)
+  select <- sql(names_to_as(con, cast))
+
   sql_query_select(
     con,
-    select = sql_values_cast_clauses(con, df, types, na = FALSE),
+    select = select,
     from = sql_query_wrap(con, subquery, name = "values_table", lvl = lvl),
     lvl = lvl
   )
@@ -175,9 +178,14 @@ sql_values_subquery_column_alias <- function(con, df, types, lvl, ...) {
     rows_query <- sql(paste0("(", rows_query, ") AS ", table_alias_sql))
   }
 
+  select <- sql(names_to_as(
+    con,
+    sql_values_cast_clauses(con, df, types, na = FALSE)
+  ))
+
   sql_query_select(
     con,
-    select = sql_values_cast_clauses(con, df, types, na = FALSE),
+    select = select,
     from = rows_query,
     lvl = lvl
   )
@@ -236,9 +244,14 @@ sql_values_subquery_union <- function(con, df, types, lvl, row, from = NULL) {
     lvl = lvl + 1
   )
 
+  select <- sql(names_to_as(
+    con,
+    sql_values_cast_clauses(con, df, types, na = FALSE)
+  ))
+
   sql_query_select(
     con,
-    select = sql_values_cast_clauses(con, df, types, na = FALSE),
+    select = select,
     from = sql_query_wrap(con, subquery, name = "values_table", lvl = lvl),
     lvl = lvl
   )

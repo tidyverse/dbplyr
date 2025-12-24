@@ -52,8 +52,6 @@ sql_query_select.ACCESS <- function(
   subquery = FALSE,
   lvl = 0
 ) {
-  select <- sql(names_to_as(con, select))
-
   sql_select_clauses(
     select = sql_clause_select(select, distinct, top = limit),
     from = sql_clause_from(sql_escape_table_source(con, from)),
@@ -245,8 +243,6 @@ sql_query_multi_join.ACCESS <- function(
       paste0("ON ", on, ")")
     ))
   }
-
-  select <- sql(names_to_as(con, select))
 
   clauses <- list(
     sql_clause_select(select),

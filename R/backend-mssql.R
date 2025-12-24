@@ -103,8 +103,6 @@ simulate_mssql <- function(version = "15.0") {
   subquery = FALSE,
   lvl = 0
 ) {
-  select <- sql(names_to_as(con, select))
-
   sql_select_clauses(
     select = sql_clause_select(select, distinct, top = limit),
     from = sql_clause_from(sql_escape_table_source(con, from)),

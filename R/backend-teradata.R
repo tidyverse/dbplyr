@@ -53,7 +53,6 @@ sql_query_select.Teradata <- function(
   # * SAMPLE clause
   # * WITH clause
 
-  select <- sql(names_to_as(con, select))
   limit_needs_subquery <- is_true(distinct)
 
   if (!is_null(limit) && limit_needs_subquery) {
