@@ -2,7 +2,7 @@ test_that("sql_select_clauses generates expected SQL", {
   con <- simulate_dbi()
 
   clauses <- list(
-    sql_clause_select(ident("a", "b", "c")),
+    sql_clause_select(sql("a", "b", "c")),
     sql_clause_from(ident("table")),
     sql_clause_where(sql("x > 1", "y < 2")),
     sql_clause_group_by(sql('"a"', '"b"')),
@@ -18,7 +18,7 @@ test_that("sql_select_clauses can generate multiple lines", {
   con <- simulate_dbi()
 
   clauses <- list(
-    sql_clause_select(ident(paste0("variable", 1:8))),
+    sql_clause_select(sql(paste0("variable", 1:8))),
     sql_clause_from(ident("table"))
   )
 

@@ -3,7 +3,7 @@
     Code
       sql_format_clauses(clauses, 0, con)
     Output
-      <SQL> SELECT "a", "b", "c"
+      <SQL> SELECT a, b, c
       FROM "table"
       WHERE (x > 1) AND (y < 2)
       GROUP BY "a", "b"
@@ -18,13 +18,13 @@
       sql_format_clauses(clauses, 0, con)
     Output
       <SQL> SELECT
-        "variable1",
-        "variable2",
-        "variable3",
-        "variable4",
-        "variable5",
-        "variable6",
-        "variable7",
-        "variable8"
+        variable1,
+        variable2,
+        variable3,
+        variable4,
+        variable5,
+        variable6,
+        variable7,
+        variable8
       FROM "table"
 

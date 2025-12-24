@@ -35,10 +35,12 @@ sql_clause_select <- function(
   select,
   distinct = FALSE,
   top = NULL,
-  lvl = 0,
-  call = caller_env()
+  lvl = 0
 ) {
-  check_character(select, call = call)
+  check_sql(select)
+  check_bool(distinct)
+  check_number_whole(top, allow_null = TRUE, allow_infinite = TRUE, min = 0)
+
   if (is_empty(select)) {
     cli_abort("Query contains no columns")
   }

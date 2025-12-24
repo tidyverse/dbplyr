@@ -181,7 +181,7 @@ sql_query_semi_join.DBIConnection <- function(
   exists <- if (anti) "NOT EXISTS" else "EXISTS"
 
   lines <- list(
-    sql_clause_select(vars),
+    sql_clause_select(escape(vars, con = con)),
     sql_clause_from(x),
     sql_glue2(con, "WHERE {.sql exists} ("),
     # lvl = 1 because they are basically in a subquery

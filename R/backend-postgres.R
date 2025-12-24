@@ -431,7 +431,7 @@ sql_query_upsert.PqConnection <- function(
   parts <- rows_prep(con, table, from, by, lvl = 0)
 
   insert_cols <- c(by, update_cols)
-  select_cols <- ident(insert_cols)
+  select_cols <- sql(sql_escape_ident(con, insert_cols))
 
   update_values <- set_names(
     sql_table_prefix(con, "excluded", update_cols),
