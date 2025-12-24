@@ -2,13 +2,10 @@
 % Please edit documentation in R/escape.R
 \name{escape}
 \alias{escape}
-\alias{escape_ansi}
 \alias{sql_vector}
 \title{Escape/quote a string.}
 \usage{
 escape(x, parens = NA, collapse = " ", con = NULL)
-
-escape_ansi(x, parens = NA, collapse = "")
 
 sql_vector(x, parens = NA, collapse = " ", con = NULL)
 }
@@ -30,20 +27,21 @@ atomic vectors are separated by spaces and wrapped in parens if needed.}
 }
 \description{
 \code{escape()} requires you to provide a database connection to control the
-details of escaping. \code{escape_ansi()} uses the SQL 92 ANSI standard.
+details of escaping.
 }
 \examples{
+con <- simulate_dbi()
+
 # Doubles vs. integers
-escape_ansi(1:5)
-escape_ansi(c(1, 5.4))
+escape(1:5, con = con)
+escape(c(1, 5.4), con = con)
 
 # String vs known sql vs. sql identifier
-escape_ansi("X")
-escape_ansi(sql("X"))
-escape_ansi(ident("X"))
+escape("X", con = con)
+escape(sql("X"), con = con)
+escape(ident("X"), con = con)
 
 # Escaping is idempotent
-escape_ansi("X")
-escape_ansi(escape_ansi("X"))
-escape_ansi(escape_ansi(escape_ansi("X")))
+escape("X", con = con)
+escape(escape("X", con = con), con = con)
 }

@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* `escape_ansi()` has been removed. Use `escape(x, con = simulate_dbi())` instead.
 * `summarise()` now reports grouping immediately, rather than when you summarise.
 * `sql_optimise()` has been removed. It was only used for two cases (filter + summarise and arrange + summarise), and these are now handled at a higher level (#1720).
 * `distinct()` after a join no longer creates a subquery (#722).

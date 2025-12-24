@@ -1,7 +1,7 @@
 #' Escape/quote a string.
 #'
 #' `escape()` requires you to provide a database connection to control the
-#' details of escaping. `escape_ansi()` uses the SQL 92 ANSI standard.
+#' details of escaping.
 #'
 #' @param x An object to escape. Existing sql vectors will be left as is,
 #'   character vectors are escaped with single quotes, numeric vectors have
@@ -15,32 +15,26 @@
 #'   commas, identifiers are separated by commas and never wrapped,
 #'   atomic vectors are separated by spaces and wrapped in parens if needed.
 #' @param con Database connection.
-#' @rdname escape
 #' @export
 #' @examples
+#' con <- simulate_dbi()
+#'
 #' # Doubles vs. integers
-#' escape_ansi(1:5)
-#' escape_ansi(c(1, 5.4))
+#' escape(1:5, con = con)
+#' escape(c(1, 5.4), con = con)
 #'
 #' # String vs known sql vs. sql identifier
-#' escape_ansi("X")
-#' escape_ansi(sql("X"))
-#' escape_ansi(ident("X"))
+#' escape("X", con = con)
+#' escape(sql("X"), con = con)
+#' escape(ident("X"), con = con)
 #'
 #' # Escaping is idempotent
-#' escape_ansi("X")
-#' escape_ansi(escape_ansi("X"))
-#' escape_ansi(escape_ansi(escape_ansi("X")))
+#' escape("X", con = con)
+#' escape(escape("X", con = con), con = con)
 escape <- function(x, parens = NA, collapse = " ", con = NULL) {
   check_con(con)
 
   UseMethod("escape")
-}
-
-#' @export
-#' @rdname escape
-escape_ansi <- function(x, parens = NA, collapse = "") {
-  escape(x, parens = parens, collapse = collapse, con = simulate_dbi())
 }
 
 #' @export
