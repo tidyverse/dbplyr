@@ -70,7 +70,7 @@ sql_build.lazy_semi_join_query <- function(op, con, ..., sql_options = NULL) {
   # so need to update the existing WHERE clause
   y_vars <- op_vars(op$y)
   y_as <- op$by$y_as
-  replacements <- lapply(y_vars, \(var) sql_glue2(con, "{y_as}.{.id var}"))
+  replacements <- lapply(y_vars, \(var) sql_glue2(con, "{.tbl y_as}.{.id var}"))
   where <- replace_sym(op$where, y_vars, replacements)
   where_sql <- translate_sql_(
     where,
@@ -182,10 +182,10 @@ sql_query_semi_join.DBIConnection <- function(
 
   lines <- list(
     sql_clause_select(escape(vars, con = con)),
-    sql_clause_from(escape(x, con = con)),
+    sql_clause_from(sql_escape_table_source(con, x)),
     sql_glue2(con, "WHERE {.sql exists} ("),
     # lvl = 1 because they are basically in a subquery
-    sql_clause("SELECT 1 FROM", escape(y, con = con), lvl = 1),
+    sql_clause("SELECT 1 FROM", sql_escape_table_source(con, y), lvl = 1),
     sql_clause_where(sql(c(on, where)), lvl = 1),
     sql(")")
   )

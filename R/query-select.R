@@ -382,7 +382,7 @@ sql_query_select.DBIConnection <- function(
 
   sql_select_clauses(
     select = sql_clause_select(select, distinct),
-    from = sql_clause_from(escape(from, con = con)),
+    from = sql_clause_from(sql_escape_table_source(con, from)),
     where = sql_clause_where(where),
     group_by = sql_clause_group_by(group_by),
     having = sql_clause_having(having),

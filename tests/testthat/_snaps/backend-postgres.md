@@ -113,9 +113,9 @@
 ---
 
     Code
-      sql_query_insert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
-        lvl = 1), insert_cols = colnames(df_y), by = c("a", "b"), conflict = "ignore",
-      returning_cols = c("a", b2 = "b"))
+      sql_query_insert(con = con, table = table_path("\"df_x\""), from = sql_render(
+        df_y, con, lvl = 1), insert_cols = colnames(df_y), by = c("a", "b"),
+      conflict = "ignore", returning_cols = c("a", b2 = "b"))
     Output
       <SQL> INSERT INTO "df_x" ("a", "b", "c", "d")
       SELECT *

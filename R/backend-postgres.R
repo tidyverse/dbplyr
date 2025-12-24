@@ -395,7 +395,7 @@ sql_query_insert.PqConnection <- function(
   clauses <- list(
     parts$insert_clause,
     sql_clause_select(sql("*")),
-    sql_clause_from(escape(parts$from, con = con)),
+    sql_clause_from(sql_escape_table_source(con, parts$from)),
     sql_clause("ON CONFLICT", by_sql),
     {
       if (conflict == "ignore") sql("DO NOTHING")
@@ -443,7 +443,7 @@ sql_query_upsert.PqConnection <- function(
   clauses <- list(
     sql_clause_insert(con, insert_cols, into = table),
     sql_clause_select(select_cols),
-    sql_clause_from(escape(parts$from, con = con)),
+    sql_clause_from(sql_escape_table_source(con, parts$from)),
     # `WHERE true` is required for SQLite
     sql("WHERE true"),
     sql_clause("ON CONFLICT ", by_sql),

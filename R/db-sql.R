@@ -281,7 +281,7 @@ sql_query_rows <- function(con, sql, ...) {
 sql_query_rows.DBIConnection <- function(con, sql, ...) {
   sql <- as_table_source(sql, con)
   from <- dbplyr_sql_subquery(con, sql, "master")
-  sql_glue2(con, "SELECT COUNT(*) FROM {.from from}")
+  sql_glue2(con, "SELECT COUNT(*) FROM {.tbl from}")
 }
 
 #' @rdname db-sql
@@ -439,7 +439,7 @@ sql_query_insert.DBIConnection <- function(
   clauses <- list2(
     parts$insert_clause,
     sql_clause_select(sql("*")),
-    sql_clause_from(escape(parts$from, con = con)),
+    sql_clause_from(sql_escape_table_source(con, parts$from)),
     !!!parts$conflict_clauses,
     sql_returning_cols(con, returning_cols, table)
   )
@@ -503,7 +503,7 @@ sql_query_append.DBIConnection <- function(
   clauses <- list2(
     sql_clause_insert(con, insert_cols, table),
     sql_clause_select(sql("*")),
-    sql_clause_from(escape(parts$from, con = con)),
+    sql_clause_from(sql_escape_table_source(con, parts$from)),
     sql_returning_cols(con, returning_cols, table)
   )
 
@@ -551,9 +551,9 @@ sql_query_update_from.DBIConnection <- function(
 
   # avoid CTEs for the general case as they do not work everywhere
   clauses <- list(
-    sql_clause_update(escape(table, con = con)),
+    sql_clause_update(sql_escape_table_source(con, table)),
     sql_clause_set(update_cols, update_values),
-    sql_clause_from(escape(parts$from, con = con)),
+    sql_clause_from(sql_escape_table_source(con, parts$from)),
     sql_clause_where(parts$where),
     sql_returning_cols(con, returning_cols, table)
   )
@@ -610,9 +610,9 @@ sql_query_upsert.DBIConnection <- function(
   update_cols <- sql_escape_ident(con, update_cols)
 
   updated_cte <- list(
-    sql_clause_update(escape(table, con = con)),
+    sql_clause_update(sql_escape_table_source(con, table)),
     sql_clause_set(update_cols, update_values),
-    sql_clause_from(escape(parts$from, con = con)),
+    sql_clause_from(sql_escape_table_source(con, parts$from)),
     sql_clause_where(parts$where),
     sql(paste0("RETURNING ", sql_star(con, table)))
   )
@@ -628,7 +628,7 @@ sql_query_upsert.DBIConnection <- function(
     sql(")"),
     sql_clause_insert(con, insert_cols, table),
     sql_clause_select(sql("*")),
-    sql_clause_from(escape(parts$from, con = con)),
+    sql_clause_from(sql_escape_table_source(con, parts$from)),
     !!!sql_clause_where_exists(update_name, where, not = TRUE),
     sql_returning_cols(con, returning_cols, table)
   )
@@ -662,7 +662,7 @@ sql_query_delete.DBIConnection <- function(
   parts <- rows_prep(con, table, from, by, lvl = 1)
 
   clauses <- list2(
-    sql_clause("DELETE FROM", escape(table, con = con)),
+    sql_clause("DELETE FROM", sql_escape_table_source(con, table)),
     !!!sql_clause_where_exists(parts$from, parts$where, not = FALSE),
     sql_returning_cols(con, returning_cols, table)
   )

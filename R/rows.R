@@ -780,12 +780,13 @@ rows_prep <- function(con, table, from, by, lvl = 0) {
 }
 
 rows_insert_prep <- function(con, table, from, cols, by, lvl = 0) {
+  table <- as_table_path(table, con)
   out <- rows_prep(con, table, from, by, lvl = lvl)
 
   join_by <- new_join_by(by, x_as = table, y_as = "...y")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
   out$conflict_clauses <- sql_clause_where_exists(
-    escape(table, con = con),
+    sql_escape_table_source(con, table),
     where,
     not = TRUE
   )

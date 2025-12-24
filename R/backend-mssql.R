@@ -107,7 +107,7 @@ simulate_mssql <- function(version = "15.0") {
 
   sql_select_clauses(
     select = sql_clause_select(select, distinct, top = limit),
-    from = sql_clause_from(escape(from, con = con)),
+    from = sql_clause_from(sql_escape_table_source(con, from)),
     where = sql_clause_where(where),
     group_by = sql_clause_group_by(group_by),
     having = sql_clause_having(having),
@@ -144,7 +144,7 @@ simulate_mssql <- function(version = "15.0") {
     parts$insert_clause,
     sql_returning_cols(con, returning_cols, "INSERTED"),
     sql_clause_select(sql("*")),
-    sql_clause_from(escape(parts$from, con = con)),
+    sql_clause_from(sql_escape_table_source(con, parts$from)),
     !!!parts$conflict_clauses
   )
 
@@ -166,7 +166,7 @@ simulate_mssql <- function(version = "15.0") {
     sql_clause_insert(con, insert_cols, into = table),
     sql_returning_cols(con, returning_cols, "INSERTED"),
     sql_clause_select(sql("*")),
-    sql_clause_from(escape(parts$from, con = con))
+    sql_clause_from(sql_escape_table_source(con, parts$from))
   )
 
   sql_format_clauses(clauses, lvl = 0)
@@ -187,10 +187,10 @@ simulate_mssql <- function(version = "15.0") {
   update_cols <- sql_escape_ident(con, names(update_values))
 
   clauses <- list(
-    sql_clause_update(escape(table, con = con)),
+    sql_clause_update(sql_escape_table_source(con, table)),
     sql_clause_set(update_cols, update_values),
     sql_returning_cols(con, returning_cols, "INSERTED"),
-    sql_clause_from(escape(table, con = con)),
+    sql_clause_from(sql_escape_table_source(con, table)),
     sql_clause("INNER JOIN", parts$from),
     sql_clause_on(parts$where, lvl = 1)
   )
@@ -212,6 +212,7 @@ simulate_mssql <- function(version = "15.0") {
   method <- method %||% "merge"
   arg_match(method, "merge", error_arg = "method")
 
+  table <- as_table_path(table, con)
   parts <- rows_prep(con, table, from, by, lvl = 0)
 
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))
@@ -223,7 +224,7 @@ simulate_mssql <- function(version = "15.0") {
   insert_cols_qual <- sql_table_prefix(con, "...y", insert_cols)
 
   clauses <- list(
-    sql_clause("MERGE INTO", escape(table, con = con)),
+    sql_clause("MERGE INTO", sql_escape_table_source(con, table)),
     sql_clause("USING", parts$from),
     sql_clause_on(parts$where, lvl = 1),
     sql("WHEN MATCHED THEN"),
@@ -246,10 +247,11 @@ simulate_mssql <- function(version = "15.0") {
   ...,
   returning_cols = NULL
 ) {
+  table <- as_table_path(table, con)
   parts <- rows_prep(con, table, from, by, lvl = 0)
 
   clauses <- list2(
-    sql_clause("DELETE FROM", escape(table, con = con)),
+    sql_clause("DELETE FROM", sql_escape_table_source(con, table)),
     sql_returning_cols(con, returning_cols, table = "DELETED"),
     !!!sql_clause_where_exists(parts$from, parts$where, not = FALSE)
   )

@@ -63,7 +63,7 @@ sql_render.base_query <- function(
   if (subquery || is.sql(from)) {
     from
   } else {
-    from <- escape(from, con = con)
+    from <- sql_escape_table_source(con, from)
     sql_query_select(con, sql("*"), from, lvl = lvl)
   }
 }
