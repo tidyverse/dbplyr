@@ -1,10 +1,5 @@
 test_that("symbols weights are dropped in output", {
-  df <- copy_to(
-    test_sqlite(),
-    tibble(x = 1, w = 1),
-    name = "test",
-    overwrite = TRUE
-  )
+  df <- local_memdb_frame("test", x = 1, w = 1)
   expect_equal(dbplyr_uncount(df, w) |> collect(), tibble(x = 1))
 
   expect_snapshot(

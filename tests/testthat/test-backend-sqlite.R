@@ -117,7 +117,7 @@ test_that("date extraction agrees with R", {
 
 test_that("can explain a query", {
   db <- copy_to(
-    test_sqlite(),
+    memdb(),
     data.frame(x = 1:5),
     name = "test",
     indexes = list("x"),

@@ -8,7 +8,8 @@
 #' `memdb_frame()` works like [tibble::tibble()], but instead of creating a new
 #' data frame in R, it creates a table in `memdb()`. `local_memdb_frame()`
 #' is like `memdb_frame()` but the table will be automatically deleted when
-#' the current scope ends. It's useful for tests.
+#' the current scope ends. It's useful for tests. But beware: this function
+#' will overwrite an existing table of the same name.
 #'
 #' @inheritParams tibble::tibble
 #' @param .name Name of table in database: defaults to a random name that's
@@ -45,7 +46,7 @@ local_memdb_frame <- function(
   ...,
   frame = caller_env()
 ) {
-  tbl <- copy_to(memdb(), tibble(...), .name)
+  tbl <- copy_to(memdb(), tibble(...), .name, overwrite = TRUE)
   withr::defer(DBI::dbRemoveTable(memdb(), .name), envir = frame)
   tbl
 }

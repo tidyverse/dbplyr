@@ -39,7 +39,8 @@ dbplyr without having to connect to a "real" database.
 \code{memdb_frame()} works like \code{\link[tibble:tibble]{tibble::tibble()}}, but instead of creating a new
 data frame in R, it creates a table in \code{memdb()}. \code{local_memdb_frame()}
 is like \code{memdb_frame()} but the table will be automatically deleted when
-the current scope ends. It's useful for tests.
+the current scope ends. It's useful for tests. But beware: this function
+will overwrite an existing table of the same name.
 }
 \examples{
 library(dplyr)

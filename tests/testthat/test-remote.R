@@ -1,10 +1,5 @@
 test_that("remote_table returns name when it makes sense", {
-  mf <- copy_to(
-    test_sqlite(),
-    tibble(x = 5),
-    name = "refxiudlph",
-    overwrite = TRUE
-  )
+  mf <- local_memdb_frame("refxiudlph", x = 5)
 
   # produces name after `group_by()`
   expect_equal(
@@ -19,12 +14,7 @@ test_that("remote_table returns name when it makes sense", {
 })
 
 test_that("remote_table returns null for computed tables", {
-  mf <- copy_to(
-    test_sqlite(),
-    tibble(x = 5, y = 1),
-    name = "refxiudlph",
-    overwrite = TRUE
-  )
+  mf <- local_memdb_frame("refxiudlph", x = 5, y = 1)
   expect_equal(remote_table(mf), table_path("`refxiudlph`"))
 
   expect_null(mf |> filter(x == 3) |> remote_table())
