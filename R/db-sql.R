@@ -498,12 +498,6 @@ sql_query_append.DBIConnection <- function(
 
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   parts <- rows_prep(con, table, from, by = list(), lvl = 0)
-  insert_cols <- escape(
-    ident(insert_cols),
-    collapse = ", ",
-    parens = TRUE,
-    con = con
-  )
 
   clauses <- list2(
     sql_clause_insert(con, insert_cols, table),
@@ -610,12 +604,6 @@ sql_query_upsert.DBIConnection <- function(
   parts <- rows_prep(con, table, from, by, lvl = 0)
 
   insert_cols <- c(by, update_cols)
-  insert_cols <- escape(
-    ident(insert_cols),
-    collapse = ", ",
-    parens = TRUE,
-    con = con
-  )
 
   update_values <- sql_table_prefix(con, "...y", update_cols)
   update_cols <- sql_escape_ident(con, update_cols)

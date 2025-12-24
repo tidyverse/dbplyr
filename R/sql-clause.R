@@ -121,11 +121,13 @@ sql_clause_set <- function(lhs, rhs) {
 }
 
 sql_clause_insert <- function(con, cols, into = NULL, lvl = 0) {
+  cols <- sql(sql_escape_ident(con, cols))
+
   if (is.null(into)) {
     sql_clause("INSERT", cols, parens = TRUE, lvl = lvl)
   } else {
-    kw <- paste0("INSERT INTO ", escape(into, con = con))
-    sql_clause(kw, cols, lvl = lvl)
+    kw <- sql_glue2(con, "INSERT INTO {.tbl into}")
+    sql_clause(kw, cols, parens = TRUE, lvl = lvl)
   }
 }
 
