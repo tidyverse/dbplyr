@@ -387,8 +387,8 @@ db_supports_table_alias_with_as.TestConnection <- function(con) {
 #' @examples
 #' sql_query_upsert(
 #'   con = simulate_postgres(),
-#'   table = ident("airlines"),
-#'   from = ident("df"),
+#'   table = "airlines",
+#'   from = "df",
 #'   by = "carrier",
 #'   update_cols = "name"
 #' )
