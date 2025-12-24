@@ -9,7 +9,8 @@ with dbplyr without having to connect to a "real" database.
 but instead of creating a new data frame in R, it creates a table in
 `memdb()`. `local_memdb_frame()` is like `memdb_frame()` but the table
 will be automatically deleted when the current scope ends. It's useful
-for tests.
+for tests. But beware: this function will overwrite an existing table of
+the same name.
 
 ## Usage
 
