@@ -57,6 +57,8 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
 <ul><li>
+<code>escape_ansi()</code> has been removed. Use <code>escape(x, con = simulate_dbi())</code> instead.</li>
+<li>
 <code><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise()</a></code> now reports grouping immediately, rather than when you summarise.</li>
 <li>
 <code>sql_optimise()</code> has been removed. It was only used for two cases (filter + summarise and arrange + summarise), and these are now handled at a higher level (<a href="https://github.com/tidyverse/dbplyr/issues/1720" class="external-link">#1720</a>).</li>
@@ -897,7 +899,7 @@ FROM (
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange()</a></code> understands the <code>.by_group</code> argument, making it possible sort by groups if desired. The default is <code>FALSE</code> (<a href="https://github.com/tidyverse/dbplyr/issues/115" class="external-link">#115</a>)</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct()</a></code> now handles computed variables like <code>distinct(df, y = x + y)</code> (<a href="https://github.com/tidyverse/dbplyr/issues/154" class="external-link">#154</a>).</p></li>
 <li><p><code><a href="../reference/escape.html">escape()</a></code>, <code><a href="../reference/sql_expr.html">sql_expr()</a></code> and <code><a href="../reference/build_sql.html">build_sql()</a></code> no longer accept <code>con = NULL</code> as a shortcut for <code>con = simulate_dbi()</code>. This made it too easy to forget to pass <code>con</code> along, introducing extremely subtle escaping bugs. <code><a href="../reference/sql_translation_window.html">win_over()</a></code> gains a <code>con</code> argument for the same reason.</p></li>
-<li><p>New <code><a href="../reference/escape.html">escape_ansi()</a></code> always uses ANSI SQL 92 standard escaping (for use in examples and documentation).</p></li>
+<li><p>New <code>escape_ansi()</code> always uses ANSI SQL 92 standard escaping (for use in examples and documentation).</p></li>
 <li><p><code>mutate(df, x = NULL)</code> drops <code>x</code> from the output, just like when working with local data frames (<a href="https://github.com/tidyverse/dbplyr/issues/194" class="external-link">#194</a>).</p></li>
 <li><p><code><a href="../reference/partial_eval.html">partial_eval()</a></code> processes inlined functions (including rlang lambda functions). This makes dbplyr work with more forms of scoped verbs like <code>df %&gt;% summarise_all(~ mean(.))</code>, <code>df %&gt;% summarise_all(list(mean))</code> (<a href="https://github.com/tidyverse/dbplyr/issues/134" class="external-link">#134</a>).</p></li>
 <li><p><code><a href="../reference/sql_translation_agg.html">sql_aggregate()</a></code> now takes an optional argument <code>f_r</code> for passing to <code>check_na_rm()</code>. This allows the warning to show the R function name rather than the SQL function name (<a href="https://github.com/sverchkov" class="external-link">@sverchkov</a>, <a href="https://github.com/tidyverse/dbplyr/issues/153" class="external-link">#153</a>).</p></li>

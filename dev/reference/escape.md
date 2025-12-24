@@ -1,14 +1,12 @@
 # Escape/quote a string.
 
 `escape()` requires you to provide a database connection to control the
-details of escaping. `escape_ansi()` uses the SQL 92 ANSI standard.
+details of escaping.
 
 ## Usage
 
 ``` r
 escape(x, parens = NA, collapse = " ", con = NULL)
-
-escape_ansi(x, parens = NA, collapse = "")
 
 sql_vector(x, parens = NA, collapse = " ", con = NULL)
 ```
@@ -38,25 +36,25 @@ sql_vector(x, parens = NA, collapse = " ", con = NULL)
 ## Examples
 
 ``` r
+con <- simulate_dbi()
+
 # Doubles vs. integers
-escape_ansi(1:5)
-#> <SQL> (12345)
-escape_ansi(c(1, 5.4))
-#> <SQL> (1.05.4)
+escape(1:5, con = con)
+#> <SQL> (1, 2, 3, 4, 5)
+escape(c(1, 5.4), con = con)
+#> <SQL> (1.0, 5.4)
 
 # String vs known sql vs. sql identifier
-escape_ansi("X")
+escape("X", con = con)
 #> <SQL> 'X'
-escape_ansi(sql("X"))
+escape(sql("X"), con = con)
 #> <SQL> X
-escape_ansi(ident("X"))
+escape(ident("X"), con = con)
 #> <SQL> "X"
 
 # Escaping is idempotent
-escape_ansi("X")
+escape("X", con = con)
 #> <SQL> 'X'
-escape_ansi(escape_ansi("X"))
-#> <SQL> 'X'
-escape_ansi(escape_ansi(escape_ansi("X")))
+escape(escape("X", con = con), con = con)
 #> <SQL> 'X'
 ```

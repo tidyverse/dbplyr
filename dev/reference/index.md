@@ -165,7 +165,6 @@
 ## SQL generation
 
 - [`escape()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
-  [`escape_ansi()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   [`sql_vector()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   : Escape/quote a string.
 - [`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md)

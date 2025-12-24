@@ -2,6 +2,8 @@
 
 ## dbplyr (development version)
 
+- `escape_ansi()` has been removed. Use
+  `escape(x, con = simulate_dbi())` instead.
 - [`summarise()`](https://dplyr.tidyverse.org/reference/summarise.html)
   now reports grouping immediately, rather than when you summarise.
 - `sql_optimise()` has been removed. It was only used for two cases
@@ -2436,10 +2438,8 @@ testing and generating reprexes.
   [`win_over()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_window.md)
   gains a `con` argument for the same reason.
 
-- New
-  [`escape_ansi()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
-  always uses ANSI SQL 92 standard escaping (for use in examples and
-  documentation).
+- New `escape_ansi()` always uses ANSI SQL 92 standard escaping (for use
+  in examples and documentation).
 
 - `mutate(df, x = NULL)` drops `x` from the output, just like when
   working with local data frames
