@@ -117,6 +117,32 @@ supports_window_clause(con)
 
 db_supports_table_alias_with_as(con)
 
+sql_returning_cols(con, cols, table, ...)
+
+sql_query_multi_join(
+  con,
+  x,
+  joins,
+  table_names,
+  by_list,
+  select,
+  ...,
+  distinct = FALSE,
+  lvl = 0
+)
+
+sql_query_join(
+  con,
+  x,
+  y,
+  select,
+  type = "inner",
+  by = NULL,
+  na_matches = FALSE,
+  ...,
+  lvl = 0
+)
+
 sql_query_select(
   con,
   select,
@@ -133,37 +159,11 @@ sql_query_select(
   lvl = 0
 )
 
-sql_query_join(
-  con,
-  x,
-  y,
-  select,
-  type = "inner",
-  by = NULL,
-  na_matches = FALSE,
-  ...,
-  lvl = 0
-)
-
-sql_query_multi_join(
-  con,
-  x,
-  joins,
-  table_names,
-  by_list,
-  select,
-  ...,
-  distinct = FALSE,
-  lvl = 0
-)
-
 sql_query_semi_join(con, x, y, anti, by, where, vars, ..., lvl = 0)
 
 sql_query_set_op(con, x, y, method, ..., all = FALSE, lvl = 0)
 
 sql_query_union(con, x, unions, ..., lvl = 0)
-
-sql_returning_cols(con, cols, table, ...)
 ```
 
 ## See also
