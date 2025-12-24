@@ -252,19 +252,21 @@ sql_query_multi_join.DBIConnection <- function(
 
   for (i in seq_len(n_joins)) {
     table <- dbplyr_sql_subquery(con, tables[[i]], name = names[[i]], lvl = lvl)
-    out[[2 * i - 1]] <- sql_clause(types[[i]], table)
+    out[[2 * i - 1]] <- sql_clause(types[[i]], escape(table, con = con))
 
     by <- joins$by[[i]]
     on <- sql_join_tbls(con, by = by, na_matches = by$na_matches)
     out[[2 * i]] <- sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1)
   }
 
+  select <- sql(names_to_as(con, select))
+
   clauses <- list2(
     sql_clause_select(select, distinct),
     sql_clause_from(escape(from, con = con)),
     !!!out
   )
-  sql_format_clauses(clauses, lvl = lvl, con = con)
+  sql_format_clauses(clauses, lvl = lvl)
 }
 
 # Helpers ----------------------------------------------------------------------

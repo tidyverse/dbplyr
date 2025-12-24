@@ -177,14 +177,16 @@ sql_query_join.DBIConnection <- function(
 
   on <- sql_join_tbls(con, by, na_matches = na_matches)
 
+  select <- sql(names_to_as(con, select))
+
   # Wrap with SELECT since callers assume a valid query is returned
   clauses <- list(
     sql_clause_select(select),
     sql_clause_from(escape(x, con = con)),
-    sql_clause(JOIN, y),
+    sql_clause(JOIN, escape(y, con = con)),
     sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1)
   )
-  sql_format_clauses(clauses, lvl, con)
+  sql_format_clauses(clauses, lvl)
 }
 dbplyr_query_join <- function(
   con,

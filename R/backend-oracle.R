@@ -54,8 +54,9 @@ sql_query_select.Oracle <- function(
   subquery = FALSE,
   lvl = 0
 ) {
+  select <- sql(names_to_as(con, select))
+
   sql_select_clauses(
-    con,
     select = sql_clause_select(select, distinct),
     from = sql_clause_from(escape(from, con = con)),
     where = sql_clause_where(where),
@@ -99,7 +100,7 @@ sql_query_upsert.Oracle <- function(
   insert_values <- sql_table_prefix(con, "...y", insert_cols)
 
   clauses <- list(
-    sql_clause("MERGE INTO", table),
+    sql_clause("MERGE INTO", escape(table, con = con)),
     sql_clause("USING", parts$from),
     sql_clause_on(parts$where, lvl = 1, parens = TRUE),
     sql("WHEN MATCHED THEN"),
@@ -110,7 +111,7 @@ sql_query_upsert.Oracle <- function(
     sql_returning_cols(con, returning_cols, table),
     sql(";")
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export

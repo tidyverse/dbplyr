@@ -784,7 +784,11 @@ rows_insert_prep <- function(con, table, from, cols, by, lvl = 0) {
 
   join_by <- new_join_by(by, x_as = table, y_as = "...y")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
-  out$conflict_clauses <- sql_clause_where_exists(table, where, not = TRUE)
+  out$conflict_clauses <- sql_clause_where_exists(
+    escape(table, con = con),
+    where,
+    not = TRUE
+  )
 
   out$insert_clause <- sql_clause_insert(con, cols, table)
 

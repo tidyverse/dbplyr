@@ -1,5 +1,4 @@
 sql_select_clauses <- function(
-  con,
   select,
   from,
   where,
@@ -11,13 +10,14 @@ sql_select_clauses <- function(
   lvl = 0
 ) {
   out <- list(select, from, where, group_by, having, window, order_by, limit)
-  sql_format_clauses(out, lvl, con)
+  sql_format_clauses(out, lvl)
 }
 
 sql_clause <- function(kw, parts, sep = ",", parens = FALSE, lvl = 0) {
   if (length(parts) == 0) {
     return()
   }
+  check_sql(parts)
 
   clause <- list(
     kw = kw,
@@ -151,28 +151,23 @@ print.sql_clause <- function(x, ...) {
 
 #' @export
 format.sql_clause <- function(x, ...) {
-  unclass(sql_format_clause(x, lvl = 0, con = simulate_dbi()))
+  unclass(sql_format_clause(x, lvl = 0))
 }
 
 
 # helpers -----------------------------------------------------------------
 
-sql_format_clauses <- function(clauses, lvl, con) {
+sql_format_clauses <- function(clauses, lvl) {
   clauses <- purrr::compact(unname(clauses))
 
-  formatted_clauses <- purrr::map_chr(
-    clauses,
-    sql_format_clause,
-    lvl = lvl,
-    con = con
-  )
+  formatted_clauses <- purrr::map_chr(clauses, sql_format_clause, lvl = lvl)
   clause_level <- purrr::map_dbl(clauses, "lvl", .default = 0)
   out <- indent_lvl(formatted_clauses, lvl + clause_level)
 
   sql(paste0(out, collapse = "\n"))
 }
 
-sql_format_clause <- function(x, lvl, con, nchar_max = 80) {
+sql_format_clause <- function(x, lvl, nchar_max = 80) {
   if (is.sql(x)) {
     return(x)
   }
@@ -184,7 +179,7 @@ sql_format_clause <- function(x, lvl, con, nchar_max = 80) {
     x$sep <- style_kw(x$sep)
   }
 
-  fields_same_line <- escape(x$parts, collapse = paste0(x$sep, " "), con = con)
+  fields_same_line <- paste(x$parts, collapse = paste0(x$sep, " "))
   if (x$parens) {
     fields_same_line <- paste0("(", fields_same_line, ")")
   }
@@ -206,7 +201,7 @@ sql_format_clause <- function(x, lvl, con, nchar_max = 80) {
     if (x$parens) " (",
     "\n",
     indent,
-    escape(x$parts, collapse = collapse, con = con),
+    paste(x$parts, collapse = collapse),
     if (x$parens) paste0("\n", indent_lvl(")", lvl))
   )
 

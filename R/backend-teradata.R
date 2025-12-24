@@ -53,11 +53,11 @@ sql_query_select.Teradata <- function(
   # * SAMPLE clause
   # * WITH clause
 
+  select <- sql(names_to_as(con, select))
   limit_needs_subquery <- is_true(distinct)
 
   if (!is_null(limit) && limit_needs_subquery) {
     unlimited_query <- sql_select_clauses(
-      con,
       select = sql_clause_select(select, distinct, top = NULL),
       from = sql_clause_from(escape(from, con = con)),
       where = sql_clause_where(where),
@@ -72,7 +72,6 @@ sql_query_select.Teradata <- function(
     from <- sql_query_wrap(con, unlimited_query, name = alias)
     select_outer <- sql_star(con, alias)
     out <- sql_select_clauses(
-      con,
       select = sql_clause_select(
         select_outer,
         distinct = FALSE,
@@ -91,7 +90,6 @@ sql_query_select.Teradata <- function(
   }
 
   sql_select_clauses(
-    con,
     select = sql_clause_select(select, distinct, top = limit),
     from = sql_clause_from(escape(from, con = con)),
     where = sql_clause_where(where),

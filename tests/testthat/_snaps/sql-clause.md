@@ -1,7 +1,7 @@
 # sql_select_clauses generates expected SQL
 
     Code
-      sql_format_clauses(clauses, 0, con)
+      sql_format_clauses(clauses, 0)
     Output
       <SQL> SELECT a, b, c
       FROM table
@@ -15,7 +15,7 @@
 # sql_select_clauses can generate multiple lines
 
     Code
-      sql_format_clauses(clauses, 0, con)
+      sql_format_clauses(clauses, 0)
     Output
       <SQL> SELECT
         variable1,

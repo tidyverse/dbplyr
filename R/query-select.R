@@ -378,8 +378,9 @@ sql_query_select.DBIConnection <- function(
   subquery = FALSE,
   lvl = 0
 ) {
+  select <- sql(names_to_as(con, select))
+
   sql_select_clauses(
-    con,
     select = sql_clause_select(select, distinct),
     from = sql_clause_from(escape(from, con = con)),
     where = sql_clause_where(where),

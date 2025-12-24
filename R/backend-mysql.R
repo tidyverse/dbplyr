@@ -238,13 +238,13 @@ sql_query_update_from.MariaDBConnection <- function(
   update_cols <- sql_table_prefix(con, table, names(update_values))
 
   clauses <- list(
-    sql_clause_update(table),
+    sql_clause_update(escape(table, con = con)),
     sql_clause("INNER JOIN", parts$from),
     sql_clause_on(parts$where, lvl = 1),
     sql_clause_set(update_cols, update_values),
     sql_returning_cols(con, returning_cols, table)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 #' @export
 sql_query_update_from.MySQLConnection <- sql_query_update_from.MariaDBConnection

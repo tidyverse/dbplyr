@@ -112,6 +112,7 @@ sql_values_subquery_default <- function(con, df, types, lvl, row) {
   #   b) `VALUES` clause
   sim_data <- rep_named(colnames(df), list(NULL))
   cols_clause <- escape(sim_data, con = con, parens = FALSE, collapse = NULL)
+  cols_clause <- sql(names_to_as(con, cols_clause))
 
   null_row_clauses <- list(
     select = sql_clause_select(cols_clause),
@@ -119,11 +120,11 @@ sql_values_subquery_default <- function(con, df, types, lvl, row) {
   )
 
   rows_clauses <- sql_values_clause(con, df, row = row)
-  rows_query <- sql_format_clauses(rows_clauses, lvl = lvl + 1, con = con)
+  rows_query <- sql_format_clauses(rows_clauses, lvl = lvl + 1)
 
   subquery <- sql_query_union(
     con,
-    x = sql_format_clauses(null_row_clauses, lvl + 1, con),
+    x = sql_format_clauses(null_row_clauses, lvl + 1),
     unions = list(table = as.character(rows_query), all = TRUE),
     lvl = lvl + 1
   )
@@ -152,7 +153,7 @@ sql_values_subquery_column_alias <- function(con, df, types, lvl, ...) {
   # columns in Postgres.
   # The `FROM` clause is simply the `VALUES` clause with table and column alias
   rows_clauses <- sql_values_clause(con, df, row = FALSE)
-  rows_query <- sql_format_clauses(rows_clauses, lvl = lvl + 1, con = con)
+  rows_query <- sql_format_clauses(rows_clauses, lvl = lvl + 1)
 
   table_alias_sql <- sql(paste0(
     "drvd(",
@@ -202,13 +203,14 @@ sql_values_subquery_union <- function(con, df, types, lvl, row, from = NULL) {
   #   b) `UNION ALL` of one row `SELECT` statements
   sim_data <- rep_named(colnames(df), list(NULL))
   cols_clause <- escape(sim_data, con = con, parens = FALSE, collapse = NULL)
+  cols_clause <- sql(names_to_as(con, cols_clause))
 
   clauses <- list(
     select = sql_clause_select(cols_clause),
     from = if (!is.null(from)) sql_clause_from(escape(ident(from), con = con)),
     where = sql_clause_where(sql("0 = 1"))
   )
-  null_row_query <- sql_format_clauses(clauses, lvl + 1, con)
+  null_row_query <- sql_format_clauses(clauses, lvl + 1)
 
   escaped_values <- purrr::map(
     df,
@@ -261,13 +263,14 @@ sql_values_zero_rows <- function(con, df, types, lvl, from = NULL) {
   }
 
   typed_cols <- sql_values_cast_clauses(con, df, types, na = TRUE)
+  typed_cols <- sql(names_to_as(con, typed_cols))
 
   clauses <- list(
     select = sql_clause_select(typed_cols),
     from = if (!is.null(from)) sql_clause_from(escape(ident(from), con = con)),
     where = sql_clause_where(sql("0 = 1"))
   )
-  sql_format_clauses(clauses, lvl, con)
+  sql_format_clauses(clauses, lvl)
 }
 
 sql_values_cast_clauses <- function(con, df, types, na) {

@@ -43,7 +43,7 @@ test_postgres <- function() {
         password = "password",
         host = "127.0.0.1"
       )
-    } else if (on_gha() || on_cran()) {
+    } else if (!interactive() && (on_gha() || on_cran())) {
       NULL
     } else {
       list(

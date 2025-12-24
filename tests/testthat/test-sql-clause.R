@@ -1,6 +1,4 @@
 test_that("sql_select_clauses generates expected SQL", {
-  con <- simulate_dbi()
-
   clauses <- list(
     sql_clause_select(sql("a", "b", "c")),
     sql_clause_from(sql("table")),
@@ -11,18 +9,16 @@ test_that("sql_select_clauses generates expected SQL", {
     sql_clause_order_by(sql('"a" DESC')),
     sql_clause_limit(10)
   )
-  expect_snapshot(sql_format_clauses(clauses, 0, con))
+  expect_snapshot(sql_format_clauses(clauses, 0))
 })
 
 test_that("sql_select_clauses can generate multiple lines", {
-  con <- simulate_dbi()
-
   clauses <- list(
     sql_clause_select(sql(paste0("variable", 1:8))),
     sql_clause_from(sql("table"))
   )
 
-  expect_snapshot(sql_format_clauses(clauses, 0, con))
+  expect_snapshot(sql_format_clauses(clauses, 0))
 })
 
 test_that("sql_clause_select can generate top", {

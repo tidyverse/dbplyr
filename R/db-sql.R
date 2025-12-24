@@ -443,7 +443,7 @@ sql_query_insert.DBIConnection <- function(
     sql_returning_cols(con, returning_cols, table)
   )
 
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -506,7 +506,7 @@ sql_query_append.DBIConnection <- function(
     sql_returning_cols(con, returning_cols, table)
   )
 
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -550,13 +550,13 @@ sql_query_update_from.DBIConnection <- function(
 
   # avoid CTEs for the general case as they do not work everywhere
   clauses <- list(
-    sql_clause_update(table),
+    sql_clause_update(escape(table, con = con)),
     sql_clause_set(update_cols, update_values),
     sql_clause_from(escape(parts$from, con = con)),
     sql_clause_where(parts$where),
     sql_returning_cols(con, returning_cols, table)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 
@@ -609,13 +609,13 @@ sql_query_upsert.DBIConnection <- function(
   update_cols <- sql_escape_ident(con, update_cols)
 
   updated_cte <- list(
-    sql_clause_update(table),
+    sql_clause_update(escape(table, con = con)),
     sql_clause_set(update_cols, update_values),
     sql_clause_from(escape(parts$from, con = con)),
     sql_clause_where(parts$where),
     sql(paste0("RETURNING ", sql_star(con, table)))
   )
-  updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
+  updated_sql <- sql_format_clauses(updated_cte, lvl = 1)
   update_name <- sql(escape(ident("updated"), con = con))
 
   join_by <- new_join_by(by, x_as = "updated", y_as = "...y")
@@ -632,7 +632,7 @@ sql_query_upsert.DBIConnection <- function(
     sql_returning_cols(con, returning_cols, table)
   )
 
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -661,11 +661,11 @@ sql_query_delete.DBIConnection <- function(
   parts <- rows_prep(con, table, from, by, lvl = 1)
 
   clauses <- list2(
-    sql_clause("DELETE FROM", table),
+    sql_clause("DELETE FROM", escape(table, con = con)),
     !!!sql_clause_where_exists(parts$from, parts$where, not = FALSE),
     sql_returning_cols(con, returning_cols, table)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export

@@ -402,7 +402,7 @@ sql_query_insert.PqConnection <- function(
     },
     sql_returning_cols(con, returning_cols, table)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 #' @export
 sql_query_insert.PostgreSQL <- sql_query_insert.PqConnection
@@ -451,7 +451,7 @@ sql_query_upsert.PqConnection <- function(
     sql_clause_set(update_cols, update_values),
     sql_returning_cols(con, returning_cols, table)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export

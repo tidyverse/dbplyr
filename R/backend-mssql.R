@@ -103,8 +103,9 @@ simulate_mssql <- function(version = "15.0") {
   subquery = FALSE,
   lvl = 0
 ) {
+  select <- sql(names_to_as(con, select))
+
   sql_select_clauses(
-    con,
     select = sql_clause_select(select, distinct, top = limit),
     from = sql_clause_from(escape(from, con = con)),
     where = sql_clause_where(where),
@@ -147,7 +148,7 @@ simulate_mssql <- function(version = "15.0") {
     !!!parts$conflict_clauses
   )
 
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -168,7 +169,7 @@ simulate_mssql <- function(version = "15.0") {
     sql_clause_from(escape(parts$from, con = con))
   )
 
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -186,14 +187,14 @@ simulate_mssql <- function(version = "15.0") {
   update_cols <- sql_escape_ident(con, names(update_values))
 
   clauses <- list(
-    sql_clause_update(table),
+    sql_clause_update(escape(table, con = con)),
     sql_clause_set(update_cols, update_values),
     sql_returning_cols(con, returning_cols, "INSERTED"),
     sql_clause_from(escape(table, con = con)),
     sql_clause("INNER JOIN", parts$from),
     sql_clause_on(parts$where, lvl = 1)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -222,7 +223,7 @@ simulate_mssql <- function(version = "15.0") {
   insert_cols_qual <- sql_table_prefix(con, "...y", insert_cols)
 
   clauses <- list(
-    sql_clause("MERGE INTO", table),
+    sql_clause("MERGE INTO", escape(table, con = con)),
     sql_clause("USING", parts$from),
     sql_clause_on(parts$where, lvl = 1),
     sql("WHEN MATCHED THEN"),
@@ -233,7 +234,7 @@ simulate_mssql <- function(version = "15.0") {
     sql_returning_cols(con, returning_cols, "INSERTED"),
     sql(";")
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -248,11 +249,11 @@ simulate_mssql <- function(version = "15.0") {
   parts <- rows_prep(con, table, from, by, lvl = 0)
 
   clauses <- list2(
-    sql_clause("DELETE FROM", table),
+    sql_clause("DELETE FROM", escape(table, con = con)),
     sql_returning_cols(con, returning_cols, table = "DELETED"),
     !!!sql_clause_where_exists(parts$from, parts$where, not = FALSE)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 mssql_scalar_base <- function() {

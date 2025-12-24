@@ -185,11 +185,11 @@ sql_query_semi_join.DBIConnection <- function(
     sql_clause_from(escape(x, con = con)),
     sql_glue2(con, "WHERE {.sql exists} ("),
     # lvl = 1 because they are basically in a subquery
-    sql_clause("SELECT 1 FROM", y, lvl = 1),
+    sql_clause("SELECT 1 FROM", escape(y, con = con), lvl = 1),
     sql_clause_where(sql(c(on, where)), lvl = 1),
     sql(")")
   )
-  sql_format_clauses(lines, lvl, con)
+  sql_format_clauses(lines, lvl)
 }
 
 dbplyr_query_semi_join <- function(
