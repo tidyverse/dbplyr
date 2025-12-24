@@ -80,10 +80,9 @@ postgres_round <- function(x, digits = 0L) {
   sql_glue("ROUND(({x})::numeric, {digits})")
 }
 
+# https://neon.com/postgresql/postgresql-date-functions/postgresql-make_interval
 postgres_period <- function(x, unit) {
-  x <- escape(x, con = sql_current_con())
-  interval <- paste0(x, " ", unit)
-  sql_glue("CAST({interval} AS INTERVAL)")
+  sql_glue("MAKE_INTERVAL({.sql unit} => {.id x})")
 }
 
 #' @export
@@ -229,28 +228,13 @@ sql_translation.PqConnection <- function(con) {
         sql_glue("EXTRACT(YEAR FROM {x})")
       },
 
-      # https://www.postgresql.org/docs/13/datatype-datetime.html#DATATYPE-INTERVAL-INPUT
-      seconds = function(x) {
-        postgres_period(x, "seconds")
-      },
-      minutes = function(x) {
-        postgres_period(x, "minutes")
-      },
-      hours = function(x) {
-        postgres_period(x, "hours")
-      },
-      days = function(x) {
-        postgres_period(x, "days")
-      },
-      weeks = function(x) {
-        postgres_period(x, "weeks")
-      },
-      months = function(x) {
-        postgres_period(x, "months")
-      },
-      years = function(x) {
-        postgres_period(x, "years")
-      },
+      seconds = function(x) postgres_period(x, "secs"),
+      minutes = function(x) postgres_period(x, "mins"),
+      hours = function(x) postgres_period(x, "hours"),
+      days = function(x) postgres_period(x, "days"),
+      weeks = function(x) postgres_period(x, "weeks"),
+      months = function(x) postgres_period(x, "months"),
+      years = function(x) postgres_period(x, "years"),
 
       # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
       floor_date = function(x, unit = "seconds") {
