@@ -180,6 +180,95 @@ flatten_query.multi_join_query <- function(qry, query_list, con) {
 
 # SQL generation ----------------------------------------------------------
 
+#' @rdname db-sql
+#' @export
+sql_query_multi_join <- function(
+  con,
+  x,
+  joins,
+  table_names,
+  by_list,
+  select,
+  ...,
+  distinct = FALSE,
+  lvl = 0
+) {
+  check_dots_used()
+  UseMethod("sql_query_multi_join")
+}
+
+#' @export
+#' @param vars tibble with six columns:
+#'   * `table` `<tbl_lazy>`: the tables to join with.
+#'   * `type` `<character>`: the join type (left, right, inner, full).
+#'   * `by_x`, `by_y` `<list_of<character>>`: The columns to join by
+#'   * `by_x_table_id` `<list_of<integer>>`: The table index where the join column
+#'     comes from. This needs to be a list because a the join columns might come
+#'     from different tables
+#'   * `on` `<character>`
+#'   * `na_matches` `<character>`: Either `"na"` or `"never"`.
+#' @param select A named SQL vector.
+#' @param table_names `<character>` The names of the tables.
+#' @noRd
+#' @examples
+#' # Left join with *
+#' df1 <- lazy_frame(x = 1, y = 1)
+#' df2 <- lazy_frame(x = 1, z = 1)
+#' df3 <- lazy_frame(x = 1, z2 = 1)
+#'
+#' tmp <- left_join(df1, df2, by = "x") |>
+#'   left_join(df3, by = c("x", z = "z2"))
+#' tibble(
+#'   table = list(df1, df2),
+#'   type = c("left", "left"),
+#'   by_x = list("x", c("x", "z")),
+#'   by_y = list("x", c("x", "z2")),
+#'   by_x_table_id = list(1L, c(1L, 2L)),
+#'   on = c(NA, NA),
+#'   na_matches = c("never", "never")
+#' )
+sql_query_multi_join.DBIConnection <- function(
+  con,
+  x,
+  joins,
+  table_names,
+  by_list,
+  select,
+  ...,
+  distinct = FALSE,
+  lvl = 0
+) {
+  if (vctrs::vec_duplicate_any(table_names)) {
+    cli_abort("{.arg table_names} must be unique.")
+  }
+
+  from <- dbplyr_sql_subquery(con, x, name = table_names[[1]], lvl = lvl)
+  names <- table_names[-1]
+  tables <- joins$table
+  types <- toupper(paste0(joins$type, " JOIN"))
+
+  n_joins <- length(types)
+  out <- vector("list", n_joins * 2)
+
+  for (i in seq_len(n_joins)) {
+    table <- dbplyr_sql_subquery(con, tables[[i]], name = names[[i]], lvl = lvl)
+    out[[2 * i - 1]] <- sql_clause(types[[i]], table)
+
+    by <- joins$by[[i]]
+    on <- sql_join_tbls(con, by = by, na_matches = by$na_matches)
+    out[[2 * i]] <- sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1)
+  }
+
+  clauses <- list2(
+    sql_clause_select(con, select, distinct),
+    sql_clause_from(from),
+    !!!out
+  )
+  sql_format_clauses(clauses, lvl = lvl, con = con)
+}
+
+# Helpers ----------------------------------------------------------------------
+
 #' @param vars tibble with three columns:
 #'   * `name` `<character>`: variable name in output.
 #'   * `table` `<list_of<integer>>`: tables index in database.

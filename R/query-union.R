@@ -86,3 +86,26 @@ flatten_query.union_query <- function(qry, query_list, con) {
   query_list$name <- name
   query_list
 }
+
+# SQL generation ----------------------------------------------------------
+
+#' @rdname db-sql
+#' @export
+sql_query_union <- function(con, x, unions, ..., lvl = 0) {
+  UseMethod("sql_query_union")
+}
+#' @export
+sql_query_union.DBIConnection <- function(con, x, unions, ..., lvl = 0) {
+  methods <- ifelse(unions$all, "UNION ALL", "UNION")
+  methods <- indent_lvl(style_kw(methods), lvl)
+  tables <- unlist(unions$table)
+
+  union_clauses <- vctrs::vec_interleave(as.character(methods), tables)
+  out <- paste0(
+    x,
+    "\n\n",
+    paste0(union_clauses, collapse = "\n\n")
+  )
+
+  sql(out)
+}

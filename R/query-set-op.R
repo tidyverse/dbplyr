@@ -66,3 +66,31 @@ sql_render.set_op_query <- function(
 flatten_query.set_op_query <- function(qry, query_list, con) {
   flatten_query_2_tables(qry, query_list, con)
 }
+
+# SQL generation ----------------------------------------------------------
+
+#' @rdname db-sql
+#' @export
+sql_query_set_op <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
+  check_dots_used()
+  UseMethod("sql_query_set_op")
+}
+#' @export
+sql_query_set_op.DBIConnection <- function(
+  con,
+  x,
+  y,
+  method,
+  ...,
+  all = FALSE,
+  lvl = 0
+) {
+  method <- paste0(method, if (all) " ALL")
+  method <- style_kw(method)
+  lines <- list(
+    sql_indent_subquery(x, con = con, lvl = lvl),
+    sql(method),
+    sql_indent_subquery(y, con = con, lvl = lvl)
+  )
+  sql_format_clauses(lines, lvl, con)
+}
