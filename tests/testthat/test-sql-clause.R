@@ -24,3 +24,10 @@ test_that("sql_select_clauses can generate multiple lines", {
 
   expect_snapshot(sql_format_clauses(clauses, 0, con))
 })
+
+test_that("sql_clause_select can generate top", {
+  expect_equal(
+    format(sql_clause_select(sql("table"), top = 5)),
+    "SELECT TOP 5 table"
+  )
+})

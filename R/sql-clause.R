@@ -45,11 +45,11 @@ sql_clause_select <- function(
     cli_abort("Query contains no columns")
   }
 
-  if (!is.null(top)) {
-    top <- paste0(" TOP ", as.integer(top))
-  }
-
-  clause <- paste0("SELECT", if (distinct) " DISTINCT", top)
+  clause <- paste0(
+    "SELECT",
+    if (distinct) " DISTINCT",
+    if (!is.null(top)) paste0(" TOP ", top)
+  )
   sql_clause(clause, select)
 }
 
@@ -145,9 +145,15 @@ sql_clause_where_exists <- function(table, where, not) {
 
 #' @export
 print.sql_clause <- function(x, ...) {
-  out <- sql_format_clause(x, lvl = 0, con = simulate_dbi())
-  cat("<sql clause>", out)
+  cat("<sql clause>", format(x))
+  invisible()
 }
+
+#' @export
+format.sql_clause <- function(x, ...) {
+  unclass(sql_format_clause(x, lvl = 0, con = simulate_dbi()))
+}
+
 
 # helpers -----------------------------------------------------------------
 
