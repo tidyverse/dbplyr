@@ -141,7 +141,7 @@
         FROM "df_y"
       ) AS "...y"
       WHERE true
-      ON CONFLICT  ("c", "d")
+      ON CONFLICT ("c", "d")
       DO UPDATE
       SET "a" = "excluded"."a", "b" = "excluded"."b"
       RETURNING "df_x"."a", "df_x"."b" AS "b2"

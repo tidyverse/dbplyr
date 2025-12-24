@@ -452,7 +452,7 @@ sql_query_upsert.PqConnection <- function(
     sql_clause_from(parts$from),
     # `WHERE true` is required for SQLite
     sql("WHERE true"),
-    sql_clause("ON CONFLICT ", by_sql),
+    sql_clause("ON CONFLICT", by_sql),
     sql("DO UPDATE"),
     sql_clause_set(update_cols, update_values),
     sql_returning_cols(con, returning_cols, table)

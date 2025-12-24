@@ -162,8 +162,8 @@ values are then inserted outside of the CTE.
 \examples{
 sql_query_upsert(
   con = simulate_postgres(),
-  table = ident("airlines"),
-  from = ident("df"),
+  table = "airlines",
+  from = "df",
   by = "carrier",
   update_cols = "name"
 )
