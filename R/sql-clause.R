@@ -50,7 +50,7 @@ sql_clause_select <- function(
     if (distinct) " DISTINCT",
     if (!is.null(top)) paste0(" TOP ", top)
   )
-  sql_clause(clause, select)
+  sql_clause(clause, select, lvl = lvl)
 }
 
 sql_clause_from <- function(from, lvl = 0) {
@@ -69,7 +69,7 @@ sql_clause_where <- function(where, lvl = 0) {
 
 sql_clause_group_by <- function(group_by, lvl = 0) {
   check_sql(group_by, allow_null = TRUE)
-  sql_clause("GROUP BY", group_by)
+  sql_clause("GROUP BY", group_by, lvl = lvl)
 }
 
 sql_clause_having <- function(having, lvl = 0) {
@@ -77,11 +77,11 @@ sql_clause_having <- function(having, lvl = 0) {
 
   # wrap each clause in parens
   having <- sql(paste0("(", having, ")", recycle0 = TRUE))
-  sql_clause("HAVING", having, sep = " AND")
+  sql_clause("HAVING", having, sep = " AND", lvl = lvl)
 }
 
-sql_clause_window <- function(window) {
-  sql_clause("WINDOW", window)
+sql_clause_window <- function(window, lvl = 0) {
+  sql_clause("WINDOW", window, lvl = lvl)
 }
 
 sql_clause_order_by <- function(
@@ -96,7 +96,7 @@ sql_clause_order_by <- function(
     warn_drop_order_by()
     NULL
   } else {
-    sql_clause("ORDER BY", order_by)
+    sql_clause("ORDER BY", order_by, lvl = lvl)
   }
 }
 
@@ -104,18 +104,18 @@ sql_clause_limit <- function(limit, lvl = 0) {
   check_number_whole(limit, allow_null = TRUE, allow_infinite = TRUE, min = 0)
 
   if (!is.null(limit) && !identical(limit, Inf)) {
-    sql_clause("LIMIT", sql(format(limit, scientific = FALSE)))
+    sql_clause("LIMIT", sql(format(limit, scientific = FALSE)), lvl = lvl)
   }
 }
 
-sql_clause_update <- function(table) {
-  sql_clause("UPDATE", table)
+sql_clause_update <- function(table, lvl = 0) {
+  sql_clause("UPDATE", table, lvl = lvl)
 }
 
-sql_clause_set <- function(lhs, rhs) {
+sql_clause_set <- function(lhs, rhs, lvl = 0) {
   update_clauses <- sql(paste0(lhs, " = ", rhs))
 
-  sql_clause("SET", update_clauses)
+  sql_clause("SET", update_clauses, lvl = lvl)
 }
 
 sql_clause_insert <- function(con, cols, into = NULL, lvl = 0) {
