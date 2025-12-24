@@ -62,8 +62,9 @@ sql_clause_where <- function(where, lvl = 0) {
   check_sql(where, allow_null = TRUE)
   check_character(where, allow_null = TRUE)
 
-  where_paren <- sql(paste0("(", where, ")", recycle0 = TRUE))
-  sql_clause("WHERE", where_paren, sep = " AND", lvl = lvl)
+  # wrap each clause in parens
+  where <- sql(paste0("(", where, ")", recycle0 = TRUE))
+  sql_clause("WHERE", where, sep = " AND", lvl = lvl)
 }
 
 sql_clause_group_by <- function(group_by, lvl = 0) {
@@ -73,8 +74,10 @@ sql_clause_group_by <- function(group_by, lvl = 0) {
 
 sql_clause_having <- function(having, lvl = 0) {
   check_sql(having, allow_null = TRUE)
-  having_paren <- sql(paste0("(", having, ")", recycle0 = TRUE))
-  sql_clause("HAVING", having_paren, sep = " AND")
+
+  # wrap each clause in parens
+  having <- sql(paste0("(", having, ")", recycle0 = TRUE))
+  sql_clause("HAVING", having, sep = " AND")
 }
 
 sql_clause_window <- function(window) {
