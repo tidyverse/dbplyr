@@ -82,7 +82,7 @@ postgres_round <- function(x, digits = 0L) {
 
 # https://neon.com/postgresql/postgresql-date-functions/postgresql-make_interval
 postgres_period <- function(x, unit) {
-  sql_glue("MAKE_INTERVAL({.sql unit} => {.id x})")
+  sql_glue("MAKE_INTERVAL({.sql unit} => {x})")
 }
 
 #' @export
@@ -374,13 +374,13 @@ sql_query_insert.PqConnection <- function(
   conflict <- rows_check_conflict(conflict)
 
   parts <- rows_insert_prep(con, table, from, insert_cols, by, lvl = 0)
-  by_sql <- escape(ident(by), parens = TRUE, collapse = ", ", con = con)
+  by_sql <- sql(sql_escape_ident(con, by))
 
   clauses <- list(
     parts$insert_clause,
     sql_clause_select(sql("*")),
     sql_clause_from(parts$from),
-    sql_clause("ON CONFLICT", by_sql),
+    sql_clause("ON CONFLICT", by_sql, parens = TRUE),
     {
       if (conflict == "ignore") sql("DO NOTHING")
     },
@@ -423,14 +423,14 @@ sql_query_upsert.PqConnection <- function(
   )
   update_cols <- sql_escape_ident(con, update_cols)
 
-  by_sql <- escape(ident(by), parens = TRUE, collapse = ", ", con = con)
+  by_sql <- sql(sql_escape_ident(con, by))
   clauses <- list(
     sql_clause_insert(con, insert_cols, into = table),
     sql_clause_select(select_cols),
     sql_clause_from(parts$from),
     # `WHERE true` is required for SQLite
     sql("WHERE true"),
-    sql_clause("ON CONFLICT", by_sql),
+    sql_clause("ON CONFLICT", by_sql, parens = TRUE),
     sql("DO UPDATE"),
     sql_clause_set(update_cols, update_values),
     sql_returning_cols(con, returning_cols, table)

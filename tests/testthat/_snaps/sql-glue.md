@@ -1,19 +1,22 @@
-# useful error if bad identified
+# useful error if bad identifier
 
     Code
       sql_glue2(con, "{.id 1}")
     Condition
       Error in `sql_glue2()`:
-      ! Failed to interpolate {.id 1}.
-      Caused by error in `glue_transformer()`:
-      ! Invalid identifier: expecting a character vector.
+      ! {.id 1} must be passed a character vector.
     Code
       sql_glue2(con, "{.tbl 1}")
     Condition
       Error in `sql_glue2()`:
       ! Failed to interpolate {.tbl 1}.
-      Caused by error in `as_table_path()`:
-      ! `value` uses unknown specification for table name
+      Caused by error in `glue_transformer()`:
+      ! `x` must be a table source (SQL or a table identifier), not the number 1.
+    Code
+      sql_glue2(con, "{.sql 1}")
+    Condition
+      Error in `sql_glue2()`:
+      ! {.sql 1} must be passed a string.
 
 # gives informative errors
 

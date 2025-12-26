@@ -280,7 +280,7 @@ sql_query_rows <- function(con, sql, ...) {
 sql_query_rows.DBIConnection <- function(con, sql, ...) {
   sql <- as_table_source(sql, con)
   from <- dbplyr_sql_subquery(con, sql, "master")
-  sql_glue2(con, "SELECT COUNT(*) FROM {.from from}")
+  sql_glue2(con, "SELECT COUNT(*) FROM {.tbl from}")
 }
 
 #' @rdname db-sql
@@ -616,7 +616,7 @@ sql_query_upsert.DBIConnection <- function(
     sql(paste0("RETURNING ", sql_star(con, table)))
   )
   updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
-  update_name <- sql(escape(ident("updated"), con = con))
+  update_name <- sql(sql_escape_ident(con, "updated"))
 
   join_by <- new_join_by(by, x_as = "updated", y_as = "...y")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
@@ -691,8 +691,7 @@ sql_named_cols <- function(con, cols, table = NULL) {
   nms[nms == cols] <- ""
 
   cols <- sql_table_prefix(con, table, cols)
-  cols <- set_names(ident_q(cols), nms)
-  escape(cols, collapse = NULL, con = con)
+  set_names(sql(cols), nms)
 }
 
 # dplyr fallbacks ---------------------------------------------------------
