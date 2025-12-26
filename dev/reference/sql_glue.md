@@ -25,6 +25,7 @@ You can also use type markers to control how the value is treated:
   [`in_schema()`](https://dbplyr.tidyverse.org/dev/reference/in_schema.md).
 
 - `{.id x}`: `x` is a generic identifier, e.g. for a column or index.
+  `x` must be a character vector
 
 ## Usage
 

@@ -47,8 +47,6 @@ con <- simulate_dbi()
 
 # Old:
 build_sql("SELECT * FROM ", ident("table"), con = con)
-#> Warning: `build_sql()` was deprecated in dbplyr 2.6.0.
-#> ℹ Please use `sql_glue2()` instead.
 #> <SQL> SELECT * FROM "table"
 # New:
 sql_glue2(con, "SELECT * FROM {.tbl 'table'}")

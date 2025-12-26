@@ -15,6 +15,7 @@ is, without additional escaping. x must be a string.
 {.tbl x}: x is a table identifier like a string, I(), or one of
 the older forms like DBI::Id() or in_schema().
 {.id x}: x is a generic identifier, e.g. for a column or index.
+x must be a character vector
 
 "><meta property="og:description" content="sql_glue() and sql_glue2() are designed to help dbplyr extenders
 generate custom SQL. They differ only in whether or not they require
@@ -32,6 +33,7 @@ is, without additional escaping. x must be a string.
 {.tbl x}: x is a table identifier like a string, I(), or one of
 the older forms like DBI::Id() or in_schema().
 {.id x}: x is a generic identifier, e.g. for a column or index.
+x must be a character vector
 
 "><meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png"><meta name="robots" content="noindex"><script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js" data-max-height="43" data-light-bg="#666f76" data-light-fg="#f9f9f9"></script><script defer data-domain="dbplyr.tidyverse.org,all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script></head><body>
     <a href="#container" class="visually-hidden-focusable">Skip to content</a>
@@ -85,7 +87,7 @@ the older forms like DBI::Id() or in_schema().
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Build SQL strings with glue syntax</h1>
-      <small class="dont-index">Source: <a href="https://github.com/tidyverse/dbplyr/blob/main/R/build-sql.R" class="external-link"><code>R/build-sql.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/tidyverse/dbplyr/blob/main/R/sql-glue.R" class="external-link"><code>R/sql-glue.R</code></a></small>
       <div class="d-none name"><code>sql_glue.Rd</code></div>
     </div>
 
@@ -104,7 +106,8 @@ to be wrapped in <code>()</code>, use a <code>*</code> suffix, e.g. <code>{x*}</
 is, without additional escaping. <code>x</code> must be a string.</p></li>
 <li><p><code>{.tbl x}</code>: <code>x</code> is a table identifier like a string, <code><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I()</a></code>, or one of
 the older forms like <code><a href="https://dbi.r-dbi.org/reference/Id.html" class="external-link">DBI::Id()</a></code> or <code><a href="in_schema.html">in_schema()</a></code>.</p></li>
-<li><p><code>{.id x}</code>: <code>x</code> is a generic identifier, e.g. for a column or index.</p></li>
+<li><p><code>{.id x}</code>: <code>x</code> is a generic identifier, e.g. for a column or index.
+<code>x</code> must be a character vector</p></li>
 </ul></div>
 
     <div class="section level2">
