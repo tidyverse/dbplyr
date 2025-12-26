@@ -110,8 +110,7 @@ sql_values_subquery_default <- function(con, df, types, lvl, row) {
   #   a) a zero row table which is just required to name the columns. This is
   #      necessary as e.g. SQLite cannot name `VALUES`.
   #   b) `VALUES` clause
-  sim_data <- rep_named(colnames(df), list(NULL))
-  cols_clause <- escape(sim_data, con = con, parens = FALSE, collapse = NULL)
+  cols_clause <- names_to_as(con, rep_named(colnames(df), "NULL"))
 
   null_row_clauses <- list(
     select = sql_clause_select(cols_clause),
@@ -154,11 +153,7 @@ sql_values_subquery_column_alias <- function(con, df, types, lvl, ...) {
   rows_clauses <- sql_values_clause(con, df, row = FALSE)
   rows_query <- sql_format_clauses(rows_clauses, lvl = lvl + 1, con = con)
 
-  table_alias_sql <- sql(paste0(
-    "drvd(",
-    escape(ident(colnames(df)), con = con),
-    ")"
-  ))
+  table_alias_sql <- sql_glue2(con, "drvd({.id colnames(df)})")
 
   if (grepl("\\n", rows_query)) {
     rows_query <- sql(paste0(
@@ -200,8 +195,7 @@ sql_values_subquery_union <- function(con, df, types, lvl, row, from = NULL) {
   #   a) a zero row table which is just required to name the columns. This is
   #      necessary as e.g. SQLite cannot name `VALUES`.
   #   b) `UNION ALL` of one row `SELECT` statements
-  sim_data <- rep_named(colnames(df), list(NULL))
-  cols_clause <- escape(sim_data, con = con, parens = FALSE, collapse = NULL)
+  cols_clause <- names_to_as(con, rep_named(colnames(df), "NULL"))
 
   clauses <- list(
     select = sql_clause_select(cols_clause),
