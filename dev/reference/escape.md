@@ -1,12 +1,34 @@
-# Escape/quote a string.
+# Escape/quote a value
 
-`escape()` requires you to provide a database connection to control the
-details of escaping.
+`escape()` turns R values into SQL literals. It implements double
+dispatch via two sets of generics: first `escape()` dispatches on the
+class of `x`, then that method calls `sql_escape_ident()`,
+`sql_escape_logical()`, etc, which dispatch on `con`.
+
+These generics translate individual values into SQL. The core generics
+are
+[`DBI::dbQuoteIdentifier()`](https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html)
+and
+[`DBI::dbQuoteString()`](https://dbi.r-dbi.org/reference/dbQuoteString.html)
+for quoting identifiers and strings, but dbplyr needs additional tools
+for inserting logical, date, date-time, and raw values into queries.
 
 ## Usage
 
 ``` r
 escape(x, parens = NA, collapse = " ", con = NULL)
+
+sql_escape_ident(con, x)
+
+sql_escape_logical(con, x)
+
+sql_escape_date(con, x)
+
+sql_escape_datetime(con, x)
+
+sql_escape_string(con, x)
+
+sql_escape_raw(con, x)
 
 sql_vector(x, parens = NA, collapse = " ", con = NULL)
 ```
@@ -33,6 +55,13 @@ sql_vector(x, parens = NA, collapse = " ", con = NULL)
 
   Database connection.
 
+## See also
+
+Other generic:
+[`db-sql`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md),
+[`db_connection_describe()`](https://dbplyr.tidyverse.org/dev/reference/db-misc.md),
+[`db_copy_to()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md)
+
 ## Examples
 
 ``` r
@@ -57,4 +86,14 @@ escape("X", con = con)
 #> <SQL> 'X'
 escape(escape("X", con = con), con = con)
 #> <SQL> 'X'
+
+# Database specific generics
+sql_escape_logical(con, c(TRUE, FALSE, NA))
+#> [1] "TRUE"  "FALSE" "NULL" 
+sql_escape_date(con, Sys.Date())
+#> [1] "'2025-12-26'"
+sql_escape_date(con, Sys.time())
+#> [1] "'2025-12-26 15:21:48.078375'"
+sql_escape_raw(con, charToRaw("hi"))
+#> [1] "X'6869'"
 ```

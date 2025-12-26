@@ -165,8 +165,14 @@
 ## SQL generation
 
 - [`escape()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
+  [`sql_escape_ident()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
+  [`sql_escape_logical()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
+  [`sql_escape_date()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
+  [`sql_escape_datetime()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
+  [`sql_escape_string()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
+  [`sql_escape_raw()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   [`sql_vector()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
-  : Escape/quote a string.
+  : Escape/quote a value
 - [`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md)
   [`is.sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md) : SQL
   escaping.
@@ -218,11 +224,15 @@ Documentation for authors of new dbplyr backends
   [`sql_query_set_op()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
   [`sql_query_union()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
   : SQL generation generics
-- [`sql_escape_logical()`](https://dbplyr.tidyverse.org/dev/reference/db-quote.md)
-  [`sql_escape_date()`](https://dbplyr.tidyverse.org/dev/reference/db-quote.md)
-  [`sql_escape_datetime()`](https://dbplyr.tidyverse.org/dev/reference/db-quote.md)
-  [`sql_escape_raw()`](https://dbplyr.tidyverse.org/dev/reference/db-quote.md)
-  : SQL escaping/quoting generics
+- [`escape()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
+  [`sql_escape_ident()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
+  [`sql_escape_logical()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
+  [`sql_escape_date()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
+  [`sql_escape_datetime()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
+  [`sql_escape_string()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
+  [`sql_escape_raw()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
+  [`sql_vector()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
+  : Escape/quote a value
 - [`sql_glue()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
   [`sql_glue2()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
   : Build SQL strings with glue syntax

@@ -49,7 +49,7 @@
 - [`distinct()`](https://dplyr.tidyverse.org/reference/distinct.html)
   with computed columns now ignores grouping, matching dplyr’s behavior
   ([\#1081](https://github.com/tidyverse/dbplyr/issues/1081)).
-- [`sql_escape_string()`](https://dplyr.tidyverse.org/reference/backend_dbplyr.html)
+- [`sql_escape_string()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   now defaults to using `'`.
 - `simulate_*()` now uses (approximately) correct quoting for all
   backends, so the generated SQL looks more like what you’ll actually
@@ -1645,7 +1645,7 @@ CRAN release: 2021-04-06
   ([@mgirlich](https://github.com/mgirlich),
   [\#615](https://github.com/tidyverse/dbplyr/issues/615)).
 
-- [`sql_escape_date()`](https://dbplyr.tidyverse.org/dev/reference/db-quote.md)
+- [`sql_escape_date()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   and `sql_escape_datetime` gain methods for MS Access
   ([@erikvona](https://github.com/erikvona),
   [\#608](https://github.com/tidyverse/dbplyr/issues/608)).
@@ -1975,11 +1975,11 @@ If you are the author of a dbplyr backend, please see
 
 - [`DBI::dbQuoteIdentifier()`](https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html)
   is now used instead of
-  [`sql_escape_ident()`](https://dplyr.tidyverse.org/reference/backend_dbplyr.html)
+  [`sql_escape_ident()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   and
   [`DBI::dbQuoteString()`](https://dbi.r-dbi.org/reference/dbQuoteString.html)
   instead of
-  [`sql_escape_string()`](https://dplyr.tidyverse.org/reference/backend_dbplyr.html).
+  [`sql_escape_string()`](https://dbplyr.tidyverse.org/dev/reference/escape.md).
 
 - A number of `db_*` generics have been replaced with new SQL generation
   generics:
@@ -2104,7 +2104,7 @@ CRAN release: 2020-05-27
 
 - [`escape()`](https://dbplyr.tidyverse.org/dev/reference/escape.md) now
   supports `blob` vectors using new
-  [`sql_escape_raw()`](https://dbplyr.tidyverse.org/dev/reference/db-quote.md)
+  [`sql_escape_raw()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   generic. It enables using [blob](https://blob.tidyverse.org/)
   variables in dplyr verbs, for example to filter nvarchar values by
   UTF-16 blobs (see
@@ -2139,9 +2139,9 @@ CRAN release: 2020-04-19
 - The Date and POSIXt methods for
   [`escape()`](https://dbplyr.tidyverse.org/dev/reference/escape.md) now
   use exported
-  [`sql_escape_date()`](https://dbplyr.tidyverse.org/dev/reference/db-quote.md)
+  [`sql_escape_date()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   and
-  [`sql_escape_datetime()`](https://dbplyr.tidyverse.org/dev/reference/db-quote.md)
+  [`sql_escape_datetime()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   generics to allow backend specific formatting of date and datetime
   literals. These are used to provide methods for Athena and Presto
   backends ([@OssiLehtinen](https://github.com/OssiLehtinen),
@@ -3101,7 +3101,7 @@ CRAN release: 2017-06-09
   provide a DBIConnection method. That means that you can easily scan
   the NAMESPACE to see the extension points.
 
-- [`sql_escape_logical()`](https://dbplyr.tidyverse.org/dev/reference/db-quote.md)
+- [`sql_escape_logical()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   allows you to control the translation of literal logicals
   ([\#2614](https://github.com/tidyverse/dbplyr/issues/2614)).
 

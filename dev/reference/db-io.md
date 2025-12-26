@@ -76,4 +76,4 @@ db_table_temporary(con, table, temporary, ...)
 Other generic:
 [`db-sql`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md),
 [`db_connection_describe()`](https://dbplyr.tidyverse.org/dev/reference/db-misc.md),
-[`sql_escape_logical()`](https://dbplyr.tidyverse.org/dev/reference/db-quote.md)
+[`escape()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)

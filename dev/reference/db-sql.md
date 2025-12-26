@@ -171,4 +171,4 @@ sql_query_union(con, x, unions, ..., lvl = 0)
 Other generic:
 [`db_connection_describe()`](https://dbplyr.tidyverse.org/dev/reference/db-misc.md),
 [`db_copy_to()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md),
-[`sql_escape_logical()`](https://dbplyr.tidyverse.org/dev/reference/db-quote.md)
+[`escape()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)

@@ -31,4 +31,4 @@ dbplyr_edition(con)
 Other generic:
 [`db-sql`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md),
 [`db_copy_to()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md),
-[`sql_escape_logical()`](https://dbplyr.tidyverse.org/dev/reference/db-quote.md)
+[`escape()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
