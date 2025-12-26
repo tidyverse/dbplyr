@@ -14,33 +14,27 @@ test_that("identifier names become AS", {
   expect_equal(ei(x = "y"), '"y" AS "x"')
 })
 
-# Zero-length inputs ------------------------------------------------------
+# sql_collapse ------------------------------------------------------------------
 
-test_that("zero length inputs yield zero length output when not collapsed", {
-  con <- simulate_dbi()
-  expect_equal(sql_vector(sql(), collapse = NULL, con = con), sql())
-  expect_equal(sql_vector(ident(), collapse = NULL, con = con), sql())
+test_that("sql_collapse collapses with separator", {
+  expect_equal(sql_collapse(sql("a", "b")), sql("a b"))
+  expect_equal(sql_collapse(sql("a", "b"), collapse = ", "), sql("a, b"))
 })
 
-test_that("zero length inputs yield length-1 output when collapsed", {
-  con <- simulate_dbi()
+test_that("sql_collapse handles 0-length inputs", {
+  expect_equal(sql_collapse(character()), sql(""))
+  expect_equal(sql_collapse(character(), collapse = NULL), sql())
 
-  expect_equal(
-    sql_vector(sql(), parens = FALSE, collapse = "", con = con),
-    sql("")
-  )
-  expect_equal(
-    sql_vector(sql(), parens = TRUE, collapse = "", con = con),
-    sql("()")
-  )
-  expect_equal(
-    sql_vector(ident(), parens = FALSE, collapse = "", con = con),
-    sql("")
-  )
-  expect_equal(
-    sql_vector(ident(), parens = TRUE, collapse = "", con = con),
-    sql("()")
-  )
+  expect_equal(sql_collapse(character(), parens = TRUE), sql("()"))
+  expect_equal(sql_collapse(character(), collapse = NULL, parens = TRUE), sql())
+})
+
+test_that("sql_collapse controls parens", {
+  expect_equal(sql_collapse(sql("a")), sql("a"))
+  expect_equal(sql_collapse(sql("a", "b")), sql("a b"))
+
+  expect_equal(sql_collapse(sql("a"), parens = TRUE), sql("(a)"))
+  expect_equal(sql_collapse(sql("a", "b"), parens = TRUE), sql("(a b)"))
 })
 
 # Numeric ------------------------------------------------------------------

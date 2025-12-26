@@ -271,24 +271,22 @@ error_embed <- function(type, expr) {
 #' @export
 #' @rdname escape
 sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
+  check_bool(parens, allow_na = TRUE)
+  check_string(collapse, allow_null = TRUE)
   check_con(con)
-
-  if (length(x) == 0) {
-    if (!is.null(collapse)) {
-      return(if (isTRUE(parens)) sql("()") else sql(""))
-    } else {
-      return(sql())
-    }
-  }
 
   if (is.na(parens)) {
     parens <- length(x) > 1L
   }
 
   x <- names_to_as(con, x)
+  sql_collapse(x, collapse, parens)
+}
+
+sql_collapse <- function(x, collapse = " ", parens = FALSE) {
   x <- paste(x, collapse = collapse)
   if (parens) {
-    x <- paste0("(", x, ")")
+    x <- paste0("(", x, ")", recycle0 = TRUE)
   }
   sql(x)
 }
