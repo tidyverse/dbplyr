@@ -11,7 +11,7 @@ in x, they'll be collapsed into a single string with ,. If you want them
 to be wrapped in (), use a * suffix, e.g. {x*}.
 You can also use type markers to control how the value is treated:
 {.sql x}: x is literal SQL that should be interpolated as
-is, without additional escaping.
+is, without additional escaping. x must be a string.
 {.tbl x}: x is a table identifier like a string, I(), or one of
 the older forms like DBI::Id() or in_schema().
 {.id x}: x is a generic identifier, e.g. for a column or index.
@@ -28,7 +28,7 @@ in x, they'll be collapsed into a single string with ,. If you want them
 to be wrapped in (), use a * suffix, e.g. {x*}.
 You can also use type markers to control how the value is treated:
 {.sql x}: x is literal SQL that should be interpolated as
-is, without additional escaping.
+is, without additional escaping. x must be a string.
 {.tbl x}: x is a table identifier like a string, I(), or one of
 the older forms like DBI::Id() or in_schema().
 {.id x}: x is a generic identifier, e.g. for a column or index.
@@ -101,7 +101,7 @@ will escape <code>x</code> using the database connection. If there are multiple 
 in <code>x</code>, they'll be collapsed into a single string with <code>,</code>. If you want them
 to be wrapped in <code>()</code>, use a <code>*</code> suffix, e.g. <code>{x*}</code>.</p>
 <p>You can also use type markers to control how the value is treated:</p><ul><li><p><code>{.sql x}</code>: <code>x</code> is literal SQL that should be interpolated as
-is, without additional escaping.</p></li>
+is, without additional escaping. <code>x</code> must be a string.</p></li>
 <li><p><code>{.tbl x}</code>: <code>x</code> is a table identifier like a string, <code><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I()</a></code>, or one of
 the older forms like <code><a href="https://dbi.r-dbi.org/reference/Id.html" class="external-link">DBI::Id()</a></code> or <code><a href="in_schema.html">in_schema()</a></code>.</p></li>
 <li><p><code>{.id x}</code>: <code>x</code> is a generic identifier, e.g. for a column or index.</p></li>

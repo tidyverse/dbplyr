@@ -17,7 +17,7 @@ you want them to be wrapped in `()`, use a `*` suffix, e.g. `{x*}`.
 You can also use type markers to control how the value is treated:
 
 - `{.sql x}`: `x` is literal SQL that should be interpolated as is,
-  without additional escaping.
+  without additional escaping. `x` must be a string.
 
 - `{.tbl x}`: `x` is a table identifier like a string,
   [`I()`](https://rdrr.io/r/base/AsIs.html), or one of the older forms
