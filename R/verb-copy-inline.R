@@ -288,7 +288,7 @@ sql_values_cast_clauses <- function(con, df, types, na) {
     })
   }
 
-  sql(typed_cols)
+  names_to_as(con, typed_cols)
 }
 
 values_prepare <- function(con, df) {

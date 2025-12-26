@@ -301,7 +301,7 @@ sql_render.select_query <- function(
 
   sql_query_select(
     con,
-    query$select,
+    names_to_as(con, query$select),
     from,
     where = query$where,
     group_by = query$group_by,
@@ -359,6 +359,8 @@ sql_query_select <- function(
   lvl = 0
 ) {
   check_dots_used()
+  check_sql(select, allow_names = FALSE)
+
   UseMethod("sql_query_select")
 }
 
