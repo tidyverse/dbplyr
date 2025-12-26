@@ -24,6 +24,10 @@ sql_select_clauses <- function(
 }
 
 sql_clause <- function(kw, parts, sep = ",", parens = FALSE, lvl = 0) {
+  if (length(parts) == 0) {
+    return()
+  }
+
   clause <- list(
     kw = kw,
     parts = parts,
@@ -57,31 +61,25 @@ sql_clause_from <- function(from, lvl = 0) {
   sql_clause("FROM", from, lvl = lvl)
 }
 
-sql_clause_where <- function(where, lvl = 0, call = caller_env()) {
-  if (length(where) == 0L) {
-    return()
-  }
-
-  check_character(where, call = call)
-  where_paren <- sql(paste0("(", where, ")"))
-  sql_clause("WHERE", where_paren, sep = " AND", lvl = lvl)
+sql_clause_where <- function(where, lvl = 0) {
+  check_sql(where, allow_null = TRUE)
+  where <- sql(paste0("(", where, ")", recycle0 = TRUE))
+  sql_clause("WHERE", where, sep = " AND", lvl = lvl)
 }
 
 sql_clause_group_by <- function(group_by, lvl = 0) {
+  check_sql(group_by, allow_null = TRUE)
   sql_clause("GROUP BY", group_by)
 }
 
 sql_clause_having <- function(having, lvl = 0, call = caller_env()) {
-  if (length(having) == 0L) {
-    return()
-  }
-
-  check_character(having, call = call)
-  having_paren <- sql(paste0("(", having, ")"))
-  sql_clause("HAVING", having_paren, sep = " AND")
+  check_sql(having, allow_null = TRUE)
+  having <- sql(paste0("(", having, ")", recycle0 = TRUE))
+  sql_clause("HAVING", having, sep = " AND")
 }
 
 sql_clause_window <- function(window) {
+  check_sql(window, allow_null = TRUE)
   sql_clause("WINDOW", window)
 }
 
@@ -149,8 +147,7 @@ print.sql_clause <- function(x, ...) {
 # helpers -----------------------------------------------------------------
 
 sql_format_clauses <- function(clauses, lvl, con) {
-  clauses <- unname(clauses)
-  clauses <- purrr::discard(clauses, ~ !is.sql(.x) && is_empty(.x$parts))
+  clauses <- purrr::compact(clauses)
 
   formatted_clauses <- purrr::map(
     clauses,
