@@ -63,7 +63,7 @@ sql_build.lazy_semi_join_query <- function(op, con, ..., sql_options = NULL) {
   ) {
     vars <- sql_star(con, op$by$x_as)
   } else {
-    vars <- sql(set_names(sql_escape_ident(con, op$vars$var), op$vars$name))
+    vars <- set_names(sql_escape_ident(con, op$vars$var), op$vars$name)
   }
 
   # We've introduced aliases to disambiguate the internal and external tables

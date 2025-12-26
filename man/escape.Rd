@@ -43,6 +43,9 @@ atomic vectors are separated by spaces and wrapped in parens if needed.}
 
 \item{con}{Database connection.}
 }
+\value{
+A \link{sql} vector.
+}
 \description{
 \code{escape()} turns R values into SQL literals. It implements double dispatch
 via two sets of generics: first \code{escape()} dispatches on the class of \code{x},

@@ -181,7 +181,7 @@ sql_escape_logical.ACCESS <- function(con, x) {
   # Access uses a convention of -1 as True and 0 as False
   y <- ifelse(x, -1, 0)
   y[is.na(x)] <- "NULL"
-  y
+  sql(y)
 }
 
 #' @export
@@ -189,7 +189,7 @@ sql_escape_date.ACCESS <- function(con, x) {
   # Access delimits dates using octothorpes, and uses YYYY-MM-DD
   y <- format(x, "#%Y-%m-%d#")
   y[is.na(x)] <- "NULL"
-  y
+  sql(y)
 }
 
 #' @export
@@ -198,7 +198,7 @@ sql_escape_datetime.ACCESS <- function(con, x) {
   # Timezones are not supported in Access
   y <- format(x, "#%Y-%m-%d %H:%M:%S#")
   y[is.na(x)] <- "NULL"
-  y
+  sql(y)
 }
 
 #' @export

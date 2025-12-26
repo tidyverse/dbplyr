@@ -291,9 +291,9 @@ sql_escape_ident.MySQLConnection <- function(con, x) {
     # for simulate_mysql()
     NextMethod()
   } else if (methods::is(x, "SQL")) {
-    x
+    sql(x)
   } else {
-    DBI::dbQuoteIdentifier(con, x)
+    sql(DBI::dbQuoteIdentifier(con, x))
   }
 }
 

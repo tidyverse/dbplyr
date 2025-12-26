@@ -28,14 +28,14 @@ dbplyr_edition.TestConnection <- function(con) 2L
 #' @export
 sql_escape_ident.TestConnection <- function(con, x) {
   if (inherits(con, "Microsoft SQL Server")) {
-    sql_quote(x, c("[", "]"))
+    sql(sql_quote(x, c("[", "]")))
   } else if (
     inherits(con, "MySQLConnection") ||
       inherits(con, "MariaDBConnection") ||
       inherits(con, "SQLiteConnection")
   ) {
-    sql_quote(x, "`")
+    sql(sql_quote(x, "`"))
   } else {
-    sql_quote(x, '"')
+    sql(sql_quote(x, '"'))
   }
 }

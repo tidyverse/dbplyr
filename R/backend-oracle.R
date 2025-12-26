@@ -91,7 +91,7 @@ sql_query_upsert.Oracle <- function(
 
   # https://oracle-base.com/articles/9i/merge-statement
   parts <- rows_prep(con, table, from, by, lvl = 0)
-  update_cols_esc <- sql(sql_escape_ident(con, update_cols))
+  update_cols_esc <- sql_escape_ident(con, update_cols)
   update_values <- sql_table_prefix(con, "...y", update_cols)
   update_clause <- sql(paste0(update_cols_esc, " = ", update_values))
 

@@ -25,6 +25,7 @@
 #'   atomic vectors are separated by spaces and wrapped in parens if needed.
 #' @param con Database connection.
 #' @family generic
+#' @returns A [sql] vector.
 #' @export
 #' @examples
 #' con <- simulate_dbi()
@@ -68,7 +69,7 @@ sql_escape_ident <- function(con, x) {
 }
 #' @export
 sql_escape_ident.default <- function(con, x) {
-  dbQuoteIdentifier(con, x)
+  sql(dbQuoteIdentifier(con, x))
 }
 
 # logical -----------------------------------------------------------------
@@ -87,7 +88,7 @@ sql_escape_logical <- function(con, x) {
 sql_escape_logical.DBIConnection <- function(con, x) {
   y <- as.character(x)
   y[is.na(x)] <- "NULL"
-  y
+  sql(y)
 }
 
 # factor ------------------------------------------------------------------
@@ -147,7 +148,7 @@ sql_escape_string <- function(con, x) {
 }
 #' @export
 sql_escape_string.default <- function(con, x) {
-  sql_quote(x, "'")
+  sql(sql_quote(x, "'"))
 }
 
 # double ------------------------------------------------------------------
@@ -203,11 +204,11 @@ sql_escape_raw.DBIConnection <- function(con, x) {
   # raw "vectors" are scalars in this content
 
   if (is.null(x)) {
-    "NULL"
+    sql("NULL")
   } else {
     # SQL-99 standard for BLOB literals
     # https://crate.io/docs/sql-99/en/latest/chapters/05.html#blob-literal-s
-    paste0(c("X'", format(x), "'"), collapse = "")
+    sql(paste0(c("X'", format(x), "'"), collapse = ""))
   }
 }
 
