@@ -280,7 +280,7 @@ sql_query_rows <- function(con, sql, ...) {
 sql_query_rows.DBIConnection <- function(con, sql, ...) {
   sql <- as_table_source(sql, con)
   from <- dbplyr_sql_subquery(con, sql, "master")
-  sql_glue2(con, "SELECT COUNT(*) FROM {.from from}")
+  sql_glue2(con, "SELECT COUNT(*) FROM {.tbl from}")
 }
 
 #' @rdname db-sql

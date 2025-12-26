@@ -82,7 +82,7 @@ postgres_round <- function(x, digits = 0L) {
 
 # https://neon.com/postgresql/postgresql-date-functions/postgresql-make_interval
 postgres_period <- function(x, unit) {
-  sql_glue("MAKE_INTERVAL({.sql unit} => {.id x})")
+  sql_glue("MAKE_INTERVAL({.sql unit} => {x})")
 }
 
 #' @export
