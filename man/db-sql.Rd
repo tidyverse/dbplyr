@@ -171,7 +171,7 @@ Query generation for manipulation:
 Other generic: 
 \code{\link{db_connection_describe}()},
 \code{\link{db_copy_to}()},
-\code{\link{sql_escape_logical}()}
+\code{\link{escape}()}
 }
 \concept{generic}
 \keyword{internal}

@@ -25,13 +25,6 @@ simulate_dbi <- function(class = character(), ...) {
 dbplyr_edition.TestConnection <- function(con) 2L
 
 
-sql_escape_ident <- function(con, x) {
-  UseMethod("sql_escape_ident")
-}
-#' @export
-sql_escape_ident.default <- function(con, x) {
-  dbQuoteIdentifier(con, x)
-}
 #' @export
 sql_escape_ident.TestConnection <- function(con, x) {
   if (inherits(con, "Microsoft SQL Server")) {
@@ -45,12 +38,4 @@ sql_escape_ident.TestConnection <- function(con, x) {
   } else {
     sql_quote(x, '"')
   }
-}
-
-sql_escape_string <- function(con, x) {
-  UseMethod("sql_escape_string")
-}
-#' @export
-sql_escape_string.default <- function(con, x) {
-  sql_quote(x, "'")
 }
