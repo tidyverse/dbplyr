@@ -1,3 +1,13 @@
+# build_sql() ------------------------------------------------------------------
+
+test_that("build_sql() requires connection", {
+  withr::local_options(lifecycle_verbosity = "quiet")
+  x <- ident("TABLE")
+  expect_snapshot(error = TRUE, build_sql("SELECT * FROM ", x))
+})
+
+# sql_expr() -------------------------------------------------------------------
+
 test_that("NULL becomes SQL NULL", {
   con <- simulate_dbi()
   expect_equal(sql_expr(NULL), sql("NULL"))
