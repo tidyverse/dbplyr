@@ -153,7 +153,7 @@ get_select_sql <- function(
     )
     return(list(
       select_sql = names_to_as(con, select_sql),
-      window_sql = character()
+      window_sql = sql()
     ))
   }
 
@@ -161,7 +161,7 @@ get_select_sql <- function(
     if (is_identity(select$expr, select$name, in_vars)) {
       out <- list(
         select_sql = sql_star(con, table_alias),
-        window_sql = character()
+        window_sql = sql()
       )
       return(out)
     } else {
@@ -186,7 +186,7 @@ get_select_sql <- function(
     names_esc <- sql_escape_ident(con, named_windows$name)
     window_sql <- sql(paste0(names_esc, " AS ", named_windows$key))
   } else {
-    window_sql <- character()
+    window_sql <- sql()
   }
 
   list(
@@ -252,21 +252,21 @@ translate_select_sql <- function(con, select_df) {
 select_query <- function(
   from,
   select = sql("*"),
-  where = character(),
-  group_by = character(),
-  having = character(),
-  window = character(),
-  order_by = character(),
+  where = sql(),
+  group_by = sql(),
+  having = sql(),
+  window = sql(),
+  order_by = sql(),
   limit = NULL,
   distinct = FALSE,
   from_alias = NULL
 ) {
   check_sql(select, allow_names = FALSE)
-  check_character(where)
-  check_character(group_by)
-  check_character(having)
-  check_character(window)
-  check_character(order_by)
+  check_sql(where)
+  check_sql(group_by)
+  check_sql(having)
+  check_sql(window)
+  check_sql(order_by)
   check_number_whole(limit, allow_infinite = TRUE, allow_null = TRUE)
   check_bool(distinct)
   check_string(from_alias, allow_null = TRUE)

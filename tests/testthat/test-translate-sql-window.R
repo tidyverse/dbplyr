@@ -387,7 +387,7 @@ test_that("name windows only if supported", {
     con = simulate_hana(),
     use_star = TRUE
   )
-  expect_equal(sql_list$window_sql, character())
+  expect_equal(sql_list$window_sql, sql())
   expect_equal(
     sql_list$select_sql,
     sql(
