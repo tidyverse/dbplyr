@@ -76,10 +76,11 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
 #' You can also use type markers to control how the value is treated:
 #'
 #' * `{.sql x}`: `x` is literal SQL that should be interpolated as
-#'   is, without additional escaping.
+#'   is, without additional escaping. `x` must be a string.
 #' * `{.tbl x}`: `x` is a table identifier like a string, `I()`, or one of
 #'   the older forms like `DBI::Id()` or `in_schema()`.
 #' * `{.id x}`: `x` is a generic identifier, e.g. for a column or index.
+#'    `x` must be a character vector
 #'
 #' @param con A database connection.
 #' @param sql A string to interpolate.
@@ -147,17 +148,25 @@ glue_transformer <- function(con, text, envir, call = caller_env()) {
 
   # Coerce types that need coercion
   if (parsed$type == "sql") {
+    if (!is_string(value)) {
+      cli::cli_abort("{{{text}}} must be passed a string.", call = call)
+    }
     value <- sql(value)
   } else if (parsed$type == "tbl") {
-    value <- wrap_glue_error(as_table_path(value, con), text, call)
+    value <- wrap_glue_error(as_table_source(value, con), text, call)
+    value <- escape(value, collapse = ", ", parens = parsed$collapse, con = con)
   } else if (parsed$type == "id") {
+    if (!is_bare_character(value)) {
+      cli::cli_abort(
+        "{{{text}}} must be passed a character vector.",
+        call = call
+      )
+    }
     value <- wrap_glue_error(as_ident(value), text, call)
-  }
-
-  if (parsed$collapse) {
-    value <- escape(value, collapse = ", ", parens = TRUE, con = con)
+    value <- sql_escape_ident(con, value)
+    value <- sql_collapse(value, collapse = ", ", parens = parsed$collapse)
   } else {
-    value <- escape(value, collapse = ", ", parens = FALSE, con = con)
+    value <- escape(value, collapse = ", ", parens = parsed$collapse, con = con)
   }
 
   unclass(value)
