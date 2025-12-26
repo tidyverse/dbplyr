@@ -105,7 +105,7 @@ simulate_mssql <- function(version = "15.0") {
 ) {
   sql_select_clauses(
     con,
-    select = sql_clause_select(con, select, distinct, top = limit),
+    select = sql_clause_select(select, distinct, top = limit),
     from = sql_clause_from(from),
     where = sql_clause_where(where),
     group_by = sql_clause_group_by(group_by),
@@ -142,7 +142,7 @@ simulate_mssql <- function(version = "15.0") {
   clauses <- list2(
     parts$insert_clause,
     sql_returning_cols(con, returning_cols, "INSERTED"),
-    sql_clause_select(con, sql("*")),
+    sql_clause_select(sql("*")),
     sql_clause_from(parts$from),
     !!!parts$conflict_clauses
   )
@@ -164,7 +164,7 @@ simulate_mssql <- function(version = "15.0") {
   clauses <- list2(
     sql_clause_insert(con, insert_cols, into = table),
     sql_returning_cols(con, returning_cols, "INSERTED"),
-    sql_clause_select(con, sql("*")),
+    sql_clause_select(sql("*")),
     sql_clause_from(parts$from)
   )
 

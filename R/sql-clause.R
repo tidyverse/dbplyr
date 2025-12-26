@@ -36,25 +36,20 @@ sql_clause <- function(kw, parts, sep = ",", parens = FALSE, lvl = 0) {
   clause
 }
 
-sql_clause_select <- function(
-  con,
-  select,
-  distinct = FALSE,
-  top = NULL,
-  lvl = 0,
-  call = caller_env()
-) {
-  check_character(select, call = call)
+sql_clause_select <- function(select, distinct = FALSE, top = NULL, lvl = 0) {
+  check_sql(select)
+  check_bool(distinct)
+  check_number_whole(top, min = 0, allow_null = TRUE)
+
   if (is_empty(select)) {
     cli_abort("Query contains no columns")
   }
 
-  if (!is.null(top)) {
-    top <- as.integer(top)
-    top <- sql_glue2(con, " TOP {top}")
-  }
-
-  clause <- paste0("SELECT", if (distinct) " DISTINCT", top)
+  clause <- paste0(
+    "SELECT",
+    if (distinct) " DISTINCT",
+    if (!is.null(top)) paste0(" TOP ", as.integer(top))
+  )
   sql_clause(clause, select)
 }
 

@@ -380,7 +380,7 @@ sql_query_select.DBIConnection <- function(
 ) {
   sql_select_clauses(
     con,
-    select = sql_clause_select(con, select, distinct),
+    select = sql_clause_select(select, distinct),
     from = sql_clause_from(from),
     where = sql_clause_where(where),
     group_by = sql_clause_group_by(group_by),

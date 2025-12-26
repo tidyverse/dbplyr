@@ -179,7 +179,7 @@ sql_query_join.DBIConnection <- function(
 
   # Wrap with SELECT since callers assume a valid query is returned
   clauses <- list(
-    sql_clause_select(con, select),
+    sql_clause_select(select),
     sql_clause_from(x),
     sql_clause(JOIN, y),
     sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1)

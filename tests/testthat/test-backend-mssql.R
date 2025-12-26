@@ -386,7 +386,7 @@ test_that("handles ORDER BY in subqueries", {
   expect_snapshot(
     sql_query_select(
       simulate_mssql(),
-      ident("x"),
+      sql("[x]"),
       ident("y"),
       order_by = "z",
       subquery = TRUE
@@ -398,7 +398,7 @@ test_that("custom limit translation", {
   expect_snapshot(
     sql_query_select(
       simulate_mssql(),
-      ident("x"),
+      sql("[x]"),
       ident("y"),
       order_by = ident("z"),
       limit = 10
