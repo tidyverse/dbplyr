@@ -60,8 +60,7 @@ win_over <- function(
     frame <- sql_glue2(con, "ROWS {.sql frame}")
   }
 
-  over <- paste(c(partition, order, frame), collapse = " ")
-  over <- sql(paste0("(", over, ")"))
+  over <- sql_collapse(c(partition, order, frame), parens = TRUE)
 
   if (sql_context$register_windows) {
     win_register(over)

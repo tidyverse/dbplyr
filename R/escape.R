@@ -57,8 +57,8 @@ escape <- function(x, parens = NA, collapse = " ", con = NULL) {
 
 #' @export
 escape.ident <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
-  y <- sql_escape_ident(con, x)
-  sql_vector(names_to_as(y, names2(x), con = con), parens, collapse, con = con)
+  y <- set_names(sql_escape_ident(con, x), names(x))
+  sql_vector(y, parens, collapse, con = con)
 }
 
 #' @export
@@ -271,38 +271,36 @@ error_embed <- function(type, expr) {
 #' @export
 #' @rdname escape
 sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
+  check_bool(parens, allow_na = TRUE)
+  check_string(collapse, allow_null = TRUE)
   check_con(con)
-
-  if (length(x) == 0) {
-    if (!is.null(collapse)) {
-      return(if (isTRUE(parens)) sql("()") else sql(""))
-    } else {
-      return(sql())
-    }
-  }
 
   if (is.na(parens)) {
     parens <- length(x) > 1L
   }
 
-  x <- names_to_as(x, con = con)
+  x <- names_to_as(con, x)
+  sql_collapse(x, collapse, parens)
+}
+
+sql_collapse <- function(x, collapse = " ", parens = FALSE) {
   x <- paste(x, collapse = collapse)
   if (parens) {
-    x <- paste0("(", x, ")")
+    x <- paste0("(", x, ")", recycle0 = TRUE)
   }
   sql(x)
 }
 
-names_to_as <- function(x, names = names2(x), con = NULL) {
+names_to_as <- function(con, x, names = names2(x)) {
   if (length(x) == 0) {
-    return(character())
+    return(sql())
   }
 
   names_esc <- sql_escape_ident(con, names)
   as_sql <- style_kw(" AS ")
   as <- ifelse(names == "" | names_esc == x, "", paste0(as_sql, names_esc))
 
-  paste0(x, as)
+  sql(paste0(x, as))
 }
 
 #' Helper function for quoting sql elements.
