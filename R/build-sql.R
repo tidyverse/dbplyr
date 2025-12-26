@@ -128,7 +128,7 @@ dbplyr_glue <- function(con, sql, envir = caller_env(), call = caller_env()) {
 
 glue_transformer <- function(con, text, envir, call = caller_env()) {
   parsed <- parse_glue_spec(text)
-  if (!parsed$type %in% c("sql", "tbl", "from", "id", "")) {
+  if (!parsed$type %in% c("sql", "tbl", "id", "")) {
     cli::cli_abort(
       "Unknown marker {.val {parsed$type}} in {{{text}}}.",
       call = call
