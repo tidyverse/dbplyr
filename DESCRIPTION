@@ -98,7 +98,6 @@ Collate:
     'data-cache.R'
     'data-lahman.R'
     'data-nycflights13.R'
-    'db-escape.R'
     'db-io.R'
     'dbplyr.R'
     'explain.R'

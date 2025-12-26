@@ -63,7 +63,7 @@ temporary tables to start with \verb{#})
 Other generic: 
 \code{\link{db-sql}},
 \code{\link{db_connection_describe}()},
-\code{\link{sql_escape_logical}()}
+\code{\link{escape}()}
 }
 \concept{generic}
 \keyword{internal}

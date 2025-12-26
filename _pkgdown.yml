@@ -96,7 +96,7 @@ reference:
   - db-io
   - db-misc
   - db-sql
-  - db-quote
+  - escape
   - sql_glue2
   - sql_variant
   - sql_query_insert

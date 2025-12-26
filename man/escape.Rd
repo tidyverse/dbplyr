@@ -2,10 +2,28 @@
 % Please edit documentation in R/escape.R
 \name{escape}
 \alias{escape}
+\alias{sql_escape_ident}
+\alias{sql_escape_logical}
+\alias{sql_escape_date}
+\alias{sql_escape_datetime}
+\alias{sql_escape_string}
+\alias{sql_escape_raw}
 \alias{sql_vector}
-\title{Escape/quote a string.}
+\title{Escape/quote a value}
 \usage{
 escape(x, parens = NA, collapse = " ", con = NULL)
+
+sql_escape_ident(con, x)
+
+sql_escape_logical(con, x)
+
+sql_escape_date(con, x)
+
+sql_escape_datetime(con, x)
+
+sql_escape_string(con, x)
+
+sql_escape_raw(con, x)
 
 sql_vector(x, parens = NA, collapse = " ", con = NULL)
 }
@@ -26,8 +44,16 @@ atomic vectors are separated by spaces and wrapped in parens if needed.}
 \item{con}{Database connection.}
 }
 \description{
-\code{escape()} requires you to provide a database connection to control the
-details of escaping.
+\code{escape()} turns R values into SQL literals. It implements double dispatch
+via two generics; first \code{escape()} dispatches on the class of \code{x}, then that
+method calls \code{sql_escape_ident()}, \code{sql_escape_logical()}, etc, which
+dispatch on \code{con}.
+
+These generics translate individual values into SQL. The core
+generics are \code{\link[DBI:dbQuoteIdentifier]{DBI::dbQuoteIdentifier()}} and \code{\link[DBI:dbQuoteString]{DBI::dbQuoteString()}}
+for quoting identifiers and strings, but dbplyr needs additional
+tools for inserting logical, date, date-time, and raw values into
+queries.
 }
 \examples{
 con <- simulate_dbi()
@@ -44,4 +70,17 @@ escape(ident("X"), con = con)
 # Escaping is idempotent
 escape("X", con = con)
 escape(escape("X", con = con), con = con)
+
+# Database specific generics
+sql_escape_logical(con, c(TRUE, FALSE, NA))
+sql_escape_date(con, Sys.Date())
+sql_escape_date(con, Sys.time())
+sql_escape_raw(con, charToRaw("hi"))
 }
+\seealso{
+Other generic: 
+\code{\link{db-sql}},
+\code{\link{db_connection_describe}()},
+\code{\link{db_copy_to}()}
+}
+\concept{generic}
