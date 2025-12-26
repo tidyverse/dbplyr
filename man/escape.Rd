@@ -45,9 +45,9 @@ atomic vectors are separated by spaces and wrapped in parens if needed.}
 }
 \description{
 \code{escape()} turns R values into SQL literals. It implements double dispatch
-via two generics; first \code{escape()} dispatches on the class of \code{x}, then that
-method calls \code{sql_escape_ident()}, \code{sql_escape_logical()}, etc, which
-dispatch on \code{con}.
+via two sets of generics: first \code{escape()} dispatches on the class of \code{x},
+then that method calls \code{sql_escape_ident()}, \code{sql_escape_logical()}, etc,
+which dispatch on \code{con}.
 
 These generics translate individual values into SQL. The core
 generics are \code{\link[DBI:dbQuoteIdentifier]{DBI::dbQuoteIdentifier()}} and \code{\link[DBI:dbQuoteString]{DBI::dbQuoteString()}}

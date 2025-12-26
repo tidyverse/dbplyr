@@ -2,9 +2,9 @@
 #'
 #' @description
 #' `escape()` turns R values into SQL literals. It implements double dispatch
-#' via two generics; first `escape()` dispatches on the class of `x`, then that
-#' method calls `sql_escape_ident()`, `sql_escape_logical()`, etc, which
-#' dispatch on `con`.
+#' via two sets of generics: first `escape()` dispatches on the class of `x`,
+#' then that method calls `sql_escape_ident()`, `sql_escape_logical()`, etc,
+#' which dispatch on `con`.
 #'
 #' These generics translate individual values into SQL. The core
 #' generics are [DBI::dbQuoteIdentifier()] and [DBI::dbQuoteString()]
