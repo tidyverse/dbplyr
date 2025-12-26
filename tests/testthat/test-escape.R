@@ -158,26 +158,13 @@ test_that("other objects get informative error", {
 
 # names_to_as() -----------------------------------------------------------
 
-test_that("names_to_as() doesn't alias when ident name and value are identical", {
-  x <- ident(name = "name")
-  y <- sql('"name"')
+test_that("names_to_as() correctly aliases", {
+  con <- simulate_dbi()
 
-  expect_equal(names_to_as(y, names2(x), con = simulate_dbi()), '"name"')
-})
-
-test_that("names_to_as() doesn't alias when ident name is missing", {
-  x <- ident("*")
-  y <- sql('"*"')
-
-  expect_equal(names_to_as(y, names2(x), con = simulate_dbi()), '"*"')
-})
-
-test_that("names_to_as() aliases when ident name and value are different", {
-  x <- ident(new_name = "name")
-  y <- sql(new_name = '"name"')
-
-  expect_equal(
-    names_to_as(y, names2(x), con = simulate_dbi()),
-    '"name" AS "new_name"'
-  )
+  # no alias when name is missing
+  expect_equal(names_to_as(con, c("name")), sql("name"))
+  # no alias when (quoted) name and value are identical
+  expect_equal(names_to_as(con, c(name = '"name"')), sql('"name"'))
+  # alias when name and value are different
+  expect_equal(names_to_as(con, c(new = "old")), sql('old AS "new"'))
 })

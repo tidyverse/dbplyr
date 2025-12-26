@@ -57,8 +57,8 @@ escape <- function(x, parens = NA, collapse = " ", con = NULL) {
 
 #' @export
 escape.ident <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
-  y <- sql_escape_ident(con, x)
-  sql_vector(names_to_as(y, names2(x), con = con), parens, collapse, con = con)
+  y <- set_names(sql_escape_ident(con, x), names(x))
+  sql_vector(y, parens, collapse, con = con)
 }
 
 #' @export
@@ -285,7 +285,7 @@ sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
     parens <- length(x) > 1L
   }
 
-  x <- names_to_as(x, con = con)
+  x <- names_to_as(con, x)
   x <- paste(x, collapse = collapse)
   if (parens) {
     x <- paste0("(", x, ")")
@@ -293,16 +293,16 @@ sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
   sql(x)
 }
 
-names_to_as <- function(x, names = names2(x), con = NULL) {
+names_to_as <- function(con, x, names = names2(x)) {
   if (length(x) == 0) {
-    return(character())
+    return(sql())
   }
 
   names_esc <- sql_escape_ident(con, names)
   as_sql <- style_kw(" AS ")
   as <- ifelse(names == "" | names_esc == x, "", paste0(as_sql, names_esc))
 
-  paste0(x, as)
+  sql(paste0(x, as))
 }
 
 #' Helper function for quoting sql elements.

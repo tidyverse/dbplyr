@@ -102,5 +102,5 @@ ident_q <- function(...) {
 
 #' @export
 escape.ident_q <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
-  sql_vector(names_to_as(x, names2(x), con = con), parens, collapse, con = con)
+  sql_vector(x, parens, collapse, con = con)
 }
