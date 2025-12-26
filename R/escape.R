@@ -291,6 +291,7 @@ sql_collapse <- function(x, collapse = " ", parens = FALSE) {
   sql(x)
 }
 
+# Strips names from named sql() vector by converting them to AS identifiers
 names_to_as <- function(con, x, names = names2(x)) {
   if (length(x) == 0) {
     return(sql())

@@ -114,7 +114,7 @@ sql_values_subquery_default <- function(con, df, types, lvl, row) {
   cols_clause <- escape(sim_data, con = con, parens = FALSE, collapse = NULL)
 
   null_row_clauses <- list(
-    select = sql_clause_select(con, cols_clause),
+    select = sql_clause_select(cols_clause),
     where = sql_clause_where(sql("0 = 1"))
   )
 
@@ -204,7 +204,7 @@ sql_values_subquery_union <- function(con, df, types, lvl, row, from = NULL) {
   cols_clause <- escape(sim_data, con = con, parens = FALSE, collapse = NULL)
 
   clauses <- list(
-    select = sql_clause_select(con, cols_clause),
+    select = sql_clause_select(cols_clause),
     from = if (!is.null(from)) sql_clause_from(ident(from)),
     where = sql_clause_where(sql("0 = 1"))
   )
@@ -263,7 +263,7 @@ sql_values_zero_rows <- function(con, df, types, lvl, from = NULL) {
   typed_cols <- sql_values_cast_clauses(con, df, types, na = TRUE)
 
   clauses <- list(
-    select = sql_clause_select(con, typed_cols),
+    select = sql_clause_select(typed_cols),
     from = if (!is.null(from)) sql_clause_from(ident(from)),
     where = sql_clause_where(sql("0 = 1"))
   )
@@ -288,7 +288,7 @@ sql_values_cast_clauses <- function(con, df, types, na) {
     })
   }
 
-  sql(typed_cols)
+  names_to_as(con, typed_cols)
 }
 
 values_prepare <- function(con, df) {

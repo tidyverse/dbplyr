@@ -73,11 +73,11 @@ lazy_select_query(
 select_query(
   from,
   select = sql("*"),
-  where = character(),
-  group_by = character(),
-  having = character(),
-  window = character(),
-  order_by = character(),
+  where = sql(),
+  group_by = sql(),
+  having = sql(),
+  window = sql(),
+  order_by = sql(),
   limit = NULL,
   distinct = FALSE,
   from_alias = NULL

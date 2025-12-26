@@ -63,7 +63,7 @@ sql_build.lazy_semi_join_query <- function(op, con, ..., sql_options = NULL) {
   ) {
     vars <- sql_star(con, op$by$x_as)
   } else {
-    vars <- ident(set_names(op$vars$var, op$vars$name))
+    vars <- sql(set_names(sql_escape_ident(con, op$vars$var), op$vars$name))
   }
 
   # We've introduced aliases to disambiguate the internal and external tables
@@ -181,12 +181,12 @@ sql_query_semi_join.DBIConnection <- function(
   exists <- if (anti) "NOT EXISTS" else "EXISTS"
 
   lines <- list(
-    sql_clause_select(con, vars),
+    sql_clause_select(vars),
     sql_clause_from(x),
     sql_glue2(con, "WHERE {.sql exists} ("),
     # lvl = 1 because they are basically in a subquery
     sql_clause("SELECT 1 FROM", y, lvl = 1),
-    sql_clause_where(c(on, where), lvl = 1),
+    sql_clause_where(sql(c(on, where)), lvl = 1),
     sql(")")
   )
   sql_format_clauses(lines, lvl, con)

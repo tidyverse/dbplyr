@@ -151,14 +151,17 @@ get_select_sql <- function(
       window = FALSE,
       context = list(clause = "SELECT")
     )
-    return(list(select_sql = select_sql, window_sql = character()))
+    return(list(
+      select_sql = names_to_as(con, select_sql),
+      window_sql = sql()
+    ))
   }
 
   if (use_star) {
     if (is_identity(select$expr, select$name, in_vars)) {
       out <- list(
         select_sql = sql_star(con, table_alias),
-        window_sql = character()
+        window_sql = sql()
       )
       return(out)
     } else {
@@ -183,7 +186,7 @@ get_select_sql <- function(
     names_esc <- sql_escape_ident(con, named_windows$name)
     window_sql <- sql(paste0(names_esc, " AS ", named_windows$key))
   } else {
-    window_sql <- character()
+    window_sql <- sql()
   }
 
   list(
@@ -239,7 +242,7 @@ translate_select_sql <- function(con, select_df) {
     )
   }
 
-  out
+  names_to_as(con, out)
 }
 
 # Built query -------------------------------------------------------------
@@ -249,21 +252,21 @@ translate_select_sql <- function(con, select_df) {
 select_query <- function(
   from,
   select = sql("*"),
-  where = character(),
-  group_by = character(),
-  having = character(),
-  window = character(),
-  order_by = character(),
+  where = sql(),
+  group_by = sql(),
+  having = sql(),
+  window = sql(),
+  order_by = sql(),
   limit = NULL,
   distinct = FALSE,
   from_alias = NULL
 ) {
-  check_character(select)
-  check_character(where)
-  check_character(group_by)
-  check_character(having)
-  check_character(window)
-  check_character(order_by)
+  check_sql(select, allow_names = FALSE)
+  check_sql(where)
+  check_sql(group_by)
+  check_sql(having)
+  check_sql(window)
+  check_sql(order_by)
   check_number_whole(limit, allow_infinite = TRUE, allow_null = TRUE)
   check_bool(distinct)
   check_string(from_alias, allow_null = TRUE)
@@ -301,7 +304,7 @@ sql_render.select_query <- function(
 
   sql_query_select(
     con,
-    query$select,
+    names_to_as(con, query$select),
     from,
     where = query$where,
     group_by = query$group_by,
@@ -359,6 +362,8 @@ sql_query_select <- function(
   lvl = 0
 ) {
   check_dots_used()
+  check_sql(select, allow_names = FALSE)
+
   UseMethod("sql_query_select")
 }
 
@@ -380,7 +385,7 @@ sql_query_select.DBIConnection <- function(
 ) {
   sql_select_clauses(
     con,
-    select = sql_clause_select(con, select, distinct),
+    select = sql_clause_select(select, distinct),
     from = sql_clause_from(from),
     where = sql_clause_where(where),
     group_by = sql_clause_group_by(group_by),

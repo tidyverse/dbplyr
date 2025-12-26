@@ -179,7 +179,7 @@ sql_query_join.DBIConnection <- function(
 
   # Wrap with SELECT since callers assume a valid query is returned
   clauses <- list(
-    sql_clause_select(con, select),
+    sql_clause_select(select),
     sql_clause_from(x),
     sql_clause(JOIN, y),
     sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1)
@@ -252,7 +252,7 @@ sql_rf_join_vars <- function(
     )
 
     out <- set_names(out, vars$name)
-    return(sql(unlist(out)))
+    return(names_to_as(con, unlist(out)))
   }
 
   multi_join_vars <- purrr::map2_dfr(

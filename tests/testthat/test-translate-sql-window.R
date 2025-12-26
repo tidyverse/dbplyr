@@ -287,11 +287,11 @@ test_that("names windows automatically", {
   expect_equal(
     sql_list$select_sql,
     sql(
-      part = "`part`",
-      col1 = "SUM(`col1`) OVER `win1`",
-      col2 = "SUM(`col2`) OVER `win1`",
-      col3 = "SUM(`col3`) OVER `win2`",
-      col4 = "SUM(`col4`) OVER `win2`"
+      "`part`",
+      "SUM(`col1`) OVER `win1` AS `col1`",
+      "SUM(`col2`) OVER `win1` AS `col2`",
+      "SUM(`col3`) OVER `win2` AS `col3`",
+      "SUM(`col4`) OVER `win2` AS `col4`"
     )
   )
 
@@ -322,11 +322,11 @@ test_that("names windows automatically", {
   expect_equal(
     sql_list$select_sql,
     sql(
-      part = "`part`",
-      col1 = "SUM(`col1`) OVER `win1`",
-      col3 = "SUM(`col3`) OVER `win2`",
-      col2 = "SUM(`col2`) OVER `win1`",
-      col4 = "SUM(`col4`) OVER `win2`"
+      "`part`",
+      "SUM(`col1`) OVER `win1` AS `col1`",
+      "SUM(`col3`) OVER `win2` AS `col3`",
+      "SUM(`col2`) OVER `win1` AS `col2`",
+      "SUM(`col4`) OVER `win2` AS `col4`"
     )
   )
 })
@@ -359,10 +359,10 @@ test_that("only name windows if they appear multiple times", {
   expect_equal(
     sql_list$select_sql,
     sql(
-      part = "`part`",
-      col1 = "SUM(`col1`) OVER `win1`",
-      col2 = "SUM(`col2`) OVER `win1`",
-      col3 = "SUM(`col3`) OVER (PARTITION BY `part` ORDER BY `ord` DESC ROWS UNBOUNDED PRECEDING)"
+      "`part`",
+      "SUM(`col1`) OVER `win1` AS `col1`",
+      "SUM(`col2`) OVER `win1` AS `col2`",
+      "SUM(`col3`) OVER (PARTITION BY `part` ORDER BY `ord` DESC ROWS UNBOUNDED PRECEDING) AS `col3`"
     )
   )
 })
@@ -387,13 +387,13 @@ test_that("name windows only if supported", {
     con = simulate_hana(),
     use_star = TRUE
   )
-  expect_equal(sql_list$window_sql, character())
+  expect_equal(sql_list$window_sql, sql())
   expect_equal(
     sql_list$select_sql,
     sql(
-      part = "\"part\"",
-      col1 = "SUM(\"col1\") OVER (PARTITION BY \"part\")",
-      col2 = "SUM(\"col2\") OVER (PARTITION BY \"part\")"
+      "\"part\"",
+      "SUM(\"col1\") OVER (PARTITION BY \"part\") AS \"col1\"",
+      "SUM(\"col2\") OVER (PARTITION BY \"part\") AS \"col2\""
     )
   )
 })
