@@ -14,33 +14,27 @@ test_that("identifier names become AS", {
   expect_equal(ei(x = "y"), '"y" AS "x"')
 })
 
-# Zero-length inputs ------------------------------------------------------
+# sql_collapse ------------------------------------------------------------------
 
-test_that("zero length inputs yield zero length output when not collapsed", {
-  con <- simulate_dbi()
-  expect_equal(sql_vector(sql(), collapse = NULL, con = con), sql())
-  expect_equal(sql_vector(ident(), collapse = NULL, con = con), sql())
+test_that("sql_collapse collapses with separator", {
+  expect_equal(sql_collapse(sql("a", "b")), sql("a b"))
+  expect_equal(sql_collapse(sql("a", "b"), collapse = ", "), sql("a, b"))
 })
 
-test_that("zero length inputs yield length-1 output when collapsed", {
-  con <- simulate_dbi()
+test_that("sql_collapse handles 0-length inputs", {
+  expect_equal(sql_collapse(character()), sql(""))
+  expect_equal(sql_collapse(character(), collapse = NULL), sql())
 
-  expect_equal(
-    sql_vector(sql(), parens = FALSE, collapse = "", con = con),
-    sql("")
-  )
-  expect_equal(
-    sql_vector(sql(), parens = TRUE, collapse = "", con = con),
-    sql("()")
-  )
-  expect_equal(
-    sql_vector(ident(), parens = FALSE, collapse = "", con = con),
-    sql("")
-  )
-  expect_equal(
-    sql_vector(ident(), parens = TRUE, collapse = "", con = con),
-    sql("()")
-  )
+  expect_equal(sql_collapse(character(), parens = TRUE), sql("()"))
+  expect_equal(sql_collapse(character(), collapse = NULL, parens = TRUE), sql())
+})
+
+test_that("sql_collapse controls parens", {
+  expect_equal(sql_collapse(sql("a")), sql("a"))
+  expect_equal(sql_collapse(sql("a", "b")), sql("a b"))
+
+  expect_equal(sql_collapse(sql("a"), parens = TRUE), sql("(a)"))
+  expect_equal(sql_collapse(sql("a", "b"), parens = TRUE), sql("(a b)"))
 })
 
 # Numeric ------------------------------------------------------------------
@@ -158,26 +152,13 @@ test_that("other objects get informative error", {
 
 # names_to_as() -----------------------------------------------------------
 
-test_that("names_to_as() doesn't alias when ident name and value are identical", {
-  x <- ident(name = "name")
-  y <- sql('"name"')
+test_that("names_to_as() correctly aliases", {
+  con <- simulate_dbi()
 
-  expect_equal(names_to_as(y, names2(x), con = simulate_dbi()), '"name"')
-})
-
-test_that("names_to_as() doesn't alias when ident name is missing", {
-  x <- ident("*")
-  y <- sql('"*"')
-
-  expect_equal(names_to_as(y, names2(x), con = simulate_dbi()), '"*"')
-})
-
-test_that("names_to_as() aliases when ident name and value are different", {
-  x <- ident(new_name = "name")
-  y <- sql(new_name = '"name"')
-
-  expect_equal(
-    names_to_as(y, names2(x), con = simulate_dbi()),
-    '"name" AS "new_name"'
-  )
+  # no alias when name is missing
+  expect_equal(names_to_as(con, c("name")), sql("name"))
+  # no alias when (quoted) name and value are identical
+  expect_equal(names_to_as(con, c(name = '"name"')), sql('"name"'))
+  # alias when name and value are different
+  expect_equal(names_to_as(con, c(new = "old")), sql('old AS "new"'))
 })
