@@ -63,6 +63,6 @@ test_that("sql_multi_join_vars generates expected SQL", {
       use_star = TRUE,
       qualify_all_columns = FALSE
     ),
-    sql('"left".*', b = '"b"')
+    sql('"left".*', '"b"')
   )
 })

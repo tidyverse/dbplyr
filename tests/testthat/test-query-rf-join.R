@@ -19,10 +19,10 @@ test_that("sql_rf_join_vars generates expected SQL", {
       qualify_all_columns = FALSE
     ),
     sql(
-      x = 'COALESCE("left"."x", "right"."x")',
-      a.x = '"left"."a"',
-      a.y = '"right"."a"',
-      b = '"b"'
+      'COALESCE("left"."x", "right"."x") AS "x"',
+      '"left"."a" AS "a.x"',
+      '"right"."a" AS "a.y"',
+      '"b"'
     )
   )
 
@@ -44,9 +44,9 @@ test_that("sql_rf_join_vars generates expected SQL", {
       qualify_all_columns = FALSE
     ),
     sql(
-      a = 'COALESCE("left"."a", "right"."a")',
-      b.x = '"left"."b"',
-      b.y = '"right"."B"'
+      'COALESCE("left"."a", "right"."a") AS "a"',
+      '"left"."b" AS "b.x"',
+      '"right"."B" AS "b.y"'
     )
   )
 })

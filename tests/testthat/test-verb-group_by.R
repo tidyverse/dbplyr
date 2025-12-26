@@ -106,7 +106,7 @@ test_that("ungroup drops PARTITION BY", {
     ungroup() |>
     mutate(x = sum(x)) |>
     sql_build()
-  expect_equal(out$select, sql(x = 'SUM("x") OVER ()'))
+  expect_equal(out$select, sql('SUM("x") OVER () AS "x"'))
 })
 
 # ops ---------------------------------------------------------------------

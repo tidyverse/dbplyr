@@ -10,7 +10,7 @@
     Code
       out$select[[2]]
     Output
-      <SQL> CASE WHEN ("x" > 1) THEN 'a' END
+      <SQL> CASE WHEN ("x" > 1) THEN 'a' END AS "y"
 
 # case_when translates correctly to ELSE when TRUE ~ is used 2
 

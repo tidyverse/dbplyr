@@ -151,7 +151,10 @@ get_select_sql <- function(
       window = FALSE,
       context = list(clause = "SELECT")
     )
-    return(list(select_sql = select_sql, window_sql = character()))
+    return(list(
+      select_sql = names_to_as(con, select_sql),
+      window_sql = character()
+    ))
   }
 
   if (use_star) {
@@ -239,7 +242,7 @@ translate_select_sql <- function(con, select_df) {
     )
   }
 
-  out
+  names_to_as(con, out)
 }
 
 # Built query -------------------------------------------------------------
@@ -258,7 +261,7 @@ select_query <- function(
   distinct = FALSE,
   from_alias = NULL
 ) {
-  check_character(select)
+  check_sql(select, allow_names = FALSE)
   check_character(where)
   check_character(group_by)
   check_character(having)

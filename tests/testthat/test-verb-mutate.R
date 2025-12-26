@@ -568,34 +568,34 @@ test_that("mutate generates simple expressions", {
     mutate(y = x + 1L) |>
     sql_build()
 
-  expect_equal(out$select, sql('"df".*', y = '"x" + 1'))
+  expect_equal(out$select, sql('"df".*', '"x" + 1 AS "y"'))
 })
 
 test_that("mutate can drop variables with NULL", {
   out <- lazy_frame(x = 1, y = 1) |>
     mutate(y = NULL)
 
-  expect_named(sql_build(out)$select, "x")
+  expect_equal(sql_build(out)$select, sql("\"x\""))
   expect_equal(op_vars(out), "x")
 })
 
 test_that("var = NULL works when var is in original data", {
   lf <- lazy_frame(x = 1) |> mutate(x = 2, z = x * 2, x = NULL)
-  expect_equal(sql_build(lf)$select, sql(z = "\"x\" * 2.0"))
+  expect_equal(sql_build(lf)$select, sql("\"x\" * 2.0 AS \"z\""))
   expect_equal(op_vars(lf), "z")
   expect_snapshot(remote_query(lf))
 })
 
 test_that("var = NULL when var is in final output", {
   lf <- lazy_frame(x = 1) |> mutate(y = NULL, y = 3)
-  expect_equal(sql_build(lf)$select, sql("\"df\".*", y = "3.0"))
+  expect_equal(sql_build(lf)$select, sql("\"df\".*", "3.0 AS \"y\""))
   expect_equal(op_vars(lf), c("x", "y"))
   expect_snapshot(remote_query(lf))
 })
 
 test_that("temp var with nested arguments", {
   lf <- lazy_frame(x = 1) |> mutate(y = 2, z = y * 2, y = NULL)
-  expect_equal(sql_build(lf)$select, sql(x = "\"x\"", z = "\"y\" * 2.0"))
+  expect_equal(sql_build(lf)$select, sql("\"x\"", "\"y\" * 2.0 AS \"z\""))
   expect_equal(op_vars(lf), c("x", "z"))
   expect_snapshot(remote_query(lf))
 })
@@ -605,12 +605,15 @@ test_that("mutate_all generates correct sql", {
     dplyr::mutate_all(~ . + 1L) |>
     sql_build()
 
-  expect_equal(out$select, sql(x = '"x" + 1', y = '"y" + 1'))
+  expect_equal(out$select, sql('"x" + 1 AS "x"', '"y" + 1 AS "y"'))
 
   out <- lazy_frame(x = 1) |>
     dplyr::mutate_all(list(one = ~ . + 1L, two = ~ . + 2L)) |>
     sql_build()
-  expect_equal(out$select, sql('"df".*', one = '"x" + 1', two = '"x" + 2'))
+  expect_equal(
+    out$select,
+    sql('"df".*', '"x" + 1 AS "one"', '"x" + 2 AS "two"')
+  )
 })
 
 test_that("mutate_all scopes nested quosures correctly", {
@@ -619,7 +622,7 @@ test_that("mutate_all scopes nested quosures correctly", {
     dplyr::mutate_all(~ . + num) |>
     sql_build()
 
-  expect_equal(out$select, sql(x = '"x" + 10', y = '"y" + 10'))
+  expect_equal(out$select, sql('"x" + 10 AS "x"', '"y" + 10 AS "y"'))
 })
 
 

@@ -1325,7 +1325,7 @@ test_that("left_join/inner_join uses *", {
     left_join(lf2, by = c("a", "b")) |>
     sql_build()
 
-  expect_equal(out$select, sql('"df_LHS".*', z = '"z"'))
+  expect_equal(out$select, sql('"df_LHS".*', '"z"'))
 
   out <- lf1 |>
     left_join(lf2, by = c("a", "b")) |>
@@ -1334,10 +1334,10 @@ test_that("left_join/inner_join uses *", {
   expect_equal(
     out$select,
     sql(
-      a = '"df_LHS"."a"',
-      b = '"df_LHS"."b"',
-      c = '"c"',
-      z = '"z"'
+      '"df_LHS"."a" AS "a"',
+      '"df_LHS"."b" AS "b"',
+      '"c"',
+      '"z"'
     )
   )
 
@@ -1347,7 +1347,7 @@ test_that("left_join/inner_join uses *", {
     relocate(z) |>
     sql_build()
 
-  expect_equal(out$select, sql(z = '"z"', '"df_LHS".*'))
+  expect_equal(out$select, sql('"z"', '"df_LHS".*'))
 
   # does not use * if variable are missing
   out <- lf1 |>
@@ -1355,7 +1355,7 @@ test_that("left_join/inner_join uses *", {
     select(a, c) |>
     sql_build()
 
-  expect_equal(out$select, sql(a = '"df_LHS"."a"', c = '"c"'))
+  expect_equal(out$select, sql('"df_LHS"."a" AS "a"', '"c"'))
 
   # does not use * if variable names changed
   lf1 <- lazy_frame(a = 1, b = 2)
@@ -1366,7 +1366,7 @@ test_that("left_join/inner_join uses *", {
 
   expect_equal(
     out$select,
-    sql(a = '"df_LHS"."a"', `b.x` = '"df_LHS"."b"', `b.y` = '"df_RHS"."b"')
+    sql('"df_LHS"."a" AS "a"', '"df_LHS"."b" AS "b.x"', '"df_RHS"."b" AS "b.y"')
   )
 })
 
@@ -1382,7 +1382,7 @@ test_that("right_join uses *", {
   # cannot use * without relocate or select
   expect_equal(
     out$select,
-    sql(a = '"df_RHS"."a"', b = '"df_RHS"."b"', c = '"c"', z = '"z"')
+    sql('"df_RHS"."a" AS "a"', '"df_RHS"."b" AS "b"', '"c"', '"z"')
   )
 
   # also works after relocate
@@ -1393,7 +1393,7 @@ test_that("right_join uses *", {
 
   expect_equal(
     out$select,
-    sql('"df_RHS".*', c = '"c"')
+    sql('"df_RHS".*', '"c"')
   )
 
   # does not use * if `use_star = FALSE`
@@ -1405,10 +1405,10 @@ test_that("right_join uses *", {
   expect_equal(
     out$select,
     sql(
-      a = '"df_RHS"."a"',
-      b = '"df_RHS"."b"',
-      z = '"z"',
-      c = '"c"'
+      '"df_RHS"."a" AS "a"',
+      '"df_RHS"."b" AS "b"',
+      '"z"',
+      '"c"'
     )
   )
 
@@ -1420,7 +1420,7 @@ test_that("right_join uses *", {
 
   expect_equal(
     out$select,
-    sql(a = '"df_RHS"."a"', z = '"z"')
+    sql('"df_RHS"."a" AS "a"', '"z"')
   )
 
   # does not use * if variable names changed
@@ -1432,7 +1432,7 @@ test_that("right_join uses *", {
 
   expect_equal(
     out$select,
-    sql(a = '"df_RHS"."a"', `b.x` = '"df_LHS"."b"', `b.y` = '"df_RHS"."b"')
+    sql('"df_RHS"."a" AS "a"', '"df_LHS"."b" AS "b.x"', '"df_RHS"."b" AS "b.y"')
   )
 })
 
@@ -1447,7 +1447,7 @@ test_that("cross_join uses *", {
 
   expect_equal(
     out$select,
-    set_names(sql('"df_LHS".*', '"df_RHS".*'), c("", ""))
+    sql('"df_LHS".*', '"df_RHS".*')
   )
 
   # does not use * if `use_star = FALSE`
@@ -1457,12 +1457,7 @@ test_that("cross_join uses *", {
 
   expect_equal(
     out$select,
-    sql(
-      a = '"a"',
-      b = '"b"',
-      x = '"x"',
-      y = '"y"'
-    )
+    sql('"a"', '"b"', '"x"', '"y"')
   )
 
   # also works after relocate
@@ -1473,7 +1468,7 @@ test_that("cross_join uses *", {
 
   expect_equal(
     out$select,
-    set_names(sql('"df_RHS".*', '"df_LHS".*'), c("", ""))
+    sql('"df_RHS".*', '"df_LHS".*')
   )
 
   out <- lf1 |>
@@ -1481,14 +1476,14 @@ test_that("cross_join uses *", {
     select(x, a, b, y) |>
     sql_build()
 
-  expect_equal(out$select, sql(x = '"x"', '"df_LHS".*', y = '"y"'))
+  expect_equal(out$select, sql('"x"', '"df_LHS".*', '"y"'))
 
   out <- lf1 |>
     cross_join(lf2) |>
     select(a, x, y, b) |>
     sql_build()
 
-  expect_equal(out$select, sql(a = '"a"', '"df_RHS".*', b = '"b"'))
+  expect_equal(out$select, sql('"a"', '"df_RHS".*', '"b"'))
 })
 
 test_that("full_join() does not use *", {
@@ -1503,8 +1498,8 @@ test_that("full_join() does not use *", {
   expect_equal(
     out$select,
     sql(
-      a = 'COALESCE("df_LHS"."a", "df_RHS"."a")',
-      b = 'COALESCE("df_LHS"."b", "df_RHS"."b")'
+      'COALESCE("df_LHS"."a", "df_RHS"."a") AS "a"',
+      'COALESCE("df_LHS"."b", "df_RHS"."b") AS "b"'
     )
   )
 })
@@ -1537,11 +1532,11 @@ test_that("can force to qualify all columns", {
   expect_equal(
     unforced$select,
     sql(
-      x = '"lf1"."x"',
-      a.x = '"lf1"."a"',
-      y = '"y"',
-      a.y = '"lf2"."a"',
-      z = '"z"'
+      '"lf1"."x" AS "x"',
+      '"lf1"."a" AS "a.x"',
+      '"y"',
+      '"lf2"."a" AS "a.y"',
+      '"z"'
     )
   )
   forced <- left_join(lf1, lf2, by = "x") |>
@@ -1549,11 +1544,11 @@ test_that("can force to qualify all columns", {
   expect_equal(
     forced$select,
     sql(
-      x = '"lf1"."x"',
-      a.x = '"lf1"."a"',
-      y = '"lf1"."y"',
-      a.y = '"lf2"."a"',
-      z = '"lf2"."z"'
+      '"lf1"."x" AS "x"',
+      '"lf1"."a" AS "a.x"',
+      '"lf1"."y" AS "y"',
+      '"lf2"."a" AS "a.y"',
+      '"lf2"."z" AS "z"'
     )
   )
 })

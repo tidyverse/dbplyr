@@ -347,7 +347,7 @@ sql_multi_join_vars <- function(
     }
   }
 
-  sql(unlist(out))
+  names_to_as(con, sql(unlist(out)))
 }
 
 join_can_use_star <- function(all_vars, used_vars, out_vars, idx) {

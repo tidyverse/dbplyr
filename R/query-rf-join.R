@@ -252,7 +252,7 @@ sql_rf_join_vars <- function(
     )
 
     out <- set_names(out, vars$name)
-    return(sql(unlist(out)))
+    return(names_to_as(con, sql(unlist(out))))
   }
 
   multi_join_vars <- purrr::map2_dfr(
