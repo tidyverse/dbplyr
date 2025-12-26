@@ -73,11 +73,7 @@ sql_query_select.Teradata <- function(
     select_outer <- sql_star(con, alias)
     out <- sql_select_clauses(
       con,
-      select = sql_clause_select(
-        select_outer,
-        distinct = FALSE,
-        top = limit
-      ),
+      select = sql_clause_select(select_outer, distinct = FALSE, top = limit),
       from = sql_clause_from(from),
       where = NULL,
       group_by = NULL,
