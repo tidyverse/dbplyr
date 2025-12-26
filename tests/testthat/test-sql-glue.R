@@ -1,20 +1,3 @@
-# build_sql() ------------------------------------------------------------------
-
-test_that("build_sql() is deprecated", {
-  con <- simulate_dbi()
-  expect_snapshot(
-    build_sql("SELECT * FROM TABLE", con = con)
-  )
-})
-
-test_that("build_sql() requires connection", {
-  withr::local_options(lifecycle_verbosity = "quiet")
-  x <- ident("TABLE")
-  expect_snapshot(error = TRUE, build_sql("SELECT * FROM ", x))
-})
-
-# glue_sql() -------------------------------------------------------------------
-
 test_that("glue_sql() handles type casting", {
   con <- simulate_dbi()
   x <- "x"
@@ -31,7 +14,7 @@ test_that("glue_sql() handles type casting", {
   expect_equal(sql_glue2(con, "{.tbl tbl3}"), sql('"schema"."table"'))
 })
 
-test_that("useful error if bad identified", {
+test_that("useful error if bad identifier", {
   con <- simulate_dbi()
   expect_snapshot(error = TRUE, {
     sql_glue2(con, "{.id 1}")
