@@ -7,18 +7,9 @@ sql_select_clauses <- function(
   window,
   order_by,
   limit = NULL,
-  lvl
+  lvl = 0
 ) {
-  out <- list(
-    select = select,
-    from = from,
-    where = where,
-    group_by = group_by,
-    having = having,
-    window = window,
-    order_by = order_by,
-    limit = limit
-  )
+  out <- list(select, from, where, group_by, having, window, order_by, limit)
   sql_format_clauses(out, lvl)
 }
 
