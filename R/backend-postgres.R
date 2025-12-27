@@ -362,6 +362,8 @@ sql_query_insert.PqConnection <- function(
   returning_cols = NULL,
   method = NULL
 ) {
+  table <- as_table_path(table, con)
+
   check_string(method, allow_null = TRUE)
   method <- method %||% "on_conflict"
   arg_match(method, c("on_conflict", "where_not_exists"), error_arg = "method")

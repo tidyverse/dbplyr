@@ -105,6 +105,7 @@ sql_clause_limit <- function(con, limit, lvl = 0) {
 }
 
 sql_clause_update <- function(table) {
+  check_sql(table)
   sql_clause("UPDATE", table)
 }
 
@@ -130,6 +131,7 @@ sql_clause_on <- function(on, lvl = 0, parens = FALSE) {
 }
 
 sql_clause_where_exists <- function(table, where, not) {
+  check_sql(table)
   list(
     sql(paste0("WHERE ", if (not) "NOT ", "EXISTS (")),
     # lvl = 1 because they are basically in a subquery

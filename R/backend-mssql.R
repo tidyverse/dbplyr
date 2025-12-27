@@ -128,6 +128,8 @@ simulate_mssql <- function(version = "15.0") {
   returning_cols = NULL,
   method = NULL
 ) {
+  table <- as_table_path(table, con)
+
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   conflict <- rows_check_conflict(conflict)
 
@@ -189,7 +191,7 @@ simulate_mssql <- function(version = "15.0") {
 
   table_sql <- sql_escape_table_source(con, table)
   clauses <- list(
-    sql_clause_update(table),
+    sql_clause_update(table_sql),
     sql_clause_set(update_cols, update_values),
     sql_returning_cols(con, returning_cols, "INSERTED"),
     sql_clause_from(table_sql),

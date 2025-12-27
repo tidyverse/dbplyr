@@ -157,7 +157,7 @@ sql_escape_table_source <- function(con, x) {
     sql_escape_table_path(con, x)
   } else {
     cli::cli_abort(
-      "{.arg {error_arg}} must be a table path or SQL.",
+      "{.arg x} must be a table path or SQL.",
       .internal = TRUE
     )
   }

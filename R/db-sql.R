@@ -548,9 +548,10 @@ sql_query_update_from.DBIConnection <- function(
   parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols <- sql_escape_ident(con, names(update_values))
 
+  table_sql <- sql_escape_table_source(con, table)
   # avoid CTEs for the general case as they do not work everywhere
   clauses <- list(
-    sql_clause_update(table),
+    sql_clause_update(table_sql),
     sql_clause_set(update_cols, update_values),
     sql_clause_from(parts$from),
     sql_clause_where(parts$where),
@@ -608,8 +609,9 @@ sql_query_upsert.DBIConnection <- function(
   update_values <- sql_table_prefix(con, "...y", update_cols)
   update_cols <- sql_escape_ident(con, update_cols)
 
+  table_sql <- sql_escape_table_source(con, table)
   updated_cte <- list(
-    sql_clause_update(table),
+    sql_clause_update(table_sql),
     sql_clause_set(update_cols, update_values),
     sql_clause_from(parts$from),
     sql_clause_where(parts$where),
