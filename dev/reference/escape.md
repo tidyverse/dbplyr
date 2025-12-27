@@ -55,6 +55,10 @@ sql_vector(x, parens = NA, collapse = " ", con = NULL)
 
   Database connection.
 
+## Value
+
+A [sql](https://dbplyr.tidyverse.org/dev/reference/sql.md) vector.
+
 ## See also
 
 Other generic:
@@ -89,11 +93,13 @@ escape(escape("X", con = con), con = con)
 
 # Database specific generics
 sql_escape_logical(con, c(TRUE, FALSE, NA))
-#> [1] "TRUE"  "FALSE" "NULL" 
+#> <SQL> TRUE
+#> <SQL> FALSE
+#> <SQL> NULL
 sql_escape_date(con, Sys.Date())
-#> [1] "'2025-12-26'"
+#> <SQL> '2025-12-27'
 sql_escape_date(con, Sys.time())
-#> [1] "'2025-12-26 22:29:30.397143'"
+#> <SQL> '2025-12-27 14:26:27.043682'
 sql_escape_raw(con, charToRaw("hi"))
-#> [1] "X'6869'"
+#> <SQL> X'6869'
 ```

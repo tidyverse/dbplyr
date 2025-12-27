@@ -127,6 +127,10 @@ atomic vectors are separated by spaces and wrapped in parens if needed.</p></dd>
 
 </dl></div>
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>A <a href="sql.html">sql</a> vector.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other generic:
 <code><a href="db-sql.html">db-sql</a></code>,
@@ -160,13 +164,15 @@ atomic vectors are separated by spaces and wrapped in parens if needed.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Database specific generics</span></span></span>
 <span class="r-in"><span><span class="fu">sql_escape_logical</span><span class="op">(</span><span class="va">con</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "TRUE"  "FALSE" "NULL" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; NULL</span>
 <span class="r-in"><span><span class="fu">sql_escape_date</span><span class="op">(</span><span class="va">con</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "'2025-12-26'"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; '2025-12-27'</span>
 <span class="r-in"><span><span class="fu">sql_escape_date</span><span class="op">(</span><span class="va">con</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "'2025-12-26 22:29:30.397143'"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; '2025-12-27 14:26:27.043682'</span>
 <span class="r-in"><span><span class="fu">sql_escape_raw</span><span class="op">(</span><span class="va">con</span>, <span class="fu"><a href="https://rdrr.io/r/base/rawConversion.html" class="external-link">charToRaw</a></span><span class="op">(</span><span class="st">"hi"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "X'6869'"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; X'6869'</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

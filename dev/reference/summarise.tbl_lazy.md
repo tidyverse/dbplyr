@@ -75,7 +75,7 @@ db |>
   show_query()
 #> <SQL>
 #> SELECT COUNT(*) AS `n()`
-#> FROM `dbplyr_tmp_gkGfyycbFy`
+#> FROM `dbplyr_tmp_yOK9MyP4tf`
 
 db |>
   group_by(g) |>
@@ -83,6 +83,6 @@ db |>
   show_query()
 #> <SQL>
 #> SELECT `g`, COUNT(*) AS `n()`
-#> FROM `dbplyr_tmp_gkGfyycbFy`
+#> FROM `dbplyr_tmp_yOK9MyP4tf`
 #> GROUP BY `g`
 ```

@@ -174,8 +174,8 @@
   [`sql_vector()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   : Escape/quote a value
 - [`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md)
-  [`is.sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md) : SQL
-  escaping.
+  [`is.sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md) :
+  Literal SQL escaping
 - [`sql_glue()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
   [`sql_glue2()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
   : Build SQL strings with glue syntax
