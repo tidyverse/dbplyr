@@ -247,7 +247,7 @@ sql_query_update_from.MariaDBConnection <- function(
     sql_clause_set(update_cols, update_values),
     sql_returning_cols(con, returning_cols, table)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 #' @export
 sql_query_update_from.MySQLConnection <- sql_query_update_from.MariaDBConnection

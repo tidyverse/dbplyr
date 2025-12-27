@@ -104,7 +104,6 @@ simulate_mssql <- function(version = "15.0") {
   lvl = 0
 ) {
   sql_select_clauses(
-    con,
     select = sql_clause_select(select, distinct, top = limit),
     from = sql_clause_from(from),
     where = sql_clause_where(where),
@@ -149,7 +148,7 @@ simulate_mssql <- function(version = "15.0") {
     !!!parts$conflict_clauses
   )
 
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -173,7 +172,7 @@ simulate_mssql <- function(version = "15.0") {
     sql_clause_from(parts$from)
   )
 
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -201,7 +200,7 @@ simulate_mssql <- function(version = "15.0") {
     sql_clause("INNER JOIN", parts$from),
     sql_clause_on(parts$where, lvl = 1)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -244,7 +243,7 @@ simulate_mssql <- function(version = "15.0") {
     sql_returning_cols(con, returning_cols, "INSERTED"),
     sql(";")
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -265,7 +264,7 @@ simulate_mssql <- function(version = "15.0") {
     sql_returning_cols(con, returning_cols, table = "DELETED"),
     !!!sql_clause_where_exists(parts$from, parts$where, not = FALSE)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 mssql_scalar_base <- function() {

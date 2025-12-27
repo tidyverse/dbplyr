@@ -443,7 +443,7 @@ sql_query_insert.DBIConnection <- function(
     sql_returning_cols(con, returning_cols, table)
   )
 
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -508,7 +508,7 @@ sql_query_append.DBIConnection <- function(
     sql_returning_cols(con, returning_cols, table)
   )
 
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -559,7 +559,7 @@ sql_query_update_from.DBIConnection <- function(
     sql_clause_where(parts$where),
     sql_returning_cols(con, returning_cols, table)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 
@@ -620,7 +620,7 @@ sql_query_upsert.DBIConnection <- function(
     sql_clause_where(parts$where),
     sql(paste0("RETURNING ", sql_star(con, table)))
   )
-  updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
+  updated_sql <- sql_format_clauses(updated_cte, lvl = 1)
   update_name <- sql_escape_ident(con, "updated")
 
   join_by <- new_join_by(by, x_as = "updated", y_as = "...y")
@@ -637,7 +637,7 @@ sql_query_upsert.DBIConnection <- function(
     sql_returning_cols(con, returning_cols, table)
   )
 
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -671,7 +671,7 @@ sql_query_delete.DBIConnection <- function(
     !!!sql_clause_where_exists(parts$from, parts$where, not = FALSE),
     sql_returning_cols(con, returning_cols, table)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export

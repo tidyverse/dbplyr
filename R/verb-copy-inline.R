@@ -118,11 +118,11 @@ sql_values_subquery_default <- function(con, df, types, lvl, row) {
   )
 
   rows_clauses <- sql_values_clause(con, df, row = row)
-  rows_query <- sql_format_clauses(rows_clauses, lvl = lvl + 1, con = con)
+  rows_query <- sql_format_clauses(rows_clauses, lvl = lvl + 1)
 
   subquery <- sql_query_union(
     con,
-    x = sql_format_clauses(null_row_clauses, lvl + 1, con),
+    x = sql_format_clauses(null_row_clauses, lvl + 1),
     unions = list(table = as.character(rows_query), all = TRUE),
     lvl = lvl + 1
   )
@@ -151,7 +151,7 @@ sql_values_subquery_column_alias <- function(con, df, types, lvl, ...) {
   # columns in Postgres.
   # The `FROM` clause is simply the `VALUES` clause with table and column alias
   rows_clauses <- sql_values_clause(con, df, row = FALSE)
-  rows_query <- sql_format_clauses(rows_clauses, lvl = lvl + 1, con = con)
+  rows_query <- sql_format_clauses(rows_clauses, lvl = lvl + 1)
 
   table_alias_sql <- sql_glue2(con, "drvd({.id colnames(df)})")
 
@@ -202,7 +202,7 @@ sql_values_subquery_union <- function(con, df, types, lvl, row, from = NULL) {
     from = if (!is.null(from)) sql_clause_from(sql_escape_ident(con, from)),
     where = sql_clause_where(sql("0 = 1"))
   )
-  null_row_query <- sql_format_clauses(clauses, lvl + 1, con)
+  null_row_query <- sql_format_clauses(clauses, lvl + 1)
 
   escaped_values <- purrr::map(
     df,
@@ -261,7 +261,7 @@ sql_values_zero_rows <- function(con, df, types, lvl, from = NULL) {
     from = if (!is.null(from)) sql_clause_from(sql_escape_ident(con, from)),
     where = sql_clause_where(sql("0 = 1"))
   )
-  sql_format_clauses(clauses, lvl, con)
+  sql_format_clauses(clauses, lvl)
 }
 
 sql_values_cast_clauses <- function(con, df, types, na) {

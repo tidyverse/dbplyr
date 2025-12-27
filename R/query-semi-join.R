@@ -189,7 +189,7 @@ sql_query_semi_join.DBIConnection <- function(
     sql_clause_where(sql(c(on, where)), lvl = 1),
     sql(")")
   )
-  sql_format_clauses(lines, lvl, con)
+  sql_format_clauses(lines, lvl)
 }
 
 dbplyr_query_semi_join <- function(

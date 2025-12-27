@@ -55,7 +55,6 @@ sql_query_select.Oracle <- function(
   lvl = 0
 ) {
   sql_select_clauses(
-    con,
     select = sql_clause_select(select, distinct),
     from = sql_clause_from(from),
     where = sql_clause_where(where),
@@ -114,7 +113,7 @@ sql_query_upsert.Oracle <- function(
     sql_returning_cols(con, returning_cols, table),
     sql(";")
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export

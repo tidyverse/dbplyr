@@ -1,5 +1,4 @@
 sql_select_clauses <- function(
-  con,
   select,
   from,
   where,
@@ -20,7 +19,7 @@ sql_select_clauses <- function(
     order_by = order_by,
     limit = limit
   )
-  sql_format_clauses(out, lvl, con)
+  sql_format_clauses(out, lvl)
 }
 
 sql_clause <- function(kw, parts, sep = ",", parens = FALSE, lvl = 0) {
@@ -146,28 +145,23 @@ sql_clause_where_exists <- function(table, where, not) {
 
 #' @export
 print.sql_clause <- function(x, ...) {
-  out <- sql_format_clause(x, lvl = 0, con = simulate_dbi())
+  out <- sql_format_clause(x, lvl = 0)
   cat("<sql clause>", out)
 }
 
 # helpers -----------------------------------------------------------------
 
-sql_format_clauses <- function(clauses, lvl, con) {
+sql_format_clauses <- function(clauses, lvl) {
   clauses <- purrr::compact(clauses)
 
-  formatted_clauses <- purrr::map(
-    clauses,
-    sql_format_clause,
-    lvl = lvl,
-    con = con
-  )
+  formatted_clauses <- purrr::map(clauses, sql_format_clause, lvl = lvl)
   clause_level <- purrr::map_dbl(clauses, "lvl", .default = 0)
   out <- indent_lvl(formatted_clauses, lvl + clause_level)
 
   sql(paste0(out, collapse = "\n"))
 }
 
-sql_format_clause <- function(x, lvl, con, nchar_max = 80) {
+sql_format_clause <- function(x, lvl, nchar_max = 80) {
   if (is.sql(x)) {
     return(x)
   }
