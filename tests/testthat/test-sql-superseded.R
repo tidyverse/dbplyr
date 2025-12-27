@@ -38,3 +38,42 @@ test_that("correct number of parens", {
 
   expect_equal(sql_expr((1L), con = con), sql("(1)"))
 })
+
+# as.sql() ---------------------------------------------------------------------
+
+test_that("as.sql() is deprecated", {
+  expect_snapshot(as.sql(ident("x")))
+})
+
+test_that("as.sql() only affects character vectors", {
+  local_options(lifecycle_verbosity = "quiet")
+
+  expect_equal(as.sql("x"), ident("x"))
+
+  x1 <- ident("x")
+  expect_equal(as.sql(x1), x1)
+
+  x2 <- ident_q('"x"')
+  expect_equal(as.sql(x2), x2)
+
+  x3 <- sql("SELECT 1")
+  expect_equal(as.sql(x3), x3)
+})
+
+# ident_q() --------------------------------------------------------------------
+
+test_that("quoted identifier correctly escaped", {
+  con <- simulate_dbi()
+  x2 <- ident_q('"x"')
+  expect_equal(escape(x2, con = con), sql('"x"'))
+
+  expect_equal(sql_vector(ident_q(), collapse = NULL, con = con), sql())
+  expect_equal(
+    sql_vector(ident_q(), parens = FALSE, collapse = "", con = con),
+    sql("")
+  )
+  expect_equal(
+    sql_vector(ident_q(), parens = TRUE, collapse = "", con = con),
+    sql("()")
+  )
+})

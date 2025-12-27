@@ -3,8 +3,6 @@
 #' @description
 #' `ident()` takes strings and turns them as database identifiers (e.g. table
 #' or column names) quoting them using the identifier rules for your database.
-#' `ident_q()` does the same, but assumes the names have already been
-#' quoted, preventing them from being quoted again.
 #'
 #' These are generally for internal use only; if you need to supply an
 #' table name that is qualified with schema or catalog, or has already been
@@ -21,12 +19,7 @@
 #' escape("x", con = con)
 #'
 #' # And identifiers with "
-#' ident("x")
 #' escape(ident("x"), con = con)
-#'
-#' # You can supply multiple inputs
-#' ident(a = "x", b = "y")
-#' ident_q(a = "x", b = "y")
 ident <- function(...) {
   x <- c_character(...)
   structure(x, class = c("ident", "character"))
