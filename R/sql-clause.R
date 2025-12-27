@@ -58,6 +58,7 @@ sql_clause_select <- function(select, distinct = FALSE, top = NULL, lvl = 0) {
 }
 
 sql_clause_from <- function(from, lvl = 0) {
+  check_sql(from)
   sql_clause("FROM", from, lvl = lvl)
 }
 

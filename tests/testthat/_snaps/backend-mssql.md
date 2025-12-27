@@ -192,7 +192,7 @@
 # handles ORDER BY in subqueries
 
     Code
-      sql_query_select(simulate_mssql(), sql("[x]"), ident("y"), order_by = "z",
+      sql_query_select(simulate_mssql(), sql("[x]"), sql("[y]"), order_by = "z",
       subquery = TRUE)
     Condition
       Warning:
@@ -205,7 +205,7 @@
 # custom limit translation
 
     Code
-      sql_query_select(simulate_mssql(), sql("[x]"), ident("y"), order_by = ident("z"),
+      sql_query_select(simulate_mssql(), sql("[x]"), sql("[y]"), order_by = sql("[z]"),
       limit = 10)
     Output
       <SQL> SELECT TOP 10 [x]

@@ -244,7 +244,7 @@ sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
       table <- table_path_name(name, con)
       names(from) <- as_table_path(table, con)
     }
-    from
+    sql_escape_table_source(con, from)
   }
 }
 

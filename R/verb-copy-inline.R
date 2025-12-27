@@ -258,7 +258,7 @@ sql_values_zero_rows <- function(con, df, types, lvl, from = NULL) {
 
   clauses <- list(
     select = sql_clause_select(typed_cols),
-    from = if (!is.null(from)) sql_clause_from(ident(from)),
+    from = if (!is.null(from)) sql_clause_from(sql_escape_ident(con, from)),
     where = sql_clause_where(sql("0 = 1"))
   )
   sql_format_clauses(clauses, lvl, con)

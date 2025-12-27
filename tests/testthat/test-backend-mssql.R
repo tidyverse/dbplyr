@@ -387,7 +387,7 @@ test_that("handles ORDER BY in subqueries", {
     sql_query_select(
       simulate_mssql(),
       sql("[x]"),
-      ident("y"),
+      sql("[y]"),
       order_by = "z",
       subquery = TRUE
     )
@@ -399,8 +399,8 @@ test_that("custom limit translation", {
     sql_query_select(
       simulate_mssql(),
       sql("[x]"),
-      ident("y"),
-      order_by = ident("z"),
+      sql("[y]"),
+      order_by = sql("[z]"),
       limit = 10
     )
   )
