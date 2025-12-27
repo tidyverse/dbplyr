@@ -41,7 +41,7 @@ dbplyr_edition.MySQLConnection <- dbplyr_edition.MariaDBConnection
 
 #' @export
 db_connection_describe.MariaDBConnection <- function(con, ...) {
-  info <- dbGetInfo(con)
+  info <- DBI::dbGetInfo(con)
 
   paste0(
     "mysql ",

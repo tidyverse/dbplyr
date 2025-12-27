@@ -120,7 +120,7 @@ db_disconnector <- function(con, quiet = FALSE) {
     if (!quiet) {
       message("Auto-disconnecting ", class(con)[[1]])
     }
-    dbDisconnect(con)
+    DBI::dbDisconnect(con)
   })
   environment()
 }

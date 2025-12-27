@@ -77,11 +77,11 @@ cat_line <- function(...) cat(paste0(..., "\n"), sep = "")
 
 # nocov start
 res_warn_incomplete <- function(res, hint = "n = -1") {
-  if (dbHasCompleted(res)) {
+  if (DBI::dbHasCompleted(res)) {
     return()
   }
 
-  rows <- big_mark(dbGetRowCount(res))
+  rows <- big_mark(DBI::dbGetRowCount(res))
   cli::cli_warn(
     "Only first {rows} results retrieved. Use {hint} to retrieve all."
   )

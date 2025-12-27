@@ -11,7 +11,12 @@ test_that("can copy and collect with schema or Id", {
   expect_equal(collect(db), df)
   expect_equal(collect(filter(db, x < 2)), df[1, ])
 
-  db <- copy_to(con, df, Id(schema = "aux", table = "db2"), temporary = FALSE)
+  db <- copy_to(
+    con,
+    df,
+    DBI::Id(schema = "aux", table = "db2"),
+    temporary = FALSE
+  )
   expect_equal(collect(db), df)
   expect_equal(collect(filter(db, x < 2)), df[1, ])
 })
