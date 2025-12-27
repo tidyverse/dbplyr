@@ -38,3 +38,21 @@ test_that("correct number of parens", {
 
   expect_equal(sql_expr((1L), con = con), sql("(1)"))
 })
+
+# ident_q() --------------------------------------------------------------------
+
+test_that("quoted identifier correctly escaped", {
+  con <- simulate_dbi()
+  x2 <- ident_q('"x"')
+  expect_equal(escape(x2, con = con), sql('"x"'))
+
+  expect_equal(sql_vector(ident_q(), collapse = NULL, con = con), sql())
+  expect_equal(
+    sql_vector(ident_q(), parens = FALSE, collapse = "", con = con),
+    sql("")
+  )
+  expect_equal(
+    sql_vector(ident_q(), parens = TRUE, collapse = "", con = con),
+    sql("()")
+  )
+})

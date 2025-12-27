@@ -138,3 +138,22 @@ replace_expr <- function(x, con) {
     x # nocov
   }
 }
+
+#' Declare a identifier as being pre-quoted.
+#'
+#' @description
+#' `r lifecycle::badge("superseded")`
+#'
+#' No longer needed; please use [sql()] instead.
+#'
+#' @keywords internal
+#' @export
+ident_q <- function(...) {
+  x <- c_character(...)
+  structure(x, class = c("ident_q", "ident", "character"))
+}
+
+#' @export
+escape.ident_q <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
+  sql_vector(x, parens, collapse, con = con)
+}
