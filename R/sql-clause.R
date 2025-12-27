@@ -1,5 +1,4 @@
 sql_select_clauses <- function(
-  con,
   select,
   from,
   where,
@@ -8,25 +7,18 @@ sql_select_clauses <- function(
   window,
   order_by,
   limit = NULL,
-  lvl
+  lvl = 0
 ) {
-  out <- list(
-    select = select,
-    from = from,
-    where = where,
-    group_by = group_by,
-    having = having,
-    window = window,
-    order_by = order_by,
-    limit = limit
-  )
-  sql_format_clauses(out, lvl, con)
+  out <- list(select, from, where, group_by, having, window, order_by, limit)
+  sql_format_clauses(out, lvl)
 }
 
 sql_clause <- function(kw, parts, sep = ",", parens = FALSE, lvl = 0) {
   if (length(parts) == 0) {
     return()
   }
+
+  check_sql(parts, allow_names = FALSE)
 
   clause <- list(
     kw = kw,
@@ -58,6 +50,7 @@ sql_clause_select <- function(select, distinct = FALSE, top = NULL, lvl = 0) {
 }
 
 sql_clause_from <- function(from, lvl = 0) {
+  check_sql(from)
   sql_clause("FROM", from, lvl = lvl)
 }
 
@@ -104,6 +97,7 @@ sql_clause_limit <- function(con, limit, lvl = 0) {
 }
 
 sql_clause_update <- function(table) {
+  check_sql(table)
   sql_clause("UPDATE", table)
 }
 
@@ -113,13 +107,14 @@ sql_clause_set <- function(lhs, rhs) {
   sql_clause("SET", update_clauses)
 }
 
-sql_clause_insert <- function(con, cols, into = NULL, lvl = 0) {
-  cols <- sql_escape_ident(con, cols)
+sql_clause_insert <- function(cols, into = NULL, lvl = 0) {
+  check_sql(cols)
+  check_sql(into, allow_null = TRUE)
 
   if (is.null(into)) {
     sql_clause("INSERT", cols, parens = TRUE, lvl = lvl)
   } else {
-    kw <- sql_glue2(con, "INSERT INTO {.tbl into}")
+    kw <- sql(paste0(style_kw("INSERT INTO "), into))
     sql_clause(kw, cols, parens = TRUE, lvl = lvl)
   }
 }
@@ -129,6 +124,7 @@ sql_clause_on <- function(on, lvl = 0, parens = FALSE) {
 }
 
 sql_clause_where_exists <- function(table, where, not) {
+  check_sql(table)
   list(
     sql(paste0("WHERE ", if (not) "NOT ", "EXISTS (")),
     # lvl = 1 because they are basically in a subquery
@@ -140,28 +136,23 @@ sql_clause_where_exists <- function(table, where, not) {
 
 #' @export
 print.sql_clause <- function(x, ...) {
-  out <- sql_format_clause(x, lvl = 0, con = simulate_dbi())
+  out <- sql_format_clause(x, lvl = 0)
   cat("<sql clause>", out)
 }
 
 # helpers -----------------------------------------------------------------
 
-sql_format_clauses <- function(clauses, lvl, con) {
+sql_format_clauses <- function(clauses, lvl) {
   clauses <- purrr::compact(clauses)
 
-  formatted_clauses <- purrr::map(
-    clauses,
-    sql_format_clause,
-    lvl = lvl,
-    con = con
-  )
+  formatted_clauses <- purrr::map(clauses, sql_format_clause, lvl = lvl)
   clause_level <- purrr::map_dbl(clauses, "lvl", .default = 0)
   out <- indent_lvl(formatted_clauses, lvl + clause_level)
 
   sql(paste0(out, collapse = "\n"))
 }
 
-sql_format_clause <- function(x, lvl, con, nchar_max = 80) {
+sql_format_clause <- function(x, lvl, nchar_max = 80) {
   if (is.sql(x)) {
     return(x)
   }
@@ -173,10 +164,11 @@ sql_format_clause <- function(x, lvl, con, nchar_max = 80) {
     x$sep <- style_kw(x$sep)
   }
 
-  fields_same_line <- escape(x$parts, collapse = paste0(x$sep, " "), con = con)
-  if (x$parens) {
-    fields_same_line <- paste0("(", fields_same_line, ")")
-  }
+  fields_same_line <- sql_collapse(
+    x$parts,
+    collapse = paste0(x$sep, " "),
+    parens = x$parens
+  )
 
   x$kw <- style_kw(x$kw)
   same_line_clause <- paste0(x$kw, " ", fields_same_line)
@@ -195,7 +187,7 @@ sql_format_clause <- function(x, lvl, con, nchar_max = 80) {
     if (x$parens) " (",
     "\n",
     indent,
-    escape(x$parts, collapse = collapse, con = con),
+    sql_collapse(x$parts, collapse = collapse),
     if (x$parens) paste0("\n", indent_lvl(")", lvl))
   )
 

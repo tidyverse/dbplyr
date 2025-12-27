@@ -244,7 +244,7 @@ sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
       table <- table_path_name(name, con)
       names(from) <- as_table_path(table, con)
     }
-    from
+    sql_escape_table_source(con, from)
   }
 }
 
@@ -443,7 +443,7 @@ sql_query_insert.DBIConnection <- function(
     sql_returning_cols(con, returning_cols, table)
   )
 
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -499,14 +499,16 @@ sql_query_append.DBIConnection <- function(
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   parts <- rows_prep(con, table, from, by = list(), lvl = 0)
 
+  insert_cols_sql <- sql_escape_ident(con, insert_cols)
+  table_sql <- sql_escape_table_source(con, table)
   clauses <- list2(
-    sql_clause_insert(con, insert_cols, table),
+    sql_clause_insert(insert_cols_sql, table_sql),
     sql_clause_select(sql("*")),
     sql_clause_from(parts$from),
     sql_returning_cols(con, returning_cols, table)
   )
 
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -548,15 +550,16 @@ sql_query_update_from.DBIConnection <- function(
   parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols <- sql_escape_ident(con, names(update_values))
 
+  table_sql <- sql_escape_table_source(con, table)
   # avoid CTEs for the general case as they do not work everywhere
   clauses <- list(
-    sql_clause_update(table),
+    sql_clause_update(table_sql),
     sql_clause_set(update_cols, update_values),
     sql_clause_from(parts$from),
     sql_clause_where(parts$where),
     sql_returning_cols(con, returning_cols, table)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 
@@ -604,18 +607,20 @@ sql_query_upsert.DBIConnection <- function(
   parts <- rows_prep(con, table, from, by, lvl = 0)
 
   insert_cols <- c(by, update_cols)
+  insert_cols_sql <- sql_escape_ident(con, insert_cols)
 
   update_values <- sql_table_prefix(con, "...y", update_cols)
   update_cols <- sql_escape_ident(con, update_cols)
 
+  table_sql <- sql_escape_table_source(con, table)
   updated_cte <- list(
-    sql_clause_update(table),
+    sql_clause_update(table_sql),
     sql_clause_set(update_cols, update_values),
     sql_clause_from(parts$from),
     sql_clause_where(parts$where),
     sql(paste0("RETURNING ", sql_star(con, table)))
   )
-  updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
+  updated_sql <- sql_format_clauses(updated_cte, lvl = 1)
   update_name <- sql_escape_ident(con, "updated")
 
   join_by <- new_join_by(by, x_as = "updated", y_as = "...y")
@@ -625,14 +630,14 @@ sql_query_upsert.DBIConnection <- function(
     sql(paste0("WITH ", update_name, " AS (")),
     updated_sql,
     sql(")"),
-    sql_clause_insert(con, insert_cols, table),
+    sql_clause_insert(insert_cols_sql, table_sql),
     sql_clause_select(sql("*")),
     sql_clause_from(parts$from),
     !!!sql_clause_where_exists(update_name, where, not = TRUE),
     sql_returning_cols(con, returning_cols, table)
   )
 
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -660,12 +665,13 @@ sql_query_delete.DBIConnection <- function(
   from <- as_table_source(from, con)
   parts <- rows_prep(con, table, from, by, lvl = 1)
 
+  table_sql <- sql_escape_table_source(con, table)
   clauses <- list2(
-    sql_clause("DELETE FROM", table),
+    sql_clause("DELETE FROM", table_sql),
     !!!sql_clause_where_exists(parts$from, parts$where, not = FALSE),
     sql_returning_cols(con, returning_cols, table)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -691,7 +697,7 @@ sql_named_cols <- function(con, cols, table = NULL) {
   nms[nms == cols] <- ""
 
   cols <- sql_table_prefix(con, table, cols)
-  set_names(sql(cols), nms)
+  names_to_as(con, cols, nms)
 }
 
 # dplyr fallbacks ---------------------------------------------------------

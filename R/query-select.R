@@ -384,7 +384,6 @@ sql_query_select.DBIConnection <- function(
   lvl = 0
 ) {
   sql_select_clauses(
-    con,
     select = sql_clause_select(select, distinct),
     from = sql_clause_from(from),
     where = sql_clause_where(where),

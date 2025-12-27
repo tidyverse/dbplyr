@@ -128,13 +128,20 @@ table_path_components.default <- function(x, con) {
   })
 }
 
-#' @export
-escape.dbplyr_table_path <- function(
-  x,
-  parens = FALSE,
-  collapse = ", ",
-  con = NULL
-) {
+sql_escape_table_source <- function(con, x) {
+  if (is.sql(x)) {
+    x
+  } else if (is_table_path(x)) {
+    sql_escape_table_path(con, x)
+  } else {
+    cli::cli_abort(
+      "{.arg x} must be a table path or SQL.",
+      .internal = TRUE
+    )
+  }
+}
+
+sql_escape_table_path <- function(con, x) {
   # names are always already escaped
   alias <- names2(x)
   table_path <- as_table_path(table_path_name(x, con), con)
@@ -146,8 +153,7 @@ escape.dbplyr_table_path <- function(
     as_sql <- " "
   }
 
-  out <- ifelse(has_alias, unname(x), paste0(x, as_sql, alias))
-  sql_vector(out, parens, collapse, con = con)
+  sql(ifelse(has_alias, unname(x), paste0(x, as_sql, alias)))
 }
 
 # table id ----------------------------------------------------------------

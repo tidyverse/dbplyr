@@ -94,7 +94,8 @@ glue_transformer <- function(con, text, envir, call = caller_env()) {
     value <- sql(value)
   } else if (parsed$type == "tbl") {
     value <- wrap_glue_error(as_table_source(value, con), text, call)
-    value <- escape(value, collapse = ", ", parens = parsed$collapse, con = con)
+    value <- sql_escape_table_source(con, value)
+    value <- sql_collapse(value, collapse = ", ", parens = parsed$collapse)
   } else if (parsed$type == "id") {
     if (!is_bare_character(value)) {
       cli::cli_abort(

@@ -229,6 +229,8 @@ sql_query_update_from.MariaDBConnection <- function(
   ...,
   returning_cols = NULL
 ) {
+  table <- as_table_path(table, con)
+
   if (!is_empty(returning_cols)) {
     check_unsupported_arg(returning_cols, backend = "MariaDB")
   }
@@ -237,14 +239,15 @@ sql_query_update_from.MariaDBConnection <- function(
   parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols <- sql_table_prefix(con, table, names(update_values))
 
+  table_sql <- sql_escape_table_source(con, table)
   clauses <- list(
-    sql_clause_update(table),
+    sql_clause_update(table_sql),
     sql_clause("INNER JOIN", parts$from),
     sql_clause_on(parts$where, lvl = 1),
     sql_clause_set(update_cols, update_values),
     sql_returning_cols(con, returning_cols, table)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 #' @export
 sql_query_update_from.MySQLConnection <- sql_query_update_from.MariaDBConnection

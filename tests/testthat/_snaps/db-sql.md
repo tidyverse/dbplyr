@@ -17,14 +17,14 @@
     Code
       sql_query_wrap(con, ident("table"))
     Output
-      <table_path> "table"
+      <SQL> "table"
 
 ---
 
     Code
       sql_query_wrap(con, in_schema("schema", "tbl"))
     Output
-      <table_path> "schema"."tbl"
+      <SQL> "schema"."tbl"
 
 ---
 
