@@ -139,6 +139,25 @@ replace_expr <- function(x, con) {
   }
 }
 
+#' Convert to sql (deprecated)
+#'
+#' `r lifecycle::badge("deprecated")`
+#'
+#' @keywords internal
+#'
+#' @param x Object to coerce
+#' @param con Needed when `x` is directly supplied from the user so that
+#'   schema specifications can be quoted using the correct identifiers.
+#' @export
+as.sql <- function(x, con) {
+  lifecycle::deprecate_warn("2.6.0", "as.sql()", "as_table_path()")
+  if (is_bare_character(x)) {
+    ident(x)
+  } else {
+    x
+  }
+}
+
 #' Declare a identifier as being pre-quoted.
 #'
 #' @description
