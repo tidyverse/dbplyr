@@ -150,6 +150,34 @@ escape.dbplyr_table_path <- function(
   sql_vector(out, parens, collapse, con = con)
 }
 
+sql_escape_table_source <- function(con, x) {
+  if (is.sql(x)) {
+    x
+  } else if (is_table_path(x)) {
+    sql_escape_table_path(con, x)
+  } else {
+    cli::cli_abort(
+      "{.arg {error_arg}} must be a table path or SQL.",
+      .internal = TRUE
+    )
+  }
+}
+
+sql_escape_table_path <- function(con, x) {
+  # names are always already escaped
+  alias <- names2(x)
+  table_path <- as_table_path(table_path_name(x, con), con)
+  has_alias <- alias == "" | alias == table_path
+
+  if (db_supports_table_alias_with_as(con)) {
+    as_sql <- style_kw(" AS ")
+  } else {
+    as_sql <- " "
+  }
+
+  sql(ifelse(has_alias, unname(x), paste0(x, as_sql, alias)))
+}
+
 # table id ----------------------------------------------------------------
 
 check_table_id <- function(x, arg = caller_arg(x), call = caller_env()) {
