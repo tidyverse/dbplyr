@@ -102,7 +102,6 @@ glue_transformer <- function(con, text, envir, call = caller_env()) {
         call = call
       )
     }
-    value <- wrap_glue_error(as_ident(value), text, call)
     value <- sql_escape_ident(con, value)
     value <- sql_collapse(value, collapse = ", ", parens = parsed$collapse)
   } else {
