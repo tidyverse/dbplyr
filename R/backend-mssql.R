@@ -161,10 +161,13 @@ simulate_mssql <- function(version = "15.0") {
   ...,
   returning_cols = NULL
 ) {
+  table <- as_table_path(table, con)
   parts <- rows_prep(con, table, from, by = list(), lvl = 0)
 
+  insert_cols_sql <- sql_escape_ident(con, insert_cols)
+  table_sql <- sql_escape_table_source(con, table)
   clauses <- list2(
-    sql_clause_insert(con, insert_cols, into = table),
+    sql_clause_insert(insert_cols_sql, into = table_sql),
     sql_returning_cols(con, returning_cols, "INSERTED"),
     sql_clause_select(sql("*")),
     sql_clause_from(parts$from)
@@ -233,7 +236,7 @@ simulate_mssql <- function(version = "15.0") {
     sql("WHEN MATCHED THEN"),
     sql_clause("UPDATE SET", update_clause, lvl = 1),
     sql("WHEN NOT MATCHED THEN"),
-    sql_clause_insert(con, insert_cols, lvl = 1),
+    sql_clause_insert(insert_cols_esc, lvl = 1),
     sql_clause("VALUES", insert_cols_qual, parens = TRUE, lvl = 1),
     sql_returning_cols(con, returning_cols, "INSERTED"),
     sql(";")

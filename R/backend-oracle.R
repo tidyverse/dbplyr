@@ -96,6 +96,7 @@ sql_query_upsert.Oracle <- function(
   update_clause <- sql(paste0(update_cols_esc, " = ", update_values))
 
   insert_cols <- c(by, update_cols)
+  insert_cols_esc <- sql_escape_ident(con, insert_cols)
   insert_values <- sql_table_prefix(con, "...y", insert_cols)
 
   clauses <- list(
@@ -105,7 +106,7 @@ sql_query_upsert.Oracle <- function(
     sql("WHEN MATCHED THEN"),
     sql_clause("UPDATE SET", update_clause, lvl = 1),
     sql("WHEN NOT MATCHED THEN"),
-    sql_clause_insert(con, insert_cols, lvl = 1),
+    sql_clause_insert(insert_cols_esc, lvl = 1),
     sql_clause("VALUES", insert_values, parens = TRUE, lvl = 1),
     sql_returning_cols(con, returning_cols, table),
     sql(";")

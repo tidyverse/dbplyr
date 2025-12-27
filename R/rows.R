@@ -787,7 +787,8 @@ rows_insert_prep <- function(con, table, from, cols, by, lvl = 0) {
   table_sql <- sql_escape_table_source(con, table)
   out$conflict_clauses <- sql_clause_where_exists(table_sql, where, not = TRUE)
 
-  out$insert_clause <- sql_clause_insert(con, cols, table)
+  cols_sql <- sql_escape_ident(con, cols)
+  out$insert_clause <- sql_clause_insert(cols_sql, table_sql)
 
   out
 }

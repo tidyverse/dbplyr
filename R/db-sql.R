@@ -499,8 +499,10 @@ sql_query_append.DBIConnection <- function(
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   parts <- rows_prep(con, table, from, by = list(), lvl = 0)
 
+  insert_cols_sql <- sql_escape_ident(con, insert_cols)
+  table_sql <- sql_escape_table_source(con, table)
   clauses <- list2(
-    sql_clause_insert(con, insert_cols, table),
+    sql_clause_insert(insert_cols_sql, table_sql),
     sql_clause_select(sql("*")),
     sql_clause_from(parts$from),
     sql_returning_cols(con, returning_cols, table)
@@ -605,6 +607,7 @@ sql_query_upsert.DBIConnection <- function(
   parts <- rows_prep(con, table, from, by, lvl = 0)
 
   insert_cols <- c(by, update_cols)
+  insert_cols_sql <- sql_escape_ident(con, insert_cols)
 
   update_values <- sql_table_prefix(con, "...y", update_cols)
   update_cols <- sql_escape_ident(con, update_cols)
@@ -627,7 +630,7 @@ sql_query_upsert.DBIConnection <- function(
     sql(paste0("WITH ", update_name, " AS (")),
     updated_sql,
     sql(")"),
-    sql_clause_insert(con, insert_cols, table),
+    sql_clause_insert(insert_cols_sql, table_sql),
     sql_clause_select(sql("*")),
     sql_clause_from(parts$from),
     !!!sql_clause_where_exists(update_name, where, not = TRUE),
