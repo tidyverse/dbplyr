@@ -9,7 +9,7 @@ test_that("fill returns same results as tidyr", {
       6 ,      2 , NA      , NA  ,   6 ,
   )
   df_db <- copy_to(memdb(), df, overwrite = TRUE)
-  withr::defer(dbRemoveTable(memdb(), "df"))
+  withr::defer(DBI::dbRemoveTable(memdb(), "df"))
 
   expect_equal(
     df_db |>

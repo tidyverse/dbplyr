@@ -69,7 +69,7 @@ sql_escape_ident <- function(con, x) {
 }
 #' @export
 sql_escape_ident.default <- function(con, x) {
-  sql(dbQuoteIdentifier(con, x))
+  sql(DBI::dbQuoteIdentifier(con, x))
 }
 
 # logical -----------------------------------------------------------------

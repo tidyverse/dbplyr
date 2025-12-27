@@ -175,10 +175,10 @@ db_collect.DBIConnection <- function(
   warn_incomplete = TRUE,
   ...
 ) {
-  res <- dbSendQuery(con, sql)
-  on.exit(dbClearResult(res), add = TRUE)
+  res <- DBI::dbSendQuery(con, sql)
+  on.exit(DBI::dbClearResult(res), add = TRUE)
 
-  out <- dbFetch(res, n = n)
+  out <- DBI::dbFetch(res, n = n)
   if (warn_incomplete) {
     res_warn_incomplete(res, "n = Inf")
   }
@@ -207,11 +207,11 @@ dbplyr_write_table <- function(
     # the bare table name
     name <- table_path_name(table, con)
   } else {
-    name <- SQL(table)
+    name <- DBI::SQL(table)
   }
 
   withCallingHandlers(
-    dbWriteTable(
+    DBI::dbWriteTable(
       con,
       name = name,
       value = values,
@@ -252,8 +252,8 @@ with_transaction <- function(
   env = caller_env()
 ) {
   if (in_transaction) {
-    dbBegin(con)
-    on.exit(dbRollback(con))
+    DBI::dbBegin(con)
+    on.exit(DBI::dbRollback(con))
   }
 
   withCallingHandlers(
@@ -265,7 +265,7 @@ with_transaction <- function(
 
   if (in_transaction) {
     on.exit()
-    dbCommit(con)
+    DBI::dbCommit(con)
   }
 }
 

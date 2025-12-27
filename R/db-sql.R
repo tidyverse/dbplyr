@@ -765,9 +765,9 @@ dbplyr_save_query <- function(
   sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
 
   if (overwrite) {
-    found <- DBI::dbExistsTable(con, SQL(name))
+    found <- DBI::dbExistsTable(con, DBI::SQL(name))
     if (found) {
-      DBI::dbRemoveTable(con, SQL(name))
+      DBI::dbRemoveTable(con, DBI::SQL(name))
     }
   }
 
@@ -795,7 +795,7 @@ dbplyr_sql_subquery <- function(
 
 db_execute <- function(con, sql, msg, call = caller_env(), env = caller_env()) {
   dbi_wrap(
-    dbExecute(con, sql, immediate = TRUE),
+    DBI::dbExecute(con, sql, immediate = TRUE),
     sql = sql,
     msg = msg,
     call = call,
@@ -811,7 +811,7 @@ db_get_query <- function(
   call = caller_env(),
   env = caller_env()
 ) {
-  dbi_wrap(dbGetQuery(con, sql), sql, msg, call = call, env = env)
+  dbi_wrap(DBI::dbGetQuery(con, sql), sql, msg, call = call, env = env)
 }
 
 dbi_wrap <- function(code, sql, msg, call = caller_env(), env = caller_env()) {

@@ -35,7 +35,7 @@ dbplyr_edition.PqConnection <- dbplyr_edition.PostgreSQL
 
 #' @export
 db_connection_describe.PqConnection <- function(con, ...) {
-  info <- dbGetInfo(con)
+  info <- DBI::dbGetInfo(con)
   host <- if (info$host == "") "localhost" else info$host
 
   paste0(
