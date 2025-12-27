@@ -665,8 +665,9 @@ sql_query_delete.DBIConnection <- function(
   from <- as_table_source(from, con)
   parts <- rows_prep(con, table, from, by, lvl = 1)
 
+  table_sql <- sql_escape_table_source(con, table)
   clauses <- list2(
-    sql_clause("DELETE FROM", table),
+    sql_clause("DELETE FROM", table_sql),
     !!!sql_clause_where_exists(parts$from, parts$where, not = FALSE),
     sql_returning_cols(con, returning_cols, table)
   )

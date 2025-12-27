@@ -128,28 +128,6 @@ table_path_components.default <- function(x, con) {
   })
 }
 
-#' @export
-escape.dbplyr_table_path <- function(
-  x,
-  parens = FALSE,
-  collapse = ", ",
-  con = NULL
-) {
-  # names are always already escaped
-  alias <- names2(x)
-  table_path <- as_table_path(table_path_name(x, con), con)
-  has_alias <- alias == "" | alias == table_path
-
-  if (db_supports_table_alias_with_as(con)) {
-    as_sql <- style_kw(" AS ")
-  } else {
-    as_sql <- " "
-  }
-
-  out <- ifelse(has_alias, unname(x), paste0(x, as_sql, alias))
-  sql_vector(out, parens, collapse, con = con)
-}
-
 sql_escape_table_source <- function(con, x) {
   if (is.sql(x)) {
     x

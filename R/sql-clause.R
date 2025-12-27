@@ -28,6 +28,8 @@ sql_clause <- function(kw, parts, sep = ",", parens = FALSE, lvl = 0) {
     return()
   }
 
+  check_sql(parts)
+
   clause <- list(
     kw = kw,
     parts = parts,

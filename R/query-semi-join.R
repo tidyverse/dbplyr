@@ -70,7 +70,7 @@ sql_build.lazy_semi_join_query <- function(op, con, ..., sql_options = NULL) {
   # so need to update the existing WHERE clause
   y_vars <- op_vars(op$y)
   y_as <- op$by$y_as
-  replacements <- lapply(y_vars, \(var) sql_glue2(con, "{y_as}.{.id var}"))
+  replacements <- lapply(y_vars, \(var) sql_glue2(con, "{.tbl y_as}.{.id var}"))
   where <- replace_sym(op$where, y_vars, replacements)
   where_sql <- translate_sql_(
     where,

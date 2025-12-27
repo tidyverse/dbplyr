@@ -215,6 +215,8 @@ simulate_mssql <- function(version = "15.0") {
   returning_cols = NULL,
   method = NULL
 ) {
+  table <- as_table_path(table, con)
+
   check_string(method, allow_null = TRUE)
   method <- method %||% "merge"
   arg_match(method, "merge", error_arg = "method")
@@ -229,8 +231,9 @@ simulate_mssql <- function(version = "15.0") {
   insert_cols_esc <- sql_escape_ident(con, insert_cols)
   insert_cols_qual <- sql_table_prefix(con, "...y", insert_cols)
 
+  table_sql <- sql_escape_table_source(con, table)
   clauses <- list(
-    sql_clause("MERGE INTO", table),
+    sql_clause("MERGE INTO", table_sql),
     sql_clause("USING", parts$from),
     sql_clause_on(parts$where, lvl = 1),
     sql("WHEN MATCHED THEN"),
@@ -253,10 +256,12 @@ simulate_mssql <- function(version = "15.0") {
   ...,
   returning_cols = NULL
 ) {
+  table <- as_table_path(table, con)
   parts <- rows_prep(con, table, from, by, lvl = 0)
 
+  table_sql <- sql_escape_table_source(con, table)
   clauses <- list2(
-    sql_clause("DELETE FROM", table),
+    sql_clause("DELETE FROM", table_sql),
     sql_returning_cols(con, returning_cols, table = "DELETED"),
     !!!sql_clause_where_exists(parts$from, parts$where, not = FALSE)
   )

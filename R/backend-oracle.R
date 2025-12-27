@@ -83,6 +83,8 @@ sql_query_upsert.Oracle <- function(
   returning_cols = NULL,
   method = NULL
 ) {
+  table <- as_table_path(table, con)
+
   method <- method %||% "merge"
   arg_match(method, c("merge", "cte_update"), error_arg = "method")
   if (method == "cte_update") {
@@ -99,8 +101,9 @@ sql_query_upsert.Oracle <- function(
   insert_cols_esc <- sql_escape_ident(con, insert_cols)
   insert_values <- sql_table_prefix(con, "...y", insert_cols)
 
+  table_sql <- sql_escape_table_source(con, table)
   clauses <- list(
-    sql_clause("MERGE INTO", table),
+    sql_clause("MERGE INTO", table_sql),
     sql_clause("USING", parts$from),
     sql_clause_on(parts$where, lvl = 1, parens = TRUE),
     sql("WHEN MATCHED THEN"),
