@@ -697,7 +697,7 @@ sql_named_cols <- function(con, cols, table = NULL) {
   nms[nms == cols] <- ""
 
   cols <- sql_table_prefix(con, table, cols)
-  set_names(sql(cols), nms)
+  names_to_as(con, cols, nms)
 }
 
 # dplyr fallbacks ---------------------------------------------------------

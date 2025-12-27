@@ -28,7 +28,7 @@ sql_clause <- function(kw, parts, sep = ",", parens = FALSE, lvl = 0) {
     return()
   }
 
-  check_sql(parts)
+  check_sql(parts, allow_names = FALSE)
 
   clause <- list(
     kw = kw,
@@ -179,10 +179,11 @@ sql_format_clause <- function(x, lvl, con, nchar_max = 80) {
     x$sep <- style_kw(x$sep)
   }
 
-  fields_same_line <- escape(x$parts, collapse = paste0(x$sep, " "), con = con)
-  if (x$parens) {
-    fields_same_line <- paste0("(", fields_same_line, ")")
-  }
+  fields_same_line <- sql_collapse(
+    x$parts,
+    collapse = paste0(x$sep, " "),
+    parens = x$parens
+  )
 
   x$kw <- style_kw(x$kw)
   same_line_clause <- paste0(x$kw, " ", fields_same_line)
@@ -201,7 +202,7 @@ sql_format_clause <- function(x, lvl, con, nchar_max = 80) {
     if (x$parens) " (",
     "\n",
     indent,
-    escape(x$parts, collapse = collapse, con = con),
+    sql_collapse(x$parts, collapse = collapse),
     if (x$parens) paste0("\n", indent_lvl(")", lvl))
   )
 
