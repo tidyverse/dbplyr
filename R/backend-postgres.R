@@ -374,7 +374,7 @@ sql_query_insert.PqConnection <- function(
   conflict <- rows_check_conflict(conflict)
 
   parts <- rows_insert_prep(con, table, from, insert_cols, by, lvl = 0)
-  by_sql <- sql(sql_escape_ident(con, by))
+  by_sql <- sql_escape_ident(con, by)
 
   clauses <- list(
     parts$insert_clause,
@@ -415,7 +415,7 @@ sql_query_upsert.PqConnection <- function(
   parts <- rows_prep(con, table, from, by, lvl = 0)
 
   insert_cols <- c(by, update_cols)
-  select_cols <- sql(sql_escape_ident(con, insert_cols))
+  select_cols <- sql_escape_ident(con, insert_cols)
 
   update_values <- set_names(
     sql_table_prefix(con, "excluded", update_cols),
@@ -423,7 +423,7 @@ sql_query_upsert.PqConnection <- function(
   )
   update_cols <- sql_escape_ident(con, update_cols)
 
-  by_sql <- sql(sql_escape_ident(con, by))
+  by_sql <- sql_escape_ident(con, by)
   clauses <- list(
     sql_clause_insert(con, insert_cols, into = table),
     sql_clause_select(select_cols),
@@ -449,7 +449,7 @@ sql_values_subquery.PostgreSQL <- sql_values_subquery.PqConnection
 
 #' @export
 sql_escape_date.PostgreSQL <- function(con, x) {
-  DBI::dbQuoteLiteral(con, x)
+  sql(DBI::dbQuoteLiteral(con, x))
 }
 #' @export
 sql_escape_date.PqConnection <- sql_escape_date.PostgreSQL

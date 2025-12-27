@@ -114,7 +114,7 @@ sql_clause_set <- function(lhs, rhs) {
 }
 
 sql_clause_insert <- function(con, cols, into = NULL, lvl = 0) {
-  cols <- sql(sql_escape_ident(con, cols))
+  cols <- sql_escape_ident(con, cols)
 
   if (is.null(into)) {
     sql_clause("INSERT", cols, parens = TRUE, lvl = lvl)

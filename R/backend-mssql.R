@@ -213,12 +213,12 @@ simulate_mssql <- function(version = "15.0") {
 
   parts <- rows_prep(con, table, from, by, lvl = 0)
 
-  update_cols_esc <- sql(sql_escape_ident(con, update_cols))
+  update_cols_esc <- sql_escape_ident(con, update_cols)
   update_values <- sql_table_prefix(con, "...y", update_cols)
   update_clause <- sql(paste0(update_cols_esc, " = ", update_values))
 
   insert_cols <- c(by, update_cols)
-  insert_cols_esc <- sql(sql_escape_ident(con, insert_cols))
+  insert_cols_esc <- sql_escape_ident(con, insert_cols)
   insert_cols_qual <- sql_table_prefix(con, "...y", insert_cols)
 
   clauses <- list(

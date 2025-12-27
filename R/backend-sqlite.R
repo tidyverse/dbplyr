@@ -122,7 +122,7 @@ sql_translation.SQLiteConnection <- function(con) {
 sql_escape_logical.SQLiteConnection <- function(con, x) {
   y <- as.character(as.integer(x))
   y[is.na(x)] <- "NULL"
-  y
+  sql(y)
 }
 
 #' @export
