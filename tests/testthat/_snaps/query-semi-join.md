@@ -57,3 +57,29 @@
         WHERE ("df_LHS"."x" = "df_RHS"."x") AND ("df_LHS"."y" = "df_RHS"."y")
       )
 
+# sql_on query doesn't change unexpectedly
+
+    Code
+      semi_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
+    Output
+      <SQL>
+      SELECT "LHS".*
+      FROM "df" AS "LHS"
+      WHERE EXISTS (
+        SELECT 1 FROM "df" AS "RHS"
+        WHERE (LHS.y < RHS.z)
+      )
+
+---
+
+    Code
+      anti_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
+    Output
+      <SQL>
+      SELECT "LHS".*
+      FROM "df" AS "LHS"
+      WHERE NOT EXISTS (
+        SELECT 1 FROM "df" AS "RHS"
+        WHERE (LHS.y < RHS.z)
+      )
+
