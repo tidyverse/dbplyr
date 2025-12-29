@@ -47,22 +47,51 @@ test_that("sql_on query doesn't change unexpectedly", {
   expect_snapshot(anti_join(lf1, lf2, sql_on = "LHS.y < RHS.z"))
 })
 
-test_that("sql_multi_join_vars generates expected SQL", {
+test_that("sql_multi_join_select generates expected SQL", {
   con <- simulate_dbi()
 
+  vars <- tibble(
+    name = c("x", "a", "b"),
+    var = c("x", "a", "b"),
+    table = c(1L, 1L, 2L)
+  )
   # left_join(lf(x, a), lf(x, b), by = "x")
   expect_equal(
-    sql_multi_join_vars(
+    sql_multi_join_select(
       con,
-      vars = tibble(
-        name = c("x", "a", "b"),
-        var = c("x", "a", "b"),
-        table = c(1L, 1L, 2L)
-      ),
-      table_vars = list(left = c("x", "a"), right = c("x", "b")),
-      use_star = TRUE,
-      qualify_all_columns = FALSE
+      vars = vars,
+      table_vars = list(left = c("x", "a"), right = c("x", "b"))
     ),
     sql('"left".*', '"b"')
+  )
+
+  # Left join with * - uses star for first table when all vars selected in order
+  vars <- tibble(
+    name = c("y", "a", "b", "c"),
+    table = c(1L, 1L, 1L, 2L),
+    var = c("y", "a", "b", "c")
+  )
+  expect_equal(
+    sql_multi_join_select(
+      con,
+      vars = vars,
+      table_vars = list(one = c("y", "a", "b"), two = c("y", "c"))
+    ),
+    sql('"one".*', '"c"')
+  )
+
+  # Left join with duplicated names - needs qualified column references
+  vars <- tibble(
+    name = c("y", "a.y", "a.x"),
+    table = c(1L, 2L, 1L),
+    var = c("x", "a", "a")
+  )
+  expect_equal(
+    sql_multi_join_select(
+      con,
+      vars = vars,
+      table_vars = list(one = c("x", "a"), two = c("x", "a"))
+    ),
+    sql('"one"."x" AS "y"', '"two"."a" AS "a.y"', '"one"."a" AS "a.x"')
   )
 })

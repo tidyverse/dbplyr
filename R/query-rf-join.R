@@ -238,15 +238,11 @@ sql_rf_join_vars <- function(
         if (!is.na(.x) && !is.na(.y)) {
           x_prefix <- sql_table_prefix(con, x_as, .x)
           y_prefix <- sql_table_prefix(con, y_as, .y)
-          out <- sql_glue2(con, "COALESCE({x_prefix}, {y_prefix})")
-
-          return(out)
-        }
-
-        if (!is.na(.x)) {
-          sql_multi_join_var(con, .x, 1L, table_names, duplicated_vars)
+          sql_glue2(con, "COALESCE({x_prefix}, {y_prefix})")
+        } else if (!is.na(.x)) {
+          sql_multi_join_var(con, .x, table_names[[1L]], duplicated_vars)
         } else {
-          sql_multi_join_var(con, .y, 2L, table_names, duplicated_vars)
+          sql_multi_join_var(con, .y, table_names[[2L]], duplicated_vars)
         }
       }
     )
@@ -274,7 +270,7 @@ sql_rf_join_vars <- function(
   multi_join_vars <- vctrs::vec_cbind(name = vars$name, multi_join_vars)
   table_vars <- set_names(vars[c("all_x", "all_y")], table_names)
 
-  sql_multi_join_vars(
+  sql_multi_join_select(
     con = con,
     vars = multi_join_vars,
     table_vars = table_vars,
