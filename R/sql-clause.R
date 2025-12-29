@@ -18,7 +18,10 @@ sql_clause <- function(kw, parts, sep = ",", parens = FALSE, lvl = 0) {
     return()
   }
 
+  check_string(kw)
   check_sql(parts, allow_names = FALSE)
+  check_string(sep, allow_null = TRUE)
+  check_bool(parens)
 
   clause <- list(
     kw = kw,
@@ -33,7 +36,6 @@ sql_clause <- function(kw, parts, sep = ",", parens = FALSE, lvl = 0) {
 }
 
 sql_clause_select <- function(select, distinct = FALSE, top = NULL, lvl = 0) {
-  check_sql(select)
   check_bool(distinct)
   check_number_whole(top, min = 0, allow_null = TRUE)
 
@@ -50,29 +52,24 @@ sql_clause_select <- function(select, distinct = FALSE, top = NULL, lvl = 0) {
 }
 
 sql_clause_from <- function(from, lvl = 0) {
-  check_sql(from)
   sql_clause("FROM", from, lvl = lvl)
 }
 
 sql_clause_where <- function(where, lvl = 0) {
-  check_sql(where, allow_null = TRUE)
   where <- sql(paste0("(", where, ")", recycle0 = TRUE))
   sql_clause("WHERE", where, sep = " AND", lvl = lvl)
 }
 
 sql_clause_group_by <- function(group_by, lvl = 0) {
-  check_sql(group_by, allow_null = TRUE)
   sql_clause("GROUP BY", group_by)
 }
 
 sql_clause_having <- function(having, lvl = 0, call = caller_env()) {
-  check_sql(having, allow_null = TRUE)
   having <- sql(paste0("(", having, ")", recycle0 = TRUE))
   sql_clause("HAVING", having, sep = " AND")
 }
 
 sql_clause_window <- function(window) {
-  check_sql(window, allow_null = TRUE)
   sql_clause("WINDOW", window)
 }
 
@@ -97,24 +94,21 @@ sql_clause_limit <- function(con, limit, lvl = 0) {
 }
 
 sql_clause_update <- function(table) {
-  check_sql(table)
   sql_clause("UPDATE", table)
 }
 
 sql_clause_set <- function(lhs, rhs) {
-  update_clauses <- sql(paste0(lhs, " = ", rhs))
-
+  update_clauses <- sql(paste0(lhs, " = ", rhs, recycle0 = TRUE))
   sql_clause("SET", update_clauses)
 }
 
 sql_clause_insert <- function(cols, into = NULL, lvl = 0) {
-  check_sql(cols)
-  check_sql(into, allow_null = TRUE)
+  check_sql(into, allow_null = TRUE, allow_names = FALSE)
 
   if (is.null(into)) {
     sql_clause("INSERT", cols, parens = TRUE, lvl = lvl)
   } else {
-    kw <- sql(paste0(style_kw("INSERT INTO "), into))
+    kw <- paste0("INSERT INTO ", into)
     sql_clause(kw, cols, parens = TRUE, lvl = lvl)
   }
 }
@@ -142,7 +136,7 @@ print.sql_clause <- function(x, ...) {
 
 # helpers -----------------------------------------------------------------
 
-sql_format_clauses <- function(clauses, lvl) {
+sql_format_clauses <- function(clauses, lvl = 0) {
   clauses <- purrr::compact(clauses)
 
   formatted_clauses <- purrr::map(clauses, sql_format_clause, lvl = lvl)
