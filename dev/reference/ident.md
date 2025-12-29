@@ -1,12 +1,14 @@
 # Flag a character vector as SQL identifiers
 
-`ident()` takes strings and turns them as database identifiers (e.g.
-table or column names) quoting them using the identifier rules for your
-database.
+`ident()` marks strings as database identifiers (e.g. table or column
+names) quoting them using the identifier rules for your database. It is
+used primarily in
+[`translate_sql()`](https://dbplyr.tidyverse.org/dev/reference/translate_sql.md)
+to label variables as identifiers; use elsewhere should be regarded with
+suspicion.
 
-These are generally for internal use only; if you need to supply an
-table name that is qualified with schema or catalog, or has already been
-quoted for some other reason, use
+`ident()` is for internal use only; if you need to supply an table name
+that is qualified with schema or catalog use
 [`I()`](https://rdrr.io/r/base/AsIs.html).
 
 ## Usage
