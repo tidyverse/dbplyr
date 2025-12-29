@@ -47,9 +47,14 @@ format.ident <- function(x, ...) {
 #' @export
 is.ident <- function(x) inherits(x, "ident")
 
-
-as_ident <- function(x, call = parent.frame()) {
-  if (is.ident(x)) {
+# Needed in in_catalog() and in_schema() for backward compatibility since
+# those functions recommended that you use sql() to escape table names.
+# Also needed in win_over() since the user might be generating their own
+# syntax
+as_ident_or_sql <- function(x) {
+  if (is.sql(x)) {
+    x
+  } else if (is.ident(x)) {
     x
   } else if (is_bare_character(x)) {
     ident(x)
@@ -58,17 +63,5 @@ as_ident <- function(x, call = parent.frame()) {
       "Invalid identifier: expecting a character vector.",
       call = call
     )
-  }
-}
-
-# Needed in in_catalog() and in_schema() for backward compatibility since
-# those functions recommended that you use sql() to escape table names.
-# Also needed in win_over() since the user might be generating their own
-# syntax
-as_ident_or_sql <- function(x) {
-  if (is.sql(x)) {
-    x
-  } else {
-    as_ident(x)
   }
 }
