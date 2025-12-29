@@ -92,5 +92,5 @@ sql_query_set_op.DBIConnection <- function(
     sql(method),
     sql_indent_subquery(y, con = con, lvl = lvl)
   )
-  sql_format_clauses(lines, lvl, con)
+  sql_format_clauses(lines, lvl)
 }

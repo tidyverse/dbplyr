@@ -184,7 +184,7 @@ sql_query_join.DBIConnection <- function(
     sql_clause(JOIN, y),
     sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1)
   )
-  sql_format_clauses(clauses, lvl, con)
+  sql_format_clauses(clauses, lvl)
 }
 dbplyr_query_join <- function(
   con,
