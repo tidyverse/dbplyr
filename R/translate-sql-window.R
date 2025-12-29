@@ -88,11 +88,11 @@ win_register_names <- function() {
 
   window_count <- vctrs::vec_count(windows, sort = "location")
   window_count <- vctrs::vec_slice(window_count, window_count$count > 1)
-  if (nrow(window_count) > 0) {
-    window_count$name <- ident(paste0("win", seq_along(window_count$key)))
-  } else {
-    window_count$name <- ident()
-  }
+  window_count$name <- paste0(
+    "win",
+    seq_along(window_count$key),
+    recycle0 = TRUE
+  )
   window_count$key <- window_count$key
 
   sql_context$window_names <- window_count
@@ -104,7 +104,7 @@ win_get <- function(over, con) {
 
   if (vctrs::vec_in(over, windows$key)) {
     id <- vctrs::vec_match(over, windows$key)
-    ident(windows$name[[id]])
+    sql_escape_ident(con, windows$name[[id]])
   } else {
     over
   }
