@@ -49,7 +49,7 @@ sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
 
   tables <- set_names(c(list(op$x), op$joins$table), table_names_out)
   table_vars <- purrr::map(tables, op_vars)
-  select_sql <- sql_multi_join_vars(
+  select_sql <- sql_multi_join_select(
     con,
     op$vars,
     table_vars,
@@ -277,40 +277,12 @@ sql_query_multi_join.DBIConnection <- function(
 #' @param table_names `<character>`: table names indexed by `table`.
 #' @param all_vars_list `<list_of<character>>` All variables in each table.
 #' @noRd
-#' @examples
-#' # Left join with *
-#' vars <- tibble(
-#'   name = c("y", "a", "b", "c"),
-#'   table = list(1, 1, 1, 2),
-#'   var = list("y", "a", "b", "c")
-#' )
-#' sql_multi_join_vars(
-#'    simulate_dbi(),
-#'    vars,
-#'    c("one", "two"),
-#'    list(c("y", "a", "b"), c("y", "c"))
-#' )
-#'
-#' # Left join with duplicated names
-#' vars <- tibble(
-#'   name = c("y", "a.y", "a.x"),
-#'   table = list(1, 2, 1),
-#'   var = list("x", "a", "a")
-#' )
-#' sql_multi_join_vars(
-#'    simulate_dbi(),
-#'    vars,
-#'    c("one", "two"),
-#'    list(c("x", "a"), c("x", "a"))
-#' )
-#'
-#' # Full and right join are handled via `sql_rf_join_vars`
-sql_multi_join_vars <- function(
+sql_multi_join_select <- function(
   con,
   vars,
   table_vars,
-  use_star,
-  qualify_all_columns
+  use_star = TRUE,
+  qualify_all_columns = FALSE
 ) {
   all_vars <- tolower(unlist(table_vars, use.names = FALSE))
   if (qualify_all_columns) {
@@ -337,13 +309,14 @@ sql_multi_join_vars <- function(
       out[[id]] <- sql_star(con, table_paths[i])
       names(out)[id] <- ""
     } else {
-      out[vars_idx_i] <- purrr::map2(
-        used_vars_i,
-        i,
-        function(var, table_idx) {
-          sql_multi_join_var(con, var, table_idx, table_paths, duplicated_vars)
-        }
-      )
+      out[vars_idx_i] <- purrr::map2(used_vars_i, i, function(var, table_idx) {
+        sql_multi_join_var(
+          con,
+          var,
+          table_paths[[table_idx]],
+          duplicated_vars
+        )
+      })
     }
   }
 
@@ -370,20 +343,9 @@ join_can_use_star <- function(all_vars, used_vars, out_vars, idx) {
   all(diff(idx) == 1)
 }
 
-sql_multi_join_var <- function(
-  con,
-  var,
-  table_id,
-  table_names,
-  duplicated_vars
-) {
-  if (length(table_id) > 1) {
-    # TODO use `vec_check_size()` after vctrs 0.6 release
-    cli_abort("{.arg table_id} must have size 1", .internal = TRUE)
-  }
-
+sql_multi_join_var <- function(con, var, table_name, duplicated_vars) {
   if (tolower(var) %in% duplicated_vars) {
-    sql_table_prefix(con, table_names[[table_id]], var)
+    sql_table_prefix(con, table_name, var)
   } else {
     sql_escape_ident(con, var)
   }
