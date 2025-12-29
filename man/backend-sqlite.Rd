@@ -2,9 +2,12 @@
 % Please edit documentation in R/backend-sqlite.R
 \name{backend-sqlite}
 \alias{simulate_sqlite}
+\alias{dialect_sqlite}
 \title{Backend: SQLite}
 \usage{
 simulate_sqlite()
+
+dialect_sqlite()
 }
 \description{
 See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for

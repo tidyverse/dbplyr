@@ -83,6 +83,12 @@ op_vars.lazy_base_values_query <- function(op) {
 
 sql_values_subquery <- function(con, df, types, lvl = 0, ...) {
   check_dots_used()
+  dialect <- sql_dialect(con)
+  return(sql_values_subquery_(dialect, df, types, lvl, ...))
+
+  UseMethod("sql_values_subquery")
+}
+sql_values_subquery_ <- function(dialect, df, types, lvl = 0, ...) {
   UseMethod("sql_values_subquery")
 }
 
@@ -90,6 +96,9 @@ sql_values_subquery <- function(con, df, types, lvl = 0, ...) {
 sql_values_subquery.DBIConnection <- function(con, df, types, lvl = 0, ...) {
   sql_values_subquery_default(con, df, types = types, lvl = lvl, row = FALSE)
 }
+
+#' @export
+sql_values_subquery.sql_dialect <- sql_values_subquery.DBIConnection
 
 sql_values_subquery_default <- function(con, df, types, lvl, row) {
   df <- values_prepare(con, df)
@@ -286,6 +295,12 @@ sql_values_cast_clauses <- function(con, df, types, na) {
 }
 
 values_prepare <- function(con, df) {
+  dialect <- sql_dialect(con)
+  return(values_prepare_(dialect, df))
+
+  UseMethod("values_prepare")
+}
+values_prepare_ <- function(dialect, df) {
   UseMethod("values_prepare")
 }
 
@@ -293,6 +308,9 @@ values_prepare <- function(con, df) {
 values_prepare.DBIConnection <- function(con, df) {
   df
 }
+
+#' @export
+values_prepare.sql_dialect <- values_prepare.DBIConnection
 
 # This
 sql_cast_dispatch <- function(x) {

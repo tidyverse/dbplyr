@@ -364,6 +364,40 @@ sql_query_select <- function(
   check_dots_used()
   check_sql(select, allow_names = FALSE)
 
+  dialect <- sql_dialect(con)
+  return(sql_query_select_(
+    dialect,
+    select,
+    from,
+    where = where,
+    group_by = group_by,
+    having = having,
+    window = window,
+    order_by = order_by,
+    limit = limit,
+    distinct = distinct,
+    ...,
+    subquery = subquery,
+    lvl = lvl
+  ))
+
+  UseMethod("sql_query_select")
+}
+sql_query_select_ <- function(
+  dialect,
+  select,
+  from,
+  where = NULL,
+  group_by = NULL,
+  having = NULL,
+  window = NULL,
+  order_by = NULL,
+  limit = NULL,
+  distinct = FALSE,
+  ...,
+  subquery = FALSE,
+  lvl = 0
+) {
   UseMethod("sql_query_select")
 }
 
@@ -395,3 +429,6 @@ sql_query_select.DBIConnection <- function(
     lvl = lvl
   )
 }
+
+#' @export
+sql_query_select.sql_dialect <- sql_query_select.DBIConnection

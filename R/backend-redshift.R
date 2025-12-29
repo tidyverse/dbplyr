@@ -36,7 +36,7 @@ redshift_round <- function(x, digits = 0L) {
 
 #' @export
 sql_translation.RedshiftConnection <- function(con) {
-  postgres <- sql_translation.PostgreSQL(con)
+  postgres <- sql_translation(dialect_postgres())
 
   sql_variant(
     sql_translator(

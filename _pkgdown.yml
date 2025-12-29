@@ -97,6 +97,7 @@ reference:
   - db-misc
   - db-sql
   - escape
+  - sql_dialect
   - sql_glue2
   - sql_variant
   - sql_query_insert
