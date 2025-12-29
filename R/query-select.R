@@ -178,7 +178,7 @@ get_select_sql <- function(
   win_register_deactivate()
 
   named_windows <- win_register_names()
-  if (nrow(named_windows) > 0 && supports_window_clause(con)) {
+  if (nrow(named_windows) > 0 && sql_has_window_clause(con)) {
     # need to translate again and use registered windows names
     select_sql <- translate_select_sql(con, select)
 

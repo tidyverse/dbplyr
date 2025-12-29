@@ -156,7 +156,7 @@ sql_escape_table_path <- function(con, x) {
   table_path <- as_table_path(table_path_name(x, con), con)
   has_alias <- alias == "" | alias == table_path
 
-  if (db_supports_table_alias_with_as(con)) {
+  if (sql_has_table_alias_with_as(con)) {
     as_sql <- style_kw(" AS ")
   } else {
     as_sql <- " "

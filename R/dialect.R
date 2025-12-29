@@ -63,7 +63,7 @@ new_sql_dialect <- function(
   dialect,
   quote_identifier,
   supports_window_clause = FALSE,
-  supports_table_alias_with_as = FALSE
+  supports_table_alias_with_as = TRUE
 ) {
   check_string(dialect)
   check_function(quote_identifier)
@@ -90,4 +90,34 @@ print.sql_dialect <- function(x, ...) {
 #' @export
 dbplyr_edition.sql_dialect <- function(con) {
   2L
+}
+
+sql_has_table_alias_with_as <- function(con) {
+  dialect <- sql_dialect(con)
+
+  if (inherits(dialect, "sql_dialect")) {
+    dialect$supports_table_alias_with_as
+  } else if (inherits(dialect, "DBIConnection")) {
+    TRUE
+  } else {
+    cli::cli_abort(
+      "{.arg con} must be a DBIConnection or sql_dialect.",
+      .internal = TRUE
+    )
+  }
+}
+
+sql_has_window_clause <- function(con) {
+  dialect <- sql_dialect(con)
+
+  if (inherits(dialect, "sql_dialect")) {
+    dialect$supports_window_clause
+  } else if (inherits(dialect, "DBIConnection")) {
+    FALSE
+  } else {
+    cli::cli_abort(
+      "{.arg con} must be a DBIConnection or sql_dialect.",
+      .internal = TRUE
+    )
+  }
 }

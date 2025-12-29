@@ -14,10 +14,6 @@
 #'   to select random rows in `slice_sample()`. This is now replaced by adding
 #'   a translation for `runif(n())`.
 #'
-#' * `supports_window_clause(con)` does the backend support named windows?
-#'
-#' * `db_supports_table_alias_with_as(con)` does the backend support using `AS` when using a table alias?
-#'
 #' Tables:
 #'
 #' * `sql_table_analyze(con, table)` generates SQL that "analyzes" the table,
@@ -277,7 +273,7 @@ sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
   from <- as_table_source(from, con)
 
   if (is.sql(from)) {
-    if (db_supports_table_alias_with_as(con)) {
+    if (sql_has_table_alias_with_as(con)) {
       as_sql <- style_kw("AS ")
     } else {
       as_sql <- ""
@@ -334,56 +330,6 @@ sql_query_rows.DBIConnection <- function(con, sql, ...) {
   from <- dbplyr_sql_subquery(con, sql, "master")
   sql_glue2(con, "SELECT COUNT(*) FROM {.tbl from}")
 }
-
-#' @rdname db-sql
-#' @export
-supports_window_clause <- function(con) {
-  dialect <- sql_dialect(con)
-  return(supports_window_clause_(dialect))
-
-  UseMethod("supports_window_clause")
-}
-supports_window_clause_ <- function(dialect) {
-  UseMethod("supports_window_clause")
-}
-
-#' @export
-supports_window_clause.DBIConnection <- function(con) {
-  FALSE
-}
-
-#' @export
-supports_window_clause.sql_dialect <- function(con) {
-  con$supports_window_clause
-}
-
-#' @rdname db-sql
-#' @export
-db_supports_table_alias_with_as <- function(con) {
-  dialect <- sql_dialect(con)
-  return(db_supports_table_alias_with_as_(dialect))
-
-  UseMethod("db_supports_table_alias_with_as")
-}
-db_supports_table_alias_with_as_ <- function(dialect) {
-  UseMethod("db_supports_table_alias_with_as")
-}
-
-#' @export
-db_supports_table_alias_with_as.DBIConnection <- function(con) {
-  FALSE
-}
-
-#' @export
-db_supports_table_alias_with_as.sql_dialect <- function(con) {
-  con$supports_table_alias_with_as
-}
-
-#' @export
-db_supports_table_alias_with_as.TestConnection <- function(con) {
-  TRUE
-}
-
 
 #' Generate SQL for Insert, Update, Upsert, and Delete
 #'
