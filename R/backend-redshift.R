@@ -23,6 +23,25 @@ NULL
 simulate_redshift <- function() simulate_dbi("RedshiftConnection")
 
 #' @export
+#' @rdname backend-redshift
+dialect_redshift <- function() {
+  new_sql_dialect(
+    "redshift",
+    quote_identifier = function(x) sql_quote(x, '"'),
+    supports_window_clause = FALSE,
+    supports_table_alias_with_as = TRUE
+  )
+}
+
+#' @export
+sql_dialect.RedshiftConnection <- function(con) {
+  dialect_redshift()
+}
+
+#' @export
+sql_dialect.Redshift <- sql_dialect.RedshiftConnection
+
+#' @export
 dbplyr_edition.RedshiftConnection <- function(con) {
   2L
 }
@@ -35,7 +54,7 @@ redshift_round <- function(x, digits = 0L) {
 }
 
 #' @export
-sql_translation.RedshiftConnection <- function(con) {
+sql_translation.sql_dialect_redshift <- function(con) {
   postgres <- sql_translation(dialect_postgres())
 
   sql_variant(
@@ -161,30 +180,19 @@ sql_translation.RedshiftConnection <- function(con) {
   )
 }
 
-#' @export
-sql_translation.Redshift <- sql_translation.RedshiftConnection
-
 # https://docs.aws.amazon.com/redshift/latest/dg/r_EXPLAIN.html
 #' @export
-sql_query_explain.Redshift <- function(con, sql, ...) {
+sql_query_explain.sql_dialect_redshift <- function(con, sql, ...) {
   sql_glue2(con, "EXPLAIN {sql}")
 }
 
 #' @export
-sql_query_explain.RedshiftConnection <- sql_query_explain.Redshift
-
-#' @export
-sql_values_subquery.Redshift <- function(con, df, types, lvl = 0, ...) {
+sql_values_subquery.sql_dialect_redshift <- function(
+  con,
+  df,
+  types,
+  lvl = 0,
+  ...
+) {
   sql_values_subquery_union(con, df, types = types, lvl = lvl)
 }
-
-#' @export
-sql_values_subquery.RedshiftConnection <- sql_values_subquery.Redshift
-
-#' @export
-supports_window_clause.Redshift <- function(con) {
-  FALSE
-}
-
-#' @export
-supports_window_clause.RedshiftConnection <- supports_window_clause.Redshift

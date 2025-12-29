@@ -2,9 +2,12 @@
 % Please edit documentation in R/backend-redshift.R
 \name{backend-redshift}
 \alias{simulate_redshift}
+\alias{dialect_redshift}
 \title{Backend: Redshift}
 \usage{
 simulate_redshift()
+
+dialect_redshift()
 }
 \description{
 Base translations come from \link[=simulate_postgres]{PostgreSQL backend}. There
