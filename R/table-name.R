@@ -159,8 +159,7 @@ check_table_id <- function(x, arg = caller_arg(x), call = caller_env()) {
 }
 
 is_table_id <- function(x) {
-  is.ident(x) ||
-    methods::is(x, "Id") ||
+  methods::is(x, "Id") ||
     is_catalog(x) ||
     is_schema(x) ||
     ((is.character(x) || is_table_path(x)) && length(x) == 1)
