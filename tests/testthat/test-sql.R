@@ -30,24 +30,3 @@ test_that("can format sql", {
   expect_snapshot(sql())
   expect_snapshot(sql(a = "x", "y"))
 })
-
-# as.sql() -------------------------
-
-test_that("as.sql() is deprecated", {
-  expect_snapshot(as.sql(ident("x")))
-})
-
-test_that("as.sql() only affects character vectors", {
-  local_options(lifecycle_verbosity = "quiet")
-
-  expect_equal(as.sql("x"), ident("x"))
-
-  x1 <- ident("x")
-  expect_equal(as.sql(x1), x1)
-
-  x2 <- ident_q('"x"')
-  expect_equal(as.sql(x2), x2)
-
-  x3 <- sql("SELECT 1")
-  expect_equal(as.sql(x3), x3)
-})

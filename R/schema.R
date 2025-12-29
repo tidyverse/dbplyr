@@ -79,21 +79,3 @@ print.dbplyr_catalog <- function(x, ...) {
 is_schema <- function(x) inherits(x, "dbplyr_schema")
 
 is_catalog <- function(x) inherits(x, "dbplyr_catalog")
-
-# Old dbplyr approach -----------------------------------------------------
-
-#' Declare a identifier as being pre-quoted.
-#'
-#' No longer needed; please use [sql()] instead.
-#'
-#' @keywords internal
-#' @export
-ident_q <- function(...) {
-  x <- c_character(...)
-  structure(x, class = c("ident_q", "ident", "character"))
-}
-
-#' @export
-escape.ident_q <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
-  sql_vector(x, parens, collapse, con = con)
-}
