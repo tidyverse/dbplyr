@@ -194,6 +194,30 @@ sql_query_multi_join <- function(
   lvl = 0
 ) {
   check_dots_used()
+  dialect <- sql_dialect(con)
+  return(sql_query_multi_join_(
+    dialect,
+    x,
+    joins,
+    table_names,
+    by_list,
+    select,
+    ...,
+    distinct = distinct,
+    lvl = lvl
+  ))
+
+  UseMethod("sql_query_multi_join")
+}
+sql_query_multi_join_ <- function(
+  dialect,
+  x,
+  joins,
+  table_names,
+  by_list,
+  select,
+  ...
+) {
   UseMethod("sql_query_multi_join")
 }
 
@@ -266,6 +290,9 @@ sql_query_multi_join.DBIConnection <- function(
   )
   sql_format_clauses(clauses, lvl = lvl)
 }
+
+#' @export
+sql_query_multi_join.sql_dialect <- sql_query_multi_join.DBIConnection
 
 # Helpers ----------------------------------------------------------------------
 

@@ -59,7 +59,7 @@ sql_query_explain.sql_dialect_sqlite <- function(con, sql, ...) {
 }
 
 #' @export
-sql_query_set_op.sql_dialect_sqlite <- sql_query_set_op.Hive
+sql_query_set_op.sql_dialect_sqlite <- sql_query_set_op.sql_dialect_hive
 
 #' @export
 sql_query_upsert.sql_dialect_sqlite <- function(

@@ -2,9 +2,12 @@
 % Please edit documentation in R/backend-hana.R
 \name{backend-hana}
 \alias{simulate_hana}
+\alias{dialect_hana}
 \title{Backend: SAP HANA}
 \usage{
 simulate_hana()
+
+dialect_hana()
 }
 \description{
 See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for

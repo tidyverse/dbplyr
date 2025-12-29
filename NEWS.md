@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* MS Acess: now uses `[]` for quoting identifiers (like SQL server)
 * PostgreSQL: uses improved translation for `seconds()`, `minutes()`, `hours()`, `days()`, `weeks()`, `months()`, and `years()`.
 * `escape_ansi()` has been removed. Use `escape(x, con = simulate_dbi())` instead.
 * `summarise()` now reports grouping immediately, rather than when you summarise.

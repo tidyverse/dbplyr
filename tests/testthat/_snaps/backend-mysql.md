@@ -28,7 +28,7 @@
     Code
       full_join(lf, lf, by = "x")
     Condition
-      Error in `sql_query_join()`:
+      Error in `sql_query_join_()`:
       ! MySQL does not support full joins
 
 ---
@@ -76,7 +76,7 @@
         UNION ALL
       
         VALUES ROW(1, 'a'), ROW(2, 'b')
-      ) AS `values_table`
+      ) `values_table`
 
 # `sql_query_update_from()` is correct
 
@@ -89,7 +89,7 @@
       INNER JOIN (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) AS `...y`
+      ) `...y`
         ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
       SET `df_x`.`c` = COALESCE(`df_x`.`c`, `...y`.`c`), `df_x`.`d` = `...y`.`d`
 

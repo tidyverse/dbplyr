@@ -28,12 +28,28 @@ NULL
 simulate_hana <- function() simulate_dbi("HDB")
 
 #' @export
+#' @rdname backend-hana
+dialect_hana <- function() {
+  new_sql_dialect(
+    "hana",
+    quote_identifier = function(x) sql_quote(x, '"'),
+    supports_window_clause = FALSE,
+    supports_table_alias_with_as = TRUE
+  )
+}
+
+#' @export
+sql_dialect.HDB <- function(con) {
+  dialect_hana()
+}
+
+#' @export
 dbplyr_edition.HDB <- function(con) {
   2L
 }
 
 #' @export
-sql_translation.HDB <- function(con) {
+sql_translation.sql_dialect_hana <- function(con) {
   sql_variant(
     sql_translator(
       .parent = base_scalar,
@@ -67,12 +83,12 @@ db_table_temporary.HDB <- function(con, table, temporary, ...) {
 # nocov end
 
 #' @export
-`sql_table_analyze.HDB` <- function(con, table, ...) {
+sql_table_analyze.sql_dialect_hana <- function(con, table, ...) {
   # CREATE STATISTICS doesn't work for temporary tables, so
   # don't do anything at all
 }
 
 #' @export
-sql_values_subquery.HDB <- function(con, df, types, lvl = 0, ...) {
+sql_values_subquery.sql_dialect_hana <- function(con, df, types, lvl = 0, ...) {
   sql_values_subquery_union(con, df, types = types, lvl = lvl, from = "DUMMY")
 }

@@ -234,6 +234,12 @@ sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
   check_bool(temporary)
   check_dots_used()
 
+  dialect <- sql_dialect(con)
+  return(sql_query_save_(dialect, sql, name, temporary = temporary, ...))
+
+  UseMethod("sql_query_save")
+}
+sql_query_save_ <- function(dialect, sql, name, temporary = TRUE, ...) {
   UseMethod("sql_query_save")
 }
 #' @export
@@ -249,6 +255,9 @@ sql_query_save.DBIConnection <- function(
   table <- if (temporary) "TEMPORARY TABLE" else "TABLE"
   sql_glue2(con, "CREATE {.sql table}\n{.tbl {name}} AS\n{sql}")
 }
+
+#' @export
+sql_query_save.sql_dialect <- sql_query_save.DBIConnection
 #' @export
 #' @rdname db-sql
 sql_query_wrap <- function(con, from, name = NULL, ..., lvl = 0) {
@@ -565,6 +574,19 @@ sql_query_append <- function(
   check_character(returning_cols, allow_null = TRUE)
 
   check_dots_used()
+  dialect <- sql_dialect(con)
+  return(sql_query_append_(
+    dialect,
+    table,
+    from,
+    insert_cols,
+    ...,
+    returning_cols = returning_cols
+  ))
+
+  UseMethod("sql_query_append")
+}
+sql_query_append_ <- function(dialect, table, from, insert_cols, ...) {
   UseMethod("sql_query_append")
 }
 
@@ -596,6 +618,9 @@ sql_query_append.DBIConnection <- function(
 }
 
 #' @export
+sql_query_append.sql_dialect <- sql_query_append.DBIConnection
+
+#' @export
 #' @rdname sql_query_insert
 sql_query_update_from <- function(
   con,
@@ -614,6 +639,28 @@ sql_query_update_from <- function(
   check_character(returning_cols, allow_null = TRUE)
 
   check_dots_used()
+  dialect <- sql_dialect(con)
+  return(sql_query_update_from_(
+    dialect,
+    table,
+    from,
+    by,
+    update_values,
+    ...,
+    returning_cols = returning_cols
+  ))
+
+  UseMethod("sql_query_update_from")
+}
+sql_query_update_from_ <- function(
+  dialect,
+  table,
+  from,
+  by,
+  update_values,
+  ...,
+  returning_cols = NULL
+) {
   UseMethod("sql_query_update_from")
 }
 
@@ -645,6 +692,9 @@ sql_query_update_from.DBIConnection <- function(
   )
   sql_format_clauses(clauses, lvl = 0)
 }
+
+#' @export
+sql_query_update_from.sql_dialect <- sql_query_update_from.DBIConnection
 
 
 #' @export
@@ -751,6 +801,19 @@ sql_query_delete <- function(con, table, from, by, ..., returning_cols = NULL) {
   check_character(returning_cols, allow_null = TRUE)
 
   check_dots_used()
+  dialect <- sql_dialect(con)
+  return(sql_query_delete_(
+    dialect,
+    table,
+    from,
+    by,
+    ...,
+    returning_cols = returning_cols
+  ))
+
+  UseMethod("sql_query_delete")
+}
+sql_query_delete_ <- function(dialect, table, from, by, ...) {
   UseMethod("sql_query_delete")
 }
 
@@ -775,6 +838,9 @@ sql_query_delete.DBIConnection <- function(
   )
   sql_format_clauses(clauses, lvl = 0)
 }
+
+#' @export
+sql_query_delete.sql_dialect <- sql_query_delete.DBIConnection
 
 #' @export
 #' @rdname db-sql

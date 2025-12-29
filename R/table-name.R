@@ -109,11 +109,17 @@ table_path_name <- function(x, con) {
 #' @export
 #' @rdname is_table_path
 table_path_components <- function(x, con) {
+  dialect <- sql_dialect(con)
+  return(table_path_components_(x, dialect))
+
   UseMethod("table_path_components", con)
+}
+table_path_components_ <- function(x, dialect) {
+  UseMethod("table_path_components", dialect)
 }
 
 #' @export
-table_path_components.default <- function(x, con) {
+table_path_components.DBIConnection <- function(x, con) {
   quote_char <- substr(sql_escape_ident(con, ""), 1, 1)
 
   lapply(x, function(x) {
@@ -127,6 +133,9 @@ table_path_components.default <- function(x, con) {
     )
   })
 }
+
+#' @export
+table_path_components.sql_dialect <- table_path_components.DBIConnection
 
 sql_escape_table_source <- function(con, x) {
   if (is.sql(x)) {

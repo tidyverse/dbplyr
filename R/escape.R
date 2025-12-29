@@ -65,10 +65,16 @@ escape.ident <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
 #' @export
 #' @rdname escape
 sql_escape_ident <- function(con, x) {
+  dialect <- sql_dialect(con)
+  return(sql_escape_ident_(dialect, x))
+
+  UseMethod("sql_escape_ident")
+}
+sql_escape_ident_ <- function(dialect, x) {
   UseMethod("sql_escape_ident")
 }
 #' @export
-sql_escape_ident.default <- function(con, x) {
+sql_escape_ident.DBIConnection <- function(con, x) {
   sql(DBI::dbQuoteIdentifier(con, x))
 }
 
@@ -228,6 +234,12 @@ escape.blob <- function(x, parens = NA, collapse = ", ", con = NULL) {
 #' @export
 #' @rdname escape
 sql_escape_raw <- function(con, x) {
+  dialect <- sql_dialect(con)
+  return(sql_escape_raw_(dialect, x))
+
+  UseMethod("sql_escape_raw")
+}
+sql_escape_raw_ <- function(dialect, x) {
   UseMethod("sql_escape_raw")
 }
 #' @export
