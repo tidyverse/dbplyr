@@ -42,3 +42,11 @@ test_that("generated sql doesn't change unexpectedly", {
   expect_snapshot(semi_join(lf, lf))
   expect_snapshot(anti_join(lf, lf))
 })
+
+test_that("sql_on query doesn't change unexpectedly", {
+  lf1 <- lazy_frame(x = 1, y = 2)
+  lf2 <- lazy_frame(x = 1, z = 3)
+
+  expect_snapshot(semi_join(lf1, lf2, sql_on = "LHS.y < RHS.z"))
+  expect_snapshot(anti_join(lf1, lf2, sql_on = "LHS.y < RHS.z"))
+})
