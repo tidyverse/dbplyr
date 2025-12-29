@@ -32,9 +32,7 @@ simulate_hana <- function() simulate_dbi("HDB")
 dialect_hana <- function() {
   new_sql_dialect(
     "hana",
-    quote_identifier = function(x) sql_quote(x, '"'),
-    supports_window_clause = FALSE,
-    supports_table_alias_with_as = TRUE
+    quote_identifier = function(x) sql_quote(x, '"')
   )
 }
 

@@ -34,8 +34,7 @@ dialect_spark_sql <- function() {
   new_sql_dialect(
     "spark_sql",
     quote_identifier = function(x) sql_quote(x, '"'),
-    supports_window_clause = TRUE,
-    supports_table_alias_with_as = TRUE
+    supports_window_clause = TRUE
   )
 }
 

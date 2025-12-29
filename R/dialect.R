@@ -35,10 +35,8 @@
 #' # Create a custom dialect
 #' my_dialect <- new_sql_dialect(
 #'   "custom",
-#'
 #'   quote_identifier = function(x) sql_quote(x, "`"),
-#'   supports_window_clause = TRUE,
-#'   supports_table_alias_with_as = TRUE
+#'   supports_window_clause = TRUE
 #' )
 #' class(my_dialect)
 sql_dialect <- function(con) {

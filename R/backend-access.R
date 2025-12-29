@@ -35,8 +35,7 @@ dialect_access <- function() {
   new_sql_dialect(
     "access",
     quote_identifier = function(x) sql_quote(x, c("[", "]")),
-    supports_window_clause = TRUE,
-    supports_table_alias_with_as = TRUE
+    supports_window_clause = TRUE
   )
 }
 

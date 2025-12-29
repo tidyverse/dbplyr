@@ -32,8 +32,7 @@ dialect_postgres <- function() {
   new_sql_dialect(
     "postgres",
     quote_identifier = function(x) sql_quote(x, '"'),
-    supports_window_clause = TRUE,
-    supports_table_alias_with_as = TRUE
+    supports_window_clause = TRUE
   )
 }
 

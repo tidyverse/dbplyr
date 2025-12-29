@@ -73,9 +73,7 @@ simulate_mssql <- function(version = "15.0") {
 dialect_mssql <- function(version = "15.0") {
   dialect <- new_sql_dialect(
     "mssql",
-    quote_identifier = function(x) sql_quote(x, c("[", "]")),
-    supports_window_clause = FALSE,
-    supports_table_alias_with_as = TRUE
+    quote_identifier = function(x) sql_quote(x, c("[", "]"))
   )
   dialect$version <- numeric_version(version)
   dialect

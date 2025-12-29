@@ -27,9 +27,7 @@ simulate_redshift <- function() simulate_dbi("RedshiftConnection")
 dialect_redshift <- function() {
   new_sql_dialect(
     "redshift",
-    quote_identifier = function(x) sql_quote(x, '"'),
-    supports_window_clause = FALSE,
-    supports_table_alias_with_as = TRUE
+    quote_identifier = function(x) sql_quote(x, '"')
   )
 }
 

@@ -36,8 +36,7 @@ dialect_mariadb <- function() {
   new_sql_dialect(
     "mariadb",
     quote_identifier = function(x) sql_quote(x, "`"),
-    supports_window_clause = TRUE,
-    supports_table_alias_with_as = TRUE
+    supports_window_clause = TRUE
   )
 }
 
