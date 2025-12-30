@@ -46,8 +46,7 @@ dialect_mysql <- function() {
   new_sql_dialect(
     "mysql",
     quote_identifier = function(x) sql_quote(x, "`"),
-    supports_window_clause = TRUE,
-    supports_table_alias_with_as = FALSE
+    supports_window_clause = TRUE
   )
 }
 
