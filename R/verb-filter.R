@@ -63,6 +63,11 @@ add_filter <- function(lazy_query, con, exprs) {
     )
   } else if (filter_can_use_having(lazy_query)) {
     filter_via_having(lazy_query, exprs)
+  } else if (inherits(lazy_query, "lazy_multi_join_query")) {
+    # Due to way JOINs generate their SELECT clauses much later we have to
+    # do the backtransformation of variable names in `sql_build.lazy_multi_join_query`
+    lazy_query$where <- c(lazy_query$where, exprs)
+    lazy_query
   } else if (can_inline_filter(exprs, lazy_query, con)) {
     # WHERE processed before SELECT
     exprs <- replace_sym(exprs, lazy_query$select$name, lazy_query$select$expr)
