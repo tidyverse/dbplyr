@@ -12,6 +12,34 @@ test_that("sql_build.lazy_multi_join_query() includes distinct", {
   expect_true(built$distinct)
 })
 
+test_that("sql_build.lazy_multi_join_query() includes where", {
+  lf1 <- lazy_frame(x = 1, y = 1)
+  lf2 <- lazy_frame(x = 1, z = 2)
+
+  out <- lf1 |>
+    left_join(lf2, by = "x") |>
+    filter(y > 1, z < 5)
+
+  query <- out$lazy_query
+  expect_s3_class(query, "lazy_multi_join_query")
+  expect_length(query$where, 2)
+
+  built <- sql_build(out, simulate_dbi())
+  expect_length(built$where, 2)
+})
+
+test_that("multi_join where clause uses qualified column names", {
+  lf1 <- lazy_frame(x = 1, y = 2)
+  lf2 <- lazy_frame(x = 1, z = 3)
+
+  expect_snapshot(left_join(lf1, lf2, by = "x") |> filter(y > 1))
+  expect_snapshot(left_join(lf1, lf2, by = "x") |> filter(z > 1))
+  expect_snapshot(left_join(lf1, lf2, by = "x") |> filter(y > 1, z < 5))
+
+  lf3 <- lazy_frame(x = 1, y = 3)
+  expect_snapshot(left_join(lf1, lf3, by = "x") |> filter(y.x > 1))
+})
+
 test_that("generated sql doesn't change unexpectedly", {
   lf <- lazy_frame(x = 1, y = 2)
 
