@@ -3,6 +3,7 @@
 \name{sql_dialect}
 \alias{sql_dialect}
 \alias{new_sql_dialect}
+\alias{dialect_ansi}
 \title{SQL dialects}
 \usage{
 sql_dialect(con)
@@ -11,8 +12,10 @@ new_sql_dialect(
   dialect,
   quote_identifier,
   supports_window_clause = FALSE,
-  supports_table_alias_with_as = FALSE
+  supports_table_alias_with_as = TRUE
 )
+
+dialect_ansi()
 }
 \arguments{
 \item{con}{A database connection or dialect object.}
@@ -55,10 +58,8 @@ sql_dialect(dialect_postgres())
 # Create a custom dialect
 my_dialect <- new_sql_dialect(
   "custom",
-
   quote_identifier = function(x) sql_quote(x, "`"),
-  supports_window_clause = TRUE,
-  supports_table_alias_with_as = TRUE
+  supports_window_clause = TRUE
 )
 class(my_dialect)
 }

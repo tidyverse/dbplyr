@@ -1,6 +1,6 @@
 test_that("table_path_components parses SQL Server bracket syntax", {
   components <- function(x) {
-    table_path_components(table_path(x), simulate_mssql())
+    table_path_components(table_path(x), dialect_mssql())
   }
 
   # Bracket quoting
@@ -18,7 +18,7 @@ test_that("table_path_components parses SQL Server bracket syntax", {
 # function translation ----------------------------------------------------
 
 test_that("custom scalar translated correctly", {
-  con <- simulate_mssql()
+  con <- dialect_mssql()
 
   expect_translation(con, as.logical(x), "TRY_CAST([x] AS BIT)")
   expect_translation(con, as.numeric(x), "TRY_CAST([x] AS FLOAT)")
@@ -54,20 +54,20 @@ test_that("custom scalar translated correctly", {
 })
 
 test_that("contents of [ have bool context", {
-  con <- simulate_mssql()
+  con <- dialect_mssql()
   local_context(list(clause = "SELECT"))
 
   expect_translation(con, x[x > y], "CASE WHEN ([x] > [y]) THEN ([x]) END")
 })
 
 test_that("custom stringr functions translated correctly", {
-  con <- simulate_mssql()
+  con <- dialect_mssql()
 
   expect_translation(con, str_length(x), "LEN([x])")
 })
 
 test_that("stringr fixed patterns use CHARINDEX", {
-  con <- simulate_mssql()
+  con <- dialect_mssql()
 
   expect_translation(
     con,
@@ -150,7 +150,7 @@ test_that("str_detect returns bit in SELECT context on SQL Server 2025", {
 })
 
 test_that("custom aggregators translated correctly", {
-  con <- simulate_mssql()
+  con <- dialect_mssql()
 
   expect_translation(con, sd(x, na.rm = TRUE), "STDEV([x])", window = FALSE)
   expect_translation(con, var(x, na.rm = TRUE), "VAR([x])", window = FALSE)
@@ -185,7 +185,7 @@ test_that("custom aggregators translated correctly", {
 })
 
 test_that("custom window functions translated correctly", {
-  con <- simulate_mssql()
+  con <- dialect_mssql()
 
   expect_translation(con, sd(x, na.rm = TRUE), "STDEV([x]) OVER ()")
   expect_translation(con, var(x, na.rm = TRUE), "VAR([x]) OVER ()")
@@ -223,7 +223,7 @@ test_that("custom window functions translated correctly", {
 })
 
 test_that("custom lubridate functions translated correctly", {
-  con <- simulate_mssql()
+  con <- dialect_mssql()
   expect_translation(con, as_date(x), "TRY_CAST([x] AS DATE)")
   expect_translation(con, as_datetime(x), "TRY_CAST([x] AS DATETIME2)")
   expect_translation(con, today(), "CAST(SYSDATETIME() AS DATE)")
@@ -258,7 +258,7 @@ test_that("custom lubridate functions translated correctly", {
 })
 
 test_that("custom clock functions translated correctly", {
-  con <- simulate_mssql()
+  con <- dialect_mssql()
   expect_translation(con, add_years(x, 1), "DATEADD(YEAR, 1.0, [x])")
   expect_translation(con, add_days(x, 1), "DATEADD(DAY, 1.0, [x])")
   expect_error(
@@ -313,7 +313,7 @@ test_that("custom clock functions translated correctly", {
 })
 
 test_that("difftime is translated correctly", {
-  con <- simulate_mssql()
+  con <- dialect_mssql()
   expect_translation(
     con,
     difftime(start_date, end_date, units = "days"),
@@ -344,7 +344,7 @@ test_that("difftime is translated correctly", {
 })
 
 test_that("last_value_sql() translated correctly", {
-  con <- simulate_mssql()
+  con <- dialect_mssql()
   expect_equal(
     translate_sql(last(x, na_rm = TRUE), vars_order = "a", con = con),
     sql(
@@ -354,7 +354,7 @@ test_that("last_value_sql() translated correctly", {
 })
 
 test_that("between translation respects context", {
-  con <- simulate_mssql()
+  con <- dialect_mssql()
 
   local_context(list(clause = "WHERE"))
   expect_translation(con, between(a, 1L, 2L), "[a] BETWEEN 1 AND 2")
@@ -365,7 +365,7 @@ test_that("between translation respects context", {
 # verb translation --------------------------------------------------------
 
 test_that("convert between bit and boolean as needed", {
-  mf <- lazy_frame(x = 1, con = simulate_mssql())
+  mf <- lazy_frame(x = 1, con = dialect_mssql())
 
   # No conversion
   expect_snapshot(mf |> filter(is.na(x)))
@@ -385,7 +385,7 @@ test_that("convert between bit and boolean as needed", {
 test_that("handles ORDER BY in subqueries", {
   expect_snapshot(
     sql_query_select(
-      simulate_mssql(),
+      dialect_mssql(),
       sql("[x]"),
       sql("[y]"),
       order_by = "z",
@@ -397,7 +397,7 @@ test_that("handles ORDER BY in subqueries", {
 test_that("custom limit translation", {
   expect_snapshot(
     sql_query_select(
-      simulate_mssql(),
+      dialect_mssql(),
       sql("[x]"),
       sql("[y]"),
       order_by = sql("[z]"),
@@ -407,7 +407,7 @@ test_that("custom limit translation", {
 })
 
 test_that("custom escapes translated correctly", {
-  mf <- lazy_frame(x = "abc", con = simulate_mssql())
+  mf <- lazy_frame(x = "abc", con = dialect_mssql())
 
   a <- blob::as_blob("abc")
   b <- blob::as_blob(as.raw(c(0x01, 0x02)))
@@ -422,18 +422,18 @@ test_that("custom escapes translated correctly", {
 })
 
 test_that("logical escaping to 0/1 for both filter() and mutate()", {
-  mf <- lazy_frame(x = "abc", con = simulate_mssql())
+  mf <- lazy_frame(x = "abc", con = dialect_mssql())
   expect_snapshot(mf |> filter(x == TRUE))
   expect_snapshot(mf |> mutate(x = TRUE))
 })
 
 test_that("sql_escape_raw handles NULLs", {
-  con <- simulate_mssql()
+  con <- dialect_mssql()
   expect_equal(sql_escape_raw(con, NULL), "NULL")
 })
 
 test_that("generates custom sql", {
-  con <- simulate_mssql()
+  con <- dialect_mssql()
 
   expect_snapshot(sql_table_analyze(con, in_schema("schema", "tbl")))
 
@@ -451,7 +451,7 @@ test_that("generates custom sql", {
     temporary = FALSE
   ))
 
-  lf <- lazy_frame(x = 1:3, con = simulate_mssql())
+  lf <- lazy_frame(x = 1:3, con = dialect_mssql())
   expect_snapshot(lf |> slice_sample(n = 1))
 
   expect_snapshot(
@@ -461,7 +461,7 @@ test_that("generates custom sql", {
 })
 
 test_that("`sql_query_insert()` is correct", {
-  con <- simulate_mssql()
+  con <- dialect_mssql()
   df_y <- lazy_frame(
     a = 2:3,
     b = c(12L, 13L),
@@ -486,7 +486,7 @@ test_that("`sql_query_insert()` is correct", {
 })
 
 test_that("`sql_query_append()` is correct", {
-  con <- simulate_mssql()
+  con <- dialect_mssql()
   df_y <- lazy_frame(
     a = 2:3,
     b = c(12L, 13L),
@@ -509,7 +509,7 @@ test_that("`sql_query_append()` is correct", {
 })
 
 test_that("`sql_query_update_from()` is correct", {
-  con <- simulate_mssql()
+  con <- dialect_mssql()
   df_y <- lazy_frame(
     a = 2:3,
     b = c(12L, 13L),
@@ -541,16 +541,16 @@ test_that("`sql_query_delete()` is correct", {
     b = c(12L, 13L),
     c = -(2:3),
     d = c("y", "z"),
-    con = simulate_mssql(),
+    con = dialect_mssql(),
     .name = "df_y"
   ) |>
     mutate(c = c + 1)
 
   expect_snapshot(
     sql_query_delete(
-      con = simulate_mssql(),
+      con = dialect_mssql(),
       table = ident("df_x"),
-      from = sql_render(df_y, simulate_mssql(), lvl = 2),
+      from = sql_render(df_y, dialect_mssql(), lvl = 2),
       by = c("a", "b"),
       returning_cols = c("a", b2 = "b")
     )
@@ -558,7 +558,7 @@ test_that("`sql_query_delete()` is correct", {
 })
 
 test_that("`sql_query_upsert()` is correct", {
-  con <- simulate_mssql()
+  con <- dialect_mssql()
   df_y <- lazy_frame(
     a = 2:3,
     b = c(12L, 13L),
@@ -582,7 +582,7 @@ test_that("`sql_query_upsert()` is correct", {
 })
 
 test_that("atoms and symbols are cast to bit in `filter`", {
-  mf <- lazy_frame(x = TRUE, con = simulate_mssql())
+  mf <- lazy_frame(x = TRUE, con = dialect_mssql())
 
   # as simple symbol and atom
   expect_snapshot(mf |> filter(x))
@@ -596,14 +596,14 @@ test_that("atoms and symbols are cast to bit in `filter`", {
 })
 
 test_that("row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per empty_order)", {
-  mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_mssql())
+  mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = dialect_mssql())
   expect_snapshot(mf |> mutate(rown = row_number()))
   expect_snapshot(mf |> group_by(y) |> mutate(rown = row_number()))
   expect_snapshot(mf |> arrange(y) |> mutate(rown = row_number()))
 })
 
 test_that("count_big", {
-  mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_mssql())
+  mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = dialect_mssql())
   expect_snapshot(count(mf))
 })
 
@@ -628,7 +628,7 @@ test_that("can copy_to() and compute() with temporary tables (#438)", {
 })
 
 test_that("add prefix to temporary table", {
-  con <- simulate_mssql()
+  con <- dialect_mssql()
   expect_snapshot(
     out <- db_table_temporary(con, table_path("foo.bar"), temporary = TRUE)
   )

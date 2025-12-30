@@ -8,7 +8,7 @@ test_that("sql_build.lazy_multi_join_query() includes distinct", {
 
   query <- out$lazy_query
   expect_s3_class(query, "lazy_multi_join_query")
-  built <- sql_build(out, simulate_dbi())
+  built <- sql_build(out, dialect_ansi())
   expect_true(built$distinct)
 })
 
@@ -41,7 +41,7 @@ test_that("sql_on query doesn't change unexpectedly", {
 })
 
 test_that("sql_multi_join_select generates expected SQL", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
 
   vars <- tibble(
     name = c("x", "a", "b"),

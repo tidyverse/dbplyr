@@ -1,5 +1,5 @@
 test_that("glue_sql() handles type casting", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   x <- "x"
 
   expect_equal(sql_glue2(con, "{x}"), sql("'x'"))
@@ -15,7 +15,7 @@ test_that("glue_sql() handles type casting", {
 })
 
 test_that("useful error if bad identifier", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_snapshot(error = TRUE, {
     sql_glue2(con, "{.id 1}")
     sql_glue2(con, "{.tbl 1}")
@@ -24,7 +24,7 @@ test_that("useful error if bad identifier", {
 })
 
 test_that("glue_sql() can collapse with and without parens", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   x <- c("a", "b")
 
   expect_equal(sql_glue2(con, "{x}"), sql("'a', 'b'"))
@@ -33,7 +33,7 @@ test_that("glue_sql() can collapse with and without parens", {
 
 
 test_that("glue_sql() can interpolate ...", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   f <- function(...) {
     sql_glue2(con, "f({...})")
   }
@@ -43,7 +43,7 @@ test_that("glue_sql() can interpolate ...", {
 })
 
 test_that("gives informative errors", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   x <- 1
   expect_snapshot(error = TRUE, {
     sql_glue2(con, "{y*}")

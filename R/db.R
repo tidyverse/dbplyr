@@ -38,6 +38,9 @@ sql_join_suffix.DBIConnection <- function(con, suffix, ...) {
   suffix %||% c(".x", ".y")
 }
 
+#' @export
+sql_join_suffix.sql_dialect <- sql_join_suffix.DBIConnection
+
 #' @rdname db-misc
 #' @export
 db_sql_render <- function(con, sql, ..., cte = FALSE, sql_options = NULL) {
@@ -74,6 +77,9 @@ db_sql_render.DBIConnection <- function(
 ) {
   sql_render(sql, con = con, ..., sql_options = sql_options)
 }
+
+#' @export
+db_sql_render.sql_dialect <- db_sql_render.DBIConnection
 
 #' @rdname db-misc
 #' @export

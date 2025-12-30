@@ -1,327 +1,126 @@
-## Goal
+# SQL Dialect System
+
+## Status: Core Implementation Complete
+
+The `sql_dialect()` system has been implemented. All backends have been migrated to use dialect objects, and the old `supports_window_clause()` and `db_supports_table_alias_with_as()` generics have been removed.
+
+## Completed Work
+
+### 1. Core Infrastructure (R/dialect.R)
+
+- Created `sql_dialect()` generic with `sql_dialect.DBIConnection` fallback for backward compatibility
+- Created `new_sql_dialect()` constructor with:
+  - `dialect` - string name
+  - `quote_identifier` - function for identifier quoting
+  - `supports_window_clause` - boolean (default: FALSE)
+  - `supports_table_alias_with_as` - boolean (default: TRUE)
+- Added helper functions:
+  - `sql_has_window_clause(con)` - safely extracts the field from dialect or returns FALSE for plain connections
+
+  - `sql_has_table_alias_with_as(con)` - safely extracts the field from dialect or returns TRUE for TestConnection, FALSE for plain connections
+
+### 2. Iterated Dispatch Pattern
+
+Added iterated dispatch to the following generics (pattern: call `sql_dialect(con)`, then dispatch on result):
+
+- `sql_translation()`
+- `sql_expr_matches()`
+- `sql_query_select()`
+- `sql_query_explain()`
+- `sql_query_wrap()`
+- `sql_query_set_op()`
+- `sql_query_multi_join()`
+- `sql_query_append()`
+- `sql_query_delete()`
+- `sql_values_subquery()`
+- `sql_table_analyze()`
+- `sql_escape_ident()`
+- `sql_escape_logical()`
+- `sql_escape_date()`
+- `sql_escape_datetime()`
+- `sql_escape_raw()`
+- `table_path_components()`
+
+### 3. Backend Migration
+
+All backends now define `dialect_*()` functions and `sql_dialect.*` methods:
+
+| Backend | Dialect Function | Quote Style | Window Clause | Table Alias AS |
+|---------|------------------|-------------|---------------|----------------|
+| PostgreSQL | `dialect_postgres()` | `"x"` | TRUE | TRUE (default) |
+| MySQL | `dialect_mysql()` | `` `x` `` | TRUE | FALSE |
+| MariaDB | `dialect_mariadb()` | `` `x` `` | TRUE | TRUE (default) |
+| SQLite | `dialect_sqlite()` | `` `x` `` | TRUE | TRUE (default) |
+| SQL Server | `dialect_mssql()` | `[x]` | FALSE (default) | TRUE (default) |
+| Oracle | `dialect_oracle()` | `"x"` | FALSE (default) | FALSE |
+| Redshift | `dialect_redshift()` | `"x"` | FALSE (default) | TRUE (default) |
+| Snowflake | `dialect_snowflake()` | `"x"` | TRUE | TRUE (default) |
+| Hive | `dialect_hive()` | `"x"` | TRUE | TRUE (default) |
+| Impala | `dialect_impala()` | `"x"` | TRUE | TRUE (default) |
+| Spark SQL | `dialect_spark_sql()` | `"x"` | TRUE | TRUE (default) |
+| Teradata | `dialect_teradata()` | `"x"` | TRUE | TRUE (default) |
+| SAP HANA | `dialect_hana()` | `"x"` | FALSE (default) | TRUE (default) |
+| MS Access | `dialect_access()` | `[x]` | TRUE | TRUE (default) |
+
+### 4. Test Migration
+
+All tests now use `dialect_*()` functions instead of `simulate_*()`:
+- Created `dialect_ansi()` for generic ANSI SQL testing (replaces `simulate_dbi()`)
+- Created `dialect_odbc()` for ODBC testing
+- Updated all test files via sed: `simulate_*()` → `dialect_*()`
+
+### 5. Additional sql_dialect Methods
+
+Added `*.sql_dialect` methods for generics used by tests:
+- `db_sql_render.sql_dialect`
+- `sql_join_suffix.sql_dialect`
+- `sql_table_index.sql_dialect`
+- `sql_query_rows.sql_dialect`
+- `db_table_temporary.sql_dialect`
+- `dbplyr_fill0.sql_dialect`
+- `sql_query_semi_join.sql_dialect`
+
+MSSQL-specific methods for dialect dispatch:
+- `db_sql_render.sql_dialect_mssql` (handles BIT to BOOLEAN conversion in WHERE clauses)
+- `db_table_temporary.sql_dialect_mssql` (handles temporary table prefix)
+
+### 6. Removed Code
+
+- Deleted `supports_window_clause()` generic and all methods
+- Deleted `db_supports_table_alias_with_as()` generic and all methods
+- Deleted `sql_escape_ident.TestConnection` (now uses dialect dispatch)
+- Removed duplicate method aliases (e.g., `sql_translation.PostgreSQL <- sql_translation.PqConnection`)
+
+### 7. Special Cases
+
+- **MSSQL**: `dialect_mssql(version)` accepts a version parameter, stores it in `dialect$version`
+- **Access/MSSQL**: Custom `table_path_components.sql_dialect_*` methods handle asymmetric `[x]` bracket quoting
+- **TestConnection**: `sql_has_table_alias_with_as()` returns TRUE for TestConnection to preserve test behavior
+
+## Remaining Work
+
+### Not Yet Done
+
+1. **Deprecate `simulate_*()` functions** - Currently still work via `simulate_dbi()` creating TestConnection objects. Could deprecate in favor of `dialect_*()` functions.
+
+2. **Documentation updates**:
+   - Update `vignette("new-backend")` to show dialect approach
+   - Add `dialect_*()` functions to `_pkgdown.yml` reference index
+
+3. **ADBC support** - The infrastructure is in place but ADBC backends have not been migrated yet.
+
+## Original Design Goals
+
+### Goal
 
 Implement a `sql_dialect()` system to reduce method duplication across database backends by:
-1. Creating a dialect object that acts as an (optional) intermediary in between the database connection and SQL translation.
-2. Allowing multiple connection classes to share a single dialect.
-3. Maintaining backward compatibility for user-facing APIs
-
-## Current Problems
-
-- PostgreSQL has both `PostgreSQL` and `PqConnection` classes
-- MySQL has `MySQL`, `MySQLConnection`, and `MariaDBConnection`
-- Each requires duplicate method definitions:
-  ```r
-  sql_translation.PqConnection <- function(...) { ... }
-  sql_translation.PostgreSQL <- sql_translation.PqConnection
-  ```
-- ~60 alias definitions across all backends
-
-There's no easy way to support backends that talk to multiple different datasets (e.g. odbc, adbc).
-
-## Proposed Architecture
-
-### 1. SQL Dialect Object Structure
-
-Introduce new dialect object used for dispatch:
-
-```r
-new_sql_dialect <- function(dialect, quote_identifier, supports_window_clause = FALSE, supports_table_alias_with_as = FALSE) {
-  check_string(dialect)
-  check_function(quote_identifier)
-  check_bool(supports_window_clause)
-  check_bool(supports_table_alias_with_as)
-
-  structure(
-    list(
-      quote_identifier = quote_identifier,
-      supports_window_clause = supports_window_clause,
-      supports_table_alias_with_as = supports_table_alias_with_as
-    ),
-    class = c(paste0("sql_dialect_", dialect), "sql_dialect"))
-}
-```
-
-**Key decisions**:
-- Translations remain separate in `sql_translation()` methods
-- Inheritance handled at translation level (not in dialect object)
-- Dialect now stores support booleans rather than using generics.
-  (This change only affects the dittodb package.)
-  
-
-### 2. Dispatch Mechanism
-
-Use **iterated dispatch**: connection → dialect, then dialect → method.
-
-```r
-#' Get SQL dialect for a connection
-#' @export
-sql_dialect <- function(con) {
-  UseMethod("sql_dialect")
-}
-
-#' @export
-sql_dialect.DBIConnection <- function(con) {
-  # For backward compatibility
-  con
-}
-```
-
-Then each backend defines its dialect:
-
-```r
-# In backend-postgres.R
-#' @export
-sql_dialect.PqConnection <- function(con) {
-  dialect_postgres()
-}
-
-#' @export
-sql_dialect.PostgreSQL <- function(con) {
-  dialect_postgres()
-}
-
-#' 
-#' @export
-dialect_postgres <- function(con = NULL) {
-  new_sql_dialect("postgres",
-    quote_identifier = function(x) sql_quote(x, '"'),
-    supports_window_clause = TRUE,
-    supports_table_alias_with_as = TRUE
-  )
-}
-```
-
-### 3. SQL generation generics call `sql_dialect()`
-
-All SQL generation generics first call `sql_dialect()` and then dispatch on that. Note that due to the limitations of `UseMethod()` this requires a special helper.
-
-```R
-#' @export
-#' @rdname db-sql
-sql_translation <- function(con) {
-  dialect <- sql_dialect(con)
-  return(sql_translation_(dialect))
-
-  # never reached; needed for roxygen2
-  UseMethod("sql_translation")
-}
-sql_translation_ <- function(dialect) {
-  UseMethod("sql_translation")
-}
-```
-
-This extra layer in conjunction with `sql_dialect.DBIConnection` above, means that `sql_dialect()` is opt-in and existing extensions will continue to work.
-
-**Which generics need this pattern?**
-
-As a general rule:
-- **`sql_*` functions** work with dialect objects. They use iterated dispatch (connection → dialect) for backward compatibility.
-- **`db_*` functions** work with connection objects. They perform database operations that require a real connection.
-
-The following SQL generation generics should use iterated dispatch:
-- `sql_translation()` - returns translation environment
-- `sql_expr_matches()` - generates SQL for equality with NULL matching
-- `sql_query_*()` - all query generation functions
-- `sql_table_*()` - table manipulation functions
-- `sql_escape_*()` - escaping functions
-
-The `db_*` functions (like `db_connection_describe()`, `db_col_types()`) continue to dispatch directly on the connection object.
-
-The support boolean generics (`supports_window_clause()` and `db_supports_table_alias_with_as()`) will be replaced by accessing dialect fields directly (see Section 7 below).
-
-### 4. SQL escaping with dialect objects
-
-SQL generation methods use `sql_glue2()` and other functions that call `sql_escape_ident()`, `sql_escape_string()`, etc. These escape functions need to work with dialect objects.
-
-**Identifier escaping:**
-
-Add a method for `sql_escape_ident()` that dispatches on dialect objects and uses the stored `quote_identifier` function:
-
-```r
-#' @export
-sql_escape_ident.sql_dialect <- function(con, x) {
-  con$quote_identifier(x)
-}
-```
-
-**String escaping:**
-
-String escaping uses `sql_quote()` with single quotes, which is consistent across most databases. The default method works for dialect objects:
-
-```r
-#' @export
-sql_escape_string.sql_dialect <- function(con, x) {
- sql(sql_quote(x, "'"))
-}
-```
-
-**Other escape functions:**
-
-Add `sql_dialect` methods for other escape functions (`sql_escape_logical`, `sql_escape_date`, `sql_escape_datetime`, `sql_escape_raw`) that provide sensible defaults. Backends can override these by adding methods on their specific dialect class (e.g., `sql_escape_date.sql_dialect_postgres`).
-
-**`sql_current_con()` returns a dialect:**
-
-The `sql_glue()` function (used inside translation functions) calls `sql_current_con()` to get the connection for escaping. With the dialect system, `sql_current_con()` will return the dialect object, not the original connection. This works because the escape functions now dispatch on dialect objects.
-
-```r
-# Inside sql_translation.sql_dialect_postgres, sql_glue() works because:
-# 1. sql_glue() calls sql_current_con() which returns the dialect
-# 2. Escaping dispatches on the dialect via sql_escape_ident.sql_dialect
-str_locate = function(string, pattern) {
-  sql_glue("STRPOS({string}, {pattern})")
-}
-```
-
-**`db_connection_describe()` remains connection-based:**
-
-The `db_connection_describe()` function retrieves actual connection metadata (host, username, database name) and must continue to dispatch on the connection object, not the dialect.
-
-### 5. Update existing methods
-
-Next we need to update each `sql_*` method to instead dispatch on the dialect.
-
-**Important**: Backend implementers write methods directly on the dialect class (e.g., `sql_expr_matches.sql_dialect_postgres`). The iterated dispatch wrapper is only needed in the user-facing generic (handled in Section 3).
-
-```R
-# Before
-sql_expr_matches.PqConnection <- function(con, x, y, ...) {
-  # https://www.postgresql.org/docs/current/functions-comparison.html
-  glue_sql2(con, "{x} IS NOT DISTINCT FROM {y}")
-}
-sql_expr_matches.PostgreSQL <- sql_expr_matches.PqConnection
-
-# After
-sql_expr_matches.sql_dialect_postgres <- function(con, x, y, ...) {
-  # https://www.postgresql.org/docs/current/functions-comparison.html
-  glue_sql2(con, "{x} IS NOT DISTINCT FROM {y}")
-}
-```
-
-Note: The first argument is still named `con` for consistency, but it will receive the dialect object when called through the iterated dispatch system.
-
-### 6. Replace "simulate_" with "dialect_" functions
-
-Old simulate functions should be deprecated in favor of exporting the new `dialect_` functions.
-
-```r
-simulate_postgres <- function() {
-  lifecycle::deprecate_warn("2.6.0", "simulate_postgres()", "dialect_postgres()")
-  dialect_postgres()
-}
-```
-
-The deprecated `simulate_*()` functions now return dialect objects. Existing tests will continue to work because the SQL generation and escaping functions are updated to work with dialect objects (see Sections 3 and 4).
-
-### 7. Accessing dialect properties
-
-The dialect object stores support booleans as fields rather than using generics. Code that needs to check these properties should access them directly from the dialect.
-
-```r
-# Old approach - using generics
-if (supports_window_clause(con)) {
-  # generate WINDOW clause
-}
-
-# New approach - accessing dialect fields
-dialect <- sql_dialect(con)
-if (dialect$supports_window_clause) {
-  # generate WINDOW clause
-}
-```
-
-The old `supports_window_clause()` and `db_supports_table_alias_with_as()` can then be deleted as they are not used outside of dbplyr.
-
-This maintains the existing API while using the new dialect system internally. Eventually, internal dbplyr code can migrate to accessing dialect fields directly for efficiency.
-
-### 8. Supporting ODBC and ADBC
-
-A key benefit of the dialect system is supporting backends that connect to multiple database types (like ODBC and ADBC). These backends can inspect the connection and return the appropriate dialect:
-
-```r
-#' @export
-sql_dialect.OdbcConnection <- function(con) {
-  # Dispatch based on the actual database driver
-  dbms <- con@info$dbms.name
-
-  switch(dbms,
-    PostgreSQL = dialect_postgres(),
-    MySQL = dialect_mysql(),
-    "Microsoft SQL Server" = dialect_mssql(),
-    SQLite = dialect_sqlite(),
-    # Add more as needed
-    dialect_odbc_generic()  # fallback for unknown databases
-  )
-}
-
-# Fallback dialect for unknown ODBC databases
-dialect_odbc_generic <- function() {
-  new_sql_dialect("odbc_generic")
-}
-```
-
-This allows ODBC connections to automatically use the correct SQL dialect for the underlying database, eliminating the need for separate backend implementations for each ODBC driver.
-
-### 9. Migration strategy
-
-Backends can migrate incrementally:
-
-1. **Add dialect definition**: Create `sql_dialect.ClassName()` method and `dialect_name()` helper
-2. **Migrate methods one at a time**: Update `sql_*.ClassName()` methods to `sql_*.sql_dialect_name()`
-3. **Delete aliases**: Once a method is migrated, delete the duplicate definitions for other connection classes
-4. **Delete old support methods**: Once fully migrated, remove old `supports_*()` method definitions
-
-The `sql_dialect.DBIConnection()` default ensures backward compatibility - existing backends that haven't migrated yet will continue to work because their connection object will be passed through unchanged.
-
-**Migration can happen one backend at a time**. There's no need to migrate all backends simultaneously. Mixed states are fully supported during the transition period.
-
-### 10. Exports and documentation
-
-**What to export:**
-- `sql_dialect()` - user-facing generic (already exported via `@export` in db-sql.R)
-- `new_sql_dialect()` - constructor for extension authors
-- `dialect_*()` - dialect helpers for each backend (e.g., `dialect_postgres()`, `dialect_mysql()`)
-
-**What NOT to export:**
-- `sql_*_()` helpers (internal use only, underscore indicates private)
-- `sql_dialect_*` classes (implicit through S3 dispatch, no need for explicit export)
-
-**Documentation updates needed:**
-1. Update `?db-sql` help topic to explain the dialect system and iterated dispatch
-2. Add new `?sql_dialect` help topic documenting the generic and how to implement it
-3. Add `?new_sql_dialect` topic for extension authors
-4. Update `vignette("new-backend")` to show the dialect approach
-5. Add dialect functions to `_pkgdown.yml` reference index
-
-### 11. Testing approach
-
-**Updating existing tests:**
-
-Existing tests using `simulate_*()` should be updated to use `dialect_*()` functions:
-
-```r
-# Before
-test_that("postgres translation works", {
-
-  con <- simulate_postgres()
-
-  expect_equal(
-    sql_expr_matches(con, "x", "y"),
-    sql("x IS NOT DISTINCT FROM y")
-  )
-})
-
-# After
-test_that("postgres translation works", {
-
-  con <- dialect_postgres()
-
-  expect_equal(
-    sql_expr_matches(con, "x", "y"),
-    sql("x IS NOT DISTINCT FROM y")
-  )
-})
-```
-**Testing the dialect system itself:**
-- Add tests verifying that `sql_dialect()` returns the correct dialect for each connection type
-- Test that dialect properties (like `supports_window_clause`) are correctly set
-- Test ODBC/ADBC dynamic dialect selection 
+1. ✅ Creating a dialect object that acts as an (optional) intermediary between the database connection and SQL translation.
+2. ✅ Allowing multiple connection classes to share a single dialect.
+3. ✅ Maintaining backward compatibility for user-facing APIs
+
+### Problems Solved
+
+- ✅ PostgreSQL `PqConnection` and `PostgreSQL` classes now share `dialect_postgres()`
+- ✅ MySQL `MySQLConnection` and `MariaDBConnection` now share `dialect_mysql()`/`dialect_mariadb()`
+- ✅ Eliminated ~60 alias definitions across backends
+- ✅ Infrastructure ready for ODBC/ADBC to dispatch to appropriate dialect based on connection metadata

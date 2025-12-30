@@ -181,6 +181,9 @@ sql_table_index.DBIConnection <- function(
   )
 }
 
+#' @export
+sql_table_index.sql_dialect <- sql_table_index.DBIConnection
+
 # Query manipulation ------------------------------------------------------
 
 #' @rdname db-sql
@@ -330,6 +333,9 @@ sql_query_rows.DBIConnection <- function(con, sql, ...) {
   from <- dbplyr_sql_subquery(con, sql, "master")
   sql_glue2(con, "SELECT COUNT(*) FROM {.tbl from}")
 }
+
+#' @export
+sql_query_rows.sql_dialect <- sql_query_rows.DBIConnection
 
 #' Generate SQL for Insert, Update, Upsert, and Delete
 #'

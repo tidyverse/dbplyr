@@ -1,5 +1,5 @@
 test_that("sql_substr works as expected", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
 
   expect_translation(con, substr(x, 3, 4), "SUBSTR(\"x\", 3, 2)")
   expect_translation(con, substr(x, 3, 3), "SUBSTR(\"x\", 3, 1)")
@@ -19,12 +19,12 @@ test_that("sql_substr works as expected", {
 })
 
 test_that("substring is also translated", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(con, substring(x, 3, 4), "SUBSTR(\"x\", 3, 2)")
 })
 
 test_that("sql_str_sub works as expected", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
 
   expect_translation(con, str_sub(x), "SUBSTR(\"x\", 1)")
   expect_translation(con, str_sub(x, 1), "SUBSTR(\"x\", 1)")
@@ -55,7 +55,7 @@ test_that("sql_str_sub works as expected", {
 })
 
 test_that("sql_str_sub can require length parameter", {
-  local_con(simulate_dbi())
+  local_con(dialect_ansi())
   x <- ident("x")
   str_sub <- sql_str_sub("SUBSTR", optional_length = FALSE)
 
@@ -113,11 +113,11 @@ test_that("str_detect(), str_starts(), str_ends() support fixed patterns", {
     c(0, 0, 0, 1, NA)
   )
 
-  expect_error(translate_sql(str_detect(x, "a"), con = simulate_dbi()))
+  expect_error(translate_sql(str_detect(x, "a"), con = dialect_ansi()))
 })
 
 test_that("basic prefix paste", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
 
   expect_translation(con, paste0(x), "CONCAT_WS('', \"x\")")
   expect_translation(con, paste0(x, y), "CONCAT_WS('', \"x\", \"y\")")
@@ -129,7 +129,7 @@ test_that("basic prefix paste", {
 })
 
 test_that("basic infix paste", {
-  local_con(simulate_dbi())
+  local_con(dialect_ansi())
 
   paste <- sql_paste_infix("", "&&")
   x <- ident("x")

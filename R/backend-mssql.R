@@ -727,6 +727,19 @@ sql_table_analyze.sql_dialect_mssql <- function(con, table, ...) {
   temporary,
   ...
 ) {
+  mssql_db_table_temporary(con, table, temporary)
+}
+#' @export
+db_table_temporary.sql_dialect_mssql <- function(
+  con,
+  table,
+  temporary,
+  ...
+) {
+  mssql_db_table_temporary(con, table, temporary)
+}
+
+mssql_db_table_temporary <- function(con, table, temporary) {
   list(
     table = add_temporary_prefix(con, table, temporary = temporary),
     temporary = FALSE
@@ -866,7 +879,28 @@ sql_escape_logical.sql_dialect_mssql <- function(con, x) {
   sql,
   ...,
   cte = FALSE,
-  use_star = TRUE
+  sql_options = NULL
+) {
+  mssql_db_sql_render(con, sql, ..., cte = cte, sql_options = sql_options)
+}
+
+#' @export
+db_sql_render.sql_dialect_mssql <- function(
+  con,
+  sql,
+  ...,
+  cte = FALSE,
+  sql_options = NULL
+) {
+  mssql_db_sql_render(con, sql, ..., cte = cte, sql_options = sql_options)
+}
+
+mssql_db_sql_render <- function(
+  con,
+  sql,
+  ...,
+  cte = FALSE,
+  sql_options = NULL
 ) {
   # Post-process WHERE to cast logicals from BIT to BOOLEAN
   sql$lazy_query <- purrr::modify_tree(
@@ -875,7 +909,13 @@ sql_escape_logical.sql_dialect_mssql <- function(con, x) {
     post = mssql_update_where_clause
   )
 
-  NextMethod()
+  db_sql_render.DBIConnection(
+    con,
+    sql,
+    ...,
+    cte = cte,
+    sql_options = sql_options
+  )
 }
 
 mssql_update_where_clause <- function(qry) {

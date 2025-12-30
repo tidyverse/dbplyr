@@ -2,9 +2,12 @@
 % Please edit documentation in R/backend-odbc.R
 \name{backend-odbc}
 \alias{simulate_odbc}
+\alias{dialect_odbc}
 \title{Backend: ODBC}
 \usage{
 simulate_odbc()
+
+dialect_odbc()
 }
 \description{
 See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for

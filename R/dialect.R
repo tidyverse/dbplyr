@@ -79,6 +79,24 @@ new_sql_dialect <- function(
 }
 
 #' @export
+#' @rdname sql_dialect
+dialect_ansi <- function() {
+  new_sql_dialect(
+    "ansi",
+    quote_identifier = function(x) sql_quote(x, '"')
+  )
+}
+
+#' @export
+sql_translation.sql_dialect_ansi <- function(con) {
+  sql_variant(
+    base_scalar,
+    base_agg,
+    base_win
+  )
+}
+
+#' @export
 print.sql_dialect <- function(x, ...) {
   cat("<sql_dialect>\n")
   cat("Class:", paste(class(x), collapse = ", "), "\n")

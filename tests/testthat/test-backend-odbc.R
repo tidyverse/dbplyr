@@ -1,5 +1,5 @@
 test_that("custom scalar translated correctly", {
-  con <- simulate_odbc()
+  con <- dialect_odbc()
 
   expect_translation(con, as.numeric(x), 'CAST("x" AS DOUBLE)')
   expect_translation(con, as.double(x), 'CAST("x" AS DOUBLE)')
@@ -8,7 +8,7 @@ test_that("custom scalar translated correctly", {
 })
 
 test_that("custom aggregators translated correctly", {
-  con <- simulate_odbc()
+  con <- dialect_odbc()
 
   expect_translation(
     con,
@@ -19,7 +19,7 @@ test_that("custom aggregators translated correctly", {
 })
 
 test_that("custom window functions translated correctly", {
-  con <- simulate_odbc()
+  con <- dialect_odbc()
 
   expect_translation(
     con,
