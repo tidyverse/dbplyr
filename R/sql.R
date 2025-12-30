@@ -43,4 +43,3 @@ format.sql <- function(x, ...) {
     paste0("<SQL> ", x, ifelse(names2(x) == "", "", paste0(" AS ", names2(x))))
   }
 }
-

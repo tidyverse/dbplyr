@@ -2,32 +2,20 @@
 NULL
 
 # nocov start
-# Use dbplyr edition 1 for custom method dispatch on RPostgreSQL connections
+# RPostgreSQL connections use the postgres dialect
 #' @export
 dbplyr_edition.PostgreSQLConnection <- function(con) {
   2L
 }
 
 #' @export
-db_connection_describe.PostgreSQLConnection <- db_connection_describe.PqConnection
-
-#' @export
-sql_translation.PostgreSQLConnection <- sql_translation.PqConnection
-
-#' @export
-sql_expr_matches.PostgreSQLConnection <- sql_expr_matches.PqConnection
-
-#' @export
-sql_query_explain.PostgreSQLConnection <- sql_query_explain.PqConnection
-
-#' @export
-supports_window_clause.PostgreSQLConnection <- function(con) {
-  TRUE
+sql_dialect.PostgreSQLConnection <- function(con) {
+  dialect_postgres()
 }
 
 #' @export
-sql_query_insert.PostgreSQLConnection <- sql_query_insert.PostgreSQL
+db_connection_describe.PostgreSQLConnection <- db_connection_describe.PqConnection
 
 #' @export
-sql_query_upsert.PostgreSQLConnection <- sql_query_upsert.PostgreSQL
+db_col_types.PostgreSQLConnection <- db_col_types.PqConnection
 # nocov end

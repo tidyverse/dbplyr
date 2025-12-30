@@ -2,9 +2,12 @@
 % Please edit documentation in R/backend-teradata.R
 \name{backend-teradata}
 \alias{simulate_teradata}
+\alias{dialect_teradata}
 \title{Backend: Teradata}
 \usage{
 simulate_teradata()
+
+dialect_teradata()
 }
 \description{
 See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for

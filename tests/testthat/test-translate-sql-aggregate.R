@@ -1,5 +1,5 @@
 test_that("aggregation functions warn once if na.rm = FALSE", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   reset_warning_verbosity("dbplyr_check_na_rm")
   local_mocked_bindings(is_testing = function() FALSE)
 
@@ -16,7 +16,7 @@ test_that("warns informatively with unsupported function", {
 })
 
 test_that("quantile and median don't change without warning", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_snapshot(translate_sql(
     quantile(x, 0.75, na.rm = TRUE),
     con = con,

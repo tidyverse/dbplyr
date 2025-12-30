@@ -282,3 +282,6 @@ db_table_temporary.DBIConnection <- function(con, table, temporary, ...) {
     temporary = temporary
   )
 }
+
+#' @export
+db_table_temporary.sql_dialect <- db_table_temporary.DBIConnection

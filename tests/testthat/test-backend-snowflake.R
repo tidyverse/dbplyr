@@ -1,5 +1,5 @@
 test_that("custom scalar translated correctly", {
-  con <- simulate_snowflake()
+  con <- dialect_snowflake()
   expect_translation(con, log10(x), 'LOG(10, "x")')
   expect_translation(
     con,
@@ -20,7 +20,7 @@ test_that("custom scalar translated correctly", {
 })
 
 test_that("pasting translated correctly", {
-  con <- simulate_snowflake()
+  con <- dialect_snowflake()
 
   expect_translation(
     con,
@@ -65,7 +65,7 @@ test_that("pasting translated correctly", {
 })
 
 test_that("custom stringr functions translated correctly", {
-  con <- simulate_snowflake()
+  con <- dialect_snowflake()
 
   expect_translation(con, str_locate(x, y), "POSITION(\"y\", \"x\")")
   expect_translation(
@@ -135,7 +135,7 @@ test_that("custom stringr functions translated correctly", {
 })
 
 test_that("aggregates are translated correctly", {
-  con <- simulate_snowflake()
+  con <- dialect_snowflake()
 
   expect_translation(
     con,
@@ -204,7 +204,7 @@ test_that("aggregates are translated correctly", {
 })
 
 test_that("snowflake mimics two argument log", {
-  con <- simulate_snowflake()
+  con <- dialect_snowflake()
 
   expect_translation(con, log(x), "LN(\"x\")")
   expect_translation(con, log(x, 10), "LOG(10.0, \"x\")")
@@ -212,7 +212,7 @@ test_that("snowflake mimics two argument log", {
 })
 
 test_that("custom lubridate functions translated correctly", {
-  con <- simulate_snowflake()
+  con <- dialect_snowflake()
 
   expect_translation(con, day(x), "EXTRACT(DAY FROM \"x\")")
   expect_translation(con, mday(x), "EXTRACT(DAY FROM \"x\")")
@@ -278,7 +278,7 @@ test_that("custom lubridate functions translated correctly", {
 })
 
 test_that("custom clock functions translated correctly", {
-  con <- simulate_snowflake()
+  con <- dialect_snowflake()
   expect_translation(
     con,
     add_years(x, 1),
@@ -349,7 +349,7 @@ test_that("custom clock functions translated correctly", {
 })
 
 test_that("difftime is translated correctly", {
-  con <- simulate_snowflake()
+  con <- dialect_snowflake()
   expect_translation(
     con,
     difftime(start_date, end_date, units = "days"),
@@ -380,7 +380,7 @@ test_that("difftime is translated correctly", {
 })
 
 test_that("min() and max()", {
-  con <- simulate_snowflake()
+  con <- dialect_snowflake()
 
   expect_translation(
     con,
@@ -411,7 +411,7 @@ test_that("min() and max()", {
 })
 
 test_that("pmin() and pmax() respect na.rm", {
-  con <- simulate_snowflake()
+  con <- dialect_snowflake()
 
   # Snowflake default for LEAST/GREATEST: If any of the argument values is NULL, the result is NULL.
   # https://docs.snowflake.com/en/sql-reference/functions/least
@@ -446,13 +446,13 @@ test_that("pmin() and pmax() respect na.rm", {
 })
 
 test_that("row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per empty_order)", {
-  mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_snowflake())
+  mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = dialect_snowflake())
   expect_snapshot(mf |> mutate(rown = row_number()))
   expect_snapshot(mf |> group_by(y) |> mutate(rown = row_number()))
   expect_snapshot(mf |> arrange(y) |> mutate(rown = row_number()))
 })
 
 test_that("correctly translates $", {
-  con <- simulate_snowflake()
+  con <- dialect_snowflake()
   expect_translation(con, x$y, "\"x\":\"y\"")
 })

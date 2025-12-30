@@ -77,7 +77,7 @@ test_that("types argument works", {
 })
 
 test_that("checks inputs", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
 
   expect_snapshot({
     (expect_error(copy_inline(con, tibble())))

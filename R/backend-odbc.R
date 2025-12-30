@@ -24,12 +24,26 @@ NULL
 simulate_odbc <- function() simulate_dbi("OdbcConnection")
 
 #' @export
+#' @rdname backend-odbc
+dialect_odbc <- function() {
+  new_sql_dialect(
+    "odbc",
+    quote_identifier = function(x) sql_quote(x, '"')
+  )
+}
+
+#' @export
+sql_dialect.OdbcConnection <- function(con) {
+  dialect_odbc()
+}
+
+#' @export
 dbplyr_edition.OdbcConnection <- function(con) {
   2L
 }
 
 #' @export
-sql_translation.OdbcConnection <- function(con) {
+sql_translation.sql_dialect_odbc <- function(con) {
   sql_variant(
     base_odbc_scalar,
     base_odbc_agg,

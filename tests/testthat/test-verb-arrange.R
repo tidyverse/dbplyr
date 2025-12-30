@@ -129,7 +129,7 @@ test_that("grouped arrange doesn't order by groups", {
 })
 
 test_that("grouped arrange order by groups when .by_group  is set to TRUE", {
-  lf <- lazy_frame(x = 1, y = 1, con = simulate_dbi())
+  lf <- lazy_frame(x = 1, y = 1, con = dialect_ansi())
   out <- lf |>
     group_by(x) |>
     arrange(y, .by_group = TRUE) |>

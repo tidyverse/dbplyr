@@ -3,11 +3,17 @@
 \name{backend-mysql}
 \alias{simulate_mysql}
 \alias{simulate_mariadb}
+\alias{dialect_mariadb}
+\alias{dialect_mysql}
 \title{Backend: MySQL/MariaDB}
 \usage{
 simulate_mysql()
 
 simulate_mariadb()
+
+dialect_mariadb()
+
+dialect_mysql()
 }
 \description{
 See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for

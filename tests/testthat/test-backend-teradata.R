@@ -1,5 +1,5 @@
 test_that("custom scalar translated correctly", {
-  con <- simulate_teradata()
+  con <- dialect_teradata()
 
   expect_translation(con, x != y, '"x" <> "y"')
   expect_translation(
@@ -65,7 +65,7 @@ test_that("custom scalar translated correctly", {
 })
 
 test_that("custom bitwise operations translated correctly", {
-  con <- simulate_teradata()
+  con <- dialect_teradata()
 
   expect_translation(con, bitwNot(x), 'BITNOT("x")')
   expect_translation(con, bitwAnd(x, 128L), 'BITAND("x", 128)')
@@ -76,7 +76,7 @@ test_that("custom bitwise operations translated correctly", {
 })
 
 test_that("custom aggregators translated correctly", {
-  con <- simulate_teradata()
+  con <- dialect_teradata()
 
   expect_translation(
     con,
@@ -92,7 +92,7 @@ test_that("custom aggregators translated correctly", {
 })
 
 test_that("custom window functions translated correctly", {
-  con <- simulate_teradata()
+  con <- dialect_teradata()
 
   expect_translation(
     con,
@@ -107,7 +107,7 @@ test_that("custom window functions translated correctly", {
 })
 
 test_that("generates custom sql", {
-  con <- simulate_teradata()
+  con <- dialect_teradata()
 
   expect_snapshot(sql_table_analyze(con, in_schema("schema", "tbl")))
 })
@@ -115,12 +115,12 @@ test_that("generates custom sql", {
 # verb translation --------------------------------------------------------
 
 test_that("head translated to TOP", {
-  mf <- lazy_frame(x = 1, con = simulate_teradata())
+  mf <- lazy_frame(x = 1, con = dialect_teradata())
   expect_snapshot(mf |> head() |> sql_render())
 })
 
 test_that("lead, lag work", {
-  mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_teradata())
+  mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = dialect_teradata())
 
   expect_snapshot(
     mf |> group_by(y) |> mutate(val2 = lead(x, order_by = x)) |> sql_render()
@@ -132,19 +132,19 @@ test_that("lead, lag work", {
 
 
 test_that("weighted.mean", {
-  mf <- lazy_frame(x = c(1:5), y = c(6:10), con = simulate_teradata())
+  mf <- lazy_frame(x = c(1:5), y = c(6:10), con = dialect_teradata())
 
   expect_snapshot(mf |> summarise(wt_mean = weighted.mean(x, y)))
 })
 
 test_that("row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per empty_order)", {
-  mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_teradata())
+  mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = dialect_teradata())
   expect_snapshot(mf |> mutate(rown = row_number()))
   expect_snapshot(mf |> group_by(y) |> mutate(rown = row_number()))
   expect_snapshot(mf |> arrange(y) |> mutate(rown = row_number()))
 })
 
 test_that("head after distinct() produces subquery", {
-  lf <- lazy_frame(x = 1, y = 2, con = simulate_teradata())
+  lf <- lazy_frame(x = 1, y = 2, con = dialect_teradata())
   expect_snapshot(lf |> distinct() |> head())
 })

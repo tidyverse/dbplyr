@@ -192,6 +192,9 @@ sql_query_semi_join.DBIConnection <- function(
   sql_format_clauses(lines, lvl)
 }
 
+#' @export
+sql_query_semi_join.sql_dialect <- sql_query_semi_join.DBIConnection
+
 dbplyr_query_semi_join <- function(
   con,
   x,

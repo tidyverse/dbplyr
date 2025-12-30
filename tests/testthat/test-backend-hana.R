@@ -1,5 +1,5 @@
 test_that("custom string translations", {
-  con <- simulate_hana()
+  con <- dialect_hana()
 
   expect_snapshot(translate_sql(paste0("a", "b"), con = con))
   expect_snapshot(translate_sql(paste("a", "b"), con = con))
@@ -10,7 +10,7 @@ test_that("custom string translations", {
 })
 
 test_that("copy_inline uses UNION ALL", {
-  con <- simulate_hana()
+  con <- dialect_hana()
   y <- tibble::tibble(id = 1L, arr = "{1,2,3}")
 
   types <- c(id = "bigint", arr = "integer[]")

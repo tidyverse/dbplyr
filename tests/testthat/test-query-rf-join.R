@@ -20,7 +20,7 @@ test_that("sql_on query doesn't change unexpectedly", {
 })
 
 test_that("sql_rf_join_vars generates expected SQL", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
 
   # full_join(lf(x, a), lf(x, b), by = "x")
   expect_equal(

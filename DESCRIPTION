@@ -99,6 +99,7 @@ Collate:
     'data-nycflights13.R'
     'db-io.R'
     'dbplyr.R'
+    'dialect.R'
     'explain.R'
     'ident.R'
     'import-standalone-s3-register.R'
