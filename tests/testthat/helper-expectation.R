@@ -18,4 +18,14 @@ expect_translation_snapshot <- function(con, expr, ..., error = FALSE) {
   ))
 }
 
+expect_translation_error <- function(con, expr, ...) {
+  expr <- substitute(expr)
+  dots <- exprs(...)
+
+  inject(expect_snapshot(
+    translate_sql(!!expr, !!!dots, con = con),
+    error = TRUE
+  ))
+}
+
 scrub_sqlite_version <- \(x) gsub(sqlite_version(), "<version>", x)
