@@ -278,13 +278,12 @@ sql_nth <- function(
   }
 
   if (na_rm) {
-    if (ignore_nulls == "inside") {
-      sql_expr <- "{.sql f}({args} IGNORE NULLS)"
-    } else if (ignore_nulls == "outside") {
-      sql_expr <- "{.sql f}({args}) IGNORE NULLS"
-    } else {
-      sql_expr <- "{.sql f}({args}, TRUE)"
-    }
+    sql_expr <- switch(
+      ignore_nulls,
+      inside = "{.sql f}({args} IGNORE NULLS)",
+      outside = "{.sql f}({args}) IGNORE NULLS",
+      bool = "{.sql f}({args}, TRUE)"
+    )
   } else {
     sql_expr <- "{.sql f}({args})"
   }
