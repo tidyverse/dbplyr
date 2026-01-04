@@ -2,15 +2,12 @@
 % Please edit documentation in R/lazy-ops.R
 \name{lazy_ops}
 \alias{lazy_ops}
-\alias{lazy_base_query}
 \alias{op_grps}
 \alias{op_vars}
 \alias{op_sort}
 \alias{op_frame}
 \title{Lazy operations}
 \usage{
-lazy_base_query(x, vars, class = character(), ...)
-
 op_grps(op)
 
 op_vars(op)
@@ -24,8 +21,7 @@ This set of S3 classes describe the action of dplyr verbs. These are
 currently used for SQL sources to separate the description of operations
 in R from their computation in SQL. This API is very new so is likely
 to evolve in the future.
-}
-\details{
+
 \code{op_vars()} and \code{op_grps()} compute the variables and groups from
 a sequence of lazy operations. \code{op_sort()} and \code{op_frame()} tracks the
 order and frame for use in window functions.
