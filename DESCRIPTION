@@ -115,7 +115,6 @@ Collate:
     'query-set-op.R'
     'query-union.R'
     'query.R'
-    'reexport.R'
     'remote.R'
     'rows.R'
     'schema.R'
