@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `do()` is deprecated. Use `collect()` then your favourite tidyverse
+  functions instead.
 * `as(x, "type")` is now translated to `CAST(x AS type)`, allowing you to cast
   to arbitrary database types not covered by the standard `as.*()` functions
   (#1729).

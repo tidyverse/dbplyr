@@ -7,7 +7,7 @@
       ! Results must be data frames
       Problems at positions 1 and 2
 
-# named argument become list columns
+# do() argument checking works
 
     Code
       do(mf, nrow = nrow(.), ncol(.))
@@ -30,4 +30,12 @@
     Condition
       Error in `named_args()`:
       ! `do()` syntax changed in dplyr 0.2. Please see documentation for details
+
+# do() is deprecated
+
+    Code
+      . <- do(local_memdb_frame(x = 1), head(.))
+    Condition
+      Warning:
+      `do()` was deprecated in dbplyr 2.6.0.
 
