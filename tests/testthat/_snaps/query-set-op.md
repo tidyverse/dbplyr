@@ -90,3 +90,49 @@
         FROM "df"
       )
 
+# sql_set_op_suffix can be customized
+
+    Code
+      union(lf, lf)
+    Output
+      <SQL>
+      SELECT *
+      FROM "df"
+      
+      UNION DISTINCT
+      
+      SELECT *
+      FROM "df"
+
+---
+
+    Code
+      intersect(lf, lf)
+    Output
+      <SQL>
+      (
+        SELECT *
+        FROM "df"
+      )
+      INTERSECT DISTINCT
+      (
+        SELECT *
+        FROM "df"
+      )
+
+---
+
+    Code
+      setdiff(lf, lf)
+    Output
+      <SQL>
+      (
+        SELECT *
+        FROM "df"
+      )
+      EXCEPT DISTINCT
+      (
+        SELECT *
+        FROM "df"
+      )
+

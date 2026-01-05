@@ -3,6 +3,7 @@
 \name{db-misc}
 \alias{db_connection_describe}
 \alias{sql_join_suffix}
+\alias{sql_set_op_suffix}
 \alias{db_sql_render}
 \alias{db_col_types}
 \alias{dbplyr_edition}
@@ -11,6 +12,8 @@
 db_connection_describe(con, ...)
 
 sql_join_suffix(con, suffix, ...)
+
+sql_set_op_suffix(con, all, ...)
 
 db_sql_render(con, sql, ..., cte = FALSE, sql_options = NULL)
 

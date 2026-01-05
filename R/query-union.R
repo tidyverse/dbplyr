@@ -96,7 +96,8 @@ sql_query_union <- function(con, x, unions, ..., lvl = 0) {
 }
 #' @export
 sql_query_union.DBIConnection <- function(con, x, unions, ..., lvl = 0) {
-  methods <- ifelse(unions$all, "UNION ALL", "UNION")
+  suffix <- sql_set_op_suffix(con, unions$all)
+  methods <- ifelse(nzchar(suffix), paste0("UNION ", suffix), "UNION")
   methods <- indent_lvl(style_kw(methods), lvl)
   tables <- unlist(unions$table)
 

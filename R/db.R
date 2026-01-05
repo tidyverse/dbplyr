@@ -40,6 +40,16 @@ sql_join_suffix.DBIConnection <- function(con, suffix, ...) {
 
 #' @rdname db-misc
 #' @export
+sql_set_op_suffix <- function(con, all, ...) {
+  UseMethod("sql_set_op_suffix")
+}
+#' @export
+sql_set_op_suffix.DBIConnection <- function(con, all, ...) {
+  ifelse(all, "ALL", "")
+}
+
+#' @rdname db-misc
+#' @export
 db_sql_render <- function(con, sql, ..., cte = FALSE, sql_options = NULL) {
   check_bool(cte)
   if (cte) {
