@@ -1,9 +1,11 @@
 test_that("ungrouped data collected first", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   out <- local_memdb_frame(x = 1:2) |> do(head(.))
   expect_equal(out, tibble(x = 1:2))
 })
 
 test_that("named argument become list columns", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   mf <- local_memdb_frame(g = rep(1:3, 1:3), x = 1:6) |>
     group_by(g)
 
@@ -13,12 +15,14 @@ test_that("named argument become list columns", {
 })
 
 test_that("unnamed results bound together by row", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   mf <- local_memdb_frame(g = c(1, 1, 2, 2), x = c(3, 9, 4, 9))
   first <- mf |> group_by(g) |> do(head(., 1)) |> ungroup() |> collect()
   expect_equal(first, tibble(g = c(1, 2), x = c(3, 4)))
 })
 
 test_that("unnamed results must be data frames", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   mf <- local_memdb_frame(g = c(1, 1, 2, 2), x = c(3, 9, 4, 9)) |>
     group_by(g)
 
@@ -26,6 +30,7 @@ test_that("unnamed results must be data frames", {
 })
 
 test_that("Results respect select", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   mf <- local_memdb_frame(
     g = c(1, 1, 2, 2),
     x = c(3, 9, 4, 9),
@@ -40,6 +45,7 @@ test_that("Results respect select", {
 })
 
 test_that("results independent of chunk_size", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   mf <- local_memdb_frame(g = rep(1:3, 1:3), x = 1:6) |>
     group_by(g)
 
@@ -52,7 +58,8 @@ test_that("results independent of chunk_size", {
   expect_equal(nrows(mf, 10), c(1, 2, 3))
 })
 
-test_that("named argument become list columns", {
+test_that("do() argument checking works", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   mf <- local_memdb_frame(g = rep(1:3, 1:3), x = 1:6) |>
     group_by(g)
 
@@ -64,4 +71,8 @@ test_that("named argument become list columns", {
 
   # old syntax
   expect_snapshot(error = TRUE, mf |> do(.f = nrow))
+})
+
+test_that("do() is deprecated", {
+  expect_snapshot(. <- local_memdb_frame(x = 1) |> do(head(.)))
 })
