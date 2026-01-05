@@ -523,32 +523,3 @@ translate_join_select <- function(
 
   names_to_as(con, unlist(out))
 }
-
-
-# Join select helpers ------------------------------------------------------
-
-# Create a table-qualified column expression like .table1$x
-join_select_expr <- function(table_idx, var) {
-  tbl_sym <- sym(paste0(".table", table_idx))
-  var_sym <- sym(var)
-  call("$", tbl_sym, var_sym)
-}
-
-# Create a COALESCE expression for full joins: coalesce(.table1$x, .table2$y)
-join_select_coalesce <- function(var_x, var_y) {
-  x_expr <- call("$", sym(".table1"), sym(var_x))
-  y_expr <- call("$", sym(".table2"), sym(var_y))
-  call("coalesce", x_expr, y_expr)
-}
-
-# Create a lazy select tibble from table indices and variable names
-new_lazy_join_select <- function(names, table_idxs, vars) {
-  exprs <- purrr::map2(table_idxs, vars, join_select_expr)
-  tibble(
-    name = names,
-    expr = exprs,
-    group_vars = rep_along(exprs, list(character())),
-    order_vars = rep_along(exprs, list(NULL)),
-    frame = rep_along(exprs, list(NULL))
-  )
-}
