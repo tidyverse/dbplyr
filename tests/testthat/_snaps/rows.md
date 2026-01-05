@@ -409,7 +409,7 @@
       
       SELECT "q01".*, NULL AS "y"
       FROM (
-        SELECT "df_y".*
+        SELECT "x"
         FROM "df_y"
         WHERE NOT EXISTS (
           SELECT 1 FROM "df_x"

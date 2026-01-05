@@ -17,7 +17,7 @@ test_that("lazy_semi_join_query() checks arguments", {
     lazy_semi_join_query(
       x = x,
       y = y,
-      vars = tibble(name = "x", var = "x"),
+      select = new_lazy_join_select(names = "x", table_idxs = 1L, vars = "x"),
       anti = anti,
       by = by
     )

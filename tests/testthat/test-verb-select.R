@@ -254,12 +254,10 @@ test_that("select() after join handles previous select", {
     select(x2 = x, y3 = y2, z)
 
   expect_equal(op_vars(lf), c("x2", "y3", "z"))
+  expect_equal(lf$lazy_query$select$name, c("x2", "y3", "z"))
   expect_equal(
-    lf$lazy_query$vars,
-    tibble(
-      name = c("x2", "y3", "z"),
-      var = c("x", "y", "z")
-    )
+    lf$lazy_query$select$expr,
+    unname(exprs(.table1$x, .table1$y, .table1$z))
   )
   expect_equal(op_grps(lf), c("x2", "y3", "z"))
   expect_snapshot(print(lf))

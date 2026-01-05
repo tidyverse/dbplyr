@@ -3,7 +3,7 @@
 lazy_semi_join_query <- function(
   x,
   y,
-  vars,
+  select,
   anti,
   by,
   where,
@@ -23,7 +23,7 @@ lazy_semi_join_query <- function(
     y = y,
     anti = anti,
     by = by,
-    vars = vars,
+    select = select,
     where = where,
     group_vars = group_vars,
     order_vars = order_vars,
@@ -50,21 +50,27 @@ check_semi_join_by <- function(by, call) {
 
 #' @export
 op_vars.lazy_semi_join_query <- function(op) {
-  op$vars$name
+  op$select$name
 }
 
 #' @export
 sql_build.lazy_semi_join_query <- function(op, con, ..., sql_options = NULL) {
-  vars_prev <- op_vars(op$x)
-  if (
-    sql_options$use_star &&
-      identical(op$vars$var, op$vars$name) &&
-      identical(op$vars$var, vars_prev)
-  ) {
-    vars <- sql_star(con, op$by$x_as)
-  } else {
-    vars <- set_names(sql_escape_ident(con, op$vars$var), op$vars$name)
-  }
+  # Build tables context for translation: .table1 -> x_as alias
+  tables_context <- list(.table1 = table_path(op$by$x_as))
+
+  # Get table vars for star optimization
+  # table_vars must be a named list where names are the table aliases
+  x_vars <- op_vars(op$x)
+  table_vars <- set_names(list(x_vars), op$by$x_as)
+
+  vars <- translate_join_select(
+    con = con,
+    select = op$select,
+    tables = tables_context,
+    table_vars = table_vars,
+    use_star = sql_options$use_star,
+    qualify_all_columns = sql_options$qualify_all_columns
+  )
 
   # We've introduced aliases to disambiguate the internal and external tables
   # so need to update the existing WHERE clause

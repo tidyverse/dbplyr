@@ -235,7 +235,7 @@
       show_query(out)
     Output
       <SQL>
-      SELECT `df1`.*
+      SELECT `id`
       FROM `df1`
       WHERE NOT EXISTS (
         SELECT 1 FROM (
@@ -416,7 +416,7 @@
       semi_join(lf1, lf2, by = "x", na_matches = "na")
     Output
       <SQL>
-      SELECT "lf1".*
+      SELECT "x"
       FROM "lf1"
       WHERE EXISTS (
         SELECT 1 FROM "lf2"
@@ -484,4 +484,3 @@
       FROM "q01" AS "LHS"
       LEFT JOIN "q01" AS "RHS"
         ON ("LHS"."z" = "RHS"."z")
-

@@ -790,9 +790,11 @@ add_semi_join <- function(
   by$y <- inline_result$by
   where <- inline_result$where
 
-  vars <- tibble(
-    name = op_vars(x),
-    var = x_vars
+  # All columns come from table 1 (the x table)
+  select <- new_lazy_join_select(
+    names = op_vars(x),
+    table_idxs = rep(1L, length(x_vars)),
+    vars = x_vars
   )
   by$na_matches <- na_matches
 
@@ -810,7 +812,7 @@ add_semi_join <- function(
   lazy_semi_join_query(
     x_lq,
     y_lq,
-    vars = vars,
+    select = select,
     anti = anti,
     by = by,
     where = where,
