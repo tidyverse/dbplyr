@@ -6,7 +6,7 @@ lazy_rf_join_query <- function(
   type,
   by,
   table_names,
-  vars,
+  select,
   group_vars = op_grps(x),
   order_vars = op_sort(x),
   frame = op_frame(x),
@@ -21,10 +21,12 @@ lazy_rf_join_query <- function(
   check_character(table_names$name, call = call)
   check_character(table_names$from, call = call)
 
-  check_has_names(vars, c("name", "x", "y"), call = call)
-  check_character(vars$name, call = call)
-  check_character(vars$x, call = call)
-  check_character(vars$y, call = call)
+  check_has_names(
+    select,
+    c("name", "expr", "group_vars", "order_vars", "frame"),
+    call = call
+  )
+  check_character(select$name, call = call)
 
   lazy_query(
     query_type = "rf_join",
@@ -33,7 +35,7 @@ lazy_rf_join_query <- function(
     type = type,
     by = by,
     table_names = table_names,
-    vars = vars,
+    select = select,
     group_vars = group_vars,
     order_vars = order_vars,
     frame = frame
@@ -42,27 +44,31 @@ lazy_rf_join_query <- function(
 
 #' @export
 op_vars.lazy_rf_join_query <- function(op) {
-  op$vars$name
+  op$select$name
 }
 
 #' @export
 sql_build.lazy_rf_join_query <- function(op, con, ..., sql_options = NULL) {
   table_names_out <- generate_join_table_names(op$table_names, con)
 
-  vars_classic <- as.list(op$vars)
-  vars_classic$all_x <- op_vars(op$x)
-  vars_classic$all_y <- op_vars(op$y)
-
   by <- op$by
   by$x_as <- table_names_out[[1]]
   by$y_as <- table_names_out[[2]]
 
-  select <- sql_rf_join_vars(
-    con,
-    type = op$type,
-    vars = vars_classic,
-    x_as = by$x_as,
-    y_as = by$y_as,
+  # Build tables mapping for expression translation
+  # Use indexing to preserve table_path class (as.list strips it)
+  tables <- set_names(
+    list(table_names_out[1], table_names_out[2]),
+    c(".table1", ".table2")
+  )
+  table_vars <- list(op_vars(op$x), op_vars(op$y))
+  table_vars <- set_names(table_vars, table_names_out)
+
+  select <- translate_join_select(
+    con = con,
+    select = op$select,
+    tables = tables,
+    table_vars = table_vars,
     use_star = sql_options$use_star,
     qualify_all_columns = sql_options$qualify_all_columns
   )

@@ -90,10 +90,26 @@ add_select <- function(lazy_query, vars) {
   lazy_query$group_vars <- rename_groups(op_grps(lazy_query), vars)
   lazy_query$order_vars <- rename_order(op_sort(lazy_query), vars)
 
-  is_join <- inherits(lazy_query, "lazy_multi_join_query") ||
-    inherits(lazy_query, "lazy_rf_join_query") ||
-    inherits(lazy_query, "lazy_semi_join_query")
-  if (is_join) {
+  is_multi_join <- inherits(lazy_query, "lazy_multi_join_query")
+  if (is_multi_join) {
+    idx <- vctrs::vec_match(vars, vars_data)
+
+    lazy_query$select <- vctrs::vec_slice(lazy_query$select, idx)
+    lazy_query$select$name <- names(vars)
+    return(lazy_query)
+  }
+
+  is_rf_join <- inherits(lazy_query, "lazy_rf_join_query")
+  if (is_rf_join) {
+    idx <- vctrs::vec_match(vars, vars_data)
+
+    lazy_query$select <- vctrs::vec_slice(lazy_query$select, idx)
+    lazy_query$select$name <- names(vars)
+    return(lazy_query)
+  }
+
+  is_semi_join <- inherits(lazy_query, "lazy_semi_join_query")
+  if (is_semi_join) {
     idx <- vctrs::vec_match(vars, vars_data)
 
     lazy_query$vars <- vctrs::vec_slice(lazy_query$vars, idx)

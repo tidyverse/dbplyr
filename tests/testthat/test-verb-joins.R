@@ -463,21 +463,16 @@ test_that("select() before join is inlined", {
   lf <- lazy_frame(x1 = 10, a = 1, y = 3, .name = "lf1")
   lf2 <- lazy_frame(x2 = 10, b = 2, z = 4, .name = "lf2")
 
-  test_vars <- function(lq, var, table) {
-    expect_equal(lq$vars$name, c("a2", "x", "b"))
-    expect_equal(lq$vars$var, var)
-    expect_equal(lq$vars$table, table)
-
-    expect_equal(lq$joins$by[[1]]$x, "x1")
-    expect_equal(lq$joins$by[[1]]$y, "x2")
-  }
-
   out_left <- left_join(
     lf |> select(a2 = a, x = x1),
     lf2 |> select(x = x2, b),
     by = "x"
   )
-  test_vars(out_left$lazy_query, c("a", "x1", "b"), c(1, 1, 2))
+  lq <- out_left$lazy_query
+  expect_equal(lq$select$name, c("a2", "x", "b"))
+  expect_equal(lq$select$expr, unname(exprs(.table1$a, .table1$x1, .table2$b)))
+  expect_equal(lq$joins$by[[1]]$x, "x1")
+  expect_equal(lq$joins$by[[1]]$y, "x2")
   expect_equal(op_vars(out_left), c("a2", "x", "b"))
   expect_snapshot(out_left)
 
@@ -486,17 +481,20 @@ test_that("select() before join is inlined", {
     lf2 |> select(x = x2, b),
     by = "x"
   )
-  test_vars(out_inner$lazy_query, c("a", "x1", "b"), c(1, 1, 2))
+  lq <- out_inner$lazy_query
+  expect_equal(lq$select$name, c("a2", "x", "b"))
+  expect_equal(lq$select$expr, unname(exprs(.table1$a, .table1$x1, .table2$b)))
 
   out_right <- right_join(
     lf |> select(a2 = a, x = x1),
     lf2 |> select(x = x2, b),
     by = "x"
   )$lazy_query
-
-  expect_equal(out_right$vars$name, c("a2", "x", "b"))
-  expect_equal(out_right$vars$x, c("a", NA, NA))
-  expect_equal(out_right$vars$y, c(NA, "x2", "b"))
+  expect_equal(out_right$select$name, c("a2", "x", "b"))
+  expect_equal(
+    out_right$select$expr,
+    unname(exprs(.table1$a, .table2$x2, .table2$b))
+  )
   expect_equal(out_right$by$x, "x1")
   expect_equal(out_right$by$y, "x2")
 
@@ -505,19 +503,27 @@ test_that("select() before join is inlined", {
     lf2 |> select(x = x2, b),
     by = "x"
   )
-  vars <- out_full$lazy_query$vars
-  expect_equal(vars$name, c("a2", "x", "b"))
-  expect_equal(vars$x, c("a", "x1", NA))
-  expect_equal(vars$y, c(NA, "x2", "b"))
+  lq <- out_full$lazy_query
+  expect_equal(lq$select$name, c("a2", "x", "b"))
+  expect_equal(
+    lq$select$expr,
+    unname(exprs(
+      .table1$a,
+      coalesce(.table1$x1, .table2$x2),
+      .table2$b
+    ))
+  )
 
   out_cross <- cross_join(
     lf |> select(a2 = a, x = x1),
     lf2 |> select(x = x2, b)
   )
-  vars <- out_cross$lazy_query$vars
-  expect_equal(vars$name, c("a2", "x.x", "x.y", "b"))
-  expect_equal(vars$var, c("a", "x1", "x2", "b"))
-  expect_equal(vars$table, c(1, 1, 2, 2))
+  lq <- out_cross$lazy_query
+  expect_equal(lq$select$name, c("a2", "x.x", "x.y", "b"))
+  expect_equal(
+    lq$select$expr,
+    unname(exprs(.table1$a, .table1$x1, .table2$x2, .table2$b))
+  )
 
   # attributes like `group`, `sort`, `frame` is kept
   lf <- lazy_frame(x = 10, a = 1, b = 1, .name = "lf1")
@@ -548,8 +554,8 @@ test_that("select() before join works for tables with same column name", {
 
   lq <- out$lazy_query
   expect_equal(op_vars(lq), c("id1", "x", "id2"))
-  expect_equal(lq$vars$var, c("id", "x", "id"))
-  expect_equal(lq$vars$table, c(1, 1, 2))
+  expect_equal(lq$select$name, c("id1", "x", "id2"))
+  expect_equal(lq$select$expr, unname(exprs(.table1$id, .table1$x, .table2$id)))
 })
 
 test_that("named by works in combination with inlined select", {
@@ -564,8 +570,8 @@ test_that("named by works in combination with inlined select", {
 
   lq <- out$lazy_query
   expect_equal(op_vars(lq), c("id_x", "x.x"))
-  expect_equal(lq$vars$var, c("id_x", "x"))
-  expect_equal(lq$vars$table, c(1, 1))
+  expect_equal(lq$select$name, c("id_x", "x.x"))
+  expect_equal(lq$select$expr, unname(exprs(.table1$id_x, .table1$x)))
   expect_equal(lq$joins$by[[1]]$x, c("id_x", "x"))
   expect_equal(lq$joins$by[[1]]$y, c("id_y", "x"))
 })
@@ -597,8 +603,8 @@ test_that("suffix works in combination with inlined select", {
 
   lq <- out$lazy_query
   expect_equal(op_vars(lq), c("id", "x2.x", "x2.y"))
-  expect_equal(lq$vars$var, c("id", "x", "x"))
-  expect_equal(lq$vars$table, c(1L, 1L, 2L))
+  expect_equal(lq$select$name, c("id", "x2.x", "x2.y"))
+  expect_equal(lq$select$expr, unname(exprs(.table1$id, .table1$x, .table2$x)))
 })
 
 test_that("select() before join is not inlined when using `sql_on`", {
@@ -614,8 +620,11 @@ test_that("select() before join is not inlined when using `sql_on`", {
   lq <- out$lazy_query
   expect_s3_class(lq$x, "lazy_select_query")
   expect_s3_class(lq$joins$table[[1]], "lazy_select_query")
-  expect_equal(lq$vars$var, c("a2", "x", "x", "b"))
-  expect_equal(lq$vars$table, c(1L, 1L, 2L, 2L))
+  expect_equal(lq$select$name, c("a2", "x.x", "x.y", "b"))
+  expect_equal(
+    lq$select$expr,
+    unname(exprs(.table1$a2, .table1$x, .table2$x, .table2$b))
+  )
 })
 
 test_that("select() before semi_join is inlined", {
@@ -796,9 +805,11 @@ test_that("multiple joins create a single query", {
       from = "name"
     )
   )
-  expect_equal(lq$vars$name, c("x", "a", "b.x", "b.y"))
-  expect_equal(lq$vars$table, c(1L, 1L, 2L, 3L))
-  expect_equal(lq$vars$var, c("x", "a", "b", "b"))
+  expect_equal(lq$select$name, c("x", "a", "b.x", "b.y"))
+  expect_equal(
+    lq$select$expr,
+    unname(exprs(.table1$x, .table1$a, .table2$b, .table3$b))
+  )
 
   expect_snapshot(out)
 })
@@ -822,10 +833,18 @@ test_that("can join 4 tables with same column #1101", {
     inner_join(lf3, by = "x") |>
     inner_join(lf4, by = "x")
 
-  join_vars <- out$lazy_query$vars
-  expect_equal(join_vars$name, c("x", "a", "b", "c", "a4"))
-  expect_equal(join_vars$table, c(1L, 1L, 2L, 3L, 4L))
-  expect_equal(join_vars$var, c("x", "a", "b", "c", "a"))
+  lq <- out$lazy_query
+  expect_equal(lq$select$name, c("x", "a", "b", "c", "a4"))
+  expect_equal(
+    lq$select$expr,
+    unname(exprs(
+      .table1$x,
+      .table1$a,
+      .table2$b,
+      .table3$c,
+      .table4$a
+    ))
+  )
   # `lf4`.`a` AS `a4`
   expect_snapshot(remote_query(out))
 })
@@ -1030,10 +1049,19 @@ test_that("by default, `by` columns omitted from `y` with equi-conditions, but n
     by = join_by(x == y, y > z),
     keep = NULL
   )
-  vars <- out$lazy_query$vars
-  expect_equal(vars$name, c("x", "y", "z.x", "x.y", "z.y"))
-  expect_equal(vars$x, c(NA, "y", "z", NA, NA))
-  expect_equal(vars$y, c("y", NA, NA, "x", "z"))
+  lq <- out$lazy_query
+  expect_equal(lq$select$name, c("x", "y", "z.x", "x.y", "z.y"))
+  # x comes from y (right table), y and z.x from left, x.y and z.y from right
+  expect_equal(
+    lq$select$expr,
+    unname(exprs(
+      .table2$y,
+      .table1$y,
+      .table1$z,
+      .table2$x,
+      .table2$z
+    ))
+  )
 
   # unless specifically requested with `keep = TRUE`
   lf <- lazy_frame(x = 1, y = 1, z = 1)
@@ -1044,10 +1072,19 @@ test_that("by default, `by` columns omitted from `y` with equi-conditions, but n
     by = join_by(x == y, y > z),
     keep = TRUE
   )
-  vars <- out$lazy_query$vars
-  expect_equal(vars$name, c("x.x", "y.x", "z.x", "x.y", "y.y", "z.y"))
-  expect_equal(vars$x, c("x", "y", "z", NA, NA, NA))
-  expect_equal(vars$y, c(NA, NA, NA, "x", "y", "z"))
+  lq <- out$lazy_query
+  expect_equal(lq$select$name, c("x.x", "y.x", "z.x", "x.y", "y.y", "z.y"))
+  expect_equal(
+    lq$select$expr,
+    unname(exprs(
+      .table1$x,
+      .table1$y,
+      .table1$z,
+      .table2$x,
+      .table2$y,
+      .table2$z
+    ))
+  )
 })
 
 test_that("can translate join conditions", {

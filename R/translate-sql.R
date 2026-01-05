@@ -92,7 +92,8 @@ translate_sql_ <- function(
   vars_order = NULL,
   vars_frame = NULL,
   window = TRUE,
-  context = list()
+  context = list(),
+  tables = NULL
 ) {
   check_con(con)
 
@@ -132,7 +133,13 @@ translate_sql_ <- function(
     } else if (is_atomic(get_expr(x))) {
       escape(get_expr(x), con = con)
     } else {
-      mask <- sql_data_mask(x, variant, con = con, window = window)
+      mask <- sql_data_mask(
+        x,
+        variant,
+        con = con,
+        window = window,
+        tables = tables
+      )
       escape(eval_tidy(x, mask), con = con)
     }
   })
@@ -145,7 +152,8 @@ sql_data_mask <- function(
   variant,
   con,
   window = FALSE,
-  strict = getOption("dplyr.strict_sql", FALSE)
+  strict = getOption("dplyr.strict_sql", FALSE),
+  tables = NULL
 ) {
   stopifnot(is.sql_variant(variant))
 
@@ -194,6 +202,13 @@ sql_data_mask <- function(
   names <- all_names(expr)
   idents <- set_names(lapply(names, ident), names)
   name_env <- list2env(idents, parent = special_calls2)
+
+  # Inject table bindings (e.g., .table1, .table2) as idents for join contexts
+  if (!is.null(tables)) {
+    for (nm in names(tables)) {
+      name_env[[nm]] <- ident(table_path_name(tables[[nm]], con))
+    }
+  }
 
   new_data_mask(name_env, top_env)
 }

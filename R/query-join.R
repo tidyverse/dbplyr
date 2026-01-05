@@ -4,7 +4,7 @@ lazy_multi_join_query <- function(
   x,
   joins,
   table_names,
-  vars,
+  select,
   distinct = FALSE,
   group_vars = op_grps(x),
   order_vars = op_sort(x),
@@ -20,17 +20,20 @@ lazy_multi_join_query <- function(
   check_character(table_names$name, call = call)
   check_character(table_names$from, call = call)
 
-  check_has_names(vars, c("name", "table", "var"), call = call)
-  check_character(vars$name, call = call)
-  check_integer(vars$table, call = call)
-  check_character(vars$var, call = call)
+  check_has_names(
+    select,
+    c("name", "expr", "group_vars", "order_vars", "frame"),
+    call = call
+  )
+  check_character(select$name, call = call)
+  check_list(select$expr, call = call)
 
   lazy_query(
     query_type = "multi_join",
     x = x,
     joins = joins,
     table_names = table_names,
-    vars = vars,
+    select = select,
     distinct = distinct,
     group_vars = group_vars,
     order_vars = order_vars,
@@ -40,19 +43,28 @@ lazy_multi_join_query <- function(
 
 #' @export
 op_vars.lazy_multi_join_query <- function(op) {
-  op$vars$name
+  op$select$name
 }
 
 #' @export
 sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
   table_names_out <- generate_join_table_names(op$table_names, con)
 
+  # Build tables mapping: .table1 -> alias1, .table2 -> alias2
+  # Use lapply with indexing to preserve table_path class (as.list strips it)
+  tables_context <- set_names(
+    lapply(seq_along(table_names_out), function(i) table_names_out[i]),
+    paste0(".table", seq_along(table_names_out))
+  )
+
   tables <- set_names(c(list(op$x), op$joins$table), table_names_out)
   table_vars <- purrr::map(tables, op_vars)
-  select_sql <- sql_multi_join_select(
-    con,
-    op$vars,
-    table_vars,
+
+  select_sql <- translate_join_select(
+    con = con,
+    select = op$select,
+    tables = tables_context,
+    table_vars = table_vars,
     use_star = sql_options$use_star,
     qualify_all_columns = sql_options$qualify_all_columns
   )
@@ -396,4 +408,147 @@ sql_table_prefix <- function(con, table, var) {
 sql_star <- function(con, table) {
   table <- table_path_name(table, con)
   sql_glue2(con, "{.id table}.*")
+}
+
+# Translate join select expressions with table context --------------------------
+
+# Try to extract table index and variable from a simple .tableN$var expression
+# Returns list(table = N, var = "varname") or NULL if not a simple reference
+parse_join_expr <- function(expr) {
+  if (is_quosure(expr)) {
+    expr <- quo_get_expr(expr)
+  }
+
+  # Check for .tableN$var pattern
+  if (!is_call(expr, "$")) {
+    return(NULL)
+  }
+
+  table_sym <- expr[[2]]
+  var_sym <- expr[[3]]
+
+  if (!is_symbol(table_sym) || !is_symbol(var_sym)) {
+    return(NULL)
+  }
+
+  table_name <- as_string(table_sym)
+  if (!grepl("^\\.table[0-9]+$", table_name)) {
+    return(NULL)
+  }
+
+  table_idx <- as.integer(sub("^\\.table", "", table_name))
+  var_name <- as_string(var_sym)
+
+  list(table = table_idx, var = var_name)
+}
+
+# Translate select expressions for joins, supporting star optimization
+translate_join_select <- function(
+  con,
+  select,
+  tables,
+  table_vars,
+  use_star = TRUE,
+  qualify_all_columns = FALSE
+) {
+  n_tables <- length(tables)
+  table_paths <- table_path(names(table_vars))
+
+  # Parse all expressions to extract table/var info
+  parsed <- purrr::map(select$expr, parse_join_expr)
+
+  # Check which expressions are simple table references
+  is_simple <- !purrr::map_lgl(parsed, is.null)
+
+  # For star optimization, we need to know which table each simple expr comes from
+  all_vars <- tolower(unlist(table_vars, use.names = FALSE))
+  if (qualify_all_columns) {
+    duplicated_vars <- unique(all_vars)
+  } else {
+    duplicated_vars <- all_vars[vctrs::vec_duplicate_detect(all_vars)]
+    duplicated_vars <- unique(duplicated_vars)
+  }
+
+  out <- rep_named(select$name, list())
+
+  # Process table by table for star optimization
+  for (i in seq_len(n_tables)) {
+    all_vars_i <- table_vars[[i]]
+
+    # Find expressions from this table
+    expr_idxs <- which(purrr::map_lgl(parsed, \(p) !is.null(p) && p$table == i))
+
+    if (length(expr_idxs) == 0) {
+      next
+    }
+
+    used_vars <- purrr::map_chr(parsed[expr_idxs], "var")
+    out_vars <- select$name[expr_idxs]
+
+    if (
+      use_star &&
+        all(is_simple[expr_idxs]) &&
+        join_can_use_star(all_vars_i, used_vars, out_vars, expr_idxs)
+    ) {
+      # Use star optimization
+      id <- expr_idxs[[1]]
+      out[[id]] <- sql_star(con, table_paths[i])
+      names(out)[id] <- ""
+    } else {
+      # Translate each expression individually
+      for (idx in expr_idxs) {
+        p <- parsed[[idx]]
+        out[[idx]] <- sql_multi_join_var(
+          con,
+          p$var,
+          table_paths[[i]],
+          duplicated_vars
+        )
+      }
+    }
+  }
+
+  # Handle complex expressions (not simple table references)
+  complex_idxs <- which(!is_simple)
+  if (length(complex_idxs) > 0) {
+    for (idx in complex_idxs) {
+      out[[idx]] <- translate_sql_(
+        dots = select$expr[idx],
+        con = con,
+        tables = tables,
+        context = list(clause = "SELECT")
+      )
+    }
+  }
+
+  names_to_as(con, unlist(out))
+}
+
+
+# Join select helpers ------------------------------------------------------
+
+# Create a table-qualified column expression like .table1$x
+join_select_expr <- function(table_idx, var) {
+  tbl_sym <- sym(paste0(".table", table_idx))
+  var_sym <- sym(var)
+  call("$", tbl_sym, var_sym)
+}
+
+# Create a COALESCE expression for full joins: coalesce(.table1$x, .table2$y)
+join_select_coalesce <- function(var_x, var_y) {
+  x_expr <- call("$", sym(".table1"), sym(var_x))
+  y_expr <- call("$", sym(".table2"), sym(var_y))
+  call("coalesce", x_expr, y_expr)
+}
+
+# Create a lazy select tibble from table indices and variable names
+new_lazy_join_select <- function(names, table_idxs, vars) {
+  exprs <- purrr::map2(table_idxs, vars, join_select_expr)
+  tibble(
+    name = names,
+    expr = exprs,
+    group_vars = rep_along(exprs, list(character())),
+    order_vars = rep_along(exprs, list(NULL)),
+    frame = rep_along(exprs, list(NULL))
+  )
 }

@@ -415,7 +415,7 @@ add_join <- function(
   by$y <- inline_result$by
 
   if (type %in% c("full", "right")) {
-    vars <- rf_join_vars(
+    select <- rf_join_select(
       x_vars = x_vars,
       y_vars = y_vars,
       vars_info = vars,
@@ -439,14 +439,14 @@ add_join <- function(
         na_matches = na_matches
       ),
       table_names = vctrs::vec_rbind(table_names_x, table_names_y),
-      vars = vars
+      select = select
     )
 
     return(out)
   }
 
   can_inline <- can_inline_join(x$lazy_query, join_alias, type)
-  vars <- multi_join_vars(
+  select <- multi_join_select(
     x_lq = x_lq,
     x_vars = x_vars,
     y_vars = y_vars,
@@ -472,7 +472,7 @@ add_join <- function(
       x = x_lq,
       joins = joins_data,
       table_names = vctrs::vec_rbind(table_names_x, table_names_y),
-      vars = vars
+      select = select
     )
     return(out)
   }
@@ -485,7 +485,7 @@ add_join <- function(
 
   x_lq$joins <- vctrs::vec_rbind(x_lq$joins, joins_data)
   x_lq$table_names <- vctrs::vec_rbind(x_lq$table_names, table_names_y)
-  x_lq$vars <- vars
+  x_lq$select <- select
 
   x_lq
 }
@@ -593,7 +593,7 @@ can_inline_join <- function(x_lq, join_alias, type) {
   TRUE
 }
 
-multi_join_vars <- function(
+multi_join_select <- function(
   x_lq,
   x_vars,
   y_vars,
@@ -602,58 +602,81 @@ multi_join_vars <- function(
   error_call
 ) {
   if (can_inline) {
-    x_join_vars <- vctrs::vec_slice(x_lq$vars, vars_info$x$out)
-    x_join_vars$name <- names(vars_info$x$out)
+    x_join_select <- vctrs::vec_slice(x_lq$select, vars_info$x$out)
+    x_join_select$name <- names(vars_info$x$out)
     table_id <- vctrs::vec_size(x_lq$table_names) + 1L
   } else {
-    x_join_vars <- tibble(
-      name = names(vars_info$x$out),
-      table = 1L,
-      var = vctrs::vec_slice(x_vars, vars_info$x$out)
+    x_out_vars <- vctrs::vec_slice(x_vars, vars_info$x$out)
+    x_join_select <- new_lazy_join_select(
+      names = names(vars_info$x$out),
+      table_idxs = rep(1L, length(x_out_vars)),
+      vars = x_out_vars
     )
     table_id <- 2L
   }
 
-  y_join_vars <- tibble(
-    name = names(vars_info$y$out),
-    table = table_id,
-    var = vctrs::vec_slice(y_vars, vars_info$y$out)
+  y_out_vars <- vctrs::vec_slice(y_vars, vars_info$y$out)
+  y_join_select <- new_lazy_join_select(
+    names = names(vars_info$y$out),
+    table_idxs = rep(table_id, length(y_out_vars)),
+    vars = y_out_vars
   )
 
-  vctrs::vec_rbind(x_join_vars, y_join_vars, .error_call = error_call)
+  vctrs::vec_rbind(x_join_select, y_join_select, .error_call = error_call)
 }
 
-rf_join_vars <- function(
+rf_join_select <- function(
   x_vars,
   y_vars,
   vars_info,
   keep,
   condition,
   by_y,
-  type,
-  call
+  type
 ) {
-  x_join_vars <- tibble(
-    name = names(vars_info$x$out),
-    x = vctrs::vec_slice(x_vars, vars_info$x$out),
-    y = NA_character_
-  )
-
-  y_join_vars <- tibble(
-    name = names(vars_info$y$out),
-    x = NA_character_,
-    y = vctrs::vec_slice(y_vars, vars_info$y$out)
-  )
+  # Build the old-style vars tibble first
+  x_col <- vctrs::vec_slice(x_vars, vars_info$x$out)
+  y_col <- rep_along(x_col, NA_character_)
 
   keep <- keep %||% (condition != "==")
-  idx <- vars_info$x$key[!keep]
-  if (type == "right") {
-    # `x`: non-join variables; `y`: all variables
-    x_join_vars$x[idx] <- NA
-  }
-  x_join_vars$y[idx] <- by_y[!keep]
+  key_idx <- vars_info$x$key[!keep]
 
-  vctrs::vec_rbind(x_join_vars, y_join_vars)
+  if (type == "right") {
+    # For right joins, key columns come from y, not x
+    x_col[key_idx] <- NA_character_
+  }
+  y_col[key_idx] <- by_y[!keep]
+
+  x_names <- names(vars_info$x$out)
+  y_names <- names(vars_info$y$out)
+  y_vars_out <- vctrs::vec_slice(y_vars, vars_info$y$out)
+
+  # Build expressions for each output column
+  x_exprs <- purrr::map2(x_col, y_col, function(x, y) {
+    if (!is.na(x) && !is.na(y)) {
+      # Both present: COALESCE for full joins
+      join_select_coalesce(x, y)
+    } else if (!is.na(x)) {
+      join_select_expr(1L, x)
+    } else {
+      join_select_expr(2L, y)
+    }
+  })
+
+  y_exprs <- purrr::map(y_vars_out, function(var) {
+    join_select_expr(2L, var)
+  })
+
+  all_names <- c(x_names, y_names)
+  all_exprs <- c(x_exprs, y_exprs)
+
+  tibble(
+    name = all_names,
+    expr = all_exprs,
+    group_vars = rep_along(all_exprs, list(character())),
+    order_vars = rep_along(all_exprs, list(NULL)),
+    frame = rep_along(all_exprs, list(NULL))
+  )
 }
 
 
@@ -696,11 +719,14 @@ join_prepare_by <- function(
 
 new_joins_data <- function(x_lq, y_lq, can_inline, type, by, na_matches) {
   if (can_inline) {
-    idx <- vctrs::vec_match(by$x, x_lq$vars$name)
+    idx <- vctrs::vec_match(by$x, x_lq$select$name)
+
+    # Extract table index and variable name from expressions
+    parsed <- purrr::map(x_lq$select$expr[idx], parse_join_expr)
 
     # need to fix `by$x` in case it was renamed in an inlined select
-    by$x <- x_lq$vars$var[idx]
-    by_x_table_id <- x_lq$vars$table[idx]
+    by$x <- purrr::map_chr(parsed, "var")
+    by_x_table_id <- purrr::map_int(parsed, "table")
   } else {
     by_x_table_id <- rep_along(by$x, 1L)
   }
