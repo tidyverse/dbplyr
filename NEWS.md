@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* `filter()` after `left_join()` or `inner_join()` no longer creates a subquery (#722).
 * PostgreSQL: uses improved translation for `seconds()`, `minutes()`, `hours()`, `days()`, `weeks()`, `months()`, and `years()`.
 * `escape_ansi()` has been removed. Use `escape(x, con = simulate_dbi())` instead.
 * `summarise()` now reports grouping immediately, rather than when you summarise.
