@@ -107,6 +107,7 @@ Collate:
     'memdb.R'
     'optimise-utils.R'
     'progress.R'
+    'query-base.R'
     'query-join.R'
     'query-rf-join.R'
     'query-select.R'
