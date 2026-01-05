@@ -216,6 +216,10 @@ base_scalar <- sql_translator(
   # Impala - https://impala.apache.org/docs/build/html/topics/impala_bigint.html
   as.integer64 = sql_cast("BIGINT"),
   as.blob = sql_cast("BLOB"),
+  as = function(x, type) {
+    check_string(type)
+    sql_glue("CAST({x} AS {.sql type})")
+  },
 
   c = function(...) {
     c(...)
