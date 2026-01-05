@@ -72,17 +72,25 @@ base_scalar <- sql_translator(
     }
   },
 
-  `[[` = function(x, i) {
-    # `x` can be a table, column or even an expression (e.g. for json)
-    i <- enexpr(i)
-    if (is.character(i)) {
-      i <- ident(i)
-      sql_glue("{x}.{i}")
-    } else if (is.numeric(i)) {
-      i <- as.integer(i)
-      sql_glue("{x}[{i}]")
+  `[[` = function(x, i, j = NULL) {
+    # Handle .tbls[[table_idx, "var"]] for join contexts
+    # x is a list of idents when called as .tbls[[i, "var"]]
+    if (is.list(x) && !is.null(j)) {
+      table_alias <- x[[i]]
+      j <- ident(j)
+      sql_glue("{table_alias}.{j}")
     } else {
-      cli_abort("Can only index with strings and numbers")
+      # `x` can be a table, column or even an expression (e.g. for json)
+      i <- enexpr(i)
+      if (is.character(i)) {
+        i <- ident(i)
+        sql_glue("{x}.{i}")
+      } else if (is.numeric(i)) {
+        i <- as.integer(i)
+        sql_glue("{x}[{i}]")
+      } else {
+        cli_abort("Can only index with strings and numbers")
+      }
     }
   },
   `[` = function(x, i) {

@@ -50,12 +50,9 @@ op_vars.lazy_multi_join_query <- function(op) {
 sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
   table_names_out <- generate_join_table_names(op$table_names, con)
 
-  # Build tables mapping: .table1 -> alias1, .table2 -> alias2
+  # Build tables list for translation context
   # Use lapply with indexing to preserve table_path class (as.list strips it)
-  tables_context <- set_names(
-    lapply(seq_along(table_names_out), function(i) table_names_out[i]),
-    paste0(".table", seq_along(table_names_out))
-  )
+  tables_context <- lapply(seq_along(table_names_out), function(i) table_names_out[i])
 
   tables <- set_names(c(list(op$x), op$joins$table), table_names_out)
   table_vars <- purrr::map(tables, op_vars)
@@ -412,34 +409,30 @@ sql_star <- function(con, table) {
 
 # Translate join select expressions with table context --------------------------
 
-# Try to extract table index and variable from a simple .tableN$var expression
-# Returns list(table = N, var = "varname") or NULL if not a simple reference
+# Try to extract table index and variable from a .tbls[[i, "var"]] expression
+# Returns list(table = i, var = "var") or NULL if not a simple reference
 parse_join_expr <- function(expr) {
   if (is_quosure(expr)) {
     expr <- quo_get_expr(expr)
   }
 
-  # Check for .tableN$var pattern
-  if (!is_call(expr, "$")) {
+  # Check for .tbls[[i, "var"]] pattern
+  if (!is_call(expr, "[[") || length(expr) != 4) {
     return(NULL)
   }
 
-  table_sym <- expr[[2]]
-  var_sym <- expr[[3]]
-
-  if (!is_symbol(table_sym) || !is_symbol(var_sym)) {
+  if (!identical(expr[[2]], sym(".tbls"))) {
     return(NULL)
   }
 
-  table_name <- as_string(table_sym)
-  if (!grepl("^\\.table[0-9]+$", table_name)) {
+  table_idx <- expr[[3]]
+  var_name <- expr[[4]]
+
+  if (!is.numeric(table_idx) || !is.character(var_name)) {
     return(NULL)
   }
 
-  table_idx <- as.integer(sub("^\\.table", "", table_name))
-  var_name <- as_string(var_sym)
-
-  list(table = table_idx, var = var_name)
+  list(table = as.integer(table_idx), var = var_name)
 }
 
 # Translate select expressions for joins, supporting star optimization

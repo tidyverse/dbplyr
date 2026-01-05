@@ -983,18 +983,14 @@ check_join_unmatched <- function(unmatched, by, call = caller_env()) {
 
 # Join select helpers ------------------------------------------------------
 
-# Create a table-qualified column expression like .table1$x
+# Create a table-qualified column expression: .tbls[[1, "var"]]
 join_select_expr <- function(table_idx, var) {
-  tbl_sym <- sym(paste0(".table", table_idx))
-  var_sym <- sym(var)
-  call("$", tbl_sym, var_sym)
+  call("[[", sym(".tbls"), table_idx, var)
 }
 
-# Create a COALESCE expression for full joins: coalesce(.table1$x, .table2$y)
+# Create a COALESCE expression for full joins: coalesce(.tbls[[1, "x"]], .tbls[[2, "y"]])
 join_select_coalesce <- function(var_x, var_y) {
-  x_expr <- call("$", sym(".table1"), sym(var_x))
-  y_expr <- call("$", sym(".table2"), sym(var_y))
-  call("coalesce", x_expr, y_expr)
+  call("coalesce", join_select_expr(1L, var_x), join_select_expr(2L, var_y))
 }
 
 # Create a lazy select tibble from table indices and variable names

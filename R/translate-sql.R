@@ -203,11 +203,10 @@ sql_data_mask <- function(
   idents <- set_names(lapply(names, ident), names)
   name_env <- list2env(idents, parent = special_calls2)
 
-  # Inject table bindings (e.g., .table1, .table2) as idents for join contexts
+  # Inject .tbls as list of idents for join contexts
   if (!is.null(tables)) {
-    for (nm in names(tables)) {
-      name_env[[nm]] <- ident(table_path_name(tables[[nm]], con))
-    }
+    tbls_list <- lapply(tables, \(tbl) ident(table_path_name(tbl, con)))
+    name_env[[".tbls"]] <- tbls_list
   }
 
   new_data_mask(name_env, top_env)

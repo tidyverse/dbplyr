@@ -55,8 +55,8 @@ op_vars.lazy_semi_join_query <- function(op) {
 
 #' @export
 sql_build.lazy_semi_join_query <- function(op, con, ..., sql_options = NULL) {
-  # Build tables context for translation: .table1 -> x_as alias
-  tables_context <- list(.table1 = table_path(op$by$x_as))
+  # Build tables list for translation context
+  tables_context <- list(table_path(op$by$x_as))
 
   # Get table vars for star optimization
   # table_vars must be a named list where names are the table aliases

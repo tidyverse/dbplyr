@@ -55,12 +55,8 @@ sql_build.lazy_rf_join_query <- function(op, con, ..., sql_options = NULL) {
   by$x_as <- table_names_out[[1]]
   by$y_as <- table_names_out[[2]]
 
-  # Build tables mapping for expression translation
-  # Use indexing to preserve table_path class (as.list strips it)
-  tables <- set_names(
-    list(table_names_out[1], table_names_out[2]),
-    c(".table1", ".table2")
-  )
+  # Build tables list for translation context
+  tables <- list(table_names_out[1], table_names_out[2])
   table_vars <- list(op_vars(op$x), op_vars(op$y))
   table_vars <- set_names(table_vars, table_names_out)
 
