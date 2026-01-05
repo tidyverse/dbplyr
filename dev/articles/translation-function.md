@@ -252,6 +252,16 @@ lf |> transmute(x = as.integer(y), y = as.character(x))
 - date/time: [`as.Date()`](https://rdrr.io/r/base/as.Date.html),
   [`as.POSIXct()`](https://rdrr.io/r/base/as.POSIXlt.html)
 
+For database-specific types not covered by these functions, use
+[`as()`](https://rdrr.io/r/methods/as.html):
+
+``` r
+lf |> transmute(x = as(x, "TIME"), y = as(y, "DECIMAL(10, 2)"))
+#> <SQL>
+#> SELECT CAST("x" AS TIME) AS "x", CAST("y" AS DECIMAL(10, 2)) AS "y"
+#> FROM "df"
+```
+
 ### `NULL`/`NA` handling
 
 - [`is.na()`](https://rdrr.io/r/base/NA.html),

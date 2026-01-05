@@ -2,6 +2,10 @@
 
 ## dbplyr (development version)
 
+- `as(x, "type")` is now translated to `CAST(x AS type)`, allowing you
+  to cast to arbitrary database types not covered by the standard
+  `as.*()` functions
+  ([\#1729](https://github.com/tidyverse/dbplyr/issues/1729)).
 - [`filter()`](https://dplyr.tidyverse.org/reference/filter.html) after
   [`left_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html)
   or
