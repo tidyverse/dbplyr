@@ -132,6 +132,12 @@ lf |> transmute(x = as.integer(y), y = as.character(x))
 * logical: `as.logical()`
 * date/time: `as.Date()`, `as.POSIXct()`
 
+For database-specific types not covered by these functions, use `as()`:
+
+```{r}
+lf |> transmute(x = as(x, "TIME"), y = as(y, "DECIMAL(10, 2)"))
+```
+
 ### `NULL`/`NA` handling
 
 * `is.na()`, `is.null()`: test for `NULL`.

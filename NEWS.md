@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `as(x, "type")` is now translated to `CAST(x AS type)`, allowing you to cast
+  to arbitrary database types not covered by the standard `as.*()` functions
+  (#1729).
 * `filter()` after `left_join()` or `inner_join()` no longer creates a subquery (#722).
 * PostgreSQL: uses improved translation for `seconds()`, `minutes()`, `hours()`, `days()`, `weeks()`, `months()`, and `years()`.
 * `escape_ansi()` has been removed. Use `escape(x, con = simulate_dbi())` instead.

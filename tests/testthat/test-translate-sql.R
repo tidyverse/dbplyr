@@ -140,6 +140,17 @@ test_that("casts as expected", {
   expect_translation(con, as.Date(x), "CAST(\"x\" AS DATE)")
 })
 
+test_that("as() translates to CAST", {
+  con <- simulate_dbi()
+  expect_translation(con, as(x, "TIME"), "CAST(\"x\" AS TIME)")
+  expect_translation(
+    con,
+    as(x, "DECIMAL(10, 2)"),
+    "CAST(\"x\" AS DECIMAL(10, 2))"
+  )
+  expect_snapshot(error = TRUE, translate_sql(as(x, 1L), con = con))
+})
+
 # numeric -----------------------------------------------------------------
 
 test_that("hypergeometric functions use manual calculation", {
