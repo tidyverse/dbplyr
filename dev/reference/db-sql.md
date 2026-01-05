@@ -126,6 +126,7 @@ sql_query_multi_join(
   table_names,
   by_list,
   select,
+  where = NULL,
   ...,
   distinct = FALSE,
   lvl = 0

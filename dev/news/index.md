@@ -2,6 +2,12 @@
 
 ## dbplyr (development version)
 
+- [`filter()`](https://dplyr.tidyverse.org/reference/filter.html) after
+  [`left_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html)
+  or
+  [`inner_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html)
+  no longer creates a subquery
+  ([\#722](https://github.com/tidyverse/dbplyr/issues/722)).
 - PostgreSQL: uses improved translation for `seconds()`, `minutes()`,
   `hours()`, `days()`, `weeks()`,
   [`months()`](https://rdrr.io/r/base/weekday.POSIXt.html), and
