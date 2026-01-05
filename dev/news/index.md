@@ -2,6 +2,9 @@
 
 ## dbplyr (development version)
 
+- [`do()`](https://dplyr.tidyverse.org/reference/do.html) is deprecated.
+  Use [`collect()`](https://dplyr.tidyverse.org/reference/compute.html)
+  then your favourite tidyverse functions instead.
 - `as(x, "type")` is now translated to `CAST(x AS type)`, allowing you
   to cast to arbitrary database types not covered by the standard
   `as.*()` functions

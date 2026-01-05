@@ -1,6 +1,12 @@
 # Perform arbitrary computation on remote backend
 
-Perform arbitrary computation on remote backend
+**\[deprecated\]**
+
+[`do()`](https://dplyr.tidyverse.org/reference/do.html) is deprecated.
+Instead of [`do()`](https://dplyr.tidyverse.org/reference/do.html) you
+should use
+[`dplyr::collect()`](https://dplyr.tidyverse.org/reference/compute.html)
+and then your favourite combination of purrr and dplyr functions.
 
 ## Usage
 

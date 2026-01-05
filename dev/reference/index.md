@@ -62,7 +62,7 @@
 - [`summarise(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/summarise.tbl_lazy.md)
   : Summarise each group to one row
 - [`do(`*`<tbl_sql>`*`)`](https://dbplyr.tidyverse.org/dev/reference/do.tbl_sql.md)
-  : Perform arbitrary computation on remote backend
+  **\[deprecated\]** : Perform arbitrary computation on remote backend
 
 ### Verbs that work with multiple tables
 

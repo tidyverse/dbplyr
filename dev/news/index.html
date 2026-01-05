@@ -57,6 +57,8 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
 <ul><li>
+<code><a href="https://dplyr.tidyverse.org/reference/do.html" class="external-link">do()</a></code> is deprecated. Use <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect()</a></code> then your favourite tidyverse functions instead.</li>
+<li>
 <code>as(x, "type")</code> is now translated to <code>CAST(x AS type)</code>, allowing you to cast to arbitrary database types not covered by the standard <code>as.*()</code> functions (<a href="https://github.com/tidyverse/dbplyr/issues/1729" class="external-link">#1729</a>).</li>
 <li>
 <code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter()</a></code> after <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join()</a></code> or <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join()</a></code> no longer creates a subquery (<a href="https://github.com/tidyverse/dbplyr/issues/722" class="external-link">#722</a>).</li>
