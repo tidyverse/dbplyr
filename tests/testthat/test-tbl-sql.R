@@ -1,16 +1,14 @@
 test_that("tbl_sql() works with string argument", {
   withr::local_options(lifecycle_verbosity = "quiet")
 
-  name <- unclass(unique_table_name())
-  df <- memdb_frame(a = 1, .name = name)
-
-  expect_equal(collect(tbl_sql("sqlite", df$src, name)), collect(df))
+  db <- local_memdb_frame("db", a = 1)
+  expect_equal(collect(tbl_sql("sqlite", src_dbi(memdb()), "db")), collect(db))
 })
 
 test_that("tbl_sql() respects subclass argument", {
   withr::local_options(lifecycle_verbosity = "quiet")
 
-  x <- tbl_sql("foo", src_memdb(), "abc", vars = letters)
+  x <- tbl_sql("foo", src_dbi(memdb()), "abc", vars = letters)
   expect_s3_class(x, "tbl_foo")
 })
 
@@ -27,7 +25,7 @@ test_that("same_src distinguishes srcs", {
 })
 
 test_that("has nice print method", {
-  mf <- copy_to_test("sqlite", tibble(x = 1, y = 1), name = "tbl_sum_test")
+  mf <- local_memdb_frame("tbl_sum_test", x = 1, y = 1)
   expect_snapshot(mf, transform = scrub_sqlite_version)
 
   out2 <- mf |> group_by(x, y) |> arrange(x) |> mutate(z = x + y)
@@ -38,7 +36,7 @@ test_that("has nice print method", {
 # tbl ---------------------------------------------------------------------
 
 test_that("can generate sql tbls with raw sql", {
-  mf1 <- memdb_frame(x = 1:3, y = 3:1)
+  mf1 <- local_memdb_frame(x = 1:3, y = 3:1)
   mf2 <- tbl(mf1$src, sql(glue("SELECT * FROM {remote_name(mf1)}")))
 
   expect_equal(collect(mf1), collect(mf2))
@@ -67,6 +65,8 @@ test_that("can distinguish 'schema.table' from 'schema'.'table'", {
 })
 
 test_that("useful error if missing I()", {
+  withr::local_options(lifecycle_verbosity = "quiet")
+
   expect_snapshot(
     tbl(src_memdb(), "foo.bar"),
     error = TRUE
@@ -83,7 +83,7 @@ test_that("check_from is deprecated", {
 # n_groups ----------------------------------------------------------------
 
 test_that("check basic group size implementation", {
-  db <- memdb_frame(x = rep(1:3, each = 10), y = rep(1:6, each = 5))
+  db <- local_memdb_frame(x = rep(1:3, each = 10), y = rep(1:6, each = 5))
   expect_equal(n_groups(db), 1L)
   expect_equal(group_size(db), 30)
 

@@ -47,7 +47,7 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
   prep <- distinct_prepare_compat(.data, dots, group_vars = group_vars(.data))
   out <- dplyr::select(prep$data, prep$keep)
 
-  out$lazy_query <- add_distinct(out)
+  out$lazy_query <- add_distinct(out$lazy_query)
   out
 }
 
@@ -112,7 +112,13 @@ add_computed_columns <- function(.data, vars, error_call = caller_env()) {
   needs_mutate <- have_name(vars) | !is_symbol
 
   if (any(needs_mutate)) {
-    out <- mutate(.data, !!!vars)
+    # Ungroup before mutate to match dplyr behavior: distinct() calculations
+    # apply to the entire dataset, not per-group (#1081)
+    grps <- op_grps(.data)
+    out <- .data |>
+      ungroup() |>
+      mutate(!!!vars) |>
+      group_by(!!!syms(grps))
     col_names <- names(exprs_auto_name(vars))
   } else {
     out <- .data
@@ -148,31 +154,36 @@ quo_is_variable_reference <- function(quo) {
 }
 
 
-add_distinct <- function(.data) {
-  lazy_query <- .data$lazy_query
+add_distinct <- function(lazy_query) {
+  if (can_inline_distinct(lazy_query)) {
+    lazy_query$distinct <- TRUE
+    lazy_query
+  } else {
+    lazy_select_query(x = lazy_query, distinct = TRUE)
+  }
+}
 
-  out <- lazy_select_query(
-    x = lazy_query,
-    distinct = TRUE
-  )
-  # TODO this could also work for joins
+# Optimisation overview
+# * `distinct()` adds the `DISTINCT` clause to `SELECT`
+# * `WHERE`, `GROUP BY`, and `HAVING` are executed before `SELECT`
+#   => they do not matter
+# * `ORDER BY`
+#   => but `arrange()` should not have an influence on `distinct()` so it
+#      should not matter
+# * `LIMIT` are executed after `SELECT`
+#   => needs a subquery
+can_inline_distinct <- function(lazy_query) {
+  if (inherits(lazy_query, "lazy_multi_join_query")) {
+    return(TRUE)
+  }
+
   if (!is_lazy_select_query(lazy_query)) {
-    return(out)
+    return(FALSE)
   }
 
-  # Optimisation overview
-  # * `distinct()` adds the `DISTINCT` clause to `SELECT`
-  # * `WHERE`, `GROUP BY`, and `HAVING` are executed before `SELECT`
-  #   => they do not matter
-  # * `ORDER BY`
-  #   => but `arrange()` should not have an influence on `distinct()` so it
-  #      should not matter
-  # * `LIMIT` are executed after `SELECT`
-  #   => needs a subquery
   if (!is_null(lazy_query$limit)) {
-    return(out)
+    return(FALSE)
   }
 
-  lazy_query$distinct <- TRUE
-  lazy_query
+  TRUE
 }

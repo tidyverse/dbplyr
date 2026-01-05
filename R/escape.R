@@ -1,7 +1,16 @@
-#' Escape/quote a string.
+#' Escape/quote a value
 #'
-#' `escape()` requires you to provide a database connection to control the
-#' details of escaping. `escape_ansi()` uses the SQL 92 ANSI standard.
+#' @description
+#' `escape()` turns R values into SQL literals. It implements double dispatch
+#' via two sets of generics: first `escape()` dispatches on the class of `x`,
+#' then that method calls `sql_escape_ident()`, `sql_escape_logical()`, etc,
+#' which dispatch on `con`.
+#'
+#' These generics translate individual values into SQL. The core
+#' generics are [DBI::dbQuoteIdentifier()] and [DBI::dbQuoteString()]
+#' for quoting identifiers and strings, but dbplyr needs additional
+#' tools for inserting logical, date, date-time, and raw values into
+#' queries.
 #'
 #' @param x An object to escape. Existing sql vectors will be left as is,
 #'   character vectors are escaped with single quotes, numeric vectors have
@@ -15,64 +24,74 @@
 #'   commas, identifiers are separated by commas and never wrapped,
 #'   atomic vectors are separated by spaces and wrapped in parens if needed.
 #' @param con Database connection.
-#' @rdname escape
+#' @family generic
+#' @returns A [sql] vector.
 #' @export
 #' @examples
+#' con <- simulate_dbi()
+#'
 #' # Doubles vs. integers
-#' escape_ansi(1:5)
-#' escape_ansi(c(1, 5.4))
+#' escape(1:5, con = con)
+#' escape(c(1, 5.4), con = con)
 #'
 #' # String vs known sql vs. sql identifier
-#' escape_ansi("X")
-#' escape_ansi(sql("X"))
-#' escape_ansi(ident("X"))
+#' escape("X", con = con)
+#' escape(sql("X"), con = con)
+#' escape(ident("X"), con = con)
 #'
 #' # Escaping is idempotent
-#' escape_ansi("X")
-#' escape_ansi(escape_ansi("X"))
-#' escape_ansi(escape_ansi(escape_ansi("X")))
+#' escape("X", con = con)
+#' escape(escape("X", con = con), con = con)
+#'
+#' # Database specific generics
+#' sql_escape_logical(con, c(TRUE, FALSE, NA))
+#' sql_escape_date(con, Sys.Date())
+#' sql_escape_date(con, Sys.time())
+#' sql_escape_raw(con, charToRaw("hi"))
 escape <- function(x, parens = NA, collapse = " ", con = NULL) {
   check_con(con)
 
   UseMethod("escape")
 }
 
-#' @export
-#' @rdname escape
-escape_ansi <- function(x, parens = NA, collapse = "") {
-  escape(x, parens = parens, collapse = collapse, con = simulate_dbi())
-}
+# ident -------------------------------------------------------------------
 
 #' @export
 escape.ident <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
-  y <- sql_escape_ident(con, x)
-  sql_vector(names_to_as(y, names2(x), con = con), parens, collapse, con = con)
+  y <- set_names(sql_escape_ident(con, x), names(x))
+  sql_vector(y, parens, collapse, con = con)
 }
 
 #' @export
-escape.dbplyr_schema <- function(
-  x,
-  parens = FALSE,
-  collapse = ", ",
-  con = NULL
-) {
-  sql_vector(as.sql(x, con = con), parens, collapse, con = con)
+#' @rdname escape
+sql_escape_ident <- function(con, x) {
+  UseMethod("sql_escape_ident")
+}
+#' @export
+sql_escape_ident.default <- function(con, x) {
+  sql(DBI::dbQuoteIdentifier(con, x))
 }
 
-#' @export
-escape.dbplyr_catalog <- function(
-  x,
-  parens = FALSE,
-  collapse = ", ",
-  con = NULL
-) {
-  sql_vector(as.sql(x, con = con), parens, collapse, con = con)
-}
+# logical -----------------------------------------------------------------
 
 #' @export
 escape.logical <- function(x, parens = NA, collapse = ", ", con = NULL) {
   sql_vector(sql_escape_logical(con, x), parens, collapse, con = con)
 }
+
+#' @rdname escape
+#' @export
+sql_escape_logical <- function(con, x) {
+  UseMethod("sql_escape_logical")
+}
+#' @export
+sql_escape_logical.DBIConnection <- function(con, x) {
+  y <- as.character(x)
+  y[is.na(x)] <- "NULL"
+  sql(y)
+}
+
+# factor ------------------------------------------------------------------
 
 #' @export
 escape.factor <- function(x, parens = NA, collapse = ", ", con = NULL) {
@@ -80,10 +99,24 @@ escape.factor <- function(x, parens = NA, collapse = ", ", con = NULL) {
   escape.character(x, parens = parens, collapse = collapse, con = con)
 }
 
+# Date --------------------------------------------------------------------
+
 #' @export
 escape.Date <- function(x, parens = NA, collapse = ", ", con = NULL) {
   sql_vector(sql_escape_date(con, x), parens, collapse, con = con)
 }
+
+#' @export
+#' @rdname escape
+sql_escape_date <- function(con, x) {
+  UseMethod("sql_escape_date")
+}
+#' @export
+sql_escape_date.DBIConnection <- function(con, x) {
+  sql_escape_string(con, as.character(x))
+}
+
+# POSIXt ------------------------------------------------------------------
 
 #' @export
 escape.POSIXt <- function(x, parens = NA, collapse = ", ", con = NULL) {
@@ -91,9 +124,34 @@ escape.POSIXt <- function(x, parens = NA, collapse = ", ", con = NULL) {
 }
 
 #' @export
+#' @rdname escape
+sql_escape_datetime <- function(con, x) {
+  UseMethod("sql_escape_datetime")
+}
+#' @export
+sql_escape_datetime.DBIConnection <- function(con, x) {
+  x <- strftime(x, "%Y-%m-%dT%H:%M:%OSZ", tz = "UTC")
+  sql_escape_string(con, x)
+}
+
+# character ---------------------------------------------------------------
+
+#' @export
 escape.character <- function(x, parens = NA, collapse = ", ", con = NULL) {
   sql_vector(sql_escape_string(con, x), parens, collapse, con = con)
 }
+
+#' @export
+#' @rdname escape
+sql_escape_string <- function(con, x) {
+  UseMethod("sql_escape_string")
+}
+#' @export
+sql_escape_string.default <- function(con, x) {
+  sql(sql_quote(x, "'"))
+}
+
+# double ------------------------------------------------------------------
 
 #' @export
 escape.double <- function(x, parens = NA, collapse = ", ", con = NULL) {
@@ -112,6 +170,8 @@ is_whole_number <- function(x) {
   trunc(x) == x
 }
 
+# integer -----------------------------------------------------------------
+
 #' @export
 escape.integer <- function(x, parens = NA, collapse = ", ", con = NULL) {
   x[is.na(x)] <- "NULL"
@@ -125,6 +185,8 @@ escape.integer64 <- function(x, parens = NA, collapse = ", ", con = NULL) {
   sql_vector(x, parens, collapse, con = con)
 }
 
+# blob --------------------------------------------------------------------
+
 #' @export
 escape.blob <- function(x, parens = NA, collapse = ", ", con = NULL) {
   pieces <- vapply(x, sql_escape_raw, character(1), con = con)
@@ -132,20 +194,47 @@ escape.blob <- function(x, parens = NA, collapse = ", ", con = NULL) {
 }
 
 #' @export
+#' @rdname escape
+sql_escape_raw <- function(con, x) {
+  UseMethod("sql_escape_raw")
+}
+#' @export
+sql_escape_raw.DBIConnection <- function(con, x) {
+  # Unlike the other escape functions, this is not vectorised because
+  # raw "vectors" are scalars in this content
+
+  if (is.null(x)) {
+    sql("NULL")
+  } else {
+    # SQL-99 standard for BLOB literals
+    # https://crate.io/docs/sql-99/en/latest/chapters/05.html#blob-literal-s
+    sql(paste0(c("X'", format(x), "'"), collapse = ""))
+  }
+}
+
+# NULL --------------------------------------------------------------------
+
+#' @export
 escape.NULL <- function(x, parens = NA, collapse = " ", con = NULL) {
   sql("NULL")
 }
+
+# sql ---------------------------------------------------------------------
 
 #' @export
 escape.sql <- function(x, parens = NULL, collapse = NULL, con = NULL) {
   sql_vector(x, isTRUE(parens), collapse, con = con)
 }
 
+# list --------------------------------------------------------------------
+
 #' @export
 escape.list <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
   pieces <- vapply(x, escape, character(1), con = con)
   sql_vector(pieces, parens, collapse, con = con)
 }
+
+# errors ------------------------------------------------------------------
 
 #' @export
 escape.data.frame <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
@@ -178,65 +267,40 @@ error_embed <- function(type, expr) {
   )
 }
 
+# helpers -----------------------------------------------------------------
+
 #' @export
 #' @rdname escape
 sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
+  check_bool(parens, allow_na = TRUE)
+  check_string(collapse, allow_null = TRUE)
   check_con(con)
-
-  if (length(x) == 0) {
-    if (!is.null(collapse)) {
-      return(if (isTRUE(parens)) sql("()") else sql(""))
-    } else {
-      return(sql())
-    }
-  }
 
   if (is.na(parens)) {
     parens <- length(x) > 1L
   }
 
-  x <- names_to_as(x, con = con)
+  x <- names_to_as(con, x)
+  sql_collapse(x, collapse, parens)
+}
+
+sql_collapse <- function(x, collapse = " ", parens = FALSE) {
   x <- paste(x, collapse = collapse)
   if (parens) {
-    x <- paste0("(", x, ")")
+    x <- paste0("(", x, ")", recycle0 = TRUE)
   }
   sql(x)
 }
 
-names_to_as <- function(x, names = names2(x), con = NULL) {
+# Strips names from named sql() vector by converting them to AS identifiers
+names_to_as <- function(con, x, names = names2(x)) {
   if (length(x) == 0) {
-    return(character())
+    return(sql())
   }
 
   names_esc <- sql_escape_ident(con, names)
   as_sql <- style_kw(" AS ")
   as <- ifelse(names == "" | names_esc == x, "", paste0(as_sql, names_esc))
 
-  paste0(x, as)
-}
-
-#' Helper function for quoting sql elements.
-#'
-#' If the quote character is present in the string, it will be doubled.
-#' `NA`s will be replaced with NULL.
-#'
-#' @param x Character vector to escape.
-#' @param quote Single quoting character.
-#' @export
-#' @keywords internal
-#' @examples
-#' sql_quote("abc", "'")
-#' sql_quote("I've had a good day", "'")
-#' sql_quote(c("abc", NA), "'")
-sql_quote <- function(x, quote) {
-  if (length(x) == 0) {
-    return(x)
-  }
-
-  y <- gsub(quote, paste0(quote, quote), x, fixed = TRUE)
-  y <- paste0(quote, y, quote)
-  y[is.na(x)] <- "NULL"
-  names(y) <- names(x)
-
-  y
+  sql(paste0(x, as))
 }

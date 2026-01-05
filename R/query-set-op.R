@@ -1,26 +1,42 @@
 #' @export
 #' @rdname sql_build
-set_op_query <- function(x, y, type, all = FALSE) {
-  structure(
-    list(
-      x = x,
-      y = y,
-      type = type,
-      all = all
-    ),
-    class = c("set_op_query", "query")
+lazy_set_op_query <- function(x, y, type, all, call = caller_env()) {
+  check_lazy_query(x, call = call)
+  check_lazy_query(y, call = call)
+  check_string(type, call = call)
+  check_bool(all, call = call)
+
+  lazy_query(
+    query_type = "set_op",
+    x = x,
+    y = y,
+    type = type,
+    all = all
   )
 }
 
 #' @export
-print.set_op_query <- function(x, ...) {
-  cat_line("<SQL ", toupper(x$type), ">")
+op_vars.lazy_set_op_query <- function(op) {
+  union(op_vars(op$x), op_vars(op$y))
+}
 
-  cat_line("X:")
-  cat_line(indent_print(x$x))
+#' @export
+sql_build.lazy_set_op_query <- function(op, con, ..., sql_options = NULL) {
+  # add_op_set_op() ensures that both have same variables
+  set_op_query(
+    sql_build(op$x, con, sql_options = sql_options),
+    sql_build(op$y, con, sql_options = sql_options),
+    type = op$type,
+    all = op$all
+  )
+}
 
-  cat_line("Y:")
-  cat_line(indent_print(x$y))
+# Built query -------------------------------------------------------------
+
+#' @export
+#' @rdname sql_build
+set_op_query <- function(x, y, type, all = FALSE) {
+  query("set_op", x = x, y = y, type = type, all = all)
 }
 
 #' @export
@@ -47,75 +63,34 @@ sql_render.set_op_query <- function(
 }
 
 #' @export
-#' @rdname sql_build
-union_query <- function(x, unions) {
-  structure(
-    list(
-      x = x,
-      unions = unions
-    ),
-    class = c("union_query", "query")
-  )
+flatten_query.set_op_query <- function(qry, query_list, con) {
+  flatten_query_2_tables(qry, query_list, con)
 }
 
+# SQL generation ----------------------------------------------------------
+
+#' @rdname db-sql
 #' @export
-print.union_query <- function(x, ...) {
-  cat_line(indent_print(x$x))
-
-  for (i in seq_along(x$unions$table)) {
-    if (x$unions$all[[i]]) {
-      method <- "UNION ALL"
-    } else {
-      method <- "UNION"
-    }
-    cat_line()
-    cat_line(indent(sql(method)))
-    cat_line()
-
-    cat_line(indent_print(x$unions$table[[i]]))
-  }
+sql_query_set_op <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
+  check_dots_used()
+  UseMethod("sql_query_set_op")
 }
-
 #' @export
-sql_render.union_query <- function(
-  query,
-  con = NULL,
+sql_query_set_op.DBIConnection <- function(
+  con,
+  x,
+  y,
+  method,
   ...,
-  sql_options = NULL,
-  subquery = FALSE,
+  all = FALSE,
   lvl = 0
 ) {
-  from_x <- sql_render(query$x, con, ..., subquery = FALSE, lvl = lvl)
-  unions <- list()
-  unions$table <- purrr::map(
-    query$unions$table,
-    \(table) sql_render(table, con, ..., subquery = FALSE, lvl = lvl)
+  method <- paste0(method, if (all) " ALL")
+  method <- style_kw(method)
+  lines <- list(
+    sql_indent_subquery(x, con = con, lvl = lvl),
+    sql(method),
+    sql_indent_subquery(y, con = con, lvl = lvl)
   )
-  unions$all <- query$unions$all
-
-  sql_query_union(con, from_x, unions, lvl = lvl)
-}
-
-#' @export
-flatten_query.set_op_query <- flatten_query_2_tables
-
-#' @export
-flatten_query.union_query <- function(qry, query_list, con) {
-  x <- qry$x
-  query_list_new <- flatten_query(x, query_list, con)
-  qry$x <- get_subquery_name(x, query_list_new)
-
-  for (i in seq_along(qry$unions$table)) {
-    y <- qry$unions$table[[i]]
-    query_list_new <- flatten_query(y, query_list_new, con)
-    qry$unions$table[[i]] <- get_subquery_name(y, query_list_new)
-  }
-
-  # TODO reuse query
-  name <- as_table_path(unique_subquery_name(), con)
-  wrapped_query <- set_names(list(qry), name)
-
-  query_list$queries <- c(query_list_new$queries, wrapped_query)
-  query_list$name <- name
-  query_list
+  sql_format_clauses(lines, lvl)
 }

@@ -10,6 +10,9 @@ check_list <- function(
   if (vctrs::vec_is_list(x)) {
     return()
   }
+  if (allow_null && is_null(x)) {
+    return()
+  }
   stop_input_type(
     x,
     c("a list"),
@@ -197,6 +200,26 @@ check_has_names <- function(
   }
 
   cli_abort("{.arg {arg}} must have fields {.val {names}}", .internal = TRUE)
+}
+
+
+check_sql <- function(
+  x,
+  allow_null = FALSE,
+  allow_names = TRUE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
+  if (is.sql(x)) {
+    if (!allow_names && is_named(x)) {
+      stop_input_type(x, "an unnamed <sql>", arg = arg, call = call)
+    }
+    return()
+  }
+  if (allow_null && is.null(x)) {
+    return()
+  }
+  stop_input_type(x, "a <sql>", arg = arg, call = call, allow_null = allow_null)
 }
 
 with_indexed_errors <- function(

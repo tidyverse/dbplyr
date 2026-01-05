@@ -1,5 +1,6 @@
 #' Lazy operations
 #'
+#' @description
 #' This set of S3 classes describe the action of dplyr verbs. These are
 #' currently used for SQL sources to separate the description of operations
 #' in R from their computation in SQL. This API is very new so is likely
@@ -12,88 +13,6 @@
 #' @keywords internal
 #' @name lazy_ops
 NULL
-
-# Base constructors -------------------------------------------------------
-
-#' @export
-#' @rdname lazy_ops
-lazy_base_query <- function(x, vars, class = character(), ...) {
-  check_character(vars)
-
-  lazy_query(
-    query_type = c(paste0("base_", class), "base"),
-    x = x,
-    vars = vars,
-    ...,
-    group_vars = character(),
-    order_vars = NULL,
-    frame = NULL
-  )
-}
-
-lazy_query_remote <- function(x, vars) {
-  lazy_base_query(x, vars, class = "remote")
-}
-
-base_query <- function(from) {
-  check_table_source(from)
-  structure(
-    list(from = from),
-    class = c("base_query", "query")
-  )
-}
-
-#' @export
-print.lazy_base_remote_query <- function(x, ...) {
-  if (is_table_path(x$x)) {
-    cat_line("From: ", format(x$x))
-  } else {
-    cat_line("From: <derived table>")
-  }
-}
-
-#' @export
-print.lazy_base_local_query <- function(x, ...) {
-  cat_line("<Local data frame> ", dplyr::dim_desc(x$x))
-}
-
-#' @export
-print.base_query <- function(x, ...) {
-  print(x$from)
-}
-
-#' @export
-sql_build.lazy_base_remote_query <- function(op, con, ...) {
-  base_query(op$x)
-}
-
-#' @export
-sql_build.lazy_base_local_query <- function(op, con, ...) {
-  base_query(op$name)
-}
-
-#' @export
-sql_render.base_query <- function(
-  query,
-  con = NULL,
-  ...,
-  sql_options = NULL,
-  subquery = FALSE,
-  lvl = 0
-) {
-  from <- query$from
-  if (subquery || is.sql(from)) {
-    from
-  } else {
-    from <- escape(from, con = con)
-    dbplyr_query_select(con, sql("*"), from, lvl = lvl)
-  }
-}
-
-#' @export
-flatten_query.base_query <- function(qry, query_list, con) {
-  query_list
-}
 
 # op_grps -----------------------------------------------------------------
 

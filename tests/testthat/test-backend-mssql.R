@@ -1,30 +1,47 @@
+test_that("table_path_components parses SQL Server bracket syntax", {
+  components <- function(x) {
+    table_path_components(table_path(x), simulate_mssql())
+  }
+
+  # Bracket quoting
+  expect_equal(components("[df]"), list("df"))
+  expect_equal(components("[schema].[table]"), list(c("schema", "table")))
+  expect_equal(components("[x.y].[z]"), list(c("x.y", "z")))
+  expect_equal(components(c("[a]", "[b].[c]")), list("a", c("b", "c")))
+
+  # Double-quote quoting
+  expect_equal(components('"df"'), list("df"))
+  expect_equal(components('"schema"."table"'), list(c("schema", "table")))
+  expect_equal(components('"x.y"."z"'), list(c("x.y", "z")))
+})
+
 # function translation ----------------------------------------------------
 
 test_that("custom scalar translated correctly", {
   con <- simulate_mssql()
 
-  expect_translation(con, as.logical(x), "TRY_CAST(`x` AS BIT)")
-  expect_translation(con, as.numeric(x), "TRY_CAST(`x` AS FLOAT)")
+  expect_translation(con, as.logical(x), "TRY_CAST([x] AS BIT)")
+  expect_translation(con, as.numeric(x), "TRY_CAST([x] AS FLOAT)")
   expect_translation(
     con,
     as.integer(x),
-    "TRY_CAST(TRY_CAST(`x` AS NUMERIC) AS INT)"
+    "TRY_CAST(TRY_CAST([x] AS NUMERIC) AS INT)"
   )
   expect_translation(
     con,
     as.integer64(x),
-    "TRY_CAST(TRY_CAST(`x` AS NUMERIC(38, 0)) AS BIGINT)"
+    "TRY_CAST(TRY_CAST([x] AS NUMERIC(38, 0)) AS BIGINT)"
   )
-  expect_translation(con, as.double(x), "TRY_CAST(`x` AS FLOAT)")
-  expect_translation(con, as.character(x), "TRY_CAST(`x` AS VARCHAR(MAX))")
-  expect_translation(con, log(x), "LOG(`x`)")
-  expect_translation(con, nchar(x), "LEN(`x`)")
-  expect_translation(con, atan2(x), "ATN2(`x`)")
-  expect_translation(con, ceiling(x), "CEILING(`x`)")
-  expect_translation(con, ceil(x), "CEILING(`x`)")
-  expect_translation(con, substr(x, 1, 2), "SUBSTRING(`x`, 1, 2)")
-  expect_translation(con, trimws(x), "LTRIM(RTRIM(`x`))")
-  expect_translation(con, paste(x, y), "`x` + ' ' + `y`")
+  expect_translation(con, as.double(x), "TRY_CAST([x] AS FLOAT)")
+  expect_translation(con, as.character(x), "TRY_CAST([x] AS VARCHAR(MAX))")
+  expect_translation(con, log(x), "LOG([x])")
+  expect_translation(con, nchar(x), "LEN([x])")
+  expect_translation(con, atan2(x), "ATN2([x])")
+  expect_translation(con, ceiling(x), "CEILING([x])")
+  expect_translation(con, ceil(x), "CEILING([x])")
+  expect_translation(con, substr(x, 1, 2), "SUBSTRING([x], 1, 2)")
+  expect_translation(con, trimws(x), "LTRIM(RTRIM([x]))")
+  expect_translation(con, paste(x, y), "[x] + ' ' + [y]")
 
   expect_error(
     translate_sql(bitwShiftL(x, 2L), con = con),
@@ -40,13 +57,13 @@ test_that("contents of [ have bool context", {
   con <- simulate_mssql()
   local_context(list(clause = "SELECT"))
 
-  expect_translation(con, x[x > y], "CASE WHEN (`x` > `y`) THEN (`x`) END")
+  expect_translation(con, x[x > y], "CASE WHEN ([x] > [y]) THEN ([x]) END")
 })
 
 test_that("custom stringr functions translated correctly", {
   con <- simulate_mssql()
 
-  expect_translation(con, str_length(x), "LEN(`x`)")
+  expect_translation(con, str_length(x), "LEN([x])")
 })
 
 test_that("stringr fixed patterns use CHARINDEX", {
@@ -55,22 +72,22 @@ test_that("stringr fixed patterns use CHARINDEX", {
   expect_translation(
     con,
     str_detect(x, fixed("abc")),
-    "CHARINDEX('abc', `x`) > 0"
+    "CHARINDEX('abc', [x]) > 0"
   )
   expect_translation(
     con,
     str_detect(x, fixed("abc"), negate = TRUE),
-    "CHARINDEX('abc', `x`) = 0"
+    "CHARINDEX('abc', [x]) = 0"
   )
   expect_translation(
     con,
     str_starts(x, fixed("abc")),
-    "CHARINDEX('abc', `x`) = 1"
+    "CHARINDEX('abc', [x]) = 1"
   )
   expect_translation(
     con,
     str_ends(x, fixed("abc")),
-    "CHARINDEX('abc', `x`) = (LEN(`x`) - LEN('abc')) + 1"
+    "CHARINDEX('abc', [x]) = (LEN([x]) - LEN('abc')) + 1"
   )
 })
 
@@ -85,44 +102,44 @@ test_that("stringr regex patterns require SQL Server 2025", {
 test_that("stringr regex functions work on SQL Server 2025", {
   con <- simulate_mssql("17.0")
 
-  expect_translation(con, str_detect(x, "abc"), "REGEXP_LIKE(`x`, 'abc')")
+  expect_translation(con, str_detect(x, "abc"), "REGEXP_LIKE([x], 'abc')")
   expect_translation(
     con,
     str_detect(x, "abc", negate = TRUE),
-    "NOT REGEXP_LIKE(`x`, 'abc')"
+    "NOT REGEXP_LIKE([x], 'abc')"
   )
   expect_translation(
     con,
     str_starts(x, "abc"),
-    "REGEXP_LIKE(`x`, '^' + 'abc')"
+    "REGEXP_LIKE([x], '^' + 'abc')"
   )
   expect_translation(
     con,
     str_ends(x, "abc"),
-    "REGEXP_LIKE(`x`, 'abc' + '$')"
+    "REGEXP_LIKE([x], 'abc' + '$')"
   )
   expect_translation(
     con,
     str_replace(x, "abc", "def"),
-    "REGEXP_REPLACE(`x`, 'abc', 'def', 1, 1)"
+    "REGEXP_REPLACE([x], 'abc', 'def', 1, 1)"
   )
   expect_translation(
     con,
     str_replace_all(x, "abc", "def"),
-    "REGEXP_REPLACE(`x`, 'abc', 'def')"
+    "REGEXP_REPLACE([x], 'abc', 'def')"
   )
   expect_translation(
     con,
     str_remove(x, "abc"),
-    "REGEXP_REPLACE(`x`, 'abc', '', 1, 1)"
+    "REGEXP_REPLACE([x], 'abc', '', 1, 1)"
   )
   expect_translation(
     con,
     str_remove_all(x, "abc"),
-    "REGEXP_REPLACE(`x`, 'abc', '')"
+    "REGEXP_REPLACE([x], 'abc', '')"
   )
-  expect_translation(con, str_extract(x, "abc"), "REGEXP_SUBSTR(`x`, 'abc')")
-  expect_translation(con, str_count(x, "abc"), "REGEXP_COUNT(`x`, 'abc')")
+  expect_translation(con, str_extract(x, "abc"), "REGEXP_SUBSTR([x], 'abc')")
+  expect_translation(con, str_count(x, "abc"), "REGEXP_COUNT([x], 'abc')")
 })
 
 test_that("str_detect returns bit in SELECT context on SQL Server 2025", {
@@ -135,8 +152,8 @@ test_that("str_detect returns bit in SELECT context on SQL Server 2025", {
 test_that("custom aggregators translated correctly", {
   con <- simulate_mssql()
 
-  expect_translation(con, sd(x, na.rm = TRUE), "STDEV(`x`)", window = FALSE)
-  expect_translation(con, var(x, na.rm = TRUE), "VAR(`x`)", window = FALSE)
+  expect_translation(con, sd(x, na.rm = TRUE), "STDEV([x])", window = FALSE)
+  expect_translation(con, var(x, na.rm = TRUE), "VAR([x])", window = FALSE)
 
   expect_error(
     translate_sql(cor(x), con = con, window = FALSE),
@@ -147,7 +164,7 @@ test_that("custom aggregators translated correctly", {
     class = "dbplyr_error_unsupported_fn"
   )
 
-  expect_translation(con, str_flatten(x), "STRING_AGG(`x`, '')", window = FALSE)
+  expect_translation(con, str_flatten(x), "STRING_AGG([x], '')", window = FALSE)
   expect_snapshot(error = TRUE, {
     translate_sql(quantile(x, 0.5, na.rm = TRUE), con = con, window = FALSE)
     translate_sql(median(x, na.rm = TRUE), con = con, window = FALSE)
@@ -156,13 +173,13 @@ test_that("custom aggregators translated correctly", {
   expect_translation(
     con,
     all(x, na.rm = TRUE),
-    "CAST(MIN(CAST(`x` AS INT)) AS BIT)",
+    "CAST(MIN(CAST([x] AS INT)) AS BIT)",
     window = FALSE
   )
   expect_translation(
     con,
     any(x, na.rm = TRUE),
-    "CAST(MAX(CAST(`x` AS INT)) AS BIT)",
+    "CAST(MAX(CAST([x] AS INT)) AS BIT)",
     window = FALSE
   )
 })
@@ -170,33 +187,33 @@ test_that("custom aggregators translated correctly", {
 test_that("custom window functions translated correctly", {
   con <- simulate_mssql()
 
-  expect_translation(con, sd(x, na.rm = TRUE), "STDEV(`x`) OVER ()")
-  expect_translation(con, var(x, na.rm = TRUE), "VAR(`x`) OVER ()")
+  expect_translation(con, sd(x, na.rm = TRUE), "STDEV([x]) OVER ()")
+  expect_translation(con, var(x, na.rm = TRUE), "VAR([x]) OVER ()")
 
-  expect_translation(con, str_flatten(x), "STRING_AGG(`x`, '') OVER ()")
+  expect_translation(con, str_flatten(x), "STRING_AGG([x], '') OVER ()")
 
   expect_translation(
     con,
     quantile(x, 0.3, na.rm = TRUE),
-    "PERCENTILE_CONT(0.3) WITHIN GROUP (ORDER BY `x`) OVER ()",
+    "PERCENTILE_CONT(0.3) WITHIN GROUP (ORDER BY [x]) OVER ()",
     window = TRUE
   )
   expect_translation(
     con,
     median(x, na.rm = TRUE),
-    "PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY `x`) OVER ()",
+    "PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY [x]) OVER ()",
     window = TRUE
   )
 
   expect_translation(
     con,
     all(x, na.rm = TRUE),
-    "CAST(MIN(CAST(`x` AS INT)) OVER () AS BIT)"
+    "CAST(MIN(CAST([x] AS INT)) OVER () AS BIT)"
   )
   expect_translation(
     con,
     any(x, na.rm = TRUE),
-    "CAST(MAX(CAST(`x` AS INT)) OVER () AS BIT)"
+    "CAST(MAX(CAST([x] AS INT)) OVER () AS BIT)"
   )
 
   expect_snapshot(
@@ -207,32 +224,32 @@ test_that("custom window functions translated correctly", {
 
 test_that("custom lubridate functions translated correctly", {
   con <- simulate_mssql()
-  expect_translation(con, as_date(x), "TRY_CAST(`x` AS DATE)")
-  expect_translation(con, as_datetime(x), "TRY_CAST(`x` AS DATETIME2)")
+  expect_translation(con, as_date(x), "TRY_CAST([x] AS DATE)")
+  expect_translation(con, as_datetime(x), "TRY_CAST([x] AS DATETIME2)")
   expect_translation(con, today(), "CAST(SYSDATETIME() AS DATE)")
-  expect_translation(con, year(x), "DATEPART(YEAR, `x`)")
-  expect_translation(con, day(x), "DATEPART(DAY, `x`)")
-  expect_translation(con, mday(x), "DATEPART(DAY, `x`)")
-  expect_translation(con, yday(x), "DATEPART(DAYOFYEAR, `x`)")
-  expect_translation(con, hour(x), "DATEPART(HOUR, `x`)")
-  expect_translation(con, minute(x), "DATEPART(MINUTE, `x`)")
-  expect_translation(con, second(x), "DATEPART(SECOND, `x`)")
-  expect_translation(con, month(x), "DATEPART(MONTH, `x`)")
+  expect_translation(con, year(x), "DATEPART(YEAR, [x])")
+  expect_translation(con, day(x), "DATEPART(DAY, [x])")
+  expect_translation(con, mday(x), "DATEPART(DAY, [x])")
+  expect_translation(con, yday(x), "DATEPART(DAYOFYEAR, [x])")
+  expect_translation(con, hour(x), "DATEPART(HOUR, [x])")
+  expect_translation(con, minute(x), "DATEPART(MINUTE, [x])")
+  expect_translation(con, second(x), "DATEPART(SECOND, [x])")
+  expect_translation(con, month(x), "DATEPART(MONTH, [x])")
   expect_translation(
     con,
     month(x, label = TRUE, abbr = FALSE),
-    "DATENAME(MONTH, `x`)"
+    "DATENAME(MONTH, [x])"
   )
   expect_snapshot(
     error = TRUE,
     translate_sql(month(x, label = TRUE, abbr = TRUE), con = con)
   )
 
-  expect_translation(con, quarter(x), "DATEPART(QUARTER, `x`)")
+  expect_translation(con, quarter(x), "DATEPART(QUARTER, [x])")
   expect_translation(
     con,
     quarter(x, with_year = TRUE),
-    "(DATENAME(YEAR, `x`) + '.' + DATENAME(QUARTER, `x`))"
+    "(DATENAME(YEAR, [x]) + '.' + DATENAME(QUARTER, [x]))"
   )
   expect_snapshot(
     error = TRUE,
@@ -242,8 +259,8 @@ test_that("custom lubridate functions translated correctly", {
 
 test_that("custom clock functions translated correctly", {
   con <- simulate_mssql()
-  expect_translation(con, add_years(x, 1), "DATEADD(YEAR, 1.0, `x`)")
-  expect_translation(con, add_days(x, 1), "DATEADD(DAY, 1.0, `x`)")
+  expect_translation(con, add_years(x, 1), "DATEADD(YEAR, 1.0, [x])")
+  expect_translation(con, add_days(x, 1), "DATEADD(DAY, 1.0, [x])")
   expect_error(
     translate_sql(add_days(x, 1, "dots", "must", "be empty"), con = con),
     class = "rlib_error_dots_nonempty"
@@ -256,23 +273,23 @@ test_that("custom clock functions translated correctly", {
   expect_translation(
     con,
     date_build(year_column, 1L, 1L),
-    "DATEFROMPARTS(`year_column`, 1, 1)"
+    "DATEFROMPARTS([year_column], 1, 1)"
   )
   expect_translation(
     con,
     get_year(date_column),
-    "DATEPART(YEAR, `date_column`)"
+    "DATEPART(YEAR, [date_column])"
   )
   expect_translation(
     con,
     get_month(date_column),
-    "DATEPART(MONTH, `date_column`)"
+    "DATEPART(MONTH, [date_column])"
   )
-  expect_translation(con, get_day(date_column), "DATEPART(DAY, `date_column`)")
+  expect_translation(con, get_day(date_column), "DATEPART(DAY, [date_column])")
   expect_translation(
     con,
     date_count_between(date_column_1, date_column_2, "day"),
-    "DATEDIFF_BIG(DAY, `date_column_1`, `date_column_2`)"
+    "DATEDIFF_BIG(DAY, [date_column_1], [date_column_2])"
   )
   expect_snapshot(
     error = TRUE,
@@ -300,12 +317,12 @@ test_that("difftime is translated correctly", {
   expect_translation(
     con,
     difftime(start_date, end_date, units = "days"),
-    "DATEDIFF_BIG(DAY, `end_date`, `start_date`)"
+    "DATEDIFF_BIG(DAY, [end_date], [start_date])"
   )
   expect_translation(
     con,
     difftime(start_date, end_date),
-    "DATEDIFF_BIG(DAY, `end_date`, `start_date`)"
+    "DATEDIFF_BIG(DAY, [end_date], [start_date])"
   )
 
   expect_snapshot(
@@ -331,7 +348,7 @@ test_that("last_value_sql() translated correctly", {
   expect_equal(
     translate_sql(last(x, na_rm = TRUE), vars_order = "a", con = con),
     sql(
-      "LAST_VALUE(`x`) IGNORE NULLS OVER (ORDER BY `a` ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)"
+      "LAST_VALUE([x]) IGNORE NULLS OVER (ORDER BY [a] ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)"
     )
   )
 })
@@ -340,9 +357,9 @@ test_that("between translation respects context", {
   con <- simulate_mssql()
 
   local_context(list(clause = "WHERE"))
-  expect_translation(con, between(a, 1L, 2L), "`a` BETWEEN 1 AND 2")
+  expect_translation(con, between(a, 1L, 2L), "[a] BETWEEN 1 AND 2")
   local_context(list(clause = "SELECT"))
-  expect_translation(con, between(a, 1L, 2L), "IIF(`a` BETWEEN 1 AND 2, 1, 0)")
+  expect_translation(con, between(a, 1L, 2L), "IIF([a] BETWEEN 1 AND 2, 1, 0)")
 })
 
 # verb translation --------------------------------------------------------
@@ -369,8 +386,8 @@ test_that("handles ORDER BY in subqueries", {
   expect_snapshot(
     sql_query_select(
       simulate_mssql(),
-      ident("x"),
-      ident("y"),
+      sql("[x]"),
+      sql("[y]"),
       order_by = "z",
       subquery = TRUE
     )
@@ -381,9 +398,9 @@ test_that("custom limit translation", {
   expect_snapshot(
     sql_query_select(
       simulate_mssql(),
-      ident("x"),
-      ident("y"),
-      order_by = ident("z"),
+      sql("[x]"),
+      sql("[y]"),
+      order_by = sql("[z]"),
       limit = 10
     )
   )
@@ -510,8 +527,8 @@ test_that("`sql_query_update_from()` is correct", {
       from = sql_render(df_y, con, lvl = 1),
       by = c("a", "b"),
       update_values = sql(
-        c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
-        d = "`...y`.`d`"
+        c = "COALESCE([df_x].[c], [...y].[c])",
+        d = "[...y].[d]"
       ),
       returning_cols = c("a", b2 = "b")
     )
@@ -593,7 +610,7 @@ test_that("count_big", {
 # Live database -----------------------------------------------------------
 
 test_that("can copy_to() and compute() with temporary tables (#438)", {
-  con <- src_test("mssql")
+  con <- test_mssql()
   df <- tibble(x = 1:3)
 
   # converts to name automatically with message
@@ -615,7 +632,7 @@ test_that("add prefix to temporary table", {
   expect_snapshot(
     out <- db_table_temporary(con, table_path("foo.bar"), temporary = TRUE)
   )
-  expect_equal(out, list(table = table_path("`foo`.`#bar`"), temporary = FALSE))
+  expect_equal(out, list(table = table_path("[foo].[#bar]"), temporary = FALSE))
 
   expect_silent(
     out <- db_table_temporary(con, table_path("foo.#bar"), temporary = TRUE)
@@ -625,12 +642,12 @@ test_that("add prefix to temporary table", {
 
 test_that("bit conversion works for important cases", {
   df <- tibble(x = 1:3, y = 3:1)
-  db <- copy_to(src_test("mssql"), df, name = unique_table_name("#"))
+  db <- copy_to(test_mssql(), df, name = unique_table_name("#"))
   expect_equal(db |> mutate(z = x == y) |> pull(), c(FALSE, TRUE, FALSE))
   expect_equal(db |> filter(x == y) |> pull(), 2)
 
   df <- tibble(x = c(TRUE, FALSE, FALSE), y = c(TRUE, FALSE, TRUE))
-  db <- copy_to(src_test("mssql"), df, name = unique_table_name("#"))
+  db <- copy_to(test_mssql(), df, name = unique_table_name("#"))
   expect_equal(db |> filter(x == 1) |> pull(), TRUE)
   expect_equal(db |> mutate(z = TRUE) |> pull(), c(1, 1, 1))
 
@@ -643,7 +660,7 @@ test_that("bit conversion works for important cases", {
 
 test_that("as.integer and as.integer64 translations if parsing failures", {
   df <- data.frame(x = c("1.3", "2x"))
-  db <- copy_to(src_test("mssql"), df, name = unique_table_name("#"))
+  db <- copy_to(test_mssql(), df, name = unique_table_name("#"))
 
   out <- db |>
     mutate(
@@ -659,7 +676,7 @@ test_that("as.integer and as.integer64 translations if parsing failures", {
 })
 
 test_that("can insert", {
-  con <- src_test("mssql")
+  con <- test_mssql()
 
   df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
   x <- local_db_table(con, df_x, "df_x")
@@ -686,7 +703,7 @@ test_that("can insert", {
 })
 
 test_that("can insert with returning", {
-  con <- src_test("mssql")
+  con <- test_mssql()
 
   df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
   x <- local_db_table(con, df_x, "df_x")
@@ -714,7 +731,7 @@ test_that("can insert with returning", {
 })
 
 test_that("can append", {
-  con <- src_test("mssql")
+  con <- test_mssql()
 
   df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
   x <- local_db_table(con, df_x, "df_x")
@@ -739,7 +756,7 @@ test_that("can append", {
 })
 
 test_that("can append with returning", {
-  con <- src_test("mssql")
+  con <- test_mssql()
 
   df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
   x <- local_db_table(con, df_x, "df_x")
@@ -765,7 +782,7 @@ test_that("can append with returning", {
 })
 
 test_that("can update", {
-  con <- src_test("mssql")
+  con <- test_mssql()
 
   df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
   x <- local_db_table(con, df_x, "df_x")
@@ -792,7 +809,7 @@ test_that("can update", {
 })
 
 test_that("can update with returning", {
-  con <- src_test("mssql")
+  con <- test_mssql()
 
   df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
   x <- local_db_table(con, df_x, "df_x")
@@ -820,7 +837,7 @@ test_that("can update with returning", {
 })
 
 test_that("can upsert", {
-  con <- src_test("mssql")
+  con <- test_mssql()
 
   df_x <- tibble(a = 1:2, b = 11:12, c = 1:2, d = c("a", "b"))
   x <- local_db_table(con, df_x, "df_x")
@@ -846,7 +863,7 @@ test_that("can upsert", {
 })
 
 test_that("can upsert with returning", {
-  con <- src_test("mssql")
+  con <- test_mssql()
 
   df_x <- tibble(a = 1:2, b = 11:12, c = 1:2, d = c("a", "b"))
   x <- local_db_table(con, df_x, "df_x")
@@ -874,7 +891,7 @@ test_that("can upsert with returning", {
 })
 
 test_that("can delete", {
-  con <- src_test("mssql")
+  con <- test_mssql()
 
   df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
   x <- local_db_table(con, df_x, "df_x")
@@ -900,7 +917,7 @@ test_that("can delete", {
 })
 
 test_that("can delete with returning", {
-  con <- src_test("mssql")
+  con <- test_mssql()
 
   df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
   x <- local_db_table(con, df_x, "df_x")

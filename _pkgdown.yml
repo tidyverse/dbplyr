@@ -53,6 +53,7 @@ reference:
 
 - subtitle: Verbs that work with multiple tables
   contents:
+  - bind_queries
   - inner_join.tbl_lazy
   - intersect.tbl_lazy
 
@@ -95,7 +96,7 @@ reference:
   - db-io
   - db-misc
   - db-sql
-  - db-quote
+  - escape
   - sql_glue2
   - sql_variant
   - sql_query_insert

@@ -5,7 +5,7 @@ test_that("reframe is not supported", {
 })
 
 test_that("summarise peels off a single layer of grouping", {
-  mf1 <- memdb_frame(x = 1, y = 1, z = 2) |> group_by(x, y)
+  mf1 <- local_memdb_frame(x = 1, y = 1, z = 2) |> group_by(x, y)
   mf2 <- mf1 |> summarise(n = n())
   expect_equal(group_vars(mf2), "x")
 
@@ -13,8 +13,47 @@ test_that("summarise peels off a single layer of grouping", {
   expect_equal(group_vars(mf3), character())
 })
 
+test_that("correctly inlines across all verbs", {
+  lf <- lazy_frame(x = 1, y = 2)
+
+  # single table verbs
+  expect_selects(lf |> arrange(x) |> summarise(y = mean(x)), 1)
+  expect_selects(lf |> distinct() |> summarise(y = mean(x)), 2)
+  expect_selects(lf |> filter(x == 1) |> summarise(y = mean(x)), 1)
+  expect_selects(lf |> head(1) |> summarise(y = mean(x)), 2)
+  expect_selects(lf |> mutate(z = x + 1) |> summarise(y = mean(x)), 2)
+  expect_selects(lf |> select(y = x) |> summarise(z = mean(y)), 2)
+  expect_selects(lf |> summarise(y = mean(x)) |> summarise(z = mean(y)), 2)
+
+  # two table verbs
+  lf2 <- lazy_frame(x = 1)
+  expect_selects(lf |> left_join(lf2, by = "x") |> summarise(y = mean(x)), 2)
+  expect_selects(lf |> right_join(lf2, by = "x") |> summarise(y = mean(x)), 2)
+  expect_selects(lf |> semi_join(lf2, by = "x") |> summarise(y = mean(x)), 3)
+
+  #
+  expect_selects(lf |> summarise(.by = x) |> summarise(n = n()), 2)
+})
+
+test_that("can performed grouped summarise with no inputs", {
+  # used in n_groups()
+  db <- local_memdb_frame("empty-summarise", x = c(1, 1, 1, 2, 2, 3))
+  out <- db |> summarise(.by = x)
+  expect_snapshot(out |> show_query())
+  expect_equal(out |> collect(), tibble(x = c(1, 2, 3)))
+})
+
+test_that("generates minimal sql when possible", {
+  lf <- lazy_frame(x = 1, y = 2)
+
+  expect_snapshot({
+    lf |> arrange(x) |> summarise(y = mean(x))
+    lf |> filter(x < 1) |> summarise(y = mean(x))
+  })
+})
+
 test_that("summarise performs partial evaluation", {
-  mf1 <- memdb_frame(x = 1)
+  mf1 <- local_memdb_frame(x = 1)
 
   val <- 1
   mf2 <- mf1 |> summarise(y = x == val) |> collect()
@@ -53,44 +92,31 @@ test_that("can't refer to freshly created variables", {
 test_that("summarise(.groups=)", {
   df <- lazy_frame(x = 1, y = 2) |> group_by(x, y)
 
-  # the `dplyr::` prefix is needed for `check()`
-  # should produce a message when called directly by user
-  expect_message(eval_bare(
-    expr(
-      lazy_frame(x = 1, y = 2) |>
-        dplyr::group_by(x, y) |>
-        dplyr::summarise() |>
-        remote_query()
-    ),
-    env(global_env())
-  ))
-  expect_snapshot(eval_bare(
-    expr(
-      lazy_frame(x = 1, y = 2) |>
-        dplyr::group_by(x, y) |>
-        dplyr::summarise() |>
-        remote_query()
-    ),
-    env(global_env())
-  ))
-
-  # should be silent when called in another package
-  expect_silent(eval_bare(
-    expr(
-      lazy_frame(x = 1, y = 2) |>
-        dplyr::group_by(x, y) |>
-        dplyr::summarise() |>
-        remote_query()
-    ),
-    asNamespace("testthat")
-  ))
-
   expect_equal(df |> summarise() |> group_vars(), "x")
   expect_equal(df |> summarise(.groups = "drop_last") |> group_vars(), "x")
   expect_equal(df |> summarise(.groups = "drop") |> group_vars(), character())
   expect_equal(df |> summarise(.groups = "keep") |> group_vars(), c("x", "y"))
 
   expect_snapshot(error = TRUE, df |> summarise(.groups = "rowwise"))
+})
+
+test_that("summarise produces informative message about grouping", {
+  local_mocked_bindings(summarise_verbose = function(...) TRUE)
+  lf <- lazy_frame(x = 1, y = 2) |> group_by(x, y)
+  expect_snapshot(. <- lf |> summarise())
+})
+
+test_that("summarise_verbose() detects caller environment correctly", {
+  call <- quote(
+    lazy_frame(x = 1, y = 2) |>
+      dplyr::group_by(x, y) |>
+      dplyr::summarise()
+  )
+
+  # should produce a message when called directly by user
+  expect_message(eval_bare(call, env(global_env())))
+  # should be silent when called in another package
+  expect_no_message(eval_bare(call, asNamespace("testthat")))
 })
 
 test_that("summarise can modify grouping variables", {
@@ -112,7 +138,7 @@ test_that("across() does not select grouping variables", {
 })
 
 test_that("summarise() after select() works #985", {
-  df <- memdb_frame(g = 1, x = 1:3)
+  df <- local_memdb_frame(g = 1, x = 1:3)
   expect_equal(
     df |>
       select(x) |>
@@ -125,7 +151,7 @@ test_that("summarise() after select() works #985", {
 # .by ----------------------------------------------------------------------
 
 test_that("can group transiently using `.by`", {
-  df <- memdb_frame(g = c(1, 1, 2, 1, 2), x = c(5, 2, 1, 2, 3))
+  df <- local_memdb_frame(g = c(1, 1, 2, 1, 2), x = c(5, 2, 1, 2, 3))
 
   out <- summarise(df, x = mean(x, na.rm = TRUE), .by = g) |>
     arrange(g) |>
@@ -146,7 +172,7 @@ test_that("across doesn't select columns from `.by` #1493", {
     )
 
   expect_snapshot(out)
-  expect_equal(sql_build(out)$select[1], sql("`g`"))
+  expect_equal(sql_build(out)$select[1], sql("\"g\""))
 })
 
 test_that("can't use `.by` with `.groups`", {
@@ -169,7 +195,7 @@ test_that("catches `.by` with grouped-df", {
 # sql-render --------------------------------------------------------------
 
 test_that("quoting for rendering summarized grouped table", {
-  out <- copy_to_test("sqlite", tibble(x = 1), name = "verb-summarise") |>
+  out <- local_memdb_frame("verb-summarise", x = 1) |>
     group_by(x) |>
     summarise(n = n())
   expect_snapshot(out |> sql_render())
@@ -184,8 +210,8 @@ test_that("summarise generates group_by and select", {
     summarise(n = n()) |>
     sql_build()
 
-  expect_equal(out$group_by, sql('`g`'))
-  expect_equal(out$select, sql('`g`', 'COUNT(*) AS `n`'))
+  expect_equal(out$group_by, sql('"g"'))
+  expect_equal(out$select, sql('"g"', 'COUNT(*) AS "n"'))
 })
 
 
@@ -197,7 +223,7 @@ test_that("summarise replaces existing", {
 })
 
 test_that("summarised vars are always named", {
-  mf <- dbplyr::memdb_frame(a = 1)
+  mf <- local_memdb_frame(a = 1)
 
   out1 <- mf |> summarise(1) |> op_vars()
   expect_equal(out1, "1")

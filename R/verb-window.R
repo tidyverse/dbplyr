@@ -33,18 +33,18 @@ window_order <- function(.data, ...) {
   names(dots) <- NULL
   check_window_order_dots(dots)
 
-  .data$lazy_query <- add_order(.data, dots)
+  .data$lazy_query <- add_order(.data$lazy_query, dots)
   .data
 }
 
 # We want to preserve this ordering (for window functions) without
 # imposing an additional arrange, so we have a special op_order
-add_order <- function(.data, dots) {
-  .data$lazy_query$order_vars <- unname(dots)
-  .data$lazy_query
+add_order <- function(lazy_query, exprs) {
+  lazy_query$order_vars <- unname(exprs)
+  lazy_query
 }
 
-check_window_order_dots <- function(dots, call = caller_env()) {
+check_window_order_dots <- function(dots, arg = "...", call = caller_env()) {
   for (i in seq_along(dots)) {
     dot <- dots[[i]]
     x <- quo_get_expr(dot)
@@ -56,7 +56,7 @@ check_window_order_dots <- function(dots, call = caller_env()) {
     if (!is_symbol(x)) {
       dot <- as_label(dot)
       msg <- c(
-        `!` = "Each element of {.code ...} must be a single column name or a column wrapped in {.fn desc}.",
+        `!` = "Every element of {.code {arg}} must be a single column name or a column wrapped in {.fn desc}.",
         x = "Element {i} is {.code {dot}}."
       )
       cli_abort(msg, call = call)

@@ -81,13 +81,7 @@ slice_min.tbl_lazy <- function(
   size <- check_slice_size(n, prop)
   check_unsupported_arg(na_rm, allowed = TRUE)
   order_by <- unwrap_order_expr({{ order_by }}, f = "slice_min")
-  slice_by(
-    .data,
-    order_by,
-    size,
-    {{ by }},
-    with_ties = with_ties
-  )
+  slice_by(.data, order_by, size, {{ by }}, with_ties = with_ties)
 }
 
 #' @rdname dbplyr-slice
@@ -107,13 +101,7 @@ slice_max.tbl_lazy <- function(
   check_unsupported_arg(na_rm, allowed = TRUE)
   order_by <- unwrap_order_expr({{ order_by }}, f = "slice_max")
   order_by <- purrr::map(order_by, swap_order_direction)
-  slice_by(
-    .data,
-    order_by,
-    size,
-    {{ by }},
-    with_ties = with_ties
-  )
+  slice_by(.data, order_by, size, {{ by }}, with_ties = with_ties)
 }
 
 #' @rdname dbplyr-slice
@@ -145,41 +133,50 @@ slice_sample.tbl_lazy <- function(
   slice_by(.data, order_by, size, {{ by }}, with_ties = FALSE)
 }
 
-slice_by <- function(.data, order_by, size, .by, with_ties = FALSE) {
+slice_by <- function(
+  .data,
+  order_by,
+  size,
+  .by,
+  with_ties = FALSE,
+  call = caller_env()
+) {
   by <- compute_by(
     {{ .by }},
     .data,
     by_arg = "by",
     data_arg = "data",
-    error_call = caller_env()
+    error_call = call
   )
   if (by$from_by) {
     .data$lazy_query$group_vars <- by$names
   }
 
-  old_frame <- op_sort(.data)
-
+  value <- switch(size$type, n = size$n, prop = size$prop)
   if (with_ties) {
-    window_fun <- switch(
-      size$type,
-      n = expr(min_rank() <= !!size$n),
-      prop = expr(cume_dist() <= !!size$prop)
-    )
+    fun_name <- switch(size$type, n = "min_rank", prop = "cume_dist")
   } else {
-    window_fun <- switch(
-      size$type,
-      n = expr(row_number() <= !!size$n),
-      prop = cli_abort("Can only use {.arg prop} when {.code with_ties = TRUE}")
-    )
+    if (size$type == "prop") {
+      cli_abort(
+        "Can only use {.arg prop} when {.code with_ties = TRUE}",
+        call = call
+      )
+    }
+    fun_name <- "row_number"
   }
 
-  # must use `add_order()` as `window_order()` only allows variables
-  # this is only okay to do because the previous, legal window order is restored
-  dots <- partial_eval_dots(.data, !!!order_by, .named = FALSE)
-  .data$lazy_query <- add_order(.data, dots)
-
-  out <- filter(.data, !!window_fun) |>
-    window_order(!!!old_frame)
+  # We generate a call to min_rank() and friends because we already do
+  # a lot work in win_rank() to correctly handle NULLs. Currently this
+  # layer of indirection isn't really needed since window functions have
+  # same translations for all backends, but in the future we might add
+  # more capability info to the dialect object so that we could generate
+  # simpler SQL.
+  if (length(order_by) == 1) {
+    window_fun <- call2(fun_name, order_by[[1]])
+  } else {
+    window_fun <- call2(fun_name, call2("tibble", !!!order_by))
+  }
+  out <- filter(.data, !!window_fun <= !!value)
 
   if (by$from_by) {
     out$lazy_query$group_vars <- character()

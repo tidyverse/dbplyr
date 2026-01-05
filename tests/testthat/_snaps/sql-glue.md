@@ -1,21 +1,22 @@
-# build_sql() is deprecated
+# useful error if bad identifier
 
     Code
-      build_sql("SELECT * FROM TABLE", con = con)
+      sql_glue2(con, "{.id 1}")
     Condition
-      Warning:
-      `build_sql()` was deprecated in dbplyr 2.6.0.
-      i Please use `sql_glue2()` instead.
-    Output
-      <SQL> SELECT * FROM TABLE
-
-# build_sql() requires connection
-
+      Error in `sql_glue2()`:
+      ! {.id 1} must be passed a character vector.
     Code
-      build_sql("SELECT * FROM ", x)
+      sql_glue2(con, "{.tbl 1}")
     Condition
-      Error in `build_sql()`:
-      ! `con` must not be NULL.
+      Error in `sql_glue2()`:
+      ! Failed to interpolate {.tbl 1}.
+      Caused by error in `glue_transformer()`:
+      ! `x` must be a table source (SQL or a table identifier), not the number 1.
+    Code
+      sql_glue2(con, "{.sql 1}")
+    Condition
+      Error in `sql_glue2()`:
+      ! {.sql 1} must be passed a string.
 
 # gives informative errors
 

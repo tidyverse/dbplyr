@@ -51,7 +51,7 @@ summarise.tbl_lazy <- function(.data, ..., .by = NULL, .groups = NULL) {
 
   dots <- summarise_eval_dots(.data, ...)
   .data$lazy_query <- add_summarise(
-    .data,
+    .data$lazy_query,
     dots,
     .groups = .groups,
     env_caller = caller_env()
@@ -154,44 +154,84 @@ check_groups <- function(.groups) {
   )
 }
 
-add_summarise <- function(.data, dots, .groups, env_caller) {
-  lazy_query <- .data$lazy_query
+add_summarise <- function(lazy_query, exprs, .groups, env_caller) {
+  cur_grps <- op_grps(lazy_query)
+  summarise_message(cur_grps, .groups, env_caller)
 
-  grps <- op_grps(lazy_query)
-  message_summarise <- summarise_message(grps, .groups, env_caller)
-
-  .groups <- .groups %||% "drop_last"
-  groups_out <- switch(
-    .groups,
-    drop_last = grps[-length(grps)],
-    keep = grps,
+  new_grps <- switch(
+    .groups %||% "drop_last",
+    drop_last = cur_grps[-length(cur_grps)],
+    keep = cur_grps,
     drop = character()
   )
 
-  vars <- c(grps, setdiff(names(dots), grps))
+  # ensure grouping variables are listed first
+  vars <- c(cur_grps, setdiff(names(exprs), cur_grps))
   select <- syms(set_names(vars))
-  select[names(dots)] <- dots
+  select[names(exprs)] <- exprs
 
-  lazy_select_query(
-    x = lazy_query,
-    select = select,
-    group_by = syms(grps),
-    group_vars = groups_out,
-    select_operation = "summarise",
-    message_summarise = message_summarise
-  )
+  if (can_inline_summarise(lazy_query)) {
+    lazy_query$select <- new_lazy_select(select, group_vars = new_grps)
+    lazy_query$select_operation <- "summarise"
+    lazy_query$group_by <- syms(cur_grps)
+    lazy_query$group_vars <- new_grps
+    lazy_query
+  } else {
+    lazy_select_query(
+      x = lazy_query,
+      select = select,
+      group_by = syms(cur_grps),
+      group_vars = new_grps,
+      select_operation = "summarise"
+    )
+  }
+}
+
+# summarise() adds GROUP BY and modifies SELECT
+# * GROUP BY is executed after WHERE but before SELECT, DISTINCT, ORDER BY, LIMIT
+#   => can inline if previous query only has WHERE or ORDER BY
+# * Can't inline after another summarise (would need to re-aggregate)
+# * Can only inline if previous SELECT is a pure projection
+can_inline_summarise <- function(lazy_query) {
+  if (!is_lazy_select_query(lazy_query)) {
+    return(FALSE)
+  }
+
+  if (lazy_query$select_operation == "summarise") {
+    return(FALSE)
+  }
+
+  if (is_true(lazy_query$distinct)) {
+    return(FALSE)
+  }
+  if (!is_null(lazy_query$limit)) {
+    return(FALSE)
+  }
+
+  if (!is_pure_projection(lazy_query$select$expr, lazy_query$select$name)) {
+    return(FALSE)
+  }
+
+  TRUE
 }
 
 summarise_message <- function(grps, .groups, env_caller) {
   verbose <- summarise_verbose(.groups, env_caller)
-  n <- length(grps)
-  if (!verbose || n <= 1) {
-    return(NULL)
+  if (!verbose) {
+    return(invisible())
   }
 
-  summarise_message <- cli::format_message(
-    "{.fun summarise} has grouped output by {.val {grps[-n]}}. You can override using the {.arg .groups} argument."
-  )
+  n <- length(grps)
+  if (n <= 1) {
+    return(invisible())
+  }
+
+  cli::cli_inform(c(
+    "!" = "Grouped output by {.val {grps[-n]}}.",
+    i = "Override behaviour and silence this message with the {.arg .groups} argument.",
+    i = "Or use {.arg .by} instead of {.fun group_by}."
+  ))
+  invisible()
 }
 
 summarise_verbose <- function(.groups, .env) {

@@ -12,7 +12,7 @@ test_that("dplyr.strict_sql = TRUE prevents auto conversion", {
 test_that("namespace calls are translated", {
   con <- simulate_dbi()
   expect_translation(con, dplyr::n(), "COUNT(*)", window = FALSE)
-  expect_translation(con, base::ceiling(x), "CEIL(`x`)")
+  expect_translation(con, base::ceiling(x), "CEIL(\"x\")")
 
   expect_snapshot(error = TRUE, {
     translate_sql(NOSUCHPACKAGE::foo(), con = con)
@@ -39,21 +39,21 @@ test_that("Wrong number of arguments raises error", {
 
 test_that("between translated to special form (#503)", {
   con <- simulate_dbi()
-  expect_translation(con, between(x, 1, 2), "`x` BETWEEN 1.0 AND 2.0")
+  expect_translation(con, between(x, 1, 2), "\"x\" BETWEEN 1.0 AND 2.0")
 })
 
 test_that("%in% translation parenthesises when needed", {
   con <- simulate_dbi()
-  expect_translation(con, x %in% 1L, "`x` IN (1)")
-  expect_translation(con, x %in% c(1L), "`x` IN (1)")
-  expect_translation(con, x %in% 1:2, "`x` IN (1, 2)")
-  expect_translation(con, x %in% y, "`x` IN `y`")
+  expect_translation(con, x %in% 1L, "\"x\" IN (1)")
+  expect_translation(con, x %in% c(1L), "\"x\" IN (1)")
+  expect_translation(con, x %in% 1:2, "\"x\" IN (1, 2)")
+  expect_translation(con, x %in% y, "\"x\" IN \"y\"")
 })
 
 test_that("%in% strips vector names", {
   con <- simulate_dbi()
-  expect_translation(con, x %in% c(a = 1L), "`x` IN (1)")
-  expect_translation(con, x %in% !!c(a = 1L), "`x` IN (1)")
+  expect_translation(con, x %in% c(a = 1L), "\"x\" IN (1)")
+  expect_translation(con, x %in% !!c(a = 1L), "\"x\" IN (1)")
 })
 
 test_that("%in% with empty vector", {
@@ -63,18 +63,23 @@ test_that("%in% with empty vector", {
 
 test_that("n_distinct(x) translated to COUNT(distinct, x)", {
   con <- simulate_dbi()
-  expect_translation(con, n_distinct(x), "COUNT(DISTINCT `x`)", window = FALSE)
   expect_translation(
     con,
     n_distinct(x),
-    "COUNT(DISTINCT `x`) OVER ()",
+    "COUNT(DISTINCT \"x\")",
+    window = FALSE
+  )
+  expect_translation(
+    con,
+    n_distinct(x),
+    "COUNT(DISTINCT \"x\") OVER ()",
     window = TRUE
   )
 })
 
 test_that("na_if is translated to NULLIF (#211)", {
   con <- simulate_dbi()
-  expect_translation(con, na_if(x, 0L), "NULLIF(`x`, 0)")
+  expect_translation(con, na_if(x, 0L), "NULLIF(\"x\", 0)")
 })
 
 test_that("connection affects quoting character", {
@@ -93,16 +98,16 @@ test_that("magrittr pipe is translated", {
 
 test_that("user infix functions are translated", {
   con <- simulate_dbi()
-  expect_translation(con, x %foo% y, "`x` foo `y`")
+  expect_translation(con, x %foo% y, "\"x\" foo \"y\"")
 
   # keep case and also works with vectors of length > 1 #1299
-  expect_translation(con, x %foo% (1:2), "`x` foo (1, 2)")
+  expect_translation(con, x %foo% (1:2), "\"x\" foo (1, 2)")
 })
 
 test_that("sql() evaluates input locally", {
   con <- simulate_dbi()
   a <- "x"
-  expect_translation(con, a, "`a`")
+  expect_translation(con, a, "\"a\"")
   expect_translation(con, sql(a), "x")
 
   f <- function() {
@@ -122,7 +127,7 @@ test_that("sql() evaluates input locally in across()", {
         across(x, ~ sql(gsub("x", "y", cur_column())))
       ) |>
       remote_query(),
-    sql("SELECT y AS `x`\nFROM `df`")
+    sql("SELECT y AS \"x\"\nFROM \"df\"")
   )
 })
 
@@ -130,33 +135,37 @@ test_that("sql() evaluates input locally in across()", {
 
 test_that("casts as expected", {
   con <- simulate_dbi()
-  expect_translation(con, as.integer64(x), "CAST(`x` AS BIGINT)")
-  expect_translation(con, as.logical(x), "CAST(`x` AS BOOLEAN)")
-  expect_translation(con, as.Date(x), "CAST(`x` AS DATE)")
+  expect_translation(con, as.integer64(x), "CAST(\"x\" AS BIGINT)")
+  expect_translation(con, as.logical(x), "CAST(\"x\" AS BOOLEAN)")
+  expect_translation(con, as.Date(x), "CAST(\"x\" AS DATE)")
 })
 
 # numeric -----------------------------------------------------------------
 
 test_that("hypergeometric functions use manual calculation", {
   con <- simulate_dbi()
-  expect_translation(con, cosh(x), "(EXP(`x`) + EXP(-(`x`))) / 2")
-  expect_translation(con, sinh(x), "(EXP(`x`) - EXP(-(`x`))) / 2")
+  expect_translation(con, cosh(x), "(EXP(\"x\") + EXP(-(\"x\"))) / 2")
+  expect_translation(con, sinh(x), "(EXP(\"x\") - EXP(-(\"x\"))) / 2")
   expect_translation(
     con,
     tanh(x),
-    "(EXP(2 * (`x`)) - 1) / (EXP(2 * (`x`)) + 1)"
+    "(EXP(2 * (\"x\")) - 1) / (EXP(2 * (\"x\")) + 1)"
   )
   expect_translation(
     con,
     coth(x),
-    "(EXP(2 * (`x`)) + 1) / (EXP(2 * (`x`)) - 1)"
+    "(EXP(2 * (\"x\")) + 1) / (EXP(2 * (\"x\")) - 1)"
   )
 })
 
 test_that("pmin and max use GREATEST and LEAST", {
   con <- simulate_dbi()
-  expect_translation(con, pmin(x, y, z, na.rm = TRUE), "LEAST(`x`, `y`, `z`)")
-  expect_translation(con, pmax(x, y, na.rm = TRUE), "GREATEST(`x`, `y`)")
+  expect_translation(
+    con,
+    pmin(x, y, z, na.rm = TRUE),
+    "LEAST(\"x\", \"y\", \"z\")"
+  )
+  expect_translation(con, pmax(x, y, na.rm = TRUE), "GREATEST(\"x\", \"y\")")
 })
 
 test_that("round uses integer digits", {
@@ -169,34 +178,38 @@ test_that("round uses integer digits", {
 
 test_that("paste() translated to CONCAT_WS", {
   con <- simulate_dbi()
-  expect_translation(con, paste0(x, y), "CONCAT_WS('', `x`, `y`)")
-  expect_translation(con, paste(x, y), "CONCAT_WS(' ', `x`, `y`)")
-  expect_translation(con, paste(x, y, sep = ","), "CONCAT_WS(',', `x`, `y`)")
+  expect_translation(con, paste0(x, y), "CONCAT_WS('', \"x\", \"y\")")
+  expect_translation(con, paste(x, y), "CONCAT_WS(' ', \"x\", \"y\")")
+  expect_translation(
+    con,
+    paste(x, y, sep = ","),
+    "CONCAT_WS(',', \"x\", \"y\")"
+  )
 })
 
 # stringr -------------------------------------------
 
 test_that("str_length() translates correctly ", {
   con <- simulate_dbi()
-  expect_translation(con, str_length(x), "LENGTH(`x`)")
+  expect_translation(con, str_length(x), "LENGTH(\"x\")")
 })
 
 test_that("lower/upper translates correctly ", {
   con <- simulate_dbi()
-  expect_translation(con, str_to_upper(x), "UPPER(`x`)")
-  expect_translation(con, str_to_lower(x), "LOWER(`x`)")
+  expect_translation(con, str_to_upper(x), "UPPER(\"x\")")
+  expect_translation(con, str_to_lower(x), "LOWER(\"x\")")
 })
 
 test_that("str_trim() translates correctly ", {
   con <- simulate_dbi()
-  expect_translation(con, str_trim(x, "both"), "LTRIM(RTRIM(`x`))")
-  expect_translation(con, str_trim(x, "left"), "LTRIM(`x`)")
-  expect_translation(con, str_trim(x, "right"), "RTRIM(`x`)")
+  expect_translation(con, str_trim(x, "both"), "LTRIM(RTRIM(\"x\"))")
+  expect_translation(con, str_trim(x, "left"), "LTRIM(\"x\")")
+  expect_translation(con, str_trim(x, "right"), "RTRIM(\"x\")")
 })
 
 # subsetting --------------------------------------------------------------
 
 test_that("[ treated as if it is logical subsetting", {
   con <- simulate_dbi()
-  expect_translation(con, y[x == 0L], "CASE WHEN (`x` = 0) THEN (`y`) END")
+  expect_translation(con, y[x == 0L], "CASE WHEN (\"x\" = 0) THEN (\"y\") END")
 })

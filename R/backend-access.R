@@ -53,8 +53,7 @@ sql_query_select.ACCESS <- function(
   lvl = 0
 ) {
   sql_select_clauses(
-    con,
-    select = sql_clause_select(con, select, distinct, top = limit),
+    select = sql_clause_select(select, distinct, top = limit),
     from = sql_clause_from(from),
     where = sql_clause_where(where),
     group_by = sql_clause_group_by(group_by),
@@ -181,7 +180,7 @@ sql_escape_logical.ACCESS <- function(con, x) {
   # Access uses a convention of -1 as True and 0 as False
   y <- ifelse(x, -1, 0)
   y[is.na(x)] <- "NULL"
-  y
+  sql(y)
 }
 
 #' @export
@@ -189,7 +188,7 @@ sql_escape_date.ACCESS <- function(con, x) {
   # Access delimits dates using octothorpes, and uses YYYY-MM-DD
   y <- format(x, "#%Y-%m-%d#")
   y[is.na(x)] <- "NULL"
-  y
+  sql(y)
 }
 
 #' @export
@@ -198,7 +197,7 @@ sql_escape_datetime.ACCESS <- function(con, x) {
   # Timezones are not supported in Access
   y <- format(x, "#%Y-%m-%d %H:%M:%S#")
   y[is.na(x)] <- "NULL"
-  y
+  sql(y)
 }
 
 #' @export
@@ -246,8 +245,8 @@ sql_query_multi_join.ACCESS <- function(
   }
 
   clauses <- list(
-    sql_clause_select(con, select),
+    sql_clause_select(select),
     sql_clause_from(from)
   )
-  sql_format_clauses(clauses, lvl = lvl, con = con)
+  sql_format_clauses(clauses, lvl = lvl)
 }

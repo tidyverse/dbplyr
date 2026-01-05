@@ -35,7 +35,7 @@ dbplyr_edition.PqConnection <- dbplyr_edition.PostgreSQL
 
 #' @export
 db_connection_describe.PqConnection <- function(con, ...) {
-  info <- dbGetInfo(con)
+  info <- DBI::dbGetInfo(con)
   host <- if (info$host == "") "localhost" else info$host
 
   paste0(
@@ -80,10 +80,9 @@ postgres_round <- function(x, digits = 0L) {
   sql_glue("ROUND(({x})::numeric, {digits})")
 }
 
+# https://neon.com/postgresql/postgresql-date-functions/postgresql-make_interval
 postgres_period <- function(x, unit) {
-  x <- escape(x, con = sql_current_con())
-  interval <- paste0(x, " ", unit)
-  sql_glue("CAST({interval} AS INTERVAL)")
+  sql_glue("MAKE_INTERVAL({.sql unit} => {x})")
 }
 
 #' @export
@@ -229,28 +228,13 @@ sql_translation.PqConnection <- function(con) {
         sql_glue("EXTRACT(YEAR FROM {x})")
       },
 
-      # https://www.postgresql.org/docs/13/datatype-datetime.html#DATATYPE-INTERVAL-INPUT
-      seconds = function(x) {
-        postgres_period(x, "seconds")
-      },
-      minutes = function(x) {
-        postgres_period(x, "minutes")
-      },
-      hours = function(x) {
-        postgres_period(x, "hours")
-      },
-      days = function(x) {
-        postgres_period(x, "days")
-      },
-      weeks = function(x) {
-        postgres_period(x, "weeks")
-      },
-      months = function(x) {
-        postgres_period(x, "months")
-      },
-      years = function(x) {
-        postgres_period(x, "years")
-      },
+      seconds = function(x) postgres_period(x, "secs"),
+      minutes = function(x) postgres_period(x, "mins"),
+      hours = function(x) postgres_period(x, "hours"),
+      days = function(x) postgres_period(x, "days"),
+      weeks = function(x) postgres_period(x, "weeks"),
+      months = function(x) postgres_period(x, "months"),
+      years = function(x) postgres_period(x, "years"),
 
       # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
       floor_date = function(x, unit = "seconds") {
@@ -378,6 +362,8 @@ sql_query_insert.PqConnection <- function(
   returning_cols = NULL,
   method = NULL
 ) {
+  table <- as_table_path(table, con)
+
   check_string(method, allow_null = TRUE)
   method <- method %||% "on_conflict"
   arg_match(method, c("on_conflict", "where_not_exists"), error_arg = "method")
@@ -390,19 +376,19 @@ sql_query_insert.PqConnection <- function(
   conflict <- rows_check_conflict(conflict)
 
   parts <- rows_insert_prep(con, table, from, insert_cols, by, lvl = 0)
-  by_sql <- escape(ident(by), parens = TRUE, collapse = ", ", con = con)
+  by_sql <- sql_escape_ident(con, by)
 
   clauses <- list(
     parts$insert_clause,
-    sql_clause_select(con, sql("*")),
+    sql_clause_select(sql("*")),
     sql_clause_from(parts$from),
-    sql_clause("ON CONFLICT", by_sql),
+    sql_clause("ON CONFLICT", by_sql, parens = TRUE),
     {
       if (conflict == "ignore") sql("DO NOTHING")
     },
     sql_returning_cols(con, returning_cols, table)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 #' @export
 sql_query_insert.PostgreSQL <- sql_query_insert.PqConnection
@@ -428,36 +414,32 @@ sql_query_upsert.PqConnection <- function(
 
   # https://stackoverflow.com/questions/17267417/how-to-upsert-merge-insert-on-duplicate-update-in-postgresql
   # https://www.sqlite.org/lang_UPSERT.html
+  table <- as_table_path(table, con)
   parts <- rows_prep(con, table, from, by, lvl = 0)
 
   insert_cols <- c(by, update_cols)
-  select_cols <- ident(insert_cols)
-  insert_cols <- escape(
-    ident(insert_cols),
-    collapse = ", ",
-    parens = TRUE,
-    con = con
-  )
+  insert_cols_sql <- sql_escape_ident(con, insert_cols)
 
   update_values <- set_names(
-    sql_table_prefix(con, update_cols, "excluded"),
+    sql_table_prefix(con, "excluded", update_cols),
     update_cols
   )
   update_cols <- sql_escape_ident(con, update_cols)
 
-  by_sql <- escape(ident(by), parens = TRUE, collapse = ", ", con = con)
+  by_sql <- sql_escape_ident(con, by)
+  table_sql <- sql_escape_table_source(con, table)
   clauses <- list(
-    sql_clause_insert(con, insert_cols, table),
-    sql_clause_select(con, select_cols),
+    sql_clause_insert(insert_cols_sql, into = table_sql),
+    sql_clause_select(insert_cols_sql),
     sql_clause_from(parts$from),
     # `WHERE true` is required for SQLite
     sql("WHERE true"),
-    sql_clause("ON CONFLICT ", by_sql),
+    sql_clause("ON CONFLICT", by_sql, parens = TRUE),
     sql("DO UPDATE"),
     sql_clause_set(update_cols, update_values),
     sql_returning_cols(con, returning_cols, table)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -471,7 +453,7 @@ sql_values_subquery.PostgreSQL <- sql_values_subquery.PqConnection
 
 #' @export
 sql_escape_date.PostgreSQL <- function(con, x) {
-  DBI::dbQuoteLiteral(con, x)
+  sql(DBI::dbQuoteLiteral(con, x))
 }
 #' @export
 sql_escape_date.PqConnection <- sql_escape_date.PostgreSQL

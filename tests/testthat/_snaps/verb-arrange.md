@@ -16,53 +16,55 @@
       arrange(lf, a)
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      ORDER BY `a`
+      SELECT "df".*
+      FROM "df"
+      ORDER BY "a"
     Code
       # double arrange
       arrange(arrange(lf, a), b)
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      ORDER BY `b`
+      SELECT "df".*
+      FROM "df"
+      ORDER BY "b", "a"
     Code
       # remove ordered by
       select(arrange(lf, a), -a)
     Output
       <SQL>
-      SELECT `b`
-      FROM `df`
-      ORDER BY `a`
+      SELECT "b"
+      FROM "df"
+      ORDER BY "a"
     Code
       arrange(select(arrange(lf, a), -a), b)
     Output
       <SQL>
-      SELECT `b`
-      FROM `df`
-      ORDER BY `b`
+      SELECT "b"
+      FROM "df"
+      ORDER BY "b"
     Code
       # un-arrange
       arrange(arrange(lf, a))
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
+      SELECT "df".*
+      FROM "df"
+      ORDER BY "a"
     Code
       arrange(select(arrange(lf, a), -a))
     Output
       <SQL>
-      SELECT `b`
-      FROM `df`
+      SELECT "b"
+      FROM "df"
+      ORDER BY "a"
     Code
       # use order
       mutate(select(arrange(lf, a), -a), c = lag(b))
     Output
       <SQL>
-      SELECT `b`, LAG(`b`, 1, NULL) OVER () AS `c`
-      FROM `df`
-      ORDER BY `a`
+      SELECT "b", LAG("b", 1, NULL) OVER () AS "c"
+      FROM "df"
+      ORDER BY "a"
 
 # arrange renders correctly for single-table verbs (#373)
 
@@ -72,56 +74,56 @@
       arrange(head(lf, 1), a)
     Output
       <SQL>
-      SELECT `q01`.*
+      SELECT "q01".*
       FROM (
-        SELECT `df`.*
-        FROM `df`
+        SELECT "df".*
+        FROM "df"
         LIMIT 1
-      ) AS `q01`
-      ORDER BY `a`
+      ) AS "q01"
+      ORDER BY "a"
     Code
       head(arrange(lf, a), 1)
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      ORDER BY `a`
+      SELECT "df".*
+      FROM "df"
+      ORDER BY "a"
       LIMIT 1
     Code
       arrange(head(arrange(lf, a), 1), b)
     Output
       <SQL>
-      SELECT `q01`.*
+      SELECT "q01".*
       FROM (
-        SELECT `df`.*
-        FROM `df`
-        ORDER BY `a`
+        SELECT "df".*
+        FROM "df"
+        ORDER BY "a"
         LIMIT 1
-      ) AS `q01`
-      ORDER BY `b`
+      ) AS "q01"
+      ORDER BY "b", "a"
     Code
       # mutate
       arrange(mutate(lf, a = b), a)
     Output
       <SQL>
-      SELECT `b` AS `a`, `b`
-      FROM `df`
-      ORDER BY `a`
+      SELECT "b" AS "a", "b"
+      FROM "df"
+      ORDER BY "a"
     Code
       # complex mutate
       arrange(mutate(arrange(lf, a), a = b), a)
     Output
       <SQL>
-      SELECT `b` AS `a`, `b`
-      FROM `df`
-      ORDER BY `a`
+      SELECT "b" AS "a", "b"
+      FROM "df"
+      ORDER BY "a"
     Code
       arrange(mutate(arrange(lf, a), a = 1), b)
     Output
       <SQL>
-      SELECT 1.0 AS `a`, `b`
-      FROM `df`
-      ORDER BY `b`
+      SELECT 1.0 AS "a", "b"
+      FROM "df"
+      ORDER BY "b", "a"
     Code
       mutate(arrange(mutate(lf, a = -a), a), a = -a)
     Condition
@@ -130,11 +132,11 @@
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
-      SELECT -`a` AS `a`, `b`
+      SELECT -"a" AS "a", "b"
       FROM (
-        SELECT -`a` AS `a`, `b`
-        FROM `df`
-      ) AS `q01`
+        SELECT -"a" AS "a", "b"
+        FROM "df"
+      ) AS "q01"
 
 # can combine arrange with dual table verbs
 
@@ -151,13 +153,13 @@
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
-      SELECT `LHS`.*, `c`
+      SELECT "LHS".*, "c"
       FROM (
-        SELECT `df`.*
-        FROM `df`
-      ) AS `LHS`
-      LEFT JOIN `df`
-        ON (`LHS`.`a` = `df`.`a`)
+        SELECT "df".*
+        FROM "df"
+      ) AS "LHS"
+      LEFT JOIN "df"
+        ON ("LHS"."a" = "df"."a")
     Code
       semi_join(arrange(lf, a), rf)
     Message
@@ -168,27 +170,27 @@
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
-      SELECT `LHS`.*
+      SELECT "LHS".*
       FROM (
-        SELECT `df`.*
-        FROM `df`
-      ) AS `LHS`
+        SELECT "df".*
+        FROM "df"
+      ) AS "LHS"
       WHERE EXISTS (
-        SELECT 1 FROM `df`
-        WHERE (`LHS`.`a` = `df`.`a`)
+        SELECT 1 FROM "df"
+        WHERE ("LHS"."a" = "df"."a")
       )
     Code
       union(arrange(lf, a), rf)
     Output
       <SQL>
-      SELECT `df`.*, NULL AS `c`
-      FROM `df`
-      ORDER BY `a`
+      SELECT "df".*, NULL AS "c"
+      FROM "df"
+      ORDER BY "a"
       
       UNION
       
-      SELECT `a`, NULL AS `b`, `c`
-      FROM `df`
+      SELECT "a", NULL AS "b", "c"
+      FROM "df"
     Code
       # can arrange after join
       arrange(left_join(lf, rf), a)
@@ -196,43 +198,43 @@
       Joining with `by = join_by(a)`
     Output
       <SQL>
-      SELECT `q01`.*
+      SELECT "q01".*
       FROM (
-        SELECT `df_LHS`.*, `c`
-        FROM `df` AS `df_LHS`
-        LEFT JOIN `df` AS `df_RHS`
-          ON (`df_LHS`.`a` = `df_RHS`.`a`)
-      ) AS `q01`
-      ORDER BY `a`
+        SELECT "df_LHS".*, "c"
+        FROM "df" AS "df_LHS"
+        LEFT JOIN "df" AS "df_RHS"
+          ON ("df_LHS"."a" = "df_RHS"."a")
+      ) AS "q01"
+      ORDER BY "a"
     Code
       arrange(semi_join(lf, rf), a)
     Message
       Joining with `by = join_by(a)`
     Output
       <SQL>
-      SELECT `q01`.*
+      SELECT "q01".*
       FROM (
-        SELECT `df_LHS`.*
-        FROM `df` AS `df_LHS`
+        SELECT "df_LHS".*
+        FROM "df" AS "df_LHS"
         WHERE EXISTS (
-          SELECT 1 FROM `df` AS `df_RHS`
-          WHERE (`df_LHS`.`a` = `df_RHS`.`a`)
+          SELECT 1 FROM "df" AS "df_RHS"
+          WHERE ("df_LHS"."a" = "df_RHS"."a")
         )
-      ) AS `q01`
-      ORDER BY `a`
+      ) AS "q01"
+      ORDER BY "a"
     Code
       arrange(union(lf, rf), a)
     Output
       <SQL>
-      SELECT `q01`.*
+      SELECT "q01".*
       FROM (
-        SELECT `df`.*, NULL AS `c`
-        FROM `df`
+        SELECT "df".*, NULL AS "c"
+        FROM "df"
       
         UNION
       
-        SELECT `a`, NULL AS `b`, `c`
-        FROM `df`
-      ) AS `q01`
-      ORDER BY `a`
+        SELECT "a", NULL AS "b", "c"
+        FROM "df"
+      ) AS "q01"
+      ORDER BY "a"
 

@@ -5,8 +5,17 @@ test_that("slice, head and tail aren't available", {
   expect_snapshot(error = TRUE, lf |> slice_tail())
 })
 
+test_that("min, max, and sample generate useful sql", {
+  lf <- lazy_frame(x = 1)
+  expect_snapshot({
+    lf |> slice_min(x, n = 1)
+    lf |> slice_max(x, prop = 0.5)
+    lf |> slice_sample(x, n = 1)
+  })
+})
+
 test_that("slice_min handles arguments", {
-  db <- memdb_frame(x = c(1, 1, 2), id = c(1, 2, 3))
+  db <- local_memdb_frame(x = c(1, 1, 2), id = c(1, 2, 3))
 
   expect_equal(db |> slice_min(id) |> pull(), 1)
   expect_equal(db |> slice_min(x) |> pull(), c(1, 2))
@@ -23,12 +32,18 @@ test_that("slice_min handles arguments", {
 })
 
 test_that("slice_max orders in opposite order", {
-  db <- memdb_frame(x = c(1, 1, 2), id = c(1, 2, 3))
+  db <- local_memdb_frame(x = c(1, 1, 2), id = c(1, 2, 3))
 
   expect_equal(db |> slice_max(id) |> pull(), 3)
   expect_equal(db |> slice_max(x) |> pull(), 3)
   expect_snapshot(error = TRUE, db |> slice_max())
   expect_snapshot(error = TRUE, db |> slice_max(id, n = 1, na_rm = FALSE))
+})
+
+test_that("slice_min and slice_max strip missing values", {
+  db <- memdb_frame(x = c(1:2, NA), id = 1:3)
+  expect_equal(db |> slice_max(x, n = 3) |> pull(), 2:1)
+  expect_equal(db |> slice_min(x, n = 3) |> pull(), 1:2)
 })
 
 test_that("slice_* can use data masking pronouns", {
@@ -43,11 +58,11 @@ test_that("slice_* can use data masking pronouns", {
 })
 
 test_that("slice_sample errors when expected", {
-  db <- memdb_frame(x = c(1, 1, 2), id = c(1, 2, 3))
+  db <- local_memdb_frame(x = c(1, 1, 2), id = c(1, 2, 3))
 
   # Can't see how to test this, but interactive experimentation
   # shows that it doesn't always return the same result
-  expect_error(db |> slice_sample() |> pull(), NA)
+  expect_no_error(db |> slice_sample() |> pull())
 
   expect_snapshot(error = TRUE, db |> slice_sample(replace = TRUE))
   expect_snapshot(error = TRUE, db |> slice_sample(weight_by = x))
@@ -55,7 +70,7 @@ test_that("slice_sample errors when expected", {
 })
 
 test_that("window_order is preserved", {
-  db <- memdb_frame(x = c(1, 1, 2), id = c(1, 2, 3))
+  db <- local_memdb_frame(x = c(1, 1, 2), id = c(1, 2, 3))
   sort <- db |> window_order(x) |> slice_min(id) |> op_sort()
   expect_equal(length(sort), 1)
   expect_equal(get_expr(sort[[1]]), quote(x))
@@ -83,7 +98,7 @@ test_that("slice_helper `by` errors use correct error context and correct `by_ar
 })
 
 test_that("slice_min/max() work with `by`", {
-  df <- memdb_frame(g = c(2, 2, 1, 1), x = c(1, 2, 3, 1))
+  df <- local_memdb_frame(g = c(2, 2, 1, 1), x = c(1, 2, 3, 1))
 
   out <- slice_min(df, x, by = g) |> arrange(g) |> collect()
   expect_identical(out, tibble(g = c(1, 2), x = 1))
@@ -95,8 +110,7 @@ test_that("slice_min/max() work with `by`", {
 })
 
 test_that("slice_sample() works with `by`", {
-  df <- tibble(g = c(2, 2, 2, 1), x = c(1, 2, 3, 1))
-  df <- memdb_frame(g = c(2, 2, 2, 1), x = c(1, 2, 3, 1))
+  df <- local_memdb_frame(g = c(2, 2, 2, 1), x = c(1, 2, 3, 1))
   expect_identical(
     slice_sample(df, n = 2, by = g) |> pull(g) |> sort(),
     c(1, 2, 2)

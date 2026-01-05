@@ -44,10 +44,10 @@ mf |>
   summarise_all(mean, na.rm = TRUE)
 ```
 
-Reprexes are easiest to understand if you create very small custom data, but if you do want to use an existing data frame you can use `tbl_memdb()`:
+Reprexes are easiest to understand if you create very small custom data, but if you do want to use an existing data frame you can use `copy_to()` + `memdb()`:
 
 ```{r}
-mtcars_db <- tbl_memdb(mtcars)
+mtcars_db <- copy_to(memdb(), mtcars)
 mtcars_db |> 
   group_by(cyl) |> 
   summarise(n = n()) |> 

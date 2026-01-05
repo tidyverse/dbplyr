@@ -41,7 +41,7 @@ dbplyr_edition.MySQLConnection <- dbplyr_edition.MariaDBConnection
 
 #' @export
 db_connection_describe.MariaDBConnection <- function(con, ...) {
-  info <- dbGetInfo(con)
+  info <- DBI::dbGetInfo(con)
 
   paste0(
     "mysql ",
@@ -229,22 +229,25 @@ sql_query_update_from.MariaDBConnection <- function(
   ...,
   returning_cols = NULL
 ) {
+  table <- as_table_path(table, con)
+
   if (!is_empty(returning_cols)) {
     check_unsupported_arg(returning_cols, backend = "MariaDB")
   }
 
   # https://stackoverflow.com/a/19346375/946850
   parts <- rows_prep(con, table, from, by, lvl = 0)
-  update_cols <- sql_table_prefix(con, names(update_values), table)
+  update_cols <- sql_table_prefix(con, table, names(update_values))
 
+  table_sql <- sql_escape_table_source(con, table)
   clauses <- list(
-    sql_clause_update(table),
+    sql_clause_update(table_sql),
     sql_clause("INNER JOIN", parts$from),
     sql_clause_on(parts$where, lvl = 1),
     sql_clause_set(update_cols, update_values),
     sql_returning_cols(con, returning_cols, table)
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 #' @export
 sql_query_update_from.MySQLConnection <- sql_query_update_from.MariaDBConnection
@@ -291,9 +294,9 @@ sql_escape_ident.MySQLConnection <- function(con, x) {
     # for simulate_mysql()
     NextMethod()
   } else if (methods::is(x, "SQL")) {
-    x
+    sql(x)
   } else {
-    DBI::dbQuoteIdentifier(con, x)
+    sql(DBI::dbQuoteIdentifier(con, x))
   }
 }
 

@@ -4,15 +4,15 @@ test_that("custom scalar functions translated correctly", {
   expect_translation(
     con,
     as.character(x),
-    "CAST(`x` AS VARCHAR2(255))"
+    'CAST("x" AS VARCHAR2(255))'
   )
   expect_translation(
     con,
     as.integer64(x),
-    "CAST(`x` AS NUMBER(19))"
+    'CAST("x" AS NUMBER(19))'
   )
-  expect_translation(con, as.double(x), "CAST(`x` AS NUMBER)")
-  expect_translation(con, as.Date(x), "DATE `x`")
+  expect_translation(con, as.double(x), 'CAST("x" AS NUMBER)')
+  expect_translation(con, as.Date(x), 'DATE "x"')
   expect_translation(
     con,
     as.Date("2023-01-01"),
@@ -23,9 +23,9 @@ test_that("custom scalar functions translated correctly", {
 test_that("paste and paste0 translate correctly", {
   con <- simulate_oracle()
 
-  expect_translation(con, paste(x, y), "`x` || ' ' || `y`")
-  expect_translation(con, paste0(x, y), "`x` || `y`")
-  expect_translation(con, str_c(x, y), "`x` || `y`")
+  expect_translation(con, paste(x, y), '"x" || \' \' || "y"')
+  expect_translation(con, paste0(x, y), '"x" || "y"')
+  expect_translation(con, str_c(x, y), '"x" || "y"')
 })
 
 
@@ -131,12 +131,12 @@ test_that("custom clock functions translated correctly", {
   expect_translation(
     con,
     add_years(x, 1),
-    "(`x` + NUMTODSINTERVAL(1.0 * 365.25, 'day'))"
+    '("x" + NUMTODSINTERVAL(1.0 * 365.25, \'day\'))'
   )
   expect_translation(
     con,
     add_days(x, 1),
-    "(`x` + NUMTODSINTERVAL(1.0, 'day'))"
+    '("x" + NUMTODSINTERVAL(1.0, \'day\'))'
   )
   expect_error(
     translate_sql(add_days(x, 1, "dots", "must", "be empty"), con = con),
@@ -149,12 +149,12 @@ test_that("difftime is translated correctly", {
   expect_translation(
     con,
     difftime(start_date, end_date, units = "days"),
-    "CEIL(CAST(`end_date` AS DATE) - CAST(`start_date` AS DATE))"
+    'CEIL(CAST("end_date" AS DATE) - CAST("start_date" AS DATE))'
   )
   expect_translation(
     con,
     difftime(start_date, end_date),
-    "CEIL(CAST(`end_date` AS DATE) - CAST(`start_date` AS DATE))"
+    'CEIL(CAST("end_date" AS DATE) - CAST("start_date" AS DATE))'
   )
 
   expect_snapshot(

@@ -1,121 +1,289 @@
 #' @export
 #' @rdname sql_build
+lazy_select_query <- function(
+  x,
+  select = NULL,
+  where = NULL,
+  group_by = NULL,
+  having = NULL,
+  order_by = NULL,
+  limit = NULL,
+  distinct = FALSE,
+  group_vars = NULL,
+  order_vars = NULL,
+  frame = NULL,
+  select_operation = c("select", "mutate", "summarise")
+) {
+  check_lazy_query(x, call = call)
+  stopifnot(is.null(select) || is_lazy_sql_part(select))
+  stopifnot(is_lazy_sql_part(where))
+  # stopifnot(is.character(group_by))
+  stopifnot(is_lazy_sql_part(order_by))
+  check_number_whole(limit, allow_infinite = TRUE, allow_null = TRUE)
+  check_bool(distinct)
+
+  select <- select %||% syms(set_names(op_vars(x)))
+  select_operation <- arg_match0(
+    select_operation,
+    c("select", "mutate", "summarise")
+  )
+
+  # inherit `group_vars`, `order_vars`, and `frame` from `from`
+  group_vars <- group_vars %||% op_grps(x)
+  order_vars <- order_vars %||% op_sort(x)
+  frame <- frame %||% op_frame(x)
+
+  if (select_operation == "mutate") {
+    select <- new_lazy_select(
+      select,
+      group_vars = group_vars,
+      order_vars = order_vars,
+      frame = frame
+    )
+  } else {
+    select <- new_lazy_select(select)
+  }
+
+  lazy_query(
+    query_type = "select",
+    x = x,
+    select = select,
+    where = where,
+    group_by = group_by,
+    order_by = order_by,
+    distinct = distinct,
+    limit = limit,
+    select_operation = select_operation,
+    group_vars = group_vars,
+    order_vars = order_vars,
+    frame = frame
+  )
+}
+
+is_lazy_select_query <- function(x) {
+  inherits(x, "lazy_select_query")
+}
+
+is_lazy_sql_part <- function(x) {
+  if (is.null(x)) {
+    return(TRUE)
+  }
+  if (is_quosures(x)) {
+    return(TRUE)
+  }
+
+  if (!is.list(x)) {
+    return(FALSE)
+  }
+  purrr::every(x, \(item) is_quosure(item) || is_symbol(item) || is_call(item))
+}
+
+new_lazy_select <- function(
+  vars,
+  group_vars = character(),
+  order_vars = NULL,
+  frame = NULL
+) {
+  vctrs::vec_as_names(names2(vars), repair = "check_unique")
+
+  var_names <- names(vars)
+  vars <- unname(vars)
+
+  tibble(
+    name = var_names %||% character(),
+    expr = vars %||% list(),
+    group_vars = rep_along(vars, list(group_vars)),
+    order_vars = rep_along(vars, list(order_vars)),
+    frame = rep_along(vars, list(frame))
+  )
+}
+
+#' @export
+op_vars.lazy_select_query <- function(op) {
+  op$select$name
+}
+
+#' @export
+sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
+  alias <- remote_name(op$x, null_if_local = FALSE) %||% unique_subquery_name()
+  from <- sql_build(op$x, con, sql_options = sql_options)
+  select_sql_list <- get_select_sql(
+    select = op$select,
+    select_operation = op$select_operation,
+    in_vars = op_vars(op$x),
+    table_alias = alias,
+    con = con,
+    use_star = sql_options$use_star
+  )
+  where_sql <- translate_sql_(
+    op$where,
+    con = con,
+    context = list(clause = "WHERE")
+  )
+
+  select_query(
+    from = from,
+    select = select_sql_list$select_sql,
+    where = where_sql,
+    group_by = translate_sql_(op$group_by, con = con),
+    having = translate_sql_(op$having, con = con, window = FALSE),
+    window = select_sql_list$window_sql,
+    order_by = translate_sql_(op$order_by, con = con),
+    distinct = op$distinct,
+    limit = op$limit,
+    from_alias = alias
+  )
+}
+
+get_select_sql <- function(
+  select,
+  select_operation,
+  in_vars,
+  table_alias,
+  con,
+  use_star
+) {
+  if (select_operation == "summarise") {
+    select_expr <- set_names(select$expr, select$name)
+    select_sql <- translate_sql_(
+      select_expr,
+      con,
+      window = FALSE,
+      context = list(clause = "SELECT")
+    )
+    return(list(
+      select_sql = names_to_as(con, select_sql),
+      window_sql = sql()
+    ))
+  }
+
+  if (use_star) {
+    if (is_identity(select$expr, select$name, in_vars)) {
+      out <- list(
+        select_sql = sql_star(con, table_alias),
+        window_sql = sql()
+      )
+      return(out)
+    } else {
+      select <- select_use_star(select, in_vars, table_alias, con)
+    }
+  }
+
+  # translate once just to register windows
+  win_register_activate()
+  # Remove known windows before building the next query
+  on.exit(win_reset(), add = TRUE)
+  on.exit(win_register_deactivate(), add = TRUE)
+  select_sql <- translate_select_sql(con, select)
+  win_register_deactivate()
+
+  named_windows <- win_register_names()
+  if (nrow(named_windows) > 0 && supports_window_clause(con)) {
+    # need to translate again and use registered windows names
+    select_sql <- translate_select_sql(con, select)
+
+    # build window sql
+    names_esc <- sql_escape_ident(con, named_windows$name)
+    window_sql <- sql(paste0(names_esc, " AS ", named_windows$key))
+  } else {
+    window_sql <- sql()
+  }
+
+  list(
+    select_sql = select_sql,
+    window_sql = window_sql
+  )
+}
+
+select_use_star <- function(select, vars_prev, table_alias, con) {
+  first_match <- vctrs::vec_match(vars_prev[[1]], select$name)
+  if (is.na(first_match)) {
+    return(select)
+  }
+
+  last <- first_match + length(vars_prev) - 1
+  n <- vctrs::vec_size(select)
+
+  if (n < last) {
+    return(select)
+  }
+
+  test_cols <- vctrs::vec_slice(select, seq2(first_match, last))
+
+  if (is_identity(test_cols$expr, test_cols$name, vars_prev)) {
+    idx_start <- seq2(1, first_match - 1)
+    idx_end <- seq2(last + 1, n)
+    vctrs::vec_rbind(
+      vctrs::vec_slice(select, idx_start),
+      tibble(name = "", expr = list(sql_star(con, table_alias))),
+      vctrs::vec_slice(select, idx_end)
+    )
+  } else {
+    select
+  }
+}
+
+translate_select_sql <- function(con, select_df) {
+  n <- vctrs::vec_size(select_df)
+  out <- vctrs::vec_init(sql(), n)
+  out <- set_names(out, select_df$name)
+  for (i in seq2(1, n)) {
+    out[[i]] <- translate_sql_(
+      dots = select_df$expr[i],
+      con = con,
+      vars_group = translate_sql_(syms(select_df$group_vars[[i]]), con),
+      vars_order = translate_sql_(
+        select_df$order_vars[[i]],
+        con,
+        context = list(clause = "ORDER")
+      ),
+      vars_frame = select_df$frame[[i]][[1]],
+      context = list(clause = "SELECT")
+    )
+  }
+
+  names_to_as(con, out)
+}
+
+# Built query -------------------------------------------------------------
+
+#' @export
+#' @rdname sql_build
 select_query <- function(
   from,
   select = sql("*"),
-  where = character(),
-  group_by = character(),
-  having = character(),
-  window = character(),
-  order_by = character(),
+  where = sql(),
+  group_by = sql(),
+  having = sql(),
+  window = sql(),
+  order_by = sql(),
   limit = NULL,
   distinct = FALSE,
   from_alias = NULL
 ) {
-  check_character(select)
-  check_character(where)
-  check_character(group_by)
-  check_character(having)
-  check_character(window)
-  check_character(order_by)
+  check_sql(select, allow_names = FALSE)
+  check_sql(where)
+  check_sql(group_by)
+  check_sql(having)
+  check_sql(window)
+  check_sql(order_by)
   check_number_whole(limit, allow_infinite = TRUE, allow_null = TRUE)
   check_bool(distinct)
   check_string(from_alias, allow_null = TRUE)
 
-  structure(
-    list(
-      from = from,
-      select = select,
-      where = where,
-      group_by = group_by,
-      having = having,
-      window = window,
-      order_by = order_by,
-      distinct = distinct,
-      limit = limit,
-      from_alias = from_alias
-    ),
-    class = c("select_query", "query")
+  query(
+    "select",
+    from = from,
+    select = select,
+    where = where,
+    group_by = group_by,
+    having = having,
+    window = window,
+    order_by = order_by,
+    distinct = distinct,
+    limit = limit,
+    from_alias = from_alias
   )
-}
-
-#' @export
-print.select_query <- function(x, ...) {
-  cat_line("<SQL SELECT", if (x$distinct) " DISTINCT", ">")
-  cat_line("From:")
-  cat_line(indent_print(x$from))
-
-  if (length(x$select)) {
-    cat_line("Select:   ", named_commas(x$select))
-  }
-  if (length(x$where)) {
-    cat_line("Where:    ", named_commas(x$where))
-  }
-  if (length(x$group_by)) {
-    cat_line("Group by: ", named_commas(x$group_by))
-  }
-  if (length(x$window)) {
-    cat_line("Window:   ", named_commas(x$window))
-  }
-  if (length(x$order_by)) {
-    cat_line("Order by: ", named_commas(x$order_by))
-  }
-  if (length(x$having)) {
-    cat_line("Having:   ", named_commas(x$having))
-  } # nocov
-  if (length(x$limit)) cat_line("Limit:    ", x$limit)
-}
-
-#' @export
-sql_optimise.select_query <- function(x, con = NULL, ..., subquery = FALSE) {
-  if (!inherits(x$from, "select_query")) {
-    return(x)
-  }
-
-  from <- sql_optimise(x$from, subquery = subquery)
-
-  # If all outer clauses are executed after the inner clauses, we
-  # can drop them down a level
-  outer <- select_query_clauses(x, subquery = subquery)
-  inner <- select_query_clauses(from, subquery = TRUE)
-
-  can_squash <- length(outer) == 0 ||
-    length(inner) == 0 ||
-    min(outer) > max(inner)
-
-  if (can_squash) {
-    # Have we optimised away an ORDER BY
-    if (length(from$order_by) > 0 && length(x$order_by) > 0) {
-      if (!identical(x$order_by, from$order_by)) {
-        warn_drop_order_by()
-      }
-    }
-
-    from[as.character(outer)] <- x[as.character(outer)]
-    from
-  } else {
-    x$from <- from
-    x
-  }
-}
-
-# List clauses used by a query, in the order they are executed
-# https://sqlbolt.com/lesson/select_queries_order_of_execution
-
-# List clauses used by a query, in the order they are executed in
-select_query_clauses <- function(x, subquery = FALSE) {
-  present <- c(
-    where = length(x$where) > 0,
-    group_by = length(x$group_by) > 0,
-    having = length(x$having) > 0,
-    select = !identical(unname(x$select), sql("*")),
-    distinct = x$distinct,
-    window = length(x$window) > 0,
-    order_by = (!subquery || !is.null(x$limit)) && length(x$order_by) > 0,
-    limit = !is.null(x$limit)
-  )
-
-  ordered(names(present)[present], levels = names(present))
 }
 
 #' @export
@@ -134,9 +302,9 @@ sql_render.select_query <- function(
     lvl = lvl
   )
 
-  dbplyr_query_select(
+  sql_query_select(
     con,
-    query$select,
+    names_to_as(con, query$select),
     from,
     where = query$where,
     group_by = query$group_by,
@@ -172,4 +340,58 @@ flatten_query.select_query <- function(qry, query_list, con) {
 
   qry$from <- get_subquery_name(from, query_list)
   querylist_reuse_query(qry, query_list, con)
+}
+
+# SQL generation ----------------------------------------------------------
+
+#' @rdname db-sql
+#' @export
+sql_query_select <- function(
+  con,
+  select,
+  from,
+  where = NULL,
+  group_by = NULL,
+  having = NULL,
+  window = NULL,
+  order_by = NULL,
+  limit = NULL,
+  distinct = FALSE,
+  ...,
+  subquery = FALSE,
+  lvl = 0
+) {
+  check_dots_used()
+  check_sql(select, allow_names = FALSE)
+
+  UseMethod("sql_query_select")
+}
+
+#' @export
+sql_query_select.DBIConnection <- function(
+  con,
+  select,
+  from,
+  where = NULL,
+  group_by = NULL,
+  having = NULL,
+  window = NULL,
+  order_by = NULL,
+  limit = NULL,
+  distinct = FALSE,
+  ...,
+  subquery = FALSE,
+  lvl = 0
+) {
+  sql_select_clauses(
+    select = sql_clause_select(select, distinct),
+    from = sql_clause_from(from),
+    where = sql_clause_where(where),
+    group_by = sql_clause_group_by(group_by),
+    having = sql_clause_having(having),
+    window = sql_clause_window(window),
+    order_by = sql_clause_order_by(order_by, subquery, limit),
+    limit = sql_clause_limit(con, limit),
+    lvl = lvl
+  )
 }

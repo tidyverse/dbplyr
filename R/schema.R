@@ -37,8 +37,8 @@
 in_schema <- function(schema, table) {
   structure(
     list(
-      schema = as.sql(schema),
-      table = as.sql(table)
+      schema = as_ident_or_sql(schema),
+      table = as_ident_or_sql(table)
     ),
     class = "dbplyr_schema"
   )
@@ -49,9 +49,9 @@ in_schema <- function(schema, table) {
 in_catalog <- function(catalog, schema, table) {
   structure(
     list(
-      schema = as.sql(schema),
-      table = as.sql(table),
-      catalog = as.sql(catalog)
+      schema = as_ident_or_sql(schema),
+      table = as_ident_or_sql(table),
+      catalog = as_ident_or_sql(catalog)
     ),
     class = "dbplyr_catalog"
   )
@@ -59,7 +59,8 @@ in_catalog <- function(catalog, schema, table) {
 
 #' @export
 format.dbplyr_schema <- function(x, ...) {
-  paste0(escape_ansi(x$schema), ".", escape_ansi(x$table))
+  con <- simulate_dbi()
+  sql_glue2(simulate_dbi(), "{.tbl x$schema}.{.tbl x$table}")
 }
 #' @export
 print.dbplyr_schema <- function(x, ...) {
@@ -68,58 +69,13 @@ print.dbplyr_schema <- function(x, ...) {
 
 #' @export
 format.dbplyr_catalog <- function(x, ...) {
-  paste0(
-    escape_ansi(x$catalog),
-    ".",
-    escape_ansi(x$schema),
-    ".",
-    escape_ansi(x$table)
-  )
+  sql_glue2(simulate_dbi(), "{.tbl x$catalog}.{.tbl x$schema}.{.tbl x$table}")
 }
 #' @export
 print.dbplyr_catalog <- function(x, ...) {
   cat_line("<CATALOG> ", format(x))
 }
 
-#' @export
-as.sql.dbplyr_schema <- function(x, con) {
-  ident_q(paste0(escape(x$schema, con = con), ".", escape(x$table, con = con)))
-}
-
-#' @export
-as.sql.dbplyr_catalog <- function(x, con) {
-  ident_q(paste0(
-    escape(x$catalog, con = con),
-    ".",
-    escape(x$schema, con = con),
-    ".",
-    escape(x$table, con = con)
-  ))
-}
-
 is_schema <- function(x) inherits(x, "dbplyr_schema")
 
 is_catalog <- function(x) inherits(x, "dbplyr_catalog")
-
-# Support for DBI::Id() ---------------------------------------------------
-
-#' @export
-as.sql.Id <- function(x, con) ident_q(dbQuoteIdentifier(con, x))
-
-# Old dbplyr approach -----------------------------------------------------
-
-#' Declare a identifier as being pre-quoted.
-#'
-#' No longer needed; please use [sql()] instead.
-#'
-#' @keywords internal
-#' @export
-ident_q <- function(...) {
-  x <- c_character(...)
-  structure(x, class = c("ident_q", "ident", "character"))
-}
-
-#' @export
-escape.ident_q <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
-  sql_vector(names_to_as(x, names2(x), con = con), parens, collapse, con = con)
-}

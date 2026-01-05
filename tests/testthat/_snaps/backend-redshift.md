@@ -3,37 +3,37 @@
     Code
       remote_query(copy_inline(con, slice(y, 0)))
     Output
-      <SQL> SELECT CAST(NULL AS INTEGER) AS `id`, CAST(NULL AS TEXT) AS `arr`
+      <SQL> SELECT CAST(NULL AS INTEGER) AS "id", CAST(NULL AS TEXT) AS "arr"
       WHERE (0 = 1)
     Code
       remote_query(copy_inline(con, y))
     Output
-      <SQL> SELECT CAST(`id` AS INTEGER) AS `id`, CAST(`arr` AS TEXT) AS `arr`
+      <SQL> SELECT CAST("id" AS INTEGER) AS "id", CAST("arr" AS TEXT) AS "arr"
       FROM (
-        SELECT NULL AS `id`, NULL AS `arr`
+        SELECT NULL AS "id", NULL AS "arr"
         WHERE (0 = 1)
       
         UNION ALL
       
         SELECT 1, '{1,2,3}'
-      ) AS `values_table`
+      ) AS "values_table"
     Code
       remote_query(copy_inline(con, slice(y, 0), types = types))
     Output
-      <SQL> SELECT CAST(NULL AS bigint) AS `id`, CAST(NULL AS integer[]) AS `arr`
+      <SQL> SELECT CAST(NULL AS bigint) AS "id", CAST(NULL AS integer[]) AS "arr"
       WHERE (0 = 1)
     Code
       remote_query(copy_inline(con, y, types = types))
     Output
-      <SQL> SELECT CAST(`id` AS bigint) AS `id`, CAST(`arr` AS integer[]) AS `arr`
+      <SQL> SELECT CAST("id" AS bigint) AS "id", CAST("arr" AS integer[]) AS "arr"
       FROM (
-        SELECT NULL AS `id`, NULL AS `arr`
+        SELECT NULL AS "id", NULL AS "arr"
         WHERE (0 = 1)
       
         UNION ALL
       
         SELECT 1, '{1,2,3}'
-      ) AS `values_table`
+      ) AS "values_table"
 
 # custom clock functions translated correctly
 

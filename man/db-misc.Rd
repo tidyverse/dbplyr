@@ -36,7 +36,7 @@ See below for more details.
 Other generic: 
 \code{\link{db-sql}},
 \code{\link{db_copy_to}()},
-\code{\link{sql_escape_logical}()}
+\code{\link{escape}()}
 }
 \concept{generic}
 \keyword{internal}

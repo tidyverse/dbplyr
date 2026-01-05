@@ -33,23 +33,23 @@ head.tbl_lazy <- function(x, n = 6L, ...) {
   }
   n <- trunc(n)
 
-  x$lazy_query <- add_head(x, n)
+  x$lazy_query <- add_head(x$lazy_query, n)
   x
 }
 
-add_head <- function(x, n) {
-  lazy_query <- x$lazy_query
-  if (!is_lazy_select_query(lazy_query)) {
-    lazy_query <- lazy_select_query(
-      x = lazy_query,
-      limit = n
-    )
-
-    return(lazy_query)
+add_head <- function(lazy_query, n) {
+  if (can_inline_head(lazy_query)) {
+    lazy_query$limit <- min(lazy_query$limit, n)
+    lazy_query
+  } else {
+    lazy_select_query(x = lazy_query, limit = n)
   }
+}
 
-  lazy_query$limit <- min(lazy_query$limit, n)
-  lazy_query
+# head() modifies the LIMIT clause
+# LIMIT happens last so can always inline
+can_inline_head <- function(lazy_query) {
+  is_lazy_select_query(lazy_query)
 }
 
 #' @export

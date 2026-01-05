@@ -4,8 +4,8 @@
       mutate(lf, detected = str_detect(x, "abc"))
     Output
       <SQL>
-      SELECT `df`.*, CAST(IIF(REGEXP_LIKE(`x`, 'abc'), 1, 0) AS BIT) AS `detected`
-      FROM `df`
+      SELECT [df].*, CAST(IIF(REGEXP_LIKE([x], 'abc'), 1, 0) AS BIT) AS [detected]
+      FROM [df]
 
 ---
 
@@ -13,9 +13,9 @@
       filter(lf, str_detect(x, "abc"))
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      WHERE (REGEXP_LIKE(`x`, 'abc'))
+      SELECT [df].*
+      FROM [df]
+      WHERE (REGEXP_LIKE([x], 'abc'))
 
 # custom aggregators translated correctly
 
@@ -102,9 +102,9 @@
       filter(mf, is.na(x))
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      WHERE ((`x` IS NULL))
+      SELECT [df].*
+      FROM [df]
+      WHERE (([x] IS NULL))
 
 ---
 
@@ -112,9 +112,9 @@
       filter(mf, !is.na(x))
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      WHERE (NOT((`x` IS NULL)))
+      SELECT [df].*
+      FROM [df]
+      WHERE (NOT(([x] IS NULL)))
 
 ---
 
@@ -122,9 +122,9 @@
       filter(mf, x == 1L || x == 2L)
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      WHERE (`x` = 1 OR `x` = 2)
+      SELECT [df].*
+      FROM [df]
+      WHERE ([x] = 1 OR [x] = 2)
 
 ---
 
@@ -132,8 +132,8 @@
       mutate(mf, z = ifelse(x == 1L, 1L, 2L))
     Output
       <SQL>
-      SELECT `df`.*, CASE WHEN (`x` = 1) THEN 1 WHEN NOT (`x` = 1) THEN 2 END AS `z`
-      FROM `df`
+      SELECT [df].*, CASE WHEN ([x] = 1) THEN 1 WHEN NOT ([x] = 1) THEN 2 END AS [z]
+      FROM [df]
 
 ---
 
@@ -141,8 +141,8 @@
       mutate(mf, z = case_when(x == 1L ~ 1L))
     Output
       <SQL>
-      SELECT `df`.*, CASE WHEN (`x` = 1) THEN 1 END AS `z`
-      FROM `df`
+      SELECT [df].*, CASE WHEN ([x] = 1) THEN 1 END AS [z]
+      FROM [df]
 
 ---
 
@@ -150,8 +150,8 @@
       mutate(mf, z = !is.na(x))
     Output
       <SQL>
-      SELECT `df`.*, ~CAST(IIF((`x` IS NULL), 1, 0) AS BIT) AS `z`
-      FROM `df`
+      SELECT [df].*, ~CAST(IIF(([x] IS NULL), 1, 0) AS BIT) AS [z]
+      FROM [df]
 
 ---
 
@@ -159,8 +159,8 @@
       mutate(mf, x = x == 1L)
     Output
       <SQL>
-      SELECT CAST(IIF(`x` = 1, 1, 0) AS BIT) AS `x`
-      FROM `df`
+      SELECT CAST(IIF([x] = 1, 1, 0) AS BIT) AS [x]
+      FROM [df]
 
 ---
 
@@ -168,8 +168,8 @@
       mutate(mf, x = x == 1L || x == 2L)
     Output
       <SQL>
-      SELECT CAST(IIF(`x` = 1 OR `x` = 2, 1, 0) AS BIT) AS `x`
-      FROM `df`
+      SELECT CAST(IIF([x] = 1 OR [x] = 2, 1, 0) AS BIT) AS [x]
+      FROM [df]
 
 ---
 
@@ -177,8 +177,8 @@
       mutate(mf, x = x == 1L || x == 2L || x == 3L)
     Output
       <SQL>
-      SELECT CAST(IIF(`x` = 1 OR `x` = 2 OR `x` = 3, 1, 0) AS BIT) AS `x`
-      FROM `df`
+      SELECT CAST(IIF([x] = 1 OR [x] = 2 OR [x] = 3, 1, 0) AS BIT) AS [x]
+      FROM [df]
 
 ---
 
@@ -186,31 +186,31 @@
       mutate(mf, x = !(x == 1L || x == 2L || x == 3L))
     Output
       <SQL>
-      SELECT ~CAST(IIF((`x` = 1 OR `x` = 2 OR `x` = 3), 1, 0) AS BIT) AS `x`
-      FROM `df`
+      SELECT ~CAST(IIF(([x] = 1 OR [x] = 2 OR [x] = 3), 1, 0) AS BIT) AS [x]
+      FROM [df]
 
 # handles ORDER BY in subqueries
 
     Code
-      sql_query_select(simulate_mssql(), ident("x"), ident("y"), order_by = "z",
+      sql_query_select(simulate_mssql(), sql("[x]"), sql("[y]"), order_by = "z",
       subquery = TRUE)
     Condition
       Warning:
       ORDER BY is ignored in subqueries without LIMIT
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
-      <SQL> SELECT `x`
-      FROM `y`
+      <SQL> SELECT [x]
+      FROM [y]
 
 # custom limit translation
 
     Code
-      sql_query_select(simulate_mssql(), ident("x"), ident("y"), order_by = ident("z"),
+      sql_query_select(simulate_mssql(), sql("[x]"), sql("[y]"), order_by = sql("[z]"),
       limit = 10)
     Output
-      <SQL> SELECT TOP 10 `x`
-      FROM `y`
-      ORDER BY `z`
+      <SQL> SELECT TOP 10 [x]
+      FROM [y]
+      ORDER BY [z]
 
 # custom escapes translated correctly
 
@@ -218,9 +218,9 @@
       filter(mf, x == a)
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      WHERE (`x` = 0x616263)
+      SELECT [df].*
+      FROM [df]
+      WHERE ([x] = 0x616263)
 
 ---
 
@@ -228,9 +228,9 @@
       filter(mf, x %in% L)
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      WHERE (`x` IN (0x616263, 0x0102))
+      SELECT [df].*
+      FROM [df]
+      WHERE ([x] IN (0x616263, 0x0102))
 
 ---
 
@@ -238,9 +238,9 @@
       qry
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      WHERE (`x` IN (0x616263, 0x0102))
+      SELECT [df].*
+      FROM [df]
+      WHERE ([x] IN (0x616263, 0x0102))
 
 # logical escaping to 0/1 for both filter() and mutate()
 
@@ -248,9 +248,9 @@
       filter(mf, x == TRUE)
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      WHERE (`x` = 1)
+      SELECT [df].*
+      FROM [df]
+      WHERE ([x] = 1)
 
 ---
 
@@ -258,22 +258,22 @@
       mutate(mf, x = TRUE)
     Output
       <SQL>
-      SELECT 1 AS `x`
-      FROM `df`
+      SELECT 1 AS [x]
+      FROM [df]
 
 # generates custom sql
 
     Code
       sql_table_analyze(con, in_schema("schema", "tbl"))
     Output
-      <SQL> UPDATE STATISTICS `schema`.`tbl`
+      <SQL> UPDATE STATISTICS [schema].[tbl]
 
 ---
 
     Code
       sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"))
     Output
-      <SQL> SELECT * INTO `schema`.`tbl` FROM (
+      <SQL> SELECT * INTO [schema].[tbl] FROM (
         SELECT * FROM foo
       ) AS temp
 
@@ -283,7 +283,7 @@
       sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"),
       temporary = FALSE)
     Output
-      <SQL> SELECT * INTO `schema`.`tbl` FROM (
+      <SQL> SELECT * INTO [schema].[tbl] FROM (
         SELECT * FROM foo
       ) AS temp
 
@@ -293,12 +293,16 @@
       slice_sample(lf, n = 1)
     Output
       <SQL>
-      SELECT `x`
+      SELECT [x]
       FROM (
-        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY RAND(CHECKSUM(NEWID()))) AS `col01`
-        FROM `df`
-      ) AS `q01`
-      WHERE (`col01` <= 1)
+        SELECT
+          [df].*,
+          CASE
+      WHEN (NOT(((RAND(CHECKSUM(NEWID()))) IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN (((RAND(CHECKSUM(NEWID()))) IS NULL)) THEN 1 ELSE 0 END) ORDER BY RAND(CHECKSUM(NEWID())))
+      END AS [col01]
+        FROM [df]
+      ) AS [q01]
+      WHERE ([col01] <= 1)
 
 ---
 
@@ -306,9 +310,9 @@
       remote_query(copy_inline(con, tibble(x = 1:2, y = letters[1:2])))
     Output
       <SQL> SELECT
-        TRY_CAST(TRY_CAST(`x` AS NUMERIC) AS INT) AS `x`,
-        TRY_CAST(`y` AS VARCHAR(MAX)) AS `y`
-      FROM (  VALUES (1, 'a'), (2, 'b')) AS drvd(`x`, `y`)
+        TRY_CAST(TRY_CAST([x] AS NUMERIC) AS INT) AS [x],
+        TRY_CAST([y] AS VARCHAR(MAX)) AS [y]
+      FROM (  VALUES (1, 'a'), (2, 'b')) AS drvd([x], [y])
 
 ---
 
@@ -316,9 +320,9 @@
       remote_query(copy_inline(con, trees))
     Output
       <SQL> SELECT
-        TRY_CAST(`Girth` AS FLOAT) AS `Girth`,
-        TRY_CAST(`Height` AS FLOAT) AS `Height`,
-        TRY_CAST(`Volume` AS FLOAT) AS `Volume`
+        TRY_CAST([Girth] AS FLOAT) AS [Girth],
+        TRY_CAST([Height] AS FLOAT) AS [Height],
+        TRY_CAST([Volume] AS FLOAT) AS [Volume]
       FROM (
         VALUES
           (8.3, 70.0, 10.3),
@@ -352,7 +356,7 @@
           (18.0, 80.0, 51.5),
           (18.0, 80.0, 51.0),
           (20.6, 87.0, 77.0)
-      ) AS drvd(`Girth`, `Height`, `Volume`)
+      ) AS drvd([Girth], [Height], [Volume])
 
 # `sql_query_insert()` is correct
 
@@ -361,16 +365,16 @@
         lvl = 1), insert_cols = colnames(df_y), by = c("a", "b"), conflict = "ignore",
       returning_cols = c("a", b2 = "b"))
     Output
-      <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
-      OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`
+      <SQL> INSERT INTO [df_x] ([a], [b], [c], [d])
+      OUTPUT [INSERTED].[a], [INSERTED].[b] AS [b2]
       SELECT *
       FROM (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
-      ) AS `...y`
+        SELECT [a], [b], [c] + 1.0 AS [c], [d]
+        FROM [df_y]
+      ) AS [...y]
       WHERE NOT EXISTS (
-        SELECT 1 FROM `df_x`
-        WHERE (`df_x`.`a` = `...y`.`a`) AND (`df_x`.`b` = `...y`.`b`)
+        SELECT 1 FROM [df_x]
+        WHERE ([df_x].[a] = [...y].[a]) AND ([df_x].[b] = [...y].[b])
       )
 
 # `sql_query_append()` is correct
@@ -379,30 +383,30 @@
       sql_query_append(con = con, table = ident("df_x"), from = sql_render(df_y, con,
         lvl = 1), insert_cols = colnames(df_y), returning_cols = c("a", b2 = "b"))
     Output
-      <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
-      OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`
+      <SQL> INSERT INTO [df_x] ([a], [b], [c], [d])
+      OUTPUT [INSERTED].[a], [INSERTED].[b] AS [b2]
       SELECT *
       FROM (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
-      ) AS `...y`
+        SELECT [a], [b], [c] + 1.0 AS [c], [d]
+        FROM [df_y]
+      ) AS [...y]
 
 # `sql_query_update_from()` is correct
 
     Code
       sql_query_update_from(con = con, table = ident("df_x"), from = sql_render(df_y,
-        con, lvl = 1), by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
-        d = "`...y`.`d`"), returning_cols = c("a", b2 = "b"))
+        con, lvl = 1), by = c("a", "b"), update_values = sql(c = "COALESCE([df_x].[c], [...y].[c])",
+        d = "[...y].[d]"), returning_cols = c("a", b2 = "b"))
     Output
-      <SQL> UPDATE `df_x`
-      SET `c` = COALESCE(`df_x`.`c`, `...y`.`c`), `d` = `...y`.`d`
-      OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`
-      FROM `df_x`
+      <SQL> UPDATE [df_x]
+      SET [c] = COALESCE([df_x].[c], [...y].[c]), [d] = [...y].[d]
+      OUTPUT [INSERTED].[a], [INSERTED].[b] AS [b2]
+      FROM [df_x]
       INNER JOIN (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
-      ) AS `...y`
-        ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
+        SELECT [a], [b], [c] + 1.0 AS [c], [d]
+        FROM [df_y]
+      ) AS [...y]
+        ON [...y].[a] = [df_x].[a] AND [...y].[b] = [df_x].[b]
 
 # `sql_query_delete()` is correct
 
@@ -411,14 +415,14 @@
         df_y, simulate_mssql(), lvl = 2), by = c("a", "b"), returning_cols = c("a",
         b2 = "b"))
     Output
-      <SQL> DELETE FROM `df_x`
-      OUTPUT `DELETED`.`a`, `DELETED`.`b` AS `b2`
+      <SQL> DELETE FROM [df_x]
+      OUTPUT [DELETED].[a], [DELETED].[b] AS [b2]
       WHERE EXISTS (
         SELECT 1 FROM (
-          SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-          FROM `df_y`
-      ) AS `...y`
-        WHERE (`...y`.`a` = `df_x`.`a`) AND (`...y`.`b` = `df_x`.`b`)
+          SELECT [a], [b], [c] + 1.0 AS [c], [d]
+          FROM [df_y]
+      ) AS [...y]
+        WHERE ([...y].[a] = [df_x].[a]) AND ([...y].[b] = [df_x].[b])
       )
 
 # `sql_query_upsert()` is correct
@@ -428,18 +432,18 @@
         lvl = 1), by = c("a", "b"), update_cols = c("c", "d"), returning_cols = c("a",
         b2 = "b"))
     Output
-      <SQL> MERGE INTO `df_x`
+      <SQL> MERGE INTO [df_x]
       USING (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
-      ) AS `...y`
-        ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
+        SELECT [a], [b], [c] + 1.0 AS [c], [d]
+        FROM [df_y]
+      ) AS [...y]
+        ON [...y].[a] = [df_x].[a] AND [...y].[b] = [df_x].[b]
       WHEN MATCHED THEN
-        UPDATE SET `c` = `...y`.`c`, `d` = `...y`.`d`
+        UPDATE SET [c] = [...y].[c], [d] = [...y].[d]
       WHEN NOT MATCHED THEN
-        INSERT (`a`, `b`, `c`, `d`)
-        VALUES (`...y`.`a`, `...y`.`b`, `...y`.`c`, `...y`.`d`)
-      OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`
+        INSERT ([a], [b], [c], [d])
+        VALUES ([...y].[a], [...y].[b], [...y].[c], [...y].[d])
+      OUTPUT [INSERTED].[a], [INSERTED].[b] AS [b2]
       ;
 
 # atoms and symbols are cast to bit in `filter`
@@ -448,9 +452,9 @@
       filter(mf, x)
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      WHERE (cast(`x` AS `BIT`) = 1)
+      SELECT [df].*
+      FROM [df]
+      WHERE (cast([x] AS [BIT]) = 1)
 
 ---
 
@@ -458,9 +462,9 @@
       filter(mf, TRUE)
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      WHERE (cast(1 AS `BIT`) = 1)
+      SELECT [df].*
+      FROM [df]
+      WHERE (cast(1 AS [BIT]) = 1)
 
 ---
 
@@ -468,9 +472,9 @@
       filter(mf, (!x) | FALSE)
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      WHERE ((NOT(cast(`x` AS `BIT`) = 1)) OR cast(0 AS `BIT`) = 1)
+      SELECT [df].*
+      FROM [df]
+      WHERE ((NOT(cast([x] AS [BIT]) = 1)) OR cast(0 AS [BIT]) = 1)
 
 ---
 
@@ -478,14 +482,14 @@
       inner_join(filter(mf, x), mf, by = "x")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`
+      SELECT [LHS].[x] AS [x]
       FROM (
-        SELECT `df`.*
-        FROM `df`
-        WHERE (cast(`x` AS `BIT`) = 1)
-      ) AS `LHS`
-      INNER JOIN `df`
-        ON (`LHS`.`x` = `df`.`x`)
+        SELECT [df].*
+        FROM [df]
+        WHERE (cast([x] AS [BIT]) = 1)
+      ) AS [LHS]
+      INNER JOIN [df]
+        ON ([LHS].[x] = [df].[x])
 
 # row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per empty_order)
 
@@ -493,8 +497,8 @@
       mutate(mf, rown = row_number())
     Output
       <SQL>
-      SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS `rown`
-      FROM `df`
+      SELECT [df].*, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS [rown]
+      FROM [df]
 
 ---
 
@@ -503,9 +507,9 @@
     Output
       <SQL>
       SELECT
-        `df`.*,
-        ROW_NUMBER() OVER (PARTITION BY `y` ORDER BY (SELECT NULL)) AS `rown`
-      FROM `df`
+        [df].*,
+        ROW_NUMBER() OVER (PARTITION BY [y] ORDER BY (SELECT NULL)) AS [rown]
+      FROM [df]
 
 ---
 
@@ -513,9 +517,9 @@
       mutate(arrange(mf, y), rown = row_number())
     Output
       <SQL>
-      SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY `y`) AS `rown`
-      FROM `df`
-      ORDER BY `y`
+      SELECT [df].*, ROW_NUMBER() OVER (ORDER BY [y]) AS [rown]
+      FROM [df]
+      ORDER BY [y]
 
 # count_big
 
@@ -523,8 +527,8 @@
       count(mf)
     Output
       <SQL>
-      SELECT COUNT_BIG(*) AS `n`
-      FROM `df`
+      SELECT COUNT_BIG(*) AS [n]
+      FROM [df]
 
 # add prefix to temporary table
 

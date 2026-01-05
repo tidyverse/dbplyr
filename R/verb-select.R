@@ -27,22 +27,6 @@ select.tbl_lazy <- function(.data, ...) {
   .data
 }
 
-ensure_group_vars <- function(loc, data, notify = TRUE) {
-  group_loc <- match(group_vars(data), colnames(data))
-  missing <- setdiff(group_loc, loc)
-
-  if (length(missing) > 0) {
-    vars <- colnames(data)[missing]
-    if (notify) {
-      cli::cli_inform("Adding missing grouping variables: {.var {vars}}")
-    }
-    loc <- c(set_names(missing, vars), loc)
-  }
-
-  loc
-}
-
-
 #' @rdname select.tbl_lazy
 #' @importFrom dplyr rename
 #' @export
@@ -86,7 +70,10 @@ relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
     after_arg = ".after"
   )
 
-  dplyr::select(.data, !!!loc)
+  new_vars <- set_names(colnames(.data)[loc], names(loc))
+
+  .data$lazy_query <- add_select(.data$lazy_query, new_vars)
+  .data
 }
 
 # op_select ---------------------------------------------------------------
@@ -99,8 +86,9 @@ add_select <- function(lazy_query, vars) {
     return(lazy_query)
   }
 
-  lazy_query <- rename_groups(lazy_query, vars)
-  lazy_query <- rename_order(lazy_query, vars)
+  # Update grouping/ordering with new variable names
+  lazy_query$group_vars <- rename_groups(op_grps(lazy_query), vars)
+  lazy_query$order_vars <- rename_order(op_sort(lazy_query), vars)
 
   is_join <- inherits(lazy_query, "lazy_multi_join_query") ||
     inherits(lazy_query, "lazy_rf_join_query") ||
@@ -113,80 +101,71 @@ add_select <- function(lazy_query, vars) {
     return(lazy_query)
   }
 
-  is_select <- is_lazy_select_query(lazy_query)
-  select_can_be_inlined <- select_can_be_inlined(lazy_query, vars)
-  if (is_select && select_can_be_inlined) {
+  if (can_inline_select(lazy_query, vars)) {
     idx <- vctrs::vec_match(vars, vars_data)
 
     lazy_query$select <- vctrs::vec_slice(lazy_query$select, idx)
     lazy_query$select$name <- names(vars)
+    lazy_query
+  } else {
+    lazy_select_query(
+      x = lazy_query,
+      select_operation = "select",
+      select = syms(vars)
+    )
+  }
+}
 
-    return(lazy_query)
+# select() modifies the SELECT clause
+# * ORDER BY can reference SELECT columns by name
+#   => computed columns used in ORDER BY must be preserved
+# * DISTINCT operates on the SELECT result
+#   => can only inline bijective projections (same columns, different order)
+can_inline_select <- function(lazy_query, vars) {
+  if (!is_lazy_select_query(lazy_query)) {
+    return(FALSE)
   }
 
-  lazy_select_query(
-    x = lazy_query,
-    select_operation = "select",
-    select = syms(vars)
-  )
-}
-
-select_can_be_inlined <- function(lazy_query, vars) {
-  # all computed columns used for ordering (if any) must be present
-  computed_flag <- purrr::map_lgl(lazy_query$select$expr, is_quosure)
-  computed_columns <- lazy_query$select$name[computed_flag]
-
+  is_mutate <- purrr::map_lgl(lazy_query$select$expr, is_quosure)
+  computed_columns <- lazy_query$select$name[is_mutate]
   order_vars <- purrr::map_chr(lazy_query$order_by, as_label)
   ordered_present <- all(intersect(computed_columns, order_vars) %in% vars)
+  if (!ordered_present) {
+    return(FALSE)
+  }
 
-  # if the projection is distinct, it must be bijective
-  is_distinct <- is_true(lazy_query$distinct)
-  is_bijective_projection <- identical(sort(unname(vars)), op_vars(lazy_query))
-  distinct_is_bijective <- !is_distinct || is_bijective_projection
-
-  ordered_present && distinct_is_bijective
+  if (is_true(lazy_query$distinct)) {
+    identical(sort(unname(vars)), op_vars(lazy_query))
+  } else {
+    TRUE
+  }
 }
 
-rename_groups <- function(lazy_query, vars) {
-  old2new <- set_names(names(vars), vars)
-  grps <- op_grps(lazy_query)
-  renamed <- grps %in% names(old2new)
-  grps[renamed] <- old2new[grps[renamed]]
-
-  lazy_query$group_vars <- grps
-  lazy_query
+rename_groups <- function(group_vars, select_vars) {
+  old2new <- set_names(names(select_vars), select_vars)
+  renamed <- group_vars %in% names(old2new)
+  group_vars[renamed] <- old2new[group_vars[renamed]]
+  group_vars
 }
 
-rename_order <- function(lazy_query, vars) {
-  old2new <- set_names(names(vars), vars)
-  order <- op_sort(lazy_query)
+rename_order <- function(order_vars, select_vars) {
+  # Drop any ordering variables not used in the output
+  order_names <- purrr::map_chr(order_vars, \(var) all_names(var)[[1]])
+  order_vars <- order_vars[order_names %in% select_vars]
 
-  is_desc <- purrr::map_lgl(
-    order,
-    function(x) {
-      if (is_quosure(x)) {
-        quo_is_call(x, "desc", n = 1L)
-      } else {
-        is_call(x, "desc", n = 1L)
-      }
-    }
-  )
-
-  order <- purrr::map_if(order, is_desc, \(x) call_args(x)[[1L]])
-  order <- purrr::map_chr(order, as_name)
-
-  keep <- order %in% names(old2new)
-  order[keep] <- syms(old2new[order[keep]])
-
-  order <- purrr::map_if(order, is_desc, \(x) call2("desc", x))
-  lazy_query$order_vars <- order[keep]
-  lazy_query
+  # Rename the remaining
+  order_vars[] <- replace_sym(order_vars, select_vars, syms(names(select_vars)))
+  order_vars
 }
 
+# Helpers ----------------------------------------------------------------------
+
+# Selection, rename, or relocation
 is_projection <- function(exprs) {
   purrr::every(exprs, is_symbol)
 }
 
+# Selection or relocation
 is_pure_projection <- function(exprs, names) {
   if (!is_projection(exprs)) {
     return(FALSE)
@@ -196,10 +175,26 @@ is_pure_projection <- function(exprs, names) {
   identical(expr_vars, names)
 }
 
+# Selects all variables
 is_identity <- function(exprs, names, names_prev) {
   if (!is_pure_projection(exprs, names)) {
     return(FALSE)
   }
 
   identical(names, names_prev)
+}
+
+ensure_group_vars <- function(loc, data, notify = TRUE) {
+  group_loc <- match(group_vars(data), colnames(data))
+  missing <- setdiff(group_loc, loc)
+
+  if (length(missing) > 0) {
+    vars <- colnames(data)[missing]
+    if (notify) {
+      cli::cli_inform("Adding missing grouping variables: {.var {vars}}")
+    }
+    loc <- c(set_names(missing, vars), loc)
+  }
+
+  loc
 }

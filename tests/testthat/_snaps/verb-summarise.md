@@ -6,6 +6,33 @@
       Error in `reframe()`:
       ! `reframe()` is not supported on database backends.
 
+# can performed grouped summarise with no inputs
+
+    Code
+      show_query(out)
+    Output
+      <SQL>
+      SELECT `x`
+      FROM `empty-summarise`
+      GROUP BY `x`
+
+# generates minimal sql when possible
+
+    Code
+      summarise(arrange(lf, x), y = mean(x))
+    Output
+      <SQL>
+      SELECT AVG("x") AS "y"
+      FROM "df"
+      ORDER BY "x"
+    Code
+      summarise(filter(lf, x < 1), y = mean(x))
+    Output
+      <SQL>
+      SELECT AVG("x") AS "y"
+      FROM "df"
+      WHERE ("x" < 1.0)
+
 # can't refer to freshly created variables
 
     Code
@@ -54,23 +81,20 @@
 # summarise(.groups=)
 
     Code
-      eval_bare(expr(remote_query(dplyr::summarise(dplyr::group_by(lazy_frame(x = 1,
-        y = 2), x, y)))), env(global_env()))
-    Message
-      `summarise()` has grouped output by "x". You can override using the `.groups` argument.
-    Output
-      <SQL> SELECT `x`, `y`
-      FROM `df`
-      GROUP BY `x`, `y`
-
----
-
-    Code
       summarise(df, .groups = "rowwise")
     Condition
       Error in `summarise()`:
       ! `.groups` can't be "rowwise" in dbplyr
       i Possible values are NULL (default), "drop_last", "drop", and "keep"
+
+# summarise produces informative message about grouping
+
+    Code
+      . <- summarise(lf)
+    Message
+      ! Grouped output by "x".
+      i Override behaviour and silence this message with the `.groups` argument.
+      i Or use `.by` instead of `group_by()`.
 
 # summarise can modify grouping variables
 
@@ -78,9 +102,9 @@
       (result1 <- summarise(group_by(lf, g), g = g + 1))
     Output
       <SQL>
-      SELECT `g` + 1.0 AS `g`
-      FROM `df`
-      GROUP BY `g`
+      SELECT "g" + 1.0 AS "g"
+      FROM "df"
+      GROUP BY "g"
 
 ---
 
@@ -88,9 +112,9 @@
       (result2 <- summarise(group_by(lf, g), x = x + 1, g = g + 1))
     Output
       <SQL>
-      SELECT `g` + 1.0 AS `g`, `x` + 1.0 AS `x`
-      FROM `df`
-      GROUP BY `g`
+      SELECT "g" + 1.0 AS "g", "x" + 1.0 AS "x"
+      FROM "df"
+      GROUP BY "g"
 
 # across() does not select grouping variables
 
@@ -98,9 +122,9 @@
       summarise(group_by(df, g), across(.fns = ~0))
     Output
       <SQL>
-      SELECT `g`, 0.0 AS `x`
-      FROM `df`
-      GROUP BY `g`
+      SELECT "g", 0.0 AS "x"
+      FROM "df"
+      GROUP BY "g"
 
 # across doesn't select columns from `.by` #1493
 
@@ -108,9 +132,9 @@
       out
     Output
       <SQL>
-      SELECT `g`, SUM(`..x`) AS `x`
-      FROM `df`
-      GROUP BY `g`
+      SELECT "g", SUM("..x") AS "x"
+      FROM "df"
+      GROUP BY "g"
 
 # can't use `.by` with `.groups`
 

@@ -1,17 +1,36 @@
 test_that("two arranges equivalent to one", {
-  skip("not clear whether test makes sense")
-  mf <- memdb_frame(x = c(2, 2, 1), y = c(1, -1, 1))
+  mf <- local_memdb_frame(x = c(2, 2, 1), y = c(1, -1, 1))
 
   mf1 <- mf |> arrange(x, y)
   mf2 <- mf |> arrange(y) |> arrange(x)
 
-  expect_warning(compare_tbl(mf1, mf2))
+  expect_equal(mf1 |> collect(), mf2 |> collect())
+})
+
+test_that("correctly inlines across all verbs", {
+  lf <- lazy_frame(x = 1, y = 2)
+
+  # single table verbs
+  expect_selects(lf |> arrange(x) |> arrange(y), 1)
+  expect_selects(lf |> distinct() |> arrange(y), 1)
+  expect_selects(lf |> filter(x) |> arrange(y), 1)
+  expect_selects(lf |> head(1) |> arrange(y), 2) # TODO: 1?
+  expect_selects(lf |> mutate(y = x + 1) |> arrange(y), 1)
+  expect_selects(lf |> select(y = x) |> arrange(y), 1)
+  expect_selects(lf |> summarise(y = mean(x)) |> arrange(y), 1)
+
+  # two table verbs
+  lf2 <- lazy_frame(x = 1)
+  expect_selects(lf |> left_join(lf2, by = "x") |> arrange(y), 2)
+  expect_selects(lf |> right_join(lf2, by = "x") |> arrange(y), 2)
+  expect_selects(lf |> semi_join(lf2, by = "x") |> arrange(y), 3)
+  expect_selects(lf |> union(lf2) |> arrange(y), 3)
 })
 
 # sql_render --------------------------------------------------------------
 
 test_that("quoting for rendering ordered grouped table", {
-  db <- copy_to_test("sqlite", tibble(x = 1, y = 2), name = "test-verb-arrange")
+  db <- local_memdb_frame("test-verb-arrange", x = 1, y = 2)
   out <- db |> group_by(x) |> arrange(y) |> ungroup()
   expect_snapshot(sql_render(out))
   expect_equal(collect(out), tibble(x = 1, y = 2))
@@ -89,7 +108,7 @@ test_that("arrange generates order_by", {
     arrange(x) |>
     sql_build()
 
-  expect_equal(out$order_by, sql('`x`'))
+  expect_equal(out$order_by, sql('"x"'))
 })
 
 test_that("arrange converts desc", {
@@ -97,7 +116,7 @@ test_that("arrange converts desc", {
     arrange(desc(x)) |>
     sql_build()
 
-  expect_equal(out$order_by, sql('`x` DESC'))
+  expect_equal(out$order_by, sql('"x" DESC'))
 })
 
 test_that("grouped arrange doesn't order by groups", {
@@ -106,7 +125,7 @@ test_that("grouped arrange doesn't order by groups", {
     arrange(y) |>
     sql_build()
 
-  expect_equal(out$order_by, sql('`y`'))
+  expect_equal(out$order_by, sql('"y"'))
 })
 
 test_that("grouped arrange order by groups when .by_group  is set to TRUE", {
@@ -115,7 +134,7 @@ test_that("grouped arrange order by groups when .by_group  is set to TRUE", {
     group_by(x) |>
     arrange(y, .by_group = TRUE) |>
     sql_build()
-  expect_equal(out$order_by, sql(c('`x`', '`y`')))
+  expect_equal(out$order_by, sql(c('"x"', '"y"')))
 })
 
 # ops ---------------------------------------------------------------------
@@ -128,10 +147,8 @@ test_that("arranges captures DESC", {
 })
 
 test_that("multiple arranges combine", {
-  skip("not clear whether test makes sense")
   out <- lazy_frame(x = 1:3, y = 3:1) |> arrange(x) |> arrange(y)
-  out <- arrange(arrange(lazy_frame(x = 1:3, y = 3:1), x), y)
 
   sort <- lapply(op_sort(out), get_expr)
-  expect_equal(sort, list(quote(x), quote(y)))
+  expect_equal(sort, list(quote(y), quote(x)))
 })

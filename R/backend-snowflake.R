@@ -283,8 +283,8 @@ sql_translation.Snowflake <- function(con) {
         }
       },
       `$` = function(x, name) {
-        if (is.sql(x)) {
-          sql_glue("{x}:{.sql name}")
+        if (is.ident(x)) {
+          sql_glue("{x}:{name}")
         } else {
           eval(bquote(`$`(x, .(substitute(name)))))
         }

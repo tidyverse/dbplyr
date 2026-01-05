@@ -4,13 +4,13 @@
       tidyr::pivot_longer(lazy_frame(x = 1:2, y = 3:4), x:y)
     Output
       <SQL>
-      SELECT 'x' AS `name`, `x` AS `value`
-      FROM `df`
+      SELECT 'x' AS "name", "x" AS "value"
+      FROM "df"
       
       UNION ALL
       
-      SELECT 'y' AS `name`, `y` AS `value`
-      FROM `df`
+      SELECT 'y' AS "name", "y" AS "value"
+      FROM "df"
 
 # can add multiple columns from spec
 
@@ -18,13 +18,13 @@
       pv
     Output
       <SQL>
-      SELECT 11 AS `a`, 13 AS `b`, `x` AS `v`
-      FROM `df`
+      SELECT 11 AS "a", 13 AS "b", "x" AS "v"
+      FROM "df"
       
       UNION ALL
       
-      SELECT 12 AS `a`, 14 AS `b`, `y` AS `v`
-      FROM `df`
+      SELECT 12 AS "a", 14 AS "b", "y" AS "v"
+      FROM "df"
 
 # preserves original keys
 
@@ -32,13 +32,13 @@
       pv
     Output
       <SQL>
-      SELECT `x`, 'y' AS `name`, `y` AS `value`
-      FROM `df`
+      SELECT "x", 'y' AS "name", "y" AS "value"
+      FROM "df"
       
       UNION ALL
       
-      SELECT `x`, 'z' AS `name`, `z` AS `value`
-      FROM `df`
+      SELECT "x", 'z' AS "name", "z" AS "value"
+      FROM "df"
 
 # can drop missing values
 
@@ -47,22 +47,22 @@
       values_drop_na = TRUE)
     Output
       <SQL>
-      SELECT `q01`.*
+      SELECT "q01".*
       FROM (
-        SELECT 'x' AS `name`, `x` AS `value`
-        FROM `df`
+        SELECT 'x' AS "name", "x" AS "value"
+        FROM "df"
       
         UNION ALL
       
-        SELECT 'y' AS `name`, `y` AS `value`
-        FROM `df`
-      ) AS `q01`
-      WHERE (NOT((`value` IS NULL)))
+        SELECT 'y' AS "name", "y" AS "value"
+        FROM "df"
+      ) AS "q01"
+      WHERE (NOT(("value" IS NULL)))
 
 # can handle missing combinations
 
     Code
-      sql
+      show_query(sql)
     Output
       <SQL>
       SELECT `q01`.*, NULL AS `y`
@@ -82,8 +82,8 @@
       tidyr::pivot_longer(lazy_frame(x = 1), x, values_transform = list(value = as.character))
     Output
       <SQL>
-      SELECT 'x' AS `name`, CAST(`x` AS TEXT) AS `value`
-      FROM `df`
+      SELECT 'x' AS "name", CAST("x" AS TEXT) AS "value"
+      FROM "df"
 
 # values_transform can be a formula
 
@@ -92,8 +92,8 @@
         as.character(.x)))
     Output
       <SQL>
-      SELECT 'x' AS `name`, CAST(`x` AS TEXT) AS `value`
-      FROM `df`
+      SELECT 'x' AS "name", CAST("x" AS TEXT) AS "value"
+      FROM "df"
 
 # `values_transform` is validated
 
@@ -116,8 +116,8 @@
       pv
     Output
       <SQL>
-      SELECT 1.0 AS `row`, `x` AS `X`, `y` AS `Y`
-      FROM `df`
+      SELECT 1.0 AS "row", "x" AS "X", "y" AS "Y"
+      FROM "df"
 
 # .value can be at any position in `names_to`
 
@@ -125,13 +125,13 @@
       value_first
     Output
       <SQL>
-      SELECT `i`, 't1' AS `time`, `y_t1` AS `y`, `z_t1` AS `z`
-      FROM `df`
+      SELECT "i", 't1' AS "time", "y_t1" AS "y", "z_t1" AS "z"
+      FROM "df"
       
       UNION ALL
       
-      SELECT `i`, 't2' AS `time`, `y_t2` AS `y`, `z_t2` AS `z`
-      FROM `df`
+      SELECT "i", 't2' AS "time", "y_t2" AS "y", "z_t2" AS "z"
+      FROM "df"
 
 ---
 
@@ -139,13 +139,13 @@
       value_second
     Output
       <SQL>
-      SELECT `i`, 't1' AS `time`, `t1_y` AS `y`, `t1_z` AS `z`
-      FROM `df`
+      SELECT "i", 't1' AS "time", "t1_y" AS "y", "t1_z" AS "z"
+      FROM "df"
       
       UNION ALL
       
-      SELECT `i`, 't2' AS `time`, `t2_y` AS `y`, `t2_z` AS `z`
-      FROM `df`
+      SELECT "i", 't2' AS "time", "t2_y" AS "y", "t2_z" AS "z"
+      FROM "df"
 
 # can repair names
 

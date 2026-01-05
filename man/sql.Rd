@@ -3,26 +3,28 @@
 \name{sql}
 \alias{sql}
 \alias{is.sql}
-\alias{as.sql}
-\title{SQL escaping.}
+\title{Literal SQL escaping}
 \usage{
 sql(...)
 
 is.sql(x)
-
-as.sql(x, con)
 }
 \arguments{
-\item{...}{Character vectors that will be combined into a single SQL
-expression.}
+\item{...}{Character vectors that will be combined into a single SQL vector.}
 
-\item{x}{Object to coerce}
-
-\item{con}{Needed when \code{x} is directly supplied from the user so that
-schema specifications can be quoted using the correct identifiers.}
+\item{x}{Object to check if it is an sql object.}
 }
 \description{
-These functions are critical when writing functions that translate R
-functions to sql functions. Typically a conversion function should escape
-all its inputs and return an sql object.
+Use \code{sql()} to declare that a string is literal SQL and should be used
+as is, without quoting.
+}
+\examples{
+library(dplyr, warn.conflicts = FALSE)
+# sql() just adds a class
+sql("x + 1")
+is.sql(sql("x + 1"))
+
+# You can use it when you need to insert some literal SQL in a query
+db <- memdb_frame(x = 1:3)
+db |> mutate(y = sql("CAST(x as VARCHAR)"))
 }

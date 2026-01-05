@@ -13,20 +13,6 @@ test_that("can copy to from remote sources", {
   expect_equal(collect(df_3), df)
 })
 
-test_that("can round trip basic data frame", {
-  df <- test_frame(x = c(1, 10, 9, NA), y = letters[1:4])
-  expect_equal_tbls(df)
-})
-
-test_that("NAs in character fields handled by db sources (#2256)", {
-  df <- test_frame(
-    x = c("a", "aa", NA),
-    y = c(NA, "b", "bb"),
-    z = c("cc", NA, "c")
-  )
-  expect_equal_tbls(df)
-})
-
 test_that("only overwrite existing table if explicitly requested", {
   con <- local_sqlite_connection()
   local_db_table(con, data.frame(x = 1:5), "df")
@@ -69,4 +55,55 @@ test_that("df must be a local or remote table", {
   con <- local_sqlite_connection()
 
   expect_snapshot(error = TRUE, copy_to(con, list(x = 1), name = "df"))
+})
+
+# as_copy() ---------------------------------------------------------------
+
+test_that("as_copy() converts TRUE/FALSE to enum", {
+  expect_equal(as_copy(TRUE), "temp-table")
+  expect_equal(as_copy(FALSE), "none")
+})
+
+test_that("as_copy() passes through valid strings", {
+  expect_equal(as_copy("none"), "none")
+  expect_equal(as_copy("temp-table"), "temp-table")
+  expect_equal(as_copy("inline"), "inline")
+})
+
+test_that("as_copy() errors on invalid values", {
+  expect_snapshot(as_copy("other"), error = TRUE)
+})
+
+# dbplyr_auto_copy() ----------------------------------------------------
+
+test_that("dbplyr_auto_copy() returns y if same source", {
+  df <- local_memdb_frame(x = 1:3)
+  expect_identical(dbplyr_auto_copy(df, df, copy = FALSE), df)
+})
+
+test_that("dbplyr_auto_copy() errors when copy = FALSE and different sources", {
+  df <- local_memdb_frame(x = 1:3)
+  local_df <- tibble(x = 1:3)
+
+  expect_snapshot(dbplyr_auto_copy(df, local_df, copy = FALSE), error = TRUE)
+  expect_snapshot(dbplyr_auto_copy(df, local_df, copy = "none"), error = TRUE)
+})
+
+test_that("dbplyr_auto_copy() with copy = TRUE copies to temp table", {
+  df <- local_memdb_frame(x = 1:3)
+  local_df <- tibble(x = 1:3)
+
+  out <- dbplyr_auto_copy(df, local_df, copy = TRUE)
+  expect_s3_class(out, "tbl_sql")
+  expect_equal(collect(out), local_df)
+})
+
+test_that("dbplyr_auto_copy() with copy = 'inline' uses copy_inline", {
+  df <- local_memdb_frame(x = 1:3)
+  local_df <- tibble(x = 1:3)
+
+  out <- dbplyr_auto_copy(df, local_df, copy = "inline")
+  expect_s3_class(out, "tbl_sql")
+  expect_s3_class(out$lazy_query, "lazy_base_values_query")
+  expect_equal(collect(out), local_df)
 })

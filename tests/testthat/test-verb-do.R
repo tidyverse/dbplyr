@@ -1,13 +1,10 @@
 test_that("ungrouped data collected first", {
-  out <- memdb_frame(x = 1:2) |> do(head(.))
+  out <- local_memdb_frame(x = 1:2) |> do(head(.))
   expect_equal(out, tibble(x = 1:2))
 })
 
 test_that("named argument become list columns", {
-  mf <- memdb_frame(
-    g = rep(1:3, 1:3),
-    x = 1:6
-  ) |>
+  mf <- local_memdb_frame(g = rep(1:3, 1:3), x = 1:6) |>
     group_by(g)
 
   out <- mf |> do(nrow = nrow(.), ncol = ncol(.))
@@ -16,28 +13,20 @@ test_that("named argument become list columns", {
 })
 
 test_that("unnamed results bound together by row", {
-  mf <- memdb_frame(
-    g = c(1, 1, 2, 2),
-    x = c(3, 9, 4, 9)
-  ) |>
-    group_by(g)
-
-  first <- mf |> do(head(., 1)) |> ungroup()
-  compare_tbl(first, tibble(g = c(1, 2), x = c(3, 4)))
+  mf <- local_memdb_frame(g = c(1, 1, 2, 2), x = c(3, 9, 4, 9))
+  first <- mf |> group_by(g) |> do(head(., 1)) |> ungroup() |> collect()
+  expect_equal(first, tibble(g = c(1, 2), x = c(3, 4)))
 })
 
 test_that("unnamed results must be data frames", {
-  mf <- memdb_frame(
-    g = c(1, 1, 2, 2),
-    x = c(3, 9, 4, 9)
-  ) |>
+  mf <- local_memdb_frame(g = c(1, 1, 2, 2), x = c(3, 9, 4, 9)) |>
     group_by(g)
 
   expect_snapshot(error = TRUE, mf |> do(nrow(.)))
 })
 
 test_that("Results respect select", {
-  mf <- memdb_frame(
+  mf <- local_memdb_frame(
     g = c(1, 1, 2, 2),
     x = c(3, 9, 4, 9),
     y = 1:4,
@@ -51,10 +40,7 @@ test_that("Results respect select", {
 })
 
 test_that("results independent of chunk_size", {
-  mf <- memdb_frame(
-    g = rep(1:3, 1:3),
-    x = 1:6
-  ) |>
+  mf <- local_memdb_frame(g = rep(1:3, 1:3), x = 1:6) |>
     group_by(g)
 
   nrows <- function(group, n) {
@@ -67,10 +53,7 @@ test_that("results independent of chunk_size", {
 })
 
 test_that("named argument become list columns", {
-  mf <- memdb_frame(
-    g = rep(1:3, 1:3),
-    x = 1:6
-  ) |>
+  mf <- local_memdb_frame(g = rep(1:3, 1:3), x = 1:6) |>
     group_by(g)
 
   # mix named and unnamed

@@ -55,8 +55,7 @@ sql_query_select.Oracle <- function(
   lvl = 0
 ) {
   sql_select_clauses(
-    con,
-    select = sql_clause_select(con, select, distinct),
+    select = sql_clause_select(select, distinct),
     from = sql_clause_from(from),
     where = sql_clause_where(where),
     group_by = sql_clause_group_by(group_by),
@@ -83,6 +82,8 @@ sql_query_upsert.Oracle <- function(
   returning_cols = NULL,
   method = NULL
 ) {
+  table <- as_table_path(table, con)
+
   method <- method %||% "merge"
   arg_match(method, c("merge", "cte_update"), error_arg = "method")
   if (method == "cte_update") {
@@ -91,27 +92,28 @@ sql_query_upsert.Oracle <- function(
 
   # https://oracle-base.com/articles/9i/merge-statement
   parts <- rows_prep(con, table, from, by, lvl = 0)
-  update_cols_esc <- sql(sql_escape_ident(con, update_cols))
-  update_values <- sql_table_prefix(con, update_cols, ident("...y"))
+  update_cols_esc <- sql_escape_ident(con, update_cols)
+  update_values <- sql_table_prefix(con, "...y", update_cols)
   update_clause <- sql(paste0(update_cols_esc, " = ", update_values))
 
   insert_cols <- c(by, update_cols)
-  insert_cols_esc <- escape(ident(insert_cols), parens = FALSE, con = con)
-  insert_values <- sql_table_prefix(con, insert_cols, "...y")
+  insert_cols_esc <- sql_escape_ident(con, insert_cols)
+  insert_values <- sql_table_prefix(con, "...y", insert_cols)
 
+  table_sql <- sql_escape_table_source(con, table)
   clauses <- list(
-    sql_clause("MERGE INTO", table),
+    sql_clause("MERGE INTO", table_sql),
     sql_clause("USING", parts$from),
     sql_clause_on(parts$where, lvl = 1, parens = TRUE),
     sql("WHEN MATCHED THEN"),
     sql_clause("UPDATE SET", update_clause, lvl = 1),
     sql("WHEN NOT MATCHED THEN"),
-    sql_clause_insert(con, insert_cols_esc, lvl = 1),
+    sql_clause_insert(insert_cols_esc, lvl = 1),
     sql_clause("VALUES", insert_values, parens = TRUE, lvl = 1),
     sql_returning_cols(con, returning_cols, table),
     sql(";")
   )
-  sql_format_clauses(clauses, lvl = 0, con)
+  sql_format_clauses(clauses, lvl = 0)
 }
 
 #' @export
@@ -191,7 +193,7 @@ sql_translation.Oracle <- function(con) {
 #' @export
 sql_query_explain.Oracle <- function(con, sql, ...) {
   # https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/generating-and-displaying-execution-plans.html
-  c(
+  sql(
     sql_glue2(con, "EXPLAIN PLAN FOR {sql}"),
     sql_glue2(con, "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())")
   )
@@ -250,7 +252,7 @@ sql_values_subquery.Oracle <- function(con, df, types, lvl = 0, ...) {
 }
 
 #' @exportS3Method dplyr::setdiff
-setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
+setdiff.tbl_Oracle <- function(x, y, copy = "none", ...) {
   # Oracle uses MINUS instead of EXCEPT for this operation:
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries004.htm
   x$lazy_query <- add_set_op(x, y, "MINUS", copy = copy, ...)

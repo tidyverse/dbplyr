@@ -241,7 +241,7 @@ partial_eval_fun <- function(fun, env, fn) {
 partial_eval_prepare_fun <- function(call, sym, env) {
   # First resolve any .data/.env pronouns before symbol replacement
   call <- resolve_mask_pronouns(call, env)
-  call <- replace_sym(call, sym, replace = quote(!!.x))
+  call <- replace_sym1(call, sym, replace = quote(!!.x))
   call <- replace_call(call, replace = quote(!!.cur_col))
   function(x, .cur_col) {
     inject(

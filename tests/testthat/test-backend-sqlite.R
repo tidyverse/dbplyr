@@ -7,22 +7,22 @@ test_that("logicals translated to integers", {
 test_that("vectorised translations", {
   con <- simulate_sqlite()
 
-  expect_translation(con, paste(x, y), "`x` || ' ' || `y`")
-  expect_translation(con, paste0(x, y), "`x` || `y`")
+  expect_translation(con, paste(x, y), '`x` || \' \' || `y`')
+  expect_translation(con, paste0(x, y), '`x` || `y`')
 })
 
 test_that("pmin and max become MIN and MAX", {
   con <- simulate_sqlite()
 
-  expect_translation(con, pmin(x, y, na.rm = TRUE), "MIN(`x`, `y`)")
-  expect_translation(con, pmax(x, y, na.rm = TRUE), "MAX(`x`, `y`)")
+  expect_translation(con, pmin(x, y, na.rm = TRUE), 'MIN(`x`, `y`)')
+  expect_translation(con, pmax(x, y, na.rm = TRUE), 'MAX(`x`, `y`)')
 })
 
 test_that("sqlite mimics two argument log", {
   con <- simulate_sqlite()
 
-  expect_translation(con, log(x), "LOG(`x`)")
-  expect_translation(con, log(x, 10), "LOG(`x`) / LOG(10.0)")
+  expect_translation(con, log(x), 'LOG(`x`)')
+  expect_translation(con, log(x, 10), 'LOG(`x`) / LOG(10.0)')
 })
 
 test_that("date-time", {
@@ -38,10 +38,10 @@ test_that("custom aggregates translated", {
   expect_translation(
     con,
     median(x, na.rm = TRUE),
-    "MEDIAN(`x`)",
+    'MEDIAN(`x`)',
     window = FALSE
   )
-  expect_translation(con, sd(x, na.rm = TRUE), "STDEV(`x`)", window = FALSE)
+  expect_translation(con, sd(x, na.rm = TRUE), 'STDEV(`x`)', window = FALSE)
   expect_error(
     translate_sql(quantile(x, 0.5, na.rm = TRUE), con = con, window = FALSE),
     class = "dbplyr_error_unsupported_fn"
@@ -79,7 +79,7 @@ test_that("case_when translates correctly to ELSE when TRUE ~ is used", {
 # live database -----------------------------------------------------------
 
 test_that("as.numeric()/as.double() get custom translation", {
-  mf <- dbplyr::memdb_frame(x = 1L)
+  mf <- local_memdb_frame(x = 1L)
 
   out <- mf |> mutate(x1 = as.numeric(x), x2 = as.double(x)) |> collect()
   expect_type(out$x1, "double")
@@ -87,7 +87,7 @@ test_that("as.numeric()/as.double() get custom translation", {
 })
 
 test_that("date extraction agrees with R", {
-  db <- memdb_frame(x = "2000-01-02 03:40:50.5")
+  db <- local_memdb_frame(x = "2000-01-02 03:40:50.5")
   out <- db |>
     transmute(
       year = year(x),
@@ -116,6 +116,12 @@ test_that("date extraction agrees with R", {
 })
 
 test_that("can explain a query", {
-  db <- copy_to_test("sqlite", data.frame(x = 1:5), indexes = list("x"))
+  db <- copy_to(
+    memdb(),
+    data.frame(x = 1:5),
+    name = "test",
+    indexes = list("x"),
+    overwrite = TRUE
+  )
   expect_snapshot(db |> filter(x > 2) |> explain())
 })

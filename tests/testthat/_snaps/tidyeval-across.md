@@ -41,8 +41,8 @@
       summarise(lazy_frame(x = 1, y = 1), across(.fns = ~ . + 1))
     Output
       <SQL>
-      SELECT `x` + 1.0 AS `x`, `y` + 1.0 AS `y`
-      FROM `df`
+      SELECT "x" + 1.0 AS "x", "y" + 1.0 AS "y"
+      FROM "df"
 
 # untranslatable functions are preserved
 
@@ -50,8 +50,8 @@
       summarise(lf, across(a:b, SQL_LOG))
     Output
       <SQL>
-      SELECT SQL_LOG(`a`) AS `a`, SQL_LOG(`b`) AS `b`
-      FROM `df`
+      SELECT SQL_LOG("a") AS "a", SQL_LOG("b") AS "b"
+      FROM "df"
 
 # old _at functions continue to work
 
@@ -59,8 +59,8 @@
       dplyr::summarise_at(lf, dplyr::vars(a:b), "sum")
     Output
       <SQL>
-      SELECT SUM(`a`) AS `a`, SUM(`b`) AS `b`
-      FROM `df`
+      SELECT SUM("a") AS "a", SUM("b") AS "b"
+      FROM "df"
 
 ---
 
@@ -68,8 +68,8 @@
       dplyr::summarise_at(lf, dplyr::vars(a:b), sum)
     Output
       <SQL>
-      SELECT SUM(`a`) AS `a`, SUM(`b`) AS `b`
-      FROM `df`
+      SELECT SUM("a") AS "a", SUM("b") AS "b"
+      FROM "df"
 
 ---
 
@@ -77,8 +77,8 @@
       dplyr::summarise_at(lf, dplyr::vars(a:b), ~ sum(.))
     Output
       <SQL>
-      SELECT SUM(`a`) AS `a`, SUM(`b`) AS `b`
-      FROM `df`
+      SELECT SUM("a") AS "a", SUM("b") AS "b"
+      FROM "df"
 
 # lambdas in across() can use columns
 
@@ -146,9 +146,9 @@
       filter(lf, if_all(a:b, ~ . > 0))
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      WHERE ((`a` > 0.0 AND `b` > 0.0))
+      SELECT "df".*
+      FROM "df"
+      WHERE (("a" > 0.0 AND "b" > 0.0))
 
 ---
 
@@ -156,9 +156,9 @@
       filter(lf, if_any(a:b, ~ . > 0))
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      WHERE ((`a` > 0.0 OR `b` > 0.0))
+      SELECT "df".*
+      FROM "df"
+      WHERE (("a" > 0.0 OR "b" > 0.0))
 
 # if_all/any works in mutate()
 
@@ -166,8 +166,8 @@
       mutate(lf, c = if_all(a:b, ~ . > 0))
     Output
       <SQL>
-      SELECT `df`.*, (`a` > 0.0 AND `b` > 0.0) AS `c`
-      FROM `df`
+      SELECT "df".*, ("a" > 0.0 AND "b" > 0.0) AS "c"
+      FROM "df"
 
 ---
 
@@ -175,8 +175,8 @@
       mutate(lf, c = if_any(a:b, ~ . > 0))
     Output
       <SQL>
-      SELECT `df`.*, (`a` > 0.0 OR `b` > 0.0) AS `c`
-      FROM `df`
+      SELECT "df".*, ("a" > 0.0 OR "b" > 0.0) AS "c"
+      FROM "df"
 
 # if_all/any uses every column as default
 
@@ -184,9 +184,9 @@
       filter(lf, if_all(.fns = ~ . > 0))
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      WHERE ((`a` > 0.0 AND `b` > 0.0))
+      SELECT "df".*
+      FROM "df"
+      WHERE (("a" > 0.0 AND "b" > 0.0))
 
 ---
 
@@ -194,9 +194,9 @@
       filter(lf, if_any(.fns = ~ . > 0))
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      WHERE ((`a` > 0.0 OR `b` > 0.0))
+      SELECT "df".*
+      FROM "df"
+      WHERE (("a" > 0.0 OR "b" > 0.0))
 
 # if_all/any works without `.fns` argument
 
@@ -204,9 +204,9 @@
       filter(lf, if_all(a:b))
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      WHERE ((`a` AND `b`))
+      SELECT "df".*
+      FROM "df"
+      WHERE (("a" AND "b"))
 
 ---
 
@@ -214,9 +214,9 @@
       filter(lf, if_any(a:b))
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      WHERE ((`a` OR `b`))
+      SELECT "df".*
+      FROM "df"
+      WHERE (("a" OR "b"))
 
 # if_all() cannot rename variables
 
@@ -241,8 +241,8 @@
       # Now across(a:b, ~mean(.x, na.rm = TRUE))
     Output
       <SQL>
-      SELECT AVG(`x`) AS `x`
-      FROM `df`
+      SELECT AVG("x") AS "x"
+      FROM "df"
 
 # across() does not support formulas with dots
 

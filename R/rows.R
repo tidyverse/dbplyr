@@ -16,12 +16,19 @@
 #' modifying the underlying table on the database.
 #'
 #' @export
+#' @inheritParams left_join.tbl_lazy
 #' @param x A lazy table.
 #'   For `in_place = TRUE`, this must be a table instantiated with [tbl()] or
 #'   [compute()], not to a lazy query. The [remote_name()] function is used to
 #'   determine the name of the table to be updated.
 #' @param y A lazy table, data frame, or data frame extensions (e.g. a tibble).
-#' @inheritParams dplyr::rows_insert
+#' @param by An unnamed character vector giving the key columns. The key columns
+#'   must exist in both `x` and `y`. Keys typically uniquely identify each row,
+#'   but this is only enforced for the key values of `y` when `rows_update()`,
+#'   `rows_patch()`, or `rows_upsert()` are used.
+#'
+#'   By default, we use the first column in `y`, since the first column is
+#'   a reasonable place to put an identifier variable.
 #' @param conflict For `rows_insert()`, how should keys in `y` that conflict
 #'   with keys in `x` be handled? A conflict arises if there is a key in `y`
 #'   that already exists in `x`.
@@ -90,7 +97,7 @@ rows_insert.tbl_lazy <- function(
   by = NULL,
   ...,
   conflict = c("error", "ignore"),
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL,
   method = NULL
@@ -152,7 +159,7 @@ rows_append.tbl_lazy <- function(
   x,
   y,
   ...,
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL
 ) {
@@ -202,7 +209,7 @@ rows_update.tbl_lazy <- function(
   by = NULL,
   ...,
   unmatched = c("error", "ignore"),
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL
 ) {
@@ -233,7 +240,7 @@ rows_update.tbl_lazy <- function(
     con <- remote_con(x)
     update_cols <- setdiff(colnames(y), by)
     update_values <- set_names(
-      sql_table_prefix(con, update_cols, "...y"),
+      sql_table_prefix(con, "...y", update_cols),
       update_cols
     )
 
@@ -283,7 +290,7 @@ rows_patch.tbl_lazy <- function(
   by = NULL,
   ...,
   unmatched = c("error", "ignore"),
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL
 ) {
@@ -315,8 +322,8 @@ rows_patch.tbl_lazy <- function(
 
     update_cols <- setdiff(colnames(y), by)
     update_values <- sql_coalesce(
-      sql_table_prefix(con, update_cols, table),
-      sql_table_prefix(con, update_cols, "...y")
+      sql_table_prefix(con, table, update_cols),
+      sql_table_prefix(con, "...y", update_cols)
     )
     update_values <- set_names(update_values, update_cols)
 
@@ -380,7 +387,7 @@ rows_upsert.tbl_lazy <- function(
   y,
   by = NULL,
   ...,
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL,
   method = NULL
@@ -458,7 +465,7 @@ rows_delete.tbl_lazy <- function(
   by = NULL,
   ...,
   unmatched = c("error", "ignore"),
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL
 ) {
@@ -777,10 +784,11 @@ rows_insert_prep <- function(con, table, from, cols, by, lvl = 0) {
 
   join_by <- new_join_by(by, x_as = table, y_as = "...y")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
-  out$conflict_clauses <- sql_clause_where_exists(table, where, not = TRUE)
+  table_sql <- sql_escape_table_source(con, table)
+  out$conflict_clauses <- sql_clause_where_exists(table_sql, where, not = TRUE)
 
-  insert_cols <- escape(ident(cols), collapse = ", ", parens = TRUE, con = con)
-  out$insert_clause <- sql_clause_insert(con, insert_cols, table)
+  cols_sql <- sql_escape_ident(con, cols)
+  out$insert_clause <- sql_clause_insert(cols_sql, table_sql)
 
   out
 }
@@ -798,7 +806,7 @@ rows_auto_copy <- function(x, y, copy, call = caller_env()) {
     x_types <- x_types[colnames(y)]
   }
 
-  auto_copy(x, y, copy = copy, types = x_types)
+  dbplyr_auto_copy(x, y, copy = copy, types = x_types, call = call)
 }
 
 rows_get_or_execute <- function(x, sql, returning_cols, call = caller_env()) {
