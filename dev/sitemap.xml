@@ -63,6 +63,7 @@
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/join.tbl_sql.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/lahman.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/last_sql.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/lazy_base_query.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/lazy_ops.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/memdb.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/mutate.tbl_lazy.html</loc></url>
