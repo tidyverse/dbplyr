@@ -23,7 +23,7 @@ test_that("sql_set_op can be customized", {
   )
 
   lf <- lazy_frame(x = 1)
-  expect_snapshot(union(lf, lf))
-  expect_snapshot(intersect(lf, lf))
-  expect_snapshot(setdiff(lf, lf))
+  expect_match(remote_query(union(lf, lf)), "UNION DISTINCT")
+  expect_match(remote_query(intersect(lf, lf)), "INTERSECT DISTINCT")
+  expect_match(remote_query(setdiff(lf, lf)), "EXCEPT DISTINCT")
 })
