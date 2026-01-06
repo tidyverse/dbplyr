@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* `set_op_query()` no longer has an `all` argument.
 * Set operations (`union()`, `intersect()`, `setdiff()`) now use the
   `sql_set_op()` generic to generate the SQL set operation keyword. This allows
   backends to customize the behavior, e.g., using "UNION DISTINCT" instead of

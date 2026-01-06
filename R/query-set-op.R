@@ -6,12 +6,15 @@ lazy_set_op_query <- function(x, y, type, all, call = caller_env()) {
   check_string(type, call = call)
   check_bool(all, call = call)
 
+  if (all) {
+    type <- paste0(type, " ALL")
+  }
+
   lazy_query(
     query_type = "set_op",
     x = x,
     y = y,
-    type = type,
-    all = all
+    type = type
   )
 }
 
@@ -26,8 +29,7 @@ sql_build.lazy_set_op_query <- function(op, con, ..., sql_options = NULL) {
   set_op_query(
     sql_build(op$x, con, sql_options = sql_options),
     sql_build(op$y, con, sql_options = sql_options),
-    type = op$type,
-    all = op$all
+    type = op$type
   )
 }
 
@@ -35,8 +37,8 @@ sql_build.lazy_set_op_query <- function(op, con, ..., sql_options = NULL) {
 
 #' @export
 #' @rdname sql_build
-set_op_query <- function(x, y, type, all = FALSE) {
-  query("set_op", x = x, y = y, type = type, all = all)
+set_op_query <- function(x, y, type) {
+  query("set_op", x = x, y = y, type = type)
 }
 
 #' @export
@@ -57,7 +59,6 @@ sql_render.set_op_query <- function(
     from_x,
     from_y,
     method = query$type,
-    all = query$all,
     lvl = lvl
   )
 }
@@ -71,26 +72,17 @@ flatten_query.set_op_query <- function(qry, query_list, con) {
 
 #' @rdname db-sql
 #' @export
-sql_query_set_op <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
+sql_query_set_op <- function(con, x, y, method, ..., lvl = 0) {
   check_dots_used()
   UseMethod("sql_query_set_op")
 }
 #' @export
-sql_query_set_op.DBIConnection <- function(
-  con,
-  x,
-  y,
-  method,
-  ...,
-  all = FALSE,
-  lvl = 0
-) {
-  op <- if (all) paste0(method, " ALL") else method
-  op <- sql_set_op(con, op)
-  op <- style_kw(op)
+sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., lvl = 0) {
+  method <- sql_set_op(con, method)
+  method <- style_kw(method)
   lines <- list(
     sql_indent_subquery(x, con = con, lvl = lvl),
-    sql(op),
+    sql(method),
     sql_indent_subquery(y, con = con, lvl = lvl)
   )
   sql_format_clauses(lines, lvl)

@@ -96,18 +96,9 @@ sql_table_analyze.Hive <- function(con, table, ...) {
 }
 
 #' @export
-sql_query_set_op.Hive <- function(
-  con,
-  x,
-  y,
-  method,
-  ...,
-  all = FALSE,
-  lvl = 0
-) {
-  check_bool(all)
+sql_query_set_op.Hive <- function(con, x, y, method, ..., lvl = 0) {
   # compared to default method, can't use parentheses
-  method <- paste0(method, if (all) " ALL")
+  method <- sql_set_op(con, method)
   sql_glue2(con, "{x}\n{.sql method}\n{y}")
 }
 

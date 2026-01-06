@@ -97,7 +97,7 @@ sql_query_union <- function(con, x, unions, ..., lvl = 0) {
 #' @export
 sql_query_union.DBIConnection <- function(con, x, unions, ..., lvl = 0) {
   ops <- ifelse(unions$all, "UNION ALL", "UNION")
-  ops <- vapply(ops, sql_set_op, character(1), con = con, USE.NAMES = FALSE)
+  ops <- purrr::map_chr(ops, \(op) sql_set_op(con, op))
   ops <- indent_lvl(style_kw(ops), lvl)
   tables <- unlist(unions$table)
 
