@@ -39,7 +39,7 @@ translate_sql_(
 - ..., dots:
 
   Expressions to translate. `translate_sql()` automatically quotes them
-  for you. `translate_sql_()` expects a list of already quoted objects.
+  for you. `translate_sql_()` expects a list of expression objects.
 
 - con:
 
