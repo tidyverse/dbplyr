@@ -111,7 +111,6 @@ capture_dot <- function(.data, x) {
 partial_eval_dots <- function(
   .data,
   ...,
-  # .env = NULL,
   .named = TRUE,
   error_call = caller_env()
 ) {
@@ -122,17 +121,12 @@ partial_eval_dots <- function(
   was_named <- have_name(exprs(...))
 
   for (i in seq_along(dots)) {
-    dot <- dots[[i]]
-    # if (!is_null(.env)) {
-    #   dot <- quo_set_env(dot, .env)
-    # }
-    dot_name <- dot_names[[i]]
     dots[[i]] <- partial_eval_quo(
-      dot,
+      dots[[i]],
       .data,
-      error_call,
-      dot_name,
-      was_named[[i]]
+      dot_names[[i]],
+      error_call = error_call,
+      was_named = was_named[[i]]
     )
   }
 
@@ -148,8 +142,8 @@ partial_eval_dots <- function(
 partial_eval_quo <- function(
   x,
   data,
+  arg_name,
   error_call = caller_env(),
-  dot_name,
   was_named = FALSE
 ) {
   # no direct equivalent in `dtplyr`, mostly handled in `dt_squash()`
@@ -161,7 +155,7 @@ partial_eval_quo <- function(
       error_call = error_call
     ),
     error = function(cnd) {
-      label <- expr_as_label(x, dot_name)
+      label <- expr_as_label(x, arg_name)
       msg <- c(i = "In argument: {.code {label}}")
       cli_abort(msg, call = error_call, parent = cnd)
     }
@@ -171,7 +165,7 @@ partial_eval_quo <- function(
     if (was_named) {
       msg <- c(
         "In dbplyr, the result of `across()` must be unnamed.",
-        i = "`{dot_name} = {as_label(x)}` is named."
+        i = "`{arg_name} = {as_label(x)}` is named."
       )
       cli_abort(msg, call = error_call)
     }

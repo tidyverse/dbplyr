@@ -248,9 +248,9 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
     quosures <- partial_eval_quo(
       dot,
       cur_data,
-      error_call,
       dot_name,
-      was_named[[i]]
+      error_call = error_call,
+      was_named = was_named[[i]]
     )
 
     if (!is.list(quosures)) {

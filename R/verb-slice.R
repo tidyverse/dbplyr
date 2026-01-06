@@ -80,11 +80,7 @@ slice_min.tbl_lazy <- function(
 ) {
   size <- check_slice_size(n, prop)
   check_unsupported_arg(na_rm, allowed = TRUE)
-  order_by_expr <- partial_eval_quo(
-    enquo(order_by),
-    .data,
-    dot_name = "order_by"
-  )
+  order_by_expr <- partial_eval_quo(enquo(order_by), .data, "order_by")
   order_by <- unwrap_order_expr(order_by_expr, f = "slice_min")
   slice_by(.data, order_by, size, {{ by }}, with_ties = with_ties)
 }
@@ -104,11 +100,7 @@ slice_max.tbl_lazy <- function(
 ) {
   size <- check_slice_size(n, prop)
   check_unsupported_arg(na_rm, allowed = TRUE)
-  order_by_expr <- partial_eval_quo(
-    enquo(order_by),
-    .data,
-    dot_name = "order_by"
-  )
+  order_by_expr <- partial_eval_quo(enquo(order_by), .data, "order_by")
   order_by <- unwrap_order_expr(order_by_expr, f = "slice_max")
   order_by <- purrr::map(order_by, swap_order_direction)
   slice_by(.data, order_by, size, {{ by }}, with_ties = with_ties)
