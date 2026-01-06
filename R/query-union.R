@@ -96,12 +96,12 @@ sql_query_union <- function(con, x, unions, ..., lvl = 0) {
 }
 #' @export
 sql_query_union.DBIConnection <- function(con, x, unions, ..., lvl = 0) {
-  suffix <- sql_set_op_suffix(con, unions$all)
-  methods <- ifelse(nzchar(suffix), paste0("UNION ", suffix), "UNION")
-  methods <- indent_lvl(style_kw(methods), lvl)
+  ops <- ifelse(unions$all, "UNION ALL", "UNION")
+  ops <- vapply(ops, sql_set_op, character(1), con = con, USE.NAMES = FALSE)
+  ops <- indent_lvl(style_kw(ops), lvl)
   tables <- unlist(unions$table)
 
-  union_clauses <- vctrs::vec_interleave(as.character(methods), tables)
+  union_clauses <- vctrs::vec_interleave(as.character(ops), tables)
   out <- paste0(
     x,
     "\n\n",

@@ -85,14 +85,12 @@ sql_query_set_op.DBIConnection <- function(
   all = FALSE,
   lvl = 0
 ) {
-  suffix <- sql_set_op_suffix(con, all)
-  if (nzchar(suffix)) {
-    method <- paste0(method, " ", suffix)
-  }
-  method <- style_kw(method)
+  op <- if (all) paste0(method, " ALL") else method
+  op <- sql_set_op(con, op)
+  op <- style_kw(op)
   lines <- list(
     sql_indent_subquery(x, con = con, lvl = lvl),
-    sql(method),
+    sql(op),
     sql_indent_subquery(y, con = con, lvl = lvl)
   )
   sql_format_clauses(lines, lvl)

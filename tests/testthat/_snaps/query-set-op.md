@@ -90,7 +90,7 @@
         FROM "df"
       )
 
-# sql_set_op_suffix can be customized
+# sql_set_op can be customized
 
     Code
       union(lf, lf)

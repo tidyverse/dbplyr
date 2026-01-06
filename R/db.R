@@ -40,12 +40,12 @@ sql_join_suffix.DBIConnection <- function(con, suffix, ...) {
 
 #' @rdname db-misc
 #' @export
-sql_set_op_suffix <- function(con, all, ...) {
-  UseMethod("sql_set_op_suffix")
+sql_set_op <- function(con, op, ...) {
+  UseMethod("sql_set_op")
 }
 #' @export
-sql_set_op_suffix.DBIConnection <- function(con, all, ...) {
-  ifelse(all, "ALL", "")
+sql_set_op.DBIConnection <- function(con, op, ...) {
+  op
 }
 
 #' @rdname db-misc

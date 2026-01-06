@@ -1,9 +1,10 @@
 # dbplyr (development version)
 
 * Set operations (`union()`, `intersect()`, `setdiff()`) now use the
-  `sql_set_op_suffix()` generic to generate the SQL operator suffix. This allows
+  `sql_set_op()` generic to generate the SQL set operation keyword. This allows
   backends to customize the behavior, e.g., using "UNION DISTINCT" instead of
-  "UNION" for databases that require it (#1596).
+  "UNION" for databases that require it, or "MINUS" instead of "EXCEPT" for
+  Oracle (#1596).
 * `do()` is deprecated. Use `collect()` then your favourite tidyverse
   functions instead.
 * `as(x, "type")` is now translated to `CAST(x AS type)`, allowing you to cast

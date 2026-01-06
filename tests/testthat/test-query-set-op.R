@@ -9,10 +9,16 @@ test_that("generated sql doesn't change unexpectedly", {
   expect_snapshot(intersect(lf, lf, all = TRUE))
 })
 
-test_that("sql_set_op_suffix can be customized", {
+test_that("sql_set_op can be customized", {
   local_methods(
-    sql_set_op_suffix.TestConnection = function(con, all, ...) {
-      ifelse(all, "ALL", "DISTINCT")
+    sql_set_op.TestConnection = function(con, op, ...) {
+      switch(
+        op,
+        "UNION" = "UNION DISTINCT",
+        "INTERSECT" = "INTERSECT DISTINCT",
+        "EXCEPT" = "EXCEPT DISTINCT",
+        op
+      )
     }
   )
 
