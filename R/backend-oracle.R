@@ -217,10 +217,10 @@ sql_values_subquery.Oracle <- function(con, df, types, lvl = 0, ...) {
 }
 
 #' @export
-sql_set_op.Oracle <- function(con, op, ...) {
+sql_set_op_method.Oracle <- function(con, op, ...) {
   # Oracle uses MINUS instead of EXCEPT:
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries004.htm
-  switch(op, "EXCEPT" = "MINUS", op)
+  switch(op, "EXCEPT" = "MINUS", "EXCEPT ALL" = "MINUS ALL", op)
 }
 
 #' @export
@@ -261,7 +261,7 @@ sql_query_save.OraConnection <- sql_query_save.Oracle
 sql_values_subquery.OraConnection <- sql_values_subquery.Oracle
 
 #' @export
-sql_set_op.OraConnection <- sql_set_op.Oracle
+sql_set_op_method.OraConnection <- sql_set_op_method.Oracle
 
 #' @export
 sql_expr_matches.OraConnection <- sql_expr_matches.Oracle

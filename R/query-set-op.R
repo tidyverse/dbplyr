@@ -72,13 +72,23 @@ flatten_query.set_op_query <- function(qry, query_list, con) {
 
 #' @rdname db-sql
 #' @export
+sql_set_op_method <- function(con, op, ...) {
+  UseMethod("sql_set_op_method")
+}
+#' @export
+sql_set_op_method.DBIConnection <- function(con, op, ...) {
+  op
+}
+
+#' @rdname db-sql
+#' @export
 sql_query_set_op <- function(con, x, y, method, ..., lvl = 0) {
   check_dots_used()
   UseMethod("sql_query_set_op")
 }
 #' @export
 sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., lvl = 0) {
-  method <- sql_set_op(con, method)
+  method <- sql_set_op_method(con, method)
   method <- style_kw(method)
   lines <- list(
     sql_indent_subquery(x, con = con, lvl = lvl),

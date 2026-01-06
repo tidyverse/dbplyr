@@ -7,9 +7,9 @@ test_that("generated sql doesn't change unexpectedly", {
   expect_snapshot(intersect(lf, lf, all = TRUE))
 })
 
-test_that("sql_set_op can be customized", {
+test_that("sql_set_op_method can be customized", {
   local_methods(
-    sql_set_op.TestConnection = function(con, op, ...) {
+    sql_set_op_method.TestConnection = function(con, op, ...) {
       switch(
         op,
         "INTERSECT" = "INTERSECT DISTINCT",

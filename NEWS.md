@@ -2,10 +2,10 @@
 
 * `set_op_query()` no longer has an `all` argument.
 * Set operations (`union()`, `intersect()`, `setdiff()`) now use the
-  `sql_set_op()` generic to generate the SQL set operation keyword. This allows
-  backends to customize the behavior, e.g., using "UNION DISTINCT" instead of
-  "UNION" for databases that require it, or "MINUS" instead of "EXCEPT" for
-  Oracle (#1596).
+  `sql_set_op_method()` generic to generate the SQL set operation keyword. This
+  allows backends to customize the behavior, e.g., using "UNION DISTINCT"
+  instead of "UNION" for databases that require it, or "MINUS" instead of
+  "EXCEPT" for Oracle (#1596).
 * `do()` is deprecated. Use `collect()` then your favourite tidyverse
   functions instead.
 * `as(x, "type")` is now translated to `CAST(x AS type)`, allowing you to cast

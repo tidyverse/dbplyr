@@ -98,7 +98,7 @@ sql_table_analyze.Hive <- function(con, table, ...) {
 #' @export
 sql_query_set_op.Hive <- function(con, x, y, method, ..., lvl = 0) {
   # compared to default method, can't use parentheses
-  method <- sql_set_op(con, method)
+  method <- sql_set_op_method(con, method)
   sql_glue2(con, "{x}\n{.sql method}\n{y}")
 }
 
