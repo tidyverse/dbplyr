@@ -210,7 +210,7 @@ across_fun <- function(fun, env, dots, fn) {
       )
     }
 
-    partial_eval_prepare_fun(f_rhs(fun), c(".", ".x"), env)
+    partial_eval_prepare_fun(f_rhs(fun), c(".", ".x", "..1"), env)
   } else if (is_call(fun, "function")) {
     fun <- eval(fun, env)
     partial_eval_fun(fun, env, fn)
@@ -241,8 +241,6 @@ partial_eval_fun <- function(fun, env, fn) {
 partial_eval_prepare_fun <- function(call, sym, env) {
   # First resolve any .data/.env pronouns before symbol replacement
   call <- resolve_mask_pronouns(call, env)
-  # Also handle purrr-style ..x and ..1 placeholders
-  sym <- c(sym, "..x", "..1", "..2", "..3")
   call <- replace_sym1(call, sym, replace = quote(!!.x))
   call <- replace_call(call, replace = quote(!!.cur_col))
   function(x, .cur_col) {

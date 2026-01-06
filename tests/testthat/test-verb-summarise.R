@@ -167,7 +167,7 @@ test_that("across doesn't select columns from `.by` #1493", {
 
   out <- lf |>
     summarise(
-      across(everything(), ~ sum(..x, na.rm = TRUE)),
+      across(everything(), ~ sum(.x, na.rm = TRUE)),
       .by = g
     )
 
