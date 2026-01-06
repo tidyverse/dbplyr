@@ -96,7 +96,7 @@ unwrap_order_expr <- function(order_by, f, error_call = caller_env()) {
   if (is.null(order_by)) {
     NULL
   } else if (is_call(order_by, c("tibble", "data.frame"))) {
-    call_args(order_by)
+    as.list(order_by[-1])
   } else {
     list(order_by)
   }
