@@ -79,7 +79,7 @@
       sql_query_save(con, sql("SELECT * FROM foo"), "ORA$PTT_tbl")
     Output
       <SQL> CREATE PRIVATE TEMPORARY TABLE "ORA$PTT_tbl"
-      ON COMMIT PRESERVE ROWS
+      ON COMMIT PRESERVE DEFINITION
       AS
       SELECT * FROM foo
 

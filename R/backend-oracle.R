@@ -211,18 +211,16 @@ is_oracle_temporary_table <- function(table, con) {
 
 #' @export
 db_table_temporary.Oracle <- function(con, table, temporary, ...) {
-  if (!temporary) {
-    list(table = table, temporary = FALSE)
-  } else if (!is_oracle_temporary_table(table, con)) {
+  if (temporary && !is_oracle_temporary_table(table, con)) {
     new_name <- paste0("ORA$PTT_", table_path_name(table, con))
     cli::cli_inform(
       paste0("Created a temporary table named ", new_name),
       class = c("dbplyr_message_temp_table", "dbplyr_message")
     )
-    list(table = table_path(new_name), temporary = FALSE)
-  } else {
-    list(table = table, temporary = FALSE)
+    table = table_path(new_name)
   }
+
+  list(table = table, temporary = temporary)
 }
 
 #' @export
@@ -236,7 +234,7 @@ sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
       con,
       "
       CREATE PRIVATE TEMPORARY TABLE {.tbl name}
-      ON COMMIT PRESERVE ROWS
+      ON COMMIT PRESERVE DEFINITION
       AS
       {sql}
       "
