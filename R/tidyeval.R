@@ -1,10 +1,11 @@
 #' Partially evaluate an expression.
 #'
-#' This function partially evaluates an expression, using information from
-#' the tbl to determine whether names refer to local expressions
-#' or remote variables. This simplifies SQL translation because expressions
-#' don't need to carry around their environment - all relevant information
-#' is incorporated into the expression.
+#' @description
+#' This function partially evaluates a quosure yielding an expression. It
+#' uses information from the current `tbl` and the local environment to yield
+#' a standalone expression. This simplifies SQL translation because we can just
+#' pass around expressions rather than expressions + environments
+#' (i.e. quosures).
 #'
 #' @section Symbol substitution:
 #'
