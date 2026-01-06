@@ -144,7 +144,7 @@ win_rank <- function(f, empty_order = FALSE) {
 
   function(order = NULL) {
     group <- win_current_group()
-    order <- unwrap_order_expr({{ order }}, f = f)
+    order <- unwrap_order_expr(enexpr(order), f = f)
     con <- sql_current_con()
 
     if (!is_null(order)) {

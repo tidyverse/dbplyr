@@ -78,17 +78,11 @@ can_inline_arrange <- function(lazy_query) {
   TRUE
 }
 
+# Used in slice_min/slice_max and the order_by argument to window functions
+# convert a single order by expression to a list of expresions
 unwrap_order_expr <- function(order_by, f, error_call = caller_env()) {
-  order_by_quo <- quo({{ order_by }})
-  order_by_expr <- quo_get_expr(order_by_quo)
-  order_by_env <- quo_get_env(order_by_quo)
-
-  if (is.null(order_by_expr)) {
-    return()
-  }
-
-  if (is_call(order_by_expr, "c")) {
-    args <- call_args(order_by_expr)
+  if (is_call(order_by, "c")) {
+    args <- call_args(order_by)
     tibble_expr <- expr_text(expr(tibble(!!!args)))
     cli_abort(
       c(
@@ -99,39 +93,19 @@ unwrap_order_expr <- function(order_by, f, error_call = caller_env()) {
     )
   }
 
-  # Resolve .env pronouns while we have access to the correct environment
-  resolve_env <- function(expr) {
-    resolve_env_pronoun(expr, order_by_env)
-  }
-
-  if (is_call(order_by_expr, c("tibble", "data.frame"))) {
-    tibble_args <- call_args(order_by_expr)
-    return(lapply(tibble_args, resolve_env))
-  }
-
-  list(resolve_env(order_by_expr))
-}
-
-# Resolve .env$var and .env[[var]] pronouns in an expression
-resolve_env_pronoun <- function(expr, env) {
-  if (is_call(expr, c("$", "[["), n = 2) && is_symbol(expr[[2]], ".env")) {
-    var <- expr[[3]]
-    if (is_call(expr, "[[")) {
-      var <- eval(var, env)
-    }
-    eval_bare(as.symbol(var), env)
-  } else if (is_call(expr)) {
-    expr[-1] <- lapply(expr[-1], resolve_env_pronoun, env = env)
-    expr
+  if (is.null(order_by)) {
+    NULL
+  } else if (is_call(order_by, c("tibble", "data.frame"))) {
+    call_args(order_by)
   } else {
-    expr
+    list(order_by)
   }
 }
 
 swap_order_direction <- function(x) {
   if (is_call(x, "desc", n = 1)) {
-    call_args(x)[[1]]
+    x[[2]]
   } else {
-    expr(desc(!!x))
+    call2("desc", x)
   }
 }

@@ -145,7 +145,13 @@ partial_eval_dots <- function(
   unlist(dots, recursive = FALSE)
 }
 
-partial_eval_quo <- function(x, data, error_call, dot_name, was_named) {
+partial_eval_quo <- function(
+  x,
+  data,
+  error_call = caller_env(),
+  dot_name,
+  was_named = FALSE
+) {
   # no direct equivalent in `dtplyr`, mostly handled in `dt_squash()`
   withCallingHandlers(
     expr <- partial_eval(
@@ -323,6 +329,8 @@ replace_sym <- function(exprs, old, new) {
   check_list(exprs, allow_null = TRUE)
   check_character(old)
   check_list(new)
+  # Allow new to be a list of quosures too
+  new <- purrr::map_if(new, is_quosure, quo_get_expr)
 
   purrr::map(exprs, \(expr) replace_sym1(expr, old, new))
 }
