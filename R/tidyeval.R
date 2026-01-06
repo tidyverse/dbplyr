@@ -258,9 +258,7 @@ partial_eval_call <- function(call, data, env) {
     } else if (is_call(call, "remote")) {
       call[[2]]
     } else if (is_call(call, "sql")) {
-      # Evaluate sql() calls immediately
-      args <- lapply(call[-1], eval_tidy, env = env)
-      exec(sql, !!!args)
+      eval_bare(call, env = env)
     } else if (is_call(call, "$")) {
       # Only the 1st argument is evaluated
       call[[2]] <- partial_eval(call[[2]], data = data, env = env)
