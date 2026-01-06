@@ -27,7 +27,7 @@ translate_sql_(
 \arguments{
 \item{..., dots}{Expressions to translate. \code{translate_sql()}
 automatically quotes them for you.  \code{translate_sql_()} expects
-a list of already quoted objects.}
+a list of expression objects.}
 
 \item{con}{Database connection used to determine the SQL dialect.}
 

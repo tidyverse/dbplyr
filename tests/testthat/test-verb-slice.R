@@ -57,6 +57,14 @@ test_that("slice_* can use data masking pronouns", {
   })
 })
 
+test_that("slice_min and slice_max give clear errors for bad order_by", {
+  lf <- lazy_frame(x = 1)
+  expect_snapshot(error = TRUE, {
+    lf |> slice_min(doesntexist)
+    lf |> slice_max(doesntexist)
+  })
+})
+
 test_that("slice_sample errors when expected", {
   db <- local_memdb_frame(x = c(1, 1, 2), id = c(1, 2, 3))
 

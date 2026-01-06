@@ -78,17 +78,11 @@ can_inline_arrange <- function(lazy_query) {
   TRUE
 }
 
+# Used in slice_min/slice_max and the order_by argument to window functions
+# convert a single order by expression to a list of expresions
 unwrap_order_expr <- function(order_by, f, error_call = caller_env()) {
-  order_by_quo <- quo({{ order_by }})
-  order_by_env <- quo_get_env(order_by_quo)
-  order_by_expr <- quo_get_expr(order_by_quo)
-
-  if (is.null(order_by_expr)) {
-    return()
-  }
-
-  if (is_call(order_by_expr, "c")) {
-    args <- call_args(order_by_expr)
+  if (is_call(order_by, "c")) {
+    args <- call_args(order_by)
     tibble_expr <- expr_text(expr(tibble(!!!args)))
     cli_abort(
       c(
@@ -99,32 +93,19 @@ unwrap_order_expr <- function(order_by, f, error_call = caller_env()) {
     )
   }
 
-  if (is_call(order_by_expr, c("tibble", "data.frame"))) {
-    tibble_args <- call_args(order_by_expr)
-    # browser()
-    out <- as_quosures(tibble_args, env = order_by_env)
-    return(out)
+  if (is.null(order_by)) {
+    NULL
+  } else if (is_call(order_by, c("tibble", "data.frame"))) {
+    as.list(order_by[-1])
+  } else {
+    list(order_by)
   }
-
-  list(order_by_quo)
 }
 
 swap_order_direction <- function(x) {
-  is_quo <- is_quosure(x)
-  if (is_quo) {
-    env <- quo_get_env(x)
-    x <- quo_get_expr(x)
-  }
-
   if (is_call(x, "desc", n = 1)) {
-    out <- call_args(x)[[1]]
+    x[[2]]
   } else {
-    out <- expr(desc(!!x))
+    call2("desc", x)
   }
-
-  if (is_quo) {
-    out <- as_quosure(out, env)
-  }
-
-  out
 }

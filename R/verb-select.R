@@ -126,7 +126,7 @@ can_inline_select <- function(lazy_query, vars) {
     return(FALSE)
   }
 
-  is_mutate <- purrr::map_lgl(lazy_query$select$expr, is_quosure)
+  is_mutate <- !purrr::map_lgl(lazy_query$select$expr, is_symbol)
   computed_columns <- lazy_query$select$name[is_mutate]
   order_vars <- purrr::map_chr(lazy_query$order_by, as_label)
   ordered_present <- all(intersect(computed_columns, order_vars) %in% vars)

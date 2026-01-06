@@ -7,10 +7,10 @@ test_that("window_order errors for data frame", {
 
 test_that("window_order only accepts variables", {
   lf <- lazy_frame(x = 1, y = 1)
-  expect_equal(window_order(lf, x, y) |> op_sort(), list(quo(x), quo(y)))
+  expect_equal(window_order(lf, x, y) |> op_sort(), list(expr(x), expr(y)))
   expect_equal(
     window_order(lf, x, desc(y)) |> op_sort(),
-    list(quo(x), quo(desc(y)))
+    list(expr(x), expr(desc(y)))
   )
 
   expect_snapshot(error = TRUE, {
