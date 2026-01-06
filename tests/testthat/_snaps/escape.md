@@ -25,7 +25,9 @@
     Code
       filter(lf, x == x())
     Condition
-      Error:
+      Error in `filter()`:
+      i In argument: `x == x()`
+      Caused by error:
       ! Cannot translate a shiny reactive to SQL.
       i Do you want to force evaluation in R with (e.g.) `!!foo()` or `local(foo())`?
     Code

@@ -127,12 +127,19 @@ translate_sql_ <- function(
 
   variant <- dbplyr_sql_translation(con)
   pieces <- lapply(dots, function(x) {
-    if (is_null(get_expr(x))) {
+    # Handle both quosures (from translate_sql) and bare expressions (from verbs)
+    # Keep env for sql() evaluation in direct translate_sql() calls
+    env <- if (is_quosure(x)) quo_get_env(x) else NULL
+    if (is_quosure(x)) {
+      x <- quo_get_expr(x)
+    }
+
+    if (is_null(x)) {
       NULL
-    } else if (is_atomic(get_expr(x))) {
-      escape(get_expr(x), con = con)
+    } else if (is_atomic(x) || is.sql(x)) {
+      escape(x, con = con)
     } else {
-      mask <- sql_data_mask(x, variant, con = con, window = window)
+      mask <- sql_data_mask(x, variant, con = con, window = window, env = env)
       escape(eval_tidy(x, mask), con = con)
     }
   })
@@ -145,14 +152,15 @@ sql_data_mask <- function(
   variant,
   con,
   window = FALSE,
-  strict = getOption("dplyr.strict_sql", FALSE)
+  strict = getOption("dplyr.strict_sql", FALSE),
+  env = NULL
 ) {
   stopifnot(is.sql_variant(variant))
 
   # Default for unknown functions
   unknown <- setdiff(all_calls(expr), names(variant))
   op <- if (strict) missing_op else default_op
-  top_env <- ceply(unknown, op, parent = empty_env(), env = get_env(expr))
+  top_env <- ceply(unknown, op, parent = empty_env())
 
   # Known R -> SQL functions
   special_calls <- copy_env(variant$scalar, parent = top_env)
@@ -181,13 +189,14 @@ sql_data_mask <- function(
     }
   }
 
-  special_calls2$sql <- function(...) {
-    dots <- exprs(...)
-
-    env <- get_env(expr)
-    dots <- purrr::map(dots, eval_tidy, env = env)
-
-    exec(sql, !!!dots)
+  # Handle sql() for direct translate_sql() calls (where env is available)
+  # For expressions from partial_eval, sql() is already evaluated
+  if (!is.null(env)) {
+    special_calls2$sql <- function(...) {
+      dots <- exprs(...)
+      dots <- purrr::map(dots, eval_tidy, env = env)
+      exec(sql, !!!dots)
+    }
   }
 
   # Existing symbols in expression
@@ -229,15 +238,8 @@ is_infix_user <- function(x) {
   grepl("^%.*%$", x)
 }
 
-default_op <- function(x, env) {
+default_op <- function(x) {
   check_string(x)
-
-  # Check for shiny reactives; these are zero-arg functions
-  # so need special handling to give a useful error
-  obj <- env_get(env, x, default = NULL, inherit = TRUE)
-  if (inherits(obj, "reactive")) {
-    error_embed("a shiny reactive", "foo()")
-  }
 
   if (is_infix_base(x)) {
     sql_infix(x)
@@ -249,7 +251,7 @@ default_op <- function(x, env) {
   }
 }
 
-missing_op <- function(x, env) {
+missing_op <- function(x) {
   force(x)
 
   function(...) {
@@ -264,9 +266,6 @@ missing_op <- function(x, env) {
 }
 
 all_calls <- function(x) {
-  if (is_quosure(x)) {
-    return(all_calls(quo_get_expr(x)))
-  }
   if (!is.call(x)) {
     return(NULL)
   }
@@ -278,9 +277,6 @@ all_calls <- function(x) {
 all_names <- function(x) {
   if (is.name(x)) {
     return(as.character(x))
-  }
-  if (is_quosure(x)) {
-    return(all_names(quo_get_expr(x)))
   }
   if (!is.call(x)) {
     return(NULL)

@@ -263,12 +263,12 @@ test_that("across() uses environment from the current quosure (dplyr#5460)", {
 
   expect_equal(
     partial_eval_dots(lf, across(all_of(y), mean)),
-    list(x = quo(mean(x)))
+    list(x = expr(mean(x)))
   )
 
   expect_equal(
     partial_eval_dots(lf, if_all(all_of(y), ~ .x < 2)),
-    list(quo((x < 2))),
+    list(expr((x < 2))),
     ignore_attr = "names"
   )
 })
@@ -279,9 +279,9 @@ test_that("lambdas in across() can use columns", {
   expect_equal(
     partial_eval_dots(db, across(everything(), ~ .x / y)),
     list(
-      x = quo(x / y),
-      y = quo(y / y),
-      z = quo(z / y)
+      x = expr(x / y),
+      y = expr(y / y),
+      z = expr(z / y)
     )
   )
 

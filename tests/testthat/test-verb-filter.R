@@ -94,7 +94,7 @@ test_that("filter() inlined after select()", {
     filter(z == 1)
   lq <- out$lazy_query
   expect_equal(lq$select$expr, list(sym("x")))
-  expect_equal(lq$where, list(quo(x == 1)), ignore_formula_env = TRUE)
+  expect_equal(lq$where, list(expr(x == 1)))
 })
 
 test_that("filter() inlined after mutate()", {
@@ -104,12 +104,8 @@ test_that("filter() inlined after mutate()", {
     mutate(x = x + 1) |>
     filter(y == 1)
   lq <- out$lazy_query
-  expect_equal(
-    lq$select$expr,
-    list(quo(x + 1), sym("y")),
-    ignore_formula_env = TRUE
-  )
-  expect_equal(lq$where, list(quo(y == 1)), ignore_formula_env = TRUE)
+  expect_equal(lq$select$expr, list(expr(x + 1), expr(y)))
+  expect_equal(lq$where, list(expr(y == 1)))
 
   # can rename variable used in `filter()`
   out <- lf |>
@@ -118,20 +114,16 @@ test_that("filter() inlined after mutate()", {
   lq <- out$lazy_query
   expect_equal(lq$select$expr, list(sym("x"), sym("y")))
   expect_equal(lq$select$name, c("z", "y"))
-  expect_equal(lq$where, list(quo(x == 1)), ignore_formula_env = TRUE)
+  expect_equal(lq$where, list(expr(x == 1)))
 
   # does not inline if uses mutated variable
   out2 <- lf |>
     mutate(x = x + 1) |>
     filter(x == 1)
   lq2 <- out2$lazy_query
-  expect_equal(
-    lq2$x$select$expr,
-    list(quo(x + 1), sym("y")),
-    ignore_formula_env = TRUE
-  )
+  expect_equal(lq2$x$select$expr, list(expr(x + 1), sym("y")))
   expect_equal(lq2$select$expr, syms(c("x", "y")))
-  expect_equal(lq2$where, list(quo(x == 1)), ignore_formula_env = TRUE)
+  expect_equal(lq2$where, list(expr(x == 1)))
 
   # does not inline if unclear whether uses mutated variable
   out3 <- lf |>
@@ -140,7 +132,8 @@ test_that("filter() inlined after mutate()", {
   lq3 <- out3$lazy_query
   expect_equal(lq3$select$expr, syms(c("x", "y")))
   expect_s3_class(lq3$x, "lazy_select_query")
-  expect_equal(lq3$where, list(quo(y == sql("1"))), ignore_formula_env = TRUE)
+  # sql("1") is evaluated during partial_eval
+  expect_equal(lq3$where[[1]], expr(y == !!sql("1")))
 })
 
 test_that("filter isn't inlined after mutate with window function #1135", {
@@ -151,11 +144,8 @@ test_that("filter isn't inlined after mutate with window function #1135", {
 
   lq <- out$lazy_query
   expect_equal(lq$select$expr, syms(c("x", "y", "z")))
-  expect_equal(lq$where, list(quo(y <= 1)), ignore_formula_env = TRUE)
-  expect_equal(
-    quo_get_expr(lq$x$select$expr[[3]]),
-    expr(sum(y, na.rm = TRUE))
-  )
+  expect_equal(lq$where, list(expr(y <= 1)))
+  expect_equal(lq$x$select$expr[[3]], expr(sum(y, na.rm = TRUE)))
 
   out2 <- lf |>
     dplyr::mutate(z = sql("SUM(y) OVER ()")) |>
@@ -163,11 +153,9 @@ test_that("filter isn't inlined after mutate with window function #1135", {
 
   lq2 <- out2$lazy_query
   expect_equal(lq2$select$expr, syms(c("x", "y", "z")))
-  expect_equal(lq2$where, list(quo(y <= 1)), ignore_formula_env = TRUE)
-  expect_equal(
-    quo_get_expr(lq2$x$select$expr[[3]]),
-    expr(sql("SUM(y) OVER ()"))
-  )
+  expect_equal(lq2$where, list(expr(y <= 1)))
+  # sql() is evaluated during partial_eval
+  expect_equal(lq2$x$select$expr[[3]], sql("SUM(y) OVER ()"))
 })
 
 # .by -------------------------------------------------------------------------
@@ -240,16 +228,8 @@ test_that("filter() after summarise() uses `HAVING`", {
 
   # use `HAVING`
   expect_snapshot((out <- lf |> filter(g == 1)))
-  expect_equal(
-    out$lazy_query$having,
-    list(quo(g == 1)),
-    ignore_formula_env = TRUE
-  )
-  expect_equal(
-    out$lazy_query$group_by,
-    list(sym("g"), sym("h")),
-    ignore_formula_env = TRUE
-  )
+  expect_equal(out$lazy_query$having, list(expr(g == 1)))
+  expect_equal(out$lazy_query$group_by, list(sym("g"), sym("h")))
   expect_equal(op_grps(out), "g")
 
   expect_equal(
@@ -261,11 +241,7 @@ test_that("filter() after summarise() uses `HAVING`", {
 
   # Can use freshly aggregated column
   expect_snapshot((out <- lf |> filter(x_mean > 1)))
-  expect_equal(
-    out$lazy_query$having,
-    list(quo(mean(x, na.rm = TRUE) > 1)),
-    ignore_formula_env = TRUE
-  )
+  expect_equal(out$lazy_query$having, list(expr(mean(x, na.rm = TRUE) > 1)))
 
   expect_equal(
     mf |>
@@ -280,22 +256,14 @@ test_that("filter() after summarise() uses `HAVING`", {
       filter(g == 1) |>
       filter(g == 2))
   )
-  expect_equal(
-    out$lazy_query$having,
-    list(quo(g == 1), quo(g == 2)),
-    ignore_formula_env = TRUE
-  )
+  expect_equal(out$lazy_query$having, list(expr(g == 1), expr(g == 2)))
 
   expect_snapshot(
     (out <- lf |>
       filter(g == 1) |>
       filter(h == 2))
   )
-  expect_equal(
-    out$lazy_query$having,
-    list(quo(g == 1), quo(h == 2)),
-    ignore_formula_env = TRUE
-  )
+  expect_equal(out$lazy_query$having, list(expr(g == 1), expr(h == 2)))
 
   # `window_order()` and `window_frame()` do not matter
   out <- lazy_frame(g = 1, h = 1, x = 1) |>
@@ -306,13 +274,9 @@ test_that("filter() after summarise() uses `HAVING`", {
     filter(x_mean > 1)
 
   lq <- out$lazy_query
-  expect_equal(
-    lq$having,
-    list(quo(mean(x, na.rm = TRUE) > 1)),
-    ignore_formula_env = TRUE
-  )
+  expect_equal(lq$having, list(expr(mean(x, na.rm = TRUE) > 1)))
   # TODO should the `order_vars` and the `frame` really survive `summarise()`?
-  expect_equal(lq$order_vars, list(quo(h)))
+  expect_equal(lq$order_vars, list(expr(h)))
   expect_equal(lq$frame, list(range = c(-3, Inf)))
 })
 
@@ -328,11 +292,7 @@ test_that("`HAVING` supports expressions #1128", {
   out <- lf |>
     summarise(x_sum = sum(x, na.rm = TRUE)) |>
     filter(!is.na(x_sum))
-  expect_equal(
-    out$lazy_query$having,
-    list(quo(!is.na(sum(x, na.rm = TRUE)))),
-    ignore_formula_env = TRUE
-  )
+  expect_equal(out$lazy_query$having, list(expr(!is.na(sum(x, na.rm = TRUE)))))
 
   # correctly handles environments
   y <- 1L
@@ -345,8 +305,7 @@ test_that("`HAVING` supports expressions #1128", {
 
   expect_equal(
     out$lazy_query$having,
-    list(quo(!is.na(sum(x, na.rm = TRUE) - 2L + 1L))),
-    ignore_formula_env = TRUE
+    list(expr(!is.na(sum(x, na.rm = TRUE) - 2L + 1L)))
   )
 })
 
@@ -390,9 +349,8 @@ test_that("generates correct lazy_select_query", {
     lazy_select_query(
       x = lf$lazy_query,
       select = syms(set_names(colnames(lf))),
-      where = list(quo(x > 1))
-    ),
-    ignore_formula_env = TRUE
+      where = list(expr(x > 1))
+    )
   )
 
   out <- lf |>
@@ -404,8 +362,7 @@ test_that("generates correct lazy_select_query", {
       x = out$lazy_query$x,
       select = syms(set_names(colnames(lf))),
       where = list(expr(col01 > 1))
-    ),
-    ignore_formula_env = TRUE
+    )
   )
 
   expect_equal(
@@ -416,9 +373,8 @@ test_that("generates correct lazy_select_query", {
       select = list(
         x = sym("x"),
         y = sym("y"),
-        col01 = quo(mean(x, na.rm = TRUE))
+        col01 = expr(mean(x, na.rm = TRUE))
       )
-    ),
-    ignore_formula_env = TRUE
+    )
   )
 })

@@ -167,7 +167,7 @@ compute_frame <- function(frame, error_call = caller_env()) {
 
 add_mutate <- function(lazy_query, exprs) {
   # drop NULLs
-  exprs <- purrr::discard(exprs, \(expr) is_quosure(expr) && quo_is_null(expr))
+  exprs <- purrr::discard(exprs, is_null)
 
   if (is_projection(exprs)) {
     # Special case selecting/renaming/reordering done in mutate
@@ -233,6 +233,7 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
   all_modified_vars <- character()
   used_vars <- character()
   all_vars <- op_vars(.data)
+  final_removed_cols <- character()
 
   # Each dot may contain an `across()` expression which can refer to freshly
   # created variables. So, it is necessary to keep track of the current data
@@ -277,10 +278,22 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
     cur_data$lazy_query <- add_mutate(cur_data$lazy_query, cols)
 
     removed_cols <- cols_result$removed_cols
+    # Track columns that are removed and not later re-added
+    final_removed_cols <- union(
+      setdiff(final_removed_cols, cols_result$modified_vars),
+      removed_cols
+    )
     cur_data$lazy_query <- add_select(
       cur_data$lazy_query,
       set_names(setdiff(all_vars, removed_cols))
     )
+  }
+
+  # Remove NULL entries and columns that were ultimately set to NULL from final layer
+  cur_layer <- purrr::discard(cur_layer, is_null)
+  if (length(final_removed_cols) > 0) {
+    cur_layer <- cur_layer[!names(cur_layer) %in% final_removed_cols]
+    all_vars <- setdiff(all_vars, final_removed_cols)
   }
 
   list(
@@ -297,26 +310,20 @@ get_mutate_dot_cols <- function(quosures, all_vars) {
   var_is_null <- logical()
 
   for (k in seq_along(quosures)) {
-    cur_quo <- quosures[[k]]
+    cur_expr <- quosures[[k]]
     cur_var <- names(quosures)[[k]]
 
-    if (quo_is_null(cur_quo)) {
+    if (is_null(cur_expr)) {
       var_is_null[[cur_var]] <- TRUE
-      cols[[cur_var]] <- cur_quo
+      cols[[cur_var]] <- cur_expr
       modified_vars <- setdiff(modified_vars, cur_var)
       next
     }
 
     var_is_null[[cur_var]] <- FALSE
-    if (quo_is_symbol(cur_quo)) {
-      cur_sym <- quo_get_expr(cur_quo)
-      if (as_name(cur_sym) %in% all_vars) {
-        cur_quo <- cur_sym
-      }
-    }
-    cols[[cur_var]] <- cur_quo
+    cols[[cur_var]] <- cur_expr
 
-    used_vars <- c(used_vars, all_names(cur_quo))
+    used_vars <- c(used_vars, all_names(cur_expr))
     modified_vars <- c(modified_vars, cur_var)
   }
 

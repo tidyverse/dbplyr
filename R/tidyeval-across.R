@@ -241,6 +241,8 @@ partial_eval_fun <- function(fun, env, fn) {
 partial_eval_prepare_fun <- function(call, sym, env) {
   # First resolve any .data/.env pronouns before symbol replacement
   call <- resolve_mask_pronouns(call, env)
+  # Also handle purrr-style ..x and ..1 placeholders
+  sym <- c(sym, "..x", "..1", "..2", "..3")
   call <- replace_sym1(call, sym, replace = quote(!!.x))
   call <- replace_call(call, replace = quote(!!.cur_col))
   function(x, .cur_col) {
@@ -345,7 +347,9 @@ across_setup <- function(data, call, env, allow_rename, fn, error_call) {
     repair = "check_unique"
   )
 
-  across_apply_fns(vars, fns, names_out, env)
+  out <- across_apply_fns(vars, fns, names_out, env)
+  # Partially evaluate each expression (e.g., to evaluate sql() calls)
+  lapply(out, partial_eval, data = data, env = env, error_call = error_call)
 }
 
 expr_as_label <- function(expr, name) {

@@ -159,7 +159,7 @@ win_rank <- function(f, empty_order = FALSE) {
 
       order_symbols <- purrr::map_if(
         order,
-        \(x) quo_is_call(x, "desc", n = 1L),
+        \(x) is_call(x, "desc", n = 1L),
         \(x) call_args(x)[[1L]]
       )
 
@@ -410,10 +410,6 @@ window_funs <- function(con = simulate_dbi()) {
 }
 
 is_aggregating <- function(x, non_group_cols, agg_f) {
-  if (is_quosure(x)) {
-    x <- quo_get_expr(x)
-  }
-
   if (is_symbol(x)) {
     xc <- as_name(x)
     return(!(xc %in% non_group_cols))

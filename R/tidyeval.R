@@ -169,10 +169,9 @@ partial_eval_quo <- function(x, data, error_call, dot_name, was_named) {
       )
       cli_abort(msg, call = error_call)
     }
-    lapply(expr, new_quosure, env = get_env(x))
-  } else {
-    new_quosure(expr, get_env(x))
   }
+
+  expr
 }
 
 partial_eval_sym <- function(sym, data, env) {
@@ -258,11 +257,24 @@ partial_eval_call <- function(call, data, env) {
       eval_bare(call[[2]], env)
     } else if (is_call(call, "remote")) {
       call[[2]]
+    } else if (is_call(call, "sql")) {
+      # Evaluate sql() calls immediately
+      args <- lapply(call[-1], eval_tidy, env = env)
+      exec(sql, !!!args)
     } else if (is_call(call, "$")) {
       # Only the 1st argument is evaluated
       call[[2]] <- partial_eval(call[[2]], data = data, env = env)
       call
     } else {
+      # Check for shiny reactives before processing unknown function calls
+      if (is_symbol(fun)) {
+        fun_name <- as_string(fun)
+        obj <- env_get(env, fun_name, default = NULL, inherit = TRUE)
+        if (inherits(obj, "reactive")) {
+          error_embed("a shiny reactive", "foo()")
+        }
+      }
+
       call[-1] <- lapply(call[-1], partial_eval, data = data, env = env)
       call
     }
@@ -311,8 +323,6 @@ replace_sym <- function(exprs, old, new) {
   check_list(exprs, allow_null = TRUE)
   check_character(old)
   check_list(new)
-  # Allow new to be a list of quosures too
-  new <- purrr::map_if(new, is_quosure, quo_get_expr)
 
   purrr::map(exprs, \(expr) replace_sym1(expr, old, new))
 }

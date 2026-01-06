@@ -80,8 +80,8 @@ can_inline_arrange <- function(lazy_query) {
 
 unwrap_order_expr <- function(order_by, f, error_call = caller_env()) {
   order_by_quo <- quo({{ order_by }})
-  order_by_env <- quo_get_env(order_by_quo)
   order_by_expr <- quo_get_expr(order_by_quo)
+  order_by_env <- quo_get_env(order_by_quo)
 
   if (is.null(order_by_expr)) {
     return()
@@ -99,32 +99,39 @@ unwrap_order_expr <- function(order_by, f, error_call = caller_env()) {
     )
   }
 
-  if (is_call(order_by_expr, c("tibble", "data.frame"))) {
-    tibble_args <- call_args(order_by_expr)
-    # browser()
-    out <- as_quosures(tibble_args, env = order_by_env)
-    return(out)
+  # Resolve .env pronouns while we have access to the correct environment
+  resolve_env <- function(expr) {
+    resolve_env_pronoun(expr, order_by_env)
   }
 
-  list(order_by_quo)
+  if (is_call(order_by_expr, c("tibble", "data.frame"))) {
+    tibble_args <- call_args(order_by_expr)
+    return(lapply(tibble_args, resolve_env))
+  }
+
+  list(resolve_env(order_by_expr))
+}
+
+# Resolve .env$var and .env[[var]] pronouns in an expression
+resolve_env_pronoun <- function(expr, env) {
+  if (is_call(expr, c("$", "[["), n = 2) && is_symbol(expr[[2]], ".env")) {
+    var <- expr[[3]]
+    if (is_call(expr, "[[")) {
+      var <- eval(var, env)
+    }
+    eval_bare(as.symbol(var), env)
+  } else if (is_call(expr)) {
+    expr[-1] <- lapply(expr[-1], resolve_env_pronoun, env = env)
+    expr
+  } else {
+    expr
+  }
 }
 
 swap_order_direction <- function(x) {
-  is_quo <- is_quosure(x)
-  if (is_quo) {
-    env <- quo_get_env(x)
-    x <- quo_get_expr(x)
-  }
-
   if (is_call(x, "desc", n = 1)) {
-    out <- call_args(x)[[1]]
+    call_args(x)[[1]]
   } else {
-    out <- expr(desc(!!x))
+    expr(desc(!!x))
   }
-
-  if (is_quo) {
-    out <- as_quosure(out, env)
-  }
-
-  out
 }

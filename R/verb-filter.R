@@ -51,8 +51,7 @@ add_filter <- function(lazy_query, con, exprs) {
     # add_mutate() always creates a subquery, so we need to bring all
     # existing variables along for the ride
     original_vars <- op_vars(lazy_query)
-    comp_quos <- purrr::map(where$comp, new_quosure)
-    new_exprs <- c(syms(set_names(original_vars)), comp_quos)
+    new_exprs <- c(syms(set_names(original_vars)), where$comp)
     mutated <- add_mutate(lazy_query, new_exprs)
 
     # filter with the modified `where` using the new columns
