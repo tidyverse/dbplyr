@@ -1,6 +1,8 @@
 expect_translation <- function(con, expr, expected, ...) {
   expected <- paste0(expected, collapse = "\n")
-  actual_sql <- translate_sql({{ expr }}, con = con, ...)
+
+  expr <- list(enexpr(expr))
+  actual_sql <- translate_sql_(expr, con = con, ...)
   expect_equal(actual_sql, sql(expected))
 }
 

@@ -11,7 +11,7 @@
 #'
 #' @param ...,dots Expressions to translate. `translate_sql()`
 #'   automatically quotes them for you.  `translate_sql_()` expects
-#'   a list of already quoted objects.
+#'   a list of expression objects.
 #' @param con Database connection used to determine the SQL dialect.
 #' @param vars_group,vars_order,vars_frame Parameters used in the `OVER`
 #'   expression of windowed functions.
@@ -74,7 +74,7 @@ translate_sql <- function(
   window = TRUE
 ) {
   translate_sql_(
-    quos(...),
+    exprs(...),
     con = con,
     vars_group = vars_group,
     vars_order = vars_order,
@@ -127,19 +127,12 @@ translate_sql_ <- function(
 
   variant <- dbplyr_sql_translation(con)
   pieces <- lapply(dots, function(x) {
-    # Handle both quosures (from translate_sql) and bare expressions (from verbs)
-    # Keep env for sql() evaluation in direct translate_sql() calls
-    env <- if (is_quosure(x)) quo_get_env(x) else NULL
-    if (is_quosure(x)) {
-      x <- quo_get_expr(x)
-    }
-
     if (is_null(x)) {
       NULL
     } else if (is_atomic(x) || is.sql(x)) {
       escape(x, con = con)
     } else {
-      mask <- sql_data_mask(x, variant, con = con, window = window, env = env)
+      mask <- sql_data_mask(x, variant, con = con, window = window)
       escape(eval_tidy(x, mask), con = con)
     }
   })
@@ -152,8 +145,7 @@ sql_data_mask <- function(
   variant,
   con,
   window = FALSE,
-  strict = getOption("dplyr.strict_sql", FALSE),
-  env = NULL
+  strict = getOption("dplyr.strict_sql", FALSE)
 ) {
   stopifnot(is.sql_variant(variant))
 
@@ -186,16 +178,6 @@ sql_data_mask <- function(
         "No known SQL translation",
         call = call2(call2("::", sym(pkg), sym(name)))
       )
-    }
-  }
-
-  # Handle sql() for direct translate_sql() calls (where env is available)
-  # For expressions from partial_eval, sql() is already evaluated
-  if (!is.null(env)) {
-    special_calls2$sql <- function(...) {
-      dots <- exprs(...)
-      dots <- purrr::map(dots, eval_tidy, env = env)
-      exec(sql, !!!dots)
     }
   }
 

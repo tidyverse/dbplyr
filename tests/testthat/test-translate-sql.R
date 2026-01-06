@@ -104,20 +104,6 @@ test_that("user infix functions are translated", {
   expect_translation(con, x %foo% (1:2), "\"x\" foo (1, 2)")
 })
 
-test_that("sql() evaluates input locally", {
-  con <- simulate_dbi()
-  a <- "x"
-  expect_translation(con, a, "\"a\"")
-  expect_translation(con, sql(a), "x")
-
-  f <- function() {
-    a <- "y"
-    translate_sql(sql(paste0(a)), con = con)
-  }
-
-  expect_equal(f(), sql("y"))
-})
-
 test_that("sql() evaluates input locally in across()", {
   lf <- lazy_frame(x = 1, y = 2)
 
