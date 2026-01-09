@@ -202,6 +202,19 @@ dbplyr_write_table <- function(
   check_bool(temporary)
   check_bool(overwrite)
 
+  UseMethod("dbplyr_write_table")
+}
+
+#' @export
+dbplyr_write_table.DBIConnection <- function(
+  con,
+  table,
+  types,
+  values,
+  temporary = TRUE,
+  ...,
+  overwrite = FALSE
+) {
   if (inherits(con, "PostgreSQLConnection")) {
     # RPostgreSQL doesn't handle `Id()` or `SQL()` correctly, so we can only pass
     # the bare table name

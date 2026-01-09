@@ -108,6 +108,20 @@
       ) "q01"
       WHERE ("col01" <= 1)
 
+# oracle_sql_table_create generates correct SQL
+
+    Code
+      oracle_sql_table_create(con, table_path("ORA$PTT_test"), c(x = "INTEGER", y = "TEXT"))
+    Output
+      <SQL> CREATE PRIVATE TEMPORARY TABLE ORA$PTT_test
+      ON COMMIT PRESERVE DEFINITION 
+      ("x" INTEGER, "y" TEXT)
+    Code
+      oracle_sql_table_create(con, table_path("test"), c(x = "INTEGER", y = "TEXT"))
+    Output
+      <SQL> CREATE TABLE test 
+      ("x" INTEGER, "y" TEXT)
+
 # copy_inline uses UNION ALL
 
     Code

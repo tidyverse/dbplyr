@@ -245,6 +245,60 @@ sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
 }
 
 #' @export
+dbplyr_write_table.Oracle <- function(
+  con,
+  table,
+  types,
+  values,
+  temporary = TRUE,
+  ...,
+  overwrite = FALSE
+) {
+  if (overwrite && DBI::dbExistsTable(con, DBI::SQL(table))) {
+    DBI::dbRemoveTable(con, DBI::SQL(table))
+  }
+
+  # We can't use DBI::dbWriteTable() here because it doesn't support
+  # Oracle's PRIVATE TEMPORARY TABLE syntax
+  fields <- types %||% values
+  create_sql <- oracle_sql_table_create(con, table, fields)
+  DBI::dbExecute(con, create_sql)
+
+  DBI::dbAppendTable(con, DBI::SQL(table), values)
+
+  table
+}
+
+
+oracle_sql_table_create <- function(con, table, fields) {
+  # Convert data frame to field types (like DBI:::sqlCreateTable_DBIConnection)
+  if (is.data.frame(fields)) {
+    fields <- vapply(fields, function(x) DBI::dbDataType(con, x), character(1))
+  }
+
+  # Quote column names and build field definitions
+  field_names <- sql_escape_ident(con, names(fields))
+  field_types <- unname(fields)
+  fields_sql <- sql(paste0(field_names, " ", field_types))
+
+  # Use PRIVATE TEMPORARY TABLE for temp tables (detected by ORA$PTT_ prefix)
+  if (is_oracle_temporary_table(table, con)) {
+    sql_glue2(
+      con,
+      "CREATE PRIVATE TEMPORARY TABLE {.tbl table}
+      ON COMMIT PRESERVE DEFINITION 
+      ({fields_sql})"
+    )
+  } else {
+    sql_glue2(
+      con,
+      "CREATE TABLE {.tbl table} 
+      ({fields_sql})"
+    )
+  }
+}
+
+#' @export
 sql_values_subquery.Oracle <- function(con, df, types, lvl = 0, ...) {
   sql_values_subquery_union(con, df, types = types, lvl = lvl, from = "DUAL")
 }
@@ -293,6 +347,9 @@ db_table_temporary.OraConnection <- db_table_temporary.Oracle
 
 #' @export
 sql_query_save.OraConnection <- sql_query_save.Oracle
+
+#' @export
+dbplyr_write_table.OraConnection <- dbplyr_write_table.Oracle
 
 #' @export
 sql_values_subquery.OraConnection <- sql_values_subquery.Oracle

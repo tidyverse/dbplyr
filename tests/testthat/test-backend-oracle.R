@@ -111,6 +111,26 @@ test_that("generates custom sql", {
   expect_snapshot(slice_sample(lf, n = 1))
 })
 
+test_that("oracle_sql_table_create generates correct SQL", {
+  con <- simulate_oracle()
+
+  expect_snapshot({
+    # Temporary table (has ORA$PTT_ prefix)
+    oracle_sql_table_create(
+      con,
+      table_path("ORA$PTT_test"),
+      c(x = "INTEGER", y = "TEXT")
+    )
+
+    # Regular table
+    oracle_sql_table_create(
+      con,
+      table_path("test"),
+      c(x = "INTEGER", y = "TEXT")
+    )
+  })
+})
+
 test_that("copy_inline uses UNION ALL", {
   con <- simulate_oracle()
   y <- tibble::tibble(id = 1L, arr = "{1,2,3}")
