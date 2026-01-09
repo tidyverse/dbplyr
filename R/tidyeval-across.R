@@ -210,7 +210,7 @@ across_fun <- function(fun, env, dots, fn) {
       )
     }
 
-    partial_eval_prepare_fun(f_rhs(fun), c(".", ".x"), env)
+    partial_eval_prepare_fun(f_rhs(fun), c(".", ".x", "..1"), env)
   } else if (is_call(fun, "function")) {
     fun <- eval(fun, env)
     partial_eval_fun(fun, env, fn)
@@ -345,7 +345,9 @@ across_setup <- function(data, call, env, allow_rename, fn, error_call) {
     repair = "check_unique"
   )
 
-  across_apply_fns(vars, fns, names_out, env)
+  out <- across_apply_fns(vars, fns, names_out, env)
+  # Partially evaluate each expression (e.g., to evaluate sql() calls)
+  lapply(out, partial_eval, data = data, env = env, error_call = error_call)
 }
 
 expr_as_label <- function(expr, name) {

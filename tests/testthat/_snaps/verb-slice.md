@@ -156,6 +156,23 @@
       ) AS "q01"
       WHERE ("col01" <= 1)
 
+# slice_min and slice_max give clear errors for bad order_by
+
+    Code
+      slice_min(lf, doesntexist)
+    Condition
+      Error in `slice_min()`:
+      i In argument: `order_by = doesntexist`
+      Caused by error:
+      ! Object `doesntexist` not found.
+    Code
+      slice_max(lf, doesntexist)
+    Condition
+      Error in `slice_max()`:
+      i In argument: `order_by = doesntexist`
+      Caused by error:
+      ! Object `doesntexist` not found.
+
 # slice_sample errors when expected
 
     Code

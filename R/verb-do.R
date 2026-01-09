@@ -1,5 +1,11 @@
 #' Perform arbitrary computation on remote backend
 #'
+#' @description
+#' `r lifecycle::badge("deprecated")`
+#'
+#' `do()` is deprecated. Instead of `do()` you should use [collect()] and then
+#' your favourite combination of purrr and dplyr functions.
+#'
 #' @inheritParams dplyr::do
 #' @param .chunk_size The size of each chunk to pull into R. If this number is
 #'   too big, the process will be slow because R has to allocate and free a lot
@@ -8,6 +14,7 @@
 #' @export
 #' @importFrom dplyr do
 do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
+  lifecycle::deprecate_warn("2.6.0", "do()")
   groups_sym <- groups(.data)
 
   if (length(groups_sym) == 0) {

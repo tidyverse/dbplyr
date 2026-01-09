@@ -104,20 +104,6 @@ test_that("user infix functions are translated", {
   expect_translation(con, x %foo% (1:2), "\"x\" foo (1, 2)")
 })
 
-test_that("sql() evaluates input locally", {
-  con <- dialect_ansi()
-  a <- "x"
-  expect_translation(con, a, "\"a\"")
-  expect_translation(con, sql(a), "x")
-
-  f <- function() {
-    a <- "y"
-    translate_sql(sql(paste0(a)), con = con)
-  }
-
-  expect_equal(f(), sql("y"))
-})
-
 test_that("sql() evaluates input locally in across()", {
   lf <- lazy_frame(x = 1, y = 2)
 
@@ -138,6 +124,17 @@ test_that("casts as expected", {
   expect_translation(con, as.integer64(x), "CAST(\"x\" AS BIGINT)")
   expect_translation(con, as.logical(x), "CAST(\"x\" AS BOOLEAN)")
   expect_translation(con, as.Date(x), "CAST(\"x\" AS DATE)")
+})
+
+test_that("as() translates to CAST", {
+  con <- simulate_dbi()
+  expect_translation(con, as(x, "TIME"), "CAST(\"x\" AS TIME)")
+  expect_translation(
+    con,
+    as(x, "DECIMAL(10, 2)"),
+    "CAST(\"x\" AS DECIMAL(10, 2))"
+  )
+  expect_snapshot(error = TRUE, translate_sql(as(x, 1L), con = con))
 })
 
 # numeric -----------------------------------------------------------------

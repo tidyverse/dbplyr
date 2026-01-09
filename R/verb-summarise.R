@@ -85,9 +85,9 @@ summarise_eval_dots <- function(.data, ..., error_call = caller_env()) {
     dots[[i]] <- partial_eval_quo(
       dot,
       .data,
-      error_call,
       dot_name,
-      was_named[[i]]
+      error_call = error_call,
+      was_named = was_named[[i]]
     )
     cur_data <- summarise_bind_error(cur_data, dots, i, error_env)
   }

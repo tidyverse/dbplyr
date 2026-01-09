@@ -132,7 +132,7 @@
       out
     Output
       <SQL>
-      SELECT "g", SUM("..x") AS "x"
+      SELECT "g", SUM("x") AS "x"
       FROM "df"
       GROUP BY "g"
 

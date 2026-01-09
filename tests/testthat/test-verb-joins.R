@@ -532,7 +532,7 @@ test_that("select() before join is inlined", {
     by = "x"
   )
   expect_equal(op_grps(out_left), "a")
-  expect_equal(op_sort(out_left), list(quo(a)))
+  expect_equal(op_sort(out_left), list(expr(a)))
   expect_equal(op_frame(out_left), list(range = c(0, 1)))
 })
 
@@ -655,7 +655,7 @@ test_that("select() before semi_join is inlined", {
     by = "x"
   )
   expect_equal(op_grps(out_semi), "a")
-  expect_equal(op_sort(out_semi), list(quo(a)))
+  expect_equal(op_sort(out_semi), list(expr(a)))
   expect_equal(op_frame(out_semi), list(range = c(0, 1)))
 })
 
@@ -710,8 +710,7 @@ test_that("filter() before semi join is inlined", {
   lq <- out$lazy_query
   expect_equal(
     lq$where,
-    list(quo(a == 1L), quo(b == 2L)),
-    ignore_formula_env = TRUE
+    list(expr(a == 1L), expr(b == 2L))
   )
   expect_snapshot(out)
 })
@@ -765,7 +764,7 @@ test_that("filtered aggregates with subsequent select are not inlined away in se
   )
   lq <- out$lazy_query
 
-  expect_equal(lq$y$having, list(quo(n() == 1)), ignore_formula_env = TRUE)
+  expect_equal(lq$y$having, list(expr(n() == 1)))
   expect_snapshot(out)
 })
 

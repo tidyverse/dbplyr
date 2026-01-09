@@ -1,6 +1,18 @@
 # dbplyr (development version)
 
 * MS Acess: now uses `[]` for quoting identifiers (like SQL server)
+* `set_op_query()` no longer has an `all` argument.
+* Set operations (`union()`, `intersect()`, `setdiff()`) now use the
+  `sql_set_op_method()` generic to generate the SQL set operation keyword. This
+  allows backends to customize the behavior, e.g., using "UNION DISTINCT"
+  instead of "UNION" for databases that require it, or "MINUS" instead of
+  "EXCEPT" for Oracle (#1596).
+* `do()` is deprecated. Use `collect()` then your favourite tidyverse
+  functions instead.
+* `as(x, "type")` is now translated to `CAST(x AS type)`, allowing you to cast
+  to arbitrary database types not covered by the standard `as.*()` functions
+  (#1729).
+* `filter()` after `left_join()` or `inner_join()` no longer creates a subquery (#722).
 * PostgreSQL: uses improved translation for `seconds()`, `minutes()`, `hours()`, `days()`, `weeks()`, `months()`, and `years()`.
 * `escape_ansi()` has been removed. Use `escape(x, con = simulate_dbi())` instead.
 * `summarise()` now reports grouping immediately, rather than when you summarise.

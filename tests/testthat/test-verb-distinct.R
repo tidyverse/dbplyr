@@ -113,8 +113,7 @@ test_that("distinct() produces optimized SQL", {
   expect_equal(out$lazy_query$select$name, c("x", "y"))
   expect_equal(
     out$lazy_query$select$expr,
-    list(sym("x"), quo(mean(y, na.rm = TRUE))),
-    ignore_formula_env = TRUE
+    list(sym("x"), expr(mean(y, na.rm = TRUE)))
   )
   expect_equal(out$lazy_query$group_by, syms("x"))
 
@@ -131,11 +130,7 @@ test_that("distinct() produces optimized SQL", {
   expect_true(out$lazy_query$distinct)
   expect_equal(out$lazy_query$select$name, "y")
   expect_equal(out$lazy_query$select$expr, syms("y"))
-  expect_equal(
-    out$lazy_query$where,
-    list(quo(x == 1L)),
-    ignore_formula_env = TRUE
-  )
+  expect_equal(out$lazy_query$where, list(expr(x == 1L)))
 
   # Note: currently this needs `distinct()` or `distinct(x, y)` because
   # `summarise()` + `select()` is not inlined.
@@ -155,8 +150,7 @@ test_that("distinct() produces optimized SQL", {
   expect_equal(out$lazy_query$select$name, c("x", "y"))
   expect_equal(
     out$lazy_query$select$expr,
-    list(sym("x"), quo(mean(y, na.rm = TRUE))),
-    ignore_formula_env = TRUE
+    list(expr(x), expr(mean(y, na.rm = TRUE)))
   )
 
   out <- lf |>

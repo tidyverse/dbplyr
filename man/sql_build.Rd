@@ -25,6 +25,7 @@ lazy_multi_join_query(
   table_names,
   vars,
   distinct = FALSE,
+  where = NULL,
   group_vars = op_grps(x),
   order_vars = op_sort(x),
   frame = op_frame(x),
@@ -108,7 +109,7 @@ semi_join_query(
 
 lazy_set_op_query(x, y, type, all, call = caller_env())
 
-set_op_query(x, y, type, all = FALSE)
+set_op_query(x, y, type)
 
 lazy_union_query(x, unions, call = caller_env())
 

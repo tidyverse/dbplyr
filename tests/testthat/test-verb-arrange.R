@@ -152,3 +152,35 @@ test_that("multiple arranges combine", {
   sort <- lapply(op_sort(out), get_expr)
   expect_equal(sort, list(quote(y), quote(x)))
 })
+
+# unwrap_order_expr/swap_order_direction ---------------------------------------
+
+test_that("unwrap_order_expr handles NULL", {
+  expect_equal(unwrap_order_expr(NULL, "test"), NULL)
+})
+
+test_that("unwrap_order_expr wraps single expression into a list", {
+  expect_equal(unwrap_order_expr(expr(x), "test"), list(expr(x)))
+  expect_equal(unwrap_order_expr(expr(desc(x)), "test"), list(expr(desc(x))))
+})
+
+test_that("unwrap_order_expr unwraps tibble/data.frame", {
+  expect_equal(
+    unwrap_order_expr(expr(tibble(x, y)), "test"),
+    list(expr(x), expr(y))
+  )
+  expect_equal(
+    unwrap_order_expr(expr(data.frame(x, desc(y))), "test"),
+    list(expr(x), expr(desc(y)))
+  )
+})
+
+test_that("unwrap_order_expr informatively errors on c()", {
+  expect_snapshot(unwrap_order_expr(expr(c(x, y)), "slice_min"), error = TRUE)
+})
+
+test_that("swap_order_direction swaps direction", {
+  expect_equal(swap_order_direction(expr(x)), expr(desc(x)))
+  expect_equal(swap_order_direction(expr(desc(x))), expr(x))
+  expect_equal(swap_order_direction(expr(a + b)), expr(desc(a + b)))
+})

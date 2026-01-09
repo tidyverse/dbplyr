@@ -6,6 +6,7 @@ lazy_multi_join_query <- function(
   table_names,
   vars,
   distinct = FALSE,
+  where = NULL,
   group_vars = op_grps(x),
   order_vars = op_sort(x),
   frame = op_frame(x),
@@ -32,6 +33,7 @@ lazy_multi_join_query <- function(
     table_names = table_names,
     vars = vars,
     distinct = distinct,
+    where = where,
     group_vars = group_vars,
     order_vars = order_vars,
     frame = frame
@@ -71,11 +73,24 @@ sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
     }
   )
 
+  # WHERE occurs before SELECT so need to backtransform variable names with
+  # qualified table.column references
+  replacements <- purrr::map2(op$vars$var, op$vars$table, \(var, table_idx) {
+    sql_table_prefix(con, table_names_out[[table_idx]], var)
+  })
+  where <- replace_sym(op$where, op$vars$name, replacements)
+  where_sql <- translate_sql_(
+    where,
+    con = con,
+    context = list(clause = "WHERE")
+  )
+
   multi_join_query(
     x = sql_build(op$x, con, sql_options = sql_options),
     joins = op$joins,
     table_names = table_names_out,
     select = select_sql,
+    where = where_sql,
     distinct = op$distinct
   )
 }
@@ -118,13 +133,21 @@ generate_join_table_names <- function(table_names, con) {
 
 # Built query -------------------------------------------------------------
 
-multi_join_query <- function(x, joins, table_names, select, distinct = FALSE) {
+multi_join_query <- function(
+  x,
+  joins,
+  table_names,
+  select,
+  where = NULL,
+  distinct = FALSE
+) {
   query(
     "multi_join",
     x = x,
     joins = joins,
     table_names = table_names,
     select = select,
+    where = where,
     distinct = distinct
   )
 }
@@ -151,6 +174,7 @@ sql_render.multi_join_query <- function(
     table_names = query$table_names,
     by_list = query$by_list,
     select = query$select,
+    where = query$where,
     distinct = query$distinct,
     lvl = lvl
   )
@@ -189,6 +213,7 @@ sql_query_multi_join <- function(
   table_names,
   by_list,
   select,
+  where = NULL,
   ...,
   distinct = FALSE,
   lvl = 0
@@ -202,6 +227,7 @@ sql_query_multi_join <- function(
     table_names,
     by_list,
     select,
+    where = where,
     ...,
     distinct = distinct,
     lvl = lvl
@@ -216,6 +242,7 @@ sql_query_multi_join_ <- function(
   table_names,
   by_list,
   select,
+  where = NULL,
   ...
 ) {
   UseMethod("sql_query_multi_join")
@@ -258,6 +285,7 @@ sql_query_multi_join.DBIConnection <- function(
   table_names,
   by_list,
   select,
+  where = NULL,
   ...,
   distinct = FALSE,
   lvl = 0
@@ -286,7 +314,8 @@ sql_query_multi_join.DBIConnection <- function(
   clauses <- list2(
     sql_clause_select(select, distinct),
     sql_clause_from(from),
-    !!!out
+    !!!out,
+    sql_clause_where(where)
   )
   sql_format_clauses(clauses, lvl = lvl)
 }
