@@ -485,6 +485,19 @@ add_join <- function(
 
   x_lq$joins <- vctrs::vec_rbind(x_lq$joins, joins_data)
   x_lq$table_names <- vctrs::vec_rbind(x_lq$table_names, table_names_y)
+
+  # Update WHERE clause if any x variables were renamed (#1770)
+  if (length(x_lq$where) > 0) {
+    old_names <- x_lq$vars$name
+    new_names <- vars$name[seq_along(x_lq$vars$name)]
+    renamed <- old_names != new_names
+
+    x_lq$where <- replace_sym(
+      x_lq$where,
+      old_names[renamed],
+      syms(new_names[renamed])
+    )
+  }
   x_lq$vars <- vars
 
   x_lq
