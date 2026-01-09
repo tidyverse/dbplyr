@@ -133,8 +133,8 @@ test_that("can translate nzchar", {
 
   # Uses individual translations from backend
   con <- dialect_access()
-  expect_translation(con, nzchar(y), '(ISNULL([y]) OR [y] <> \'\')')
-  expect_translation(con, nzchar(y, TRUE), '[y] <> \'\'')
+  expect_translation(con, nzchar(y), '(ISNULL("y") OR "y" <> \'\')')
+  expect_translation(con, nzchar(y, TRUE), '"y" <> \'\'')
 })
 
 # aggregates --------------------------------------------------------------

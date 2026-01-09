@@ -34,7 +34,7 @@ simulate_access <- function() simulate_dbi("ACCESS")
 dialect_access <- function() {
   new_sql_dialect(
     "access",
-    quote_identifier = function(x) sql_quote(x, c("[", "]")),
+    quote_identifier = function(x) sql_quote(x, '"'),
     supports_window_clause = TRUE
   )
 }
@@ -47,17 +47,6 @@ sql_dialect.ACCESS <- function(con) {
 #' @export
 dbplyr_edition.ACCESS <- function(con) {
   2L
-}
-
-#' @export
-table_path_components.sql_dialect_access <- function(x, con) {
-  # Access uses asymmetric quotes [identifier], which scan() can't handle
-  # Same logic as MSSQL
-  lapply(x, function(path) {
-    matches <- gregexpr('\\[[^]]*\\]|"[^"]*"|[^.]+', path)
-    components <- regmatches(path, matches)[[1]]
-    gsub('^\\[|\\]$|^"|"$', "", components)
-  })
 }
 
 # sql_ generics --------------------------------------------
