@@ -79,14 +79,18 @@ new_sql_dialect <- function(
 }
 
 dialect_ansi <- function() {
-  new_sql_dialect(
-    "ansi",
-    quote_identifier = function(x) sql_quote(x, '"')
+  structure(
+    list(
+      quote_identifier = function(x) sql_quote(x, '"'),
+      supports_window_clause = FALSE,
+      supports_table_alias_with_as = TRUE
+    ),
+    class = "sql_dialect"
   )
 }
 
 #' @export
-sql_translation.sql_dialect_ansi <- function(con) {
+sql_translation.sql_dialect <- function(con) {
   sql_variant(
     base_scalar,
     base_agg,
