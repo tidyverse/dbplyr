@@ -27,6 +27,19 @@ NULL
 #' @rdname backend-sqlite
 simulate_sqlite <- function() simulate_dbi("SQLiteConnection")
 
+dialect_sqlite <- function() {
+  new_sql_dialect(
+    "sqlite",
+    quote_identifier = function(x) sql_quote(x, "`"),
+    has_window_clause = TRUE
+  )
+}
+
+#' @export
+sql_dialect.SQLiteConnection <- function(con) {
+  dialect_sqlite()
+}
+
 #' @export
 dbplyr_edition.SQLiteConnection <- function(con) {
   2L
@@ -38,15 +51,33 @@ db_connection_describe.SQLiteConnection <- function(con, ...) {
 }
 
 #' @export
-sql_query_explain.SQLiteConnection <- function(con, sql, ...) {
+sql_query_explain.sql_dialect_sqlite <- function(con, sql, ...) {
   sql_glue2(con, "EXPLAIN QUERY PLAN {sql}")
 }
 
 #' @export
-sql_query_set_op.SQLiteConnection <- sql_query_set_op.Hive
+sql_query_set_op.sql_dialect_sqlite <- sql_query_set_op.sql_dialect_hive
 
 #' @export
-sql_query_upsert.SQLiteConnection <- sql_query_upsert.PqConnection
+sql_query_upsert.sql_dialect_sqlite <- function(
+  con,
+  table,
+  from,
+  by,
+  update_cols,
+  ...,
+  returning_cols = NULL,
+  method = NULL
+) {
+  sql_query_upsert_on_conflict(
+    con,
+    table,
+    from,
+    by,
+    update_cols,
+    returning_cols = returning_cols
+  )
+}
 
 sqlite_version <- function() {
   numeric_version(RSQLite::rsqliteVersion()[[2]])
@@ -55,7 +86,7 @@ sqlite_version <- function() {
 # SQL methods -------------------------------------------------------------
 
 #' @export
-sql_translation.SQLiteConnection <- function(con) {
+sql_translation.sql_dialect_sqlite <- function(con) {
   sql_variant(
     sql_translator(
       .parent = base_scalar,
@@ -119,20 +150,20 @@ sql_translation.SQLiteConnection <- function(con) {
 }
 
 #' @export
-sql_escape_logical.SQLiteConnection <- function(con, x) {
+sql_escape_logical.sql_dialect_sqlite <- function(con, x) {
   y <- as.character(as.integer(x))
   y[is.na(x)] <- "NULL"
   sql(y)
 }
 
 #' @export
-sql_expr_matches.SQLiteConnection <- function(con, x, y, ...) {
+sql_expr_matches.sql_dialect_sqlite <- function(con, x, y, ...) {
   # https://sqlite.org/lang_expr.html#isisnot
   sql_glue2(con, "{x} IS {y}")
 }
 
 #' @export
-values_prepare.SQLiteConnection <- function(con, df) {
+values_prepare.sql_dialect_sqlite <- function(con, df) {
   needs_escape <- purrr::map_lgl(
     df,
     \(col) methods::is(col, "Date") || inherits(col, "POSIXct")
@@ -142,14 +173,4 @@ values_prepare.SQLiteConnection <- function(con, df) {
     needs_escape,
     \(col) escape(col, con = con, parens = FALSE, collapse = NULL)
   )
-}
-
-#' @export
-supports_window_clause.SQLiteConnection <- function(con) {
-  TRUE
-}
-
-#' @export
-db_supports_table_alias_with_as.SQLiteConnection <- function(con) {
-  TRUE
 }

@@ -129,6 +129,9 @@ dbplyr_fill0.DBIConnection <- function(
     )
 }
 
+#' @export
+dbplyr_fill0.sql_dialect <- dbplyr_fill0.DBIConnection
+
 # Define function & avoid R CMD CHECK note
 last <- function(x, na_rm = TRUE) {
   if (na_rm) {
@@ -224,6 +227,22 @@ dbplyr_fill0.MariaDBConnection <- dbplyr_fill0.SQLiteConnection
 dbplyr_fill0.MySQLConnection <- dbplyr_fill0.SQLiteConnection
 #' @export
 dbplyr_fill0.MySQL <- dbplyr_fill0.SQLiteConnection
+
+# Dialect methods for databases without support for `IGNORE NULLS`
+#' @export
+dbplyr_fill0.sql_dialect_sqlite <- dbplyr_fill0.SQLiteConnection
+#' @export
+dbplyr_fill0.sql_dialect_postgres <- dbplyr_fill0.SQLiteConnection
+#' @export
+dbplyr_fill0.sql_dialect_mysql <- dbplyr_fill0.SQLiteConnection
+#' @export
+dbplyr_fill0.sql_dialect_mariadb <- dbplyr_fill0.SQLiteConnection
+#' @export
+dbplyr_fill0.sql_dialect_mssql <- dbplyr_fill0.SQLiteConnection
+#' @export
+dbplyr_fill0.sql_dialect_hana <- dbplyr_fill0.SQLiteConnection
+#' @export
+dbplyr_fill0.sql_dialect_access <- dbplyr_fill0.SQLiteConnection
 
 #' @importFrom dplyr case_when
 NULL

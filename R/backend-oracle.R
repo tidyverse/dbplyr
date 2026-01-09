@@ -33,13 +33,30 @@ NULL
 #' @rdname backend-oracle
 simulate_oracle <- function() simulate_dbi("Oracle")
 
+dialect_oracle <- function() {
+  new_sql_dialect(
+    "oracle",
+    quote_identifier = function(x) sql_quote(x, '"'),
+    has_table_alias_with_as = FALSE
+  )
+}
+
+#' @export
+sql_dialect.Oracle <- function(con) {
+  dialect_oracle()
+}
+#' @export
+sql_dialect.OraConnection <- function(con) {
+  dialect_oracle()
+}
+
 #' @export
 dbplyr_edition.Oracle <- function(con) {
   2L
 }
 
 #' @export
-sql_query_select.Oracle <- function(
+sql_query_select.sql_dialect_oracle <- function(
   con,
   select,
   from,
@@ -72,7 +89,7 @@ sql_query_select.Oracle <- function(
 }
 
 #' @export
-sql_query_upsert.Oracle <- function(
+sql_query_upsert.sql_dialect_oracle <- function(
   con,
   table,
   from,
@@ -117,7 +134,7 @@ sql_query_upsert.Oracle <- function(
 }
 
 #' @export
-sql_translation.Oracle <- function(con) {
+sql_translation.sql_dialect_oracle <- function(con) {
   sql_variant(
     sql_translator(
       .parent = base_odbc_scalar,
@@ -191,7 +208,7 @@ sql_translation.Oracle <- function(con) {
 }
 
 #' @export
-sql_query_explain.Oracle <- function(con, sql, ...) {
+sql_query_explain.sql_dialect_oracle <- function(con, sql, ...) {
   # https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/generating-and-displaying-execution-plans.html
   sql(
     sql_glue2(con, "EXPLAIN PLAN FOR {sql}"),
@@ -200,71 +217,48 @@ sql_query_explain.Oracle <- function(con, sql, ...) {
 }
 
 #' @export
-sql_table_analyze.Oracle <- function(con, table, ...) {
+sql_table_analyze.sql_dialect_oracle <- function(con, table, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_4005.htm
   sql_glue2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
 }
 
 #' @export
-sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
+sql_query_save.sql_dialect_oracle <- function(
+  con,
+  sql,
+  name,
+  temporary = TRUE,
+  ...
+) {
   type <- if (temporary) "GLOBAL TEMPORARY TABLE" else "TABLE"
   sql_glue2(con, "CREATE {.sql type} {.tbl name} AS\n{sql}")
 }
 
 #' @export
-sql_values_subquery.Oracle <- function(con, df, types, lvl = 0, ...) {
+sql_values_subquery.sql_dialect_oracle <- function(
+  con,
+  df,
+  types,
+  lvl = 0,
+  ...
+) {
   sql_values_subquery_union(con, df, types = types, lvl = lvl, from = "DUAL")
 }
 
 #' @export
-sql_set_op_method.Oracle <- function(con, op, ...) {
+sql_set_op_method.sql_dialect_oracle <- function(con, op, ...) {
   # Oracle uses MINUS instead of EXCEPT:
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries004.htm
   switch(op, "EXCEPT" = "MINUS", op)
 }
 
 #' @export
-sql_expr_matches.Oracle <- function(con, x, y, ...) {
+sql_expr_matches.sql_dialect_oracle <- function(con, x, y, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/functions040.htm
   sql_glue2(con, "decode({x}, {y}, 0, 1) = 0")
-}
-
-#' @export
-db_supports_table_alias_with_as.Oracle <- function(con) {
-  FALSE
 }
 
 # roacle package ----------------------------------------------------------
 
 #' @export
 dbplyr_edition.OraConnection <- dbplyr_edition.Oracle
-
-#' @export
-sql_query_select.OraConnection <- sql_query_select.Oracle
-
-#' @export
-sql_query_upsert.OraConnection <- sql_query_upsert.Oracle
-
-#' @export
-sql_translation.OraConnection <- sql_translation.Oracle
-
-#' @export
-sql_query_explain.OraConnection <- sql_query_explain.Oracle
-
-#' @export
-sql_table_analyze.OraConnection <- sql_table_analyze.Oracle
-
-#' @export
-sql_query_save.OraConnection <- sql_query_save.Oracle
-
-#' @export
-sql_values_subquery.OraConnection <- sql_values_subquery.Oracle
-
-#' @export
-sql_set_op_method.OraConnection <- sql_set_op_method.Oracle
-
-#' @export
-sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
-
-#' @export
-db_supports_table_alias_with_as.OraConnection <- db_supports_table_alias_with_as.Oracle

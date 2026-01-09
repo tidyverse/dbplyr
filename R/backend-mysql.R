@@ -30,6 +30,35 @@ simulate_mysql <- function() simulate_dbi("MySQLConnection")
 #' @rdname backend-mysql
 simulate_mariadb <- function() simulate_dbi("MariaDBConnection")
 
+dialect_mariadb <- function() {
+  new_sql_dialect(
+    "mariadb",
+    quote_identifier = function(x) sql_quote(x, "`"),
+    has_window_clause = TRUE
+  )
+}
+
+dialect_mysql <- function() {
+  new_sql_dialect(
+    "mysql",
+    quote_identifier = function(x) sql_quote(x, "`"),
+    has_window_clause = TRUE
+  )
+}
+
+#' @export
+sql_dialect.MariaDBConnection <- function(con) {
+  dialect_mariadb()
+}
+#' @export
+sql_dialect.MySQL <- function(con) {
+  dialect_mysql()
+}
+#' @export
+sql_dialect.MySQLConnection <- function(con) {
+  dialect_mysql()
+}
+
 #' @export
 dbplyr_edition.MariaDBConnection <- function(con) {
   2L
@@ -74,7 +103,7 @@ db_col_types.MySQL <- db_col_types.MariaDBConnection
 db_col_types.MySQLConnection <- db_col_types.MariaDBConnection
 
 #' @export
-sql_translation.MariaDBConnection <- function(con) {
+sql_translation.sql_dialect_mariadb <- function(con) {
   sql_variant(
     sql_translator(
       .parent = base_scalar,
@@ -150,8 +179,8 @@ sql_translation.MariaDBConnection <- function(con) {
 }
 
 #' @export
-sql_translation.MySQL <- function(con) {
-  maria <- unclass(sql_translation.MariaDBConnection())
+sql_translation.sql_dialect_mysql <- function(con) {
+  maria <- unclass(sql_translation(dialect_mariadb()))
   sql_variant(
     sql_translator(
       .parent = maria$scalar,
@@ -163,20 +192,16 @@ sql_translation.MySQL <- function(con) {
     maria$window
   )
 }
-#' @export
-sql_translation.MySQLConnection <- sql_translation.MySQL
 
 #' @export
-sql_table_analyze.MariaDBConnection <- function(con, table, ...) {
+sql_table_analyze.sql_dialect_mariadb <- function(con, table, ...) {
   sql_glue2(con, "ANALYZE TABLE {.tbl table}")
 }
 #' @export
-sql_table_analyze.MySQL <- sql_table_analyze.MariaDBConnection
-#' @export
-sql_table_analyze.MySQLConnection <- sql_table_analyze.MariaDBConnection
+sql_table_analyze.sql_dialect_mysql <- sql_table_analyze.sql_dialect_mariadb
 
 #' @export
-sql_query_join.MariaDBConnection <- function(
+sql_query_join.sql_dialect_mariadb <- function(
   con,
   x,
   y,
@@ -191,36 +216,36 @@ sql_query_join.MariaDBConnection <- function(
   NextMethod()
 }
 #' @export
-sql_query_join.MySQL <- sql_query_join.MariaDBConnection
-#' @export
-sql_query_join.MySQLConnection <- sql_query_join.MariaDBConnection
+sql_query_join.sql_dialect_mysql <- sql_query_join.sql_dialect_mariadb
 
 
 #' @export
-sql_expr_matches.MariaDBConnection <- function(con, x, y, ...) {
+sql_expr_matches.sql_dialect_mariadb <- function(con, x, y, ...) {
   # https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_equal-to
   sql_glue2(con, "{x} <=> {y}")
 }
 #' @export
-sql_expr_matches.MySQL <- sql_expr_matches.MariaDBConnection
-#' @export
-sql_expr_matches.MySQLConnection <- sql_expr_matches.MariaDBConnection
+sql_expr_matches.sql_dialect_mysql <- sql_expr_matches.sql_dialect_mariadb
 
 # https://modern-sql.com/blog/2018-08/whats-new-in-mariadb-10.3#3.values
 # MariaDB doesn't accept `ROW` unlike MySQL
 #' @export
-sql_values_subquery.MariaDBConnection <- sql_values_subquery.DBIConnection
+sql_values_subquery.sql_dialect_mariadb <- sql_values_subquery.sql_dialect
 
 #' @export
-sql_values_subquery.MySQL <- function(con, df, types, lvl = 0, ...) {
+sql_values_subquery.sql_dialect_mysql <- function(
+  con,
+  df,
+  types,
+  lvl = 0,
+  ...
+) {
   # https://dev.mysql.com/doc/refman/8.0/en/values.html
   sql_values_subquery_default(con, df, types = types, lvl = lvl, row = TRUE)
 }
-#' @export
-sql_values_subquery.MySQLConnection <- sql_values_subquery.MySQL
 
 #' @export
-sql_query_update_from.MariaDBConnection <- function(
+sql_query_update_from.sql_dialect_mariadb <- function(
   con,
   table,
   from,
@@ -250,13 +275,11 @@ sql_query_update_from.MariaDBConnection <- function(
   sql_format_clauses(clauses, lvl = 0)
 }
 #' @export
-sql_query_update_from.MySQLConnection <- sql_query_update_from.MariaDBConnection
-#' @export
-sql_query_update_from.MySQL <- sql_query_update_from.MariaDBConnection
+sql_query_update_from.sql_dialect_mysql <- sql_query_update_from.sql_dialect_mariadb
 
 
 #' @export
-sql_query_upsert.MariaDBConnection <- function(
+sql_query_upsert.sql_dialect_mariadb <- function(
   con,
   table,
   from,
@@ -269,12 +292,10 @@ sql_query_upsert.MariaDBConnection <- function(
   cli_abort("{.fun rows_upsert} is not supported for MariaDB.")
 }
 #' @export
-sql_query_upsert.MySQLConnection <- sql_query_upsert.MariaDBConnection
-#' @export
-sql_query_upsert.MySQL <- sql_query_upsert.MariaDBConnection
+sql_query_upsert.sql_dialect_mysql <- sql_query_upsert.sql_dialect_mariadb
 
 #' @export
-sql_escape_datetime.MariaDBConnection <- function(con, x) {
+sql_escape_datetime.sql_dialect_mariadb <- function(con, x) {
   # DateTime format as per:
   # https://dev.mysql.com/doc/refman/8.0/en/datetime.html
   # https://mariadb.com/kb/en/datetime/
@@ -282,30 +303,4 @@ sql_escape_datetime.MariaDBConnection <- function(con, x) {
   sql_escape_string(con, x)
 }
 #' @export
-sql_escape_datetime.MySQLConnection <- sql_escape_datetime.MariaDBConnection
-#' @export
-sql_escape_datetime.MySQL <- sql_escape_datetime.MariaDBConnection
-
-
-# dbQuoteIdentifier() for RMySQL lacks handling of SQL objects
-#' @export
-sql_escape_ident.MySQLConnection <- function(con, x) {
-  if (!isS4(con)) {
-    # for simulate_mysql()
-    NextMethod()
-  } else if (methods::is(x, "SQL")) {
-    sql(x)
-  } else {
-    sql(DBI::dbQuoteIdentifier(con, x))
-  }
-}
-
-
-#' @export
-supports_window_clause.MariaDBConnection <- function(con) {
-  TRUE
-}
-#' @export
-supports_window_clause.MySQLConnection <- supports_window_clause.MariaDBConnection
-#' @export
-supports_window_clause.MySQL <- supports_window_clause.MariaDBConnection
+sql_escape_datetime.sql_dialect_mysql <- sql_escape_datetime.sql_dialect_mariadb

@@ -22,13 +22,26 @@ NULL
 #' @rdname backend-impala
 simulate_impala <- function() simulate_dbi("Impala")
 
+dialect_impala <- function() {
+  new_sql_dialect(
+    "impala",
+    quote_identifier = function(x) sql_quote(x, '"'),
+    has_window_clause = TRUE
+  )
+}
+
+#' @export
+sql_dialect.Impala <- function(con) {
+  dialect_impala()
+}
+
 #' @export
 dbplyr_edition.Impala <- function(con) {
   2L
 }
 
 #' @export
-sql_translation.Impala <- function(con) {
+sql_translation.sql_dialect_impala <- function(con) {
   sql_variant(
     scalar = sql_translator(
       .parent = base_odbc_scalar,
@@ -48,7 +61,7 @@ sql_translation.Impala <- function(con) {
 }
 
 #' @export
-sql_table_analyze.Impala <- function(con, table, ...) {
+sql_table_analyze.sql_dialect_impala <- function(con, table, ...) {
   # Using COMPUTE STATS instead of ANALYZE as recommended in this article
   # https://www.cloudera.com/documentation/enterprise/5-9-x/topics/impala_compute_stats.html
   sql_glue2(con, "COMPUTE STATS {.tbl table}")

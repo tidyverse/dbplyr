@@ -16,8 +16,26 @@
 #' lf |> transmute(x = paste0(d, " times"))
 NULL
 
+dialect_snowflake <- function() {
+  new_sql_dialect(
+    "snowflake",
+    quote_identifier = function(x) sql_quote(x, '"'),
+    has_window_clause = TRUE
+  )
+}
+
 #' @export
-sql_translation.Snowflake <- function(con) {
+sql_dialect.Snowflake <- function(con) {
+  dialect_snowflake()
+}
+
+#' @export
+dbplyr_edition.Snowflake <- function(con) {
+  2L
+}
+
+#' @export
+sql_translation.sql_dialect_snowflake <- function(con) {
   sql_variant(
     sql_translator(
       .parent = base_odbc_scalar,
@@ -330,7 +348,7 @@ simulate_snowflake <- function() simulate_dbi("Snowflake")
 # functions that performed similar operations, and found none.
 # Link to full list: https://docs.snowflake.com/en/sql-reference/sql-all.html
 #' @export
-sql_table_analyze.Snowflake <- function(con, table, ...) {}
+sql_table_analyze.sql_dialect_snowflake <- function(con, table, ...) {}
 
 snowflake_grepl <- function(
   pattern,

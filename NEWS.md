@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `db_table_temporary()` has been renamed to `sql_table_temporary()` for
+  consistency with other SQL generation functions. This 
 * `set_op_query()` no longer has an `all` argument.
 * Set operations (`union()`, `intersect()`, `setdiff()`) now use the
   `sql_set_op_method()` generic to generate the SQL set operation keyword. This
