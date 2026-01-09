@@ -67,24 +67,21 @@ Next, define a dialect for your backend using `sql_dialect()` and `new_sql_diale
 sql_dialect.myConnectionClass <- function(con) {
   new_sql_dialect(
     "mybackend",
-    quote_identifier = function(x) sql_quote(x, '"'),
-    has_window_clause = TRUE,
-    has_table_alias_with_as = TRUE
+    quote_identifier = function(x) sql_quote(x, '"')
   )
 }
 ```
 
-The `new_sql_dialect()` function takes:
+The `new_sql_dialect()` function requires two arguments:
 
 * `dialect`: A unique name for your backend (used to create the class name).
-* `quote_identifier`: A function that quotes identifiers. Common choices are
-  double quotes (`"`), backticks (`` ` ``), or square brackets (`[]`).
-* `has_window_clause`: Set to `TRUE` if your database supports the `WINDOW`
-  clause for defining named window specifications.
-* `has_table_alias_with_as`: Set to `FALSE` if your database doesn't support
-  `AS` when aliasing tables in subqueries (e.g., Oracle).
+* `quote_identifier`: A function that quotes identifiers. This will typically b e either a call to `sql_quote()` or to `DBI::dbQuoteIdentifier()`
 
-The dialect system allows you to write methods that dispatch on the dialect class (e.g., `sql_translation.sql_dialect_mybackend`) rather than the connection class. This makes it easier to share SQL generation code between different connection types that use the same database.
+`new_sql_dialect()` has a number of additional arguments that describe the capabilities of the SQL dialect; see `?new_sql_dialect` for details.
+
+The dialect system allows you to write methods that dispatch on the dialect class (e.g., `sql_translation.sql_dialect_mybackend`) rather than the connection class. This makes it easier to share SQL generation code between different connection types that use the same database (e.g. direct, ODBC, JDBC, ADBC). 
+
+In general, generics that start with `sql_` should have a sql_dialect method, and generics that start with `db_` should use a DBI connection method. It should be relatively rare to need a method for `db_` generic, but occassionally dbplyr's SQL generation system is not quite flexible enough. If you find this, it's worth filing an issue so I can look into it.
 
 ## Copying, computing, collecting and collapsing
 
