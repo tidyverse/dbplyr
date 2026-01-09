@@ -93,19 +93,11 @@ sql_set_op_method.sql_dialect <- sql_set_op_method.DBIConnection
 sql_query_set_op <- function(con, x, y, method, ..., lvl = 0) {
   check_dots_used()
   dialect <- sql_dialect(con)
-  return(sql_query_set_op_(dialect, x, y, method, ..., all = all, lvl = lvl))
+  return(sql_query_set_op_(dialect, x, y, method, ..., lvl = lvl))
 
   UseMethod("sql_query_set_op")
 }
-sql_query_set_op_ <- function(
-  dialect,
-  x,
-  y,
-  method,
-  ...,
-  all = FALSE,
-  lvl = 0
-) {
+sql_query_set_op_ <- function(dialect, x, y, method, ...) {
   UseMethod("sql_query_set_op")
 }
 #' @export
