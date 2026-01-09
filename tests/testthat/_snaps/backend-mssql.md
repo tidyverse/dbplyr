@@ -533,7 +533,7 @@
 # add prefix to temporary table
 
     Code
-      out <- db_table_temporary(con, table_path("foo.bar"), temporary = TRUE)
+      out <- sql_table_temporary(con, table_path("foo.bar"), temporary = TRUE)
     Message
       Created a temporary table named #bar
 

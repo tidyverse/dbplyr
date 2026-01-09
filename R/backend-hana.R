@@ -72,7 +72,7 @@ sql_translation.sql_dialect_hana <- function(con) {
 
 # nocov start
 #' @export
-db_table_temporary.HDB <- function(con, table, temporary, ...) {
+sql_table_temporary.sql_dialect_hana <- function(con, table, temporary, ...) {
   list(
     table = add_temporary_prefix(con, table, temporary = temporary),
     temporary = FALSE

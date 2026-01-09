@@ -4,7 +4,7 @@
 \alias{db_copy_to}
 \alias{db_compute}
 \alias{db_collect}
-\alias{db_table_temporary}
+\alias{sql_table_temporary}
 \title{Database I/O generics}
 \usage{
 db_copy_to(
@@ -36,7 +36,7 @@ db_compute(
 
 db_collect(con, sql, n = -1, warn_incomplete = TRUE, ...)
 
-db_table_temporary(con, table, temporary, ...)
+sql_table_temporary(con, table, temporary, ...)
 }
 \description{
 These generics are responsible for getting data into and out of the
@@ -54,7 +54,7 @@ analyses (via \code{\link[=sql_table_analyze]{sql_table_analyze()}}).
 (via \code{\link[=sql_table_index]{sql_table_index()}}) and analyses (via \code{\link[=sql_table_analyze]{sql_table_analyze()}}).
 \item \code{db_collect()} implements \code{\link[=collect.tbl_sql]{collect.tbl_sql()}} using \code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}}
 and \code{\link[DBI:dbFetch]{DBI::dbFetch()}}.
-\item \code{db_table_temporary()} is used for databases that have special naming
+\item \code{sql_table_temporary()} is used for databases that have special naming
 schemes for temporary tables (e.g. SQL server and SAP HANA require
 temporary tables to start with \verb{#})
 }

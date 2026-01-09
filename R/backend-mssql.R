@@ -721,25 +721,7 @@ sql_table_analyze.sql_dialect_mssql <- function(con, table, ...) {
 # temporary table names with #
 # <https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms177399%28v%3dsql.105%29#temporary-tables>
 #' @export
-`db_table_temporary.Microsoft SQL Server` <- function(
-  con,
-  table,
-  temporary,
-  ...
-) {
-  mssql_db_table_temporary(con, table, temporary)
-}
-#' @export
-db_table_temporary.sql_dialect_mssql <- function(
-  con,
-  table,
-  temporary,
-  ...
-) {
-  mssql_db_table_temporary(con, table, temporary)
-}
-
-mssql_db_table_temporary <- function(con, table, temporary) {
+sql_table_temporary.sql_dialect_mssql <- function(con, table, temporary, ...) {
   list(
     table = add_temporary_prefix(con, table, temporary = temporary),
     temporary = FALSE
