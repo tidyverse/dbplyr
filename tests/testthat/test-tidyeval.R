@@ -75,6 +75,12 @@ test_that("respects .sql pronoun", {
   expect_equal(partial_eval(expr(.sql$foo(x, "y")), lf), expr(foo(x, "y")))
 })
 
+test_that("sql() is inlined", {
+  lf <- lazy_frame(x = 1)
+
+  foo <- "x"
+  expect_equal(partial_eval(expr(sql(foo)), lf), sql("x"))
+})
 
 test_that("fails with multi-classes", {
   lf <- lazy_frame(x = 1, y = 2)

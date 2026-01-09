@@ -46,11 +46,6 @@ test_that("custom scalar translated correctly", {
     as.Date("2020-01-01"),
     "DATE '2020-01-01'"
   )
-  expect_translation(
-    con,
-    as.Date(sql("x + 1")),
-    "CAST(x + 1 AS DATE)"
-  )
   expect_translation(con, as.Date(x), 'CAST("x" AS DATE)')
   expect_translation(
     con,

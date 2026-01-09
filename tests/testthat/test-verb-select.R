@@ -65,11 +65,7 @@ test_that("select after arrange produces subquery, if needed", {
 
   inner_query <- out$lazy_query$x
   expect_s3_class(inner_query, "lazy_select_query")
-  expect_equal(
-    inner_query$order_by,
-    list(quo(x), quo(z)),
-    ignore_formula_env = TRUE
-  )
+  expect_equal(inner_query$order_by, list(expr(x), expr(z)))
   expect_equal(
     op_vars(inner_query),
     c("x", "z")
@@ -151,16 +147,16 @@ test_that("select handles order vars", {
   # can rename order vars
   expect_equal(
     lf |> window_order(y) |> select(y2 = y) |> op_sort(),
-    list(quo(y2))
+    list(expr(y2))
   )
   expect_equal(
     lf |> window_order(desc(y)) |> select(y2 = y) |> op_sort(),
-    list(quo(desc(y2)))
+    list(expr(desc(y2)))
   )
   # keeps sort order
   expect_equal(
     lf |> window_order(x, y) |> select(y2 = y, x) |> op_sort(),
-    list(quo(x), quo(y2))
+    list(expr(x), expr(y2))
   )
 })
 
@@ -344,11 +340,7 @@ test_that("arranged computed columns are not inlined away", {
     lf |> mutate(z = 1) |> arrange(x, z) |> select(x)
   })
   expect_s3_class(inner_query, "lazy_select_query")
-  expect_equal(
-    inner_query$order_by,
-    list(quo(x), quo(z)),
-    ignore_formula_env = TRUE
-  )
+  expect_equal(inner_query$order_by, list(expr(x), expr(z)))
   expect_equal(op_vars(inner_query), c("x", "z"))
   expect_equal(op_vars(out$lazy_query), "x")
   expect_equal(

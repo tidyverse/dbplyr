@@ -51,8 +51,7 @@ add_filter <- function(lazy_query, con, exprs) {
     # add_mutate() always creates a subquery, so we need to bring all
     # existing variables along for the ride
     original_vars <- op_vars(lazy_query)
-    comp_quos <- purrr::map(where$comp, new_quosure)
-    new_exprs <- c(syms(set_names(original_vars)), comp_quos)
+    new_exprs <- c(syms(set_names(original_vars)), where$comp)
     mutated <- add_mutate(lazy_query, new_exprs)
 
     # filter with the modified `where` using the new columns
@@ -63,6 +62,11 @@ add_filter <- function(lazy_query, con, exprs) {
     )
   } else if (filter_can_use_having(lazy_query)) {
     filter_via_having(lazy_query, exprs)
+  } else if (inherits(lazy_query, "lazy_multi_join_query")) {
+    # Due to way JOINs generate their SELECT clauses much later we have to
+    # do the backtransformation of variable names in `sql_build.lazy_multi_join_query`
+    lazy_query$where <- c(lazy_query$where, exprs)
+    lazy_query
   } else if (can_inline_filter(exprs, lazy_query, con)) {
     # WHERE processed before SELECT
     exprs <- replace_sym(exprs, lazy_query$select$name, lazy_query$select$expr)

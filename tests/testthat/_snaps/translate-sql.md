@@ -47,3 +47,11 @@
       Error in `base::abbreviate()`:
       ! No known SQL translation
 
+# as() translates to CAST
+
+    Code
+      translate_sql(as(x, 1L), con = con)
+    Condition
+      Error in `as()`:
+      ! `type` must be a single string, not the number 1.
+

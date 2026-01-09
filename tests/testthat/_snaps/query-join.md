@@ -1,3 +1,51 @@
+# multi_join where clause uses qualified column names
+
+    Code
+      filter(left_join(lf1, lf2, by = "x"), y > 1)
+    Output
+      <SQL>
+      SELECT "df_LHS".*, "z"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" = "df_RHS"."x")
+      WHERE ("df_LHS"."y" > 1.0)
+
+---
+
+    Code
+      filter(left_join(lf1, lf2, by = "x"), z > 1)
+    Output
+      <SQL>
+      SELECT "df_LHS".*, "z"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" = "df_RHS"."x")
+      WHERE ("df_RHS"."z" > 1.0)
+
+---
+
+    Code
+      filter(left_join(lf1, lf2, by = "x"), y > 1, z < 5)
+    Output
+      <SQL>
+      SELECT "df_LHS".*, "z"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" = "df_RHS"."x")
+      WHERE ("df_LHS"."y" > 1.0) AND ("df_RHS"."z" < 5.0)
+
+---
+
+    Code
+      filter(left_join(lf1, lf3, by = "x"), y.x > 1)
+    Output
+      <SQL>
+      SELECT "df_LHS"."x" AS "x", "df_LHS"."y" AS "y.x", "df_RHS"."y" AS "y.y"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" = "df_RHS"."x")
+      WHERE ("df_LHS"."y" > 1.0)
+
 # generated sql doesn't change unexpectedly
 
     Code

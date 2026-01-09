@@ -44,7 +44,7 @@ op_sort.tbl_lazy <- function(op) op_sort(op$lazy_query)
 #' @export
 op_sort.lazy_query <- function(op) {
   # Renaming (like for groups) cannot be done because:
-  # * `order_vars` is a list of quosures
+  # * `order_vars` is a list of expressions
   # * variables needed in sorting can be dropped
   op$order_vars
 }

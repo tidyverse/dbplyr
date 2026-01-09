@@ -238,3 +238,12 @@
       ) AS "q01"
       ORDER BY "a"
 
+# unwrap_order_expr informatively errors on c()
+
+    Code
+      unwrap_order_expr(expr(c(x, y)), "slice_min")
+    Condition
+      Error:
+      ! Can't use `c()` in `slice_min()`
+      i Did you mean to use `tibble(x, y)` instead?
+

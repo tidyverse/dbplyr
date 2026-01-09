@@ -1,10 +1,11 @@
 #' Partially evaluate an expression.
 #'
-#' This function partially evaluates an expression, using information from
-#' the tbl to determine whether names refer to local expressions
-#' or remote variables. This simplifies SQL translation because expressions
-#' don't need to carry around their environment - all relevant information
-#' is incorporated into the expression.
+#' @description
+#' This function partially evaluates a quosure yielding an expression. It
+#' uses information from the current `tbl` and the local environment to yield
+#' a standalone expression. This simplifies SQL translation because we can just
+#' pass around expressions rather than expressions + environments
+#' (i.e. quosures).
 #'
 #' @section Symbol substitution:
 #'
@@ -111,7 +112,6 @@ capture_dot <- function(.data, x) {
 partial_eval_dots <- function(
   .data,
   ...,
-  # .env = NULL,
   .named = TRUE,
   error_call = caller_env()
 ) {
@@ -122,17 +122,12 @@ partial_eval_dots <- function(
   was_named <- have_name(exprs(...))
 
   for (i in seq_along(dots)) {
-    dot <- dots[[i]]
-    # if (!is_null(.env)) {
-    #   dot <- quo_set_env(dot, .env)
-    # }
-    dot_name <- dot_names[[i]]
     dots[[i]] <- partial_eval_quo(
-      dot,
+      dots[[i]],
       .data,
-      error_call,
-      dot_name,
-      was_named[[i]]
+      dot_names[[i]],
+      error_call = error_call,
+      was_named = was_named[[i]]
     )
   }
 
@@ -145,7 +140,13 @@ partial_eval_dots <- function(
   unlist(dots, recursive = FALSE)
 }
 
-partial_eval_quo <- function(x, data, error_call, dot_name, was_named) {
+partial_eval_quo <- function(
+  x,
+  data,
+  arg_name,
+  error_call = caller_env(),
+  was_named = FALSE
+) {
   # no direct equivalent in `dtplyr`, mostly handled in `dt_squash()`
   withCallingHandlers(
     expr <- partial_eval(
@@ -155,7 +156,7 @@ partial_eval_quo <- function(x, data, error_call, dot_name, was_named) {
       error_call = error_call
     ),
     error = function(cnd) {
-      label <- expr_as_label(x, dot_name)
+      label <- expr_as_label(x, arg_name)
       msg <- c(i = "In argument: {.code {label}}")
       cli_abort(msg, call = error_call, parent = cnd)
     }
@@ -165,14 +166,13 @@ partial_eval_quo <- function(x, data, error_call, dot_name, was_named) {
     if (was_named) {
       msg <- c(
         "In dbplyr, the result of `across()` must be unnamed.",
-        i = "`{dot_name} = {as_label(x)}` is named."
+        i = "`{arg_name} = {as_label(x)}` is named."
       )
       cli_abort(msg, call = error_call)
     }
-    lapply(expr, new_quosure, env = get_env(x))
-  } else {
-    new_quosure(expr, get_env(x))
   }
+
+  expr
 }
 
 partial_eval_sym <- function(sym, data, env) {
@@ -258,11 +258,22 @@ partial_eval_call <- function(call, data, env) {
       eval_bare(call[[2]], env)
     } else if (is_call(call, "remote")) {
       call[[2]]
+    } else if (is_call(call, "sql")) {
+      eval_bare(call, env = env)
     } else if (is_call(call, "$")) {
       # Only the 1st argument is evaluated
       call[[2]] <- partial_eval(call[[2]], data = data, env = env)
       call
     } else {
+      # Check for shiny reactives before processing unknown function calls
+      if (is_symbol(fun)) {
+        fun_name <- as_string(fun)
+        obj <- env_get(env, fun_name, default = NULL, inherit = TRUE)
+        if (inherits(obj, "reactive")) {
+          error_embed("a shiny reactive", "foo()")
+        }
+      }
+
       call[-1] <- lapply(call[-1], partial_eval, data = data, env = env)
       call
     }
