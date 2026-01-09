@@ -49,9 +49,6 @@ intended for dbplyr backend authors.
 }
 }
 \examples{
-# Get dialect for a connection
-sql_dialect(dialect_postgres())
-
 # Create a custom dialect
 my_dialect <- new_sql_dialect(
   "custom",
