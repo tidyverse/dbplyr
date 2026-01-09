@@ -216,12 +216,11 @@ sql_values_subquery.Oracle <- function(con, df, types, lvl = 0, ...) {
   sql_values_subquery_union(con, df, types = types, lvl = lvl, from = "DUAL")
 }
 
-#' @exportS3Method dplyr::setdiff
-setdiff.tbl_Oracle <- function(x, y, copy = "none", ...) {
-  # Oracle uses MINUS instead of EXCEPT for this operation:
+#' @export
+sql_set_op_method.Oracle <- function(con, op, ...) {
+  # Oracle uses MINUS instead of EXCEPT:
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries004.htm
-  x$lazy_query <- add_set_op(x, y, "MINUS", copy = copy, ...)
-  x
+  switch(op, "EXCEPT" = "MINUS", op)
 }
 
 #' @export
@@ -261,8 +260,8 @@ sql_query_save.OraConnection <- sql_query_save.Oracle
 #' @export
 sql_values_subquery.OraConnection <- sql_values_subquery.Oracle
 
-#' @exportS3Method dplyr::setdiff
-setdiff.OraConnection <- setdiff.tbl_Oracle
+#' @export
+sql_set_op_method.OraConnection <- sql_set_op_method.Oracle
 
 #' @export
 sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
