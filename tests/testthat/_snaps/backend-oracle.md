@@ -114,8 +114,8 @@
       oracle_sql_table_create(con, table_path("ORA$PTT_test"), c(x = "INTEGER", y = "TEXT"))
     Output
       <SQL> CREATE PRIVATE TEMPORARY TABLE ORA$PTT_test
-      ON COMMIT PRESERVE DEFINITION 
       ("x" INTEGER, "y" TEXT)
+      ON COMMIT PRESERVE DEFINITION
     Code
       oracle_sql_table_create(con, table_path("test"), c(x = "INTEGER", y = "TEXT"))
     Output

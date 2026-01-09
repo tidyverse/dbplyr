@@ -291,8 +291,8 @@ oracle_sql_table_create <- function(con, table, fields) {
     sql_glue2(
       con,
       "CREATE PRIVATE TEMPORARY TABLE {.tbl table}
-      ON COMMIT PRESERVE DEFINITION 
-      ({fields_sql})"
+      ({fields_sql})
+      ON COMMIT PRESERVE DEFINITION"
     )
   } else {
     sql_glue2(
