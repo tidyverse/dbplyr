@@ -192,7 +192,7 @@
 # handles ORDER BY in subqueries
 
     Code
-      sql_query_select(dialect_mssql(), sql("[x]"), sql("[y]"), order_by = "z",
+      sql_query_select(simulate_mssql(), sql("[x]"), sql("[y]"), order_by = "z",
       subquery = TRUE)
     Condition
       Warning:
@@ -205,7 +205,7 @@
 # custom limit translation
 
     Code
-      sql_query_select(dialect_mssql(), sql("[x]"), sql("[y]"), order_by = sql("[z]"),
+      sql_query_select(simulate_mssql(), sql("[x]"), sql("[y]"), order_by = sql("[z]"),
       limit = 10)
     Output
       <SQL> SELECT TOP 10 [x]
@@ -411,8 +411,8 @@
 # `sql_query_delete()` is correct
 
     Code
-      sql_query_delete(con = dialect_mssql(), table = ident("df_x"), from = sql_render(
-        df_y, dialect_mssql(), lvl = 2), by = c("a", "b"), returning_cols = c("a",
+      sql_query_delete(con = simulate_mssql(), table = ident("df_x"), from = sql_render(
+        df_y, simulate_mssql(), lvl = 2), by = c("a", "b"), returning_cols = c("a",
         b2 = "b"))
     Output
       <SQL> DELETE FROM [df_x]

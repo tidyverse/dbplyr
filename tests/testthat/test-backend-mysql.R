@@ -1,7 +1,7 @@
 # function translation ----------------------------------------------------
 
 test_that("custom scalar translated correctly", {
-  con <- dialect_mysql()
+  con <- simulate_mysql()
   expect_translation(con, as.logical(1L), "IF(1, TRUE, FALSE)")
 
   expect_translation(con, str_locate("abc", "b"), "REGEXP_INSTR('abc', 'b')")
@@ -13,7 +13,7 @@ test_that("custom scalar translated correctly", {
 })
 
 test_that("custom aggregators translated correctly", {
-  con <- dialect_mysql()
+  con <- simulate_mysql()
 
   expect_translation(
     con,
@@ -24,12 +24,12 @@ test_that("custom aggregators translated correctly", {
 })
 
 test_that("use CHAR type for as.character", {
-  con <- dialect_mysql()
+  con <- simulate_mysql()
   expect_translation(con, as.character(x), "CAST(`x` AS CHAR)")
 })
 
 test_that("custom date escaping works as expected", {
-  con <- dialect_mysql()
+  con <- simulate_mysql()
 
   expect_equal(escape(as.Date("2020-01-01"), con = con), sql("'2020-01-01'"))
   expect_equal(escape(as.Date(NA), con = con), sql("NULL"))
@@ -43,7 +43,7 @@ test_that("custom date escaping works as expected", {
 
 
 test_that("custom stringr functions translated correctly", {
-  con <- dialect_mysql()
+  con <- simulate_mysql()
 
   expect_translation(con, str_c(x, y), "CONCAT_WS('', `x`, `y`)")
   expect_translation(con, str_detect(x, y), "`x` REGEXP `y`")
@@ -61,7 +61,7 @@ test_that("custom stringr functions translated correctly", {
 # verbs -------------------------------------------------------------------
 
 test_that("generates custom sql", {
-  con_maria <- dialect_mariadb()
+  con_maria <- simulate_mariadb()
 
   expect_snapshot(sql_table_analyze(con_maria, in_schema("schema", "tbl")))
   expect_snapshot(sql_query_explain(con_maria, sql("SELECT * FROM table")))
@@ -76,14 +76,14 @@ test_that("generates custom sql", {
     copy_inline(con_maria, tibble(x = 1:2, y = letters[1:2])) |> remote_query()
   )
 
-  con_mysql <- dialect_mysql()
+  con_mysql <- simulate_mysql()
   expect_snapshot(
     copy_inline(con_mysql, tibble(x = 1:2, y = letters[1:2])) |> remote_query()
   )
 })
 
 test_that("`sql_query_update_from()` is correct", {
-  con <- dialect_mysql()
+  con <- simulate_mysql()
   df_y <- lazy_frame(
     a = 2:3,
     b = c(12L, 13L),

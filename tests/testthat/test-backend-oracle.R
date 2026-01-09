@@ -1,5 +1,5 @@
 test_that("custom scalar functions translated correctly", {
-  con <- dialect_oracle()
+  con <- simulate_oracle()
 
   expect_translation(
     con,
@@ -21,7 +21,7 @@ test_that("custom scalar functions translated correctly", {
 })
 
 test_that("paste and paste0 translate correctly", {
-  con <- dialect_oracle()
+  con <- simulate_oracle()
 
   expect_translation(con, paste(x, y), '"x" || \' \' || "y"')
   expect_translation(con, paste0(x, y), '"x" || "y"')
@@ -30,7 +30,7 @@ test_that("paste and paste0 translate correctly", {
 
 
 test_that("string functions translate correctly", {
-  con <- dialect_oracle()
+  con <- simulate_oracle()
 
   expect_snapshot({
     translate_sql(str_replace(col, "pattern", "replacement"), con = con)
@@ -39,12 +39,12 @@ test_that("string functions translate correctly", {
 })
 
 test_that("queries translate correctly", {
-  mf <- lazy_frame(x = 1, con = dialect_oracle())
+  mf <- lazy_frame(x = 1, con = simulate_oracle())
   expect_snapshot(mf |> head())
 })
 
 test_that("`sql_query_upsert()` is correct", {
-  con <- dialect_oracle()
+  con <- simulate_oracle()
   df_y <- lazy_frame(
     a = 2:3,
     b = c(12L, 13L),
@@ -69,7 +69,7 @@ test_that("`sql_query_upsert()` is correct", {
 })
 
 test_that("generates custom sql", {
-  con <- dialect_oracle()
+  con <- simulate_oracle()
 
   expect_snapshot(sql_table_analyze(con, in_schema("schema", "tbl")))
   expect_snapshot(sql_query_explain(con, sql("SELECT * FROM foo")))
@@ -93,7 +93,7 @@ test_that("generates custom sql", {
 })
 
 test_that("copy_inline uses UNION ALL", {
-  con <- dialect_oracle()
+  con <- simulate_oracle()
   y <- tibble::tibble(id = 1L, arr = "{1,2,3}")
 
   types <- c(id = "bigint", arr = "integer[]")
@@ -108,7 +108,7 @@ test_that("copy_inline uses UNION ALL", {
 })
 
 test_that("custom clock functions translated correctly", {
-  con <- dialect_oracle()
+  con <- simulate_oracle()
   expect_translation(
     con,
     add_years(x, 1),
@@ -126,7 +126,7 @@ test_that("custom clock functions translated correctly", {
 })
 
 test_that("difftime is translated correctly", {
-  con <- dialect_oracle()
+  con <- simulate_oracle()
   expect_translation(
     con,
     difftime(start_date, end_date, units = "days"),

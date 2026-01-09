@@ -1,12 +1,12 @@
 test_that("custom scalar functions translated correctly", {
-  con <- dialect_impala()
+  con <- simulate_impala()
 
   expect_translation(con, as.Date(x), 'CAST("x" AS VARCHAR(10))')
   expect_translation(con, ceiling(x), 'CEIL("x")')
 })
 
 test_that("custom bitwise operations translated correctly", {
-  con <- dialect_impala()
+  con <- simulate_impala()
 
   expect_translation(con, bitwNot(x), 'BITNOT("x")')
   expect_translation(con, bitwAnd(x, 128L), 'BITAND("x", 128)')
@@ -17,7 +17,7 @@ test_that("custom bitwise operations translated correctly", {
 })
 
 test_that("generates custom sql", {
-  con <- dialect_impala()
+  con <- simulate_impala()
 
   expect_snapshot(sql_table_analyze(con, in_schema("schema", "tbl")))
 })

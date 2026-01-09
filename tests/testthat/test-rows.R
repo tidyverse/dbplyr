@@ -207,7 +207,7 @@ test_that("rows_get_or_execute() gives error context", {
 })
 
 test_that("`sql_query_insert()` works", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   df_y <- lazy_frame(
     a = 2:3,
     b = c(12L, 13L),
@@ -342,7 +342,7 @@ test_that("`rows_append()` with `in_place = TRUE` and `returning`", {
 })
 
 test_that("`sql_query_append()` works", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   df_y <- lazy_frame(
     a = 2:3,
     b = c(12L, 13L),
@@ -365,7 +365,7 @@ test_that("`sql_query_append()` works", {
 })
 
 test_that("sql_query_append supports old interface works", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   df_y <- lazy_frame(
     a = 2:3,
     b = c(12L, 13L),
@@ -577,7 +577,7 @@ test_that("`rows_update()` with `in_place = TRUE` and `returning`", {
 })
 
 test_that("`sql_query_update_from()` works", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   df_y <- lazy_frame(
     a = 2:3,
     b = c(12L, 13L),
@@ -915,7 +915,7 @@ test_that("`rows_upsert()` works with `in_place = TRUE` and `returning`", {
 })
 
 test_that("`sql_query_upsert()` is correct", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   df_y <- lazy_frame(
     a = 2:3,
     b = c(12L, 13L),
@@ -1055,16 +1055,16 @@ test_that("`sql_query_delete()` is correct", {
     b = c(12L, 13L),
     c = -(2:3),
     d = c("y", "z"),
-    con = dialect_ansi(),
+    con = simulate_dbi(),
     .name = "df_y"
   ) |>
     mutate(c = c + 1)
 
   expect_snapshot(
     sql_query_delete(
-      con = dialect_ansi(),
+      con = simulate_dbi(),
       table = ident("df_x"),
-      from = sql_render(df_y, dialect_ansi(), lvl = 2),
+      from = sql_render(df_y, simulate_dbi(), lvl = 2),
       by = c("a", "b"),
       returning_cols = c("a", b2 = "b")
     )

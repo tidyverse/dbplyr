@@ -1,5 +1,5 @@
 test_that("custom scalar & string functions translated correctly", {
-  con <- dialect_hive()
+  con <- simulate_hive()
 
   expect_translation(con, bitwShiftL(x, 2L), 'SHIFTLEFT("x", 2)')
   expect_translation(con, bitwShiftR(x, 2L), 'SHIFTRIGHT("x", 2)')
@@ -17,7 +17,7 @@ test_that("custom scalar & string functions translated correctly", {
 })
 
 test_that("generates custom sql", {
-  con <- dialect_hive()
+  con <- simulate_hive()
   expect_snapshot(sql_table_analyze(con, in_schema("schema", "tbl")))
 
   expect_equal(

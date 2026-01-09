@@ -1,5 +1,5 @@
 test_that("custom scalar translated correctly", {
-  con <- dialect_postgres()
+  con <- simulate_postgres()
 
   expect_translation(con, bitwXor(x, 128L), "\"x\" # 128")
   expect_translation(con, log10(x), "LOG(\"x\")")
@@ -13,7 +13,7 @@ test_that("custom scalar translated correctly", {
 })
 
 test_that("custom stringr functions translated correctly", {
-  con <- dialect_postgres()
+  con <- simulate_postgres()
 
   expect_translation(con, str_detect(x, y), "\"x\" ~ \"y\"")
   expect_translation(con, str_detect(x, y, negate = TRUE), "!(\"x\" ~ \"y\")")
@@ -60,7 +60,7 @@ test_that("custom stringr functions translated correctly", {
 })
 
 test_that("two variable aggregates are translated correctly", {
-  con <- dialect_postgres()
+  con <- simulate_postgres()
 
   expect_translation(con, cor(x, y), "CORR(\"x\", \"y\")", window = FALSE)
   expect_translation(
@@ -72,7 +72,7 @@ test_that("two variable aggregates are translated correctly", {
 })
 
 test_that("pasting translated correctly", {
-  con <- dialect_postgres()
+  con <- simulate_postgres()
 
   expect_translation(
     con,
@@ -94,7 +94,7 @@ test_that("pasting translated correctly", {
 })
 
 test_that("postgres mimics two argument log", {
-  con <- dialect_postgres()
+  con <- simulate_postgres()
 
   expect_translation(con, log(x), "LN(\"x\")")
   expect_translation(con, log(x, 10), "LOG(\"x\") / LOG(10.0)")
@@ -102,7 +102,7 @@ test_that("postgres mimics two argument log", {
 })
 
 test_that("custom lubridate functions translated correctly", {
-  con <- dialect_postgres()
+  con <- simulate_postgres()
 
   expect_translation(con, day(x), "EXTRACT(DAY FROM \"x\")")
   expect_translation(con, mday(x), "EXTRACT(DAY FROM \"x\")")
@@ -138,7 +138,7 @@ test_that("custom lubridate functions translated correctly", {
 })
 
 test_that("custom clock functions translated correctly", {
-  con <- dialect_postgres()
+  con <- simulate_postgres()
   expect_translation(con, add_years(x, 1), "(\"x\" + 1.0*INTERVAL'1 year')")
   expect_translation(con, add_days(x, 1), "(\"x\" + 1.0*INTERVAL'1 day')")
   expect_error(
@@ -193,7 +193,7 @@ test_that("custom clock functions translated correctly", {
 })
 
 test_that("difftime is translated correctly", {
-  con <- dialect_postgres()
+  con <- simulate_postgres()
   expect_translation(
     con,
     difftime(start_date, end_date, units = "days"),
@@ -225,7 +225,7 @@ test_that("difftime is translated correctly", {
 })
 
 test_that("custom window functions translated correctly", {
-  con <- dialect_postgres()
+  con <- simulate_postgres()
 
   expect_snapshot(
     error = TRUE,
@@ -238,10 +238,10 @@ test_that("custom window functions translated correctly", {
 })
 
 test_that("custom SQL translation", {
-  lf <- lazy_frame(x = 1, con = dialect_postgres())
+  lf <- lazy_frame(x = 1, con = simulate_postgres())
   expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
 
-  con <- dialect_postgres()
+  con <- simulate_postgres()
   expect_snapshot(
     copy_inline(con, tibble(x = integer(), y = character())) |> remote_query()
   )
@@ -251,7 +251,7 @@ test_that("custom SQL translation", {
 })
 
 test_that("`sql_query_insert()` works", {
-  con <- dialect_postgres()
+  con <- simulate_postgres()
   df_y <- lazy_frame(
     a = 2:3,
     b = c(12L, 13L),
@@ -289,7 +289,7 @@ test_that("`sql_query_insert()` works", {
 })
 
 test_that("`sql_query_upsert()` with method = 'on_conflict' is correct", {
-  con <- dialect_postgres()
+  con <- simulate_postgres()
   df_y <- lazy_frame(
     a = 2:3,
     b = c(12L, 13L),

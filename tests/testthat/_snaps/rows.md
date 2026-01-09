@@ -511,8 +511,8 @@
 # `sql_query_delete()` is correct
 
     Code
-      sql_query_delete(con = dialect_ansi(), table = ident("df_x"), from = sql_render(
-        df_y, dialect_ansi(), lvl = 2), by = c("a", "b"), returning_cols = c("a", b2 = "b"))
+      sql_query_delete(con = simulate_dbi(), table = ident("df_x"), from = sql_render(
+        df_y, simulate_dbi(), lvl = 2), by = c("a", "b"), returning_cols = c("a", b2 = "b"))
     Output
       <SQL> DELETE FROM "df_x"
       WHERE EXISTS (

@@ -1,11 +1,11 @@
 test_that("window functions without group have empty over", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_translation(con, n(), "COUNT(*) OVER ()")
   expect_translation(con, sum(x, na.rm = TRUE), "SUM(\"x\") OVER ()")
 })
 
 test_that("aggregating window functions ignore order_by", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_translation(con, n(), "COUNT(*) OVER ()", vars_order = "x")
   expect_translation(
     con,
@@ -16,7 +16,7 @@ test_that("aggregating window functions ignore order_by", {
 })
 
 test_that("count uses order_by if frame is used", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_translation(
     con,
     n(),
@@ -27,7 +27,7 @@ test_that("count uses order_by if frame is used", {
 })
 
 test_that("order_by overrides default ordering", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_translation(
     con,
     order_by(y, cumsum(x)),
@@ -55,7 +55,7 @@ test_that("order_by overrides default ordering", {
 })
 
 test_that("cumulative windows warn if no order", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_warning(
     translate_sql(cumsum(x), con = con),
     "does not have explicit order"
@@ -64,12 +64,12 @@ test_that("cumulative windows warn if no order", {
 })
 
 test_that("ntile always casts to integer", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_translation(con, ntile(x, 10.5), "NTILE(10) OVER (ORDER BY \"x\")")
 })
 
 test_that("first, last, and nth translated to _value", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_translation(con, first(x), "FIRST_VALUE(\"x\") OVER ()")
   expect_translation(
     con,
@@ -109,7 +109,7 @@ test_that("first, last, and nth translated to _value", {
 })
 
 test_that("can override frame of recycled functions", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_translation(
     con,
     sum(x, na.rm = TRUE),
@@ -120,7 +120,7 @@ test_that("can override frame of recycled functions", {
 })
 
 test_that("frame is checked", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_snapshot(
     error = TRUE,
     translate_sql(sum(x, na.rm = TRUE), con = con, vars_frame = c(1, 0))
@@ -139,14 +139,14 @@ test_that("win_rank() correctly handles missing values", {
 })
 
 test_that("win_rank works in both directions", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   sql_row_number <- win_rank("ROW_NUMBER")
   expect_translation_snapshot(con, row_number(x))
   expect_translation_snapshot(con, row_number(desc(x)))
 })
 
 test_that("win_rank works with multiple variables", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
 
   expect_equal(
     translate_sql(row_number(tibble(x)), con = con),
@@ -161,14 +161,14 @@ test_that("win_rank works with multiple variables", {
 })
 
 test_that("win_rank(c()) gives an informative error", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_snapshot(error = TRUE, {
     translate_sql(row_number(c(x)), con = con)
   })
 })
 
 test_that("row_number() with and without group_by() and arrange()", {
-  mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = dialect_ansi())
+  mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_dbi())
   expect_snapshot(mf |> mutate(rown = row_number()))
   expect_snapshot(mf |> group_by(y) |> mutate(rown = row_number()))
   expect_snapshot(
@@ -178,7 +178,7 @@ test_that("row_number() with and without group_by() and arrange()", {
 })
 
 test_that("win_cumulative works", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_translation(
     con,
     cumsum(x, "y"),
@@ -197,12 +197,12 @@ test_that("win_cumulative works", {
 # win_over ----------------------------------------------------------------
 
 test_that("over() only requires first argument", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_equal(win_over("X", con = con), sql("'X' OVER ()"))
 })
 
 test_that("multiple group by or order values don't have parens", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
 
   expect_equal(
     win_over(ident("x"), order = c("x", "y"), con = con),
@@ -258,7 +258,7 @@ test_that("names windows automatically", {
     col4 = runif(3),
     part = c("a", "a", "b"),
     ord = 3:1,
-    con = dialect_sqlite()
+    con = simulate_sqlite()
   ) |>
     group_by(part) |>
     window_order(ord)
@@ -274,7 +274,7 @@ test_that("names windows automatically", {
     select_operation = "mutate",
     in_vars = op_vars(lf),
     table_alias = "df",
-    con = dialect_sqlite(),
+    con = simulate_sqlite(),
     use_star = TRUE
   )
   expect_equal(
@@ -309,7 +309,7 @@ test_that("names windows automatically", {
     select_operation = "mutate",
     in_vars = op_vars(lf),
     table_alias = "df",
-    con = dialect_sqlite(),
+    con = simulate_sqlite(),
     use_star = TRUE
   )
   expect_equal(
@@ -338,7 +338,7 @@ test_that("only name windows if they appear multiple times", {
     col3 = runif(3),
     part = c("a", "a", "b"),
     ord = 3:1,
-    con = dialect_sqlite()
+    con = simulate_sqlite()
   ) |>
     group_by(part) |>
     window_order(ord) |>
@@ -352,7 +352,7 @@ test_that("only name windows if they appear multiple times", {
     select_operation = "mutate",
     in_vars = op_vars(lf),
     table_alias = "df",
-    con = dialect_sqlite(),
+    con = simulate_sqlite(),
     use_star = TRUE
   )
   expect_equal(sql_list$window_sql, sql("`win1` AS (PARTITION BY `part`)"))
@@ -372,7 +372,7 @@ test_that("name windows only if supported", {
     col1 = runif(3),
     col2 = runif(3),
     part = c("a", "a", "b"),
-    con = dialect_hana()
+    con = simulate_hana()
   ) |>
     group_by(part) |>
     transmute(
@@ -384,7 +384,7 @@ test_that("name windows only if supported", {
     select_operation = "mutate",
     in_vars = op_vars(lf),
     table_alias = "df",
-    con = dialect_hana(),
+    con = simulate_hana(),
     use_star = TRUE
   )
   expect_equal(sql_list$window_sql, sql())

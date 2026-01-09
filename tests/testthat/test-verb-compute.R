@@ -48,7 +48,7 @@ test_that("compute keeps window and groups", {
 })
 
 test_that("compute can handle named name", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_equal(
     local_memdb_frame(x = 1:10) |>
       compute(name = c(x = unique_table_name())) |>

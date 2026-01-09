@@ -1,5 +1,5 @@
 test_that("case_when converted to CASE WHEN", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_snapshot(translate_sql(case_when(x > 1L ~ "a"), con = con))
 })
 
@@ -11,7 +11,7 @@ test_that("even inside mutate", {
 })
 
 test_that("case_when translates correctly to ELSE when TRUE ~ is used 2", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_snapshot(
     translate_sql(
       case_when(
@@ -25,7 +25,7 @@ test_that("case_when translates correctly to ELSE when TRUE ~ is used 2", {
 })
 
 test_that("case_when uses the .default arg", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_snapshot(
     translate_sql(
       case_when(
@@ -63,7 +63,7 @@ test_that("case_when uses the .default arg", {
 })
 
 test_that("case_when does not support .ptype and .size", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_snapshot({
     (expect_error(translate_sql(
       case_when(
@@ -80,7 +80,7 @@ test_that("case_when does not support .ptype and .size", {
 })
 
 test_that("long case_when is on multiple lines", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_snapshot(
     translate_sql(
       case_when(
@@ -94,7 +94,7 @@ test_that("long case_when is on multiple lines", {
 })
 
 test_that("all forms of if translated to case statement", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
 
   expect_translation(
     con,
@@ -114,7 +114,7 @@ test_that("all forms of if translated to case statement", {
 })
 
 test_that("if_else can be simplified", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_translation(
     con,
     if_else(x, 1L, 2L, 2L),
@@ -123,7 +123,7 @@ test_that("if_else can be simplified", {
 })
 
 test_that("if translation adds parens", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_translation(con, if (x) y, "CASE WHEN \"x\" THEN \"y\" END")
   expect_translation(
     con,
@@ -143,7 +143,7 @@ test_that("if translation adds parens", {
 })
 
 test_that("if_else can translate missing", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_translation(
     con,
     if_else(x, 1L, 2L, 3L),
@@ -152,7 +152,7 @@ test_that("if_else can translate missing", {
 })
 
 test_that("if and ifelse use correctly named arguments", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   exp <- translate_sql(if (x) 1 else 2, con = con)
 
   expect_equal(translate_sql(ifelse(test = x, yes = 1, no = 2), con = con), exp)
@@ -174,7 +174,7 @@ test_that("if and ifelse use correctly named arguments", {
 })
 
 test_that("switch translated to CASE WHEN", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_translation(
     con,
     switch(x, a = 1L),
@@ -188,7 +188,7 @@ test_that("switch translated to CASE WHEN", {
 })
 
 test_that("is.na and is.null are equivalent", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   # Needs to be wrapped in parens to ensure correct precedence
   expect_translation(con, is.na(x + y), "((\"x\" + \"y\") IS NULL)")
   expect_translation(con, is.null(x + y), "((\"x\" + \"y\") IS NULL)")
@@ -198,7 +198,7 @@ test_that("is.na and is.null are equivalent", {
 })
 
 test_that("magrittr pipe is translated in conditionals", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_translation(
     con,
     x |> ifelse(1L, 2L),
@@ -207,7 +207,7 @@ test_that("magrittr pipe is translated in conditionals", {
 })
 
 test_that("conditionals check arguments", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_snapshot(error = TRUE, translate_sql(case_when(), con = con))
 
   expect_snapshot(error = TRUE, translate_sql(switch(x, 1L, 2L), con = con))
@@ -217,7 +217,7 @@ test_that("conditionals check arguments", {
 # case_match --------------------------------------------------------------
 
 test_that("LHS can handle different types", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_translation(
     con,
     case_match(z, 1L ~ "a"),
@@ -244,7 +244,7 @@ test_that("LHS can handle different types", {
 })
 
 test_that("LHS can match multiple values", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_translation(
     con,
     case_match(z, 1:2 ~ "a"),
@@ -271,7 +271,7 @@ test_that("LHS can match multiple values", {
 })
 
 test_that("LHS can match NA", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_translation(
     con,
     case_match(z, NA ~ "a"),
@@ -286,7 +286,7 @@ test_that("LHS can match NA", {
 })
 
 test_that("LHS can handle bang bang", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_snapshot({
     translate_sql(case_match(x, !!1L ~ "x"), con = con)
     translate_sql(case_match(x, !!c(1L, 2L) ~ "x"), con = con)
@@ -295,7 +295,7 @@ test_that("LHS can handle bang bang", {
 })
 
 test_that("`NULL` values in `...` are dropped", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_translation(
     con,
     case_match(x, 1L ~ "a", NULL, 2L ~ "b", NULL),
@@ -304,7 +304,7 @@ test_that("`NULL` values in `...` are dropped", {
 })
 
 test_that("requires at least one condition", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_snapshot(error = TRUE, {
     translate_sql(case_match(x), con = con)
   })
@@ -314,7 +314,7 @@ test_that("requires at least one condition", {
 })
 
 test_that("passes through `.default` correctly", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_translation(
     con,
     case_match(z, 3L ~ 1L, .default = 2L),
@@ -323,7 +323,7 @@ test_that("passes through `.default` correctly", {
 })
 
 test_that("can handle multiple cases", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_translation(
     con,
     case_match(z, 1L ~ "a", 2L ~ "b"),
@@ -339,7 +339,7 @@ test_that("can handle multiple cases", {
 })
 
 test_that("`.ptype` not supported", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_snapshot({
     (expect_error(translate_sql(
       case_match(x, 1 ~ 1, .ptype = integer()),
@@ -349,7 +349,7 @@ test_that("`.ptype` not supported", {
 })
 
 test_that(".x must be a symbol", {
-  con <- dialect_ansi()
+  con <- simulate_dbi()
   expect_snapshot({
     (expect_error(translate_sql(case_match(1, 1 ~ 1), con = con)))
   })

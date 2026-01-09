@@ -521,7 +521,7 @@ test_that("quoting for rendering mutated grouped table", {
 })
 
 test_that("mutate generates subqueries as needed", {
-  lf <- lazy_frame(x = 1, con = dialect_sqlite())
+  lf <- lazy_frame(x = 1, con = simulate_sqlite())
 
   expect_snapshot(lf |> mutate(x = x + 1, x = x + 1))
   expect_snapshot(lf |> mutate(x1 = x + 1, x2 = x1 + 1))

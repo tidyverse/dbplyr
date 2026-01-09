@@ -44,7 +44,7 @@ test_that("fill() respects grouping", {
 })
 
 test_that("can generate variant SQL", {
-  lf <- lazy_frame(id = 1, group = 1, n1 = 1, con = dialect_sqlite())
+  lf <- lazy_frame(id = 1, group = 1, n1 = 1, con = simulate_sqlite())
 
   expect_snapshot({
     lf |> window_order(id) |> tidyr::fill(n1)
