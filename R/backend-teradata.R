@@ -24,8 +24,6 @@ NULL
 #' @rdname backend-teradata
 simulate_teradata <- function() simulate_dbi("Teradata")
 
-#' @export
-#' @rdname backend-teradata
 dialect_teradata <- function() {
   new_sql_dialect(
     "teradata",

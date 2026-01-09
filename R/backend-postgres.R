@@ -26,8 +26,6 @@ NULL
 #' @rdname backend-postgres
 simulate_postgres <- function() simulate_dbi("PqConnection")
 
-#' @export
-#' @rdname backend-postgres
 dialect_postgres <- function() {
   new_sql_dialect(
     "postgres",

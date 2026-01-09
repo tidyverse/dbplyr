@@ -2,12 +2,9 @@
 % Please edit documentation in R/backend-spark-sql.R
 \name{backend-spark-sql}
 \alias{simulate_spark_sql}
-\alias{dialect_spark_sql}
 \title{Backend: Databricks Spark SQL}
 \usage{
 simulate_spark_sql()
-
-dialect_spark_sql()
 }
 \description{
 See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for

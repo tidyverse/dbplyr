@@ -2,12 +2,9 @@
 % Please edit documentation in R/backend-impala.R
 \name{backend-impala}
 \alias{simulate_impala}
-\alias{dialect_impala}
 \title{Backend: Impala}
 \usage{
 simulate_impala()
-
-dialect_impala()
 }
 \description{
 See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for

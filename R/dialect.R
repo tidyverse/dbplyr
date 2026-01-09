@@ -78,8 +78,6 @@ new_sql_dialect <- function(
   )
 }
 
-#' @export
-#' @rdname sql_dialect
 dialect_ansi <- function() {
   new_sql_dialect(
     "ansi",

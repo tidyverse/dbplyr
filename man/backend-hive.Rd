@@ -2,12 +2,9 @@
 % Please edit documentation in R/backend-hive.R
 \name{backend-hive}
 \alias{simulate_hive}
-\alias{dialect_hive}
 \title{Backend: Hive}
 \usage{
 simulate_hive()
-
-dialect_hive()
 }
 \description{
 See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for

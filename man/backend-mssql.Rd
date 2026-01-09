@@ -2,12 +2,9 @@
 % Please edit documentation in R/backend-mssql.R
 \name{backend-mssql}
 \alias{simulate_mssql}
-\alias{dialect_mssql}
 \title{Backend: SQL server}
 \usage{
 simulate_mssql(version = "15.0")
-
-dialect_mssql(version = "15.0")
 }
 \arguments{
 \item{version}{Version of MS SQL to simulate. Currently, 11.0 and above

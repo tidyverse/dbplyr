@@ -23,8 +23,6 @@ NULL
 #' @rdname backend-odbc
 simulate_odbc <- function() simulate_dbi("OdbcConnection")
 
-#' @export
-#' @rdname backend-odbc
 dialect_odbc <- function() {
   new_sql_dialect(
     "odbc",

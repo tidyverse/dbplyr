@@ -27,8 +27,6 @@ NULL
 #' @rdname backend-sqlite
 simulate_sqlite <- function() simulate_dbi("SQLiteConnection")
 
-#' @export
-#' @rdname backend-sqlite
 dialect_sqlite <- function() {
   new_sql_dialect(
     "sqlite",

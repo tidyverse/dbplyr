@@ -27,8 +27,6 @@ NULL
 #' @rdname backend-hana
 simulate_hana <- function() simulate_dbi("HDB")
 
-#' @export
-#' @rdname backend-hana
 dialect_hana <- function() {
   new_sql_dialect(
     "hana",

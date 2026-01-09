@@ -16,8 +16,6 @@
 #' lf |> transmute(x = paste0(d, " times"))
 NULL
 
-#' @export
-#' @rdname backend-snowflake
 dialect_snowflake <- function() {
   new_sql_dialect(
     "snowflake",

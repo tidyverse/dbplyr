@@ -33,8 +33,6 @@ NULL
 #' @rdname backend-oracle
 simulate_oracle <- function() simulate_dbi("Oracle")
 
-#' @export
-#' @rdname backend-oracle
 dialect_oracle <- function() {
   new_sql_dialect(
     "oracle",

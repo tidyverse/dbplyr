@@ -29,8 +29,6 @@ NULL
 #' @rdname backend-access
 simulate_access <- function() simulate_dbi("ACCESS")
 
-#' @export
-#' @rdname backend-access
 dialect_access <- function() {
   new_sql_dialect(
     "access",

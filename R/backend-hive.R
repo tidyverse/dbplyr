@@ -26,8 +26,6 @@ NULL
 #' @rdname backend-hive
 simulate_hive <- function() simulate_dbi("Hive")
 
-#' @export
-#' @rdname backend-hive
 dialect_hive <- function() {
   new_sql_dialect(
     "hive",

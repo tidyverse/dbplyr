@@ -2,12 +2,9 @@
 % Please edit documentation in R/backend-postgres.R
 \name{backend-postgres}
 \alias{simulate_postgres}
-\alias{dialect_postgres}
 \title{Backend: PostgreSQL}
 \usage{
 simulate_postgres()
-
-dialect_postgres()
 }
 \description{
 See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for

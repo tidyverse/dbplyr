@@ -30,8 +30,6 @@ simulate_mysql <- function() simulate_dbi("MySQLConnection")
 #' @rdname backend-mysql
 simulate_mariadb <- function() simulate_dbi("MariaDBConnection")
 
-#' @export
-#' @rdname backend-mysql
 dialect_mariadb <- function() {
   new_sql_dialect(
     "mariadb",
@@ -40,8 +38,6 @@ dialect_mariadb <- function() {
   )
 }
 
-#' @export
-#' @rdname backend-mysql
 dialect_mysql <- function() {
   new_sql_dialect(
     "mysql",

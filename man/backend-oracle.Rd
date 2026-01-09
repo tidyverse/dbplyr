@@ -2,12 +2,9 @@
 % Please edit documentation in R/backend-oracle.R
 \name{backend-oracle}
 \alias{simulate_oracle}
-\alias{dialect_oracle}
 \title{Backend: Oracle}
 \usage{
 simulate_oracle()
-
-dialect_oracle()
 }
 \description{
 See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for

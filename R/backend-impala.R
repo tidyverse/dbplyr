@@ -22,8 +22,6 @@ NULL
 #' @rdname backend-impala
 simulate_impala <- function() simulate_dbi("Impala")
 
-#' @export
-#' @rdname backend-impala
 dialect_impala <- function() {
   new_sql_dialect(
     "impala",

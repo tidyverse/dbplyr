@@ -3,7 +3,6 @@
 \name{sql_dialect}
 \alias{sql_dialect}
 \alias{new_sql_dialect}
-\alias{dialect_ansi}
 \title{SQL dialects}
 \usage{
 sql_dialect(con)
@@ -14,8 +13,6 @@ new_sql_dialect(
   supports_window_clause = FALSE,
   supports_table_alias_with_as = TRUE
 )
-
-dialect_ansi()
 }
 \arguments{
 \item{con}{A database connection or dialect object.}

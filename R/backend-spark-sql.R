@@ -28,8 +28,6 @@ NULL
 #' @rdname backend-spark-sql
 simulate_spark_sql <- function() simulate_dbi("Spark SQL")
 
-#' @export
-#' @rdname backend-spark-sql
 dialect_spark_sql <- function() {
   new_sql_dialect(
     "spark_sql",

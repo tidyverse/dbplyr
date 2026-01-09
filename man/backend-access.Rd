@@ -2,12 +2,9 @@
 % Please edit documentation in R/backend-access.R
 \name{backend-access}
 \alias{simulate_access}
-\alias{dialect_access}
 \title{Backend: MS Access}
 \usage{
 simulate_access()
-
-dialect_access()
 }
 \description{
 See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
