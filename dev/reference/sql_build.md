@@ -99,7 +99,7 @@ semi_join_query(
 
 lazy_set_op_query(x, y, type, all, call = caller_env())
 
-set_op_query(x, y, type, all = FALSE)
+set_op_query(x, y, type)
 
 lazy_union_query(x, unions, call = caller_env())
 

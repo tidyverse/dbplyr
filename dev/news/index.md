@@ -2,6 +2,19 @@
 
 ## dbplyr (development version)
 
+- [`set_op_query()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)
+  no longer has an `all` argument.
+- Set operations
+  ([`union()`](https://generics.r-lib.org/reference/setops.html),
+  [`intersect()`](https://generics.r-lib.org/reference/setops.html),
+  [`setdiff()`](https://generics.r-lib.org/reference/setops.html)) now
+  use the
+  [`sql_set_op_method()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  generic to generate the SQL set operation keyword. This allows
+  backends to customize the behavior, e.g., using “UNION DISTINCT”
+  instead of “UNION” for databases that require it, or “MINUS” instead
+  of “EXCEPT” for Oracle
+  ([\#1596](https://github.com/tidyverse/dbplyr/issues/1596)).
 - [`do()`](https://dplyr.tidyverse.org/reference/do.html) is deprecated.
   Use [`collect()`](https://dplyr.tidyverse.org/reference/compute.html)
   then your favourite tidyverse functions instead.

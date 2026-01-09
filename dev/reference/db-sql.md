@@ -162,7 +162,9 @@ sql_query_select(
 
 sql_query_semi_join(con, x, y, anti, by, where, vars, ..., lvl = 0)
 
-sql_query_set_op(con, x, y, method, ..., all = FALSE, lvl = 0)
+sql_set_op_method(con, op, ...)
+
+sql_query_set_op(con, x, y, method, ..., lvl = 0)
 
 sql_query_union(con, x, unions, ..., lvl = 0)
 ```

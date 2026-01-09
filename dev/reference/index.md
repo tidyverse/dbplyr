@@ -221,6 +221,7 @@ Documentation for authors of new dbplyr backends
   [`sql_query_join()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
   [`sql_query_select()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
   [`sql_query_semi_join()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`sql_set_op_method()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
   [`sql_query_set_op()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
   [`sql_query_union()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
   : SQL generation generics
