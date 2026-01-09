@@ -20,7 +20,7 @@ dialect_snowflake <- function() {
   new_sql_dialect(
     "snowflake",
     quote_identifier = function(x) sql_quote(x, '"'),
-    supports_window_clause = TRUE
+    has_window_clause = TRUE
   )
 }
 

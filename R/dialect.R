@@ -16,9 +16,9 @@
 #' @param dialect A string giving the dialect name (e.g., "postgres", "mysql").
 #' @param quote_identifier A function that quotes identifiers. Should accept
 #'   a character vector and return a [sql] vector.
-#' @param supports_window_clause Does the backend support named window
+#' @param has_window_clause Does the backend support named window
 #'   definitions (the `WINDOW` clause)?
-#' @param supports_table_alias_with_as Does the backend support using `AS`
+#' @param has_table_alias_with_as Does the backend support using `AS`
 #'   when aliasing a table in a subquery?
 #'
 #' @return
@@ -36,7 +36,7 @@
 #' my_dialect <- new_sql_dialect(
 #'   "custom",
 #'   quote_identifier = function(x) sql_quote(x, "`"),
-#'   supports_window_clause = TRUE
+#'   has_window_clause = TRUE
 #' )
 #' class(my_dialect)
 sql_dialect <- function(con) {
@@ -60,19 +60,21 @@ sql_dialect.DBIConnection <- function(con) {
 new_sql_dialect <- function(
   dialect,
   quote_identifier,
-  supports_window_clause = FALSE,
-  supports_table_alias_with_as = TRUE
+  has_window_clause = FALSE,
+  has_table_alias_with_as = TRUE
 ) {
   check_string(dialect)
   check_function(quote_identifier)
-  check_bool(supports_window_clause)
-  check_bool(supports_table_alias_with_as)
+  check_bool(has_window_clause)
+  check_bool(has_table_alias_with_as)
 
   structure(
     list(
       quote_identifier = quote_identifier,
-      supports_window_clause = supports_window_clause,
-      supports_table_alias_with_as = supports_table_alias_with_as
+      has = list(
+        window_clause = has_window_clause,
+        table_alias_with_as = has_table_alias_with_as
+      )
     ),
     class = c(paste0("sql_dialect_", dialect), "sql_dialect")
   )
@@ -82,8 +84,10 @@ dialect_ansi <- function() {
   structure(
     list(
       quote_identifier = function(x) sql_quote(x, '"'),
-      supports_window_clause = FALSE,
-      supports_table_alias_with_as = TRUE
+      has = list(
+        window_clause = FALSE,
+        table_alias_with_as = TRUE
+      )
     ),
     class = "sql_dialect"
   )
@@ -114,7 +118,7 @@ sql_has_table_alias_with_as <- function(con) {
   dialect <- sql_dialect(con)
 
   if (inherits(dialect, "sql_dialect")) {
-    dialect$supports_table_alias_with_as
+    dialect$has$table_alias_with_as
   } else if (inherits(dialect, "DBIConnection")) {
     TRUE
   } else {
@@ -129,7 +133,7 @@ sql_has_window_clause <- function(con) {
   dialect <- sql_dialect(con)
 
   if (inherits(dialect, "sql_dialect")) {
-    dialect$supports_window_clause
+    dialect$has$window_clause
   } else if (inherits(dialect, "DBIConnection")) {
     FALSE
   } else {

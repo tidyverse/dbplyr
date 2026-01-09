@@ -31,7 +31,7 @@ dialect_sqlite <- function() {
   new_sql_dialect(
     "sqlite",
     quote_identifier = function(x) sql_quote(x, "`"),
-    supports_window_clause = TRUE
+    has_window_clause = TRUE
   )
 }
 

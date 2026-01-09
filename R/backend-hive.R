@@ -30,7 +30,7 @@ dialect_hive <- function() {
   new_sql_dialect(
     "hive",
     quote_identifier = function(x) sql_quote(x, '"'),
-    supports_window_clause = TRUE
+    has_window_clause = TRUE
   )
 }
 

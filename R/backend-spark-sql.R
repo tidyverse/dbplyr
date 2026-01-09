@@ -32,7 +32,7 @@ dialect_spark_sql <- function() {
   new_sql_dialect(
     "spark_sql",
     quote_identifier = function(x) sql_quote(x, '"'),
-    supports_window_clause = TRUE
+    has_window_clause = TRUE
   )
 }
 

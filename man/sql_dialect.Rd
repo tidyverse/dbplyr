@@ -10,8 +10,8 @@ sql_dialect(con)
 new_sql_dialect(
   dialect,
   quote_identifier,
-  supports_window_clause = FALSE,
-  supports_table_alias_with_as = TRUE
+  has_window_clause = FALSE,
+  has_table_alias_with_as = TRUE
 )
 }
 \arguments{
@@ -22,10 +22,10 @@ new_sql_dialect(
 \item{quote_identifier}{A function that quotes identifiers. Should accept
 a character vector and return a \link{sql} vector.}
 
-\item{supports_window_clause}{Does the backend support named window
+\item{has_window_clause}{Does the backend support named window
 definitions (the \code{WINDOW} clause)?}
 
-\item{supports_table_alias_with_as}{Does the backend support using \code{AS}
+\item{has_table_alias_with_as}{Does the backend support using \code{AS}
 when aliasing a table in a subquery?}
 }
 \value{
@@ -56,7 +56,7 @@ sql_dialect(dialect_postgres())
 my_dialect <- new_sql_dialect(
   "custom",
   quote_identifier = function(x) sql_quote(x, "`"),
-  supports_window_clause = TRUE
+  has_window_clause = TRUE
 )
 class(my_dialect)
 }
