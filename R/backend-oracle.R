@@ -250,6 +250,17 @@ sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
 }
 
 #' @export
+db_table_drop_if_exists.Oracle <- function(con, table, ...) {
+  # Private temporary tables don't appear in DBI::dbExistsTable() because
+  # they're not in the normal catalog views, so we try to drop directly
+  if (is_oracle_temporary_table(table, con)) {
+    try(DBI::dbRemoveTable(con, DBI::SQL(table)), silent = TRUE)
+  } else if (DBI::dbExistsTable(con, DBI::SQL(table))) {
+    DBI::dbRemoveTable(con, DBI::SQL(table))
+  }
+}
+
+#' @export
 dbplyr_write_table.Oracle <- function(
   con,
   table,
@@ -259,8 +270,8 @@ dbplyr_write_table.Oracle <- function(
   ...,
   overwrite = FALSE
 ) {
-  if (overwrite && DBI::dbExistsTable(con, DBI::SQL(table))) {
-    DBI::dbRemoveTable(con, DBI::SQL(table))
+  if (overwrite) {
+    db_table_drop_if_exists(con, table)
   }
 
   # We can't use DBI::dbWriteTable() here because it doesn't support
@@ -354,6 +365,9 @@ sql_query_save.OraConnection <- sql_query_save.Oracle
 
 #' @export
 dbplyr_write_table.OraConnection <- dbplyr_write_table.Oracle
+
+#' @export
+db_table_drop_if_exists.OraConnection <- db_table_drop_if_exists.Oracle
 
 #' @export
 sql_values_subquery.OraConnection <- sql_values_subquery.Oracle

@@ -23,6 +23,9 @@
 #'   schemes for temporary tables (e.g. SQL server and SAP HANA require
 #'   temporary tables to start with `#`)
 #'
+#' * `db_table_drop_if_exists()` is used to drop a table if it exists. This
+#'   is used when `overwrite = TRUE` in [copy_to()] and [compute()].
+#'
 #' @keywords internal
 #' @family generic
 #' @name db-io
@@ -294,4 +297,17 @@ db_table_temporary.DBIConnection <- function(con, table, temporary, ...) {
     table = table,
     temporary = temporary
   )
+}
+
+#' @rdname db-io
+#' @export
+db_table_drop_if_exists <- function(con, table, ...) {
+  UseMethod("db_table_drop_if_exists")
+}
+
+#' @export
+db_table_drop_if_exists.DBIConnection <- function(con, table, ...) {
+  if (DBI::dbExistsTable(con, DBI::SQL(table))) {
+    DBI::dbRemoveTable(con, DBI::SQL(table))
+  }
 }

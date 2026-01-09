@@ -1,6 +1,8 @@
 # dbplyr (development version)
 
 * Oracle temporary tables now use private temporary tables (Oracle 18c+) instead of global temporary tables. This ensures data persists correctly and table names are automatically prefixed with `ORA$PTT_` (#750).
+* New `db_table_drop_if_exists()` generic allows backends to customize how
+  tables are dropped when `overwrite = TRUE` (#1695).
 * `set_op_query()` no longer has an `all` argument.
 * Set operations (`union()`, `intersect()`, `setdiff()`) now use the
   `sql_set_op_method()` generic to generate the SQL set operation keyword. This
