@@ -58,6 +58,34 @@ dbplyr_edition.myConnectionClass <- function(con) 2L
 
 This declares that your package uses version 2 of the API, which is the version that this vignette documents.
 
+## Define a dialect
+
+Next, define a dialect for your backend using `sql_dialect()` and `new_sql_dialect()`. A dialect encapsulates the SQL syntax rules for your database:
+
+```{r, eval = FALSE}
+#' @export
+sql_dialect.myConnectionClass <- function(con) {
+  new_sql_dialect(
+    "mybackend",
+    quote_identifier = function(x) sql_quote(x, '"'),
+    has_window_clause = TRUE,
+    has_table_alias_with_as = TRUE
+  )
+}
+```
+
+The `new_sql_dialect()` function takes:
+
+* `dialect`: A unique name for your backend (used to create the class name).
+* `quote_identifier`: A function that quotes identifiers. Common choices are
+  double quotes (`"`), backticks (`` ` ``), or square brackets (`[]`).
+* `has_window_clause`: Set to `TRUE` if your database supports the `WINDOW`
+  clause for defining named window specifications.
+* `has_table_alias_with_as`: Set to `FALSE` if your database doesn't support
+  `AS` when aliasing tables in subqueries (e.g., Oracle).
+
+The dialect system allows you to write methods that dispatch on the dialect class (e.g., `sql_translation.sql_dialect_mybackend`) rather than the connection class. This makes it easier to share SQL generation code between different connection types that use the same database.
+
 ## Copying, computing, collecting and collapsing
 
 Next, check that `copy_to()`, `collapse()`, `compute()`, and `collect()` work:
@@ -129,10 +157,13 @@ Next, `sql_render()` is called on the result of `sql_build()` and dispatches to 
 
 ## SQL translation: vectors
 
-Finally, you may have to provide custom R -> SQL translation for functions that work with vectors within verbs. You can do with by providing a method for `sql_translation()`, which return an object created by `sql_variant()`. The `sql_variant()` function creates a container for three types of function translations:
+Finally, you may have to provide custom R -> SQL translation for functions that work with vectors within verbs. You can do this by providing a method for `sql_translation()`, which returns an object created by `sql_variant()`.
+
+You can define translation methods either on your connection class or on your dialect class. Using the dialect class is recommended as it allows sharing translations between different connection types:
 
 ```{r, eval = FALSE}
-sql_translation.myConnectionClass <- function(con) {
+# Method on dialect class (recommended)
+sql_translation.sql_dialect_mybackend <- function(con) {
   sql_variant(
     scalar = sql_translator(base_scalar, ...), # Functions in SELECT (non-aggregated)
     aggregate = sql_translator(base_aggregate, ...), # Aggregation functions (mean, sum, etc.)
@@ -166,7 +197,7 @@ Here's an example showing all of these helpers in use:
 
 ```{r}
 #| eval: false
-sql_translation.myConnectionClass <- function(con) {
+sql_translation.sql_dialect_mybackend <- function(con) {
   sql_variant(
     scalar = sql_translator(
       base_scalar,
@@ -196,7 +227,7 @@ sql_translation.myConnectionClass <- function(con) {
 
 ```{r}
 #| eval: false
-sql_translation.myConnectionClass <- function(con) {
+sql_translation.sql_dialect_mybackend <- function(con) {
   sql_variant(
     scalar = sql_translator(base_scalar),
     aggregate = sql_translator(
