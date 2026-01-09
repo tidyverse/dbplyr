@@ -201,6 +201,11 @@ sql_query_explain.Oracle <- function(con, sql, ...) {
 
 #' @export
 sql_table_analyze.Oracle <- function(con, table, ...) {
+  # Can't analyze private temporary tables
+  if (is_oracle_temporary_table(table, con)) {
+    return(NULL)
+  }
+
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_4005.htm
   sql_glue2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
 }

@@ -93,6 +93,9 @@ test_that("generates custom sql", {
   con <- simulate_oracle()
 
   expect_snapshot(sql_table_analyze(con, in_schema("schema", "tbl")))
+  # Can't analyze private temporary tables
+  expect_null(sql_table_analyze(con, table_path("ORA$PTT_tbl")))
+
   expect_snapshot(sql_query_explain(con, sql("SELECT * FROM foo")))
 
   lf <- lazy_frame(x = 1, con = con)
