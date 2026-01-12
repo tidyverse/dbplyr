@@ -56,7 +56,9 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li>
+<ul><li>Oracle temporary tables now use private temporary tables (Oracle 18c+) instead of global temporary tables. This ensures data persists correctly and table names are automatically prefixed with <code>ORA$PTT_</code> (<a href="https://github.com/tidyverse/dbplyr/issues/750" class="external-link">#750</a>).</li>
+<li>New <code><a href="../reference/db-io.html">db_table_drop_if_exists()</a></code> generic allows backends to customize how tables are dropped when <code>overwrite = TRUE</code> (<a href="https://github.com/tidyverse/dbplyr/issues/1695" class="external-link">#1695</a>).</li>
+<li>
 <code><a href="../reference/sql_build.html">set_op_query()</a></code> no longer has an <code>all</code> argument.</li>
 <li>Set operations (<code><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">union()</a></code>, <code><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">intersect()</a></code>, <code><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">setdiff()</a></code>) now use the <code><a href="../reference/db-sql.html">sql_set_op_method()</a></code> generic to generate the SQL set operation keyword. This allows backends to customize the behavior, e.g., using “UNION DISTINCT” instead of “UNION” for databases that require it, or “MINUS” instead of “EXCEPT” for Oracle (<a href="https://github.com/tidyverse/dbplyr/issues/1596" class="external-link">#1596</a>).</li>
 <li>

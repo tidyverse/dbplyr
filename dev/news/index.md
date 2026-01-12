@@ -2,6 +2,15 @@
 
 ## dbplyr (development version)
 
+- Oracle temporary tables now use private temporary tables (Oracle 18c+)
+  instead of global temporary tables. This ensures data persists
+  correctly and table names are automatically prefixed with `ORA$PTT_`
+  ([\#750](https://github.com/tidyverse/dbplyr/issues/750)).
+- New
+  [`db_table_drop_if_exists()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md)
+  generic allows backends to customize how tables are dropped when
+  `overwrite = TRUE`
+  ([\#1695](https://github.com/tidyverse/dbplyr/issues/1695)).
 - [`set_op_query()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)
   no longer has an `all` argument.
 - Set operations

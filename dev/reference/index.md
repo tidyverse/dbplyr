@@ -196,6 +196,7 @@ Documentation for authors of new dbplyr backends
   [`db_compute()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md)
   [`db_collect()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md)
   [`db_table_temporary()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md)
+  [`db_table_drop_if_exists()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md)
   : Database I/O generics
 - [`db_connection_describe()`](https://dbplyr.tidyverse.org/dev/reference/db-misc.md)
   [`sql_join_suffix()`](https://dbplyr.tidyverse.org/dev/reference/db-misc.md)

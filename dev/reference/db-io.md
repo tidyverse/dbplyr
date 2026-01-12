@@ -36,6 +36,12 @@ backend has special handling of temporary tables.
   schemes for temporary tables (e.g. SQL server and SAP HANA require
   temporary tables to start with `#`)
 
+- `db_table_drop_if_exists()` is used to drop a table if it exists. This
+  is used when `overwrite = TRUE` in
+  [`dplyr::copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html)
+  and
+  [`dplyr::compute()`](https://dplyr.tidyverse.org/reference/compute.html).
+
 ## Usage
 
 ``` r
@@ -69,6 +75,8 @@ db_compute(
 db_collect(con, sql, n = -1, warn_incomplete = TRUE, ...)
 
 db_table_temporary(con, table, temporary, ...)
+
+db_table_drop_if_exists(con, table, ...)
 ```
 
 ## See also
