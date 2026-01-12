@@ -325,7 +325,7 @@ mssql_scalar_base <- function() {
       if (context$clause == "WHERE") {
         sql_glue("{x} BETWEEN {left} AND {right}")
       } else {
-        sql_glue("IIF({x} BETWEEN {left} AND {right}, 1, 0)")
+        sql_glue("CASE WHEN {x} BETWEEN {left} AND {right} THEN 1 ELSE 0 END")
       }
     },
 
@@ -745,7 +745,7 @@ with_mssql_bool <- function(code) {
 
 mssql_as_bit <- function(x) {
   if (mssql_needs_bit()) {
-    sql_glue("CAST(IIF({x}, 1, 0) AS BIT)")
+    sql_glue("CAST(CASE WHEN {x} THEN 1 ELSE 0 END AS BIT)")
   } else {
     x
   }
