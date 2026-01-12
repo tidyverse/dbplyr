@@ -4,7 +4,9 @@
       mutate(lf, detected = str_detect(x, "abc"))
     Output
       <SQL>
-      SELECT [df].*, CAST(CASE WHEN REGEXP_LIKE([x], 'abc') THEN 1 ELSE 0 END AS BIT) AS [detected]
+      SELECT
+        [df].*,
+        CAST(CASE WHEN REGEXP_LIKE([x], 'abc') THEN 1 ELSE 0 END AS BIT) AS [detected]
       FROM [df]
 
 ---
