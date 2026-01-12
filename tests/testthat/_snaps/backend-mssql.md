@@ -4,7 +4,7 @@
       mutate(lf, detected = str_detect(x, "abc"))
     Output
       <SQL>
-      SELECT [df].*, CAST(IIF(REGEXP_LIKE([x], 'abc'), 1, 0) AS BIT) AS [detected]
+      SELECT [df].*, CAST(CASE WHEN REGEXP_LIKE([x], 'abc') THEN 1 ELSE 0 END AS BIT) AS [detected]
       FROM [df]
 
 ---
@@ -150,7 +150,7 @@
       mutate(mf, z = !is.na(x))
     Output
       <SQL>
-      SELECT [df].*, ~CAST(IIF(([x] IS NULL), 1, 0) AS BIT) AS [z]
+      SELECT [df].*, ~CAST(CASE WHEN ([x] IS NULL) THEN 1 ELSE 0 END AS BIT) AS [z]
       FROM [df]
 
 ---
@@ -159,7 +159,7 @@
       mutate(mf, x = x == 1L)
     Output
       <SQL>
-      SELECT CAST(IIF([x] = 1, 1, 0) AS BIT) AS [x]
+      SELECT CAST(CASE WHEN [x] = 1 THEN 1 ELSE 0 END AS BIT) AS [x]
       FROM [df]
 
 ---
@@ -168,7 +168,7 @@
       mutate(mf, x = x == 1L || x == 2L)
     Output
       <SQL>
-      SELECT CAST(IIF([x] = 1 OR [x] = 2, 1, 0) AS BIT) AS [x]
+      SELECT CAST(CASE WHEN [x] = 1 OR [x] = 2 THEN 1 ELSE 0 END AS BIT) AS [x]
       FROM [df]
 
 ---
@@ -177,7 +177,7 @@
       mutate(mf, x = x == 1L || x == 2L || x == 3L)
     Output
       <SQL>
-      SELECT CAST(IIF([x] = 1 OR [x] = 2 OR [x] = 3, 1, 0) AS BIT) AS [x]
+      SELECT CAST(CASE WHEN [x] = 1 OR [x] = 2 OR [x] = 3 THEN 1 ELSE 0 END AS BIT) AS [x]
       FROM [df]
 
 ---
@@ -186,7 +186,7 @@
       mutate(mf, x = !(x == 1L || x == 2L || x == 3L))
     Output
       <SQL>
-      SELECT ~CAST(IIF(([x] = 1 OR [x] = 2 OR [x] = 3), 1, 0) AS BIT) AS [x]
+      SELECT ~CAST(CASE WHEN ([x] = 1 OR [x] = 2 OR [x] = 3) THEN 1 ELSE 0 END AS BIT) AS [x]
       FROM [df]
 
 # handles ORDER BY in subqueries
