@@ -771,10 +771,7 @@ dbplyr_save_query <- function(
   sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
 
   if (overwrite) {
-    found <- DBI::dbExistsTable(con, DBI::SQL(name))
-    if (found) {
-      DBI::dbRemoveTable(con, DBI::SQL(name))
-    }
+    db_table_drop_if_exists(con, name)
   }
 
   db_execute(

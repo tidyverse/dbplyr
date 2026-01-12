@@ -5,6 +5,7 @@
 \alias{db_compute}
 \alias{db_collect}
 \alias{db_table_temporary}
+\alias{db_table_drop_if_exists}
 \title{Database I/O generics}
 \usage{
 db_copy_to(
@@ -37,6 +38,8 @@ db_compute(
 db_collect(con, sql, n = -1, warn_incomplete = TRUE, ...)
 
 db_table_temporary(con, table, temporary, ...)
+
+db_table_drop_if_exists(con, table, ...)
 }
 \description{
 These generics are responsible for getting data into and out of the
@@ -57,6 +60,8 @@ and \code{\link[DBI:dbFetch]{DBI::dbFetch()}}.
 \item \code{db_table_temporary()} is used for databases that have special naming
 schemes for temporary tables (e.g. SQL server and SAP HANA require
 temporary tables to start with \verb{#})
+\item \code{db_table_drop_if_exists()} is used to drop a table if it exists. This
+is used when \code{overwrite = TRUE} in \code{\link[dplyr:copy_to]{dplyr::copy_to()}} and \code{\link[dplyr:compute]{dplyr::compute()}}.
 }
 }
 \seealso{
