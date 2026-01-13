@@ -364,3 +364,9 @@ sql_expr_matches.sql_dialect_oracle <- function(con, x, y, ...) {
 
 #' @export
 dbplyr_edition.OraConnection <- dbplyr_edition.Oracle
+
+#' @export
+dbplyr_write_table.OraConnection <- dbplyr_write_table.Oracle
+
+#' @export
+db_table_drop_if_exists.OraConnection <- db_table_drop_if_exists.Oracle
