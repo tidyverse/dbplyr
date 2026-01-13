@@ -861,7 +861,8 @@ sql_escape_logical.sql_dialect_mssql <- function(con, x) {
   cte = FALSE,
   sql_options = NULL
 ) {
-  mssql_db_sql_render(con, sql, ..., cte = cte, sql_options = sql_options)
+  sql <- mssql_render_preprocess(sql)
+  NextMethod()
 }
 
 #' @export
@@ -872,30 +873,18 @@ db_sql_render.sql_dialect_mssql <- function(
   cte = FALSE,
   sql_options = NULL
 ) {
-  mssql_db_sql_render(con, sql, ..., cte = cte, sql_options = sql_options)
+  sql <- mssql_render_preprocess(sql)
+  NextMethod()
 }
 
-mssql_db_sql_render <- function(
-  con,
-  sql,
-  ...,
-  cte = FALSE,
-  sql_options = NULL
-) {
+mssql_render_preprocess <- function(sql) {
   # Post-process WHERE to cast logicals from BIT to BOOLEAN
   sql$lazy_query <- purrr::modify_tree(
     sql$lazy_query,
     is_node = \(x) inherits(x, "lazy_query"),
     post = mssql_update_where_clause
   )
-
-  db_sql_render.DBIConnection(
-    con,
-    sql,
-    ...,
-    cte = cte,
-    sql_options = sql_options
-  )
+  sql
 }
 
 mssql_update_where_clause <- function(qry) {
