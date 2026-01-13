@@ -40,6 +40,13 @@
       RETURNING "df_x"."a", "df_x"."b" AS "b2"
       ;
 
+# db_table_temporary adds ORA$PTT_ prefix
+
+    Code
+      result <- sql_table_temporary(con, table_path("tbl"), temporary = TRUE)
+    Message
+      Created a temporary table named ORA$PTT_tbl
+
 # generates custom sql
 
     Code
@@ -69,18 +76,19 @@
 ---
 
     Code
-      sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"))
+      sql_query_save(con, sql("SELECT * FROM foo"), "ORA$PTT_tbl")
     Output
-      <SQL> CREATE GLOBAL TEMPORARY TABLE "schema"."tbl" AS
+      <SQL> CREATE PRIVATE TEMPORARY TABLE "ORA$PTT_tbl"
+      ON COMMIT PRESERVE DEFINITION
+      AS
       SELECT * FROM foo
 
 ---
 
     Code
-      sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"),
-      temporary = FALSE)
+      sql_query_save(con, sql("SELECT * FROM foo"), "tbl", temporary = FALSE)
     Output
-      <SQL> CREATE TABLE "schema"."tbl" AS
+      <SQL> CREATE TABLE "tbl" AS
       SELECT * FROM foo
 
 ---
@@ -99,6 +107,20 @@
         FROM "df"
       ) "q01"
       WHERE ("col01" <= 1)
+
+# oracle_sql_table_create generates correct SQL
+
+    Code
+      oracle_sql_table_create(con, table_path("ORA$PTT_test"), c(x = "INTEGER", y = "TEXT"))
+    Output
+      <SQL> CREATE PRIVATE TEMPORARY TABLE ORA$PTT_test
+      ("x" INTEGER, "y" TEXT)
+      ON COMMIT PRESERVE DEFINITION
+    Code
+      oracle_sql_table_create(con, table_path("test"), c(x = "INTEGER", y = "TEXT"))
+    Output
+      <SQL> CREATE TABLE test 
+      ("x" INTEGER, "y" TEXT)
 
 # copy_inline uses UNION ALL
 

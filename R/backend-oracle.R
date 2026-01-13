@@ -218,8 +218,31 @@ sql_query_explain.sql_dialect_oracle <- function(con, sql, ...) {
 
 #' @export
 sql_table_analyze.sql_dialect_oracle <- function(con, table, ...) {
+  # Can't analyze private temporary tables
+  if (is_oracle_temporary_table(table, con)) {
+    return(NULL)
+  }
+
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_4005.htm
   sql_glue2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
+}
+
+is_oracle_temporary_table <- function(table, con) {
+  grepl("^ORA\\$PTT_", table_path_name(table, con), ignore.case = TRUE)
+}
+
+#' @export
+sql_table_temporary.sql_dialect_oracle <- function(con, table, temporary, ...) {
+  if (temporary && !is_oracle_temporary_table(table, con)) {
+    new_name <- paste0("ORA$PTT_", table_path_name(table, con))
+    cli::cli_inform(
+      paste0("Created a temporary table named ", new_name),
+      class = c("dbplyr_message_temp_table", "dbplyr_message")
+    )
+    table = table_path(new_name)
+  }
+
+  list(table = table, temporary = temporary)
 }
 
 #' @export
@@ -230,8 +253,87 @@ sql_query_save.sql_dialect_oracle <- function(
   temporary = TRUE,
   ...
 ) {
-  type <- if (temporary) "GLOBAL TEMPORARY TABLE" else "TABLE"
-  sql_glue2(con, "CREATE {.sql type} {.tbl name} AS\n{sql}")
+  # Since db_table_temporary handles the prefix, `temporary` here is always
+  # FALSE for temp tables (the name already has ORA$PTT_ prefix)
+
+  # ON COMMIT PRESERVE ROWS creates a session-specific temporary table
+  if (is_oracle_temporary_table(name, con)) {
+    sql_glue2(
+      con,
+      "
+      CREATE PRIVATE TEMPORARY TABLE {.tbl name}
+      ON COMMIT PRESERVE DEFINITION
+      AS
+      {sql}
+      "
+    )
+  } else {
+    sql_glue2(con, "CREATE TABLE {.tbl name} AS\n{sql}")
+  }
+}
+
+#' @export
+db_table_drop_if_exists.Oracle <- function(con, table, ...) {
+  # Private temporary tables don't appear in DBI::dbExistsTable() because
+  # they're not in the normal catalog views, so we try to drop directly
+  if (is_oracle_temporary_table(table, con)) {
+    try(DBI::dbRemoveTable(con, DBI::SQL(table)), silent = TRUE)
+  } else if (DBI::dbExistsTable(con, DBI::SQL(table))) {
+    DBI::dbRemoveTable(con, DBI::SQL(table))
+  }
+}
+
+#' @export
+dbplyr_write_table.Oracle <- function(
+  con,
+  table,
+  types,
+  values,
+  temporary = TRUE,
+  ...,
+  overwrite = FALSE
+) {
+  if (overwrite) {
+    db_table_drop_if_exists(con, table)
+  }
+
+  # We can't use DBI::dbWriteTable() here because it doesn't support
+  # Oracle's PRIVATE TEMPORARY TABLE syntax
+  fields <- types %||% values
+  create_sql <- oracle_sql_table_create(con, table, fields)
+  DBI::dbExecute(con, create_sql)
+
+  DBI::dbAppendTable(con, DBI::SQL(table), values)
+
+  table
+}
+
+oracle_sql_table_create <- function(con, table, fields) {
+  # Convert data frame to field types (like DBI:::sqlCreateTable_DBIConnection)
+  if (is.data.frame(fields)) {
+    fields <- vapply(fields, function(x) DBI::dbDataType(con, x), character(1))
+  }
+
+  # Quote column names and build field definitions
+  field_names <- sql_escape_ident(con, names(fields))
+  field_types <- unname(fields)
+  fields_sql <- sql(paste0(field_names, " ", field_types))
+
+  # Use PRIVATE TEMPORARY TABLE for temp tables (detected by ORA$PTT_ prefix)
+  if (is_oracle_temporary_table(table, con)) {
+    sql_glue2(
+      con,
+      "CREATE PRIVATE TEMPORARY TABLE {.tbl table}
+      ({fields_sql})
+      ON COMMIT PRESERVE DEFINITION"
+    )
+  } else {
+    sql_glue2(
+      con,
+      "CREATE TABLE {.tbl table} 
+      ({fields_sql})"
+    )
+  }
 }
 
 #' @export
