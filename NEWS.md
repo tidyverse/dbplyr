@@ -1,7 +1,8 @@
 # dbplyr (development version)
 
-* `db_table_temporary()` has been renamed to `sql_table_temporary()` for
-  consistency with other SQL generation functions. This 
+* New `sql_dialect()` generic provides a way for a database connections to choose a SQL dialect, using `new_sql_dialect()` to create a `sql_dialect` class. This allows connections to more easily share translations, and lays the foundation for better translations for connections via ODBC/JDBC/ADBC (#1624).
+* `db_supports_table_alias_with_as()` and `supports_window_clause()` generics have been removed. They are now part of the `sql_dialect()` data structure (#1760).
+* `db_table_temporary()` has been renamed to `sql_table_temporary()` for consistency with other SQL generation functions (#1760).
 * Oracle temporary tables now use private temporary tables (Oracle 18c+) instead of global temporary tables. This ensures data persists correctly and table names are automatically prefixed with `ORA$PTT_` (#750).
 * New `db_table_drop_if_exists()` generic allows backends to customize how
   tables are dropped when `overwrite = TRUE` (#1695).
