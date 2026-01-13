@@ -207,6 +207,10 @@ dbplyr_edition.default <- function(con) {
 }
 
 check_2ed <- function(con, call = caller_env()) {
+  if (is_sql_dialect(con)) {
+    return(TRUE)
+  }
+
   edition <- dbplyr_edition(con)
   if (edition >= 2) {
     return(invisible())

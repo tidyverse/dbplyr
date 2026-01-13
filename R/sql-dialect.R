@@ -77,19 +77,6 @@ new_sql_dialect <- function(
   )
 }
 
-dialect_ansi <- function() {
-  structure(
-    list(
-      quote_identifier = function(x) sql_quote(x, '"'),
-      has = list(
-        window_clause = FALSE,
-        table_alias_with_as = TRUE
-      )
-    ),
-    class = "sql_dialect"
-  )
-}
-
 #' @export
 sql_translation.sql_dialect <- function(con) {
   sql_variant(
@@ -101,42 +88,32 @@ sql_translation.sql_dialect <- function(con) {
 
 #' @export
 print.sql_dialect <- function(x, ...) {
-  cat("<sql_dialect>\n")
-  cat("Class:", paste(class(x), collapse = ", "), "\n")
+  cat("<", class(x)[[1]], ">\n", sep = "")
   invisible(x)
 }
 
-#' @export
-dbplyr_edition.sql_dialect <- function(con) {
-  2L
+is_sql_dialect <- function(x) {
+  inherits(x, "sql_dialect")
 }
 
 sql_has_table_alias_with_as <- function(con) {
   dialect <- sql_dialect(con)
 
-  if (inherits(dialect, "sql_dialect")) {
+  if (is_sql_dialect(dialect)) {
     dialect$has$table_alias_with_as
-  } else if (inherits(dialect, "DBIConnection")) {
-    TRUE
   } else {
-    cli::cli_abort(
-      "{.arg con} must be a DBIConnection or sql_dialect.",
-      .internal = TRUE
-    )
+    # For backward comptaibility
+    TRUE
   }
 }
 
 sql_has_window_clause <- function(con) {
   dialect <- sql_dialect(con)
 
-  if (inherits(dialect, "sql_dialect")) {
+  if (is_sql_dialect(dialect)) {
     dialect$has$window_clause
-  } else if (inherits(dialect, "DBIConnection")) {
-    FALSE
   } else {
-    cli::cli_abort(
-      "{.arg con} must be a DBIConnection or sql_dialect.",
-      .internal = TRUE
-    )
+    # For backward comptaibility
+    FALSE
   }
 }

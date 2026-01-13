@@ -21,9 +21,21 @@ simulate_dbi <- function(class = character(), ...) {
   )
 }
 
+dialect_ansi <- function() {
+  structure(
+    list(
+      quote_identifier = function(x) sql_quote(x, '"'),
+      has = list(
+        window_clause = FALSE,
+        table_alias_with_as = TRUE
+      )
+    ),
+    class = "sql_dialect"
+  )
+}
+
 #' @export
 dbplyr_edition.TestConnection <- function(con) 2L
-
 
 #' @export
 sql_escape_ident.TestConnection <- function(con, x) {
