@@ -138,7 +138,8 @@ sql_table_index <- function(
   check_name(name, allow_null = TRUE, call = call)
   check_bool(unique, call = call)
 
-  UseMethod("sql_table_index")
+  con <- sql_dialect(con)
+  UseMethod("sql_table_index", con)
 }
 #' @export
 sql_table_index.DBIConnection <- function(
@@ -191,7 +192,8 @@ sql_query_fields <- function(con, sql, ...) {
   check_table_source(sql)
   check_dots_used()
 
-  UseMethod("sql_query_fields")
+  con <- sql_dialect(con)
+  UseMethod("sql_query_fields", con)
 }
 #' @export
 sql_query_fields.DBIConnection <- function(con, sql, ...) {
@@ -203,6 +205,8 @@ sql_query_fields.DBIConnection <- function(con, sql, ...) {
     where = sql("0 = 1")
   )
 }
+#' @export
+sql_query_fields.sql_dialect <- sql_query_fields.DBIConnection
 
 #' @rdname db-sql
 #' @export
@@ -293,7 +297,8 @@ sql_query_rows <- function(con, sql, ...) {
   check_table_source(sql)
   check_dots_used()
 
-  UseMethod("sql_query_rows")
+  con <- sql_dialect(con)
+  UseMethod("sql_query_rows", con)
 }
 #' @export
 sql_query_rows.DBIConnection <- function(con, sql, ...) {

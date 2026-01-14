@@ -31,7 +31,8 @@ db_connection_describe.DBIConnection <- function(con, ...) {
 #' @rdname db-misc
 #' @export
 sql_join_suffix <- function(con, suffix, ...) {
-  UseMethod("sql_join_suffix")
+  con <- sql_dialect(con)
+  UseMethod("sql_join_suffix", con)
 }
 #' @export
 sql_join_suffix.DBIConnection <- function(con, suffix, ...) {
