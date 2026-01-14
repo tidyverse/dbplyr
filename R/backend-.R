@@ -48,7 +48,7 @@ dialect_ansi <- function() {
         window_clause = FALSE,
         table_alias_with_as = TRUE
       )
-    
+    ),
     class = "sql_dialect"
   )
 }
