@@ -25,4 +25,4 @@ copy_nycflights13(con, ...)
 - dbname, ...:
 
   Arguments passed on to
-  [`dplyr::src_postgres()`](https://dplyr.tidyverse.org/reference/src_dbi.html)
+  [`DBI::dbConnect()`](https://dbi.r-dbi.org/reference/dbConnect.html)
