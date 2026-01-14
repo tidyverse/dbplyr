@@ -47,7 +47,10 @@ sql_glue2(con, sql, envir = parent.frame())
 
 - con:
 
-  A database connection.
+  A
+  [sql_dialect](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
+  object or database connection. Connections are supported for backward
+  compatibility.
 
 ## Value
 

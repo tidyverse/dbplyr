@@ -53,7 +53,10 @@ sql_vector(x, parens = NA, collapse = " ", con = NULL)
 
 - con:
 
-  Database connection.
+  A
+  [sql_dialect](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
+  object or database connection. Connections are supported for backward
+  compatibility.
 
 ## Value
 
@@ -99,7 +102,7 @@ sql_escape_logical(con, c(TRUE, FALSE, NA))
 sql_escape_date(con, Sys.Date())
 #> <SQL> '2026-01-14'
 sql_escape_date(con, Sys.time())
-#> <SQL> '2026-01-14 17:29:58.417251'
+#> <SQL> '2026-01-14 18:44:13.767838'
 sql_escape_raw(con, charToRaw("hi"))
 #> <SQL> X'6869'
 ```

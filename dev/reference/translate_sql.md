@@ -43,7 +43,10 @@ translate_sql_(
 
 - con:
 
-  Database connection used to determine the SQL dialect.
+  A
+  [sql_dialect](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
+  object or database connection. Connections are supported for backward
+  compatibility.
 
 - vars_group, vars_order, vars_frame:
 

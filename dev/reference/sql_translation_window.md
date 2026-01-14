@@ -66,7 +66,10 @@ win_current_frame()
 
 - con:
 
-  Database connection.
+  A
+  [sql_dialect](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
+  object or database connection. Connections are supported for backward
+  compatibility.
 
 - f:
 

@@ -47,7 +47,10 @@ sql_query_delete(con, table, from, by, ..., returning_cols = NULL)
 
 - con:
 
-  Database connection.
+  A
+  [sql_dialect](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
+  object or database connection. Connections are supported for backward
+  compatibility.
 
 - table:
 

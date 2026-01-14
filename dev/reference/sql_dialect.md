@@ -28,7 +28,7 @@ new_sql_dialect(
 
 - con:
 
-  A database connection or dialect object.
+  A database connection.
 
 - dialect:
 

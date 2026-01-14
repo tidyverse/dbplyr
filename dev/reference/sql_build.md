@@ -138,9 +138,12 @@ sql_render(
 
 - con:
 
-  A database connection. The default `NULL` uses a set of rules that
-  should be very similar to ANSI 92, and allows for testing without an
-  active database connection.
+  A
+  [sql_dialect](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
+  object or database connection. Connections are supported for backward
+  compatibility. The default `NULL` uses a set of rules that should be
+  very similar to ANSI 92, and allows for testing without an active
+  database connection.
 
 - sql_options:
 
