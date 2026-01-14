@@ -118,7 +118,6 @@ Collate:
     'remote.R'
     'rows.R'
     'schema.R'
-    'simulate.R'
     'sql-build.R'
     'sql-clause.R'
     'sql-dialect.R'
