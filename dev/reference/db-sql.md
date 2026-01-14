@@ -14,11 +14,6 @@ SQL translation:
   [`slice_sample()`](https://dplyr.tidyverse.org/reference/slice.html).
   This is now replaced by adding a translation for `runif(n())`.
 
-- `supports_window_clause(con)` does the backend support named windows?
-
-- `db_supports_table_alias_with_as(con)` does the backend support using
-  `AS` when using a table alias?
-
 Tables:
 
 - `sql_table_analyze(con, table)` generates SQL that "analyzes" the
@@ -112,10 +107,6 @@ sql_query_wrap(con, from, name = NULL, ..., lvl = 0)
 sql_indent_subquery(from, con, lvl = 0)
 
 sql_query_rows(con, sql, ...)
-
-supports_window_clause(con)
-
-db_supports_table_alias_with_as(con)
 
 sql_returning_cols(con, cols, table, ...)
 

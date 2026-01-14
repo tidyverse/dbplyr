@@ -2,6 +2,24 @@
 
 ## dbplyr (development version)
 
+- New
+  [`sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
+  generic provides a way for a database connections to choose a SQL
+  dialect, using
+  [`new_sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
+  to create a `sql_dialect` class. This allows connections to more
+  easily share translations, and lays the foundation for better
+  translations for connections via ODBC/JDBC/ADBC
+  ([\#1624](https://github.com/tidyverse/dbplyr/issues/1624)).
+- `db_supports_table_alias_with_as()` and `supports_window_clause()`
+  generics have been removed. They are now part of the
+  [`sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
+  data structure
+  ([\#1760](https://github.com/tidyverse/dbplyr/issues/1760)).
+- `db_table_temporary()` has been renamed to
+  [`sql_table_temporary()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md)
+  for consistency with other SQL generation functions
+  ([\#1760](https://github.com/tidyverse/dbplyr/issues/1760)).
 - Oracle temporary tables now use private temporary tables (Oracle 18c+)
   instead of global temporary tables. This ensures data persists
   correctly and table names are automatically prefixed with `ORA$PTT_`
@@ -677,10 +695,9 @@ CRAN release: 2023-10-26
   ([@mgirlich](https://github.com/mgirlich),
   [\#1237](https://github.com/tidyverse/dbplyr/issues/1237)).
 
-- Added
-  [`db_supports_table_alias_with_as()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
-  to customise whether a backend supports specifying a table alias with
-  `AS` or not ([@mgirlich](https://github.com/mgirlich)).
+- Added `db_supports_table_alias_with_as()` to customise whether a
+  backend supports specifying a table alias with `AS` or not
+  ([@mgirlich](https://github.com/mgirlich)).
 
 - [`db_write_table()`](https://dplyr.tidyverse.org/reference/backend_dbplyr.html)
   and

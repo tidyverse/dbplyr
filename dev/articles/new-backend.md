@@ -67,6 +67,55 @@ dbplyr_edition.myConnectionClass <- function(con) 2L
 This declares that your package uses version 2 of the API, which is the
 version that this vignette documents.
 
+## Define a dialect
+
+Next, define a dialect for your backend using
+[`sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
+and
+[`new_sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md).
+A dialect encapsulates the SQL syntax rules for your database:
+
+``` r
+#' @export
+sql_dialect.myConnectionClass <- function(con) {
+  new_sql_dialect(
+    "mybackend",
+    quote_identifier = function(x) sql_quote(x, '"')
+  )
+}
+```
+
+The
+[`new_sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
+function requires two arguments:
+
+- `dialect`: A unique name for your backend (used to create the class
+  name).
+- `quote_identifier`: A function that quotes identifiers. This will
+  typically b e either a call to
+  [`sql_quote()`](https://dbplyr.tidyverse.org/dev/reference/sql_quote.md)
+  or to
+  [`DBI::dbQuoteIdentifier()`](https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html)
+
+[`new_sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
+has a number of additional arguments that describe the capabilities of
+the SQL dialect; see
+[`?new_sql_dialect`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
+for details.
+
+The dialect system allows you to write methods that dispatch on the
+dialect class (e.g., `sql_translation.sql_dialect_mybackend`) rather
+than the connection class. This makes it easier to share SQL generation
+code between different connection types that use the same database
+(e.g. direct, ODBC, JDBC, ADBC).
+
+In general, generics that start with `sql_` should have a sql_dialect
+method, and generics that start with `db_` should use a DBI connection
+method. It should be relatively rare to need a method for `db_` generic,
+but occassionally dbplyr’s SQL generation system is not quite flexible
+enough. If you find this, it’s worth filing an issue so I can look into
+it.
+
 ## Copying, computing, collecting and collapsing
 
 Next, check that
@@ -236,17 +285,19 @@ creating the needed SQL.
 ## SQL translation: vectors
 
 Finally, you may have to provide custom R -\> SQL translation for
-functions that work with vectors within verbs. You can do with by
+functions that work with vectors within verbs. You can do this by
 providing a method for
 [`sql_translation()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md),
-which return an object created by
+which returns an object created by
 [`sql_variant()`](https://dbplyr.tidyverse.org/dev/reference/sql_variant.md).
-The
-[`sql_variant()`](https://dbplyr.tidyverse.org/dev/reference/sql_variant.md)
-function creates a container for three types of function translations:
+
+You can define translation methods either on your connection class or on
+your dialect class. Using the dialect class is recommended as it allows
+sharing translations between different connection types:
 
 ``` r
-sql_translation.myConnectionClass <- function(con) {
+# Method on dialect class (recommended)
+sql_translation.sql_dialect_mybackend <- function(con) {
   sql_variant(
     scalar = sql_translator(base_scalar, ...), # Functions in SELECT (non-aggregated)
     aggregate = sql_translator(base_aggregate, ...), # Aggregation functions (mean, sum, etc.)
@@ -281,7 +332,7 @@ R functions to SQL:
 Here’s an example showing all of these helpers in use:
 
 ``` r
-sql_translation.myConnectionClass <- function(con) {
+sql_translation.sql_dialect_mybackend <- function(con) {
   sql_variant(
     scalar = sql_translator(
       base_scalar,
@@ -311,7 +362,7 @@ sql_translation.myConnectionClass <- function(con) {
   functions.
 
 ``` r
-sql_translation.myConnectionClass <- function(con) {
+sql_translation.sql_dialect_mybackend <- function(con) {
   sql_variant(
     scalar = sql_translator(base_scalar),
     aggregate = sql_translator(

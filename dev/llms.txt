@@ -302,7 +302,7 @@ Documentation for authors of new dbplyr backends
 - [`db_copy_to()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md)
   [`db_compute()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md)
   [`db_collect()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md)
-  [`db_table_temporary()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md)
+  [`sql_table_temporary()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md)
   [`db_table_drop_if_exists()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md)
   : Database I/O generics
 - [`db_connection_describe()`](https://dbplyr.tidyverse.org/dev/reference/db-misc.md)
@@ -322,8 +322,6 @@ Documentation for authors of new dbplyr backends
   [`sql_query_wrap()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
   [`sql_indent_subquery()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
   [`sql_query_rows()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
-  [`supports_window_clause()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
-  [`db_supports_table_alias_with_as()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
   [`sql_returning_cols()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
   [`sql_query_multi_join()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
   [`sql_query_join()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
@@ -342,6 +340,9 @@ Documentation for authors of new dbplyr backends
   [`sql_escape_raw()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   [`sql_vector()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   : Escape/quote a value
+- [`sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
+  [`new_sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
+  : SQL dialects
 - [`sql_glue()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
   [`sql_glue2()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
   : Build SQL strings with glue syntax

@@ -32,7 +32,7 @@ backend has special handling of temporary tables.
   [`DBI::dbSendQuery()`](https://dbi.r-dbi.org/reference/dbSendQuery.html)
   and [`DBI::dbFetch()`](https://dbi.r-dbi.org/reference/dbFetch.html).
 
-- `db_table_temporary()` is used for databases that have special naming
+- `sql_table_temporary()` is used for databases that have special naming
   schemes for temporary tables (e.g. SQL server and SAP HANA require
   temporary tables to start with `#`)
 
@@ -74,7 +74,7 @@ db_compute(
 
 db_collect(con, sql, n = -1, warn_incomplete = TRUE, ...)
 
-db_table_temporary(con, table, temporary, ...)
+sql_table_temporary(con, table, temporary, ...)
 
 db_table_drop_if_exists(con, table, ...)
 ```

@@ -151,6 +151,47 @@ narrow down the problem.</p>
 the version that this vignette documents.</p>
 </div>
 <div class="section level2">
+<h2 id="define-a-dialect">Define a dialect<a class="anchor" aria-label="anchor" href="#define-a-dialect"></a>
+</h2>
+<p>Next, define a dialect for your backend using
+<code><a href="../reference/sql_dialect.html">sql_dialect()</a></code> and <code><a href="../reference/sql_dialect.html">new_sql_dialect()</a></code>. A dialect
+encapsulates the SQL syntax rules for your database:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#' @export</span></span>
+<span><span class="va">sql_dialect.myConnectionClass</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">con</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="../reference/sql_dialect.html">new_sql_dialect</a></span><span class="op">(</span></span>
+<span>    <span class="st">"mybackend"</span>,</span>
+<span>    quote_identifier <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="../reference/sql_quote.html">sql_quote</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">'"'</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>The <code><a href="../reference/sql_dialect.html">new_sql_dialect()</a></code> function requires two
+arguments:</p>
+<ul>
+<li>
+<code>dialect</code>: A unique name for your backend (used to create
+the class name).</li>
+<li>
+<code>quote_identifier</code>: A function that quotes identifiers.
+This will typically b e either a call to <code><a href="../reference/sql_quote.html">sql_quote()</a></code> or to
+<code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html" class="external-link">DBI::dbQuoteIdentifier()</a></code>
+</li>
+</ul>
+<p><code><a href="../reference/sql_dialect.html">new_sql_dialect()</a></code> has a number of additional arguments
+that describe the capabilities of the SQL dialect; see
+<code><a href="../reference/sql_dialect.html">?new_sql_dialect</a></code> for details.</p>
+<p>The dialect system allows you to write methods that dispatch on the
+dialect class (e.g., <code>sql_translation.sql_dialect_mybackend</code>)
+rather than the connection class. This makes it easier to share SQL
+generation code between different connection types that use the same
+database (e.g. direct, ODBC, JDBC, ADBC).</p>
+<p>In general, generics that start with <code>sql_</code> should have a
+sql_dialect method, and generics that start with <code>db_</code> should
+use a DBI connection method. It should be relatively rare to need a
+method for <code>db_</code> generic, but occassionally dbplyr’s SQL
+generation system is not quite flexible enough. If you find this, it’s
+worth filing an issue so I can look into it.</p>
+</div>
+<div class="section level2">
 <h2 id="copying-computing-collecting-and-collapsing">Copying, computing, collecting and collapsing<a class="anchor" aria-label="anchor" href="#copying-computing-collecting-and-collapsing"></a>
 </h2>
 <p>Next, check that <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collapse()</a></code>,
@@ -199,7 +240,7 @@ key verbs work:</p>
 <p>If you need to generate your own SQL, we recommend using
 <code><a href="../reference/sql_glue.html">sql_glue2()</a></code>. It uses glue syntax with type markers for safe
 SQL generation:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_dbi.html">simulate_dbi</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create an index</span></span>
@@ -290,13 +331,15 @@ creating the needed SQL.</p>
 <h2 id="sql-translation-vectors">SQL translation: vectors<a class="anchor" aria-label="anchor" href="#sql-translation-vectors"></a>
 </h2>
 <p>Finally, you may have to provide custom R -&gt; SQL translation for
-functions that work with vectors within verbs. You can do with by
-providing a method for <code><a href="../reference/db-sql.html">sql_translation()</a></code>, which return an
-object created by <code><a href="../reference/sql_variant.html">sql_variant()</a></code>. The
-<code><a href="../reference/sql_variant.html">sql_variant()</a></code> function creates a container for three types
-of function translations:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sql_translation.myConnectionClass</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">con</span><span class="op">)</span> <span class="op">{</span></span>
+functions that work with vectors within verbs. You can do this by
+providing a method for <code><a href="../reference/db-sql.html">sql_translation()</a></code>, which returns an
+object created by <code><a href="../reference/sql_variant.html">sql_variant()</a></code>.</p>
+<p>You can define translation methods either on your connection class or
+on your dialect class. Using the dialect class is recommended as it
+allows sharing translations between different connection types:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Method on dialect class (recommended)</span></span>
+<span><span class="va">sql_translation.sql_dialect_mybackend</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">con</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="../reference/sql_variant.html">sql_variant</a></span><span class="op">(</span></span>
 <span>    scalar <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span><span class="va">base_scalar</span>, <span class="va">...</span><span class="op">)</span>, <span class="co"># Functions in SELECT (non-aggregated)</span></span>
 <span>    aggregate <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span><span class="va">base_aggregate</span>, <span class="va">...</span><span class="op">)</span>, <span class="co"># Aggregation functions (mean, sum, etc.)</span></span>
@@ -305,7 +348,7 @@ of function translations:</p>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Each translator will inherits from the base (ANSI SQL) translator and
 overrides only what’s different for your backend:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span></span>
 <span>  <span class="va">base_scalar</span>, <span class="co"># Inherit most translations</span></span>
 <span>  <span class="co"># Override specific functions for your backend</span></span>
@@ -333,8 +376,8 @@ functions.</li>
 with no SQL translation.</li>
 </ul>
 <p>Here’s an example showing all of these helpers in use:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sql_translation.myConnectionClass</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">con</span><span class="op">)</span> <span class="op">{</span></span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sql_translation.sql_dialect_mybackend</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">con</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="../reference/sql_variant.html">sql_variant</a></span><span class="op">(</span></span>
 <span>    scalar <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span></span>
 <span>      <span class="va">base_scalar</span>,</span>
@@ -369,8 +412,8 @@ SQL aggregate functions.</li>
 <strong><code>sql_aggregate_n(f, f_r = f)</code></strong>: For
 variadic SQL aggregate functions.</li>
 </ul>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sql_translation.myConnectionClass</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">con</span><span class="op">)</span> <span class="op">{</span></span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sql_translation.sql_dialect_mybackend</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">con</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="../reference/sql_variant.html">sql_variant</a></span><span class="op">(</span></span>
 <span>    scalar <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span><span class="va">base_scalar</span><span class="op">)</span>,</span>
 <span>    aggregate <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span></span>
@@ -409,7 +452,7 @@ functions.</li>
 support certain window functions.</li>
 </ul>
 <p>Here’s an example showing all of these helpers in use:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">window</span> <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span></span>
 <span>  <span class="va">base_win</span>,</span>
 <span>  <span class="co"># Ranking functions</span></span>
@@ -431,7 +474,7 @@ support certain window functions.</li>
 <p>For more complex translations, you can write custom functions that
 return SQL expressions using <code><a href="../reference/sql_glue.html">sql_glue()</a></code>. This uses glue
 syntax for string interpolation with automatic escaping.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">scalar</span> <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span></span>
 <span>  <span class="va">base_scalar</span>,</span>
 <span></span>

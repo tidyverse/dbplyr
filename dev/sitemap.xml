@@ -81,6 +81,7 @@
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/simulate_dbi.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_build.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_dialect.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_expr.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_glue.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_options.html</loc></url>

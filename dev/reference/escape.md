@@ -97,9 +97,9 @@ sql_escape_logical(con, c(TRUE, FALSE, NA))
 #> <SQL> FALSE
 #> <SQL> NULL
 sql_escape_date(con, Sys.Date())
-#> <SQL> '2026-01-12'
+#> <SQL> '2026-01-14'
 sql_escape_date(con, Sys.time())
-#> <SQL> '2026-01-12 22:10:20.960622'
+#> <SQL> '2026-01-14 13:53:48.36311'
 sql_escape_raw(con, charToRaw("hi"))
 #> <SQL> X'6869'
 ```

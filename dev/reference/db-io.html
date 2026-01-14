@@ -13,7 +13,7 @@ sql_query_save() to create the table, then optionally adds indexes
 (via sql_table_index()) and analyses (via sql_table_analyze()).
 db_collect() implements collect.tbl_sql() using DBI::dbSendQuery()
 and DBI::dbFetch().
-db_table_temporary() is used for databases that have special naming
+sql_table_temporary() is used for databases that have special naming
 schemes for temporary tables (e.g. SQL server and SAP HANA require
 temporary tables to start with #)
 db_table_drop_if_exists() is used to drop a table if it exists. This
@@ -33,7 +33,7 @@ sql_query_save() to create the table, then optionally adds indexes
 (via sql_table_index()) and analyses (via sql_table_analyze()).
 db_collect() implements collect.tbl_sql() using DBI::dbSendQuery()
 and DBI::dbFetch().
-db_table_temporary() is used for databases that have special naming
+sql_table_temporary() is used for databases that have special naming
 schemes for temporary tables (e.g. SQL server and SAP HANA require
 temporary tables to start with #)
 db_table_drop_if_exists() is used to drop a table if it exists. This
@@ -109,7 +109,7 @@ analyses (via <code><a href="db-sql.html">sql_table_analyze()</a></code>).</p></
 (via <code><a href="db-sql.html">sql_table_index()</a></code>) and analyses (via <code><a href="db-sql.html">sql_table_analyze()</a></code>).</p></li>
 <li><p><code>db_collect()</code> implements <code><a href="collect.tbl_sql.html">collect.tbl_sql()</a></code> using <code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">DBI::dbSendQuery()</a></code>
 and <code><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">DBI::dbFetch()</a></code>.</p></li>
-<li><p><code>db_table_temporary()</code> is used for databases that have special naming
+<li><p><code>sql_table_temporary()</code> is used for databases that have special naming
 schemes for temporary tables (e.g. SQL server and SAP HANA require
 temporary tables to start with <code>#</code>)</p></li>
 <li><p><code>db_table_drop_if_exists()</code> is used to drop a table if it exists. This
@@ -147,7 +147,7 @@ is used when <code>overwrite = TRUE</code> in <code><a href="https://dplyr.tidyv
 <span></span>
 <span><span class="fu">db_collect</span><span class="op">(</span><span class="va">con</span>, <span class="va">sql</span>, n <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, warn_incomplete <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">db_table_temporary</span><span class="op">(</span><span class="va">con</span>, <span class="va">table</span>, <span class="va">temporary</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">sql_table_temporary</span><span class="op">(</span><span class="va">con</span>, <span class="va">table</span>, <span class="va">temporary</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">db_table_drop_if_exists</span><span class="op">(</span><span class="va">con</span>, <span class="va">table</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
