@@ -54,6 +54,7 @@ dialect_ansi <- function() {
 
 #' @export
 #' @rdname backend-ansi
+#' @param class,... No longer used.
 simulate_dbi <- function(class = character(), ...) {
   structure(
     list(),

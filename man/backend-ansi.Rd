@@ -9,6 +9,9 @@ dialect_ansi()
 
 simulate_dbi(class = character(), ...)
 }
+\arguments{
+\item{class, ...}{No longer used.}
+}
 \description{
 This is the base dialect for ANSI compliant SQL, forming the foundation
 of all othe dialects. See \code{vignette("translation-function")} for a list
