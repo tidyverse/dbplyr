@@ -19,8 +19,8 @@
 #'   `str_remove_all()`, `str_extract()`, and `str_count()` require SQL Server
 #'   2025+ (version 17.0)
 #'
-#' Use `simulate_mssql()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' Use `dialect_mssql()` with `lazy_frame()` to see simulated SQL without
+#' connecting to a live database.
 #'
 #' @section Bit vs boolean:
 #' SQL server uses two incompatible types to represent `TRUE` and `FALSE`
@@ -50,7 +50,7 @@
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_mssql())
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_mssql())
 #' lf |> head()
 #' lf |> transmute(x = paste(b, c, d))
 #'

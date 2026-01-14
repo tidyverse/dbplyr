@@ -13,12 +13,12 @@ simulate_snowflake()
 See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
 details of overall translation technology.
 
-Use \code{simulate_snowflake()} with \code{lazy_frame()} to see simulated SQL without
-converting to live access database.
+Use \code{dialect_snowflake()} with \code{lazy_frame()} to see simulated SQL without
+connecting to a live database.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)
 
-lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_snowflake())
+lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_snowflake())
 lf |> transmute(x = paste0(d, " times"))
 }

@@ -34,8 +34,8 @@ require SQL Server 2025+ (version 17.0)
 2025+ (version 17.0)
 }
 
-Use \code{simulate_mssql()} with \code{lazy_frame()} to see simulated SQL without
-converting to live access database.
+Use \code{dialect_mssql()} with \code{lazy_frame()} to see simulated SQL without
+connecting to a live database.
 }
 \section{Bit vs boolean}{
 
@@ -63,7 +63,7 @@ from time to time.
 \examples{
 library(dplyr, warn.conflicts = FALSE)
 
-lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_mssql())
+lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_mssql())
 lf |> head()
 lf |> transmute(x = paste(b, c, d))
 

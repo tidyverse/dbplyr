@@ -6,15 +6,15 @@
 #' are a scattering of custom translations provided by users, mostly focussed
 #' on bitwise operations.
 #'
-#' Use `simulate_impala()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' Use `dialect_impala()` with `lazy_frame()` to see simulated SQL without
+#' connecting to a live database.
 #'
 #' @name backend-impala
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_impala())
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_impala())
 #' lf |> transmute(X = bitwNot(bitwOr(b, c)))
 NULL
 

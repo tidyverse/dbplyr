@@ -14,13 +14,13 @@ See \code{vignette("translation-function")} and \code{vignette("translation-verb
 details of overall translation technology. Key differences for this backend
 are minor translations for common data types.
 
-Use \code{simulate_odbc()} with \code{lazy_frame()} to see simulated SQL without
-converting to live access database.
+Use \code{dialect_odbc()} with \code{lazy_frame()} to see simulated SQL without
+connecting to a live database.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)
 
-lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = simulate_odbc())
+lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = dialect_odbc())
 lf |> transmute(x = as.numeric(b))
 lf |> transmute(x = as.integer(b))
 lf |> transmute(x = as.character(b))

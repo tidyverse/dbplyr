@@ -11,15 +11,15 @@
 #' * Note that you can't create new boolean columns from logical expressions;
 #'   you need to wrap with explicit `ifelse`: `ifelse(x > y, TRUE, FALSE)`.
 #'
-#' Use `simulate_hana()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' Use `dialect_hana()` with `lazy_frame()` to see simulated SQL without
+#' connecting to a live database.
 #'
 #' @name backend-hana
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_hana())
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_hana())
 #' lf |> transmute(x = paste0(d, " times"))
 NULL
 

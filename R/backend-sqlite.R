@@ -10,15 +10,15 @@
 #' * Custom median translation
 #' * Right and full joins are simulated using left joins
 #'
-#' Use `simulate_sqlite()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' Use `dialect_sqlite()` with `lazy_frame()` to see simulated SQL without
+#' connecting to a live database.
 #'
 #' @name backend-sqlite
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_sqlite())
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_sqlite())
 #' lf |> transmute(x = paste(c, " times"))
 #' lf |> transmute(x = log(b), y = log(b, base = 2))
 NULL

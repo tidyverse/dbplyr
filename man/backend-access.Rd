@@ -21,12 +21,12 @@ are:
 \item \code{TRUE} and \code{FALSE} converted to 1 and 0
 }
 
-Use \code{simulate_access()} with \code{lazy_frame()} to see simulated SQL without
-converting to live access database.
+Use \code{dialect_access()} with \code{lazy_frame()} to see simulated SQL without
+connecting to a live database.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)
-lf <- lazy_frame(x = 1, y = 2, z = "a", con = simulate_access())
+lf <- lazy_frame(x = 1, y = 2, z = "a", con = dialect_access())
 
 lf |> head()
 lf |> mutate(y = as.numeric(y), z = sqrt(x^2 + 10))

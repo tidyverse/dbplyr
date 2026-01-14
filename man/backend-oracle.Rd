@@ -26,13 +26,13 @@ Note that versions of Oracle prior to 23c have limited supported for
 See \url{https://oracle-base.com/articles/23/boolean-data-type-23} for
 more details.
 
-Use \code{simulate_oracle()} with \code{lazy_frame()} to see simulated SQL without
-converting to live access database.
+Use \code{dialect_oracle()} with \code{lazy_frame()} to see simulated SQL without
+connecting to a live database.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)
 
-lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_oracle())
+lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_oracle())
 lf |> transmute(x = paste0(c, " times"))
 lf |> setdiff(lf)
 }

@@ -15,12 +15,12 @@ details of overall translation technology. Key differences for this backend
 are a scattering of custom translations provided by users, mostly focussed
 on bitwise operations.
 
-Use \code{simulate_impala()} with \code{lazy_frame()} to see simulated SQL without
-converting to live access database.
+Use \code{dialect_impala()} with \code{lazy_frame()} to see simulated SQL without
+connecting to a live database.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)
 
-lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_impala())
+lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_impala())
 lf |> transmute(X = bitwNot(bitwOr(b, c)))
 }

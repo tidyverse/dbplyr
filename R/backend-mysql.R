@@ -10,15 +10,15 @@
 #'   `str_replace_all()`
 #' * Clear error message for unsupported full joins
 #'
-#' Use `simulate_mysql()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' Use `dialect_mysql()` with `lazy_frame()` to see simulated SQL without
+#' connecting to a live database.
 #'
 #' @name backend-mysql
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_mysql())
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_mysql())
 #' lf |> transmute(x = paste0(d, " times"))
 NULL
 

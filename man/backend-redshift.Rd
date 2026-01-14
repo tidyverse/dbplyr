@@ -13,13 +13,13 @@ simulate_redshift()
 Base translations come from \link[=simulate_postgres]{PostgreSQL backend}. There
 are generally few differences, apart from string manipulation.
 
-Use \code{simulate_redshift()} with \code{lazy_frame()} to see simulated SQL without
-converting to live access database.
+Use \code{dialect_redshift()} with \code{lazy_frame()} to see simulated SQL without
+connecting to a live database.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)
 
-lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_redshift())
+lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_redshift())
 lf |> transmute(x = paste(c, " times"))
 lf |> transmute(x = substr(c, 2, 3))
 lf |> transmute(x = str_replace_all(c, "a", "z"))

@@ -7,15 +7,15 @@
 #' (e.g. `var()`, `median()`) and use of temporary views instead of temporary
 #' tables when copying data.
 #'
-#' Use `simulate_spark_sql()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' Use `dialect_spark_sql()` with `lazy_frame()` to see simulated SQL without
+#' connecting to a live database.
 #'
 #' @name backend-spark-sql
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = simulate_spark_sql())
+#' lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = dialect_spark_sql())
 #'
 #' lf |> summarise(x = median(d, na.rm = TRUE))
 #' lf |> summarise(x = var(c, na.rm = TRUE), .by = d)

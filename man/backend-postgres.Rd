@@ -19,13 +19,13 @@ are:
 \item More standard statistical summaries
 }
 
-Use \code{simulate_postgres()} with \code{lazy_frame()} to see simulated SQL without
-converting to live access database.
+Use \code{dialect_postgres()} with \code{lazy_frame()} to see simulated SQL without
+connecting to a live database.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)
 
-lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_postgres())
+lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_postgres())
 lf |> summarise(x = sd(b, na.rm = TRUE))
 lf |> summarise(y = cor(b, c), z = cov(b, c))
 }

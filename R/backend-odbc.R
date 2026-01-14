@@ -5,15 +5,15 @@
 #' details of overall translation technology. Key differences for this backend
 #' are minor translations for common data types.
 #'
-#' Use `simulate_odbc()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' Use `dialect_odbc()` with `lazy_frame()` to see simulated SQL without
+#' connecting to a live database.
 #'
 #' @name backend-odbc
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = simulate_odbc())
+#' lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = dialect_odbc())
 #' lf |> transmute(x = as.numeric(b))
 #' lf |> transmute(x = as.integer(b))
 #' lf |> transmute(x = as.character(b))

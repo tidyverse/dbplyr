@@ -11,14 +11,14 @@
 #' * No `ANALYZE` equivalent
 #' * `TRUE` and `FALSE` converted to 1 and 0
 #'
-#' Use `simulate_access()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' Use `dialect_access()` with `lazy_frame()` to see simulated SQL without
+#' connecting to a live database.
 #'
 #' @name backend-access
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
-#' lf <- lazy_frame(x = 1, y = 2, z = "a", con = simulate_access())
+#' lf <- lazy_frame(x = 1, y = 2, z = "a", con = dialect_access())
 #'
 #' lf |> head()
 #' lf |> mutate(y = as.numeric(y), z = sqrt(x^2 + 10))

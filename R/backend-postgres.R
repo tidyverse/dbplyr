@@ -9,15 +9,15 @@
 #' * lubridate date-time extraction functions
 #' * More standard statistical summaries
 #'
-#' Use `simulate_postgres()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' Use `dialect_postgres()` with `lazy_frame()` to see simulated SQL without
+#' connecting to a live database.
 #'
 #' @name backend-postgres
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_postgres())
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_postgres())
 #' lf |> summarise(x = sd(b, na.rm = TRUE))
 #' lf |> summarise(y = cor(b, c), z = cov(b, c))
 NULL

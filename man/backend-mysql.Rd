@@ -26,12 +26,12 @@ are:
 \item Clear error message for unsupported full joins
 }
 
-Use \code{simulate_mysql()} with \code{lazy_frame()} to see simulated SQL without
-converting to live access database.
+Use \code{dialect_mysql()} with \code{lazy_frame()} to see simulated SQL without
+connecting to a live database.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)
 
-lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_mysql())
+lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_mysql())
 lf |> transmute(x = paste0(d, " times"))
 }
