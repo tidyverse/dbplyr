@@ -1,12 +1,15 @@
 #' Hive backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are a scattering of custom translations provided by users.
+#' This backend supports Apache Hive, typically accessed via odbc. Use
+#' `dialect_hive()` with `lazy_frame()` to see simulated SQL without connecting
+#' to a live database.
 #'
-#' Use `dialect_hive()` with `lazy_frame()` to see simulated SQL without
-#' connecting to a live database.
+#' Key differences for this backend are a scattering of custom translations
+#' provided by users.
+#'
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-hive
 #' @aliases NULL

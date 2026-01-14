@@ -10,14 +10,16 @@ dialect_spark_sql()
 simulate_spark_sql()
 }
 \description{
-See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
-details of overall translation technology. Key differences for this backend
-are better translation of statistical aggregate functions
-(e.g. \code{var()}, \code{median()}) and use of temporary views instead of temporary
-tables when copying data.
+This backend supports Databricks Spark SQL, typically accessed via the
+Databricks ODBC or JDBC connector. Use \code{dialect_spark_sql()} with
+\code{lazy_frame()} to see simulated SQL without connecting to a live database.
 
-Use \code{dialect_spark_sql()} with \code{lazy_frame()} to see simulated SQL without
-connecting to a live database.
+Key differences for this backend are better translation of statistical
+aggregate functions (e.g. \code{var()}, \code{median()}) and use of temporary views
+instead of temporary tables when copying data.
+
+See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
+details of overall translation technology.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)

@@ -1,9 +1,11 @@
 #' Oracle backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are:
+#' This backend supports Oracle databases, typically accessed via
+#' `OraConnection` created by [DBI::dbConnect()]. Use `dialect_oracle()` with
+#' `lazy_frame()` to see simulated SQL without connecting to a live database.
+#'
+#' Key differences for this backend are:
 #'
 #' * Use `FETCH FIRST` instead of `LIMIT`
 #' * Custom types
@@ -16,8 +18,8 @@
 #' See <https://oracle-base.com/articles/23/boolean-data-type-23> for
 #' more details.
 #'
-#' Use `dialect_oracle()` with `lazy_frame()` to see simulated SQL without
-#' connecting to a live database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-oracle
 #' @aliases NULL

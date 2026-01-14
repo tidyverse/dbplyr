@@ -1,9 +1,11 @@
 #' SAP HANA backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are:
+#' This backend supports SAP HANA databases, typically accessed via
+#' `HDBConnection` created by [DBI::dbConnect()]. Use `dialect_hana()` with
+#' `lazy_frame()` to see simulated SQL without connecting to a live database.
+#'
+#' Key differences for this backend are:
 #'
 #' * Temporary tables get `#` prefix and use `LOCAL TEMPORARY COLUMN`.
 #' * No table analysis performed in [copy_to()].
@@ -11,8 +13,8 @@
 #' * Note that you can't create new boolean columns from logical expressions;
 #'   you need to wrap with explicit `ifelse`: `ifelse(x > y, TRUE, FALSE)`.
 #'
-#' Use `dialect_hana()` with `lazy_frame()` to see simulated SQL without
-#' connecting to a live database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-hana
 #' @aliases NULL

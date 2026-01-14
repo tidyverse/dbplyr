@@ -10,9 +10,11 @@ dialect_access()
 simulate_access()
 }
 \description{
-See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
-details of overall translation technology. Key differences for this backend
-are:
+This backend supports Microsoft Access databases, typically accessed via
+odbc. Use \code{dialect_access()} with \code{lazy_frame()} to see simulated SQL without
+connecting to a live database.
+
+Key differences for this backend are:
 \itemize{
 \item \code{SELECT} uses \code{TOP}, not \code{LIMIT}
 \item Non-standard types and mathematical functions
@@ -21,8 +23,8 @@ are:
 \item \code{TRUE} and \code{FALSE} converted to 1 and 0
 }
 
-Use \code{dialect_access()} with \code{lazy_frame()} to see simulated SQL without
-connecting to a live database.
+See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
+details of overall translation technology.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)

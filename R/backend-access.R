@@ -1,9 +1,11 @@
 #' MS Access backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are:
+#' This backend supports Microsoft Access databases, typically accessed via
+#' odbc. Use `dialect_access()` with `lazy_frame()` to see simulated SQL without
+#' connecting to a live database.
+#'
+#' Key differences for this backend are:
 #'
 #' * `SELECT` uses `TOP`, not `LIMIT`
 #' * Non-standard types and mathematical functions
@@ -11,8 +13,8 @@
 #' * No `ANALYZE` equivalent
 #' * `TRUE` and `FALSE` converted to 1 and 0
 #'
-#' Use `dialect_access()` with `lazy_frame()` to see simulated SQL without
-#' connecting to a live database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-access
 #' @aliases NULL

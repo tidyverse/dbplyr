@@ -16,9 +16,12 @@ simulate_mysql()
 simulate_mariadb()
 }
 \description{
-See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
-details of overall translation technology. Key differences for this backend
-are:
+This backend supports MySQL and MariaDB databases, typically accessed via
+\code{MySQLConnection} or \code{MariaDBConnection} created by \code{\link[DBI:dbConnect]{DBI::dbConnect()}}. Use
+\code{dialect_mysql()} with \code{lazy_frame()} to see simulated SQL without connecting
+to a live database.
+
+Key differences for this backend are:
 \itemize{
 \item \code{paste()} uses \code{CONCAT_WS()}
 \item String translations for \code{str_detect()}, \code{str_locate()}, and
@@ -26,8 +29,8 @@ are:
 \item Clear error message for unsupported full joins
 }
 
-Use \code{dialect_mysql()} with \code{lazy_frame()} to see simulated SQL without
-connecting to a live database.
+See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
+details of overall translation technology.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)

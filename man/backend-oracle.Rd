@@ -10,9 +10,11 @@ dialect_oracle()
 simulate_oracle()
 }
 \description{
-See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
-details of overall translation technology. Key differences for this backend
-are:
+This backend supports Oracle databases, typically accessed via
+\code{OraConnection} created by \code{\link[DBI:dbConnect]{DBI::dbConnect()}}. Use \code{dialect_oracle()} with
+\code{lazy_frame()} to see simulated SQL without connecting to a live database.
+
+Key differences for this backend are:
 \itemize{
 \item Use \verb{FETCH FIRST} instead of \code{LIMIT}
 \item Custom types
@@ -26,8 +28,8 @@ Note that versions of Oracle prior to 23c have limited supported for
 See \url{https://oracle-base.com/articles/23/boolean-data-type-23} for
 more details.
 
-Use \code{dialect_oracle()} with \code{lazy_frame()} to see simulated SQL without
-connecting to a live database.
+See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
+details of overall translation technology.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)

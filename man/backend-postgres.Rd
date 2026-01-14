@@ -10,17 +10,19 @@ dialect_postgres()
 simulate_postgres()
 }
 \description{
-See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
-details of overall translation technology. Key differences for this backend
-are:
+This backend supports PostgreSQL databases, typically accessed via
+\code{PqConnection} created by \code{\link[DBI:dbConnect]{DBI::dbConnect()}}. Use \code{dialect_postgres()} with
+\code{lazy_frame()} to see simulated SQL without connecting to a live database.
+
+Key differences for this backend are:
 \itemize{
 \item Many stringr functions
 \item lubridate date-time extraction functions
 \item More standard statistical summaries
 }
 
-Use \code{dialect_postgres()} with \code{lazy_frame()} to see simulated SQL without
-connecting to a live database.
+See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
+details of overall translation technology.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)

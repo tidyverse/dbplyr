@@ -1,11 +1,12 @@
 #' Snowflake backend
 #'
 #' @description
+#' This backend supports Snowflake databases, typically accessed via odbc. Use
+#' `dialect_snowflake()` with `lazy_frame()` to see simulated SQL without
+#' connecting to a live database.
+#'
 #' See `vignette("translation-function")` and `vignette("translation-verb")` for
 #' details of overall translation technology.
-#'
-#' Use `dialect_snowflake()` with `lazy_frame()` to see simulated SQL without
-#' connecting to a live database.
 #'
 #' @name backend-snowflake
 #' @aliases NULL

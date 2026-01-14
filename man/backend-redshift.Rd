@@ -10,11 +10,16 @@ dialect_redshift()
 simulate_redshift()
 }
 \description{
+This backend supports Amazon Redshift databases, typically accessed via
+a \code{RedshiftConnection} created by \code{\link[DBI:dbConnect]{DBI::dbConnect()}}. Use \code{dialect_redshift()}
+with \code{lazy_frame()} to see simulated SQL without connecting to a live
+database.
+
 Base translations come from \link[=dialect_postgres]{PostgreSQL backend}. There
 are generally few differences, apart from string manipulation.
 
-Use \code{dialect_redshift()} with \code{lazy_frame()} to see simulated SQL without
-connecting to a live database.
+See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
+details of overall translation technology.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)

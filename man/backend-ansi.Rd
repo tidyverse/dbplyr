@@ -14,11 +14,11 @@ simulate_dbi(class = character(), ...)
 }
 \description{
 This is the base dialect for ANSI compliant SQL, forming the foundation
-of all othe dialects. See \code{vignette("translation-function")} for a list
-of functions that are translated.
+of all other dialects. Use \code{dialect_ansi()} with \code{lazy_frame()} to see
+simulated SQL without connecting to a live database.
 
-Use \code{dialect_ansi()} with \code{lazy_frame()} to see simulated SQL without
-connecting to a live database.
+See \code{vignette("translation-function")} for a list of functions that are
+translated.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)

@@ -1,13 +1,15 @@
 #' Impala backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are a scattering of custom translations provided by users, mostly focussed
-#' on bitwise operations.
-#'
-#' Use `dialect_impala()` with `lazy_frame()` to see simulated SQL without
+#' This backend supports Apache Impala, typically accessed via odbc. Use
+#' `dialect_impala()` with `lazy_frame()` to see simulated SQL without
 #' connecting to a live database.
+#'
+#' Key differences for this backend are a scattering of custom translations
+#' provided by users, mostly focussed on bitwise operations.
+#'
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-impala
 #' @aliases NULL

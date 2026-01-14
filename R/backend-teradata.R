@@ -1,15 +1,17 @@
 #' Teradata backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are:
+#' This backend supports Teradata databases, typically accessed via odbc. Use
+#' `dialect_teradata()` with `lazy_frame()` to see simulated SQL without
+#' connecting to a live database.
+#'
+#' Key differences for this backend are:
 #'
 #' * Uses `TOP` instead of `LIMIT`
 #' * Selection of user supplied translations
 #'
-#' Use `dialect_teradata()` with `lazy_frame()` to see simulated SQL without
-#' connecting to a live database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-teradata
 #' @aliases NULL

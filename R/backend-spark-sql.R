@@ -1,14 +1,16 @@
 #' Databricks Spark SQL backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are better translation of statistical aggregate functions
-#' (e.g. `var()`, `median()`) and use of temporary views instead of temporary
-#' tables when copying data.
+#' This backend supports Databricks Spark SQL, typically accessed via the
+#' Databricks ODBC or JDBC connector. Use `dialect_spark_sql()` with
+#' `lazy_frame()` to see simulated SQL without connecting to a live database.
 #'
-#' Use `dialect_spark_sql()` with `lazy_frame()` to see simulated SQL without
-#' connecting to a live database.
+#' Key differences for this backend are better translation of statistical
+#' aggregate functions (e.g. `var()`, `median()`) and use of temporary views
+#' instead of temporary tables when copying data.
+#'
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-spark-sql
 #' @aliases NULL

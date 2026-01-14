@@ -1,17 +1,20 @@
 #' MySQL/MariaDB backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are:
+#' This backend supports MySQL and MariaDB databases, typically accessed via
+#' `MySQLConnection` or `MariaDBConnection` created by [DBI::dbConnect()]. Use
+#' `dialect_mysql()` with `lazy_frame()` to see simulated SQL without connecting
+#' to a live database.
+#'
+#' Key differences for this backend are:
 #'
 #' * `paste()` uses `CONCAT_WS()`
 #' * String translations for `str_detect()`, `str_locate()`, and
 #'   `str_replace_all()`
 #' * Clear error message for unsupported full joins
 #'
-#' Use `dialect_mysql()` with `lazy_frame()` to see simulated SQL without
-#' connecting to a live database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-mysql
 #' @aliases NULL

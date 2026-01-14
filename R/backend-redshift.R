@@ -1,11 +1,16 @@
 #' Redshift backend
 #'
 #' @description
+#' This backend supports Amazon Redshift databases, typically accessed via
+#' a `RedshiftConnection` created by [DBI::dbConnect()]. Use `dialect_redshift()`
+#' with `lazy_frame()` to see simulated SQL without connecting to a live
+#' database.
+#'
 #' Base translations come from [PostgreSQL backend][dialect_postgres]. There
 #' are generally few differences, apart from string manipulation.
 #'
-#' Use `dialect_redshift()` with `lazy_frame()` to see simulated SQL without
-#' connecting to a live database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-redshift
 #' @aliases NULL

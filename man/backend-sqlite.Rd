@@ -10,9 +10,12 @@ dialect_sqlite()
 simulate_sqlite()
 }
 \description{
-See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
-details of overall translation technology. Key differences for this backend
-are:
+This backend supports SQLite databases, typically accessed via
+a \code{SQLiteConnection} created by \code{\link[DBI:dbConnect]{DBI::dbConnect()}}. Use \code{dialect_sqlite()}
+with \code{lazy_frame()} to see simulated SQL without connecting to a live
+database.
+
+Key differences for this backend are:
 \itemize{
 \item Uses non-standard \code{LOG()} function
 \item Date-time extraction functions from lubridate
@@ -20,8 +23,8 @@ are:
 \item Right and full joins are simulated using left joins
 }
 
-Use \code{dialect_sqlite()} with \code{lazy_frame()} to see simulated SQL without
-connecting to a live database.
+See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
+details of overall translation technology.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)

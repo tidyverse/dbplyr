@@ -10,11 +10,12 @@ dialect_snowflake()
 simulate_snowflake()
 }
 \description{
+This backend supports Snowflake databases, typically accessed via odbc. Use
+\code{dialect_snowflake()} with \code{lazy_frame()} to see simulated SQL without
+connecting to a live database.
+
 See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
 details of overall translation technology.
-
-Use \code{dialect_snowflake()} with \code{lazy_frame()} to see simulated SQL without
-connecting to a live database.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)

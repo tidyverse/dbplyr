@@ -10,13 +10,15 @@ dialect_impala()
 simulate_impala()
 }
 \description{
-See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
-details of overall translation technology. Key differences for this backend
-are a scattering of custom translations provided by users, mostly focussed
-on bitwise operations.
-
-Use \code{dialect_impala()} with \code{lazy_frame()} to see simulated SQL without
+This backend supports Apache Impala, typically accessed via odbc. Use
+\code{dialect_impala()} with \code{lazy_frame()} to see simulated SQL without
 connecting to a live database.
+
+Key differences for this backend are a scattering of custom translations
+provided by users, mostly focussed on bitwise operations.
+
+See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
+details of overall translation technology.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)

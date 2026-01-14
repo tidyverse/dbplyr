@@ -10,12 +10,15 @@ dialect_odbc()
 simulate_odbc()
 }
 \description{
-See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
-details of overall translation technology. Key differences for this backend
-are minor translations for common data types.
+This backend supports databases accessed via \code{OdbcConnection} created by
+\code{\link[DBI:dbConnect]{DBI::dbConnect()}}. Use \code{dialect_odbc()} with \code{lazy_frame()} to see simulated
+SQL without connecting to a live database.
 
-Use \code{dialect_odbc()} with \code{lazy_frame()} to see simulated SQL without
-connecting to a live database.
+Key differences for this backend are minor translations for common data
+types.
+
+See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
+details of overall translation technology.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)

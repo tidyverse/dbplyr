@@ -1,9 +1,11 @@
 #' SQL Server backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are:
+#' This backend supports Microsoft SQL Server, typically accessed via odbc. Use
+#' `dialect_mssql()` with `lazy_frame()` to see simulated SQL without connecting
+#' to a live database.
+#'
+#' Key differences for this backend are:
 #'
 #' - `SELECT` uses `TOP` not `LIMIT`
 #' - Automatically prefixes `#` to create temporary tables. Add the prefix
@@ -19,8 +21,8 @@
 #'   `str_remove_all()`, `str_extract()`, and `str_count()` require SQL Server
 #'   2025+ (version 17.0)
 #'
-#' Use `dialect_mssql()` with `lazy_frame()` to see simulated SQL without
-#' connecting to a live database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @section Bit vs boolean:
 #' SQL server uses two incompatible types to represent `TRUE` and `FALSE`

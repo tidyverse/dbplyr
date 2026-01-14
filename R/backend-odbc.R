@@ -1,12 +1,15 @@
 #' ODBC backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are minor translations for common data types.
+#' This backend supports databases accessed via `OdbcConnection` created by
+#' [DBI::dbConnect()]. Use `dialect_odbc()` with `lazy_frame()` to see simulated
+#' SQL without connecting to a live database.
 #'
-#' Use `dialect_odbc()` with `lazy_frame()` to see simulated SQL without
-#' connecting to a live database.
+#' Key differences for this backend are minor translations for common data
+#' types.
+#'
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-odbc
 #' @aliases NULL

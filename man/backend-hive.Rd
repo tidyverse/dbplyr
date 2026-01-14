@@ -10,12 +10,15 @@ dialect_hive()
 simulate_hive()
 }
 \description{
-See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
-details of overall translation technology. Key differences for this backend
-are a scattering of custom translations provided by users.
+This backend supports Apache Hive, typically accessed via odbc. Use
+\code{dialect_hive()} with \code{lazy_frame()} to see simulated SQL without connecting
+to a live database.
 
-Use \code{dialect_hive()} with \code{lazy_frame()} to see simulated SQL without
-connecting to a live database.
+Key differences for this backend are a scattering of custom translations
+provided by users.
+
+See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
+details of overall translation technology.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)

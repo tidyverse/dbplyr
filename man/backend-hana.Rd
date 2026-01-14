@@ -10,9 +10,11 @@ dialect_hana()
 simulate_hana()
 }
 \description{
-See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
-details of overall translation technology. Key differences for this backend
-are:
+This backend supports SAP HANA databases, typically accessed via
+\code{HDBConnection} created by \code{\link[DBI:dbConnect]{DBI::dbConnect()}}. Use \code{dialect_hana()} with
+\code{lazy_frame()} to see simulated SQL without connecting to a live database.
+
+Key differences for this backend are:
 \itemize{
 \item Temporary tables get \verb{#} prefix and use \verb{LOCAL TEMPORARY COLUMN}.
 \item No table analysis performed in \code{\link[dplyr:copy_to]{dplyr::copy_to()}}.
@@ -21,8 +23,8 @@ are:
 you need to wrap with explicit \code{ifelse}: \code{ifelse(x > y, TRUE, FALSE)}.
 }
 
-Use \code{dialect_hana()} with \code{lazy_frame()} to see simulated SQL without
-connecting to a live database.
+See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
+details of overall translation technology.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)

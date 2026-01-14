@@ -10,16 +10,18 @@ dialect_teradata()
 simulate_teradata()
 }
 \description{
-See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
-details of overall translation technology. Key differences for this backend
-are:
+This backend supports Teradata databases, typically accessed via odbc. Use
+\code{dialect_teradata()} with \code{lazy_frame()} to see simulated SQL without
+connecting to a live database.
+
+Key differences for this backend are:
 \itemize{
 \item Uses \code{TOP} instead of \code{LIMIT}
 \item Selection of user supplied translations
 }
 
-Use \code{dialect_teradata()} with \code{lazy_frame()} to see simulated SQL without
-connecting to a live database.
+See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
+details of overall translation technology.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)

@@ -15,9 +15,11 @@ will use \code{TRY_CAST()} instead of \code{CAST()}, and 17.0 and above will
 support regular expression patterns in stringr functions.}
 }
 \description{
-See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
-details of overall translation technology. Key differences for this backend
-are:
+This backend supports Microsoft SQL Server, typically accessed via odbc. Use
+\code{dialect_mssql()} with \code{lazy_frame()} to see simulated SQL without connecting
+to a live database.
+
+Key differences for this backend are:
 \itemize{
 \item \code{SELECT} uses \code{TOP} not \code{LIMIT}
 \item Automatically prefixes \verb{#} to create temporary tables. Add the prefix
@@ -34,8 +36,8 @@ require SQL Server 2025+ (version 17.0)
 2025+ (version 17.0)
 }
 
-Use \code{dialect_mssql()} with \code{lazy_frame()} to see simulated SQL without
-connecting to a live database.
+See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
+details of overall translation technology.
 }
 \section{Bit vs boolean}{
 

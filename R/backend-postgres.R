@@ -1,16 +1,18 @@
 #' PostgreSQL backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are:
+#' This backend supports PostgreSQL databases, typically accessed via a
+#' `PqConnection` created by [DBI::dbConnect()]. Use `dialect_postgres()` with
+#' `lazy_frame()` to see simulated SQL without connecting to a live database.
+#'
+#' Key differences for this backend are:
 #'
 #' * Many stringr functions
 #' * lubridate date-time extraction functions
 #' * More standard statistical summaries
 #'
-#' Use `dialect_postgres()` with `lazy_frame()` to see simulated SQL without
-#' connecting to a live database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-postgres
 #' @aliases NULL
