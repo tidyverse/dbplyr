@@ -17,7 +17,7 @@
 #' @include verb-copy-inline.R
 NULL
 
-#' ANSI SQL
+#' ANSI SQL backend
 #'
 #' @description
 #' This is the base dialect for ANSI compliant SQL, forming the foundation

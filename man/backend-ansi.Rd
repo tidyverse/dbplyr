@@ -3,7 +3,7 @@
 \name{backend-ansi}
 \alias{dialect_ansi}
 \alias{simulate_dbi}
-\title{ANSI SQL}
+\title{ANSI SQL backend}
 \usage{
 dialect_ansi()
 
