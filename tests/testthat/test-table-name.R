@@ -17,7 +17,7 @@ test_that("can check for table name", {
 # as_table_path -----------------------------------------------------------
 
 test_that("can coerce all user facing inputs", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
 
   x_esc <- table_path('"x"')
   x_raw <- table_path("x")
@@ -68,7 +68,7 @@ test_that("vectorised table_path is not a table_id", {
 })
 
 test_that("strips names", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_equal(as_table_path(c(x = "x"), con), table_path('"x"'))
 
   id <- in_schema(c(x = "a"), "b")
@@ -79,7 +79,7 @@ test_that("strips names", {
 })
 
 test_that("as_table_path validates its inputs", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_snapshot(error = TRUE, {
     as_table_path("x")
     as_table_path(c("x", "y"), con)
@@ -89,14 +89,14 @@ test_that("as_table_path validates its inputs", {
 })
 
 test_that("as_table_path warns when using sql", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_snapshot(as_table_path(sql("x"), con))
 })
 
 # components --------------------------------------------------------------
 
 test_that("can parse components from path", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
 
   expect_equal(
     table_path_components(table_path(c("x.y", '"x.y".z', '"x.y"."y.z"')), con),
@@ -105,7 +105,7 @@ test_that("can parse components from path", {
 })
 
 test_that("can extract names from path", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
 
   expect_equal(
     table_path_name(table_path(c("x.y", '"x.y".z', 'x."y.z"')), con),

@@ -40,7 +40,7 @@ test_that("remote_table returns null for computed tables", {
 test_that("remote_name and remote_table can handle different table identifiers", {
   test_remote_table <- function(
     x,
-    exp_tbl = as_table_path(x, simulate_dbi())
+    exp_tbl = as_table_path(x, dialect_ansi())
   ) {
     lf <- lazy_frame(x = 1, .name = x)
     expect_equal(remote_table(lf, null_if_local = FALSE), exp_tbl)

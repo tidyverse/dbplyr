@@ -3,7 +3,7 @@ test_that("zero length inputs return correct clases", {
 })
 
 test_that("ident quotes", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   x1 <- ident("x")
 
   expect_equal(escape(x1, con = con), sql('"x"'))

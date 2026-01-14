@@ -3,7 +3,7 @@ sql_lines <- function(...) {
 }
 
 test_that("can translate cut", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(
     con,
     cut(x, 1:2),
@@ -31,7 +31,7 @@ test_that("can translate cut", {
 })
 
 test_that("works with include.lowest = TRUE", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(
     con,
     cut(x, 1:3, include.lowest = TRUE),
@@ -47,7 +47,7 @@ test_that("works with include.lowest = TRUE", {
 })
 
 test_that("works with right = FALSE", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(
     con,
     cut(x, 1:2, right = FALSE),
@@ -62,7 +62,7 @@ test_that("works with right = FALSE", {
 })
 
 test_that("works with right = FALSE and include.lowest = TRUE", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(
     con,
     cut(x, 1:2, right = FALSE, include.lowest = TRUE),
@@ -77,7 +77,7 @@ test_that("works with right = FALSE and include.lowest = TRUE", {
 })
 
 test_that("works with labels = FALSE", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(
     con,
     cut(x, 1:3, labels = FALSE),
@@ -93,7 +93,7 @@ test_that("works with labels = FALSE", {
 })
 
 test_that("works with labels a character vector", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(
     con,
     cut(x, 1:3, labels = c("a", "b")),
@@ -115,7 +115,7 @@ test_that("works with labels a character vector", {
 })
 
 test_that("can handle infinity", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(
     con,
     cut(x, c(-Inf, 0, 1, Inf)),
@@ -154,7 +154,7 @@ test_that("can handle infinity", {
 })
 
 test_that("cut checks arguments", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation_snapshot(con, cut(x, 1), error = TRUE)
   expect_translation_snapshot(con, cut(x, c(1, 1)), error = TRUE)
   expect_translation_snapshot(con, cut(x, c(1, 2, NA)), error = TRUE)

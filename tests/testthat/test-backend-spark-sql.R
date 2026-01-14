@@ -1,5 +1,9 @@
+test_that("simulate_spark_sql() still works", {
+  expect_translation(simulate_spark_sql(), x + 1, '"x" + 1.0')
+})
+
 test_that("custom clock functions translated correctly", {
-  con <- simulate_spark_sql()
+  con <- dialect_spark_sql()
   expect_translation(
     con,
     add_years(x, 1),
@@ -62,7 +66,7 @@ test_that("custom clock functions translated correctly", {
 })
 
 test_that("difftime is translated correctly", {
-  con <- simulate_spark_sql()
+  con <- dialect_spark_sql()
   expect_translation(
     con,
     difftime(start_date, end_date, units = "days"),

@@ -1,3 +1,7 @@
+test_that("simulate_dbi() still works", {
+  expect_translation(simulate_dbi(), x + 1, '"x" + 1.0')
+})
+
 test_that("base_no_win includes all aggregates and window functions", {
   # All aggregates must be included in window functions
   expect_equal(setdiff(names(base_agg), names(base_win)), character())
@@ -7,7 +11,7 @@ test_that("base_no_win includes all aggregates and window functions", {
 })
 
 test_that("can translate both pipes", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(
     con,
     x %>% mean() %>% sum(),
@@ -20,7 +24,7 @@ test_that("can translate both pipes", {
 # mathematics --------------------------------------------------------
 
 test_that("basic arithmetic is correct", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(con, 1 + 2, "1.0 + 2.0")
   expect_translation(con, 2 * 4, "2.0 * 4.0")
   expect_translation(con, 5^2, "POWER(5.0, 2.0)")
@@ -30,25 +34,25 @@ test_that("basic arithmetic is correct", {
 })
 
 test_that("small numbers aren't converted to 0", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(con, 1e-9, "1e-09")
 })
 
 test_that("unary plus works with numbers", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(con, +10L, "10")
   expect_translation(con, x == +10, '"x" = 10.0')
   expect_translation(con, x %in% c(+1L, 0L), '"x" IN (1, 0)')
 })
 
 test_that("unary plus works for non-numeric expressions", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(con, +(1L + 2L), "(1 + 2)")
   expect_translation(con, mean(x, na.rm = TRUE), 'AVG("x")', window = FALSE)
 })
 
 test_that("unary minus flips sign of number", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(con, -10L, "-10")
   expect_translation(con, -10L + x, '-10 + "x"')
   expect_translation(con, x == -10, '"x" = -10.0')
@@ -56,28 +60,28 @@ test_that("unary minus flips sign of number", {
 })
 
 test_that("unary minus wraps non-numeric expressions", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(con, -(1L + 2L), "-(1 + 2)")
   expect_translation(con, -mean(x, na.rm = TRUE), '-AVG("x")', window = FALSE)
 })
 
 test_that("binary minus subtracts", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(con, 1L - 10L, "1 - 10")
 })
 
 test_that("log base comes first", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(con, log(x, 10), 'LOG(10.0, "x")')
 })
 
 test_that("log becomes ln", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(con, log(x), 'LN("x")')
 })
 
 test_that("can translate subsetting", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(con, a$b, '"a"."b"')
   expect_translation(con, a[["b"]], '"a"."b"')
   expect_translation(con, f(a)[["b"]], 'f("a")."b"')
@@ -102,7 +106,7 @@ test_that("useful error if $ used with inlined value", {
 # window ------------------------------------------------------------------
 
 test_that("lead and lag translate n to integers", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(con, lead(x, 1), 'LEAD("x", 1, NULL) OVER ()')
   expect_translation(con, lag(x, 1), 'LAG("x", 1, NULL) OVER ()')
 })
@@ -110,7 +114,7 @@ test_that("lead and lag translate n to integers", {
 # strings -----------------------------------------------------------------
 
 test_that("can only translate case sensitive str_like", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(con, str_like(x, "abc"), '"x" LIKE \'abc\'')
 
   expect_translation_snapshot(con, str_like(x, "abc", ignore_case = FALSE))
@@ -127,12 +131,12 @@ test_that("can only translate case sensitive str_like", {
 })
 
 test_that("can translate nzchar", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(con, nzchar(y), '(("y" IS NULL) OR "y" != \'\')')
   expect_translation(con, nzchar(y, TRUE), '"y" != \'\'')
 
   # Uses individual translations from backend
-  con <- simulate_access()
+  con <- dialect_access()
   expect_translation(con, nzchar(y), '(ISNULL("y") OR "y" <> \'\')')
   expect_translation(con, nzchar(y, TRUE), '"y" <> \'\'')
 })
@@ -176,7 +180,7 @@ test_that("all and any translated correctly", {
 # binary/bitwise ---------------------------------------------------------------
 
 test_that("bitwise operations", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   expect_translation(con, bitwNot(x), '~("x")')
   expect_translation(con, bitwAnd(x, 128L), '"x" & 128')
   expect_translation(con, bitwOr(x, 128L), '"x" | 128')
@@ -186,7 +190,7 @@ test_that("bitwise operations", {
 })
 
 test_that("default raw escapes translated correctly", {
-  mf <- lazy_frame(x = "abc", con = simulate_sqlite())
+  mf <- lazy_frame(x = "abc", con = dialect_sqlite())
 
   a <- blob::as_blob("abc")
   b <- blob::as_blob(as.raw(c(0x01, 0x02)))

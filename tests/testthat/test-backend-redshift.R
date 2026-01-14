@@ -1,10 +1,14 @@
+test_that("simulate_redshift() still works", {
+  expect_translation(simulate_redshift(), x + 1, '"x" + 1.0')
+})
+
 test_that("defaults to postgres translations", {
-  con <- simulate_redshift()
+  con <- dialect_redshift()
   expect_translation(con, log10(x), 'LOG("x")')
 })
 
 test_that("string translations", {
-  con <- simulate_redshift()
+  con <- dialect_redshift()
 
   expect_error(
     translate_sql(str_replace("xx", ".", "a"), con = con),
@@ -30,7 +34,7 @@ test_that("string translations", {
 })
 
 test_that("numeric translations", {
-  con <- simulate_redshift()
+  con <- dialect_redshift()
 
   expect_translation(con, as.numeric(x), 'CAST("x" AS FLOAT)')
   expect_translation(con, as.double(x), 'CAST("x" AS FLOAT)')
@@ -38,7 +42,7 @@ test_that("numeric translations", {
 })
 
 test_that("aggregate functions", {
-  con <- simulate_redshift()
+  con <- dialect_redshift()
 
   expect_translation(
     con,
@@ -60,14 +64,14 @@ test_that("aggregate functions", {
 })
 
 test_that("lag and lead translation", {
-  con <- simulate_redshift()
+  con <- dialect_redshift()
 
   expect_translation(con, lead(x), 'LEAD("x", 1) OVER ()')
   expect_translation(con, lag(x), 'LAG("x", 1) OVER ()')
 })
 
 test_that("copy_inline uses UNION ALL", {
-  con <- simulate_redshift()
+  con <- dialect_redshift()
   y <- tibble::tibble(id = 1L, arr = "{1,2,3}")
 
   types <- c(id = "bigint", arr = "integer[]")
@@ -82,7 +86,7 @@ test_that("copy_inline uses UNION ALL", {
 })
 
 test_that("custom clock functions translated correctly", {
-  con <- simulate_redshift()
+  con <- dialect_redshift()
   expect_translation(
     con,
     add_years(x, 1),
@@ -149,7 +153,7 @@ test_that("custom clock functions translated correctly", {
 })
 
 test_that("difftime is translated correctly", {
-  con <- simulate_redshift()
+  con <- dialect_redshift()
   expect_translation(
     con,
     difftime(start_date, end_date, units = "days"),
@@ -180,7 +184,7 @@ test_that("difftime is translated correctly", {
 })
 
 test_that("window functions with redshift specific error message", {
-  con <- simulate_redshift()
+  con <- dialect_redshift()
   expect_error(
     translate_sql(quantile(x, 0.3, na.rm = TRUE), window = TRUE, con = con),
     "Redshift"
