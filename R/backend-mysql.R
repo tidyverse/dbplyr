@@ -1,35 +1,32 @@
-#' Backend: MySQL/MariaDB
+#' MySQL/MariaDB backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are:
+#' This backend supports MySQL and MariaDB databases, typically accessed via
+#' `MySQLConnection` or `MariaDBConnection` created by [DBI::dbConnect()]. Use
+#' `dialect_mysql()` with `lazy_frame()` to see simulated SQL without connecting
+#' to a live database.
+#'
+#' Key differences for this backend are:
 #'
 #' * `paste()` uses `CONCAT_WS()`
 #' * String translations for `str_detect()`, `str_locate()`, and
 #'   `str_replace_all()`
 #' * Clear error message for unsupported full joins
 #'
-#' Use `simulate_mysql()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-mysql
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_mysql())
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_mysql())
 #' lf |> transmute(x = paste0(d, " times"))
 NULL
 
 #' @export
 #' @rdname backend-mysql
-simulate_mysql <- function() simulate_dbi("MySQLConnection")
-
-#' @export
-#' @rdname backend-mysql
-simulate_mariadb <- function() simulate_dbi("MariaDBConnection")
-
 dialect_mariadb <- function() {
   new_sql_dialect(
     "mariadb",
@@ -38,6 +35,8 @@ dialect_mariadb <- function() {
   )
 }
 
+#' @export
+#' @rdname backend-mysql
 dialect_mysql <- function() {
   new_sql_dialect(
     "mysql",
@@ -45,6 +44,14 @@ dialect_mysql <- function() {
     has_window_clause = TRUE
   )
 }
+
+#' @export
+#' @rdname backend-mysql
+simulate_mysql <- function() simulate_dbi("MySQLConnection")
+
+#' @export
+#' @rdname backend-mysql
+simulate_mariadb <- function() simulate_dbi("MariaDBConnection")
 
 #' @export
 sql_dialect.MariaDBConnection <- function(con) {

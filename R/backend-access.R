@@ -1,9 +1,11 @@
-#' Backend: MS Access
+#' MS Access backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are:
+#' This backend supports Microsoft Access databases, typically accessed via
+#' odbc. Use `dialect_access()` with `lazy_frame()` to see simulated SQL without
+#' connecting to a live database.
+#'
+#' Key differences for this backend are:
 #'
 #' * `SELECT` uses `TOP`, not `LIMIT`
 #' * Non-standard types and mathematical functions
@@ -11,14 +13,14 @@
 #' * No `ANALYZE` equivalent
 #' * `TRUE` and `FALSE` converted to 1 and 0
 #'
-#' Use `simulate_access()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-access
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
-#' lf <- lazy_frame(x = 1, y = 2, z = "a", con = simulate_access())
+#' lf <- lazy_frame(x = 1, y = 2, z = "a", con = dialect_access())
 #'
 #' lf |> head()
 #' lf |> mutate(y = as.numeric(y), z = sqrt(x^2 + 10))
@@ -27,8 +29,6 @@ NULL
 
 #' @export
 #' @rdname backend-access
-simulate_access <- function() simulate_dbi("ACCESS")
-
 dialect_access <- function() {
   new_sql_dialect(
     "access",
@@ -36,6 +36,10 @@ dialect_access <- function() {
     has_window_clause = TRUE
   )
 }
+
+#' @export
+#' @rdname backend-access
+simulate_access <- function() simulate_dbi("ACCESS")
 
 #' @export
 sql_dialect.ACCESS <- function(con) {

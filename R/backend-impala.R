@@ -1,27 +1,27 @@
-#' Backend: Impala
+#' Impala backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are a scattering of custom translations provided by users, mostly focussed
-#' on bitwise operations.
+#' This backend supports Apache Impala, typically accessed via odbc. Use
+#' `dialect_impala()` with `lazy_frame()` to see simulated SQL without
+#' connecting to a live database.
 #'
-#' Use `simulate_impala()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' Key differences for this backend are a scattering of custom translations
+#' provided by users, mostly focussed on bitwise operations.
+#'
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-impala
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_impala())
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_impala())
 #' lf |> transmute(X = bitwNot(bitwOr(b, c)))
 NULL
 
 #' @export
 #' @rdname backend-impala
-simulate_impala <- function() simulate_dbi("Impala")
-
 dialect_impala <- function() {
   new_sql_dialect(
     "impala",
@@ -29,6 +29,10 @@ dialect_impala <- function() {
     has_window_clause = TRUE
   )
 }
+
+#' @export
+#' @rdname backend-impala
+simulate_impala <- function() simulate_dbi("Impala")
 
 #' @export
 sql_dialect.Impala <- function(con) {

@@ -25,7 +25,7 @@
 #' db |> head() |> show_query()
 #'
 #' # Pretend we have data in a SQL server database
-#' db2 <- lazy_frame(x = 1:100, con = simulate_mssql())
+#' db2 <- lazy_frame(x = 1:100, con = dialect_mssql())
 #' db2 |> head() |> show_query()
 head.tbl_lazy <- function(x, n = 6L, ...) {
   if (!is.numeric(n) || length(n) != 1L || n < 0) {

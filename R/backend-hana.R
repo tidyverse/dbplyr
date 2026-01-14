@@ -1,9 +1,11 @@
-#' Backend: SAP HANA
+#' SAP HANA backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are:
+#' This backend supports SAP HANA databases, typically accessed via
+#' `HDBConnection` created by [DBI::dbConnect()]. Use `dialect_hana()` with
+#' `lazy_frame()` to see simulated SQL without connecting to a live database.
+#'
+#' Key differences for this backend are:
 #'
 #' * Temporary tables get `#` prefix and use `LOCAL TEMPORARY COLUMN`.
 #' * No table analysis performed in [copy_to()].
@@ -11,28 +13,30 @@
 #' * Note that you can't create new boolean columns from logical expressions;
 #'   you need to wrap with explicit `ifelse`: `ifelse(x > y, TRUE, FALSE)`.
 #'
-#' Use `simulate_hana()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-hana
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_hana())
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_hana())
 #' lf |> transmute(x = paste0(d, " times"))
 NULL
 
 #' @export
 #' @rdname backend-hana
-simulate_hana <- function() simulate_dbi("HDB")
-
 dialect_hana <- function() {
   new_sql_dialect(
     "hana",
     quote_identifier = function(x) sql_quote(x, '"')
   )
 }
+
+#' @export
+#' @rdname backend-hana
+simulate_hana <- function() simulate_dbi("HDB")
 
 #' @export
 sql_dialect.HDB <- function(con) {

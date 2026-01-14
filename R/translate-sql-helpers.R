@@ -1,10 +1,13 @@
 #' Create an SQL translator
 #'
+#' @description
 #' `sql_variant()` creates a SQL variant, a list of translators for scalar,
 #' aggregate, and window functions. `sql_translator()` creates a translator,
 #' an environment containing R to SQL translations. When creating a backend,
 #' you'll use these functions to customize how R functions are converted to
 #' SQL.
+#'
+#' Learn more in `vignette("new-backend")`.
 #'
 #' @param scalar,aggregate,window The three families of functions that an SQL
 #'   variant can supply.
@@ -30,7 +33,6 @@
 #' @examples
 #' # An example of adding some mappings for the statistical functions that
 #' # postgresql provides: http://bit.ly/K5EdTn
-#'
 #' postgres_agg <- sql_translator(.parent = base_agg,
 #'   cor = sql_aggregate_2("CORR"),
 #'   cov = sql_aggregate_2("COVAR_SAMP"),
@@ -39,8 +41,8 @@
 #' )
 #'
 #' # Next we have to simulate a connection that uses this variant
-#' con <- simulate_dbi("TestCon")
-#' sql_translation.TestCon <- function(x) {
+#' con <- new_sql_dialect("test", quote = \(x) sql_quote(x, '"'))
+#' sql_translation.sql_dialect_test <- function(x) {
 #'   sql_variant(
 #'     base_scalar,
 #'     postgres_agg,
@@ -49,11 +51,7 @@
 #' }
 #'
 #' translate_sql(cor(x, y), con = con, window = FALSE)
-#' translate_sql(sd(income / years), con = con, window = FALSE)
-#'
-#' # Any functions not explicitly listed in the converter will be translated
-#' # to sql as is, so you don't need to convert all functions.
-#' translate_sql(regr_intercept(y, x), con = con)
+#' translate_sql(sd(income / years, na.rm = TRUE), con = con, window = FALSE)
 sql_variant <- function(
   scalar = sql_translator(),
   aggregate = sql_translator(),

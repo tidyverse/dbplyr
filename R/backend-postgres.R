@@ -1,31 +1,31 @@
-#' Backend: PostgreSQL
+#' PostgreSQL backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are:
+#' This backend supports PostgreSQL databases, typically accessed via a
+#' `PqConnection` created by [DBI::dbConnect()]. Use `dialect_postgres()` with
+#' `lazy_frame()` to see simulated SQL without connecting to a live database.
+#'
+#' Key differences for this backend are:
 #'
 #' * Many stringr functions
 #' * lubridate date-time extraction functions
 #' * More standard statistical summaries
 #'
-#' Use `simulate_postgres()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-postgres
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_postgres())
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_postgres())
 #' lf |> summarise(x = sd(b, na.rm = TRUE))
 #' lf |> summarise(y = cor(b, c), z = cov(b, c))
 NULL
 
 #' @export
 #' @rdname backend-postgres
-simulate_postgres <- function() simulate_dbi("PqConnection")
-
 dialect_postgres <- function() {
   new_sql_dialect(
     "postgres",
@@ -33,6 +33,10 @@ dialect_postgres <- function() {
     has_window_clause = TRUE
   )
 }
+
+#' @export
+#' @rdname backend-postgres
+simulate_postgres <- function() simulate_dbi("PqConnection")
 
 #' @export
 sql_dialect.PqConnection <- function(con) {

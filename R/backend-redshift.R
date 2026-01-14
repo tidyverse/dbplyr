@@ -1,18 +1,23 @@
-#' Backend: Redshift
+#' Redshift backend
 #'
 #' @description
-#' Base translations come from [PostgreSQL backend][simulate_postgres]. There
+#' This backend supports Amazon Redshift databases, typically accessed via
+#' a `RedshiftConnection` created by [DBI::dbConnect()]. Use `dialect_redshift()`
+#' with `lazy_frame()` to see simulated SQL without connecting to a live
+#' database.
+#'
+#' Base translations come from [PostgreSQL backend][dialect_postgres]. There
 #' are generally few differences, apart from string manipulation.
 #'
-#' Use `simulate_redshift()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-redshift
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_redshift())
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_redshift())
 #' lf |> transmute(x = paste(c, " times"))
 #' lf |> transmute(x = substr(c, 2, 3))
 #' lf |> transmute(x = str_replace_all(c, "a", "z"))
@@ -20,14 +25,16 @@ NULL
 
 #' @export
 #' @rdname backend-redshift
-simulate_redshift <- function() simulate_dbi("RedshiftConnection")
-
 dialect_redshift <- function() {
   new_sql_dialect(
     "redshift",
     quote_identifier = function(x) sql_quote(x, '"')
   )
 }
+
+#' @export
+#' @rdname backend-redshift
+simulate_redshift <- function() simulate_dbi("RedshiftConnection")
 
 #' @export
 sql_dialect.RedshiftConnection <- function(con) {

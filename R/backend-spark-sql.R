@@ -1,21 +1,23 @@
-#' Backend: Databricks Spark SQL
+#' Databricks Spark SQL backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are better translation of statistical aggregate functions
-#' (e.g. `var()`, `median()`) and use of temporary views instead of temporary
-#' tables when copying data.
+#' This backend supports Databricks Spark SQL, typically accessed via the
+#' Databricks ODBC or JDBC connector. Use `dialect_spark_sql()` with
+#' `lazy_frame()` to see simulated SQL without connecting to a live database.
 #'
-#' Use `simulate_spark_sql()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' Key differences for this backend are better translation of statistical
+#' aggregate functions (e.g. `var()`, `median()`) and use of temporary views
+#' instead of temporary tables when copying data.
+#'
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-spark-sql
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = simulate_spark_sql())
+#' lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = dialect_spark_sql())
 #'
 #' lf |> summarise(x = median(d, na.rm = TRUE))
 #' lf |> summarise(x = var(c, na.rm = TRUE), .by = d)
@@ -26,8 +28,6 @@ NULL
 
 #' @export
 #' @rdname backend-spark-sql
-simulate_spark_sql <- function() simulate_dbi("Spark SQL")
-
 dialect_spark_sql <- function() {
   new_sql_dialect(
     "spark_sql",
@@ -35,6 +35,10 @@ dialect_spark_sql <- function() {
     has_window_clause = TRUE
   )
 }
+
+#' @export
+#' @rdname backend-spark-sql
+simulate_spark_sql <- function() simulate_dbi("Spark SQL")
 
 #' @export
 `sql_dialect.Spark SQL` <- function(con) {

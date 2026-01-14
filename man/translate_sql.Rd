@@ -51,7 +51,7 @@ functions.  All other functions will be preserved as is. R's infix functions
 Learn more in \code{vignette("translation-function")}.
 }
 \examples{
-con <- simulate_dbi()
+con <- dialect_ansi()
 
 # Regular maths is translated in a very straightforward way
 translate_sql(x + 1, con = con)
@@ -80,7 +80,7 @@ translate_sql(x == 1L, con = con)
 
 # If you have an already quoted object, use translate_sql_:
 x <- quote(y + 1 / sin(t))
-translate_sql_(list(x), con = simulate_dbi())
+translate_sql_(list(x), con = dialect_ansi())
 
 # Windowed translation --------------------------------------------
 # Known window functions automatically get OVER()

@@ -1,9 +1,11 @@
-#' Backend: SQL server
+#' SQL Server backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are:
+#' This backend supports Microsoft SQL Server, typically accessed via odbc. Use
+#' `dialect_mssql()` with `lazy_frame()` to see simulated SQL without connecting
+#' to a live database.
+#'
+#' Key differences for this backend are:
 #'
 #' - `SELECT` uses `TOP` not `LIMIT`
 #' - Automatically prefixes `#` to create temporary tables. Add the prefix
@@ -19,8 +21,8 @@
 #'   `str_remove_all()`, `str_extract()`, and `str_count()` require SQL Server
 #'   2025+ (version 17.0)
 #'
-#' Use `simulate_mssql()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @section Bit vs boolean:
 #' SQL server uses two incompatible types to represent `TRUE` and `FALSE`
@@ -50,7 +52,7 @@
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_mssql())
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_mssql())
 #' lf |> head()
 #' lf |> transmute(x = paste(b, c, d))
 #'
@@ -64,10 +66,6 @@ NULL
 
 #' @export
 #' @rdname backend-mssql
-simulate_mssql <- function(version = "15.0") {
-  simulate_dbi("Microsoft SQL Server", version = numeric_version(version))
-}
-
 dialect_mssql <- function(version = "15.0") {
   dialect <- new_sql_dialect(
     "mssql",
@@ -75,6 +73,12 @@ dialect_mssql <- function(version = "15.0") {
   )
   dialect$version <- numeric_version(version)
   dialect
+}
+
+#' @export
+#' @rdname backend-mssql
+simulate_mssql <- function(version = "15.0") {
+  simulate_dbi("Microsoft SQL Server", version = numeric_version(version))
 }
 
 #' @export

@@ -38,6 +38,6 @@ db <- memdb_frame(x = 1:100)
 db |> head() |> show_query()
 
 # Pretend we have data in a SQL server database
-db2 <- lazy_frame(x = 1:100, con = simulate_mssql())
+db2 <- lazy_frame(x = 1:100, con = dialect_mssql())
 db2 |> head() |> show_query()
 }

@@ -24,7 +24,7 @@
 #' @name sql_translation_window
 #' @export
 #' @examples
-#' con <- simulate_dbi()
+#' con <- dialect_ansi()
 #'
 #' win_over(sql("avg(x)"), con = con)
 #' win_over(sql("avg(x)"), "y", con = con)

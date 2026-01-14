@@ -1,32 +1,33 @@
-#' Backend: SQLite
+#' SQLite backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are:
+#' This backend supports SQLite databases, typically accessed via
+#' a `SQLiteConnection` created by [DBI::dbConnect()]. Use `dialect_sqlite()`
+#' with `lazy_frame()` to see simulated SQL without connecting to a live
+#' database.
+#'
+#' Key differences for this backend are:
 #'
 #' * Uses non-standard `LOG()` function
 #' * Date-time extraction functions from lubridate
 #' * Custom median translation
 #' * Right and full joins are simulated using left joins
 #'
-#' Use `simulate_sqlite()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-sqlite
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_sqlite())
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_sqlite())
 #' lf |> transmute(x = paste(c, " times"))
 #' lf |> transmute(x = log(b), y = log(b, base = 2))
 NULL
 
 #' @export
 #' @rdname backend-sqlite
-simulate_sqlite <- function() simulate_dbi("SQLiteConnection")
-
 dialect_sqlite <- function() {
   new_sql_dialect(
     "sqlite",
@@ -34,6 +35,10 @@ dialect_sqlite <- function() {
     has_window_clause = TRUE
   )
 }
+
+#' @export
+#' @rdname backend-sqlite
+simulate_sqlite <- function() simulate_dbi("SQLiteConnection")
 
 #' @export
 sql_dialect.SQLiteConnection <- function(con) {

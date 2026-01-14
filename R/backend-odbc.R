@@ -1,19 +1,22 @@
-#' Backend: ODBC
+#' ODBC backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are minor translations for common data types.
+#' This backend supports databases accessed via `OdbcConnection` created by
+#' [DBI::dbConnect()]. Use `dialect_odbc()` with `lazy_frame()` to see simulated
+#' SQL without connecting to a live database.
 #'
-#' Use `simulate_odbc()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' Key differences for this backend are minor translations for common data
+#' types.
+#'
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-odbc
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = simulate_odbc())
+#' lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = dialect_odbc())
 #' lf |> transmute(x = as.numeric(b))
 #' lf |> transmute(x = as.integer(b))
 #' lf |> transmute(x = as.character(b))
@@ -21,14 +24,16 @@ NULL
 
 #' @export
 #' @rdname backend-odbc
-simulate_odbc <- function() simulate_dbi("OdbcConnection")
-
 dialect_odbc <- function() {
   new_sql_dialect(
     "odbc",
     quote_identifier = function(x) sql_quote(x, '"')
   )
 }
+
+#' @export
+#' @rdname backend-odbc
+simulate_odbc <- function() simulate_dbi("OdbcConnection")
 
 #' @export
 sql_dialect.OdbcConnection <- function(con) {

@@ -1,9 +1,11 @@
-#' Backend: Oracle
+#' Oracle backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are:
+#' This backend supports Oracle databases, typically accessed via
+#' `OraConnection` created by [DBI::dbConnect()]. Use `dialect_oracle()` with
+#' `lazy_frame()` to see simulated SQL without connecting to a live database.
+#'
+#' Key differences for this backend are:
 #'
 #' * Use `FETCH FIRST` instead of `LIMIT`
 #' * Custom types
@@ -16,23 +18,21 @@
 #' See <https://oracle-base.com/articles/23/boolean-data-type-23> for
 #' more details.
 #'
-#' Use `simulate_oracle()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-oracle
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_oracle())
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_oracle())
 #' lf |> transmute(x = paste0(c, " times"))
 #' lf |> setdiff(lf)
 NULL
 
 #' @export
 #' @rdname backend-oracle
-simulate_oracle <- function() simulate_dbi("Oracle")
-
 dialect_oracle <- function() {
   new_sql_dialect(
     "oracle",
@@ -40,6 +40,10 @@ dialect_oracle <- function() {
     has_table_alias_with_as = FALSE
   )
 }
+
+#' @export
+#' @rdname backend-oracle
+simulate_oracle <- function() simulate_dbi("Oracle")
 
 #' @export
 sql_dialect.Oracle <- function(con) {

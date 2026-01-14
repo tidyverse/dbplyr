@@ -1,29 +1,29 @@
-#' Backend: Teradata
+#' Teradata backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are:
+#' This backend supports Teradata databases, typically accessed via odbc. Use
+#' `dialect_teradata()` with `lazy_frame()` to see simulated SQL without
+#' connecting to a live database.
+#'
+#' Key differences for this backend are:
 #'
 #' * Uses `TOP` instead of `LIMIT`
 #' * Selection of user supplied translations
 #'
-#' Use `simulate_teradata()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-teradata
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_teradata())
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_teradata())
 #' lf |> head()
 NULL
 
 #' @export
 #' @rdname backend-teradata
-simulate_teradata <- function() simulate_dbi("Teradata")
-
 dialect_teradata <- function() {
   new_sql_dialect(
     "teradata",
@@ -31,6 +31,10 @@ dialect_teradata <- function() {
     has_window_clause = TRUE
   )
 }
+
+#' @export
+#' @rdname backend-teradata
+simulate_teradata <- function() simulate_dbi("Teradata")
 
 #' @export
 sql_dialect.Teradata <- function(con) {

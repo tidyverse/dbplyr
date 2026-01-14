@@ -74,6 +74,7 @@ reference:
 
 - title: Built-in database backends
   contents:
+  - dialect_ansi
   - starts_with("backend")
 
 - title: Database connection

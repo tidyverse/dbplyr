@@ -1,19 +1,22 @@
-#' Backend: Hive
+#' Hive backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are a scattering of custom translations provided by users.
+#' This backend supports Apache Hive, typically accessed via odbc. Use
+#' `dialect_hive()` with `lazy_frame()` to see simulated SQL without connecting
+#' to a live database.
 #'
-#' Use `simulate_hive()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' Key differences for this backend are a scattering of custom translations
+#' provided by users.
+#'
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-hive
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = simulate_hive())
+#' lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = dialect_hive())
 #' lf |> transmute(x = cot(b))
 #' lf |> transmute(x = bitwShiftL(c, 1L))
 #' lf |> transmute(x = str_replace_all(c, "a", "b"))
@@ -24,8 +27,6 @@ NULL
 
 #' @export
 #' @rdname backend-hive
-simulate_hive <- function() simulate_dbi("Hive")
-
 dialect_hive <- function() {
   new_sql_dialect(
     "hive",
@@ -33,6 +34,10 @@ dialect_hive <- function() {
     has_window_clause = TRUE
   )
 }
+
+#' @export
+#' @rdname backend-hive
+simulate_hive <- function() simulate_dbi("Hive")
 
 #' @export
 sql_dialect.Hive <- function(con) {

@@ -60,7 +60,7 @@ tools for inserting logical, date, date-time, and raw values into
 queries.
 }
 \examples{
-con <- simulate_dbi()
+con <- dialect_ansi()
 
 # Doubles vs. integers
 escape(1:5, con = con)
