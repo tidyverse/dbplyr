@@ -130,6 +130,20 @@ the connection itself for backward compatibility.</p></li>
 <li><p><code>new_sql_dialect()</code> returns a dialect object with class
 <code>c("sql_dialect_{name}", "sql_dialect")</code>.</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="dispatching-on-dialect">Dispatching on dialect<a class="anchor" aria-label="anchor" href="#dispatching-on-dialect"></a></h2>
+    <p>For backward compatibility, all <code>sql_</code> generics (and a handful of others)
+call <code>sql_dialect()</code> on the <code>con</code> argument in order to dispatch further on
+the dialect object, if possible:</p>
+<p></p><div class="sourceCode R"><pre><code><span><span class="va">sql_generic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">con</span>, <span class="va">arg1</span>, <span class="va">arg2</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">UseMethod</a></span><span class="op">(</span><span class="st">"sql_generic"</span>, <span class="fu"><a href="../reference/sql_dialect.html">sql_dialect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre><p></p></div>
+<p>Unfortunately, due to the way that <code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">UseMethod()</a></code> works, this uses
+<code>sql_dialect(con)</code> to control which method is selected, but still passes
+the original <code>con</code> to the method. This means that if you are implementing
+a method for a dialect and need to access dialect properties, you must call
+<code>sql_dialect(con)</code> again inside the method.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

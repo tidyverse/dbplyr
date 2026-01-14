@@ -58,6 +58,23 @@ new_sql_dialect(
 - `new_sql_dialect()` returns a dialect object with class
   `c("sql_dialect_{name}", "sql_dialect")`.
 
+## Dispatching on dialect
+
+For backward compatibility, all `sql_` generics (and a handful of
+others) call `sql_dialect()` on the `con` argument in order to dispatch
+further on the dialect object, if possible:
+
+    sql_generic <- function(con, arg1, arg2, ...) {
+      UseMethod("sql_generic", sql_dialect(con))
+    }
+
+Unfortunately, due to the way that
+[`UseMethod()`](https://rdrr.io/r/base/UseMethod.html) works, this uses
+`sql_dialect(con)` to control which method is selected, but still passes
+the original `con` to the method. This means that if you are
+implementing a method for a dialect and need to access dialect
+properties, you must call `sql_dialect(con)` again inside the method.
+
 ## Examples
 
 ``` r
