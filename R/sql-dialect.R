@@ -12,6 +12,24 @@
 #' * `new_sql_dialect()` creates a new dialect object. This is primarily
 #'   intended for dbplyr backend authors.
 #'
+#' # Dispatching on dialect
+#'
+#' For backward compatibility, all `sql_` generics (and a handful of others)
+#' call `sql_dialect()` on the `con` argument in order to dispatch further on
+#' the dialect object, if possible:
+#'
+#' ```R
+#' sql_generic <- function(con, arg1, arg2, ...) {
+#'   UseMethod("sql_generic", sql_dialect(con))
+#' }
+#' ```
+#'
+#' Unfortunately, due to the way that `UseMethod()` works, this uses
+#' `sql_dialect(con)` to control which method is selected, but still passes
+#' the original `con` to the method. This means that if you are implementing
+#' a method for a dialect and need to access dialect properties, you must call
+#' `sql_dialect(con)` again inside the method.
+#'
 #' @param con A database connection or dialect object.
 #' @param dialect A string giving the dialect name (e.g., "postgres", "mysql").
 #' @param quote_identifier A function that quotes identifiers. Should accept

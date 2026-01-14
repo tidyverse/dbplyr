@@ -159,7 +159,7 @@ sql_query_semi_join <- function(
   lvl = 0
 ) {
   check_dots_used()
-  UseMethod("sql_query_semi_join")
+  UseMethod("sql_query_semi_join", sql_dialect(con))
 }
 #' @export
 sql_query_semi_join.DBIConnection <- function(

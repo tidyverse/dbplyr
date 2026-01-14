@@ -48,6 +48,23 @@ for backward compatibility.
 intended for dbplyr backend authors.
 }
 }
+\section{Dispatching on dialect}{
+For backward compatibility, all \code{sql_} generics (and a handful of others)
+call \code{sql_dialect()} on the \code{con} argument in order to dispatch further on
+the dialect object, if possible:
+
+\if{html}{\out{<div class="sourceCode R">}}\preformatted{sql_generic <- function(con, arg1, arg2, ...) \{
+  UseMethod("sql_generic", sql_dialect(con))
+\}
+}\if{html}{\out{</div>}}
+
+Unfortunately, due to the way that \code{UseMethod()} works, this uses
+\code{sql_dialect(con)} to control which method is selected, but still passes
+the original \code{con} to the method. This means that if you are implementing
+a method for a dialect and need to access dialect properties, you must call
+\code{sql_dialect(con)} again inside the method.
+}
+
 \examples{
 # Create a custom dialect
 my_dialect <- new_sql_dialect(
