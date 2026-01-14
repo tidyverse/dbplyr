@@ -605,6 +605,7 @@ mssql_scalar_17 <- function() {
 
 #' @export
 sql_translation.sql_dialect_mssql <- function(con) {
+  # Needed because UseMethod hack only affects dispatch, not value
   version <- sql_dialect(con)$version
   mssql_scalar <- if (version >= "17.0") {
     mssql_scalar_17()

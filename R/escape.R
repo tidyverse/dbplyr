@@ -74,6 +74,7 @@ sql_escape_ident.DBIConnection <- function(con, x) {
 
 #' @export
 sql_escape_ident.sql_dialect <- function(con, x) {
+  # Needed because UseMethod hack only affects dispatch, not value
   sql_dialect(con)$quote_identifier(x)
 }
 
