@@ -123,6 +123,7 @@ Collate:
     'sql-clause.R'
     'sql-dialect.R'
     'sql-glue.R'
+    'sql-quote.R'
     'sql-superseded.R'
     'src-sql.R'
     'src_dbi.R'
