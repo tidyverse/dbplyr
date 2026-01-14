@@ -1,5 +1,5 @@
 test_that("missing window functions create a warning", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   sim_scalar <- sql_translator()
   sim_agg <- sql_translator(`+` = sql_infix("+"))
   sim_win <- sql_translator()

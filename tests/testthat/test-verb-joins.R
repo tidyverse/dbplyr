@@ -1245,7 +1245,7 @@ test_that("join verbs generate expected ops", {
 })
 
 test_that("can optionally match NA values", {
-  con <- simulate_postgres()
+  con <- dialect_postgres()
   lf1 <- lazy_frame(x = 1, .name = "lf1", con = con)
   lf2 <- lazy_frame(x = 1, .name = "lf2", con = con)
   expect_snapshot(left_join(lf1, lf2, by = "x", na_matches = "na"))
@@ -1319,7 +1319,7 @@ test_that("left_join/inner_join uses *", {
   lf1 <- lazy_frame(a = 1, b = 2, c = 1)
   lf2 <- lazy_frame(a = 1, b = 2, z = 1)
 
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   out <- lf1 |>
     left_join(lf2, by = c("a", "b")) |>
     sql_build()
@@ -1373,7 +1373,7 @@ test_that("right_join uses *", {
   lf1 <- lazy_frame(a = 1, b = 2, c = 1)
   lf2 <- lazy_frame(a = 1, b = 2, z = 1)
 
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   out <- lf1 |>
     right_join(lf2, by = c("a", "b")) |>
     sql_build()
@@ -1439,7 +1439,7 @@ test_that("cross_join uses *", {
   lf1 <- lazy_frame(a = 1, b = 1)
   lf2 <- lazy_frame(x = 1, y = 1)
 
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   out <- lf1 |>
     cross_join(lf2) |>
     sql_build()
@@ -1486,7 +1486,7 @@ test_that("cross_join uses *", {
 })
 
 test_that("full_join() does not use *", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
   lf1 <- lazy_frame(a = 1, b = 2)
   lf2 <- lazy_frame(a = 1, b = 2)
 

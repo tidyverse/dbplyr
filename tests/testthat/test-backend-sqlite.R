@@ -1,39 +1,39 @@
 test_that("logicals translated to integers", {
-  expect_equal(escape(FALSE, con = simulate_sqlite()), sql("0"))
-  expect_equal(escape(TRUE, con = simulate_sqlite()), sql("1"))
-  expect_equal(escape(NA, con = simulate_sqlite()), sql("NULL"))
+  expect_equal(escape(FALSE, con = dialect_sqlite()), sql("0"))
+  expect_equal(escape(TRUE, con = dialect_sqlite()), sql("1"))
+  expect_equal(escape(NA, con = dialect_sqlite()), sql("NULL"))
 })
 
 test_that("vectorised translations", {
-  con <- simulate_sqlite()
+  con <- dialect_sqlite()
 
   expect_translation(con, paste(x, y), '`x` || \' \' || `y`')
   expect_translation(con, paste0(x, y), '`x` || `y`')
 })
 
 test_that("pmin and max become MIN and MAX", {
-  con <- simulate_sqlite()
+  con <- dialect_sqlite()
 
   expect_translation(con, pmin(x, y, na.rm = TRUE), 'MIN(`x`, `y`)')
   expect_translation(con, pmax(x, y, na.rm = TRUE), 'MAX(`x`, `y`)')
 })
 
 test_that("sqlite mimics two argument log", {
-  con <- simulate_sqlite()
+  con <- dialect_sqlite()
 
   expect_translation(con, log(x), 'LOG(`x`)')
   expect_translation(con, log(x, 10), 'LOG(`x`) / LOG(10.0)')
 })
 
 test_that("date-time", {
-  con <- simulate_sqlite()
+  con <- dialect_sqlite()
 
   expect_translation(con, today(), "DATE('now')")
   expect_translation(con, now(), "DATETIME('now')")
 })
 
 test_that("custom aggregates translated", {
-  con <- simulate_sqlite()
+  con <- dialect_sqlite()
 
   expect_translation(
     con,
@@ -53,16 +53,16 @@ test_that("custom aggregates translated", {
 })
 
 test_that("custom SQL translation", {
-  con <- simulate_sqlite()
+  con <- dialect_sqlite()
 
-  lf <- lazy_frame(x = 1, con = simulate_sqlite())
+  lf <- lazy_frame(x = 1, con = dialect_sqlite())
   expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
 
   expect_snapshot(translate_sql(runif(n()), con = con))
 })
 
 test_that("case_when translates correctly to ELSE when TRUE ~ is used", {
-  con <- simulate_sqlite()
+  con <- dialect_sqlite()
   expect_snapshot(
     translate_sql(
       case_when(
