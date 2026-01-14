@@ -1,11 +1,11 @@
-# Backend: MS Access
+# MS Access backend
 
-See
-[`vignette("translation-function")`](https://dbplyr.tidyverse.org/dev/articles/translation-function.md)
-and
-[`vignette("translation-verb")`](https://dbplyr.tidyverse.org/dev/articles/translation-verb.md)
-for details of overall translation technology. Key differences for this
-backend are:
+This backend supports Microsoft Access databases, typically accessed via
+odbc. Use `dialect_access()` with
+[`lazy_frame()`](https://dbplyr.tidyverse.org/dev/reference/tbl_lazy.md)
+to see simulated SQL without connecting to a live database.
+
+Key differences for this backend are:
 
 - `SELECT` uses `TOP`, not `LIMIT`
 
@@ -17,13 +17,17 @@ backend are:
 
 - `TRUE` and `FALSE` converted to 1 and 0
 
-Use `simulate_access()` with
-[`lazy_frame()`](https://dbplyr.tidyverse.org/dev/reference/tbl_lazy.md)
-to see simulated SQL without converting to live access database.
+See
+[`vignette("translation-function")`](https://dbplyr.tidyverse.org/dev/articles/translation-function.md)
+and
+[`vignette("translation-verb")`](https://dbplyr.tidyverse.org/dev/articles/translation-verb.md)
+for details of overall translation technology.
 
 ## Usage
 
 ``` r
+dialect_access()
+
 simulate_access()
 ```
 
@@ -31,7 +35,7 @@ simulate_access()
 
 ``` r
 library(dplyr, warn.conflicts = FALSE)
-lf <- lazy_frame(x = 1, y = 2, z = "a", con = simulate_access())
+lf <- lazy_frame(x = 1, y = 2, z = "a", con = dialect_access())
 
 lf |> head()
 #> <SQL>

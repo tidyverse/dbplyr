@@ -16,6 +16,7 @@
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/arrange.tbl_lazy.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/as.sql.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-access.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-ansi.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-hana.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-hive.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-impala.html</loc></url>
@@ -78,7 +79,6 @@
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/rows-db.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/select.tbl_lazy.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/show_query.html</loc></url>
-<url><loc>https://dbplyr.tidyverse.org/dev/reference/simulate_dbi.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_build.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_dialect.html</loc></url>

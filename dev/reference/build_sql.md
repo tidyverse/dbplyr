@@ -43,7 +43,7 @@ build_sql(..., .env = parent.frame(), con = sql_current_con())
 ## Examples
 
 ``` r
-con <- simulate_dbi()
+con <- dialect_ansi()
 
 # Old:
 build_sql("SELECT * FROM ", ident("table"), con = con)

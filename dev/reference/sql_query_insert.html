@@ -231,7 +231,7 @@ values are then inserted outside of the CTE.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">sql_query_upsert</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  con <span class="op">=</span> <span class="fu"><a href="backend-postgres.html">simulate_postgres</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  con <span class="op">=</span> <span class="fu"><a href="backend-postgres.html">dialect_postgres</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  table <span class="op">=</span> <span class="st">"airlines"</span>,</span></span>
 <span class="r-in"><span>  from <span class="op">=</span> <span class="st">"df"</span>,</span></span>
 <span class="r-in"><span>  by <span class="op">=</span> <span class="st">"carrier"</span>,</span></span>

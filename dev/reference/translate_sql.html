@@ -129,7 +129,7 @@ SQL for a grouped summary.</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="simulate_dbi.html">simulate_dbi</a></span><span class="op">(</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="backend-ansi.html">dialect_ansi</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Regular maths is translated in a very straightforward way</span></span></span>
 <span class="r-in"><span><span class="fu">translate_sql</span><span class="op">(</span><span class="va">x</span> <span class="op">+</span> <span class="fl">1</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span></span></span>
@@ -169,7 +169,7 @@ SQL for a grouped summary.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># If you have an already quoted object, use translate_sql_:</span></span></span>
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="va">y</span> <span class="op">+</span> <span class="fl">1</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">t</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">translate_sql_</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, con <span class="op">=</span> <span class="fu"><a href="simulate_dbi.html">simulate_dbi</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">translate_sql_</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, con <span class="op">=</span> <span class="fu"><a href="backend-ansi.html">dialect_ansi</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; "y" + 1.0 / SIN("t")</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Windowed translation --------------------------------------------</span></span></span>

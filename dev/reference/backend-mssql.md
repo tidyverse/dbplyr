@@ -1,11 +1,11 @@
-# Backend: SQL server
+# SQL Server backend
 
-See
-[`vignette("translation-function")`](https://dbplyr.tidyverse.org/dev/articles/translation-function.md)
-and
-[`vignette("translation-verb")`](https://dbplyr.tidyverse.org/dev/articles/translation-verb.md)
-for details of overall translation technology. Key differences for this
-backend are:
+This backend supports Microsoft SQL Server, typically accessed via odbc.
+Use `dialect_mssql()` with
+[`lazy_frame()`](https://dbplyr.tidyverse.org/dev/reference/tbl_lazy.md)
+to see simulated SQL without connecting to a live database.
+
+Key differences for this backend are:
 
 - `SELECT` uses `TOP` not `LIMIT`
 
@@ -30,13 +30,17 @@ backend are:
   `str_remove()`, `str_remove_all()`, `str_extract()`, and `str_count()`
   require SQL Server 2025+ (version 17.0)
 
-Use `simulate_mssql()` with
-[`lazy_frame()`](https://dbplyr.tidyverse.org/dev/reference/tbl_lazy.md)
-to see simulated SQL without converting to live access database.
+See
+[`vignette("translation-function")`](https://dbplyr.tidyverse.org/dev/articles/translation-function.md)
+and
+[`vignette("translation-verb")`](https://dbplyr.tidyverse.org/dev/articles/translation-verb.md)
+for details of overall translation technology.
 
 ## Usage
 
 ``` r
+dialect_mssql(version = "15.0")
+
 simulate_mssql(version = "15.0")
 ```
 
@@ -75,7 +79,7 @@ conversions from time to time.
 ``` r
 library(dplyr, warn.conflicts = FALSE)
 
-lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_mssql())
+lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_mssql())
 lf |> head()
 #> <SQL>
 #> SELECT TOP 6 [df].*

@@ -170,11 +170,11 @@ reach <code>n</code>/<code>prop</code>.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `x`, `y`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> (</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     `dbplyr_tmp_JGCySHwmYE`.*,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     `dbplyr_tmp_ySHwmYEz3c`.*,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     CASE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> WHEN (NOT((`x` IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN ((`x` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `x`)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> END<span style="color: #0000BB;"> AS </span>`col01`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_JGCySHwmYE`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_ySHwmYEz3c`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ) <span style="color: #0000BB;">AS </span>`q01`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">WHERE</span> (`col01` &lt;= 1)</span>
 <span class="r-in"><span><span class="va">db</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_max</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
@@ -182,11 +182,11 @@ reach <code>n</code>/<code>prop</code>.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `x`, `y`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> (</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     `dbplyr_tmp_JGCySHwmYE`.*,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     `dbplyr_tmp_ySHwmYEz3c`.*,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     CASE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> WHEN (NOT((`x` IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN ((`x` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `x` DESC)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> END<span style="color: #0000BB;"> AS </span>`col01`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_JGCySHwmYE`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_ySHwmYEz3c`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ) <span style="color: #0000BB;">AS </span>`q01`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">WHERE</span> (`col01` &lt;= 1)</span>
 <span class="r-in"><span><span class="va">db</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
@@ -194,14 +194,14 @@ reach <code>n</code>/<code>prop</code>.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `x`, `y`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> (</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     `dbplyr_tmp_JGCySHwmYE`.*,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     `dbplyr_tmp_ySHwmYEz3c`.*,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     CASE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> WHEN (NOT((((0.5 + RANDOM() / 18446744073709551616.0)) IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> WHEN ((((0.5 + RANDOM() / 18446744073709551616.0)) IS NULL)) THEN 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ELSE 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> END) ORDER BY (0.5 + RANDOM() / 18446744073709551616.0))</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> END<span style="color: #0000BB;"> AS </span>`col01`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_JGCySHwmYE`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_ySHwmYEz3c`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ) <span style="color: #0000BB;">AS </span>`q01`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">WHERE</span> (`col01` &lt;= 1)</span>
 <span class="r-in"><span></span></span>
@@ -210,11 +210,11 @@ reach <code>n</code>/<code>prop</code>.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `x`, `y`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> (</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     `dbplyr_tmp_JGCySHwmYE`.*,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     `dbplyr_tmp_ySHwmYEz3c`.*,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     CASE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> WHEN (NOT((`x` IS NULL))) THEN RANK() OVER (PARTITION BY `y`, (CASE WHEN ((`x` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `x`)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> END<span style="color: #0000BB;"> AS </span>`col01`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_JGCySHwmYE`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_ySHwmYEz3c`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ) <span style="color: #0000BB;">AS </span>`q01`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">WHERE</span> (`col01` &lt;= 1)</span>
 <span class="r-in"><span></span></span>

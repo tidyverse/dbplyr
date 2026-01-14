@@ -91,7 +91,7 @@ Other SQL translation helpers:
 ## Examples
 
 ``` r
-con <- simulate_dbi()
+con <- dialect_ansi()
 
 win_over(sql("avg(x)"), con = con)
 #> <SQL> avg(x) OVER ()

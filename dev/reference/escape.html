@@ -141,7 +141,7 @@ supported for backward compatibility.</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="simulate_dbi.html">simulate_dbi</a></span><span class="op">(</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="backend-ansi.html">dialect_ansi</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Doubles vs. integers</span></span></span>
 <span class="r-in"><span><span class="fu">escape</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span></span></span>
@@ -171,7 +171,7 @@ supported for backward compatibility.</p></dd>
 <span class="r-in"><span><span class="fu">sql_escape_date</span><span class="op">(</span><span class="va">con</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; '2026-01-14'</span>
 <span class="r-in"><span><span class="fu">sql_escape_date</span><span class="op">(</span><span class="va">con</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; '2026-01-14 18:47:53.682074'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; '2026-01-14 23:47:10.360924'</span>
 <span class="r-in"><span><span class="fu">sql_escape_raw</span><span class="op">(</span><span class="va">con</span>, <span class="fu"><a href="https://rdrr.io/r/base/rawConversion.html" class="external-link">charToRaw</a></span><span class="op">(</span><span class="st">"hi"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; X'6869'</span>
 </code></pre></div>

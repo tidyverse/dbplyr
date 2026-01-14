@@ -3,11 +3,13 @@
 aggregate, and window functions. sql_translator() creates a translator,
 an environment containing R to SQL translations. When creating a backend,
 you'll use these functions to customize how R functions are converted to
-SQL."><meta property="og:description" content="sql_variant() creates a SQL variant, a list of translators for scalar,
+SQL.
+Learn more in vignette(&quot;new-backend&quot;)."><meta property="og:description" content="sql_variant() creates a SQL variant, a list of translators for scalar,
 aggregate, and window functions. sql_translator() creates a translator,
 an environment containing R to SQL translations. When creating a backend,
 you'll use these functions to customize how R functions are converted to
-SQL."><meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png"><meta name="robots" content="noindex"><script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js" data-max-height="43" data-light-bg="#666f76" data-light-fg="#f9f9f9"></script><script defer data-domain="dbplyr.tidyverse.org,all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script></head><body>
+SQL.
+Learn more in vignette(&quot;new-backend&quot;)."><meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png"><meta name="robots" content="noindex"><script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js" data-max-height="43" data-light-bg="#666f76" data-light-fg="#f9f9f9"></script><script defer data-domain="dbplyr.tidyverse.org,all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script></head><body>
     <a href="#container" class="visually-hidden-focusable">Skip to content</a>
 
 
@@ -69,6 +71,7 @@ aggregate, and window functions. <code>sql_translator()</code> creates a transla
 an environment containing R to SQL translations. When creating a backend,
 you'll use these functions to customize how R functions are converted to
 SQL.</p>
+<p>Learn more in <code><a href="../articles/new-backend.html">vignette("new-backend")</a></code>.</p>
     </div>
 
     <div class="section level2">
@@ -141,7 +144,6 @@ semantics:</p><ul><li><p><code>base_scalar</code> - scalar functions and operato
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># An example of adding some mappings for the statistical functions that</span></span></span>
 <span class="r-in"><span><span class="co"># postgresql provides: http://bit.ly/K5EdTn</span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">postgres_agg</span> <span class="op">&lt;-</span> <span class="fu">sql_translator</span><span class="op">(</span>.parent <span class="op">=</span> <span class="va">base_agg</span>,</span></span>
 <span class="r-in"><span>  cor <span class="op">=</span> <span class="fu"><a href="sql_translation_agg.html">sql_aggregate_2</a></span><span class="op">(</span><span class="st">"CORR"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  cov <span class="op">=</span> <span class="fu"><a href="sql_translation_agg.html">sql_aggregate_2</a></span><span class="op">(</span><span class="st">"COVAR_SAMP"</span><span class="op">)</span>,</span></span>
@@ -150,8 +152,8 @@ semantics:</p><ul><li><p><code>base_scalar</code> - scalar functions and operato
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Next we have to simulate a connection that uses this variant</span></span></span>
-<span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="simulate_dbi.html">simulate_dbi</a></span><span class="op">(</span><span class="st">"TestCon"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">sql_translation.TestCon</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="sql_dialect.html">new_sql_dialect</a></span><span class="op">(</span><span class="st">"test"</span>, quote <span class="op">=</span> \<span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="sql_quote.html">sql_quote</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">'"'</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sql_translation.sql_dialect_test</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu">sql_variant</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="va">base_scalar</span>,</span></span>
 <span class="r-in"><span>    <span class="va">postgres_agg</span>,</span></span>
@@ -161,13 +163,8 @@ semantics:</p><ul><li><p><code>base_scalar</code> - scalar functions and operato
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, con <span class="op">=</span> <span class="va">con</span>, window <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in cor(x, y):</span> `cor()` is not available in this SQL variant.</span>
-<span class="r-in"><span><span class="fu"><a href="translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">income</span> <span class="op">/</span> <span class="va">years</span><span class="op">)</span>, con <span class="op">=</span> <span class="va">con</span>, window <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in sd(income/years):</span> `sd()` is not available in this SQL variant.</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Any functions not explicitly listed in the converter will be translated</span></span></span>
-<span class="r-in"><span><span class="co"># to sql as is, so you don't need to convert all functions.</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu">regr_intercept</span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; regr_intercept("y", "x")</span>
+<span class="r-in"><span><span class="fu"><a href="translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">income</span> <span class="op">/</span> <span class="va">years</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, con <span class="op">=</span> <span class="va">con</span>, window <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in sd(income/years, na.rm = TRUE):</span> `sd()` is not available in this SQL variant.</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -32,7 +32,7 @@ is.ident(x)
 ## Examples
 
 ``` r
-con <- simulate_dbi()
+con <- dialect_ansi()
 
 # SQL92 quotes strings with '
 escape("x", con = con)

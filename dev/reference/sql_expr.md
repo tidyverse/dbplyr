@@ -44,7 +44,7 @@ sql_call2(.fn, ..., con = sql_current_con())
 ## Examples
 
 ``` r
-con <- simulate_dbi() # not necessary when writing translations
+con <- dialect_ansi() # not necessary when writing translations
 
 sql_expr(f(x + 1), con = con)
 #> <SQL> F(x + 1.0)

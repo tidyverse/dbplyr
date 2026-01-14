@@ -225,35 +225,53 @@ contributing to this project, you agree to abide by its terms.
 
 ## Built-in database backends
 
-- [`simulate_access()`](https://dbplyr.tidyverse.org/dev/reference/backend-access.md)
-  : Backend: MS Access
-- [`simulate_hana()`](https://dbplyr.tidyverse.org/dev/reference/backend-hana.md)
-  : Backend: SAP HANA
-- [`simulate_hive()`](https://dbplyr.tidyverse.org/dev/reference/backend-hive.md)
-  : Backend: Hive
-- [`simulate_impala()`](https://dbplyr.tidyverse.org/dev/reference/backend-impala.md)
-  : Backend: Impala
-- [`simulate_mssql()`](https://dbplyr.tidyverse.org/dev/reference/backend-mssql.md)
-  : Backend: SQL server
-- [`simulate_mysql()`](https://dbplyr.tidyverse.org/dev/reference/backend-mysql.md)
+- [`dialect_ansi()`](https://dbplyr.tidyverse.org/dev/reference/backend-ansi.md)
+  [`simulate_dbi()`](https://dbplyr.tidyverse.org/dev/reference/backend-ansi.md)
+  : ANSI SQL backend
+- [`dialect_access()`](https://dbplyr.tidyverse.org/dev/reference/backend-access.md)
+  [`simulate_access()`](https://dbplyr.tidyverse.org/dev/reference/backend-access.md)
+  : MS Access backend
+- [`dialect_hana()`](https://dbplyr.tidyverse.org/dev/reference/backend-hana.md)
+  [`simulate_hana()`](https://dbplyr.tidyverse.org/dev/reference/backend-hana.md)
+  : SAP HANA backend
+- [`dialect_hive()`](https://dbplyr.tidyverse.org/dev/reference/backend-hive.md)
+  [`simulate_hive()`](https://dbplyr.tidyverse.org/dev/reference/backend-hive.md)
+  : Hive backend
+- [`dialect_impala()`](https://dbplyr.tidyverse.org/dev/reference/backend-impala.md)
+  [`simulate_impala()`](https://dbplyr.tidyverse.org/dev/reference/backend-impala.md)
+  : Impala backend
+- [`dialect_mssql()`](https://dbplyr.tidyverse.org/dev/reference/backend-mssql.md)
+  [`simulate_mssql()`](https://dbplyr.tidyverse.org/dev/reference/backend-mssql.md)
+  : SQL Server backend
+- [`dialect_mariadb()`](https://dbplyr.tidyverse.org/dev/reference/backend-mysql.md)
+  [`dialect_mysql()`](https://dbplyr.tidyverse.org/dev/reference/backend-mysql.md)
+  [`simulate_mysql()`](https://dbplyr.tidyverse.org/dev/reference/backend-mysql.md)
   [`simulate_mariadb()`](https://dbplyr.tidyverse.org/dev/reference/backend-mysql.md)
-  : Backend: MySQL/MariaDB
-- [`simulate_odbc()`](https://dbplyr.tidyverse.org/dev/reference/backend-odbc.md)
-  : Backend: ODBC
-- [`simulate_oracle()`](https://dbplyr.tidyverse.org/dev/reference/backend-oracle.md)
-  : Backend: Oracle
-- [`simulate_postgres()`](https://dbplyr.tidyverse.org/dev/reference/backend-postgres.md)
-  : Backend: PostgreSQL
-- [`simulate_redshift()`](https://dbplyr.tidyverse.org/dev/reference/backend-redshift.md)
-  : Backend: Redshift
-- [`simulate_snowflake()`](https://dbplyr.tidyverse.org/dev/reference/backend-snowflake.md)
-  : Backend: Snowflake
-- [`simulate_spark_sql()`](https://dbplyr.tidyverse.org/dev/reference/backend-spark-sql.md)
-  : Backend: Databricks Spark SQL
-- [`simulate_sqlite()`](https://dbplyr.tidyverse.org/dev/reference/backend-sqlite.md)
-  : Backend: SQLite
-- [`simulate_teradata()`](https://dbplyr.tidyverse.org/dev/reference/backend-teradata.md)
-  : Backend: Teradata
+  : MySQL/MariaDB backend
+- [`dialect_odbc()`](https://dbplyr.tidyverse.org/dev/reference/backend-odbc.md)
+  [`simulate_odbc()`](https://dbplyr.tidyverse.org/dev/reference/backend-odbc.md)
+  : ODBC backend
+- [`dialect_oracle()`](https://dbplyr.tidyverse.org/dev/reference/backend-oracle.md)
+  [`simulate_oracle()`](https://dbplyr.tidyverse.org/dev/reference/backend-oracle.md)
+  : Oracle backend
+- [`dialect_postgres()`](https://dbplyr.tidyverse.org/dev/reference/backend-postgres.md)
+  [`simulate_postgres()`](https://dbplyr.tidyverse.org/dev/reference/backend-postgres.md)
+  : PostgreSQL backend
+- [`dialect_redshift()`](https://dbplyr.tidyverse.org/dev/reference/backend-redshift.md)
+  [`simulate_redshift()`](https://dbplyr.tidyverse.org/dev/reference/backend-redshift.md)
+  : Redshift backend
+- [`dialect_snowflake()`](https://dbplyr.tidyverse.org/dev/reference/backend-snowflake.md)
+  [`simulate_snowflake()`](https://dbplyr.tidyverse.org/dev/reference/backend-snowflake.md)
+  : Snowflake backend
+- [`dialect_spark_sql()`](https://dbplyr.tidyverse.org/dev/reference/backend-spark-sql.md)
+  [`simulate_spark_sql()`](https://dbplyr.tidyverse.org/dev/reference/backend-spark-sql.md)
+  : Databricks Spark SQL backend
+- [`dialect_sqlite()`](https://dbplyr.tidyverse.org/dev/reference/backend-sqlite.md)
+  [`simulate_sqlite()`](https://dbplyr.tidyverse.org/dev/reference/backend-sqlite.md)
+  : SQLite backend
+- [`dialect_teradata()`](https://dbplyr.tidyverse.org/dev/reference/backend-teradata.md)
+  [`simulate_teradata()`](https://dbplyr.tidyverse.org/dev/reference/backend-teradata.md)
+  : Teradata backend
 
 ## Database connection
 

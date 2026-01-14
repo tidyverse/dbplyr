@@ -72,7 +72,7 @@ Other generic:
 ## Examples
 
 ``` r
-con <- simulate_dbi()
+con <- dialect_ansi()
 
 # Doubles vs. integers
 escape(1:5, con = con)
@@ -102,7 +102,7 @@ sql_escape_logical(con, c(TRUE, FALSE, NA))
 sql_escape_date(con, Sys.Date())
 #> <SQL> '2026-01-14'
 sql_escape_date(con, Sys.time())
-#> <SQL> '2026-01-14 18:47:53.682074'
+#> <SQL> '2026-01-14 23:47:10.360924'
 sql_escape_raw(con, charToRaw("hi"))
 #> <SQL> X'6869'
 ```

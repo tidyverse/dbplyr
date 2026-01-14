@@ -141,7 +141,7 @@ supported for backward compatibility.</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="simulate_dbi.html">simulate_dbi</a></span><span class="op">(</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="backend-ansi.html">dialect_ansi</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">tbl</span> <span class="op">&lt;-</span> <span class="st">"my_table"</span></span></span>
 <span class="r-in"><span><span class="fu">sql_glue2</span><span class="op">(</span><span class="va">con</span>, <span class="st">"SELECT * FROM {.tbl tbl}"</span><span class="op">)</span></span></span>

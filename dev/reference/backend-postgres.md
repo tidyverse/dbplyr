@@ -1,11 +1,13 @@
-# Backend: PostgreSQL
+# PostgreSQL backend
 
-See
-[`vignette("translation-function")`](https://dbplyr.tidyverse.org/dev/articles/translation-function.md)
-and
-[`vignette("translation-verb")`](https://dbplyr.tidyverse.org/dev/articles/translation-verb.md)
-for details of overall translation technology. Key differences for this
-backend are:
+This backend supports PostgreSQL databases, typically accessed via
+`PqConnection` created by
+[`DBI::dbConnect()`](https://dbi.r-dbi.org/reference/dbConnect.html).
+Use `dialect_postgres()` with
+[`lazy_frame()`](https://dbplyr.tidyverse.org/dev/reference/tbl_lazy.md)
+to see simulated SQL without connecting to a live database.
+
+Key differences for this backend are:
 
 - Many stringr functions
 
@@ -13,13 +15,17 @@ backend are:
 
 - More standard statistical summaries
 
-Use `simulate_postgres()` with
-[`lazy_frame()`](https://dbplyr.tidyverse.org/dev/reference/tbl_lazy.md)
-to see simulated SQL without converting to live access database.
+See
+[`vignette("translation-function")`](https://dbplyr.tidyverse.org/dev/articles/translation-function.md)
+and
+[`vignette("translation-verb")`](https://dbplyr.tidyverse.org/dev/articles/translation-verb.md)
+for details of overall translation technology.
 
 ## Usage
 
 ``` r
+dialect_postgres()
+
 simulate_postgres()
 ```
 
@@ -28,7 +34,7 @@ simulate_postgres()
 ``` r
 library(dplyr, warn.conflicts = FALSE)
 
-lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_postgres())
+lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_postgres())
 lf |> summarise(x = sd(b, na.rm = TRUE))
 #> <SQL>
 #> SELECT STDDEV_SAMP("b") AS "x"

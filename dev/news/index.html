@@ -843,7 +843,7 @@ FROM (
 <h2 class="pkg-version" data-toc-text="1.4.0" id="dbplyr-140">dbplyr 1.4.0<a class="anchor" aria-label="anchor" href="#dbplyr-140"></a></h2><p class="text-muted">CRAN release: 2019-04-23</p>
 <div class="section level3">
 <h3 id="breaking-changes-1-4-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-1-4-0"></a></h3>
-<ul><li><p><code>Error: `con` must not be NULL</code>: If you see this error, it probably means that you have forgotten to pass <code>con</code> down to a dbplyr function. Previously, dbplyr defaulted to using <code><a href="../reference/simulate_dbi.html">simulate_dbi()</a></code> which introduced subtle escaping bugs. (It’s also possible I have forgotten to pass it somewhere that the dbplyr tests don’t pick up, so if you can’t figure it out, please let me know).</p></li>
+<ul><li><p><code>Error: `con` must not be NULL</code>: If you see this error, it probably means that you have forgotten to pass <code>con</code> down to a dbplyr function. Previously, dbplyr defaulted to using <code><a href="../reference/backend-ansi.html">simulate_dbi()</a></code> which introduced subtle escaping bugs. (It’s also possible I have forgotten to pass it somewhere that the dbplyr tests don’t pick up, so if you can’t figure it out, please let me know).</p></li>
 <li><p>Subsetting (<code>[[</code>, <code>$</code>, and <code>[</code>) functions are no longer evaluated locally. This makes the translation more consistent and enables useful new idioms for modern databases (<a href="https://github.com/tidyverse/dbplyr/issues/200" class="external-link">#200</a>).</p></li>
 </ul></div>
 <div class="section level3">

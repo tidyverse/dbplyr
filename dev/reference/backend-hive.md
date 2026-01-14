@@ -1,19 +1,24 @@
-# Backend: Hive
+# Hive backend
+
+This backend supports Apache Hive, typically accessed via odbc. Use
+`dialect_hive()` with
+[`lazy_frame()`](https://dbplyr.tidyverse.org/dev/reference/tbl_lazy.md)
+to see simulated SQL without connecting to a live database.
+
+Key differences for this backend are a scattering of custom translations
+provided by users.
 
 See
 [`vignette("translation-function")`](https://dbplyr.tidyverse.org/dev/articles/translation-function.md)
 and
 [`vignette("translation-verb")`](https://dbplyr.tidyverse.org/dev/articles/translation-verb.md)
-for details of overall translation technology. Key differences for this
-backend are a scattering of custom translations provided by users.
-
-Use `simulate_hive()` with
-[`lazy_frame()`](https://dbplyr.tidyverse.org/dev/reference/tbl_lazy.md)
-to see simulated SQL without converting to live access database.
+for details of overall translation technology.
 
 ## Usage
 
 ``` r
+dialect_hive()
+
 simulate_hive()
 ```
 
@@ -22,7 +27,7 @@ simulate_hive()
 ``` r
 library(dplyr, warn.conflicts = FALSE)
 
-lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = simulate_hive())
+lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = dialect_hive())
 lf |> transmute(x = cot(b))
 #> <SQL>
 #> SELECT 1.0 / TAN("b") AS "x"

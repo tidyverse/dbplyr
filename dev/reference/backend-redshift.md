@@ -1,16 +1,27 @@
-# Backend: Redshift
+# Redshift backend
+
+This backend supports Amazon Redshift databases, typically accessed via
+a `RedshiftConnection` created by
+[`DBI::dbConnect()`](https://dbi.r-dbi.org/reference/dbConnect.html).
+Use `dialect_redshift()` with
+[`lazy_frame()`](https://dbplyr.tidyverse.org/dev/reference/tbl_lazy.md)
+to see simulated SQL without connecting to a live database.
 
 Base translations come from [PostgreSQL
 backend](https://dbplyr.tidyverse.org/dev/reference/backend-postgres.md).
 There are generally few differences, apart from string manipulation.
 
-Use `simulate_redshift()` with
-[`lazy_frame()`](https://dbplyr.tidyverse.org/dev/reference/tbl_lazy.md)
-to see simulated SQL without converting to live access database.
+See
+[`vignette("translation-function")`](https://dbplyr.tidyverse.org/dev/articles/translation-function.md)
+and
+[`vignette("translation-verb")`](https://dbplyr.tidyverse.org/dev/articles/translation-verb.md)
+for details of overall translation technology.
 
 ## Usage
 
 ``` r
+dialect_redshift()
+
 simulate_redshift()
 ```
 
@@ -19,7 +30,7 @@ simulate_redshift()
 ``` r
 library(dplyr, warn.conflicts = FALSE)
 
-lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_redshift())
+lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_redshift())
 lf |> transmute(x = paste(c, " times"))
 #> <SQL>
 #> SELECT "c" || ' ' || ' times' AS "x"

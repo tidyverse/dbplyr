@@ -1,11 +1,13 @@
-# Backend: SQLite
+# SQLite backend
 
-See
-[`vignette("translation-function")`](https://dbplyr.tidyverse.org/dev/articles/translation-function.md)
-and
-[`vignette("translation-verb")`](https://dbplyr.tidyverse.org/dev/articles/translation-verb.md)
-for details of overall translation technology. Key differences for this
-backend are:
+This backend supports SQLite databases, typically accessed via a
+`SQLiteConnection` created by
+[`DBI::dbConnect()`](https://dbi.r-dbi.org/reference/dbConnect.html).
+Use `dialect_sqlite()` with
+[`lazy_frame()`](https://dbplyr.tidyverse.org/dev/reference/tbl_lazy.md)
+to see simulated SQL without connecting to a live database.
+
+Key differences for this backend are:
 
 - Uses non-standard `LOG()` function
 
@@ -15,13 +17,17 @@ backend are:
 
 - Right and full joins are simulated using left joins
 
-Use `simulate_sqlite()` with
-[`lazy_frame()`](https://dbplyr.tidyverse.org/dev/reference/tbl_lazy.md)
-to see simulated SQL without converting to live access database.
+See
+[`vignette("translation-function")`](https://dbplyr.tidyverse.org/dev/articles/translation-function.md)
+and
+[`vignette("translation-verb")`](https://dbplyr.tidyverse.org/dev/articles/translation-verb.md)
+for details of overall translation technology.
 
 ## Usage
 
 ``` r
+dialect_sqlite()
+
 simulate_sqlite()
 ```
 
@@ -30,7 +36,7 @@ simulate_sqlite()
 ``` r
 library(dplyr, warn.conflicts = FALSE)
 
-lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_sqlite())
+lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_sqlite())
 lf |> transmute(x = paste(c, " times"))
 #> <SQL>
 #> SELECT `c` || ' ' || ' times' AS `x`

@@ -2264,7 +2264,7 @@ CRAN release: 2019-04-23
 - `` Error: `con` must not be NULL ``: If you see this error, it
   probably means that you have forgotten to pass `con` down to a dbplyr
   function. Previously, dbplyr defaulted to using
-  [`simulate_dbi()`](https://dbplyr.tidyverse.org/dev/reference/simulate_dbi.md)
+  [`simulate_dbi()`](https://dbplyr.tidyverse.org/dev/reference/backend-ansi.md)
   which introduced subtle escaping bugs. (It’s also possible I have
   forgotten to pass it somewhere that the dbplyr tests don’t pick up, so
   if you can’t figure it out, please let me know).

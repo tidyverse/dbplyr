@@ -6,6 +6,9 @@ translator, an environment containing R to SQL translations. When
 creating a backend, you'll use these functions to customize how R
 functions are converted to SQL.
 
+Learn more in
+[`vignette("new-backend")`](https://dbplyr.tidyverse.org/dev/articles/new-backend.md).
+
 ## Usage
 
 ``` r
@@ -76,7 +79,6 @@ Other SQL translation helpers:
 ``` r
 # An example of adding some mappings for the statistical functions that
 # postgresql provides: http://bit.ly/K5EdTn
-
 postgres_agg <- sql_translator(.parent = base_agg,
   cor = sql_aggregate_2("CORR"),
   cov = sql_aggregate_2("COVAR_SAMP"),
@@ -85,8 +87,8 @@ postgres_agg <- sql_translator(.parent = base_agg,
 )
 
 # Next we have to simulate a connection that uses this variant
-con <- simulate_dbi("TestCon")
-sql_translation.TestCon <- function(x) {
+con <- new_sql_dialect("test", quote = \(x) sql_quote(x, '"'))
+sql_translation.sql_dialect_test <- function(x) {
   sql_variant(
     base_scalar,
     postgres_agg,
@@ -96,11 +98,6 @@ sql_translation.TestCon <- function(x) {
 
 translate_sql(cor(x, y), con = con, window = FALSE)
 #> Error in cor(x, y): `cor()` is not available in this SQL variant.
-translate_sql(sd(income / years), con = con, window = FALSE)
-#> Error in sd(income/years): `sd()` is not available in this SQL variant.
-
-# Any functions not explicitly listed in the converter will be translated
-# to sql as is, so you don't need to convert all functions.
-translate_sql(regr_intercept(y, x), con = con)
-#> <SQL> regr_intercept("y", "x")
+translate_sql(sd(income / years, na.rm = TRUE), con = con, window = FALSE)
+#> Error in sd(income/years, na.rm = TRUE): `sd()` is not available in this SQL variant.
 ```
