@@ -24,8 +24,6 @@ NULL
 
 #' @export
 #' @rdname backend-hive
-simulate_hive <- function() simulate_dbi("Hive")
-
 dialect_hive <- function() {
   new_sql_dialect(
     "hive",
@@ -33,6 +31,10 @@ dialect_hive <- function() {
     has_window_clause = TRUE
   )
 }
+
+#' @export
+#' @rdname backend-hive
+simulate_hive <- function() simulate_dbi("Hive")
 
 #' @export
 sql_dialect.Hive <- function(con) {

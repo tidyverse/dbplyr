@@ -64,10 +64,6 @@ NULL
 
 #' @export
 #' @rdname backend-mssql
-simulate_mssql <- function(version = "15.0") {
-  simulate_dbi("Microsoft SQL Server", version = numeric_version(version))
-}
-
 dialect_mssql <- function(version = "15.0") {
   dialect <- new_sql_dialect(
     "mssql",
@@ -75,6 +71,12 @@ dialect_mssql <- function(version = "15.0") {
   )
   dialect$version <- numeric_version(version)
   dialect
+}
+
+#' @export
+#' @rdname backend-mssql
+simulate_mssql <- function(version = "15.0") {
+  simulate_dbi("Microsoft SQL Server", version = numeric_version(version))
 }
 
 #' @export

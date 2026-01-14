@@ -31,8 +31,6 @@ NULL
 
 #' @export
 #' @rdname backend-oracle
-simulate_oracle <- function() simulate_dbi("Oracle")
-
 dialect_oracle <- function() {
   new_sql_dialect(
     "oracle",
@@ -40,6 +38,10 @@ dialect_oracle <- function() {
     has_table_alias_with_as = FALSE
   )
 }
+
+#' @export
+#' @rdname backend-oracle
+simulate_oracle <- function() simulate_dbi("Oracle")
 
 #' @export
 sql_dialect.Oracle <- function(con) {

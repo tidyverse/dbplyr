@@ -16,6 +16,8 @@
 #' lf |> transmute(x = paste0(d, " times"))
 NULL
 
+#' @export
+#' @rdname backend-snowflake
 dialect_snowflake <- function() {
   new_sql_dialect(
     "snowflake",
@@ -23,6 +25,10 @@ dialect_snowflake <- function() {
     has_window_clause = TRUE
   )
 }
+
+#' @export
+#' @rdname backend-snowflake
+simulate_snowflake <- function() simulate_dbi("Snowflake")
 
 #' @export
 sql_dialect.Snowflake <- function(con) {
@@ -339,10 +345,6 @@ sql_translation.sql_dialect_snowflake <- function(con) {
     )
   )
 }
-
-#' @export
-#' @rdname backend-snowflake
-simulate_snowflake <- function() simulate_dbi("Snowflake")
 
 # There seems to be no concept of ANALYZE TABLE in Snowflake.  I searched for
 # functions that performed similar operations, and found none.

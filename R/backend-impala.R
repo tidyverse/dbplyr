@@ -20,8 +20,6 @@ NULL
 
 #' @export
 #' @rdname backend-impala
-simulate_impala <- function() simulate_dbi("Impala")
-
 dialect_impala <- function() {
   new_sql_dialect(
     "impala",
@@ -29,6 +27,10 @@ dialect_impala <- function() {
     has_window_clause = TRUE
   )
 }
+
+#' @export
+#' @rdname backend-impala
+simulate_impala <- function() simulate_dbi("Impala")
 
 #' @export
 sql_dialect.Impala <- function(con) {

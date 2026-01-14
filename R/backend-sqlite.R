@@ -25,8 +25,6 @@ NULL
 
 #' @export
 #' @rdname backend-sqlite
-simulate_sqlite <- function() simulate_dbi("SQLiteConnection")
-
 dialect_sqlite <- function() {
   new_sql_dialect(
     "sqlite",
@@ -34,6 +32,10 @@ dialect_sqlite <- function() {
     has_window_clause = TRUE
   )
 }
+
+#' @export
+#' @rdname backend-sqlite
+simulate_sqlite <- function() simulate_dbi("SQLiteConnection")
 
 #' @export
 sql_dialect.SQLiteConnection <- function(con) {

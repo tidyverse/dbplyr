@@ -21,14 +21,16 @@ NULL
 
 #' @export
 #' @rdname backend-odbc
-simulate_odbc <- function() simulate_dbi("OdbcConnection")
-
 dialect_odbc <- function() {
   new_sql_dialect(
     "odbc",
     quote_identifier = function(x) sql_quote(x, '"')
   )
 }
+
+#' @export
+#' @rdname backend-odbc
+simulate_odbc <- function() simulate_dbi("OdbcConnection")
 
 #' @export
 sql_dialect.OdbcConnection <- function(con) {

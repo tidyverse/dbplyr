@@ -22,8 +22,6 @@ NULL
 
 #' @export
 #' @rdname backend-teradata
-simulate_teradata <- function() simulate_dbi("Teradata")
-
 dialect_teradata <- function() {
   new_sql_dialect(
     "teradata",
@@ -31,6 +29,10 @@ dialect_teradata <- function() {
     has_window_clause = TRUE
   )
 }
+
+#' @export
+#' @rdname backend-teradata
+simulate_teradata <- function() simulate_dbi("Teradata")
 
 #' @export
 sql_dialect.Teradata <- function(con) {

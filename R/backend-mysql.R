@@ -24,12 +24,6 @@ NULL
 
 #' @export
 #' @rdname backend-mysql
-simulate_mysql <- function() simulate_dbi("MySQLConnection")
-
-#' @export
-#' @rdname backend-mysql
-simulate_mariadb <- function() simulate_dbi("MariaDBConnection")
-
 dialect_mariadb <- function() {
   new_sql_dialect(
     "mariadb",
@@ -38,6 +32,8 @@ dialect_mariadb <- function() {
   )
 }
 
+#' @export
+#' @rdname backend-mysql
 dialect_mysql <- function() {
   new_sql_dialect(
     "mysql",
@@ -45,6 +41,14 @@ dialect_mysql <- function() {
     has_window_clause = TRUE
   )
 }
+
+#' @export
+#' @rdname backend-mysql
+simulate_mysql <- function() simulate_dbi("MySQLConnection")
+
+#' @export
+#' @rdname backend-mysql
+simulate_mariadb <- function() simulate_dbi("MariaDBConnection")
 
 #' @export
 sql_dialect.MariaDBConnection <- function(con) {

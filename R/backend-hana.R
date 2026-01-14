@@ -25,14 +25,16 @@ NULL
 
 #' @export
 #' @rdname backend-hana
-simulate_hana <- function() simulate_dbi("HDB")
-
 dialect_hana <- function() {
   new_sql_dialect(
     "hana",
     quote_identifier = function(x) sql_quote(x, '"')
   )
 }
+
+#' @export
+#' @rdname backend-hana
+simulate_hana <- function() simulate_dbi("HDB")
 
 #' @export
 sql_dialect.HDB <- function(con) {

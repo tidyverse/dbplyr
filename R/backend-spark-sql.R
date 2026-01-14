@@ -26,8 +26,6 @@ NULL
 
 #' @export
 #' @rdname backend-spark-sql
-simulate_spark_sql <- function() simulate_dbi("Spark SQL")
-
 dialect_spark_sql <- function() {
   new_sql_dialect(
     "spark_sql",
@@ -35,6 +33,10 @@ dialect_spark_sql <- function() {
     has_window_clause = TRUE
   )
 }
+
+#' @export
+#' @rdname backend-spark-sql
+simulate_spark_sql <- function() simulate_dbi("Spark SQL")
 
 #' @export
 `sql_dialect.Spark SQL` <- function(con) {

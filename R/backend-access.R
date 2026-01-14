@@ -27,8 +27,6 @@ NULL
 
 #' @export
 #' @rdname backend-access
-simulate_access <- function() simulate_dbi("ACCESS")
-
 dialect_access <- function() {
   new_sql_dialect(
     "access",
@@ -36,6 +34,10 @@ dialect_access <- function() {
     has_window_clause = TRUE
   )
 }
+
+#' @export
+#' @rdname backend-access
+simulate_access <- function() simulate_dbi("ACCESS")
 
 #' @export
 sql_dialect.ACCESS <- function(con) {

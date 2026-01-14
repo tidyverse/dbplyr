@@ -24,8 +24,6 @@ NULL
 
 #' @export
 #' @rdname backend-postgres
-simulate_postgres <- function() simulate_dbi("PqConnection")
-
 dialect_postgres <- function() {
   new_sql_dialect(
     "postgres",
@@ -33,6 +31,10 @@ dialect_postgres <- function() {
     has_window_clause = TRUE
   )
 }
+
+#' @export
+#' @rdname backend-postgres
+simulate_postgres <- function() simulate_dbi("PqConnection")
 
 #' @export
 sql_dialect.PqConnection <- function(con) {

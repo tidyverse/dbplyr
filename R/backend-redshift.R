@@ -20,14 +20,16 @@ NULL
 
 #' @export
 #' @rdname backend-redshift
-simulate_redshift <- function() simulate_dbi("RedshiftConnection")
-
 dialect_redshift <- function() {
   new_sql_dialect(
     "redshift",
     quote_identifier = function(x) sql_quote(x, '"')
   )
 }
+
+#' @export
+#' @rdname backend-redshift
+simulate_redshift <- function() simulate_dbi("RedshiftConnection")
 
 #' @export
 sql_dialect.RedshiftConnection <- function(con) {
