@@ -17,29 +17,28 @@
 #' @include verb-copy-inline.R
 NULL
 
-#' Simulate database connections
+#' ANSI SQL
 #'
 #' @description
-#' These functions generate S3 objects that have been designed to simulate
-#' the action of a database connection, without actually having the database
-#' available. Obviously, this simulation can only be incomplete, but most
-#' importantly it allows us to simulate SQL generation for any database without
-#' actually connecting to it.
+#' This is the base dialect for ANSI compliant SQL, forming the foundation
+#' of all othe dialects. See [vignette("translation-function")] for a list
+#' of functions that are translated.
 #'
-#' Simulated SQL quotes identifiers with `"x"` (double quotes) by default,
-#' `` `x` `` (backticks) for MySQL/MariaDB/SQLite, and `[x]` (square brackets)
-#' for SQL Server. Strings are quoted with `'x'`.
+#' Use `dialect_ansi()` with `lazy_frame()` to see simulated SQL without
+#' connecting to a live database.
 #'
-#' @keywords internal
-#' @export
-simulate_dbi <- function(class = character(), ...) {
-  structure(
-    list(),
-    ...,
-    class = c(class, "TestConnection", "DBIConnection")
-  )
-}
+#' @name backend-ansi
+#' @aliases NULL
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_ansi())
+#' lf |> transmute(x = mean(b, na.rm = TRUE))
+#' lf |> transmute(x = log(b), y = log(b, base = 2))
+NULL
 
+#' @export
+#' @rdname backend-ansi
 dialect_ansi <- function() {
   structure(
     list(
@@ -50,6 +49,16 @@ dialect_ansi <- function() {
       )
     ),
     class = "sql_dialect"
+  )
+}
+
+#' @export
+#' @rdname backend-ansi
+simulate_dbi <- function(class = character(), ...) {
+  structure(
+    list(),
+    ...,
+    class = c(class, "TestConnection", "DBIConnection")
   )
 }
 

@@ -376,7 +376,7 @@ sql_query_rows.sql_dialect <- sql_query_rows.DBIConnection
 #'
 #' @examples
 #' sql_query_upsert(
-#'   con = simulate_postgres(),
+#'   con = dialect_postgres(),
 #'   table = "airlines",
 #'   from = "df",
 #'   by = "carrier",

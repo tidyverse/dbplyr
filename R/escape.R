@@ -28,7 +28,7 @@
 #' @returns A [sql] vector.
 #' @export
 #' @examples
-#' con <- simulate_dbi()
+#' con <- dialect_ansi()
 #'
 #' # Doubles vs. integers
 #' escape(1:5, con = con)

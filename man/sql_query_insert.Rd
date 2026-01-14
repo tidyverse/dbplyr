@@ -161,7 +161,7 @@ values are then inserted outside of the CTE.
 }
 \examples{
 sql_query_upsert(
-  con = simulate_postgres(),
+  con = dialect_postgres(),
   table = "airlines",
   from = "df",
   by = "carrier",

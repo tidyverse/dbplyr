@@ -10,7 +10,7 @@ dialect_redshift()
 simulate_redshift()
 }
 \description{
-Base translations come from \link[=simulate_postgres]{PostgreSQL backend}. There
+Base translations come from \link[=dialect_postgres]{PostgreSQL backend}. There
 are generally few differences, apart from string manipulation.
 
 Use \code{dialect_redshift()} with \code{lazy_frame()} to see simulated SQL without

@@ -1,7 +1,7 @@
 #' Redshift backend
 #'
 #' @description
-#' Base translations come from [PostgreSQL backend][simulate_postgres]. There
+#' Base translations come from [PostgreSQL backend][dialect_postgres]. There
 #' are generally few differences, apart from string manipulation.
 #'
 #' Use `dialect_redshift()` with `lazy_frame()` to see simulated SQL without

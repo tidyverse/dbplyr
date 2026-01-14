@@ -21,7 +21,7 @@
 #' @param context Use to carry information for special translation cases. For example, MS SQL needs a different conversion for is.na() in WHERE vs. SELECT clauses.  Expects a list.
 #' @export
 #' @examples
-#' con <- simulate_dbi()
+#' con <- dialect_ansi()
 #'
 #' # Regular maths is translated in a very straightforward way
 #' translate_sql(x + 1, con = con)
@@ -50,7 +50,7 @@
 #'
 #' # If you have an already quoted object, use translate_sql_:
 #' x <- quote(y + 1 / sin(t))
-#' translate_sql_(list(x), con = simulate_dbi())
+#' translate_sql_(list(x), con = dialect_ansi())
 #'
 #' # Windowed translation --------------------------------------------
 #' # Known window functions automatically get OVER()

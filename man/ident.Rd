@@ -24,7 +24,7 @@ elsewhere should be regarded with suspicion.
 is qualified with schema or catalog use \code{I()}.
 }
 \examples{
-con <- simulate_dbi()
+con <- dialect_ansi()
 
 # SQL92 quotes strings with '
 escape("x", con = con)

@@ -28,7 +28,7 @@
 #' @return An SQL string.
 #' @export
 #' @examples
-#' con <- simulate_dbi()
+#' con <- dialect_ansi()
 #'
 #' tbl <- "my_table"
 #' sql_glue2(con, "SELECT * FROM {.tbl tbl}")
