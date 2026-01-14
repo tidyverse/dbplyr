@@ -21,7 +21,7 @@ NULL
 #'
 #' @description
 #' This is the base dialect for ANSI compliant SQL, forming the foundation
-#' of all othe dialects. See [vignette("translation-function")] for a list
+#' of all othe dialects. See `vignette("translation-function")` for a list
 #' of functions that are translated.
 #'
 #' Use `dialect_ansi()` with `lazy_frame()` to see simulated SQL without
