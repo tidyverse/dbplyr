@@ -73,8 +73,7 @@ flatten_query.set_op_query <- function(qry, query_list, con) {
 #' @rdname db-sql
 #' @export
 sql_set_op_method <- function(con, op, ...) {
-  con <- sql_dialect(con)
-  UseMethod("sql_set_op_method", con)
+  UseMethod("sql_set_op_method", sql_dialect(con))
 }
 #' @export
 sql_set_op_method.DBIConnection <- function(con, op, ...) {
@@ -87,8 +86,7 @@ sql_set_op_method.sql_dialect <- sql_set_op_method.DBIConnection
 #' @export
 sql_query_set_op <- function(con, x, y, method, ..., lvl = 0) {
   check_dots_used()
-  con <- sql_dialect(con)
-  UseMethod("sql_query_set_op", con)
+  UseMethod("sql_query_set_op", sql_dialect(con))
 }
 #' @export
 sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., lvl = 0) {

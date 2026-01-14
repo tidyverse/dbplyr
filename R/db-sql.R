@@ -68,8 +68,7 @@ NULL
 #' @rdname db-sql
 sql_expr_matches <- function(con, x, y, ...) {
   check_dots_used()
-  con <- sql_dialect(con)
-  UseMethod("sql_expr_matches", con)
+  UseMethod("sql_expr_matches", sql_dialect(con))
 }
 
 #' @export
@@ -85,8 +84,7 @@ sql_expr_matches.sql_dialect <- sql_expr_matches.DBIConnection
 #' @export
 #' @rdname db-sql
 sql_translation <- function(con) {
-  con <- sql_dialect(con)
-  UseMethod("sql_translation", con)
+  UseMethod("sql_translation", sql_dialect(con))
 }
 # sql_translation.DBIConnection lives in backend-.R
 dbplyr_sql_translation <- function(con) {
@@ -112,8 +110,7 @@ sql_random <- function(con) {
 #' @export
 sql_table_analyze <- function(con, table, ...) {
   check_dots_used()
-  con <- sql_dialect(con)
-  UseMethod("sql_table_analyze", con)
+  UseMethod("sql_table_analyze", sql_dialect(con))
 }
 #' @export
 sql_table_analyze.DBIConnection <- function(con, table, ...) {
@@ -138,8 +135,7 @@ sql_table_index <- function(
   check_name(name, allow_null = TRUE, call = call)
   check_bool(unique, call = call)
 
-  con <- sql_dialect(con)
-  UseMethod("sql_table_index", con)
+  UseMethod("sql_table_index", sql_dialect(con))
 }
 #' @export
 sql_table_index.DBIConnection <- function(
@@ -175,8 +171,7 @@ sql_table_index.sql_dialect <- sql_table_index.DBIConnection
 sql_query_explain <- function(con, sql, ...) {
   check_scalar_sql(sql)
   check_dots_used()
-  con <- sql_dialect(con)
-  UseMethod("sql_query_explain", con)
+  UseMethod("sql_query_explain", sql_dialect(con))
 }
 #' @export
 sql_query_explain.DBIConnection <- function(con, sql, ...) {
@@ -192,8 +187,7 @@ sql_query_fields <- function(con, sql, ...) {
   check_table_source(sql)
   check_dots_used()
 
-  con <- sql_dialect(con)
-  UseMethod("sql_query_fields", con)
+  UseMethod("sql_query_fields", sql_dialect(con))
 }
 #' @export
 sql_query_fields.DBIConnection <- function(con, sql, ...) {
@@ -215,8 +209,7 @@ sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
   check_bool(temporary)
   check_dots_used()
 
-  con <- sql_dialect(con)
-  UseMethod("sql_query_save", con)
+  UseMethod("sql_query_save", sql_dialect(con))
 }
 #' @export
 sql_query_save.DBIConnection <- function(
@@ -240,8 +233,7 @@ sql_query_wrap <- function(con, from, name = NULL, ..., lvl = 0) {
   check_name(name, allow_null = TRUE)
   check_dots_used()
 
-  con <- sql_dialect(con)
-  UseMethod("sql_query_wrap", con)
+  UseMethod("sql_query_wrap", sql_dialect(con))
 }
 #' @export
 sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
@@ -297,8 +289,7 @@ sql_query_rows <- function(con, sql, ...) {
   check_table_source(sql)
   check_dots_used()
 
-  con <- sql_dialect(con)
-  UseMethod("sql_query_rows", con)
+  UseMethod("sql_query_rows", sql_dialect(con))
 }
 #' @export
 sql_query_rows.DBIConnection <- function(con, sql, ...) {
@@ -409,8 +400,7 @@ sql_query_insert <- function(
   check_character(returning_cols, allow_null = TRUE)
 
   check_dots_used()
-  con <- sql_dialect(con)
-  UseMethod("sql_query_insert", con)
+  UseMethod("sql_query_insert", sql_dialect(con))
 }
 
 #' @export
@@ -484,8 +474,7 @@ sql_query_append <- function(
   check_character(returning_cols, allow_null = TRUE)
 
   check_dots_used()
-  con <- sql_dialect(con)
-  UseMethod("sql_query_append", con)
+  UseMethod("sql_query_append", sql_dialect(con))
 }
 
 #' @export
@@ -537,8 +526,7 @@ sql_query_update_from <- function(
   check_character(returning_cols, allow_null = TRUE)
 
   check_dots_used()
-  con <- sql_dialect(con)
-  UseMethod("sql_query_update_from", con)
+  UseMethod("sql_query_update_from", sql_dialect(con))
 }
 
 #' @export
@@ -595,8 +583,7 @@ sql_query_upsert <- function(
   # https://wiki.postgresql.org/wiki/UPSERT#SQL_MERGE_syntax
   # https://github.com/cynkra/dm/pull/616#issuecomment-920613435
   check_dots_used()
-  con <- sql_dialect(con)
-  UseMethod("sql_query_upsert", con)
+  UseMethod("sql_query_upsert", sql_dialect(con))
 }
 
 #' @export
@@ -664,8 +651,7 @@ sql_query_delete <- function(con, table, from, by, ..., returning_cols = NULL) {
   check_character(returning_cols, allow_null = TRUE)
 
   check_dots_used()
-  con <- sql_dialect(con)
-  UseMethod("sql_query_delete", con)
+  UseMethod("sql_query_delete", sql_dialect(con))
 }
 
 #' @export
@@ -701,8 +687,7 @@ sql_returning_cols <- function(con, cols, table, ...) {
   }
 
   check_dots_used()
-  con <- sql_dialect(con)
-  UseMethod("sql_returning_cols", con)
+  UseMethod("sql_returning_cols", sql_dialect(con))
 }
 
 #' @export

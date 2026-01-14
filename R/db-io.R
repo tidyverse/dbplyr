@@ -288,8 +288,7 @@ with_transaction <- function(
 #' @export
 #' @rdname db-io
 sql_table_temporary <- function(con, table, temporary, ...) {
-  con <- sql_dialect(con)
-  UseMethod("sql_table_temporary", con)
+  UseMethod("sql_table_temporary", sql_dialect(con))
 }
 #' @export
 sql_table_temporary.DBIConnection <- function(con, table, temporary, ...) {

@@ -363,8 +363,7 @@ sql_query_select <- function(
   check_dots_used()
   check_sql(select, allow_names = FALSE)
 
-  con <- sql_dialect(con)
-  UseMethod("sql_query_select", con)
+  UseMethod("sql_query_select", sql_dialect(con))
 }
 
 #' @export

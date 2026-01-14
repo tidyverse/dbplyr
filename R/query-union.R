@@ -92,8 +92,7 @@ flatten_query.union_query <- function(qry, query_list, con) {
 #' @rdname db-sql
 #' @export
 sql_query_union <- function(con, x, unions, ..., lvl = 0) {
-  con <- sql_dialect(con)
-  UseMethod("sql_query_union", con)
+  UseMethod("sql_query_union", sql_dialect(con))
 }
 #' @export
 sql_query_union.DBIConnection <- function(con, x, unions, ..., lvl = 0) {
