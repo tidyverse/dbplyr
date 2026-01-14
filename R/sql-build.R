@@ -19,7 +19,8 @@
 #' @export
 #' @keywords internal
 #' @param op A sequence of lazy operations
-#' @param con A database connection. The default `NULL` uses a set of
+#' @param con A [sql_dialect] object or database connection. Connections are
+#'   supported for backward compatibility. The default `NULL` uses a set of
 #'   rules that should be very similar to ANSI 92, and allows for testing
 #'   without an active database connection.
 #' @param ... Other arguments passed on to the methods. Not currently used.

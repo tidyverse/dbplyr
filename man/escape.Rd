@@ -41,7 +41,8 @@ Default behaviour: lists are always wrapped in parens and separated by
 commas, identifiers are separated by commas and never wrapped,
 atomic vectors are separated by spaces and wrapped in parens if needed.}
 
-\item{con}{Database connection.}
+\item{con}{A \link{sql_dialect} object or database connection. Connections are
+supported for backward compatibility.}
 }
 \value{
 A \link{sql} vector.

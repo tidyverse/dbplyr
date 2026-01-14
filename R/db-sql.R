@@ -305,7 +305,8 @@ sql_query_rows.sql_dialect <- sql_query_rows.DBIConnection
 #'
 #' These functions generate the SQL used in `rows_*(in_place = TRUE)`.
 #'
-#' @param con Database connection.
+#' @param con A [sql_dialect] object or database connection. Connections are
+#'   supported for backward compatibility.
 #' @param table Table to update. Must be a table identifier.
 #'   Use a string to refer to tables in the current schema/catalog or
 #'   `I()` to refer to tables in other schemas/catalogs.

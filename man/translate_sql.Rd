@@ -29,7 +29,8 @@ translate_sql_(
 automatically quotes them for you.  \code{translate_sql_()} expects
 a list of expression objects.}
 
-\item{con}{Database connection used to determine the SQL dialect.}
+\item{con}{A \link{sql_dialect} object or database connection. Connections are
+supported for backward compatibility.}
 
 \item{vars_group, vars_order, vars_frame}{Parameters used in the \code{OVER}
 expression of windowed functions.}

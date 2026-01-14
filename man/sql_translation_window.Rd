@@ -47,7 +47,8 @@ win_current_frame()
 
 \item{frame}{A numeric vector of length two defining the frame.}
 
-\item{con}{Database connection.}
+\item{con}{A \link{sql_dialect} object or database connection. Connections are
+supported for backward compatibility.}
 
 \item{f}{The name of an SQL function as a string.}
 
