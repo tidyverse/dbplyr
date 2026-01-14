@@ -1,3 +1,7 @@
+test_that("simulate_mssql() still works", {
+  expect_translation(simulate_mssql(), x + 1, "[x] + 1.0")
+})
+
 test_that("table_path_components parses SQL Server bracket syntax", {
   components <- function(x) {
     table_path_components(table_path(x), dialect_mssql())

@@ -1,3 +1,7 @@
+test_that("simulate_postgres() still works", {
+  expect_translation(simulate_postgres(), x + 1, '"x" + 1.0')
+})
+
 test_that("custom scalar translated correctly", {
   con <- dialect_postgres()
 

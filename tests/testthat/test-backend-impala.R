@@ -1,3 +1,7 @@
+test_that("simulate_impala() still works", {
+  expect_translation(simulate_impala(), x + 1, '"x" + 1.0')
+})
+
 test_that("custom scalar functions translated correctly", {
   con <- dialect_impala()
 

@@ -1,3 +1,7 @@
+test_that("simulate_hana() still works", {
+  expect_translation(simulate_hana(), x + 1, '"x" + 1.0')
+})
+
 test_that("custom string translations", {
   con <- dialect_hana()
 

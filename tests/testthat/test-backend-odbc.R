@@ -1,3 +1,7 @@
+test_that("simulate_odbc() still works", {
+  expect_translation(simulate_odbc(), x + 1, '"x" + 1.0')
+})
+
 test_that("custom scalar translated correctly", {
   con <- dialect_odbc()
 

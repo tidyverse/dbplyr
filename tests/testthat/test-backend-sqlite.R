@@ -1,3 +1,7 @@
+test_that("simulate_sqlite() still works", {
+  expect_translation(simulate_sqlite(), x + 1, "`x` + 1.0")
+})
+
 test_that("logicals translated to integers", {
   expect_equal(escape(FALSE, con = dialect_sqlite()), sql("0"))
   expect_equal(escape(TRUE, con = dialect_sqlite()), sql("1"))

@@ -1,3 +1,7 @@
+test_that("simulate_oracle() still works", {
+  expect_translation(simulate_oracle(), x + 1, '"x" + 1.0')
+})
+
 test_that("custom scalar functions translated correctly", {
   con <- dialect_oracle()
 

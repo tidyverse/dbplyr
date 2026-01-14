@@ -1,3 +1,7 @@
+test_that("simulate_hive() still works", {
+  expect_translation(simulate_hive(), x + 1, '"x" + 1.0')
+})
+
 test_that("custom scalar & string functions translated correctly", {
   con <- dialect_hive()
 

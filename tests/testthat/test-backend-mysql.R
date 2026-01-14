@@ -1,3 +1,8 @@
+test_that("simulate_mysql() and simulate_mariadb() still work", {
+  expect_translation(simulate_mysql(), x + 1, "`x` + 1.0")
+  expect_translation(simulate_mariadb(), x + 1, "`x` + 1.0")
+})
+
 # function translation ----------------------------------------------------
 
 test_that("custom scalar translated correctly", {

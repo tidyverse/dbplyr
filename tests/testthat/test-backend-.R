@@ -1,3 +1,7 @@
+test_that("simulate_dbi() still works", {
+  expect_translation(simulate_dbi(), x + 1, '"x" + 1.0')
+})
+
 test_that("base_no_win includes all aggregates and window functions", {
   # All aggregates must be included in window functions
   expect_equal(setdiff(names(base_agg), names(base_win)), character())
