@@ -46,7 +46,8 @@ sql_query_upsert(
 sql_query_delete(con, table, from, by, ..., returning_cols = NULL)
 }
 \arguments{
-\item{con}{Database connection.}
+\item{con}{A \link{sql_dialect} object or database connection. Connections are
+supported for backward compatibility.}
 
 \item{table}{Table to update. Must be a table identifier.
 Use a string to refer to tables in the current schema/catalog or

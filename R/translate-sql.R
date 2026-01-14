@@ -12,7 +12,8 @@
 #' @param ...,dots Expressions to translate. `translate_sql()`
 #'   automatically quotes them for you.  `translate_sql_()` expects
 #'   a list of expression objects.
-#' @param con Database connection used to determine the SQL dialect.
+#' @param con A [sql_dialect] object or database connection. Connections are
+#'   supported for backward compatibility.
 #' @param vars_group,vars_order,vars_frame Parameters used in the `OVER`
 #'   expression of windowed functions.
 #' @param window Use `FALSE` to suppress generation of the `OVER`

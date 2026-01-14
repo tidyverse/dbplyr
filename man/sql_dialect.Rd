@@ -15,7 +15,7 @@ new_sql_dialect(
 )
 }
 \arguments{
-\item{con}{A database connection or dialect object.}
+\item{con}{A database connection.}
 
 \item{dialect}{A string giving the dialect name (e.g., "postgres", "mysql").}
 

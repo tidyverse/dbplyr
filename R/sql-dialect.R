@@ -30,7 +30,7 @@
 #' a method for a dialect and need to access dialect properties, you must call
 #' `sql_dialect(con)` again inside the method.
 #'
-#' @param con A database connection or dialect object.
+#' @param con A database connection.
 #' @param dialect A string giving the dialect name (e.g., "postgres", "mysql").
 #' @param quote_identifier A function that quotes identifiers. Should accept
 #'   a character vector and return a [sql] vector.

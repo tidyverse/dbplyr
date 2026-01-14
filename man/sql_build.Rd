@@ -140,7 +140,8 @@ sql_render(
 
 \item{op}{A sequence of lazy operations}
 
-\item{con}{A database connection. The default \code{NULL} uses a set of
+\item{con}{A \link{sql_dialect} object or database connection. Connections are
+supported for backward compatibility. The default \code{NULL} uses a set of
 rules that should be very similar to ANSI 92, and allows for testing
 without an active database connection.}
 

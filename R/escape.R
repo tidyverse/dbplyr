@@ -23,7 +23,8 @@
 #'   Default behaviour: lists are always wrapped in parens and separated by
 #'   commas, identifiers are separated by commas and never wrapped,
 #'   atomic vectors are separated by spaces and wrapped in parens if needed.
-#' @param con Database connection.
+#' @param con A [sql_dialect] object or database connection. Connections are
+#'   supported for backward compatibility.
 #' @family generic
 #' @returns A [sql] vector.
 #' @export

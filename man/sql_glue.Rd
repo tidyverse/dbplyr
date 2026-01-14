@@ -14,7 +14,8 @@ sql_glue2(con, sql, envir = parent.frame())
 
 \item{envir}{Environment to evaluate \code{sql} in.}
 
-\item{con}{A database connection.}
+\item{con}{A \link{sql_dialect} object or database connection. Connections are
+supported for backward compatibility.}
 }
 \value{
 An SQL string.
