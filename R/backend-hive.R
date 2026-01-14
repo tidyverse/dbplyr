@@ -26,13 +26,26 @@ NULL
 #' @rdname backend-hive
 simulate_hive <- function() simulate_dbi("Hive")
 
+dialect_hive <- function() {
+  new_sql_dialect(
+    "hive",
+    quote_identifier = function(x) sql_quote(x, '"'),
+    has_window_clause = TRUE
+  )
+}
+
+#' @export
+sql_dialect.Hive <- function(con) {
+  dialect_hive()
+}
+
 #' @export
 dbplyr_edition.Hive <- function(con) {
   2L
 }
 
 #' @export
-sql_translation.Hive <- function(con) {
+sql_translation.sql_dialect_hive <- function(con) {
   sql_variant(
     sql_translator(
       .parent = base_odbc_scalar,
@@ -90,19 +103,14 @@ sql_translation.Hive <- function(con) {
 }
 
 #' @export
-sql_table_analyze.Hive <- function(con, table, ...) {
+sql_table_analyze.sql_dialect_hive <- function(con, table, ...) {
   # https://cwiki.apache.org/confluence/display/Hive/StatsDev
   sql_glue2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
 }
 
 #' @export
-sql_query_set_op.Hive <- function(con, x, y, method, ..., lvl = 0) {
+sql_query_set_op.sql_dialect_hive <- function(con, x, y, method, ..., lvl = 0) {
   # compared to default method, can't use parentheses
   method <- sql_set_op_method(con, method)
   sql_glue2(con, "{x}\n{.sql method}\n{y}")
-}
-
-#' @export
-supports_window_clause.Hive <- function(con) {
-  TRUE
 }

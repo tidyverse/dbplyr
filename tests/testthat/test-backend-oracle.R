@@ -73,18 +73,22 @@ test_that("db_table_temporary adds ORA$PTT_ prefix", {
 
   # Adds prefix (with message) for temporary tables
   expect_snapshot(
-    result <- db_table_temporary(con, table_path("tbl"), temporary = TRUE)
+    result <- sql_table_temporary(con, table_path("tbl"), temporary = TRUE)
   )
   expect_equal(as.character(result$table), "ORA$PTT_tbl")
   expect_true(result$temporary)
 
   # Doesn't double-prefix if already has ORA$PTT_
-  result <- db_table_temporary(con, table_path("ORA$PTT_tbl"), temporary = TRUE)
+  result <- sql_table_temporary(
+    con,
+    table_path("ORA$PTT_tbl"),
+    temporary = TRUE
+  )
   expect_equal(as.character(result$table), "ORA$PTT_tbl")
   expect_true(result$temporary)
 
   # Returns table unchanged for non-temporary
-  result <- db_table_temporary(con, table_path("tbl"), temporary = FALSE)
+  result <- sql_table_temporary(con, table_path("tbl"), temporary = FALSE)
   expect_equal(as.character(result$table), "tbl")
   expect_false(result$temporary)
 })

@@ -177,7 +177,7 @@ get_select_sql <- function(
   win_register_deactivate()
 
   named_windows <- win_register_names()
-  if (nrow(named_windows) > 0 && supports_window_clause(con)) {
+  if (nrow(named_windows) > 0 && sql_has_window_clause(con)) {
     # need to translate again and use registered windows names
     select_sql <- translate_select_sql(con, select)
 
@@ -363,6 +363,40 @@ sql_query_select <- function(
   check_dots_used()
   check_sql(select, allow_names = FALSE)
 
+  dialect <- sql_dialect(con)
+  return(sql_query_select_(
+    dialect,
+    select,
+    from,
+    where = where,
+    group_by = group_by,
+    having = having,
+    window = window,
+    order_by = order_by,
+    limit = limit,
+    distinct = distinct,
+    ...,
+    subquery = subquery,
+    lvl = lvl
+  ))
+
+  UseMethod("sql_query_select")
+}
+sql_query_select_ <- function(
+  dialect,
+  select,
+  from,
+  where = NULL,
+  group_by = NULL,
+  having = NULL,
+  window = NULL,
+  order_by = NULL,
+  limit = NULL,
+  distinct = FALSE,
+  ...,
+  subquery = FALSE,
+  lvl = 0
+) {
   UseMethod("sql_query_select")
 }
 
@@ -394,3 +428,6 @@ sql_query_select.DBIConnection <- function(
     lvl = lvl
   )
 }
+
+#' @export
+sql_query_select.sql_dialect <- sql_query_select.DBIConnection

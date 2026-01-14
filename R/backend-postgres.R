@@ -26,6 +26,24 @@ NULL
 #' @rdname backend-postgres
 simulate_postgres <- function() simulate_dbi("PqConnection")
 
+dialect_postgres <- function() {
+  new_sql_dialect(
+    "postgres",
+    quote_identifier = function(x) sql_quote(x, '"'),
+    has_window_clause = TRUE
+  )
+}
+
+#' @export
+sql_dialect.PqConnection <- function(con) {
+  dialect_postgres()
+}
+
+#' @export
+sql_dialect.PostgreSQL <- function(con) {
+  dialect_postgres()
+}
+
 #' @export
 dbplyr_edition.PostgreSQL <- function(con) {
   2L
@@ -86,7 +104,7 @@ postgres_period <- function(x, unit) {
 }
 
 #' @export
-sql_translation.PqConnection <- function(con) {
+sql_translation.sql_dialect_postgres <- function(con) {
   sql_variant(
     sql_translator(
       .parent = base_scalar,
@@ -325,20 +343,21 @@ sql_translation.PqConnection <- function(con) {
     )
   )
 }
-#' @export
-sql_translation.PostgreSQL <- sql_translation.PqConnection
 
 #' @export
-sql_expr_matches.PqConnection <- function(con, x, y, ...) {
+sql_expr_matches.sql_dialect_postgres <- function(con, x, y, ...) {
   # https://www.postgresql.org/docs/current/functions-comparison.html
   sql_glue2(con, "{x} IS NOT DISTINCT FROM {y}")
 }
-#' @export
-sql_expr_matches.PostgreSQL <- sql_expr_matches.PqConnection
 
 # http://www.postgresql.org/docs/9.3/static/sql-explain.html
 #' @export
-sql_query_explain.PqConnection <- function(con, sql, format = "text", ...) {
+sql_query_explain.sql_dialect_postgres <- function(
+  con,
+  sql,
+  format = "text",
+  ...
+) {
   format <- match.arg(format, c("text", "json", "yaml", "xml"))
 
   if (!is.null(format)) {
@@ -347,11 +366,9 @@ sql_query_explain.PqConnection <- function(con, sql, format = "text", ...) {
     sql_glue2(con, "EXPLAIN {.sql sql}")
   }
 }
-#' @export
-sql_query_explain.PostgreSQL <- sql_query_explain.PqConnection
 
 #' @export
-sql_query_insert.PqConnection <- function(
+sql_query_insert.sql_dialect_postgres <- function(
   con,
   table,
   from,
@@ -390,11 +407,9 @@ sql_query_insert.PqConnection <- function(
   )
   sql_format_clauses(clauses, lvl = 0)
 }
-#' @export
-sql_query_insert.PostgreSQL <- sql_query_insert.PqConnection
 
 #' @export
-sql_query_upsert.PqConnection <- function(
+sql_query_upsert.sql_dialect_postgres <- function(
   con,
   table,
   from,
@@ -412,8 +427,27 @@ sql_query_upsert.PqConnection <- function(
     return(NextMethod("sql_query_upsert"))
   }
 
-  # https://stackoverflow.com/questions/17267417/how-to-upsert-merge-insert-on-duplicate-update-in-postgresql
-  # https://www.sqlite.org/lang_UPSERT.html
+  sql_query_upsert_on_conflict(
+    con,
+    table,
+    from,
+    by,
+    update_cols,
+    returning_cols = returning_cols
+  )
+}
+
+# Shared upsert implementation for Postgres and SQLite (ON CONFLICT syntax)
+# https://stackoverflow.com/questions/17267417/how-to-upsert-merge-insert-on-duplicate-update-in-postgresql
+# https://www.sqlite.org/lang_UPSERT.html
+sql_query_upsert_on_conflict <- function(
+  con,
+  table,
+  from,
+  by,
+  update_cols,
+  returning_cols = NULL
+) {
   table <- as_table_path(table, con)
   parts <- rows_prep(con, table, from, by, lvl = 0)
 
@@ -443,40 +477,17 @@ sql_query_upsert.PqConnection <- function(
 }
 
 #' @export
-sql_query_upsert.PostgreSQL <- sql_query_upsert.PqConnection
+sql_values_subquery.sql_dialect_postgres <- sql_values_subquery_column_alias
 
 #' @export
-sql_values_subquery.PqConnection <- sql_values_subquery_column_alias
-
-#' @export
-sql_values_subquery.PostgreSQL <- sql_values_subquery.PqConnection
-
-#' @export
-sql_escape_date.PostgreSQL <- function(con, x) {
-  sql(DBI::dbQuoteLiteral(con, x))
-}
-#' @export
-sql_escape_date.PqConnection <- sql_escape_date.PostgreSQL
-
-
-#' @export
-supports_window_clause.PqConnection <- function(con) {
-  TRUE
+sql_escape_date.sql_dialect_postgres <- function(con, x) {
+  sql(paste0(sql_quote(as.character(x), "'"), "::date"))
 }
 
 #' @export
-supports_window_clause.PostgreSQL <- function(con) {
-  TRUE
-}
-
-#' @export
-db_supports_table_alias_with_as.PqConnection <- function(con) {
-  TRUE
-}
-
-#' @export
-db_supports_table_alias_with_as.PostgreSQL <- function(con) {
-  TRUE
+sql_escape_datetime.sql_dialect_postgres <- function(con, x) {
+  x <- strftime(x, "%Y-%m-%dT%H:%M:%OSZ", tz = "UTC")
+  sql(paste0(sql_quote(x, "'"), "::timestamp"))
 }
 
 #' @export

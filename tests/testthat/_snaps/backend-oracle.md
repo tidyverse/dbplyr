@@ -43,7 +43,7 @@
 # db_table_temporary adds ORA$PTT_ prefix
 
     Code
-      result <- db_table_temporary(con, table_path("tbl"), temporary = TRUE)
+      result <- sql_table_temporary(con, table_path("tbl"), temporary = TRUE)
     Message
       Created a temporary table named ORA$PTT_tbl
 

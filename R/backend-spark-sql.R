@@ -28,13 +28,26 @@ NULL
 #' @rdname backend-spark-sql
 simulate_spark_sql <- function() simulate_dbi("Spark SQL")
 
+dialect_spark_sql <- function() {
+  new_sql_dialect(
+    "spark_sql",
+    quote_identifier = function(x) sql_quote(x, '"'),
+    has_window_clause = TRUE
+  )
+}
+
+#' @export
+`sql_dialect.Spark SQL` <- function(con) {
+  dialect_spark_sql()
+}
+
 #' @export
 `dbplyr_edition.Spark SQL` <- function(con) {
   2L
 }
 
 #' @export
-`sql_translation.Spark SQL` <- function(con) {
+sql_translation.sql_dialect_spark_sql <- function(con) {
   sql_variant(
     sql_translator(
       .parent = base_odbc_scalar,
@@ -132,14 +145,9 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
 }
 
 #' @export
-`sql_table_analyze.Spark SQL` <- function(con, table, ...) {
+sql_table_analyze.sql_dialect_spark_sql <- function(con, table, ...) {
   # https://docs.databricks.com/en/sql/language-manual/sql-ref-syntax-aux-analyze-table.html
   sql_glue2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
-}
-
-#' @export
-`supports_window_clause.Spark SQL` <- function(con) {
-  TRUE
 }
 
 #' @export

@@ -19,7 +19,7 @@
 #' * `db_collect()` implements [collect.tbl_sql()] using [DBI::dbSendQuery()]
 #'   and [DBI::dbFetch()].
 #'
-#' * `db_table_temporary()` is used for databases that have special naming
+#' * `sql_table_temporary()` is used for databases that have special naming
 #'   schemes for temporary tables (e.g. SQL server and SAP HANA require
 #'   temporary tables to start with `#`)
 #'
@@ -73,7 +73,7 @@ db_copy_to.DBIConnection <- function(
   in_transaction = TRUE
 ) {
   table <- as_table_path(table, con)
-  new <- db_table_temporary(con, table, temporary)
+  new <- sql_table_temporary(con, table, temporary)
   table <- new$table
   temporary <- new$temporary
   call <- current_env()
@@ -138,7 +138,7 @@ db_compute.DBIConnection <- function(
   in_transaction = FALSE
 ) {
   table <- as_table_path(table, con)
-  new <- db_table_temporary(con, table, temporary)
+  new <- sql_table_temporary(con, table, temporary)
   table <- new$table
   temporary <- new$temporary
 
@@ -287,17 +287,24 @@ with_transaction <- function(
 
 #' @export
 #' @rdname db-io
-db_table_temporary <- function(con, table, temporary, ...) {
-  check_dots_used()
-  UseMethod("db_table_temporary")
+sql_table_temporary <- function(con, table, temporary, ...) {
+  dialect <- sql_dialect(con)
+  return(sql_table_temporary_(dialect, table, temporary, ...))
+
+  UseMethod("sql_table_temporary")
+}
+sql_table_temporary_ <- function(con, table, temporary, ...) {
+  UseMethod("sql_table_temporary")
 }
 #' @export
-db_table_temporary.DBIConnection <- function(con, table, temporary, ...) {
+sql_table_temporary.DBIConnection <- function(con, table, temporary, ...) {
   list(
     table = table,
     temporary = temporary
   )
 }
+#' @export
+sql_table_temporary.sql_dialect <- sql_table_temporary.DBIConnection
 
 #' @rdname db-io
 #' @export

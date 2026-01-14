@@ -121,6 +121,7 @@ Collate:
     'simulate.R'
     'sql-build.R'
     'sql-clause.R'
+    'sql-dialect.R'
     'sql-glue.R'
     'sql-superseded.R'
     'src-sql.R'

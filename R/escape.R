@@ -65,11 +65,22 @@ escape.ident <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
 #' @export
 #' @rdname escape
 sql_escape_ident <- function(con, x) {
+  dialect <- sql_dialect(con)
+  return(sql_escape_ident_(dialect, x))
+
+  UseMethod("sql_escape_ident")
+}
+sql_escape_ident_ <- function(dialect, x) {
   UseMethod("sql_escape_ident")
 }
 #' @export
-sql_escape_ident.default <- function(con, x) {
+sql_escape_ident.DBIConnection <- function(con, x) {
   sql(DBI::dbQuoteIdentifier(con, x))
+}
+
+#' @export
+sql_escape_ident.sql_dialect <- function(con, x) {
+  con$quote_identifier(x)
 }
 
 # logical -----------------------------------------------------------------
@@ -82,6 +93,12 @@ escape.logical <- function(x, parens = NA, collapse = ", ", con = NULL) {
 #' @rdname escape
 #' @export
 sql_escape_logical <- function(con, x) {
+  dialect <- sql_dialect(con)
+  return(sql_escape_logical_(dialect, x))
+
+  UseMethod("sql_escape_logical")
+}
+sql_escape_logical_ <- function(dialect, x) {
   UseMethod("sql_escape_logical")
 }
 #' @export
@@ -90,6 +107,9 @@ sql_escape_logical.DBIConnection <- function(con, x) {
   y[is.na(x)] <- "NULL"
   sql(y)
 }
+
+#' @export
+sql_escape_logical.sql_dialect <- sql_escape_logical.DBIConnection
 
 # factor ------------------------------------------------------------------
 
@@ -109,12 +129,21 @@ escape.Date <- function(x, parens = NA, collapse = ", ", con = NULL) {
 #' @export
 #' @rdname escape
 sql_escape_date <- function(con, x) {
+  dialect <- sql_dialect(con)
+  return(sql_escape_date_(dialect, x))
+
+  UseMethod("sql_escape_date")
+}
+sql_escape_date_ <- function(dialect, x) {
   UseMethod("sql_escape_date")
 }
 #' @export
 sql_escape_date.DBIConnection <- function(con, x) {
   sql_escape_string(con, as.character(x))
 }
+
+#' @export
+sql_escape_date.sql_dialect <- sql_escape_date.DBIConnection
 
 # POSIXt ------------------------------------------------------------------
 
@@ -126,6 +155,12 @@ escape.POSIXt <- function(x, parens = NA, collapse = ", ", con = NULL) {
 #' @export
 #' @rdname escape
 sql_escape_datetime <- function(con, x) {
+  dialect <- sql_dialect(con)
+  return(sql_escape_datetime_(dialect, x))
+
+  UseMethod("sql_escape_datetime")
+}
+sql_escape_datetime_ <- function(dialect, x) {
   UseMethod("sql_escape_datetime")
 }
 #' @export
@@ -133,6 +168,9 @@ sql_escape_datetime.DBIConnection <- function(con, x) {
   x <- strftime(x, "%Y-%m-%dT%H:%M:%OSZ", tz = "UTC")
   sql_escape_string(con, x)
 }
+
+#' @export
+sql_escape_datetime.sql_dialect <- sql_escape_datetime.DBIConnection
 
 # character ---------------------------------------------------------------
 
@@ -196,6 +234,12 @@ escape.blob <- function(x, parens = NA, collapse = ", ", con = NULL) {
 #' @export
 #' @rdname escape
 sql_escape_raw <- function(con, x) {
+  dialect <- sql_dialect(con)
+  return(sql_escape_raw_(dialect, x))
+
+  UseMethod("sql_escape_raw")
+}
+sql_escape_raw_ <- function(dialect, x) {
   UseMethod("sql_escape_raw")
 }
 #' @export
@@ -211,6 +255,9 @@ sql_escape_raw.DBIConnection <- function(con, x) {
     sql(paste0(c("X'", format(x), "'"), collapse = ""))
   }
 }
+
+#' @export
+sql_escape_raw.sql_dialect <- sql_escape_raw.DBIConnection
 
 # NULL --------------------------------------------------------------------
 

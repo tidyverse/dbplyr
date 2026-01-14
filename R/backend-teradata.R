@@ -24,13 +24,26 @@ NULL
 #' @rdname backend-teradata
 simulate_teradata <- function() simulate_dbi("Teradata")
 
+dialect_teradata <- function() {
+  new_sql_dialect(
+    "teradata",
+    quote_identifier = function(x) sql_quote(x, '"'),
+    has_window_clause = TRUE
+  )
+}
+
+#' @export
+sql_dialect.Teradata <- function(con) {
+  dialect_teradata()
+}
+
 #' @export
 dbplyr_edition.Teradata <- function(con) {
   2L
 }
 
 #' @export
-sql_query_select.Teradata <- function(
+sql_query_select.sql_dialect_teradata <- function(
   con,
   select,
   from,
@@ -97,7 +110,7 @@ sql_query_select.Teradata <- function(
 }
 
 #' @export
-sql_translation.Teradata <- function(con) {
+sql_translation.sql_dialect_teradata <- function(con) {
   sql_variant(
     sql_translator(
       .parent = base_odbc_scalar,
@@ -224,7 +237,7 @@ teradata_as_date <- function(x) {
 }
 
 #' @export
-sql_table_analyze.Teradata <- function(con, table, ...) {
+sql_table_analyze.sql_dialect_teradata <- function(con, table, ...) {
   # https://www.tutorialspoint.com/teradata/teradata_statistics.htm
   sql_glue2(con, "COLLECT STATISTICS {.tbl table}")
 }
