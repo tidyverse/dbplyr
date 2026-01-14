@@ -83,13 +83,8 @@ op_vars.lazy_base_values_query <- function(op) {
 
 sql_values_subquery <- function(con, df, types, lvl = 0, ...) {
   check_dots_used()
-  dialect <- sql_dialect(con)
-  return(sql_values_subquery_(dialect, df, types, lvl, ...))
-
-  UseMethod("sql_values_subquery")
-}
-sql_values_subquery_ <- function(dialect, df, types, lvl = 0, ...) {
-  UseMethod("sql_values_subquery")
+  con <- sql_dialect(con)
+  UseMethod("sql_values_subquery", con)
 }
 
 #' @export

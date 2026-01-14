@@ -65,13 +65,8 @@ escape.ident <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
 #' @export
 #' @rdname escape
 sql_escape_ident <- function(con, x) {
-  dialect <- sql_dialect(con)
-  return(sql_escape_ident_(dialect, x))
-
-  UseMethod("sql_escape_ident")
-}
-sql_escape_ident_ <- function(dialect, x) {
-  UseMethod("sql_escape_ident")
+  con <- sql_dialect(con)
+  UseMethod("sql_escape_ident", con)
 }
 #' @export
 sql_escape_ident.DBIConnection <- function(con, x) {
@@ -80,7 +75,7 @@ sql_escape_ident.DBIConnection <- function(con, x) {
 
 #' @export
 sql_escape_ident.sql_dialect <- function(con, x) {
-  con$quote_identifier(x)
+  sql_dialect(con)$quote_identifier(x)
 }
 
 # logical -----------------------------------------------------------------
@@ -93,13 +88,8 @@ escape.logical <- function(x, parens = NA, collapse = ", ", con = NULL) {
 #' @rdname escape
 #' @export
 sql_escape_logical <- function(con, x) {
-  dialect <- sql_dialect(con)
-  return(sql_escape_logical_(dialect, x))
-
-  UseMethod("sql_escape_logical")
-}
-sql_escape_logical_ <- function(dialect, x) {
-  UseMethod("sql_escape_logical")
+  con <- sql_dialect(con)
+  UseMethod("sql_escape_logical", con)
 }
 #' @export
 sql_escape_logical.DBIConnection <- function(con, x) {
@@ -129,13 +119,8 @@ escape.Date <- function(x, parens = NA, collapse = ", ", con = NULL) {
 #' @export
 #' @rdname escape
 sql_escape_date <- function(con, x) {
-  dialect <- sql_dialect(con)
-  return(sql_escape_date_(dialect, x))
-
-  UseMethod("sql_escape_date")
-}
-sql_escape_date_ <- function(dialect, x) {
-  UseMethod("sql_escape_date")
+  con <- sql_dialect(con)
+  UseMethod("sql_escape_date", con)
 }
 #' @export
 sql_escape_date.DBIConnection <- function(con, x) {
@@ -155,13 +140,8 @@ escape.POSIXt <- function(x, parens = NA, collapse = ", ", con = NULL) {
 #' @export
 #' @rdname escape
 sql_escape_datetime <- function(con, x) {
-  dialect <- sql_dialect(con)
-  return(sql_escape_datetime_(dialect, x))
-
-  UseMethod("sql_escape_datetime")
-}
-sql_escape_datetime_ <- function(dialect, x) {
-  UseMethod("sql_escape_datetime")
+  con <- sql_dialect(con)
+  UseMethod("sql_escape_datetime", con)
 }
 #' @export
 sql_escape_datetime.DBIConnection <- function(con, x) {
@@ -234,13 +214,8 @@ escape.blob <- function(x, parens = NA, collapse = ", ", con = NULL) {
 #' @export
 #' @rdname escape
 sql_escape_raw <- function(con, x) {
-  dialect <- sql_dialect(con)
-  return(sql_escape_raw_(dialect, x))
-
-  UseMethod("sql_escape_raw")
-}
-sql_escape_raw_ <- function(dialect, x) {
-  UseMethod("sql_escape_raw")
+  con <- sql_dialect(con)
+  UseMethod("sql_escape_raw", con)
 }
 #' @export
 sql_escape_raw.DBIConnection <- function(con, x) {

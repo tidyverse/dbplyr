@@ -148,33 +148,8 @@ sql_query_join <- function(
   lvl = 0
 ) {
   check_dots_used()
-  dialect <- sql_dialect(con)
-  return(sql_query_join_(
-    dialect,
-    x,
-    y,
-    select,
-    type = type,
-    by = by,
-    na_matches = na_matches,
-    ...,
-    lvl = lvl
-  ))
-
-  UseMethod("sql_query_join")
-}
-sql_query_join_ <- function(
-  dialect,
-  x,
-  y,
-  select,
-  type = "inner",
-  by = NULL,
-  na_matches = FALSE,
-  ...,
-  lvl = 0
-) {
-  UseMethod("sql_query_join")
+  con <- sql_dialect(con)
+  UseMethod("sql_query_join", con)
 }
 #' @export
 sql_query_join.DBIConnection <- function(

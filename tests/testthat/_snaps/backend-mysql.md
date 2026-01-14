@@ -28,7 +28,7 @@
     Code
       full_join(lf, lf, by = "x")
     Condition
-      Error in `sql_query_join_()`:
+      Error in `sql_query_join()`:
       ! MySQL does not support full joins
 
 ---

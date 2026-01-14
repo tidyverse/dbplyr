@@ -118,7 +118,7 @@
         lvl = 1), insert_cols = colnames(df_y), by = c("a", "b"), conflict = "error",
       returning_cols = c("a", b2 = "b")))
     Condition
-      Error in `sql_query_insert_()`:
+      Error in `sql_query_insert()`:
       ! `conflict = "error"` isn't supported on database backends.
       i It must be "ignore" instead.
 
