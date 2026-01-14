@@ -5,7 +5,7 @@
 \alias{dialect_mysql}
 \alias{simulate_mysql}
 \alias{simulate_mariadb}
-\title{Backend: MySQL/MariaDB}
+\title{MySQL/MariaDB backend}
 \usage{
 dialect_mariadb()
 

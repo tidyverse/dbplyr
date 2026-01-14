@@ -3,7 +3,7 @@
 \name{backend-hive}
 \alias{dialect_hive}
 \alias{simulate_hive}
-\title{Backend: Hive}
+\title{Hive backend}
 \usage{
 dialect_hive()
 

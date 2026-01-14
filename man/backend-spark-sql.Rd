@@ -3,7 +3,7 @@
 \name{backend-spark-sql}
 \alias{dialect_spark_sql}
 \alias{simulate_spark_sql}
-\title{Backend: Databricks Spark SQL}
+\title{Databricks Spark SQL backend}
 \usage{
 dialect_spark_sql()
 

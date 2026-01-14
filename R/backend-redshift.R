@@ -1,4 +1,4 @@
-#' Backend: Redshift
+#' Redshift backend
 #'
 #' @description
 #' Base translations come from [PostgreSQL backend][simulate_postgres]. There

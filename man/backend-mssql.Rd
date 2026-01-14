@@ -3,7 +3,7 @@
 \name{backend-mssql}
 \alias{dialect_mssql}
 \alias{simulate_mssql}
-\title{Backend: SQL server}
+\title{SQL Server backend}
 \usage{
 dialect_mssql(version = "15.0")
 

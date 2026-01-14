@@ -1,4 +1,4 @@
-#' Backend: SQL server
+#' SQL Server backend
 #'
 #' @description
 #' See `vignette("translation-function")` and `vignette("translation-verb")` for

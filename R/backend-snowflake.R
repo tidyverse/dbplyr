@@ -1,4 +1,4 @@
-#' Backend: Snowflake
+#' Snowflake backend
 #'
 #' @description
 #' See `vignette("translation-function")` and `vignette("translation-verb")` for

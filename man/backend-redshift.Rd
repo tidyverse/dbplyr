@@ -3,7 +3,7 @@
 \name{backend-redshift}
 \alias{dialect_redshift}
 \alias{simulate_redshift}
-\title{Backend: Redshift}
+\title{Redshift backend}
 \usage{
 dialect_redshift()
 

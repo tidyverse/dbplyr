@@ -3,7 +3,7 @@
 \name{backend-odbc}
 \alias{dialect_odbc}
 \alias{simulate_odbc}
-\title{Backend: ODBC}
+\title{ODBC backend}
 \usage{
 dialect_odbc()
 

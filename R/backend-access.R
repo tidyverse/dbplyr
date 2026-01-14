@@ -1,4 +1,4 @@
-#' Backend: MS Access
+#' MS Access backend
 #'
 #' @description
 #' See `vignette("translation-function")` and `vignette("translation-verb")` for

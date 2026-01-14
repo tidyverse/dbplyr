@@ -3,7 +3,7 @@
 \name{backend-snowflake}
 \alias{dialect_snowflake}
 \alias{simulate_snowflake}
-\title{Backend: Snowflake}
+\title{Snowflake backend}
 \usage{
 dialect_snowflake()
 

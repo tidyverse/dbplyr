@@ -3,7 +3,7 @@
 \name{backend-teradata}
 \alias{dialect_teradata}
 \alias{simulate_teradata}
-\title{Backend: Teradata}
+\title{Teradata backend}
 \usage{
 dialect_teradata()
 

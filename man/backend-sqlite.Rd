@@ -3,7 +3,7 @@
 \name{backend-sqlite}
 \alias{dialect_sqlite}
 \alias{simulate_sqlite}
-\title{Backend: SQLite}
+\title{SQLite backend}
 \usage{
 dialect_sqlite()
 

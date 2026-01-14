@@ -3,7 +3,7 @@
 \name{backend-postgres}
 \alias{dialect_postgres}
 \alias{simulate_postgres}
-\title{Backend: PostgreSQL}
+\title{PostgreSQL backend}
 \usage{
 dialect_postgres()
 

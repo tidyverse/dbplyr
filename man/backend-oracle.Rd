@@ -3,7 +3,7 @@
 \name{backend-oracle}
 \alias{dialect_oracle}
 \alias{simulate_oracle}
-\title{Backend: Oracle}
+\title{Oracle backend}
 \usage{
 dialect_oracle()
 

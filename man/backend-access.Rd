@@ -3,7 +3,7 @@
 \name{backend-access}
 \alias{dialect_access}
 \alias{simulate_access}
-\title{Backend: MS Access}
+\title{MS Access backend}
 \usage{
 dialect_access()
 

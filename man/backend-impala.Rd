@@ -3,7 +3,7 @@
 \name{backend-impala}
 \alias{dialect_impala}
 \alias{simulate_impala}
-\title{Backend: Impala}
+\title{Impala backend}
 \usage{
 dialect_impala()
 

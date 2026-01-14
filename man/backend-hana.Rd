@@ -3,7 +3,7 @@
 \name{backend-hana}
 \alias{dialect_hana}
 \alias{simulate_hana}
-\title{Backend: SAP HANA}
+\title{SAP HANA backend}
 \usage{
 dialect_hana()
 
