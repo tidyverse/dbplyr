@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* Single-table SELECT queries now use unqualified `*` (e.g., `SELECT *`)   instead of table-qualified `*` (e.g., `SELECT "df".*`) for most backends.   Oracle and Teradata continue to use qualified stars as required by their   syntax (#1577, #1485).
 * New `sql_dialect()` generic provides a way for a database connections to choose a SQL dialect, using `new_sql_dialect()` to create a `sql_dialect` class. This allows connections to more easily share translations, and lays the foundation for better translations for connections via ODBC/JDBC/ADBC (#1624).
 * `db_supports_table_alias_with_as()` and `supports_window_clause()` generics have been removed. They are now part of the `sql_dialect()` data structure (#1760).
 * `db_table_temporary()` has been renamed to `sql_table_temporary()` for consistency with other SQL generation functions (#1760).

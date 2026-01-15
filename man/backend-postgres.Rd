@@ -10,7 +10,7 @@ dialect_postgres()
 simulate_postgres()
 }
 \description{
-This backend supports PostgreSQL databases, typically accessed via
+This backend supports PostgreSQL databases, typically accessed via a
 \code{PqConnection} created by \code{\link[DBI:dbConnect]{DBI::dbConnect()}}. Use \code{dialect_postgres()} with
 \code{lazy_frame()} to see simulated SQL without connecting to a live database.
 

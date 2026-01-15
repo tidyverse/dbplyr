@@ -6,7 +6,7 @@
       <SQL>
       SELECT 0.0 AS "x"
       FROM (
-        SELECT DISTINCT "df".*
+        SELECT DISTINCT *
         FROM "df"
       ) AS "q01"
 
@@ -16,7 +16,7 @@
       (expect_no_error(mutate(lf, r = row_number())))
     Output
       <SQL>
-      SELECT "q01".*, ROW_NUMBER() OVER () AS "r"
+      SELECT *, ROW_NUMBER() OVER () AS "r"
       FROM (
         SELECT "g"
         FROM "df"
@@ -75,7 +75,7 @@
     Output
       <SQL> SELECT "x", SQRT("y") AS "y"
       FROM (
-        SELECT "df".*, 2.0 AS "y"
+        SELECT *, 2.0 AS "y"
         FROM "df"
       ) AS "q01"
 
@@ -99,9 +99,9 @@
     Code
       remote_query(lf)
     Output
-      <SQL> SELECT "q01".*, "y" + 1.0 AS "z"
+      <SQL> SELECT *, "y" + 1.0 AS "z"
       FROM (
-        SELECT "df".*, 2.0 AS "y"
+        SELECT *, 2.0 AS "y"
         FROM "df"
       ) AS "q01"
 
@@ -137,10 +137,10 @@
       out
     Output
       <SQL>
-      SELECT "q01".*, AVG("x") OVER (PARTITION BY "g") AS "r2"
+      SELECT *, AVG("x") OVER (PARTITION BY "g") AS "r2"
       FROM (
         SELECT
-          "df".*,
+          *,
           SUM("x") OVER (PARTITION BY "g" ORDER BY "y" ROWS UNBOUNDED PRECEDING) AS "r1"
         FROM "df"
       ) AS "q01"
@@ -152,7 +152,7 @@
     Output
       <SQL>
       SELECT
-        "df".*,
+        *,
         SUM("x") OVER (PARTITION BY "g" ORDER BY "y" ROWS UNBOUNDED PRECEDING) AS "r"
       FROM "df"
     Code
@@ -160,7 +160,7 @@
     Output
       <SQL>
       SELECT
-        "df".*,
+        *,
         SUM("x") OVER (PARTITION BY "g" ORDER BY "x", "y" DESC ROWS UNBOUNDED PRECEDING) AS "r"
       FROM "df"
 
@@ -171,7 +171,7 @@
     Output
       <SQL>
       SELECT
-        "df".*,
+        *,
         SUM("x") OVER (PARTITION BY "g" ORDER BY "y" ROWS UNBOUNDED PRECEDING) AS "r"
       FROM "df"
     Code
@@ -179,7 +179,7 @@
     Output
       <SQL>
       SELECT
-        "df".*,
+        *,
         SUM("x") OVER (PARTITION BY "g" ORDER BY "y" ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS "r"
       FROM "df"
 
@@ -229,9 +229,9 @@
       mutate(lf, x1 = x + 1, x2 = x1 + 1)
     Output
       <SQL>
-      SELECT `q01`.*, `x1` + 1.0 AS `x2`
+      SELECT *, `x1` + 1.0 AS `x2`
       FROM (
-        SELECT `df`.*, `x` + 1.0 AS `x1`
+        SELECT *, `x` + 1.0 AS `x1`
         FROM `df`
       ) AS `q01`
 
@@ -269,7 +269,7 @@
     Code
       remote_query(lf)
     Output
-      <SQL> SELECT "df".*, 3.0 AS "y"
+      <SQL> SELECT *, 3.0 AS "y"
       FROM "df"
 
 # temp var with nested arguments
@@ -279,7 +279,7 @@
     Output
       <SQL> SELECT "x", "y" * 2.0 AS "z"
       FROM (
-        SELECT "df".*, 2.0 AS "y"
+        SELECT *, 2.0 AS "y"
         FROM "df"
       ) AS "q01"
 

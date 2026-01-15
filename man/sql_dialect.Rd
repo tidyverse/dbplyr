@@ -11,7 +11,8 @@ new_sql_dialect(
   dialect,
   quote_identifier,
   has_window_clause = FALSE,
-  has_table_alias_with_as = TRUE
+  has_table_alias_with_as = TRUE,
+  has_star_table_prefix = FALSE
 )
 }
 \arguments{
@@ -27,6 +28,9 @@ definitions (the \code{WINDOW} clause)?}
 
 \item{has_table_alias_with_as}{Does the backend support using \code{AS}
 when aliasing a table in a subquery?}
+
+\item{has_star_table_prefix}{Does the backend require table prefixes when
+selecting all columns in single-table queries (e.g., \verb{"table".*} vs \code{*})?}
 }
 \value{
 \itemize{

@@ -61,6 +61,25 @@ test_that("sql_has_table_alias_with_as() returns correct values", {
   expect_true(sql_has_table_alias_with_as(dialect_ansi()))
 })
 
+test_that("sql_has_star_table_prefix() returns correct values", {
+  d1 <- new_sql_dialect(
+    "test",
+    quote_identifier = identity,
+    has_star_table_prefix = FALSE
+  )
+  d2 <- new_sql_dialect(
+    "test",
+    quote_identifier = identity,
+    has_star_table_prefix = TRUE
+  )
+
+  expect_false(sql_has_star_table_prefix(d1))
+  expect_true(sql_has_star_table_prefix(d2))
+
+  # DBIConnection defaults to FALSE
+  expect_false(sql_has_star_table_prefix(dialect_ansi()))
+})
+
 test_that("print method shows class", {
   d <- new_sql_dialect("test", quote_identifier = identity)
   expect_snapshot(d)

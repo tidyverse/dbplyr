@@ -28,7 +28,7 @@
       filter(lazy_frame(x = 1, y = 1), x == y$id)
     Output
       <SQL>
-      SELECT "df".*
+      SELECT *
       FROM "df"
       WHERE ("x" = "y"."id")
 
@@ -38,7 +38,7 @@
       filter(lazy_frame(x = 1), x == y$id)
     Output
       <SQL>
-      SELECT "df".*
+      SELECT *
       FROM "df"
       WHERE ("x" = 1.0)
 
@@ -89,7 +89,7 @@
       filter(mf, x == a)
     Output
       <SQL>
-      SELECT `df`.*
+      SELECT *
       FROM `df`
       WHERE (`x` = X'616263')
 
@@ -99,7 +99,7 @@
       filter(mf, x %in% L)
     Output
       <SQL>
-      SELECT `df`.*
+      SELECT *
       FROM `df`
       WHERE (`x` IN (X'616263', X'0102'))
 
@@ -109,7 +109,7 @@
       qry
     Output
       <SQL>
-      SELECT `df`.*
+      SELECT *
       FROM `df`
       WHERE (`x` IN (X'616263', X'0102'))
 

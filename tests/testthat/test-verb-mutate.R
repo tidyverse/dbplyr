@@ -197,7 +197,7 @@ test_that("new columns take precedence over global variables", {
 test_that("constants do not need a new query", {
   expect_equal(
     lazy_frame(x = 1, y = 2) |> mutate(z = 2, z = 3) |> remote_query(),
-    sql("SELECT \"df\".*, 3.0 AS \"z\"\nFROM \"df\"")
+    sql("SELECT *, 3.0 AS \"z\"\nFROM \"df\"")
   )
 })
 
@@ -539,17 +539,17 @@ test_that("mutate() uses star", {
 
   expect_equal(
     lf |> mutate(z = 1L) |> remote_query(),
-    sql("SELECT \"df\".*, 1 AS \"z\"\nFROM \"df\"")
+    sql("SELECT *, 1 AS \"z\"\nFROM \"df\"")
   )
 
   expect_equal(
     lf |> mutate(a = 1L, .before = 1) |> remote_query(),
-    sql("SELECT 1 AS \"a\", \"df\".*\nFROM \"df\"")
+    sql("SELECT 1 AS \"a\", *\nFROM \"df\"")
   )
 
   expect_equal(
     lf |> transmute(a = 1L, x, y, z = 2L) |> remote_query(),
-    sql("SELECT 1 AS \"a\", \"df\".*, 2 AS \"z\"\nFROM \"df\"")
+    sql("SELECT 1 AS \"a\", *, 2 AS \"z\"\nFROM \"df\"")
   )
 
   # does not use * if `use_star = FALSE`
@@ -568,7 +568,7 @@ test_that("mutate generates simple expressions", {
     mutate(y = x + 1L) |>
     sql_build()
 
-  expect_equal(out$select, sql('"df".*', '"x" + 1 AS "y"'))
+  expect_equal(out$select, sql('*', '"x" + 1 AS "y"'))
 })
 
 test_that("mutate can drop variables with NULL", {
@@ -588,7 +588,7 @@ test_that("var = NULL works when var is in original data", {
 
 test_that("var = NULL when var is in final output", {
   lf <- lazy_frame(x = 1) |> mutate(y = NULL, y = 3)
-  expect_equal(sql_build(lf)$select, sql("\"df\".*", "3.0 AS \"y\""))
+  expect_equal(sql_build(lf)$select, sql("*", "3.0 AS \"y\""))
   expect_equal(op_vars(lf), c("x", "y"))
   expect_snapshot(remote_query(lf))
 })
@@ -612,7 +612,7 @@ test_that("mutate_all generates correct sql", {
     sql_build()
   expect_equal(
     out$select,
-    sql('"df".*', '"x" + 1 AS "one"', '"x" + 2 AS "two"')
+    sql('*', '"x" + 1 AS "one"', '"x" + 2 AS "two"')
   )
 })
 

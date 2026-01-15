@@ -427,3 +427,12 @@ sql_star <- function(con, table) {
   table <- table_path_name(table, con)
   sql_glue2(con, "{.id table}.*")
 }
+
+# For single-table SELECTs: use unqualified * unless backend requires prefix
+sql_select_star <- function(con, table) {
+  if (sql_has_star_table_prefix(con)) {
+    sql_star(con, table)
+  } else {
+    sql("*")
+  }
+}

@@ -55,20 +55,20 @@
       show_query(lf_union)
     Output
       <SQL>
-      SELECT "lf1".*, NULL AS "z"
+      SELECT *, NULL AS "z"
       FROM "lf1"
       
       UNION ALL
       
-      SELECT "q01".*, NULL AS "z"
+      SELECT *, NULL AS "z"
       FROM (
-        SELECT NULL AS "x", "lf2".*
+        SELECT NULL AS "x", *
         FROM "lf2"
       ) AS "q01"
       
       UNION
       
-      SELECT NULL AS "x", NULL AS "y", "lf3".*
+      SELECT NULL AS "x", NULL AS "y", *
       FROM "lf3"
 
 ---
@@ -78,19 +78,19 @@
     Output
       <SQL>
       WITH "q01" AS (
-        SELECT "lf1".*, NULL AS "z"
+        SELECT *, NULL AS "z"
         FROM "lf1"
       ),
       "q02" AS (
-        SELECT NULL AS "x", "lf2".*
+        SELECT NULL AS "x", *
         FROM "lf2"
       ),
       "q03" AS (
-        SELECT "q01".*, NULL AS "z"
+        SELECT *, NULL AS "z"
         FROM "q02" AS "q01"
       ),
       "q04" AS (
-        SELECT NULL AS "x", NULL AS "y", "lf3".*
+        SELECT NULL AS "x", NULL AS "y", *
         FROM "lf3"
       )
       SELECT *
@@ -113,7 +113,7 @@
     Output
       <SQL>
       WITH "q01" AS (
-        SELECT "lf".*, "x" + 1.0 AS "y"
+        SELECT *, "x" + 1.0 AS "y"
         FROM "lf"
       )
       SELECT *
