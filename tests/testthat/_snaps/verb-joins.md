@@ -239,7 +239,7 @@
       FROM `df1`
       WHERE NOT EXISTS (
         SELECT 1 FROM (
-        SELECT `df2`.*, ROW_NUMBER() OVER () AS `col01`
+        SELECT *, ROW_NUMBER() OVER () AS `col01`
         FROM `df2`
       ) AS `RHS`
         WHERE (`df1`.`id` = `RHS`.`id`) AND (`RHS`.`col01` <= 3.0)
@@ -477,7 +477,7 @@
     Output
       <SQL>
       WITH "q01" AS (
-        SELECT "lf".*, "x" * 2.0 AS "z"
+        SELECT *, "x" * 2.0 AS "z"
         FROM "lf"
       )
       SELECT "LHS"."x" AS "x.x", "LHS"."z" AS "z", "RHS"."x" AS "x.y"

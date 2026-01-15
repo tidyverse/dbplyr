@@ -37,7 +37,8 @@ dialect_oracle <- function() {
   new_sql_dialect(
     "oracle",
     quote_identifier = function(x) sql_quote(x, '"'),
-    has_table_alias_with_as = FALSE
+    has_table_alias_with_as = FALSE,
+    has_star_table_prefix = TRUE
   )
 }
 

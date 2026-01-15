@@ -159,7 +159,7 @@ get_select_sql <- function(
   if (use_star) {
     if (is_identity(select$expr, select$name, in_vars)) {
       out <- list(
-        select_sql = sql_star(con, table_alias),
+        select_sql = sql_select_star(con, table_alias),
         window_sql = sql()
       )
       return(out)
@@ -212,9 +212,10 @@ select_use_star <- function(select, vars_prev, table_alias, con) {
   if (is_identity(test_cols$expr, test_cols$name, vars_prev)) {
     idx_start <- seq2(1, first_match - 1)
     idx_end <- seq2(last + 1, n)
+    star <- sql_select_star(con, table_alias)
     vctrs::vec_rbind(
       vctrs::vec_slice(select, idx_start),
-      tibble(name = "", expr = list(sql_star(con, table_alias))),
+      tibble(name = "", expr = list(star)),
       vctrs::vec_slice(select, idx_end)
     )
   } else {

@@ -38,6 +38,8 @@
 #'   definitions (the `WINDOW` clause)?
 #' @param has_table_alias_with_as Does the backend support using `AS`
 #'   when aliasing a table in a subquery?
+#' @param has_star_table_prefix Does the backend require table prefixes when
+#'   selecting all columns in single-table queries (e.g., `"table".*` vs `*`)?
 #'
 #' @return
 #' * `sql_dialect()` returns a dialect object (class `sql_dialect`) or
@@ -76,19 +78,22 @@ new_sql_dialect <- function(
   dialect,
   quote_identifier,
   has_window_clause = FALSE,
-  has_table_alias_with_as = TRUE
+  has_table_alias_with_as = TRUE,
+  has_star_table_prefix = FALSE
 ) {
   check_string(dialect)
   check_function(quote_identifier)
   check_bool(has_window_clause)
   check_bool(has_table_alias_with_as)
+  check_bool(has_star_table_prefix)
 
   structure(
     list(
       quote_identifier = quote_identifier,
       has = list(
         window_clause = has_window_clause,
-        table_alias_with_as = has_table_alias_with_as
+        table_alias_with_as = has_table_alias_with_as,
+        star_table_prefix = has_star_table_prefix
       )
     ),
     class = c(paste0("sql_dialect_", dialect), "sql_dialect")
@@ -132,6 +137,17 @@ sql_has_window_clause <- function(con) {
     dialect$has$window_clause
   } else {
     # For backward comptaibility
+    FALSE
+  }
+}
+
+sql_has_star_table_prefix <- function(con) {
+  dialect <- sql_dialect(con)
+
+  if (is_sql_dialect(dialect)) {
+    dialect$has$star_table_prefix %||% FALSE
+  } else {
+    # For backward compatibility
     FALSE
   }
 }

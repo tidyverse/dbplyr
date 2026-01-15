@@ -4,7 +4,7 @@
       show_query(out)
     Output
       <SQL>
-      SELECT "df".*
+      SELECT *
       FROM "df"
       WHERE ("x" > 0.0)
 

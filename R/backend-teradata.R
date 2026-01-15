@@ -28,7 +28,8 @@ dialect_teradata <- function() {
   new_sql_dialect(
     "teradata",
     quote_identifier = function(x) sql_quote(x, '"'),
-    has_window_clause = TRUE
+    has_window_clause = TRUE,
+    has_star_table_prefix = TRUE
   )
 }
 
