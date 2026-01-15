@@ -82,7 +82,7 @@ library(dplyr, warn.conflicts = FALSE)
 lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_mssql())
 lf |> head()
 #> <SQL>
-#> SELECT TOP 6 [df].*
+#> SELECT TOP 6 *
 #> FROM [df]
 lf |> transmute(x = paste(b, c, d))
 #> <SQL>
@@ -92,7 +92,7 @@ lf |> transmute(x = paste(b, c, d))
 # Can use boolean as is:
 lf |> filter(c > d)
 #> <SQL>
-#> SELECT [df].*
+#> SELECT *
 #> FROM [df]
 #> WHERE ([c] > [d])
 # Need to convert from boolean to bit:

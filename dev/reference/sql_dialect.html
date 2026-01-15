@@ -91,7 +91,8 @@ intended for dbplyr backend authors.</p></li>
 <span>  <span class="va">dialect</span>,</span>
 <span>  <span class="va">quote_identifier</span>,</span>
 <span>  has_window_clause <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  has_table_alias_with_as <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  has_table_alias_with_as <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  has_star_table_prefix <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -120,6 +121,11 @@ definitions (the <code>WINDOW</code> clause)?</p></dd>
 <dt id="arg-has-table-alias-with-as">has_table_alias_with_as<a class="anchor" aria-label="anchor" href="#arg-has-table-alias-with-as"></a></dt>
 <dd><p>Does the backend support using <code>AS</code>
 when aliasing a table in a subquery?</p></dd>
+
+
+<dt id="arg-has-star-table-prefix">has_star_table_prefix<a class="anchor" aria-label="anchor" href="#arg-has-star-table-prefix"></a></dt>
+<dd><p>Does the backend require table prefixes when
+selecting all columns in single-table queries (e.g., <code>"table".*</code> vs <code>*</code>)?</p></dd>
 
 </dl></div>
     <div class="section level2">

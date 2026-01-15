@@ -99,7 +99,7 @@ lazy_frame(x = x, con = simulate_postgres()) |>
   head(5) |> 
   show_query()
 #> <SQL>
-#> SELECT "df".*
+#> SELECT *
 #> FROM "df"
 #> LIMIT 5
 
@@ -107,7 +107,7 @@ lazy_frame(x = x, con = simulate_mssql()) |>
   head(5) |> 
   show_query()
 #> <SQL>
-#> SELECT TOP 5 [df].*
+#> SELECT TOP 5 *
 #> FROM [df]
 ```
 

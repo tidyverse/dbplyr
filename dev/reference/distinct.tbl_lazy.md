@@ -45,7 +45,7 @@ library(dplyr, warn.conflicts = FALSE)
 db <- memdb_frame(x = c(1, 1, 2, 2), y = c(1, 2, 1, 1))
 db |> distinct() |> show_query()
 #> <SQL>
-#> SELECT DISTINCT `dbplyr_tmp_eoeBlLyCUB`.*
+#> SELECT DISTINCT *
 #> FROM `dbplyr_tmp_eoeBlLyCUB`
 db |> distinct(x) |> show_query()
 #> <SQL>

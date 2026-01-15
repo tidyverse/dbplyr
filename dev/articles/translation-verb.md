@@ -49,7 +49,7 @@ airports <- copy_to(con, nycflights13::airports)
     filter(month == 1, day == 1) |>
     show_query()
   #> <SQL>
-  #> SELECT `nycflights13::flights`.*
+  #> SELECT *
   #> FROM `nycflights13::flights`
   #> WHERE (`month` = 1.0) AND (`day` = 1.0)
   ```
@@ -62,7 +62,7 @@ airports <- copy_to(con, nycflights13::airports)
     arrange(carrier, desc(arr_delay)) |>
     show_query()
   #> <SQL>
-  #> SELECT `nycflights13::flights`.*
+  #> SELECT *
   #> FROM `nycflights13::flights`
   #> ORDER BY `carrier`, `arr_delay` DESC
   ```
@@ -102,7 +102,7 @@ flights |>
     speed = distance / air_time_h) |>
   show_query()
 #> <SQL>
-#> SELECT `q01`.*, `distance` / `air_time_h` AS `speed`
+#> SELECT *, `distance` / `air_time_h` AS `speed`
 #> FROM (
 #>   SELECT `distance`, `air_time`, `air_time` / 60.0 AS `air_time_h`
 #>   FROM `nycflights13::flights`
@@ -123,7 +123,7 @@ flights |>
 #>   SELECT `distance`, `air_time`, `air_time` / 60.0 AS `air_time_h`
 #>   FROM `nycflights13::flights`
 #> )
-#> SELECT `q01`.*, `distance` / `air_time_h` AS `speed`
+#> SELECT *, `distance` / `air_time_h` AS `speed`
 #> FROM `q01`
 ```
 

@@ -81,7 +81,7 @@ df |> arrange(x)
 #> # ℹ more rows
 df |> arrange(x) |> show_query()
 #> <SQL>
-#> SELECT `dbplyr_tmp_KpjGw3nPZi`.*
+#> SELECT *
 #> FROM `dbplyr_tmp_KpjGw3nPZi`
 #> ORDER BY `x`
 

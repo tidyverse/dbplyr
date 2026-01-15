@@ -43,7 +43,7 @@ bind_queries(lf1, lf2)
 lf3 <- lazy_frame(y = "c", x = 3, z = 10)
 bind_queries(lf2, lf3)
 #> <SQL>
-#> SELECT "df".*, NULL AS "z"
+#> SELECT *, NULL AS "z"
 #> FROM "df"
 #> 
 #> UNION ALL

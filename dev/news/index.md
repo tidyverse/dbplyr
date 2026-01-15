@@ -2,6 +2,12 @@
 
 ## dbplyr (development version)
 
+- Single-table SELECT queries now use unqualified `*` (e.g., `SELECT *`)
+  instead of table-qualified `*` (e.g., `SELECT "df".*`) for most
+  backends. Oracle and Teradata continue to use qualified stars as
+  required by their syntax
+  ([\#1577](https://github.com/tidyverse/dbplyr/issues/1577),
+  [\#1485](https://github.com/tidyverse/dbplyr/issues/1485)).
 - New
   [`sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
   generic provides a way for a database connections to choose a SQL

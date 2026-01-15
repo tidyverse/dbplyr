@@ -395,9 +395,9 @@ variable in <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" cl
 <span>    b <span class="op">=</span> <span class="va">a</span> <span class="op">^</span> <span class="fl">2</span>,</span>
 <span>  <span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "q01".*, POWER("a", 2.0)<span style="color: #0000BB;"> AS </span>"b"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> *, POWER("a", 2.0)<span style="color: #0000BB;"> AS </span>"b"</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> (</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> "df".*, "y" * "x"<span style="color: #0000BB;"> AS </span>"a"</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> *, "y" * "x"<span style="color: #0000BB;"> AS </span>"a"</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> "df"</span></span>
 <span><span class="co">#&gt; ) <span style="color: #0000BB;">AS </span>"q01"</span></span></code></pre></div>
 <p>In general, it’s much easier to work iteratively in dbplyr. You can
@@ -421,13 +421,13 @@ cases, you’ll need to write SQL code directly.</p>
 <code class="sourceCode R"><span><span class="va">db</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>z <span class="op">=</span> <span class="fu">foofify</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "df".*, foofify("x", "y")<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> *, foofify("x", "y")<span style="color: #0000BB;"> AS </span>"z"</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span>
 <span></span>
 <span><span class="va">db</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">x</span> <span class="op">%LIKE%</span> <span class="st">"%foo%"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "df".*</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> *</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> ("x" LIKE '%foo%')</span></span></code></pre></div>
 <p>To make it more clear that you’re calling a SQL function, not an R
@@ -436,7 +436,7 @@ function, you can use the <code>.sql</code> pronoun:</p>
 <code class="sourceCode R"><span><span class="va">db</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>z <span class="op">=</span> <span class="va">.sql</span><span class="op">$</span><span class="fu">foofify</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> "df".*, foofify("x", "y")<span style="color: #0000BB;"> AS </span>"z"</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> *, foofify("x", "y")<span style="color: #0000BB;"> AS </span>"z"</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> "df"</span></span></code></pre></div>
 <p>SQL functions tend to have a greater variety of syntax than R. That
 means there are a number of expressions that can’t be translated

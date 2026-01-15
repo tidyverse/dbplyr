@@ -79,7 +79,7 @@ library(dplyr, warn.conflicts = FALSE)
 db <- memdb_frame(a = c(3, 4, 1, 2), b = c(5, 1, 2, NA))
 db |> filter(a <= 2) |> show_query()
 #> <SQL>
-#> SELECT `dbplyr_tmp_ZorR1u5Cjc`.*
+#> SELECT *
 #> FROM `dbplyr_tmp_ZorR1u5Cjc`
 #> WHERE (`a` <= 2.0)
 db |> filter(a <= 2) |> compute() |> show_query()

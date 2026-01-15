@@ -39,7 +39,7 @@ lf <- lazy_frame(x = 1, y = 2, z = "a", con = dialect_access())
 
 lf |> head()
 #> <SQL>
-#> SELECT TOP 6 "df".*
+#> SELECT TOP 6 *
 #> FROM "df"
 lf |> mutate(y = as.numeric(y), z = sqrt(x^2 + 10))
 #> <SQL>
@@ -47,6 +47,6 @@ lf |> mutate(y = as.numeric(y), z = sqrt(x^2 + 10))
 #> FROM "df"
 lf |> mutate(a = paste0(z, " times"))
 #> <SQL>
-#> SELECT "df".*, "z" & ' times' AS "a"
+#> SELECT *, "z" & ' times' AS "a"
 #> FROM "df"
 ```

@@ -55,12 +55,12 @@ library(dplyr, warn.conflicts = FALSE)
 db <- memdb_frame(x = c(2, NA, 5, NA, 10), y = 1:5)
 db |> filter(x < 5) |> show_query()
 #> <SQL>
-#> SELECT `dbplyr_tmp_6RTXYj8SWn`.*
+#> SELECT *
 #> FROM `dbplyr_tmp_6RTXYj8SWn`
 #> WHERE (`x` < 5.0)
 db |> filter(is.na(x)) |> show_query()
 #> <SQL>
-#> SELECT `dbplyr_tmp_6RTXYj8SWn`.*
+#> SELECT *
 #> FROM `dbplyr_tmp_6RTXYj8SWn`
 #> WHERE ((`x` IS NULL))
 ```

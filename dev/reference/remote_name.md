@@ -84,7 +84,7 @@ remote_con(mf2)
 #>   Path: :memory:
 #>   Extensions: TRUE
 remote_query(mf2)
-#> <SQL> SELECT `blorp`.*
+#> <SQL> SELECT *
 #> FROM `blorp`
 #> WHERE (`x` > 3.0)
 ```

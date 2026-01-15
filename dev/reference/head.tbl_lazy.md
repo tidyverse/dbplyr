@@ -53,7 +53,7 @@ library(dplyr, warn.conflicts = FALSE)
 db <- memdb_frame(x = 1:100)
 db |> head() |> show_query()
 #> <SQL>
-#> SELECT `dbplyr_tmp_zqTiZvfqQI`.*
+#> SELECT *
 #> FROM `dbplyr_tmp_zqTiZvfqQI`
 #> LIMIT 6
 
@@ -61,6 +61,6 @@ db |> head() |> show_query()
 db2 <- lazy_frame(x = 1:100, con = dialect_mssql())
 db2 |> head() |> show_query()
 #> <SQL>
-#> SELECT TOP 6 [df].*
+#> SELECT TOP 6 *
 #> FROM [df]
 ```

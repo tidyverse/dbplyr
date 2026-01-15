@@ -22,7 +22,7 @@ needing to connect to a real database:
 lf <- lazy_frame(x = 1, y = 2, g = "a")
 lf |> mutate(z = (x + y) / 2)
 #> <SQL>
-#> SELECT "df".*, ("x" + "y") / 2.0 AS "z"
+#> SELECT *, ("x" + "y") / 2.0 AS "z"
 #> FROM "df"
 ```
 
@@ -86,7 +86,7 @@ There are two fundamental differences between R and SQL:
   ``` r
   lf |> filter(x == "x")
   #> <SQL>
-  #> SELECT "df".*
+  #> SELECT *
   #> FROM "df"
   #> WHERE ("x" = 'x')
   ```
@@ -193,19 +193,19 @@ cross-database translation available.
 ``` r
 lf |> filter(x > 5 | y == 2)
 #> <SQL>
-#> SELECT "df".*
+#> SELECT *
 #> FROM "df"
 #> WHERE ("x" > 5.0 OR "y" = 2.0)
 
 lf |> filter(x %in% c(1, 2, 3))
 #> <SQL>
-#> SELECT "df".*
+#> SELECT *
 #> FROM "df"
 #> WHERE ("x" IN (1.0, 2.0, 3.0))
 
 lf |> filter(between(x, 1, 5))
 #> <SQL>
-#> SELECT "df".*
+#> SELECT *
 #> FROM "df"
 #> WHERE ("x" BETWEEN 1.0 AND 5.0)
 ```
@@ -274,7 +274,7 @@ lf |> transmute(x = as(x, "TIME"), y = as(y, "DECIMAL(10, 2)"))
 ``` r
 lf |> filter(!is.na(x))
 #> <SQL>
-#> SELECT "df".*
+#> SELECT *
 #> FROM "df"
 #> WHERE (NOT(("x" IS NULL)))
 
@@ -322,13 +322,13 @@ a window translation:
 ``` r
 lf |> mutate(z = mean(x, na.rm = TRUE))
 #> <SQL>
-#> SELECT "df".*, AVG("x") OVER () AS "z"
+#> SELECT *, AVG("x") OVER () AS "z"
 #> FROM "df"
 lf |> filter(mean(x, na.rm = TRUE) > 0)
 #> <SQL>
 #> SELECT "x", "y", "g"
 #> FROM (
-#>   SELECT "df".*, AVG("x") OVER () AS "col01"
+#>   SELECT *, AVG("x") OVER () AS "col01"
 #>   FROM "df"
 #> ) AS "q01"
 #> WHERE ("col01" > 0.0)
@@ -374,7 +374,7 @@ lf |>
   ))
 #> <SQL>
 #> SELECT
-#>   "df".*,
+#>   *,
 #>   CASE
 #> WHEN ("x" > 10.0) THEN 'medium'
 #> WHEN ("x" > 30.0) THEN 'big'
@@ -384,9 +384,7 @@ lf |>
 
 lf |> mutate(z = switch(g, a = 1L, b = 2L, 3L))
 #> <SQL>
-#> SELECT
-#>   "df".*,
-#>   CASE "g" WHEN ('a') THEN (1) WHEN ('b') THEN (2) ELSE (3) END AS "z"
+#> SELECT *, CASE "g" WHEN ('a') THEN (1) WHEN ('b') THEN (2) ELSE (3) END AS "z"
 #> FROM "df"
 ```
 
@@ -487,7 +485,7 @@ Any function that dbplyr doesn’t know about will be left as is:
 ``` r
 lf |> mutate(z = foofify(x, y))
 #> <SQL>
-#> SELECT "df".*, foofify("x", "y") AS "z"
+#> SELECT *, foofify("x", "y") AS "z"
 #> FROM "df"
 ```
 
@@ -515,7 +513,7 @@ matching:
 ``` r
 lf |> filter(x %LIKE% "%foo%")
 #> <SQL>
-#> SELECT "df".*
+#> SELECT *
 #> FROM "df"
 #> WHERE ("x" LIKE '%foo%')
 ```
@@ -525,7 +523,7 @@ You can also use `str_like()` for this common case:
 ``` r
 lf |> filter(str_like(x, "%foo%"))
 #> <SQL>
-#> SELECT "df".*
+#> SELECT *
 #> FROM "df"
 #> WHERE ("x" LIKE '%foo%')
 ```
@@ -710,12 +708,12 @@ by” and “order by” clauses:
 ``` r
 lf |> arrange(year) |> mutate(z = cummean(g))
 #> <SQL>
-#> SELECT "df".*, AVG("g") OVER (ORDER BY "year" ROWS UNBOUNDED PRECEDING) AS "z"
+#> SELECT *, AVG("g") OVER (ORDER BY "year" ROWS UNBOUNDED PRECEDING) AS "z"
 #> FROM "df"
 #> ORDER BY "year"
 lf |> group_by(id) |> mutate(z = rank())
 #> <SQL>
-#> SELECT "df".*, RANK() OVER (PARTITION BY "id") AS "z"
+#> SELECT *, RANK() OVER (PARTITION BY "id") AS "z"
 #> FROM "df"
 ```
 

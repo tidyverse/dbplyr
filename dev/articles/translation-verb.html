@@ -138,7 +138,7 @@ demonstrate we’ll make a temporary database with a couple of tables</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op">==</span> <span class="fl">1</span>, <span class="va">day</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `nycflights13::flights`.*</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> *</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `nycflights13::flights`</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> (`month` = 1.0)<span style="color: #0000BB;"> AND</span> (`day` = 1.0)</span></span></code></pre></div>
 </li>
@@ -150,7 +150,7 @@ clause:</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">carrier</span>, <span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">arr_delay</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `nycflights13::flights`.*</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> *</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `nycflights13::flights`</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">ORDER BY</span> `carrier`, `arr_delay` DESC</span></span></code></pre></div>
 </li>
@@ -189,7 +189,7 @@ create subqueries where needed:</p>
 <span>    speed <span class="op">=</span> <span class="va">distance</span> <span class="op">/</span> <span class="va">air_time_h</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `q01`.*, `distance` / `air_time_h`<span style="color: #0000BB;"> AS </span>`speed`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> *, `distance` / `air_time_h`<span style="color: #0000BB;"> AS </span>`speed`</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> (</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> `distance`, `air_time`, `air_time` / 60.0<span style="color: #0000BB;"> AS </span>`air_time_h`</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> `nycflights13::flights`</span></span>
@@ -207,7 +207,7 @@ create subqueries where needed:</p>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> `distance`, `air_time`, `air_time` / 60.0<span style="color: #0000BB;"> AS </span>`air_time_h`</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> `nycflights13::flights`</span></span>
 <span><span class="co">#&gt; )</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `q01`.*, `distance` / `air_time_h`<span style="color: #0000BB;"> AS </span>`speed`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> *, `distance` / `air_time_h`<span style="color: #0000BB;"> AS </span>`speed`</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `q01`</span></span></code></pre></div>
 <p>Sometimes dbplyr will create a subquery where it’s not strictly
 necessary. We strive to avoid this as much as possible, but our analysis

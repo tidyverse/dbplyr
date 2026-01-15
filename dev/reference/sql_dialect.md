@@ -20,7 +20,8 @@ new_sql_dialect(
   dialect,
   quote_identifier,
   has_window_clause = FALSE,
-  has_table_alias_with_as = TRUE
+  has_table_alias_with_as = TRUE,
+  has_star_table_prefix = FALSE
 )
 ```
 
@@ -49,6 +50,11 @@ new_sql_dialect(
 
   Does the backend support using `AS` when aliasing a table in a
   subquery?
+
+- has_star_table_prefix:
+
+  Does the backend require table prefixes when selecting all columns in
+  single-table queries (e.g., `"table".*` vs `*`)?
 
 ## Value
 

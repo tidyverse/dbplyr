@@ -1,6 +1,6 @@
 # PostgreSQL backend
 
-This backend supports PostgreSQL databases, typically accessed via
+This backend supports PostgreSQL databases, typically accessed via a
 `PqConnection` created by
 [`DBI::dbConnect()`](https://dbi.r-dbi.org/reference/dbConnect.html).
 Use `dialect_postgres()` with

@@ -116,10 +116,7 @@ db |>
   mutate(a = (x + y) / 2, b = sqrt(x^2L + y^2L)) |>
   show_query()
 #> <SQL>
-#> SELECT
-#>   `dbplyr_tmp_I6Ojtgl00s`.*,
-#>   (`x` + `y`) / 2.0 AS `a`,
-#>   SQRT((POWER(`x`, 2)) + POWER(`y`, 2)) AS `b`
+#> SELECT *, (`x` + `y`) / 2.0 AS `a`, SQRT((POWER(`x`, 2)) + POWER(`y`, 2)) AS `b`
 #> FROM `dbplyr_tmp_I6Ojtgl00s`
 
 # dbplyr automatically creates subqueries as needed
@@ -127,9 +124,9 @@ db |>
   mutate(x1 = x + 1, x2 = x1 * 2) |>
   show_query()
 #> <SQL>
-#> SELECT `q01`.*, `x1` * 2.0 AS `x2`
+#> SELECT *, `x1` * 2.0 AS `x2`
 #> FROM (
-#>   SELECT `dbplyr_tmp_I6Ojtgl00s`.*, `x` + 1.0 AS `x1`
+#>   SELECT *, `x` + 1.0 AS `x1`
 #>   FROM `dbplyr_tmp_I6Ojtgl00s`
 #> ) AS `q01`
 
@@ -143,7 +140,7 @@ db |>
 #> This warning is displayed once every 8 hours.
 #> <SQL>
 #> SELECT
-#>   `dbplyr_tmp_IlBpEtJTVT`.*,
+#>   *,
 #>   SUM(`x`) OVER (PARTITION BY `g` ORDER BY `x` ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING) AS `rolling_sum`
 #> FROM `dbplyr_tmp_IlBpEtJTVT`
 ```

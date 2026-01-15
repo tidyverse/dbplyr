@@ -63,6 +63,6 @@ db |>
   mutate(x2 = x / sum(x, na.rm = TRUE)) |>
   show_query()
 #> <SQL>
-#> SELECT `dbplyr_tmp_dkFTvzIEFY`.*, `x` / SUM(`x`) OVER (PARTITION BY `g`) AS `x2`
+#> SELECT *, `x` / SUM(`x`) OVER (PARTITION BY `g`) AS `x2`
 #> FROM `dbplyr_tmp_dkFTvzIEFY`
 ```

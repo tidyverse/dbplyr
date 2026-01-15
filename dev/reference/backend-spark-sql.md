@@ -43,10 +43,10 @@ lf |> summarise(x = var(c, na.rm = TRUE), .by = d)
 
 lf |> mutate(x = first(c))
 #> <SQL>
-#> SELECT "df".*, FIRST_VALUE("c") OVER () AS "x"
+#> SELECT *, FIRST_VALUE("c") OVER () AS "x"
 #> FROM "df"
 lf |> mutate(x = first(c), .by = d)
 #> <SQL>
-#> SELECT "df".*, FIRST_VALUE("c") OVER (PARTITION BY "d") AS "x"
+#> SELECT *, FIRST_VALUE("c") OVER (PARTITION BY "d") AS "x"
 #> FROM "df"
 ```

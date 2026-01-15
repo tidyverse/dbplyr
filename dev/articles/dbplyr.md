@@ -356,9 +356,9 @@ db |>
     b = a ^ 2,
   )
 #> <SQL>
-#> SELECT "q01".*, POWER("a", 2.0) AS "b"
+#> SELECT *, POWER("a", 2.0) AS "b"
 #> FROM (
-#>   SELECT "df".*, "y" * "x" AS "a"
+#>   SELECT *, "y" * "x" AS "a"
 #>   FROM "df"
 #> ) AS "q01"
 ```
@@ -385,13 +385,13 @@ Any function that dbplyr doesn’t know about will be left as is:
 db |>
   mutate(z = foofify(x, y))
 #> <SQL>
-#> SELECT "df".*, foofify("x", "y") AS "z"
+#> SELECT *, foofify("x", "y") AS "z"
 #> FROM "df"
 
 db |>
   filter(x %LIKE% "%foo%")
 #> <SQL>
-#> SELECT "df".*
+#> SELECT *
 #> FROM "df"
 #> WHERE ("x" LIKE '%foo%')
 ```
@@ -403,7 +403,7 @@ function, you can use the `.sql` pronoun:
 db |>
   mutate(z = .sql$foofify(x, y))
 #> <SQL>
-#> SELECT "df".*, foofify("x", "y") AS "z"
+#> SELECT *, foofify("x", "y") AS "z"
 #> FROM "df"
 ```
 
