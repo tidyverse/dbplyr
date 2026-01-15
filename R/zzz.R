@@ -8,6 +8,12 @@
   methods::setOldClass(c("sql", "character"), sql())
 
   base_scalar$`%>%` <- magrittr::`%>%`
+
+  # Register needed RJDBC method if RJDBC loaded now or later
+  if (isNamespaceLoaded("RJDBC")) {
+    register_JDBC_dbExecute()
+  }
+  setHook(packageEvent("RJDBC", "onLoad"), register_JDBC_dbExecute)
 }
 
 # Silence R CMD check note:

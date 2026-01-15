@@ -98,3 +98,17 @@ jdbc_class_to_dialect <- function(class_name) {
     dialect_odbc()
   }
 }
+
+register_JDBC_dbExecute <- function(...) {
+  # Protect against JDBC defined this
+  if (methods::existsMethod(DBI::dbExecute, c("JDBCConnection", "character"))) {
+    return()
+  }
+  methods::setMethod(
+    DBI::dbExecute,
+    c("JDBCConnection", "character"),
+    function(conn, statement, ..., immediate = FALSE) {
+      RJDBC::dbSendUpdate(conn, statement, ...)
+    }
+  )
+}
