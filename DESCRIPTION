@@ -82,6 +82,7 @@ Collate:
     'backend-hana.R'
     'backend-hive.R'
     'backend-impala.R'
+    'backend-jdbc.R'
     'backend-mssql.R'
     'backend-mysql.R'
     'backend-odbc.R'

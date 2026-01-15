@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* JDBC connections are now supported. dbplyr automatically detects the underlying database type from the JDBC connection class and uses the appropriate SQL dialect (#1359).
 * CTEs now correctly quote table names when the same query is used multiple times (#1559).
 * Custom translations of functions starting with `.` work (@MichaelChirico, #1529).
 * dbplyr 1e interfaces are now deprecated (#1197). Backend developers have had >2 years to update.
