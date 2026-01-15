@@ -29,7 +29,6 @@
 #' details of overall translation technology.
 #'
 #' @name backend-jdbc
-#' @aliases NULL
 #' @examples
 #' # JDBC connections require the RJDBC package and a JDBC driver JAR file.
 #' # Once connected, dbplyr automatically detects the database type:
@@ -109,6 +108,7 @@ register_JDBC_dbExecute <- function(...) {
     c("JDBCConnection", "character"),
     function(conn, statement, ..., immediate = FALSE) {
       RJDBC::dbSendUpdate(conn, statement, ...)
-    }
+    },
+    where = globalenv()
   )
 }
