@@ -363,7 +363,11 @@ test_that("between translation respects context", {
   local_context(list(clause = "WHERE"))
   expect_translation(con, between(a, 1L, 2L), "[a] BETWEEN 1 AND 2")
   local_context(list(clause = "SELECT"))
-  expect_translation(con, between(a, 1L, 2L), "CASE WHEN [a] BETWEEN 1 AND 2 THEN 1 ELSE 0 END")
+  expect_translation(
+    con,
+    between(a, 1L, 2L),
+    "CASE WHEN [a] BETWEEN 1 AND 2 THEN 1 ELSE 0 END"
+  )
 })
 
 # verb translation --------------------------------------------------------
