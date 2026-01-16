@@ -23,7 +23,7 @@ nycflights13_sqlite <- function(path = NULL) {
 
 #' @export
 #' @rdname nycflights13
-#' @param dbname,... Arguments passed on to [src_postgres()]
+#' @param dbname,... Arguments passed on to [DBI::dbConnect()]
 nycflights13_postgres <- function(dbname = "nycflights13", ...) {
   cache_computation("nycflights_postgres", {
     message("Caching nycflights db in postgresql db ", dbname)

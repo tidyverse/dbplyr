@@ -23,7 +23,7 @@
 #' @keywords internal
 #' @export
 #' @examples
-#' con <- simulate_dbi()
+#' con <- dialect_ansi()
 #'
 #' # Old:
 #' build_sql("SELECT * FROM ", ident("table"), con = con)
@@ -80,7 +80,7 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
 #' @keywords internal
 #' @export
 #' @examples
-#' con <- simulate_dbi() # not necessary when writing translations
+#' con <- dialect_ansi() # not necessary when writing translations
 #'
 #' sql_expr(f(x + 1), con = con)
 #' sql_expr(f("x", "y"), con = con)

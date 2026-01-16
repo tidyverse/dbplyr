@@ -27,7 +27,7 @@
       mutate(mf, rown = row_number())
     Output
       <SQL>
-      SELECT "df".*, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS "rown"
+      SELECT *, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS "rown"
       FROM "df"
 
 ---
@@ -36,9 +36,7 @@
       mutate(group_by(mf, y), rown = row_number())
     Output
       <SQL>
-      SELECT
-        "df".*,
-        ROW_NUMBER() OVER (PARTITION BY "y" ORDER BY (SELECT NULL)) AS "rown"
+      SELECT *, ROW_NUMBER() OVER (PARTITION BY "y" ORDER BY (SELECT NULL)) AS "rown"
       FROM "df"
 
 ---
@@ -47,7 +45,7 @@
       mutate(arrange(mf, y), rown = row_number())
     Output
       <SQL>
-      SELECT "df".*, ROW_NUMBER() OVER (ORDER BY "y") AS "rown"
+      SELECT *, ROW_NUMBER() OVER (ORDER BY "y") AS "rown"
       FROM "df"
       ORDER BY "y"
 

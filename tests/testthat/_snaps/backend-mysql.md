@@ -40,7 +40,7 @@
       SELECT `x`
       FROM (
         SELECT
-          `df`.*,
+          *,
           CASE
       WHEN (NOT(((RAND()) IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN (((RAND()) IS NULL)) THEN 1 ELSE 0 END) ORDER BY RAND())
       END AS `col01`
@@ -103,7 +103,7 @@
       explain(mutate(db, y = x + 1))
     Output
       <SQL>
-      SELECT `test`.*, `x` + 1.0 AS `y`
+      SELECT *, `x` + 1.0 AS `y`
       FROM `test`
       
       <PLAN>

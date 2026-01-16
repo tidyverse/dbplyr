@@ -1,16 +1,16 @@
 test_that("adds src class", {
-  tb <- tbl_lazy(mtcars, con = simulate_sqlite())
-  expect_s3_class(tb, "tbl_SQLiteConnection")
+  tb <- tbl_lazy(mtcars, con = dialect_sqlite())
+  expect_s3_class(tb, "tbl_sql_dialect_sqlite")
 })
 
 test_that("argument src is deprecated", {
-  expect_snapshot(error = TRUE, tbl_lazy(mtcars, src = simulate_sqlite()))
+  expect_snapshot(error = TRUE, tbl_lazy(mtcars, src = dialect_sqlite()))
 })
 
 test_that("cannot convert tbl_lazy to data.frame", {
   expect_snapshot(
     error = TRUE,
-    as.data.frame(tbl_lazy(mtcars, con = simulate_sqlite()))
+    as.data.frame(tbl_lazy(mtcars, con = dialect_sqlite()))
   )
 })
 

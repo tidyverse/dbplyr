@@ -1,31 +1,49 @@
-#' Backend: SQLite
+#' SQLite backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are:
+#' This backend supports SQLite databases, typically accessed via
+#' a `SQLiteConnection` created by [DBI::dbConnect()]. Use `dialect_sqlite()`
+#' with `lazy_frame()` to see simulated SQL without connecting to a live
+#' database.
+#'
+#' Key differences for this backend are:
 #'
 #' * Uses non-standard `LOG()` function
 #' * Date-time extraction functions from lubridate
 #' * Custom median translation
 #' * Right and full joins are simulated using left joins
 #'
-#' Use `simulate_sqlite()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-sqlite
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_sqlite())
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_sqlite())
 #' lf |> transmute(x = paste(c, " times"))
 #' lf |> transmute(x = log(b), y = log(b, base = 2))
 NULL
 
 #' @export
 #' @rdname backend-sqlite
+dialect_sqlite <- function() {
+  new_sql_dialect(
+    "sqlite",
+    quote_identifier = function(x) sql_quote(x, "`"),
+    has_window_clause = TRUE
+  )
+}
+
+#' @export
+#' @rdname backend-sqlite
 simulate_sqlite <- function() simulate_dbi("SQLiteConnection")
+
+#' @export
+sql_dialect.SQLiteConnection <- function(con) {
+  dialect_sqlite()
+}
 
 #' @export
 dbplyr_edition.SQLiteConnection <- function(con) {
@@ -38,15 +56,33 @@ db_connection_describe.SQLiteConnection <- function(con, ...) {
 }
 
 #' @export
-sql_query_explain.SQLiteConnection <- function(con, sql, ...) {
+sql_query_explain.sql_dialect_sqlite <- function(con, sql, ...) {
   sql_glue2(con, "EXPLAIN QUERY PLAN {sql}")
 }
 
 #' @export
-sql_query_set_op.SQLiteConnection <- sql_query_set_op.Hive
+sql_query_set_op.sql_dialect_sqlite <- sql_query_set_op.sql_dialect_hive
 
 #' @export
-sql_query_upsert.SQLiteConnection <- sql_query_upsert.PqConnection
+sql_query_upsert.sql_dialect_sqlite <- function(
+  con,
+  table,
+  from,
+  by,
+  update_cols,
+  ...,
+  returning_cols = NULL,
+  method = NULL
+) {
+  sql_query_upsert_on_conflict(
+    con,
+    table,
+    from,
+    by,
+    update_cols,
+    returning_cols = returning_cols
+  )
+}
 
 sqlite_version <- function() {
   numeric_version(RSQLite::rsqliteVersion()[[2]])
@@ -55,7 +91,7 @@ sqlite_version <- function() {
 # SQL methods -------------------------------------------------------------
 
 #' @export
-sql_translation.SQLiteConnection <- function(con) {
+sql_translation.sql_dialect_sqlite <- function(con) {
   sql_variant(
     sql_translator(
       .parent = base_scalar,
@@ -119,20 +155,20 @@ sql_translation.SQLiteConnection <- function(con) {
 }
 
 #' @export
-sql_escape_logical.SQLiteConnection <- function(con, x) {
+sql_escape_logical.sql_dialect_sqlite <- function(con, x) {
   y <- as.character(as.integer(x))
   y[is.na(x)] <- "NULL"
   sql(y)
 }
 
 #' @export
-sql_expr_matches.SQLiteConnection <- function(con, x, y, ...) {
+sql_expr_matches.sql_dialect_sqlite <- function(con, x, y, ...) {
   # https://sqlite.org/lang_expr.html#isisnot
   sql_glue2(con, "{x} IS {y}")
 }
 
 #' @export
-values_prepare.SQLiteConnection <- function(con, df) {
+values_prepare.sql_dialect_sqlite <- function(con, df) {
   needs_escape <- purrr::map_lgl(
     df,
     \(col) methods::is(col, "Date") || inherits(col, "POSIXct")
@@ -142,14 +178,4 @@ values_prepare.SQLiteConnection <- function(con, df) {
     needs_escape,
     \(col) escape(col, con = con, parens = FALSE, collapse = NULL)
   )
-}
-
-#' @export
-supports_window_clause.SQLiteConnection <- function(con) {
-  TRUE
-}
-
-#' @export
-db_supports_table_alias_with_as.SQLiteConnection <- function(con) {
-  TRUE
 }

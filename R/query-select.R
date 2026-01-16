@@ -159,7 +159,7 @@ get_select_sql <- function(
   if (use_star) {
     if (is_identity(select$expr, select$name, in_vars)) {
       out <- list(
-        select_sql = sql_star(con, table_alias),
+        select_sql = sql_select_star(con, table_alias),
         window_sql = sql()
       )
       return(out)
@@ -177,7 +177,7 @@ get_select_sql <- function(
   win_register_deactivate()
 
   named_windows <- win_register_names()
-  if (nrow(named_windows) > 0 && supports_window_clause(con)) {
+  if (nrow(named_windows) > 0 && sql_has_window_clause(con)) {
     # need to translate again and use registered windows names
     select_sql <- translate_select_sql(con, select)
 
@@ -212,9 +212,10 @@ select_use_star <- function(select, vars_prev, table_alias, con) {
   if (is_identity(test_cols$expr, test_cols$name, vars_prev)) {
     idx_start <- seq2(1, first_match - 1)
     idx_end <- seq2(last + 1, n)
+    star <- sql_select_star(con, table_alias)
     vctrs::vec_rbind(
       vctrs::vec_slice(select, idx_start),
-      tibble(name = "", expr = list(sql_star(con, table_alias))),
+      tibble(name = "", expr = list(star)),
       vctrs::vec_slice(select, idx_end)
     )
   } else {
@@ -363,7 +364,7 @@ sql_query_select <- function(
   check_dots_used()
   check_sql(select, allow_names = FALSE)
 
-  UseMethod("sql_query_select")
+  UseMethod("sql_query_select", sql_dialect(con))
 }
 
 #' @export
@@ -394,3 +395,6 @@ sql_query_select.DBIConnection <- function(
     lvl = lvl
   )
 }
+
+#' @export
+sql_query_select.sql_dialect <- sql_query_select.DBIConnection

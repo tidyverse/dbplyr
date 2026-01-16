@@ -33,7 +33,7 @@
       SELECT "x"
       FROM (
         SELECT
-          "df".*,
+          *,
           CASE
       WHEN (NOT(("x" IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN (("x" IS NULL)) THEN 1 ELSE 0 END) ORDER BY "x")
       END AS "col01"
@@ -47,7 +47,7 @@
       SELECT "x"
       FROM (
         SELECT
-          "df".*,
+          *,
           CASE
       WHEN (NOT(("x" IS NULL))) THEN CUME_DIST() OVER (PARTITION BY (CASE WHEN (("x" IS NULL)) THEN 1 ELSE 0 END) ORDER BY "x" DESC)
       END AS "col01"
@@ -61,7 +61,7 @@
       SELECT "x"
       FROM (
         SELECT
-          "df".*,
+          *,
           CASE
       WHEN (NOT(((RANDOM()) IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN (((RANDOM()) IS NULL)) THEN 1 ELSE 0 END) ORDER BY RANDOM())
       END AS "col01"
@@ -120,7 +120,7 @@
       SELECT "x", "id"
       FROM (
         SELECT
-          "df".*,
+          *,
           CASE
       WHEN (NOT(("x" IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN (("x" IS NULL)) THEN 1 ELSE 0 END) ORDER BY "x" DESC)
       END AS "col01"
@@ -134,7 +134,7 @@
       SELECT "x", "id"
       FROM (
         SELECT
-          "df".*,
+          *,
           CASE
       WHEN (NOT(("x" IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN (("x" IS NULL)) THEN 1 ELSE 0 END) ORDER BY "x" DESC)
       END AS "col01"
@@ -148,7 +148,7 @@
       SELECT "x", "id"
       FROM (
         SELECT
-          "df".*,
+          *,
           CASE
       WHEN (NOT((("x" * -1) IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN ((("x" * -1) IS NULL)) THEN 1 ELSE 0 END) ORDER BY "x" * -1 DESC)
       END AS "col01"
@@ -264,7 +264,7 @@
       SELECT "x", "y"
       FROM (
         SELECT
-          "df".*,
+          *,
           CASE
       WHEN (NOT(("x" IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN (("x" IS NULL)) THEN 1 ELSE 0 END) ORDER BY "x")
       END AS "col01"
@@ -278,7 +278,7 @@
       SELECT "x", "y"
       FROM (
         SELECT
-          "df".*,
+          *,
           CASE
       WHEN (NOT(("x" IS NULL) OR ("y" IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN (("x" IS NULL) OR ("y" IS NULL)) THEN 1 ELSE 0 END) ORDER BY "x", "y")
       END AS "col01"
@@ -292,7 +292,7 @@
       SELECT "x", "y"
       FROM (
         SELECT
-          "df".*,
+          *,
           CASE
       WHEN (NOT(("y" IS NULL) OR ("x" IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN (("y" IS NULL) OR ("x" IS NULL)) THEN 1 ELSE 0 END) ORDER BY "y", "x")
       END AS "col01"
@@ -309,7 +309,7 @@
       SELECT "x", "y"
       FROM (
         SELECT
-          "df".*,
+          *,
           CASE
       WHEN (NOT(("x" IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN (("x" IS NULL)) THEN 1 ELSE 0 END) ORDER BY "x" DESC)
       END AS "col01"
@@ -323,7 +323,7 @@
       SELECT "x", "y"
       FROM (
         SELECT
-          "df".*,
+          *,
           CASE
       WHEN (NOT(("x" IS NULL) OR ("y" IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN (("x" IS NULL) OR ("y" IS NULL)) THEN 1 ELSE 0 END) ORDER BY "x" DESC, "y" DESC)
       END AS "col01"
@@ -337,7 +337,7 @@
       SELECT "x", "y"
       FROM (
         SELECT
-          "df".*,
+          *,
           CASE
       WHEN (NOT(("y" IS NULL) OR ("x" IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN (("y" IS NULL) OR ("x" IS NULL)) THEN 1 ELSE 0 END) ORDER BY "y" DESC, "x" DESC)
       END AS "col01"

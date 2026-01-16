@@ -47,7 +47,8 @@ win_current_frame()
 
 \item{frame}{A numeric vector of length two defining the frame.}
 
-\item{con}{Database connection.}
+\item{con}{A \link{sql_dialect} object or database connection. Connections are
+supported for backward compatibility.}
 
 \item{f}{The name of an SQL function as a string.}
 
@@ -67,7 +68,7 @@ the grouping and order context set up by \code{\link[dplyr:group_by]{dplyr::grou
 }
 }
 \examples{
-con <- simulate_dbi()
+con <- dialect_ansi()
 
 win_over(sql("avg(x)"), con = con)
 win_over(sql("avg(x)"), "y", con = con)

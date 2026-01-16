@@ -31,7 +31,7 @@ other high level queries, or for other syntax that has no R equivalent.
 For individual function translations, prefer \code{\link[=sql_expr]{sql_expr()}}.
 }
 \examples{
-con <- simulate_dbi()
+con <- dialect_ansi()
 
 # Old:
 build_sql("SELECT * FROM ", ident("table"), con = con)

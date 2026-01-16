@@ -18,12 +18,13 @@
 #' @param f The name of an SQL function as a string.
 #' @param empty_order A logical value indicating whether to order by NULL if
 #'   `order` is not specified.
-#' @param con Database connection.
+#' @param con A [sql_dialect] object or database connection. Connections are
+#'   supported for backward compatibility.
 #' @family SQL translation helpers
 #' @name sql_translation_window
 #' @export
 #' @examples
-#' con <- simulate_dbi()
+#' con <- dialect_ansi()
 #'
 #' win_over(sql("avg(x)"), con = con)
 #' win_over(sql("avg(x)"), "y", con = con)

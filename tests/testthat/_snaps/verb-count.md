@@ -35,7 +35,7 @@
       add_count(db, g, sort = TRUE)
     Output
       <SQL>
-      SELECT "df".*, COUNT(*) OVER (PARTITION BY "g") AS "n"
+      SELECT *, COUNT(*) OVER (PARTITION BY "g") AS "n"
       FROM "df"
       ORDER BY "n" DESC
 
@@ -45,7 +45,7 @@
       add_count(group_by(db, g))
     Output
       <SQL>
-      SELECT "df".*, COUNT(*) OVER (PARTITION BY "g") AS "n"
+      SELECT *, COUNT(*) OVER (PARTITION BY "g") AS "n"
       FROM "df"
 
 # .drop is not supported

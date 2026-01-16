@@ -1,9 +1,11 @@
-#' Backend: Oracle
+#' Oracle backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are:
+#' This backend supports Oracle databases, typically accessed via
+#' `OraConnection` created by [DBI::dbConnect()]. Use `dialect_oracle()` with
+#' `lazy_frame()` to see simulated SQL without connecting to a live database.
+#'
+#' Key differences for this backend are:
 #'
 #' * Use `FETCH FIRST` instead of `LIMIT`
 #' * Custom types
@@ -16,22 +18,42 @@
 #' See <https://oracle-base.com/articles/23/boolean-data-type-23> for
 #' more details.
 #'
-#' Use `simulate_oracle()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-oracle
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_oracle())
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_oracle())
 #' lf |> transmute(x = paste0(c, " times"))
 #' lf |> setdiff(lf)
 NULL
 
 #' @export
 #' @rdname backend-oracle
+dialect_oracle <- function() {
+  new_sql_dialect(
+    "oracle",
+    quote_identifier = function(x) sql_quote(x, '"'),
+    has_table_alias_with_as = FALSE,
+    has_star_table_prefix = TRUE
+  )
+}
+
+#' @export
+#' @rdname backend-oracle
 simulate_oracle <- function() simulate_dbi("Oracle")
+
+#' @export
+sql_dialect.Oracle <- function(con) {
+  dialect_oracle()
+}
+#' @export
+sql_dialect.OraConnection <- function(con) {
+  dialect_oracle()
+}
 
 #' @export
 dbplyr_edition.Oracle <- function(con) {
@@ -39,7 +61,7 @@ dbplyr_edition.Oracle <- function(con) {
 }
 
 #' @export
-sql_query_select.Oracle <- function(
+sql_query_select.sql_dialect_oracle <- function(
   con,
   select,
   from,
@@ -72,7 +94,7 @@ sql_query_select.Oracle <- function(
 }
 
 #' @export
-sql_query_upsert.Oracle <- function(
+sql_query_upsert.sql_dialect_oracle <- function(
   con,
   table,
   from,
@@ -117,7 +139,7 @@ sql_query_upsert.Oracle <- function(
 }
 
 #' @export
-sql_translation.Oracle <- function(con) {
+sql_translation.sql_dialect_oracle <- function(con) {
   sql_variant(
     sql_translator(
       .parent = base_odbc_scalar,
@@ -191,7 +213,7 @@ sql_translation.Oracle <- function(con) {
 }
 
 #' @export
-sql_query_explain.Oracle <- function(con, sql, ...) {
+sql_query_explain.sql_dialect_oracle <- function(con, sql, ...) {
   # https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/generating-and-displaying-execution-plans.html
   sql(
     sql_glue2(con, "EXPLAIN PLAN FOR {sql}"),
@@ -200,38 +222,147 @@ sql_query_explain.Oracle <- function(con, sql, ...) {
 }
 
 #' @export
-sql_table_analyze.Oracle <- function(con, table, ...) {
+sql_table_analyze.sql_dialect_oracle <- function(con, table, ...) {
+  # Can't analyze private temporary tables
+  if (is_oracle_temporary_table(table, con)) {
+    return(NULL)
+  }
+
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_4005.htm
   sql_glue2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
 }
 
-#' @export
-sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
-  type <- if (temporary) "GLOBAL TEMPORARY TABLE" else "TABLE"
-  sql_glue2(con, "CREATE {.sql type} {.tbl name} AS\n{sql}")
+is_oracle_temporary_table <- function(table, con) {
+  grepl("^ORA\\$PTT_", table_path_name(table, con), ignore.case = TRUE)
 }
 
 #' @export
-sql_values_subquery.Oracle <- function(con, df, types, lvl = 0, ...) {
+sql_table_temporary.sql_dialect_oracle <- function(con, table, temporary, ...) {
+  if (temporary && !is_oracle_temporary_table(table, con)) {
+    new_name <- paste0("ORA$PTT_", table_path_name(table, con))
+    cli::cli_inform(
+      paste0("Created a temporary table named ", new_name),
+      class = c("dbplyr_message_temp_table", "dbplyr_message")
+    )
+    table = table_path(new_name)
+  }
+
+  list(table = table, temporary = temporary)
+}
+
+#' @export
+sql_query_save.sql_dialect_oracle <- function(
+  con,
+  sql,
+  name,
+  temporary = TRUE,
+  ...
+) {
+  # Since db_table_temporary handles the prefix, `temporary` here is always
+  # FALSE for temp tables (the name already has ORA$PTT_ prefix)
+
+  # ON COMMIT PRESERVE ROWS creates a session-specific temporary table
+  if (is_oracle_temporary_table(name, con)) {
+    sql_glue2(
+      con,
+      "
+      CREATE PRIVATE TEMPORARY TABLE {.tbl name}
+      ON COMMIT PRESERVE DEFINITION
+      AS
+      {sql}
+      "
+    )
+  } else {
+    sql_glue2(con, "CREATE TABLE {.tbl name} AS\n{sql}")
+  }
+}
+
+#' @export
+db_table_drop_if_exists.Oracle <- function(con, table, ...) {
+  # Private temporary tables don't appear in DBI::dbExistsTable() because
+  # they're not in the normal catalog views, so we try to drop directly
+  if (is_oracle_temporary_table(table, con)) {
+    try(DBI::dbRemoveTable(con, DBI::SQL(table)), silent = TRUE)
+  } else if (DBI::dbExistsTable(con, DBI::SQL(table))) {
+    DBI::dbRemoveTable(con, DBI::SQL(table))
+  }
+}
+
+#' @export
+dbplyr_write_table.Oracle <- function(
+  con,
+  table,
+  types,
+  values,
+  temporary = TRUE,
+  ...,
+  overwrite = FALSE
+) {
+  if (overwrite) {
+    db_table_drop_if_exists(con, table)
+  }
+
+  # We can't use DBI::dbWriteTable() here because it doesn't support
+  # Oracle's PRIVATE TEMPORARY TABLE syntax
+  fields <- types %||% values
+  create_sql <- oracle_sql_table_create(con, table, fields)
+  DBI::dbExecute(con, create_sql)
+
+  DBI::dbAppendTable(con, DBI::SQL(table), values)
+
+  table
+}
+
+oracle_sql_table_create <- function(con, table, fields) {
+  # Convert data frame to field types (like DBI:::sqlCreateTable_DBIConnection)
+  if (is.data.frame(fields)) {
+    fields <- vapply(fields, function(x) DBI::dbDataType(con, x), character(1))
+  }
+
+  # Quote column names and build field definitions
+  field_names <- sql_escape_ident(con, names(fields))
+  field_types <- unname(fields)
+  fields_sql <- sql(paste0(field_names, " ", field_types))
+
+  # Use PRIVATE TEMPORARY TABLE for temp tables (detected by ORA$PTT_ prefix)
+  if (is_oracle_temporary_table(table, con)) {
+    sql_glue2(
+      con,
+      "CREATE PRIVATE TEMPORARY TABLE {.tbl table}
+      ({fields_sql})
+      ON COMMIT PRESERVE DEFINITION"
+    )
+  } else {
+    sql_glue2(
+      con,
+      "CREATE TABLE {.tbl table} 
+      ({fields_sql})"
+    )
+  }
+}
+
+#' @export
+sql_values_subquery.sql_dialect_oracle <- function(
+  con,
+  df,
+  types,
+  lvl = 0,
+  ...
+) {
   sql_values_subquery_union(con, df, types = types, lvl = lvl, from = "DUAL")
 }
 
 #' @export
-sql_set_op_method.Oracle <- function(con, op, ...) {
+sql_set_op_method.sql_dialect_oracle <- function(con, op, ...) {
   # Oracle uses MINUS instead of EXCEPT:
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries004.htm
   switch(op, "EXCEPT" = "MINUS", op)
 }
 
 #' @export
-sql_expr_matches.Oracle <- function(con, x, y, ...) {
+sql_expr_matches.sql_dialect_oracle <- function(con, x, y, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/functions040.htm
   sql_glue2(con, "decode({x}, {y}, 0, 1) = 0")
-}
-
-#' @export
-db_supports_table_alias_with_as.Oracle <- function(con) {
-  FALSE
 }
 
 # roacle package ----------------------------------------------------------
@@ -240,31 +371,7 @@ db_supports_table_alias_with_as.Oracle <- function(con) {
 dbplyr_edition.OraConnection <- dbplyr_edition.Oracle
 
 #' @export
-sql_query_select.OraConnection <- sql_query_select.Oracle
+dbplyr_write_table.OraConnection <- dbplyr_write_table.Oracle
 
 #' @export
-sql_query_upsert.OraConnection <- sql_query_upsert.Oracle
-
-#' @export
-sql_translation.OraConnection <- sql_translation.Oracle
-
-#' @export
-sql_query_explain.OraConnection <- sql_query_explain.Oracle
-
-#' @export
-sql_table_analyze.OraConnection <- sql_table_analyze.Oracle
-
-#' @export
-sql_query_save.OraConnection <- sql_query_save.Oracle
-
-#' @export
-sql_values_subquery.OraConnection <- sql_values_subquery.Oracle
-
-#' @export
-sql_set_op_method.OraConnection <- sql_set_op_method.Oracle
-
-#' @export
-sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
-
-#' @export
-db_supports_table_alias_with_as.OraConnection <- db_supports_table_alias_with_as.Oracle
+db_table_drop_if_exists.OraConnection <- db_table_drop_if_exists.Oracle

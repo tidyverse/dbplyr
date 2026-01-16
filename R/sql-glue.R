@@ -22,13 +22,14 @@
 #' * `{.id x}`: `x` is a generic identifier, e.g. for a column or index.
 #'    `x` must be a character vector
 #'
-#' @param con A database connection.
+#' @param con A [sql_dialect] object or database connection. Connections are
+#'   supported for backward compatibility.
 #' @param sql A string to interpolate.
 #' @param envir Environment to evaluate `sql` in.
 #' @return An SQL string.
 #' @export
 #' @examples
-#' con <- simulate_dbi()
+#' con <- dialect_ansi()
 #'
 #' tbl <- "my_table"
 #' sql_glue2(con, "SELECT * FROM {.tbl tbl}")

@@ -17,6 +17,71 @@
 #' @include verb-copy-inline.R
 NULL
 
+#' ANSI SQL backend
+#'
+#' @description
+#' This is the base dialect for ANSI compliant SQL, forming the foundation
+#' of all other dialects. Use `dialect_ansi()` with `lazy_frame()` to see
+#' simulated SQL without connecting to a live database.
+#'
+#' See `vignette("translation-function")` for a list of functions that are
+#' translated.
+#'
+#' @name backend-ansi
+#' @aliases NULL
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_ansi())
+#' lf |> transmute(x = mean(b, na.rm = TRUE))
+#' lf |> transmute(x = log(b), y = log(b, base = 2))
+NULL
+
+#' @export
+#' @rdname backend-ansi
+dialect_ansi <- function() {
+  structure(
+    list(
+      quote_identifier = function(x) sql_quote(x, '"'),
+      has = list(
+        window_clause = FALSE,
+        table_alias_with_as = TRUE
+      )
+    ),
+    class = "sql_dialect"
+  )
+}
+
+#' @export
+#' @rdname backend-ansi
+#' @param class,... No longer used.
+simulate_dbi <- function(class = character(), ...) {
+  structure(
+    list(),
+    ...,
+    class = c(class, "TestConnection", "DBIConnection")
+  )
+}
+
+#' @export
+dbplyr_edition.TestConnection <- function(con) 2L
+
+#' @export
+sql_escape_ident.TestConnection <- function(con, x) {
+  if (inherits(con, "Microsoft SQL Server")) {
+    sql_quote(x, c("[", "]"))
+  } else if (
+    inherits(con, "MySQLConnection") ||
+      inherits(con, "MariaDBConnection") ||
+      inherits(con, "SQLiteConnection")
+  ) {
+    sql_quote(x, "`")
+  } else {
+    sql_quote(x, '"')
+  }
+}
+
+
 #' @export
 sql_translation.DBIConnection <- function(con) {
   sql_variant(

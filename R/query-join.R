@@ -219,7 +219,7 @@ sql_query_multi_join <- function(
   lvl = 0
 ) {
   check_dots_used()
-  UseMethod("sql_query_multi_join")
+  UseMethod("sql_query_multi_join", sql_dialect(con))
 }
 
 #' @export
@@ -293,6 +293,9 @@ sql_query_multi_join.DBIConnection <- function(
   )
   sql_format_clauses(clauses, lvl = lvl)
 }
+
+#' @export
+sql_query_multi_join.sql_dialect <- sql_query_multi_join.DBIConnection
 
 # Helpers ----------------------------------------------------------------------
 
@@ -423,4 +426,13 @@ sql_table_prefix <- function(con, table, var) {
 sql_star <- function(con, table) {
   table <- table_path_name(table, con)
   sql_glue2(con, "{.id table}.*")
+}
+
+# For single-table SELECTs: use unqualified * unless backend requires prefix
+sql_select_star <- function(con, table) {
+  if (sql_has_star_table_prefix(con)) {
+    sql_star(con, table)
+  } else {
+    sql("*")
+  }
 }

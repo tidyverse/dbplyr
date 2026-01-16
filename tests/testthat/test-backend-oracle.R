@@ -1,5 +1,9 @@
+test_that("simulate_oracle() still works", {
+  expect_translation(simulate_oracle(), x + 1, '"x" + 1.0')
+})
+
 test_that("custom scalar functions translated correctly", {
-  con <- simulate_oracle()
+  con <- dialect_oracle()
 
   expect_translation(
     con,
@@ -21,7 +25,7 @@ test_that("custom scalar functions translated correctly", {
 })
 
 test_that("paste and paste0 translate correctly", {
-  con <- simulate_oracle()
+  con <- dialect_oracle()
 
   expect_translation(con, paste(x, y), '"x" || \' \' || "y"')
   expect_translation(con, paste0(x, y), '"x" || "y"')
@@ -30,7 +34,7 @@ test_that("paste and paste0 translate correctly", {
 
 
 test_that("string functions translate correctly", {
-  con <- simulate_oracle()
+  con <- dialect_oracle()
 
   expect_snapshot({
     translate_sql(str_replace(col, "pattern", "replacement"), con = con)
@@ -39,12 +43,12 @@ test_that("string functions translate correctly", {
 })
 
 test_that("queries translate correctly", {
-  mf <- lazy_frame(x = 1, con = simulate_oracle())
+  mf <- lazy_frame(x = 1, con = dialect_oracle())
   expect_snapshot(mf |> head())
 })
 
 test_that("`sql_query_upsert()` is correct", {
-  con <- simulate_oracle()
+  con <- dialect_oracle()
   df_y <- lazy_frame(
     a = 2:3,
     b = c(12L, 13L),
@@ -68,32 +72,78 @@ test_that("`sql_query_upsert()` is correct", {
   )
 })
 
+test_that("db_table_temporary adds ORA$PTT_ prefix", {
+  con <- dialect_oracle()
+
+  # Adds prefix (with message) for temporary tables
+  expect_snapshot(
+    result <- sql_table_temporary(con, table_path("tbl"), temporary = TRUE)
+  )
+  expect_equal(as.character(result$table), "ORA$PTT_tbl")
+  expect_true(result$temporary)
+
+  # Doesn't double-prefix if already has ORA$PTT_
+  result <- sql_table_temporary(
+    con,
+    table_path("ORA$PTT_tbl"),
+    temporary = TRUE
+  )
+  expect_equal(as.character(result$table), "ORA$PTT_tbl")
+  expect_true(result$temporary)
+
+  # Returns table unchanged for non-temporary
+  result <- sql_table_temporary(con, table_path("tbl"), temporary = FALSE)
+  expect_equal(as.character(result$table), "tbl")
+  expect_false(result$temporary)
+})
+
 test_that("generates custom sql", {
-  con <- simulate_oracle()
+  con <- dialect_oracle()
 
   expect_snapshot(sql_table_analyze(con, in_schema("schema", "tbl")))
+  # Can't analyze private temporary tables
+  expect_null(sql_table_analyze(con, table_path("ORA$PTT_tbl")))
+
   expect_snapshot(sql_query_explain(con, sql("SELECT * FROM foo")))
 
   lf <- lazy_frame(x = 1, con = con)
   expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
 
+  # With ORA$PTT_ prefix -> creates PRIVATE TEMPORARY TABLE
+  expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), "ORA$PTT_tbl"))
+  # Without ORA$PTT_ prefix -> creates regular TABLE
   expect_snapshot(sql_query_save(
     con,
     sql("SELECT * FROM foo"),
-    in_schema("schema", "tbl")
-  ))
-  expect_snapshot(sql_query_save(
-    con,
-    sql("SELECT * FROM foo"),
-    in_schema("schema", "tbl"),
+    "tbl",
     temporary = FALSE
   ))
 
   expect_snapshot(slice_sample(lf, n = 1))
 })
 
+test_that("oracle_sql_table_create generates correct SQL", {
+  con <- dialect_oracle()
+
+  expect_snapshot({
+    # Temporary table (has ORA$PTT_ prefix)
+    oracle_sql_table_create(
+      con,
+      table_path("ORA$PTT_test"),
+      c(x = "INTEGER", y = "TEXT")
+    )
+
+    # Regular table
+    oracle_sql_table_create(
+      con,
+      table_path("test"),
+      c(x = "INTEGER", y = "TEXT")
+    )
+  })
+})
+
 test_that("copy_inline uses UNION ALL", {
-  con <- simulate_oracle()
+  con <- dialect_oracle()
   y <- tibble::tibble(id = 1L, arr = "{1,2,3}")
 
   types <- c(id = "bigint", arr = "integer[]")
@@ -108,7 +158,7 @@ test_that("copy_inline uses UNION ALL", {
 })
 
 test_that("custom clock functions translated correctly", {
-  con <- simulate_oracle()
+  con <- dialect_oracle()
   expect_translation(
     con,
     add_years(x, 1),
@@ -126,7 +176,7 @@ test_that("custom clock functions translated correctly", {
 })
 
 test_that("difftime is translated correctly", {
-  con <- simulate_oracle()
+  con <- dialect_oracle()
   expect_translation(
     con,
     difftime(start_date, end_date, units = "days"),

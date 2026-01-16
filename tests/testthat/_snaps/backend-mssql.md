@@ -5,7 +5,7 @@
     Output
       <SQL>
       SELECT
-        [df].*,
+        *,
         CAST(CASE WHEN REGEXP_LIKE([x], 'abc') THEN 1 ELSE 0 END AS BIT) AS [detected]
       FROM [df]
 
@@ -15,7 +15,7 @@
       filter(lf, str_detect(x, "abc"))
     Output
       <SQL>
-      SELECT [df].*
+      SELECT *
       FROM [df]
       WHERE (REGEXP_LIKE([x], 'abc'))
 
@@ -104,7 +104,7 @@
       filter(mf, is.na(x))
     Output
       <SQL>
-      SELECT [df].*
+      SELECT *
       FROM [df]
       WHERE (([x] IS NULL))
 
@@ -114,7 +114,7 @@
       filter(mf, !is.na(x))
     Output
       <SQL>
-      SELECT [df].*
+      SELECT *
       FROM [df]
       WHERE (NOT(([x] IS NULL)))
 
@@ -124,7 +124,7 @@
       filter(mf, x == 1L || x == 2L)
     Output
       <SQL>
-      SELECT [df].*
+      SELECT *
       FROM [df]
       WHERE ([x] = 1 OR [x] = 2)
 
@@ -134,7 +134,7 @@
       mutate(mf, z = ifelse(x == 1L, 1L, 2L))
     Output
       <SQL>
-      SELECT [df].*, CASE WHEN ([x] = 1) THEN 1 WHEN NOT ([x] = 1) THEN 2 END AS [z]
+      SELECT *, CASE WHEN ([x] = 1) THEN 1 WHEN NOT ([x] = 1) THEN 2 END AS [z]
       FROM [df]
 
 ---
@@ -143,7 +143,7 @@
       mutate(mf, z = case_when(x == 1L ~ 1L))
     Output
       <SQL>
-      SELECT [df].*, CASE WHEN ([x] = 1) THEN 1 END AS [z]
+      SELECT *, CASE WHEN ([x] = 1) THEN 1 END AS [z]
       FROM [df]
 
 ---
@@ -152,7 +152,7 @@
       mutate(mf, z = !is.na(x))
     Output
       <SQL>
-      SELECT [df].*, ~CAST(CASE WHEN ([x] IS NULL) THEN 1 ELSE 0 END AS BIT) AS [z]
+      SELECT *, ~CAST(CASE WHEN ([x] IS NULL) THEN 1 ELSE 0 END AS BIT) AS [z]
       FROM [df]
 
 ---
@@ -194,7 +194,7 @@
 # handles ORDER BY in subqueries
 
     Code
-      sql_query_select(simulate_mssql(), sql("[x]"), sql("[y]"), order_by = "z",
+      sql_query_select(dialect_mssql(), sql("[x]"), sql("[y]"), order_by = "z",
       subquery = TRUE)
     Condition
       Warning:
@@ -207,7 +207,7 @@
 # custom limit translation
 
     Code
-      sql_query_select(simulate_mssql(), sql("[x]"), sql("[y]"), order_by = sql("[z]"),
+      sql_query_select(dialect_mssql(), sql("[x]"), sql("[y]"), order_by = sql("[z]"),
       limit = 10)
     Output
       <SQL> SELECT TOP 10 [x]
@@ -220,7 +220,7 @@
       filter(mf, x == a)
     Output
       <SQL>
-      SELECT [df].*
+      SELECT *
       FROM [df]
       WHERE ([x] = 0x616263)
 
@@ -230,7 +230,7 @@
       filter(mf, x %in% L)
     Output
       <SQL>
-      SELECT [df].*
+      SELECT *
       FROM [df]
       WHERE ([x] IN (0x616263, 0x0102))
 
@@ -240,7 +240,7 @@
       qry
     Output
       <SQL>
-      SELECT [df].*
+      SELECT *
       FROM [df]
       WHERE ([x] IN (0x616263, 0x0102))
 
@@ -250,7 +250,7 @@
       filter(mf, x == TRUE)
     Output
       <SQL>
-      SELECT [df].*
+      SELECT *
       FROM [df]
       WHERE ([x] = 1)
 
@@ -298,7 +298,7 @@
       SELECT [x]
       FROM (
         SELECT
-          [df].*,
+          *,
           CASE
       WHEN (NOT(((RAND(CHECKSUM(NEWID()))) IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN (((RAND(CHECKSUM(NEWID()))) IS NULL)) THEN 1 ELSE 0 END) ORDER BY RAND(CHECKSUM(NEWID())))
       END AS [col01]
@@ -413,8 +413,8 @@
 # `sql_query_delete()` is correct
 
     Code
-      sql_query_delete(con = simulate_mssql(), table = ident("df_x"), from = sql_render(
-        df_y, simulate_mssql(), lvl = 2), by = c("a", "b"), returning_cols = c("a",
+      sql_query_delete(con = dialect_mssql(), table = ident("df_x"), from = sql_render(
+        df_y, dialect_mssql(), lvl = 2), by = c("a", "b"), returning_cols = c("a",
         b2 = "b"))
     Output
       <SQL> DELETE FROM [df_x]
@@ -454,7 +454,7 @@
       filter(mf, x)
     Output
       <SQL>
-      SELECT [df].*
+      SELECT *
       FROM [df]
       WHERE (cast([x] AS [BIT]) = 1)
 
@@ -464,7 +464,7 @@
       filter(mf, TRUE)
     Output
       <SQL>
-      SELECT [df].*
+      SELECT *
       FROM [df]
       WHERE (cast(1 AS [BIT]) = 1)
 
@@ -474,7 +474,7 @@
       filter(mf, (!x) | FALSE)
     Output
       <SQL>
-      SELECT [df].*
+      SELECT *
       FROM [df]
       WHERE ((NOT(cast([x] AS [BIT]) = 1)) OR cast(0 AS [BIT]) = 1)
 
@@ -486,7 +486,7 @@
       <SQL>
       SELECT [LHS].[x] AS [x]
       FROM (
-        SELECT [df].*
+        SELECT *
         FROM [df]
         WHERE (cast([x] AS [BIT]) = 1)
       ) AS [LHS]
@@ -499,7 +499,7 @@
       mutate(mf, rown = row_number())
     Output
       <SQL>
-      SELECT [df].*, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS [rown]
+      SELECT *, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS [rown]
       FROM [df]
 
 ---
@@ -508,9 +508,7 @@
       mutate(group_by(mf, y), rown = row_number())
     Output
       <SQL>
-      SELECT
-        [df].*,
-        ROW_NUMBER() OVER (PARTITION BY [y] ORDER BY (SELECT NULL)) AS [rown]
+      SELECT *, ROW_NUMBER() OVER (PARTITION BY [y] ORDER BY (SELECT NULL)) AS [rown]
       FROM [df]
 
 ---
@@ -519,7 +517,7 @@
       mutate(arrange(mf, y), rown = row_number())
     Output
       <SQL>
-      SELECT [df].*, ROW_NUMBER() OVER (ORDER BY [y]) AS [rown]
+      SELECT *, ROW_NUMBER() OVER (ORDER BY [y]) AS [rown]
       FROM [df]
       ORDER BY [y]
 
@@ -535,7 +533,7 @@
 # add prefix to temporary table
 
     Code
-      out <- db_table_temporary(con, table_path("foo.bar"), temporary = TRUE)
+      out <- sql_table_temporary(con, table_path("foo.bar"), temporary = TRUE)
     Message
       Created a temporary table named #bar
 

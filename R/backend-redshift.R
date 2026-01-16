@@ -1,18 +1,23 @@
-#' Backend: Redshift
+#' Redshift backend
 #'
 #' @description
-#' Base translations come from [PostgreSQL backend][simulate_postgres]. There
+#' This backend supports Amazon Redshift databases, typically accessed via
+#' a `RedshiftConnection` created by [DBI::dbConnect()]. Use `dialect_redshift()`
+#' with `lazy_frame()` to see simulated SQL without connecting to a live
+#' database.
+#'
+#' Base translations come from [PostgreSQL backend][dialect_postgres]. There
 #' are generally few differences, apart from string manipulation.
 #'
-#' Use `simulate_redshift()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-redshift
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_redshift())
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_redshift())
 #' lf |> transmute(x = paste(c, " times"))
 #' lf |> transmute(x = substr(c, 2, 3))
 #' lf |> transmute(x = str_replace_all(c, "a", "z"))
@@ -20,7 +25,24 @@ NULL
 
 #' @export
 #' @rdname backend-redshift
+dialect_redshift <- function() {
+  new_sql_dialect(
+    "redshift",
+    quote_identifier = function(x) sql_quote(x, '"')
+  )
+}
+
+#' @export
+#' @rdname backend-redshift
 simulate_redshift <- function() simulate_dbi("RedshiftConnection")
+
+#' @export
+sql_dialect.RedshiftConnection <- function(con) {
+  dialect_redshift()
+}
+
+#' @export
+sql_dialect.Redshift <- sql_dialect.RedshiftConnection
 
 #' @export
 dbplyr_edition.RedshiftConnection <- function(con) {
@@ -35,8 +57,8 @@ redshift_round <- function(x, digits = 0L) {
 }
 
 #' @export
-sql_translation.RedshiftConnection <- function(con) {
-  postgres <- sql_translation.PostgreSQL(con)
+sql_translation.sql_dialect_redshift <- function(con) {
+  postgres <- sql_translation(dialect_postgres())
 
   sql_variant(
     sql_translator(
@@ -161,30 +183,19 @@ sql_translation.RedshiftConnection <- function(con) {
   )
 }
 
-#' @export
-sql_translation.Redshift <- sql_translation.RedshiftConnection
-
 # https://docs.aws.amazon.com/redshift/latest/dg/r_EXPLAIN.html
 #' @export
-sql_query_explain.Redshift <- function(con, sql, ...) {
+sql_query_explain.sql_dialect_redshift <- function(con, sql, ...) {
   sql_glue2(con, "EXPLAIN {sql}")
 }
 
 #' @export
-sql_query_explain.RedshiftConnection <- sql_query_explain.Redshift
-
-#' @export
-sql_values_subquery.Redshift <- function(con, df, types, lvl = 0, ...) {
+sql_values_subquery.sql_dialect_redshift <- function(
+  con,
+  df,
+  types,
+  lvl = 0,
+  ...
+) {
   sql_values_subquery_union(con, df, types = types, lvl = lvl)
 }
-
-#' @export
-sql_values_subquery.RedshiftConnection <- sql_values_subquery.Redshift
-
-#' @export
-supports_window_clause.Redshift <- function(con) {
-  FALSE
-}
-
-#' @export
-supports_window_clause.RedshiftConnection <- supports_window_clause.Redshift

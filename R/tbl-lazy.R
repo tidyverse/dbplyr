@@ -1,8 +1,7 @@
 #' Create a local lazy tibble
 #'
 #' These functions are useful for testing SQL generation without having to
-#' have an active database connection. See [simulate_dbi()] for a list
-#' available database simulations.
+#' have an active database connection.
 #'
 #' @keywords internal
 #' @export
@@ -10,7 +9,7 @@
 #' library(dplyr)
 #' df <- data.frame(x = 1, y = 2)
 #'
-#' df_sqlite <- tbl_lazy(df, con = simulate_sqlite())
+#' df_sqlite <- tbl_lazy(df, con = dialect_sqlite())
 #' df_sqlite |> summarise(x = sd(x, na.rm = TRUE))
 tbl_lazy <- function(df, con = NULL, ..., name = "df") {
   check_dots_empty0(...)

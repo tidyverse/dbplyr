@@ -33,7 +33,7 @@ which I think is worthwhile because it leads to more readable translation
 code.
 }
 \examples{
-con <- simulate_dbi() # not necessary when writing translations
+con <- dialect_ansi() # not necessary when writing translations
 
 sql_expr(f(x + 1), con = con)
 sql_expr(f("x", "y"), con = con)

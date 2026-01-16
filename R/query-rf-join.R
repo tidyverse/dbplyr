@@ -148,7 +148,7 @@ sql_query_join <- function(
   lvl = 0
 ) {
   check_dots_used()
-  UseMethod("sql_query_join")
+  UseMethod("sql_query_join", sql_dialect(con))
 }
 #' @export
 sql_query_join.DBIConnection <- function(
@@ -186,6 +186,9 @@ sql_query_join.DBIConnection <- function(
   )
   sql_format_clauses(clauses, lvl)
 }
+
+#' @export
+sql_query_join.sql_dialect <- sql_query_join.DBIConnection
 dbplyr_query_join <- function(
   con,
   x,

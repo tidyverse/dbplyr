@@ -74,6 +74,7 @@ reference:
 
 - title: Built-in database backends
   contents:
+  - dialect_ansi
   - starts_with("backend")
 
 - title: Database connection
@@ -97,6 +98,7 @@ reference:
   - db-misc
   - db-sql
   - escape
+  - sql_dialect
   - sql_glue2
   - sql_variant
   - sql_query_insert

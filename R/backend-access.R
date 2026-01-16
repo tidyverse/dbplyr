@@ -1,9 +1,11 @@
-#' Backend: MS Access
+#' MS Access backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are:
+#' This backend supports Microsoft Access databases, typically accessed via
+#' odbc. Use `dialect_access()` with `lazy_frame()` to see simulated SQL without
+#' connecting to a live database.
+#'
+#' Key differences for this backend are:
 #'
 #' * `SELECT` uses `TOP`, not `LIMIT`
 #' * Non-standard types and mathematical functions
@@ -11,14 +13,14 @@
 #' * No `ANALYZE` equivalent
 #' * `TRUE` and `FALSE` converted to 1 and 0
 #'
-#' Use `simulate_access()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-access
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
-#' lf <- lazy_frame(x = 1, y = 2, z = "a", con = simulate_access())
+#' lf <- lazy_frame(x = 1, y = 2, z = "a", con = dialect_access())
 #'
 #' lf |> head()
 #' lf |> mutate(y = as.numeric(y), z = sqrt(x^2 + 10))
@@ -27,7 +29,22 @@ NULL
 
 #' @export
 #' @rdname backend-access
+dialect_access <- function() {
+  new_sql_dialect(
+    "access",
+    quote_identifier = function(x) sql_quote(x, '"'),
+    has_window_clause = TRUE
+  )
+}
+
+#' @export
+#' @rdname backend-access
 simulate_access <- function() simulate_dbi("ACCESS")
+
+#' @export
+sql_dialect.ACCESS <- function(con) {
+  dialect_access()
+}
 
 #' @export
 dbplyr_edition.ACCESS <- function(con) {
@@ -37,7 +54,7 @@ dbplyr_edition.ACCESS <- function(con) {
 # sql_ generics --------------------------------------------
 
 #' @export
-sql_query_select.ACCESS <- function(
+sql_query_select.sql_dialect_access <- function(
   con,
   select,
   from,
@@ -65,7 +82,7 @@ sql_query_select.ACCESS <- function(
 }
 
 #' @export
-sql_translation.ACCESS <- function(con) {
+sql_translation.sql_dialect_access <- function(con) {
   sql_variant(
     sql_translator(
       .parent = base_scalar,
@@ -168,7 +185,7 @@ sql_translation.ACCESS <- function(con) {
 # db_ generics -----------------------------------
 
 #' @export
-sql_table_analyze.ACCESS <- function(con, table, ...) {
+sql_table_analyze.sql_dialect_access <- function(con, table, ...) {
   # Do nothing. Access doesn't support an analyze / update statistics function
   NULL # nocov
 }
@@ -176,7 +193,7 @@ sql_table_analyze.ACCESS <- function(con, table, ...) {
 # Util -------------------------------------------
 
 #' @export
-sql_escape_logical.ACCESS <- function(con, x) {
+sql_escape_logical.sql_dialect_access <- function(con, x) {
   # Access uses a convention of -1 as True and 0 as False
   y <- ifelse(x, -1, 0)
   y[is.na(x)] <- "NULL"
@@ -184,7 +201,7 @@ sql_escape_logical.ACCESS <- function(con, x) {
 }
 
 #' @export
-sql_escape_date.ACCESS <- function(con, x) {
+sql_escape_date.sql_dialect_access <- function(con, x) {
   # Access delimits dates using octothorpes, and uses YYYY-MM-DD
   y <- format(x, "#%Y-%m-%d#")
   y[is.na(x)] <- "NULL"
@@ -192,7 +209,7 @@ sql_escape_date.ACCESS <- function(con, x) {
 }
 
 #' @export
-sql_escape_datetime.ACCESS <- function(con, x) {
+sql_escape_datetime.sql_dialect_access <- function(con, x) {
   # Access delimits datetimes using octothorpes, and uses YYYY-MM-DD HH:MM:SS
   # Timezones are not supported in Access
   y <- format(x, "#%Y-%m-%d %H:%M:%S#")
@@ -201,12 +218,7 @@ sql_escape_datetime.ACCESS <- function(con, x) {
 }
 
 #' @export
-supports_window_clause.ACCESS <- function(con) {
-  TRUE
-}
-
-#' @export
-sql_query_multi_join.ACCESS <- function(
+sql_query_multi_join.sql_dialect_access <- function(
   con,
   x,
   joins,

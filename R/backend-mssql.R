@@ -1,9 +1,11 @@
-#' Backend: SQL server
+#' SQL Server backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are:
+#' This backend supports Microsoft SQL Server, typically accessed via odbc. Use
+#' `dialect_mssql()` with `lazy_frame()` to see simulated SQL without connecting
+#' to a live database.
+#'
+#' Key differences for this backend are:
 #'
 #' - `SELECT` uses `TOP` not `LIMIT`
 #' - Automatically prefixes `#` to create temporary tables. Add the prefix
@@ -19,8 +21,8 @@
 #'   `str_remove_all()`, `str_extract()`, and `str_count()` require SQL Server
 #'   2025+ (version 17.0)
 #'
-#' Use `simulate_mssql()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @section Bit vs boolean:
 #' SQL server uses two incompatible types to represent `TRUE` and `FALSE`
@@ -50,7 +52,7 @@
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_mssql())
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_mssql())
 #' lf |> head()
 #' lf |> transmute(x = paste(b, c, d))
 #'
@@ -64,8 +66,25 @@ NULL
 
 #' @export
 #' @rdname backend-mssql
+dialect_mssql <- function(version = "15.0") {
+  dialect <- new_sql_dialect(
+    "mssql",
+    quote_identifier = function(x) sql_quote(x, c("[", "]"))
+  )
+  dialect$version <- numeric_version(version)
+  dialect
+}
+
+#' @export
+#' @rdname backend-mssql
 simulate_mssql <- function(version = "15.0") {
   simulate_dbi("Microsoft SQL Server", version = numeric_version(version))
+}
+
+#' @export
+`sql_dialect.Microsoft SQL Server` <- function(con) {
+  version <- mssql_version(con)
+  dialect_mssql(version = version)
 }
 
 #' @export
@@ -75,6 +94,14 @@ simulate_mssql <- function(version = "15.0") {
 
 #' @export
 `table_path_components.Microsoft SQL Server` <- function(x, con) {
+  mssql_table_path_components(x)
+}
+#' @export
+table_path_components.sql_dialect_mssql <- function(x, con) {
+  mssql_table_path_components(x)
+}
+
+mssql_table_path_components <- function(x) {
   # SQL Server uses asymmetric quotes [identifier], which scan() can't handle
   # Also support standard SQL double-quote quoting "identifier"
   lapply(x, function(path) {
@@ -88,7 +115,7 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_select.Microsoft SQL Server` <- function(
+sql_query_select.sql_dialect_mssql <- function(
   con,
   select,
   from,
@@ -116,7 +143,7 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_insert.Microsoft SQL Server` <- function(
+sql_query_insert.sql_dialect_mssql <- function(
   con,
   table,
   from,
@@ -152,7 +179,7 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_append.Microsoft SQL Server` <- function(
+sql_query_append.sql_dialect_mssql <- function(
   con,
   table,
   from,
@@ -176,7 +203,7 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_update_from.Microsoft SQL Server` <- function(
+sql_query_update_from.sql_dialect_mssql <- function(
   con,
   table,
   from,
@@ -204,7 +231,7 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_upsert.Microsoft SQL Server` <- function(
+sql_query_upsert.sql_dialect_mssql <- function(
   con,
   table,
   from,
@@ -247,7 +274,7 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_delete.Microsoft SQL Server` <- function(
+sql_query_delete.sql_dialect_mssql <- function(
   con,
   table,
   from,
@@ -581,10 +608,12 @@ mssql_scalar_17 <- function() {
 }
 
 #' @export
-`sql_translation.Microsoft SQL Server` <- function(con) {
-  mssql_scalar <- if (mssql_version(con) >= "17.0") {
+sql_translation.sql_dialect_mssql <- function(con) {
+  # Needed because UseMethod hack only affects dispatch, not value
+  version <- sql_dialect(con)$version
+  mssql_scalar <- if (version >= "17.0") {
     mssql_scalar_17()
-  } else if (mssql_version(con) >= "11.0") {
+  } else if (version >= "11.0") {
     mssql_scalar_11()
   } else {
     mssql_scalar_base()
@@ -675,7 +704,7 @@ mssql_version <- function(con) {
 }
 
 #' @export
-`sql_escape_raw.Microsoft SQL Server` <- function(con, x) {
+sql_escape_raw.sql_dialect_mssql <- function(con, x) {
   if (is.null(x)) {
     "NULL"
   } else {
@@ -686,7 +715,7 @@ mssql_version <- function(con) {
 }
 
 #' @export
-`sql_table_analyze.Microsoft SQL Server` <- function(con, table, ...) {
+sql_table_analyze.sql_dialect_mssql <- function(con, table, ...) {
   # https://docs.microsoft.com/en-us/sql/t-sql/statements/update-statistics-transact-sql
   sql_glue2(con, "UPDATE STATISTICS {.tbl table}")
 }
@@ -695,12 +724,7 @@ mssql_version <- function(con) {
 # temporary table names with #
 # <https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms177399%28v%3dsql.105%29#temporary-tables>
 #' @export
-`db_table_temporary.Microsoft SQL Server` <- function(
-  con,
-  table,
-  temporary,
-  ...
-) {
+sql_table_temporary.sql_dialect_mssql <- function(con, table, temporary, ...) {
   list(
     table = add_temporary_prefix(con, table, temporary = temporary),
     temporary = FALSE
@@ -709,7 +733,7 @@ mssql_version <- function(con) {
 
 
 #' @export
-`sql_query_save.Microsoft SQL Server` <- function(
+sql_query_save.sql_dialect_mssql <- function(
   con,
   sql,
   name,
@@ -721,10 +745,10 @@ mssql_version <- function(con) {
 }
 
 #' @export
-`sql_values_subquery.Microsoft SQL Server` <- sql_values_subquery_column_alias
+sql_values_subquery.sql_dialect_mssql <- sql_values_subquery_column_alias
 
 #' @export
-`sql_returning_cols.Microsoft SQL Server` <- function(con, cols, table, ...) {
+sql_returning_cols.sql_dialect_mssql <- function(con, cols, table, ...) {
   arg_match(table, values = c("DELETED", "INSERTED"))
   returning_cols <- sql_named_cols(con, cols, table = table)
 
@@ -830,7 +854,7 @@ mssql_str_detect <- function(type = c("detect", "start", "end")) {
 }
 
 #' @export
-`sql_escape_logical.Microsoft SQL Server` <- function(con, x) {
+sql_escape_logical.sql_dialect_mssql <- function(con, x) {
   dplyr::if_else(x, "1", "0", "NULL")
 }
 
@@ -840,16 +864,32 @@ mssql_str_detect <- function(type = c("detect", "start", "end")) {
   sql,
   ...,
   cte = FALSE,
-  use_star = TRUE
+  sql_options = NULL
 ) {
+  sql <- mssql_render_preprocess(sql)
+  NextMethod()
+}
+
+#' @export
+db_sql_render.sql_dialect_mssql <- function(
+  con,
+  sql,
+  ...,
+  cte = FALSE,
+  sql_options = NULL
+) {
+  sql <- mssql_render_preprocess(sql)
+  NextMethod()
+}
+
+mssql_render_preprocess <- function(sql) {
   # Post-process WHERE to cast logicals from BIT to BOOLEAN
   sql$lazy_query <- purrr::modify_tree(
     sql$lazy_query,
     is_node = \(x) inherits(x, "lazy_query"),
     post = mssql_update_where_clause
   )
-
-  NextMethod()
+  sql
 }
 
 mssql_update_where_clause <- function(qry) {

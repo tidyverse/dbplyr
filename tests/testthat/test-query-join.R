@@ -8,7 +8,7 @@ test_that("sql_build.lazy_multi_join_query() includes distinct", {
 
   query <- out$lazy_query
   expect_s3_class(query, "lazy_multi_join_query")
-  built <- sql_build(out, simulate_dbi())
+  built <- sql_build(out, dialect_ansi())
   expect_true(built$distinct)
 })
 
@@ -24,7 +24,7 @@ test_that("sql_build.lazy_multi_join_query() includes where", {
   expect_s3_class(query, "lazy_multi_join_query")
   expect_length(query$where, 2)
 
-  built <- sql_build(out, simulate_dbi())
+  built <- sql_build(out, dialect_ansi())
   expect_length(built$where, 2)
 })
 
@@ -38,6 +38,20 @@ test_that("multi_join where clause uses qualified column names", {
 
   lf3 <- lazy_frame(x = 1, y = 3)
   expect_snapshot(left_join(lf1, lf3, by = "x") |> filter(y.x > 1))
+})
+
+test_that("where clause is updated when vars are renamed by later join (#1770)", {
+  lf1 <- lazy_frame(x = 1, y = 2, .name = "t1")
+  lf2 <- lazy_frame(x = 1, z = 3, .name = "t2")
+  lf3 <- lazy_frame(x = 1, z = 4, .name = "t3")
+
+  # When z gets renamed to z.x, the filter should use the new name
+  out <- lf1 |>
+    left_join(lf2, by = "x") |>
+    filter(z == 1) |>
+    left_join(lf3, by = "x")
+
+  expect_equal(out$lazy_query$where, list(expr(z.x == 1)))
 })
 
 test_that("generated sql doesn't change unexpectedly", {
@@ -69,7 +83,7 @@ test_that("sql_on query doesn't change unexpectedly", {
 })
 
 test_that("sql_multi_join_select generates expected SQL", {
-  con <- simulate_dbi()
+  con <- dialect_ansi()
 
   vars <- tibble(
     name = c("x", "a", "b"),

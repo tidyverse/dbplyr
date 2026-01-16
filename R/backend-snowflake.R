@@ -1,23 +1,48 @@
-#' Backend: Snowflake
+#' Snowflake backend
 #'
 #' @description
+#' This backend supports Snowflake databases, typically accessed via odbc. Use
+#' `dialect_snowflake()` with `lazy_frame()` to see simulated SQL without
+#' connecting to a live database.
+#'
 #' See `vignette("translation-function")` and `vignette("translation-verb")` for
 #' details of overall translation technology.
-#'
-#' Use `simulate_snowflake()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
 #'
 #' @name backend-snowflake
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_snowflake())
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_snowflake())
 #' lf |> transmute(x = paste0(d, " times"))
 NULL
 
 #' @export
-sql_translation.Snowflake <- function(con) {
+#' @rdname backend-snowflake
+dialect_snowflake <- function() {
+  new_sql_dialect(
+    "snowflake",
+    quote_identifier = function(x) sql_quote(x, '"'),
+    has_window_clause = TRUE
+  )
+}
+
+#' @export
+#' @rdname backend-snowflake
+simulate_snowflake <- function() simulate_dbi("Snowflake")
+
+#' @export
+sql_dialect.Snowflake <- function(con) {
+  dialect_snowflake()
+}
+
+#' @export
+dbplyr_edition.Snowflake <- function(con) {
+  2L
+}
+
+#' @export
+sql_translation.sql_dialect_snowflake <- function(con) {
   sql_variant(
     sql_translator(
       .parent = base_odbc_scalar,
@@ -322,15 +347,11 @@ sql_translation.Snowflake <- function(con) {
   )
 }
 
-#' @export
-#' @rdname backend-snowflake
-simulate_snowflake <- function() simulate_dbi("Snowflake")
-
 # There seems to be no concept of ANALYZE TABLE in Snowflake.  I searched for
 # functions that performed similar operations, and found none.
 # Link to full list: https://docs.snowflake.com/en/sql-reference/sql-all.html
 #' @export
-sql_table_analyze.Snowflake <- function(con, table, ...) {}
+sql_table_analyze.sql_dialect_snowflake <- function(con, table, ...) {}
 
 snowflake_grepl <- function(
   pattern,
