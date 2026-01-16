@@ -98,7 +98,7 @@ lf |> filter(c > d)
 # Need to convert from boolean to bit:
 lf |> transmute(x = c > d)
 #> <SQL>
-#> SELECT CAST(IIF([c] > [d], 1, 0) AS BIT) AS [x]
+#> SELECT CAST(CASE WHEN [c] > [d] THEN 1 ELSE 0 END AS BIT) AS [x]
 #> FROM [df]
 # Can use boolean as is:
 lf |> transmute(x = ifelse(c > d, "c", "d"))

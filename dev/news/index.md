@@ -89,6 +89,11 @@
   ([@edward-burn](https://github.com/edward-burn),
   [\#1570](https://github.com/tidyverse/dbplyr/issues/1570)).
 - SQL Server:
+  [`between()`](https://dplyr.tidyverse.org/reference/between.html) now
+  uses `CASE WHEN` instead of `IIF()` for compatibility with Azure
+  Synapse ([@rehbbea](https://github.com/rehbbea),
+  [\#1773](https://github.com/tidyverse/dbplyr/issues/1773)).
+- SQL Server:
   [`if_else()`](https://dplyr.tidyverse.org/reference/if_else.html) now
   uses `CASE WHEN` instead of `IIF`. This ensures the handling of
   `NULL`s matches R’s `NA` handling rules
