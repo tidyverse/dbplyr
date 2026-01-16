@@ -57,6 +57,11 @@
 #' )
 #' class(my_dialect)
 sql_dialect <- function(con) {
+  # Check for dialect override from with_dialect()
+  override <- attr(con, "dbplyr_dialect", exact = TRUE)
+  if (!is.null(override)) {
+    return(override)
+  }
   UseMethod("sql_dialect")
 }
 
