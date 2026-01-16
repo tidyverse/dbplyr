@@ -78,6 +78,7 @@
 * `tbl_sql()` is now (soft) deprecated. It hasn't been required in a while.
 * `win_rank_tdata()` has been removed after being deprecated.
 * `window_order()` works with `dplyr::desc()` (not just `desc()`) (#1486).
+* `with_dialect()` allows you to override the SQL dialect for a connection (#1784).
 
 # dbplyr 2.5.1
 
