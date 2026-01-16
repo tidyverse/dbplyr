@@ -46,9 +46,9 @@ db <- memdb_frame(x = c(1, 1, 2, 2), y = c(1, 2, 1, 1))
 db |> distinct() |> show_query()
 #> <SQL>
 #> SELECT DISTINCT *
-#> FROM `dbplyr_tmp_eoeBlLyCUB`
+#> FROM `dbplyr_tmp_oeBlLyCUBq`
 db |> distinct(x) |> show_query()
 #> <SQL>
 #> SELECT DISTINCT `x`
-#> FROM `dbplyr_tmp_eoeBlLyCUB`
+#> FROM `dbplyr_tmp_oeBlLyCUBq`
 ```

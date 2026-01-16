@@ -155,7 +155,7 @@ and return data to R.</p>
 <span class="r-in"><span>  <span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> *, (`x` + `y`) / 2.0<span style="color: #0000BB;"> AS </span>`a`, SQRT((POWER(`x`, 2)) + POWER(`y`, 2))<span style="color: #0000BB;"> AS </span>`b`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_I6Ojtgl00s`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_6Ojtgl00si`</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># dbplyr automatically creates subqueries as needed</span></span></span>
 <span class="r-in"><span><span class="va">db</span> <span class="op">|&gt;</span></span></span>
@@ -165,7 +165,7 @@ and return data to R.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> *, `x1` * 2.0<span style="color: #0000BB;"> AS </span>`x2`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> (</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span> *, `x` + 1.0<span style="color: #0000BB;"> AS </span>`x1`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_I6Ojtgl00s`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_6Ojtgl00si`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ) <span style="color: #0000BB;">AS </span>`q01`</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># `.order` and `.frame` control window functions</span></span></span>
@@ -180,7 +180,7 @@ and return data to R.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   *,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   SUM(`x`) OVER (PARTITION BY `g` ORDER BY `x` ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING)<span style="color: #0000BB;"> AS </span>`rolling_sum`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_IlBpEtJTVT`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_lBpEtJTVTw`</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -133,6 +133,8 @@
 - [`dialect_impala()`](https://dbplyr.tidyverse.org/dev/reference/backend-impala.md)
   [`simulate_impala()`](https://dbplyr.tidyverse.org/dev/reference/backend-impala.md)
   : Impala backend
+- [`backend-jdbc`](https://dbplyr.tidyverse.org/dev/reference/backend-jdbc.md)
+  : JDBC backend
 - [`dialect_mssql()`](https://dbplyr.tidyverse.org/dev/reference/backend-mssql.md)
   [`simulate_mssql()`](https://dbplyr.tidyverse.org/dev/reference/backend-mssql.md)
   : SQL Server backend

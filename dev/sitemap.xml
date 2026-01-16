@@ -20,6 +20,7 @@
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-hana.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-hive.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-impala.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-jdbc.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-mssql.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-mysql.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-odbc.html</loc></url>

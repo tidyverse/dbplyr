@@ -324,14 +324,14 @@ db2 <- memdb_frame(x = 1:3, y = letters[1:3])
 db1 |> left_join(db2) |> show_query()
 #> Joining with `by = join_by(x)`
 #> <SQL>
-#> SELECT `dbplyr_tmp_GAnL54XlxB`.`x` AS `x`, `y`
-#> FROM `dbplyr_tmp_GAnL54XlxB`
-#> LEFT JOIN `dbplyr_tmp_m9HzOkF05U`
-#>   ON (`dbplyr_tmp_GAnL54XlxB`.`x` = `dbplyr_tmp_m9HzOkF05U`.`x`)
+#> SELECT `dbplyr_tmp_AnL54XlxBL`.`x` AS `x`, `y`
+#> FROM `dbplyr_tmp_AnL54XlxBL`
+#> LEFT JOIN `dbplyr_tmp_9HzOkF05UK`
+#>   ON (`dbplyr_tmp_AnL54XlxBL`.`x` = `dbplyr_tmp_9HzOkF05UK`.`x`)
 db1 |> left_join(db2, sql_on = "LHS.x < RHS.x") |> show_query()
 #> <SQL>
 #> SELECT `LHS`.`x` AS `x.x`, `RHS`.`x` AS `x.y`, `y`
-#> FROM `dbplyr_tmp_GAnL54XlxB` AS `LHS`
-#> LEFT JOIN `dbplyr_tmp_m9HzOkF05U` AS `RHS`
+#> FROM `dbplyr_tmp_AnL54XlxBL` AS `LHS`
+#> LEFT JOIN `dbplyr_tmp_9HzOkF05UK` AS `RHS`
 #>   ON (LHS.x < RHS.x)
 ```

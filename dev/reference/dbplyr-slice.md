@@ -116,7 +116,7 @@ db |> slice_min(x) |> show_query()
 #>     CASE
 #> WHEN (NOT((`x` IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN ((`x` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `x`)
 #> END AS `col01`
-#>   FROM `dbplyr_tmp_ySHwmYEz3c`
+#>   FROM `dbplyr_tmp_SHwmYEz3cq`
 #> ) AS `q01`
 #> WHERE (`col01` <= 1)
 db |> slice_max(x) |> show_query()
@@ -128,7 +128,7 @@ db |> slice_max(x) |> show_query()
 #>     CASE
 #> WHEN (NOT((`x` IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN ((`x` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `x` DESC)
 #> END AS `col01`
-#>   FROM `dbplyr_tmp_ySHwmYEz3c`
+#>   FROM `dbplyr_tmp_SHwmYEz3cq`
 #> ) AS `q01`
 #> WHERE (`col01` <= 1)
 db |> slice_sample() |> show_query()
@@ -143,7 +143,7 @@ db |> slice_sample() |> show_query()
 #> ELSE 0
 #> END) ORDER BY (0.5 + RANDOM() / 18446744073709551616.0))
 #> END AS `col01`
-#>   FROM `dbplyr_tmp_ySHwmYEz3c`
+#>   FROM `dbplyr_tmp_SHwmYEz3cq`
 #> ) AS `q01`
 #> WHERE (`col01` <= 1)
 
@@ -156,7 +156,7 @@ db |> group_by(y) |> slice_min(x) |> show_query()
 #>     CASE
 #> WHEN (NOT((`x` IS NULL))) THEN RANK() OVER (PARTITION BY `y`, (CASE WHEN ((`x` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `x`)
 #> END AS `col01`
-#>   FROM `dbplyr_tmp_ySHwmYEz3c`
+#>   FROM `dbplyr_tmp_SHwmYEz3cq`
 #> ) AS `q01`
 #> WHERE (`col01` <= 1)
 

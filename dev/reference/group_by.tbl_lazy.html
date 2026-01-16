@@ -113,7 +113,7 @@ our naming conventions.</p></dd>
 <span class="r-in"><span>  <span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `g`, COUNT(*)<span style="color: #0000BB;"> AS </span>`n()`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_dkFTvzIEFY`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_kFTvzIEFYG`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">GROUP BY</span> `g`</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">db</span> <span class="op">|&gt;</span></span></span>
@@ -122,7 +122,7 @@ our naming conventions.</p></dd>
 <span class="r-in"><span>  <span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> *, `x` / SUM(`x`) OVER (PARTITION BY `g`)<span style="color: #0000BB;"> AS </span>`x2`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_dkFTvzIEFY`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_kFTvzIEFYG`</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

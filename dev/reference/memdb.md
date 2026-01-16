@@ -82,7 +82,7 @@ df |> arrange(x)
 df |> arrange(x) |> show_query()
 #> <SQL>
 #> SELECT *
-#> FROM `dbplyr_tmp_KpjGw3nPZi`
+#> FROM `dbplyr_tmp_pjGw3nPZis`
 #> ORDER BY `x`
 
 # Use memdb() + copy_to() to copy an existing data frame
