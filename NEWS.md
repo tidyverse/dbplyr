@@ -25,6 +25,7 @@
 * Redshift: fixed syntax error in `date_build()` translation (#1512).
 * Snowflake: correctly translates `$` to `:` (@jsowder, #1608).
 * Snowflake: fixed translations that were being reported as unknown (@edward-burn, #1570).
+* SQL Server: `between()` now uses `CASE WHEN` instead of `IIF()` for compatibility with Azure Synapse (@rehbbea, #1773).
 * SQL Server: `if_else()` now uses `CASE WHEN` instead of `IIF`. This ensures the handling of `NULL`s matches R's `NA` handling rules (#1569).
 * SQL Server: `slice_sample()` returns different results each run (@thomashulst, #1503).
 * SQL Server: `str_like()` and `str_ilike()` now have consistent behaviour (@edward-burn, #1669).
