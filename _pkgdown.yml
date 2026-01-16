@@ -81,6 +81,7 @@ reference:
   contents:
   - memdb_frame
   - remote_name
+  - with_dialect
 
 - title: SQL generation
   contents:

@@ -160,4 +160,5 @@ Collate:
     'verb-summarise.R'
     'verb-uncount.R'
     'verb-window.R'
+    'with-dialect.R'
     'zzz.R'
