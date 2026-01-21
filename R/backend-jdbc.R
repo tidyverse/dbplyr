@@ -8,19 +8,19 @@
 #'
 #' The following databases are recognized via their JDBC connection class:
 #'
-#' * PostgreSQL (`org.postgresql.*`)
-#' * MySQL (`com.mysql.*`)
-#' * MariaDB (`org.mariadb.*`)
-#' * SQLite (`org.sqlite.*`)
-#' * Oracle (`oracle.*`)
-#' * SQL Server (`com.microsoft.sqlserver.*`)
-#' * SAP HANA (`com.sap.db.*`)
-#' * Teradata (`com.teradata.*`)
-#' * Apache Hive (`org.apache.hive.*`)
-#' * Apache Spark (`org.apache.spark.*` or `com.simba.spark.*`)
-#' * Snowflake (`net.snowflake.*`)
-#' * Impala (`com.cloudera.impala.*`)
-#' * Amazon Redshift (`com.amazon.redshift.*`)
+#' * PostgreSQL (`org.postgresql.*`): [dialect_postgres()]
+#' * MySQL (`com.mysql.*`): [dialect_mysql()]
+#' * MariaDB (`org.mariadb.*`): [dialect_mariadb()]
+#' * SQLite (`org.sqlite.*`): [dialect_sqlite()]
+#' * Oracle (`oracle.*`): [dialect_oracle()]
+#' * SQL Server (`com.microsoft.sqlserver.*`): [dialect_mssql()]
+#' * SAP HANA (`com.sap.db.*`): [dialect_hana()]
+#' * Teradata (`com.teradata.*`): [dialect_teradata()]
+#' * Apache Hive (`org.apache.hive.*`): [dialect_hive()]
+#' * Apache Spark (`org.apache.spark.*` or `com.simba.spark.*`): [dialect_spark_sql()]
+#' * Snowflake (`net.snowflake.*`): [dialect_snowflake()]
+#' * Impala (`com.cloudera.impala.*`): [dialect_impala()]
+#' * Amazon Redshift (`com.amazon.redshift.*`): [dialect_redshift()]
 #'
 #' If your database is not recognized, dbplyr will fall back to a generic ODBC
 #' dialect. Please file an issue if you'd like support for additional databases.
