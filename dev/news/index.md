@@ -297,6 +297,10 @@
   [`dplyr::desc()`](https://dplyr.tidyverse.org/reference/desc.html)
   (not just [`desc()`](https://dplyr.tidyverse.org/reference/desc.html))
   ([\#1486](https://github.com/tidyverse/dbplyr/issues/1486)).
+- [`with_dialect()`](https://dbplyr.tidyverse.org/dev/reference/with_dialect.md)
+  overrides the default SQL dialect for a connection, which is useful if
+  dbplyr guesses incorrectly
+  ([\#1784](https://github.com/tidyverse/dbplyr/issues/1784)).
 
 ## dbplyr 2.5.1
 

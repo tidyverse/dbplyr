@@ -167,6 +167,8 @@
 - [`dialect_teradata()`](https://dbplyr.tidyverse.org/dev/reference/backend-teradata.md)
   [`simulate_teradata()`](https://dbplyr.tidyverse.org/dev/reference/backend-teradata.md)
   : Teradata backend
+- [`with_dialect()`](https://dbplyr.tidyverse.org/dev/reference/with_dialect.md)
+  : Override the SQL dialect for a connection
 
 ## Database connection
 

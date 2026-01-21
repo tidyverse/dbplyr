@@ -44,6 +44,12 @@ and
 [`vignette("translation-verb")`](https://dbplyr.tidyverse.org/dev/articles/translation-verb.md)
 for details of overall translation technology.
 
+## See also
+
+[`with_dialect()`](https://dbplyr.tidyverse.org/dev/reference/with_dialect.md)
+to use a different dialect if dbplyr guesses incorrectly, or a more
+specific translation is available.
+
 ## Examples
 
 ``` r
