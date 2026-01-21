@@ -28,6 +28,8 @@
 #' See `vignette("translation-function")` and `vignette("translation-verb")` for
 #' details of overall translation technology.
 #'
+#' @seealso [with_dialect()] to use a different dialect if dbplyr guesses
+#'   incorrectly, or a more specific translation is available.
 #' @name backend-jdbc
 #' @examples
 #' # JDBC connections require the RJDBC package and a JDBC driver JAR file.

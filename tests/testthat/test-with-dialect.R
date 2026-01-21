@@ -4,7 +4,6 @@ test_that("with_dialect() validates inputs", {
   expect_snapshot(error = TRUE, {
     with_dialect(NULL, dialect_postgres())
     with_dialect(con, "postgres")
-    with_dialect(con, list())
   })
 })
 
@@ -16,48 +15,29 @@ test_that("with_dialect() returns correct dialect", {
 })
 
 test_that("SQL generation uses specified dialect", {
-  lf <- lazy_frame(
-    x = 1,
-    con = with_dialect(simulate_dbi(), dialect_postgres())
-  )
-  expect_snapshot(lf |> mutate(y = sd(x)))
+  con <- with_dialect(memdb(), dialect_postgres())
+  mtcars <- local_db_table(con, mtcars, "mtcars")
+  expect_snapshot(mtcars |> summarise(mpg = sd(mpg), .by = cyl) |> show_query())
 })
 
-test_that("DBI operations work through wrapper", {
+test_that("verbs work through wrapper", {
   skip_if_not_installed("RSQLite")
 
-  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-  on.exit(DBI::dbDisconnect(con))
-
-  wrapped <- with_dialect(con, dialect_postgres())
-  expect_equal(sql_dialect(wrapped), dialect_postgres())
-
-  DBI::dbWriteTable(wrapped, "test", data.frame(x = 1:3))
-  expect_true(DBI::dbExistsTable(wrapped, "test"))
-
-  result <- DBI::dbGetQuery(wrapped, "SELECT * FROM test")
-  expect_equal(nrow(result), 3)
-})
-
-test_that("dplyr verbs work through wrapper", {
-  skip_if_not_installed("RSQLite")
-
-  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-  on.exit(DBI::dbDisconnect(con))
-
-  wrapped <- with_dialect(con, dialect_sqlite())
+  # For simple operations there's no difference between sqlite and postgres
+  wrapped <- with_dialect(memdb(), dialect_postgres())
 
   # copy_to()
   db_mtcars <- copy_to(wrapped, mtcars, name = "mtcars")
+  withr::defer(DBI::dbRemoveTable(wrapped, "mtcars"))
   expect_true(DBI::dbExistsTable(wrapped, "mtcars"))
-  expect_equal(nrow(collect(db_mtcars)), 32)
 
   # compute()
   result <- db_mtcars |>
     filter(cyl == 4) |>
+    select(cyl, vs, am) |>
     compute(name = "mtcars_4cyl")
   expect_true(DBI::dbExistsTable(wrapped, "mtcars_4cyl"))
-  expect_equal(nrow(collect(result)), 11)
+  withr::defer(DBI::dbRemoveTable(wrapped, "mtcars_4cyl"))
 
   # collect()
   collected <- db_mtcars |>

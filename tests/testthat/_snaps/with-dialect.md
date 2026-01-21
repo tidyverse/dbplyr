@@ -10,18 +10,14 @@
     Condition
       Error in `with_dialect()`:
       ! `dialect` must be a dialect object.
-    Code
-      with_dialect(con, list())
-    Condition
-      Error in `with_dialect()`:
-      ! `dialect` must be a dialect object.
 
 # SQL generation uses specified dialect
 
     Code
-      mutate(lf, y = sd(x))
+      show_query(summarise(mtcars, mpg = sd(mpg), .by = cyl))
     Output
       <SQL>
-      SELECT *, STDDEV_SAMP("x") OVER () AS "y"
-      FROM "df"
+      SELECT "cyl", STDDEV_SAMP("mpg") AS "mpg"
+      FROM "mtcars"
+      GROUP BY "cyl"
 

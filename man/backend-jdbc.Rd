@@ -43,3 +43,7 @@ details of overall translation technology.
 # con <- dbConnect(drv, "jdbc:postgresql://localhost/mydb", "user", "password")
 # tbl(con, "my_table") |> filter(x > 1)
 }
+\seealso{
+\code{\link[=with_dialect]{with_dialect()}} to use a different dialect if dbplyr guesses
+incorrectly, or a more specific translation is available.
+}

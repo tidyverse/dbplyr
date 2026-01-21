@@ -1,12 +1,9 @@
 #' Override the SQL dialect for a connection
 #'
 #' @description
-#' `with_dialect()` wraps a database connection to use a specific SQL dialect
-#' for SQL generation, while still using the original connection for database
-#' operations.
-#'
-#' This is useful when you want to use a connection with an ODBC or JDBC driver
-#' but want dbplyr to generate SQL for a specific database backend.
+#' `with_dialect()` overrides the default dialect assigned to a connection.
+#' This is useful when dbplyr guesses the dialect incorrectly, which is most
+#' likely to occur with ODBC/JDBC/ADBC backends.
 #'
 #' @param con A database connection (class `DBIConnection`).
 #' @param dialect A dialect object created by a `dialect_*()` function
@@ -30,6 +27,9 @@ with_dialect <- function(con, dialect) {
     cli_abort("{.arg dialect} must be a dialect object.")
   }
 
+  # This is a little hacky, but it seems to be ok to add additional attributes
+  # to S4 objects, and namespacing the attribute ensures that there's little
+  # chance of collision.
   attr(con, "dbplyr_dialect") <- dialect
   con
 }

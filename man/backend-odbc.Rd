@@ -28,3 +28,7 @@ lf |> transmute(x = as.numeric(b))
 lf |> transmute(x = as.integer(b))
 lf |> transmute(x = as.character(b))
 }
+\seealso{
+\code{\link[=with_dialect]{with_dialect()}} to use a different dialect if dbplyr guesses
+incorrectly, or a more specific translation is available.
+}
