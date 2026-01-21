@@ -76,6 +76,7 @@ reference:
   contents:
   - dialect_ansi
   - starts_with("backend")
+  - with_dialect
 
 - title: Database connection
   contents:
