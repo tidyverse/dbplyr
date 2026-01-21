@@ -42,9 +42,7 @@ sql_dialect.RedshiftConnection <- function(con) {
 }
 
 #' @export
-sql_dialect.Redshift <- function(con) {
-  dialect_redshift()
-}
+sql_dialect.Redshift <- sql_dialect.RedshiftConnection
 
 #' @export
 dbplyr_edition.RedshiftConnection <- function(con) {
