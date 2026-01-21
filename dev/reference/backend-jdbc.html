@@ -4,19 +4,19 @@ RJDBC::JDBC() and DBI::dbConnect(). dbplyr automatically detects the
 underlying database type from the JDBC connection class and uses the
 appropriate SQL dialect.
 The following databases are recognized via their JDBC connection class:
-PostgreSQL (org.postgresql.*)
-MySQL (com.mysql.*)
-MariaDB (org.mariadb.*)
-SQLite (org.sqlite.*)
-Oracle (oracle.*)
-SQL Server (com.microsoft.sqlserver.*)
-SAP HANA (com.sap.db.*)
-Teradata (com.teradata.*)
-Apache Hive (org.apache.hive.*)
-Apache Spark (org.apache.spark.* or com.simba.spark.*)
-Snowflake (net.snowflake.*)
-Impala (com.cloudera.impala.*)
-Amazon Redshift (com.amazon.redshift.*)
+PostgreSQL (org.postgresql.*): dialect_postgres()
+MySQL (com.mysql.*): dialect_mysql()
+MariaDB (org.mariadb.*): dialect_mariadb()
+SQLite (org.sqlite.*): dialect_sqlite()
+Oracle (oracle.*): dialect_oracle()
+SQL Server (com.microsoft.sqlserver.*): dialect_mssql()
+SAP HANA (com.sap.db.*): dialect_hana()
+Teradata (com.teradata.*): dialect_teradata()
+Apache Hive (org.apache.hive.*): dialect_hive()
+Apache Spark (org.apache.spark.* or com.simba.spark.*): dialect_spark_sql()
+Snowflake (net.snowflake.*): dialect_snowflake()
+Impala (com.cloudera.impala.*): dialect_impala()
+Amazon Redshift (com.amazon.redshift.*): dialect_redshift()
 
 
 If your database is not recognized, dbplyr will fall back to a generic ODBC
@@ -27,19 +27,19 @@ RJDBC::JDBC() and DBI::dbConnect(). dbplyr automatically detects the
 underlying database type from the JDBC connection class and uses the
 appropriate SQL dialect.
 The following databases are recognized via their JDBC connection class:
-PostgreSQL (org.postgresql.*)
-MySQL (com.mysql.*)
-MariaDB (org.mariadb.*)
-SQLite (org.sqlite.*)
-Oracle (oracle.*)
-SQL Server (com.microsoft.sqlserver.*)
-SAP HANA (com.sap.db.*)
-Teradata (com.teradata.*)
-Apache Hive (org.apache.hive.*)
-Apache Spark (org.apache.spark.* or com.simba.spark.*)
-Snowflake (net.snowflake.*)
-Impala (com.cloudera.impala.*)
-Amazon Redshift (com.amazon.redshift.*)
+PostgreSQL (org.postgresql.*): dialect_postgres()
+MySQL (com.mysql.*): dialect_mysql()
+MariaDB (org.mariadb.*): dialect_mariadb()
+SQLite (org.sqlite.*): dialect_sqlite()
+Oracle (oracle.*): dialect_oracle()
+SQL Server (com.microsoft.sqlserver.*): dialect_mssql()
+SAP HANA (com.sap.db.*): dialect_hana()
+Teradata (com.teradata.*): dialect_teradata()
+Apache Hive (org.apache.hive.*): dialect_hive()
+Apache Spark (org.apache.spark.* or com.simba.spark.*): dialect_spark_sql()
+Snowflake (net.snowflake.*): dialect_snowflake()
+Impala (com.cloudera.impala.*): dialect_impala()
+Amazon Redshift (com.amazon.redshift.*): dialect_redshift()
 
 
 If your database is not recognized, dbplyr will fall back to a generic ODBC
@@ -106,19 +106,19 @@ details of overall translation technology."><meta property="og:image" content="h
 <code><a href="https://rdrr.io/pkg/RJDBC/man/JDBC.html" class="external-link">RJDBC::JDBC()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">DBI::dbConnect()</a></code>. dbplyr automatically detects the
 underlying database type from the JDBC connection class and uses the
 appropriate SQL dialect.</p>
-<p>The following databases are recognized via their JDBC connection class:</p><ul><li><p>PostgreSQL (<code>org.postgresql.*</code>)</p></li>
-<li><p>MySQL (<code>com.mysql.*</code>)</p></li>
-<li><p>MariaDB (<code>org.mariadb.*</code>)</p></li>
-<li><p>SQLite (<code>org.sqlite.*</code>)</p></li>
-<li><p>Oracle (<code>oracle.*</code>)</p></li>
-<li><p>SQL Server (<code>com.microsoft.sqlserver.*</code>)</p></li>
-<li><p>SAP HANA (<code>com.sap.db.*</code>)</p></li>
-<li><p>Teradata (<code>com.teradata.*</code>)</p></li>
-<li><p>Apache Hive (<code>org.apache.hive.*</code>)</p></li>
-<li><p>Apache Spark (<code>org.apache.spark.*</code> or <code>com.simba.spark.*</code>)</p></li>
-<li><p>Snowflake (<code>net.snowflake.*</code>)</p></li>
-<li><p>Impala (<code>com.cloudera.impala.*</code>)</p></li>
-<li><p>Amazon Redshift (<code>com.amazon.redshift.*</code>)</p></li>
+<p>The following databases are recognized via their JDBC connection class:</p><ul><li><p>PostgreSQL (<code>org.postgresql.*</code>): <code><a href="backend-postgres.html">dialect_postgres()</a></code></p></li>
+<li><p>MySQL (<code>com.mysql.*</code>): <code><a href="backend-mysql.html">dialect_mysql()</a></code></p></li>
+<li><p>MariaDB (<code>org.mariadb.*</code>): <code><a href="backend-mysql.html">dialect_mariadb()</a></code></p></li>
+<li><p>SQLite (<code>org.sqlite.*</code>): <code><a href="backend-sqlite.html">dialect_sqlite()</a></code></p></li>
+<li><p>Oracle (<code>oracle.*</code>): <code><a href="backend-oracle.html">dialect_oracle()</a></code></p></li>
+<li><p>SQL Server (<code>com.microsoft.sqlserver.*</code>): <code><a href="backend-mssql.html">dialect_mssql()</a></code></p></li>
+<li><p>SAP HANA (<code>com.sap.db.*</code>): <code><a href="backend-hana.html">dialect_hana()</a></code></p></li>
+<li><p>Teradata (<code>com.teradata.*</code>): <code><a href="backend-teradata.html">dialect_teradata()</a></code></p></li>
+<li><p>Apache Hive (<code>org.apache.hive.*</code>): <code><a href="backend-hive.html">dialect_hive()</a></code></p></li>
+<li><p>Apache Spark (<code>org.apache.spark.*</code> or <code>com.simba.spark.*</code>): <code><a href="backend-spark-sql.html">dialect_spark_sql()</a></code></p></li>
+<li><p>Snowflake (<code>net.snowflake.*</code>): <code><a href="backend-snowflake.html">dialect_snowflake()</a></code></p></li>
+<li><p>Impala (<code>com.cloudera.impala.*</code>): <code><a href="backend-impala.html">dialect_impala()</a></code></p></li>
+<li><p>Amazon Redshift (<code>com.amazon.redshift.*</code>): <code><a href="backend-redshift.html">dialect_redshift()</a></code></p></li>
 </ul><p>If your database is not recognized, dbplyr will fall back to a generic ODBC
 dialect. Please file an issue if you'd like support for additional databases.</p>
 <p>See <code><a href="../articles/translation-function.html">vignette("translation-function")</a></code> and <code><a href="../articles/translation-verb.html">vignette("translation-verb")</a></code> for
