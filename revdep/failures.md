@@ -1,385 +1,220 @@
-# BiocFileCache
+# ckanr (0.7.0)
 
-<details>
+* GitHub: <https://github.com/ropensci/ckanr>
+* Email: <mailto:fjunior.alves.oliveira@gmail.com>
+* GitHub mirror: <https://github.com/cran/ckanr>
 
-* Version: NA
-* GitHub: NA
-* Source code: https://github.com/cran/BiocFileCache
-* Number of recursive dependencies: 110
+Run `revdepcheck::cloud_details(, "ckanr")` for more info
 
-Run `revdepcheck::cloud_details(, "BiocFileCache")` for more info
+## Newly broken
 
-</details>
+*   checking whether package ‘ckanr’ can be installed ... ERROR
+     ```
+     Installation failed.
+     See ‘/tmp/workdir/ckanr/new/ckanr.Rcheck/00install.out’ for details.
+     ```
 
-## Error before installation
+## Installation
 
 ### Devel
 
 ```
-
-
-
-
+* installing *source* package ‘ckanr’ ...
+** this is package ‘ckanr’ version ‘0.7.0’
+** package ‘ckanr’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+Error: object ‘src_sql’ is not exported by 'namespace:dbplyr'
+Execution halted
+ERROR: lazy loading failed for package ‘ckanr’
+* removing ‘/tmp/workdir/ckanr/new/ckanr.Rcheck/ckanr’
 
 
 ```
 ### CRAN
 
 ```
-
-
-
-
+* installing *source* package ‘ckanr’ ...
+** this is package ‘ckanr’ version ‘0.7.0’
+** package ‘ckanr’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (ckanr)
 
 
 ```
-# BiocOncoTK
+# implyr (0.5.0)
 
-<details>
+* GitHub: <https://github.com/ianmcook/implyr>
+* Email: <mailto:ianmcook@gmail.com>
+* GitHub mirror: <https://github.com/cran/implyr>
 
-* Version: NA
-* GitHub: NA
-* Source code: https://github.com/cran/BiocOncoTK
-* Number of recursive dependencies: 218
+Run `revdepcheck::cloud_details(, "implyr")` for more info
 
-Run `revdepcheck::cloud_details(, "BiocOncoTK")` for more info
+## Newly broken
 
-</details>
+*   checking whether package ‘implyr’ can be installed ... ERROR
+     ```
+     Installation failed.
+     See ‘/tmp/workdir/implyr/new/implyr.Rcheck/00install.out’ for details.
+     ```
 
-## Error before installation
+## Installation
 
 ### Devel
 
 ```
-
-
-
-
+* installing *source* package ‘implyr’ ...
+** this is package ‘implyr’ version ‘0.5.0’
+** package ‘implyr’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** byte-compile and prepare package for lazy loading
+Error: object ‘src_sql’ is not exported by 'namespace:dbplyr'
+Execution halted
+ERROR: lazy loading failed for package ‘implyr’
+* removing ‘/tmp/workdir/implyr/new/implyr.Rcheck/implyr’
 
 
 ```
 ### CRAN
 
 ```
-
-
-
-
+* installing *source* package ‘implyr’ ...
+** this is package ‘implyr’ version ‘0.5.0’
+** package ‘implyr’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (implyr)
 
 
 ```
-# CompoundDb
+# RPresto (1.4.8)
 
-<details>
+* GitHub: <https://github.com/prestodb/RPresto>
+* Email: <mailto:jarodm@fb.com>
+* GitHub mirror: <https://github.com/cran/RPresto>
 
-* Version: NA
-* GitHub: NA
-* Source code: https://github.com/cran/CompoundDb
-* Number of recursive dependencies: 123
+Run `revdepcheck::cloud_details(, "RPresto")` for more info
 
-Run `revdepcheck::cloud_details(, "CompoundDb")` for more info
+## Newly broken
 
-</details>
+*   checking whether package ‘RPresto’ can be installed ... ERROR
+     ```
+     Installation failed.
+     See ‘/tmp/workdir/RPresto/new/RPresto.Rcheck/00install.out’ for details.
+     ```
 
-## Error before installation
+## Installation
 
 ### Devel
 
 ```
-
-
-
-
+* installing *source* package ‘RPresto’ ...
+** this is package ‘RPresto’ version ‘1.4.8’
+** package ‘RPresto’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+Error: object ‘sql_optimise’ is not exported by 'namespace:dbplyr'
+Execution halted
+ERROR: lazy loading failed for package ‘RPresto’
+* removing ‘/tmp/workdir/RPresto/new/RPresto.Rcheck/RPresto’
 
 
 ```
 ### CRAN
 
 ```
-
-
-
-
+* installing *source* package ‘RPresto’ ...
+** this is package ‘RPresto’ version ‘1.4.8’
+** package ‘RPresto’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (RPresto)
 
 
 ```
-# CuratedAtlasQueryR
+# sergeant (0.9.1)
 
-<details>
+* Email: <mailto:bob@rud.is>
+* GitHub mirror: <https://github.com/cran/sergeant>
 
-* Version: NA
-* GitHub: NA
-* Source code: https://github.com/cran/CuratedAtlasQueryR
-* Number of recursive dependencies: 196
+Run `revdepcheck::cloud_details(, "sergeant")` for more info
 
-Run `revdepcheck::cloud_details(, "CuratedAtlasQueryR")` for more info
+## Newly broken
 
-</details>
+*   checking whether package ‘sergeant’ can be installed ... ERROR
+     ```
+     Installation failed.
+     See ‘/tmp/workdir/sergeant/new/sergeant.Rcheck/00install.out’ for details.
+     ```
 
-## Error before installation
+## Installation
 
 ### Devel
 
 ```
-
-
-
-
+* installing *source* package ‘sergeant’ ...
+** this is package ‘sergeant’ version ‘0.9.1’
+** package ‘sergeant’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+Error: object ‘src_sql’ is not exported by 'namespace:dbplyr'
+Execution halted
+ERROR: lazy loading failed for package ‘sergeant’
+* removing ‘/tmp/workdir/sergeant/new/sergeant.Rcheck/sergeant’
 
 
 ```
 ### CRAN
 
 ```
-
-
-
-
-
-
-```
-# GEOmetadb
-
-<details>
-
-* Version: NA
-* GitHub: NA
-* Source code: https://github.com/cran/GEOmetadb
-* Number of recursive dependencies: 76
-
-Run `revdepcheck::cloud_details(, "GEOmetadb")` for more info
-
-</details>
-
-## Error before installation
-
-### Devel
-
-```
-
-
-
-
-
-
-```
-### CRAN
-
-```
-
-
-
-
-
-
-```
-# grasp2db
-
-<details>
-
-* Version: NA
-* GitHub: NA
-* Source code: https://github.com/cran/grasp2db
-* Number of recursive dependencies: 129
-
-Run `revdepcheck::cloud_details(, "grasp2db")` for more info
-
-</details>
-
-## Error before installation
-
-### Devel
-
-```
-
-
-
-
-
-
-```
-### CRAN
-
-```
-
-
-
-
-
-
-```
-# msPurity
-
-<details>
-
-* Version: NA
-* GitHub: NA
-* Source code: https://github.com/cran/msPurity
-* Number of recursive dependencies: 183
-
-Run `revdepcheck::cloud_details(, "msPurity")` for more info
-
-</details>
-
-## Error before installation
-
-### Devel
-
-```
-
-
-
-
-
-
-```
-### CRAN
-
-```
-
-
-
-
-
-
-```
-# NoRCE
-
-<details>
-
-* Version: NA
-* GitHub: NA
-* Source code: https://github.com/cran/NoRCE
-* Number of recursive dependencies: 160
-
-Run `revdepcheck::cloud_details(, "NoRCE")` for more info
-
-</details>
-
-## Error before installation
-
-### Devel
-
-```
-
-
-
-
-
-
-```
-### CRAN
-
-```
-
-
-
-
-
-
-```
-# Organism.dplyr
-
-<details>
-
-* Version: NA
-* GitHub: NA
-* Source code: https://github.com/cran/Organism.dplyr
-* Number of recursive dependencies: 141
-
-Run `revdepcheck::cloud_details(, "Organism.dplyr")` for more info
-
-</details>
-
-## Error before installation
-
-### Devel
-
-```
-
-
-
-
-
-
-```
-### CRAN
-
-```
-
-
-
-
-
-
-```
-# SQLDataFrame
-
-<details>
-
-* Version: NA
-* GitHub: NA
-* Source code: https://github.com/cran/SQLDataFrame
-* Number of recursive dependencies: 93
-
-Run `revdepcheck::cloud_details(, "SQLDataFrame")` for more info
-
-</details>
-
-## Error before installation
-
-### Devel
-
-```
-
-
-
-
-
-
-```
-### CRAN
-
-```
-
-
-
-
-
-
-```
-# synaptome.db
-
-<details>
-
-* Version: NA
-* GitHub: NA
-* Source code: https://github.com/cran/synaptome.db
-* Number of recursive dependencies: 149
-
-Run `revdepcheck::cloud_details(, "synaptome.db")` for more info
-
-</details>
-
-## Error before installation
-
-### Devel
-
-```
-
-
-
-
-
-
-```
-### CRAN
-
-```
-
-
-
-
+* installing *source* package ‘sergeant’ ...
+** this is package ‘sergeant’ version ‘0.9.1’
+** package ‘sergeant’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (sergeant)
 
 
 ```
