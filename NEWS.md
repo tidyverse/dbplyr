@@ -46,7 +46,7 @@
 * `distinct()` after a join no longer creates a subquery (#722).
 * `distinct()` with computed columns now ignores grouping, matching dplyr's behavior (#1081).
 * `do()` is deprecated. Use `collect()` then your favourite tidyverse functions instead.
-* `escape_ansi()` has been removed. Use `escape(x, con = simulate_dbi())` instead.
+* `escape_ansi()` is deprecated. Use `escape(x, con = simulate_dbi())` instead.
 * `expand()` now errors when column expressions don't reference any columns in the data, instead of generating invalid SQL (#720).
 * `fill()` now errors if you attempt to rename a column, for consistency with dplyr (#1536).
 * `filter()` after `left_join()` or `inner_join()` no longer creates a subquery (#722).

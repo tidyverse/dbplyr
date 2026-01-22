@@ -142,3 +142,10 @@ src_tbls.src_sql <- function(x, ...) {
   lifecycle::deprecate_soft("2.6.0", "src_tbls()")
   DBI::dbListTables(x$con)
 }
+
+# Used by healthdb
+#' @export
+escape_ansi <- function(x, parens = NA, collapse = "") {
+  lifecycle::deprecate_soft("2.6.0", "escape_ansi()", "escape()")
+  escape(x, parens = parens, collapse = collapse, con = simulate_dbi())
+}
