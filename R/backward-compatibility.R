@@ -129,9 +129,16 @@ sql_optimise <- function(x, con = NULL, ..., subquery = FALSE) {
   UseMethod("sql_optimise")
 }
 
+# Used by ckanr, implyr, sergeant
+#' @export
+src_sql <- function(subclass, con, ...) {
+  lifecycle::deprecate_stop(when = "1.4.0", what = "src_sql()")
+}
+
 # Used by dm, etl, starwarsdb
 #' @importFrom dplyr src_tbls
 #' @export
 src_tbls.src_sql <- function(x, ...) {
+  lifecycle::deprecate_soft("2.6.0", "src_tbls()")
   DBI::dbListTables(x$con)
 }
