@@ -128,3 +128,10 @@ glue_check_collapse <- function(type, collapse) {
 sql_optimise <- function(x, con = NULL, ..., subquery = FALSE) {
   UseMethod("sql_optimise")
 }
+
+# Used by dm, etl, starwarsdb
+#' @importFrom dplyr src_tbls
+#' @export
+src_tbls.src_sql <- function(x, ...) {
+  DBI::dbListTables(x$con)
+}
