@@ -115,3 +115,16 @@ glue_check_collapse <- function(type, collapse) {
     )
   }
 }
+
+
+# Used by RPresto
+
+#' Optimise a SQL query
+#'
+#' No longer used.
+#'
+#' @export
+#' @keywords internal
+sql_optimise <- function(x, con = NULL, ..., subquery = FALSE) {
+  UseMethod("sql_optimise")
+}

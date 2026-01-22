@@ -69,7 +69,7 @@
 * `sql_glue()` and `sql_glue2()` provide a convenient syntax for building SQL strings. These functions replace the now superseded `build_sql()`, `sql_expr()`, and `sql_call2()` (#1249).
 * `sql_glue2()` is now exported for building SQL strings with glue syntax and type markers (#1249).
 * `sql_infix()` no longer has a `con` argument since the connection needs to be determined at call time, not at definition time.
-* `sql_optimise()` has been removed. It was only used for two cases (filter + summarise and arrange + summarise), and these are now handled at a higher level (#1720).
+* `sql_optimise()` is no longer used. It was only used for two cases (filter + summarise and arrange + summarise), and these are now handled at a higher level (#1720).
 * `src_memdb()` and `tbl_memdb()` are deprecated; use `memdb()` and `copy_to(memdb(), df)` instead. New `local_memdb_frame()` for use in tests.
 * `str_flatten()` now has an `na.rm` argument, which regularly warns when it's not `TRUE` (#1540).
 * `str_like()` argument `ignore_case` has been deprecated (@edward-burn, #1630).
