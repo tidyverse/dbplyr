@@ -172,131 +172,6 @@ Run `revdepcheck::cloud_details(, "bigrquery")` for more info
        Execution halted
      ```
 
-# CDMConnector (2.3.0)
-
-* GitHub: <https://github.com/darwin-eu/CDMConnector>
-* Email: <mailto:black@ohdsi.org>
-* GitHub mirror: <https://github.com/cran/CDMConnector>
-
-Run `revdepcheck::cloud_details(, "CDMConnector")` for more info
-
-## Newly broken
-
-*   checking tests ... ERROR
-     ```
-     ...
-        14. │ └─dbplyr:::collect.tbl_sql(x)
-        15. │   └─dbplyr::db_sql_render(x$con, x, cte = cte)
-        16. │     ├─dbplyr:::db_sql_render_dispatch(con, sql, ..., sql_options = sql_options)
-        17. │     └─dbplyr:::db_sql_render.DBIConnection(con, sql, ..., sql_options = sql_options)
-        18. │       ├─dbplyr::sql_render(sql, con = con, ..., sql_options = sql_options)
-        19. │       └─dbplyr:::sql_render.tbl_lazy(sql, con = con, ..., sql_options = sql_options)
-        20. │         ├─dbplyr::sql_render(...)
-        21. │         └─dbplyr:::sql_render.lazy_query(...)
-        22. │           ├─dbplyr::sql_build(query, con = con, sql_options = sql_options)
-        23. │           └─dbplyr:::sql_build.lazy_select_query(query, con = con, sql_options = sql_options)
-        24. │             └─dbplyr:::get_select_sql(...)
-        25. │               └─dbplyr::translate_sql_(select_expr, con, window = FALSE, context = list(clause = "SELECT"))
-        26. │                 └─base::lapply(...)
-        27. │                   └─dbplyr (local) FUN(X[[i]], ...)
-        28. │                     ├─dbplyr::escape(eval_tidy(x, mask), con = con)
-        29. │                     └─rlang::eval_tidy(x, mask)
-        30. └─dplyr::n_distinct(subject_id)
-        31.   └─duckdb:::pkg_method("glue_sql2", "dbplyr")
-        32.     └─utils::getFromNamespace(fun, pkg)
-        33.       └─base::get(x, envir = ns, inherits = FALSE)
-       
-       [ FAIL 7 | WARN 0 | SKIP 44 | PASS 53 ]
-       Error:
-       ! Test failures.
-       Execution halted
-     ```
-
-*   checking re-building of vignette outputs ... ERROR
-     ```
-     ...
-      15. │               ├─dbplyr::sql_render(...)
-      16. │               └─dbplyr:::sql_render.lazy_query(...)
-      17. │                 ├─dbplyr::sql_build(query, con = con, sql_options = sql_options)
-      18. │                 └─dbplyr:::sql_build.lazy_select_query(query, con = con, sql_options = sql_options)
-      19. │                   └─dbplyr:::get_select_sql(...)
-      20. │                     └─dbplyr::translate_sql_(select_expr, con, window = FALSE, context = list(clause = "SELECT"))
-      21. │                       └─base::lapply(...)
-      22. │                         └─dbplyr (local) FUN(X[[i]], ...)
-      23. │                           ├─dbplyr::escape(eval_tidy(x, mask), con = con)
-      24. │                           └─rlang::eval_tidy(x, mask)
-      25. └─dplyr::n_distinct(subject_id)
-      26.   └─duckdb:::pkg_method("glue_sql2", "dbplyr")
-      27.     └─utils::getFromNamespace(fun, pkg)
-      28.       └─base::get(x, envir = ns, inherits = FALSE)
-     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     
-     Error: processing vignette 'a06_using_cdm_attributes.Rmd' failed with diagnostics:
-     object 'glue_sql2' not found
-     --- failed re-building ‘a06_using_cdm_attributes.Rmd’
-     
-     SUMMARY: processing the following file failed:
-       ‘a06_using_cdm_attributes.Rmd’
-     
-     Error: Vignette re-building failed.
-     Execution halted
-     ```
-
-# ckanr (0.7.0)
-
-* GitHub: <https://github.com/ropensci/ckanr>
-* Email: <mailto:fjunior.alves.oliveira@gmail.com>
-* GitHub mirror: <https://github.com/cran/ckanr>
-
-Run `revdepcheck::cloud_details(, "ckanr")` for more info
-
-## Newly broken
-
-*   checking whether package ‘ckanr’ can be installed ... ERROR
-     ```
-     Installation failed.
-     See ‘/tmp/workdir/ckanr/new/ckanr.Rcheck/00install.out’ for details.
-     ```
-
-## Installation
-
-### Devel
-
-```
-* installing *source* package ‘ckanr’ ...
-** this is package ‘ckanr’ version ‘0.7.0’
-** package ‘ckanr’ successfully unpacked and MD5 sums checked
-** using staged installation
-** R
-** inst
-** byte-compile and prepare package for lazy loading
-Error: object ‘src_sql’ is not exported by 'namespace:dbplyr'
-Execution halted
-ERROR: lazy loading failed for package ‘ckanr’
-* removing ‘/tmp/workdir/ckanr/new/ckanr.Rcheck/ckanr’
-
-
-```
-### CRAN
-
-```
-* installing *source* package ‘ckanr’ ...
-** this is package ‘ckanr’ version ‘0.7.0’
-** package ‘ckanr’ successfully unpacked and MD5 sums checked
-** using staged installation
-** R
-** inst
-** byte-compile and prepare package for lazy loading
-** help
-*** installing help indices
-** building package indices
-** testing if installed package can be loaded from temporary location
-** testing if installed package can be loaded from final location
-** testing if installed package keeps a record of temporary installation path
-* DONE (ckanr)
-
-
-```
 # CohortCharacteristics (1.1.0)
 
 * GitHub: <https://github.com/darwin-eu/CohortCharacteristics>
@@ -310,131 +185,31 @@ Run `revdepcheck::cloud_details(, "CohortCharacteristics")` for more info
 *   checking tests ... ERROR
      ```
      ...
-        10. │         └─dbplyr:::collect.tbl_sql(x)
-        11. │           └─dbplyr::db_sql_render(x$con, x, cte = cte)
-        12. │             ├─dbplyr:::db_sql_render_dispatch(con, sql, ..., sql_options = sql_options)
-        13. │             └─dbplyr:::db_sql_render.DBIConnection(con, sql, ..., sql_options = sql_options)
-        14. │               ├─dbplyr::sql_render(sql, con = con, ..., sql_options = sql_options)
-        15. │               └─dbplyr:::sql_render.tbl_lazy(sql, con = con, ..., sql_options = sql_options)
-        16. │                 ├─dbplyr::sql_render(...)
-        17. │                 └─dbplyr:::sql_render.lazy_query(...)
-        18. │                   ├─dbplyr::sql_build(query, con = con, sql_options = sql_options)
-        19. │                   └─dbplyr:::sql_build.lazy_select_query(query, con = con, sql_options = sql_options)
-        20. │                     └─dbplyr:::get_select_sql(...)
-        21. │                       └─dbplyr::translate_sql_(select_expr, con, window = FALSE, context = list(clause = "SELECT"))
-        22. │                         └─base::lapply(...)
-        23. │                           └─dbplyr (local) FUN(X[[i]], ...)
-        24. │                             ├─dbplyr::escape(eval_tidy(x, mask), con = con)
-        25. │                             └─rlang::eval_tidy(x, mask)
-        26. └─dplyr::n_distinct(subject_id)
-        27.   └─duckdb:::pkg_method("glue_sql2", "dbplyr")
-        28.     └─utils::getFromNamespace(fun, pkg)
-        29.       └─base::get(x, envir = ns, inherits = FALSE)
+        11. │           └─DBI::dbSendStatement(conn, statement, ...)
+        12. │             ├─DBI::dbSendQuery(conn, statement, ...)
+        13. │             └─duckdb::dbSendQuery(conn, statement, ...)
+        14. │               └─duckdb (local) .local(conn, statement, ...)
+        15. │                 └─duckdb:::rethrow_rapi_prepare(conn@conn_ref, statement, env)
+        16. │                   ├─rlang::try_fetch(...)
+        17. │                   │ ├─base::tryCatch(...)
+        18. │                   │ │ └─base (local) tryCatchList(expr, classes, parentenv, handlers)
+        19. │                   │ │   └─base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
+        20. │                   │ │     └─base (local) doTryCatch(return(expr), name, parentenv, handler)
+        21. │                   │ └─base::withCallingHandlers(...)
+        22. │                   └─duckdb:::rapi_prepare(conn, query, env)
+        23. ├─duckdb (local) `<fn>`(...)
+        24. │ └─rlang::abort(error_parts, class = "duckdb_error", !!!fields)
+        25. │   └─rlang:::signal_abort(cnd, .file)
+        26. │     └─base::signalCondition(cnd)
+        27. └─rlang (local) `<fn>`(`<dckdb_rr>`)
+        28.   └─handlers[[1L]](cnd)
+        29.     └─duckdb:::rethrow_error_from_rapi(e, call)
+        30.       └─rlang::abort(msg, call = call)
        
-       [ FAIL 8 | WARN 16 | SKIP 24 | PASS 108 ]
+       [ FAIL 1 | WARN 17 | SKIP 24 | PASS 228 ]
        Error:
        ! Test failures.
        Execution halted
-     ```
-
-*   checking re-building of vignette outputs ... ERROR
-     ```
-     ...
-      22. │           ├─dbplyr::sql_build(query, con = con, sql_options = sql_options)
-      23. │           └─dbplyr:::sql_build.lazy_select_query(query, con = con, sql_options = sql_options)
-      24. │             └─dbplyr:::get_select_sql(...)
-      25. │               └─dbplyr::translate_sql_(select_expr, con, window = FALSE, context = list(clause = "SELECT"))
-      26. │                 └─base::lapply(...)
-      27. │                   └─dbplyr (local) FUN(X[[i]], ...)
-      28. │                     ├─dbplyr::escape(eval_tidy(x, mask), con = con)
-      29. │                     └─rlang::eval_tidy(x, mask)
-      30. └─dplyr::n_distinct(subject_id)
-      31.   └─duckdb:::pkg_method("glue_sql2", "dbplyr")
-      32.     └─utils::getFromNamespace(fun, pkg)
-      33.       └─base::get(x, envir = ns, inherits = FALSE)
-     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     
-     Error: processing vignette 'summarise_large_scale_characteristics.Rmd' failed with diagnostics:
-     object 'glue_sql2' not found
-     --- failed re-building ‘summarise_large_scale_characteristics.Rmd’
-     
-     SUMMARY: processing the following files failed:
-       ‘summarise_characteristics.Rmd’ ‘summarise_cohort_overlap.Rmd’
-       ‘summarise_cohort_timing.Rmd’
-       ‘summarise_large_scale_characteristics.Rmd’
-     
-     Error: Vignette re-building failed.
-     Execution halted
-     ```
-
-# CohortSymmetry (0.2.4)
-
-* GitHub: <https://github.com/OHDSI/CohortSymmetry>
-* Email: <mailto:xihang.chen@ndorms.ox.ac.uk>
-* GitHub mirror: <https://github.com/cran/CohortSymmetry>
-
-Run `revdepcheck::cloud_details(, "CohortSymmetry")` for more info
-
-## Newly broken
-
-*   checking tests ... ERROR
-     ```
-     ...
-         7. │     └─dbplyr:::collect.tbl_sql(x)
-         8. │       └─dbplyr::db_sql_render(x$con, x, cte = cte)
-         9. │         ├─dbplyr:::db_sql_render_dispatch(con, sql, ..., sql_options = sql_options)
-        10. │         └─dbplyr:::db_sql_render.DBIConnection(con, sql, ..., sql_options = sql_options)
-        11. │           ├─dbplyr::sql_render(sql, con = con, ..., sql_options = sql_options)
-        12. │           └─dbplyr:::sql_render.tbl_lazy(sql, con = con, ..., sql_options = sql_options)
-        13. │             ├─dbplyr::sql_render(...)
-        14. │             └─dbplyr:::sql_render.lazy_query(...)
-        15. │               ├─dbplyr::sql_build(query, con = con, sql_options = sql_options)
-        16. │               └─dbplyr:::sql_build.lazy_select_query(query, con = con, sql_options = sql_options)
-        17. │                 └─dbplyr:::get_select_sql(...)
-        18. │                   └─dbplyr::translate_sql_(select_expr, con, window = FALSE, context = list(clause = "SELECT"))
-        19. │                     └─base::lapply(...)
-        20. │                       └─dbplyr (local) FUN(X[[i]], ...)
-        21. │                         ├─dbplyr::escape(eval_tidy(x, mask), con = con)
-        22. │                         └─rlang::eval_tidy(x, mask)
-        23. └─dplyr::n_distinct(cohort_definition_id)
-        24.   └─duckdb:::pkg_method("glue_sql2", "dbplyr")
-        25.     └─utils::getFromNamespace(fun, pkg)
-        26.       └─base::get(x, envir = ns, inherits = FALSE)
-       
-       [ FAIL 9 | WARN 36 | SKIP 55 | PASS 0 ]
-       Error:
-       ! Test failures.
-       Execution halted
-     ```
-
-*   checking re-building of vignette outputs ... ERROR
-     ```
-     ...
-      22. │                         └─dbplyr:::get_select_sql(...)
-      23. │                           └─dbplyr::translate_sql_(select_expr, con, window = FALSE, context = list(clause = "SELECT"))
-      24. │                             └─base::lapply(...)
-      25. │                               └─dbplyr (local) FUN(X[[i]], ...)
-      26. │                                 ├─dbplyr::escape(eval_tidy(x, mask), con = con)
-      27. │                                 └─rlang::eval_tidy(x, mask)
-      28. └─dplyr::n_distinct(subject_id)
-      29.   └─duckdb:::pkg_method("glue_sql2", "dbplyr")
-      30.     └─utils::getFromNamespace(fun, pkg)
-      31.       └─base::get(x, envir = ns, inherits = FALSE)
-     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     
-     Error: processing vignette 'a06_Visualise_temporal_symmetry.Rmd' failed with diagnostics:
-     object 'glue_sql2' not found
-     --- failed re-building ‘a06_Visualise_temporal_symmetry.Rmd’
-     
-     SUMMARY: processing the following files failed:
-       ‘a01_Introduction.Rmd’ ‘a02_Generate_a_sequence_cohort.Rmd’
-       ‘a03_Summarise_sequence_ratios.Rmd’
-       ‘a04_Visualise_sequence_ratios.Rmd’
-       ‘a05_Summarise_temporal_symmetry.Rmd’
-       ‘a06_Visualise_temporal_symmetry.Rmd’
-     
-     Error: Vignette re-building failed.
-     Execution halted
      ```
 
 # connector (1.0.0)
@@ -675,46 +450,6 @@ Run `revdepcheck::cloud_details(, "dm")` for more info
        Execution halted
      ```
 
-# duckdb (1.4.3)
-
-* GitHub: <https://github.com/duckdb/duckdb-r>
-* Email: <mailto:kirill@cynkra.com>
-* GitHub mirror: <https://github.com/cran/duckdb>
-
-Run `revdepcheck::cloud_details(, "duckdb")` for more info
-
-## Newly broken
-
-*   checking tests ... ERROR
-     ```
-     ...
-         7. │ └─dbplyr:::collect.tbl_sql(.data)
-         8. │   └─dbplyr::db_sql_render(x$con, x, cte = cte)
-         9. │     ├─dbplyr:::db_sql_render_dispatch(con, sql, ..., sql_options = sql_options)
-        10. │     └─dbplyr:::db_sql_render.DBIConnection(con, sql, ..., sql_options = sql_options)
-        11. │       ├─dbplyr::sql_render(sql, con = con, ..., sql_options = sql_options)
-        12. │       └─dbplyr:::sql_render.tbl_lazy(sql, con = con, ..., sql_options = sql_options)
-        13. │         ├─dbplyr::sql_render(...)
-        14. │         └─dbplyr:::sql_render.lazy_query(...)
-        15. │           ├─dbplyr::sql_build(query, con = con, sql_options = sql_options)
-        16. │           └─dbplyr:::sql_build.lazy_select_query(query, con = con, sql_options = sql_options)
-        17. │             └─dbplyr:::get_select_sql(...)
-        18. │               └─dbplyr::translate_sql_(select_expr, con, window = FALSE, context = list(clause = "SELECT"))
-        19. │                 └─base::lapply(...)
-        20. │                   └─dbplyr (local) FUN(X[[i]], ...)
-        21. │                     ├─dbplyr::escape(eval_tidy(x, mask), con = con)
-        22. │                     └─rlang::eval_tidy(x, mask)
-        23. └─duckdb (local) n_distinct(x, na.rm = TRUE)
-        24.   └─duckdb:::pkg_method("glue_sql2", "dbplyr")
-        25.     └─utils::getFromNamespace(fun, pkg)
-        26.       └─base::get(x, envir = ns, inherits = FALSE)
-       
-       [ FAIL 3 | WARN 0 | SKIP 75 | PASS 793 ]
-       Error:
-       ! Test failures.
-       Execution halted
-     ```
-
 # duckplyr (1.1.3)
 
 * GitHub: <https://github.com/tidyverse/duckplyr>
@@ -751,7 +486,7 @@ Run `revdepcheck::cloud_details(, "duckplyr")` for more info
        🦆: 1085
        add_count, anti_join, anti_join.data.frame, arrange, arrange.data.frame, compute, count, count.data.frame, cross_join, distinct, distinct.data.frame, do, eval, filter, filter.data.frame, full_join, group_by, group_indices, group_keys, group_map, group_modify, group_nest, group_size, group_split, group_trim, head, inner_join, inner_join.data.frame, intersect, left_join, left_join.data.frame, mutate, mutate.data.frame, n_groups, nest_by, nest_join, pull, reframe, relocate, rename, rename_with, right_join, rows_append, rows_delete, rows_insert, rows_patch, rows_update, rows_upsert, rowwise, select, select.data.frame, semi_join, semi_join.data.frame, setdiff, setequal, slice, slice_head, slice_head.data.frame, slice_sample, slice_tail, summarise, summarise.data.frame, symdiff, transmute, ungroup, union_all
        
-       00:01:31.964881
+       00:00:41.87272
        Execution halted
      ```
 
@@ -825,36 +560,6 @@ Run `revdepcheck::cloud_details(, "editbl")` for more info
        Execution halted
      ```
 
-*   checking re-building of vignette outputs ... ERROR
-     ```
-     ...
-         ▆
-      1. └─dm::dm_from_con(conn, learn_keys = FALSE)
-      2.   └─dm:::get_src_tbl_names(src, ..., names = .names)
-      3.     └─dplyr::src_tbls(src)
-     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     
-     Error: processing vignette 'howto_relational_db_dm.rmd' failed with diagnostics:
-     no applicable method for 'src_tbls' applied to an object of class "c('src_SQLiteConnection', 'src_dbi', 'src_sql', 'src')"
-     --- failed re-building ‘howto_relational_db_dm.rmd’
-     
-     --- re-building ‘howto_row_level_access.rmd’ using rmarkdown
-     Warning: Shiny application in a static R Markdown document
-     Warning: Shiny application in a static R Markdown document
-     --- finished re-building ‘howto_row_level_access.rmd’
-     
-     --- re-building ‘howto_switch_from_DT.rmd’ using rmarkdown
-     Warning: Shiny application in a static R Markdown document
-     Warning: Shiny application in a static R Markdown document
-     --- finished re-building ‘howto_switch_from_DT.rmd’
-     
-     SUMMARY: processing the following file failed:
-       ‘howto_relational_db_dm.rmd’
-     
-     Error: Vignette re-building failed.
-     Execution halted
-     ```
-
 # etl (0.4.2)
 
 * GitHub: <https://github.com/beanumber/etl>
@@ -865,94 +570,34 @@ Run `revdepcheck::cloud_details(, "etl")` for more info
 
 ## Newly broken
 
-*   checking examples ... ERROR
-     ```
-     ...
-     2 0 0 GB /tmp/RtmpWtxhYy/load
-           Length Class            Mode
-     con   1      SQLiteConnection S4  
-     disco 0      -none-           NULL
-     > 
-     > ## Not run: 
-     > ##D # connect to a PostgreSQL server
-     > ##D if (require(RPostgreSQL)) {
-     > ##D   db <- src_postgres("mtcars", user = "postgres", host = "localhost")
-     > ##D   cars <- etl("mtcars", db)
-     > ##D }
-     > ## End(Not run)
-     > 
-     > # Do it step-by-step
-     > cars |>
-     +   etl_extract() |>
-     +   etl_transform() |>
-     +   etl_load()
-     Extracting raw data...
-     Loading 1 file(s) into the database...
-     > src_tbls(cars)
-     Error in UseMethod("src_tbls") : 
-       no applicable method for 'src_tbls' applied to an object of class "c('etl_mtcars', 'etl', 'src_SQLiteConnection', 'src_dbi', 'src_sql', 'src')"
-     Calls: src_tbls
-     Execution halted
-     ```
-
 *   checking tests ... ERROR
      ```
      ...
+       > test_check("etl")
+       Saving _problems/test-etl-35.R
+       Saving _problems/test-etl-97.R
+       [ FAIL 2 | WARN 1 | SKIP 3 | PASS 29 ]
+       
        ══ Skipped tests (3) ═══════════════════════════════════════════════════════════
        • On CRAN (2): 'test-etl.R:102:3', 'test-etl.R:119:3'
        • empty test (1): 'test-etl.R:51:1'
        
        ══ Failed tests ════════════════════════════════════════════════════════════════
-       ── Error ('test-etl.R:32:3'): dplyr works ──────────────────────────────────────
-       Error in `UseMethod("src_tbls")`: no applicable method for 'src_tbls' applied to an object of class "c('etl_mtcars', 'etl', 'src_SQLiteConnection', 'src_dbi', 'src_sql', 'src')"
-       Backtrace:
-           ▆
-        1. ├─testthat::expect_gt(length(src_tbls(cars)), 0) at test-etl.R:32:3
-        2. │ └─testthat::quasi_label(enquo(object), label)
-        3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
-        4. └─dplyr::src_tbls(cars)
+       ── Failure ('test-etl.R:35:3'): dplyr works ────────────────────────────────────
+       Expected `tbl_cars` to inherit from "tbl_dbi".
+       Actual class: "tbl_SQLiteConnection"/"tbl_sql"/"tbl_lazy"/"tbl".
        ── Failure ('test-etl.R:97:3'): etl works ──────────────────────────────────────
        Expected output from `print(cars)` to match regexp "sqlite".
        Actual output:
        ✖ │ dir:  2 files occupying 0 GB
          │ <S4 class 'SQLiteConnection' [package "RSQLite"] with 8 slots>NULL
        
-       [ FAIL 2 | WARN 0 | SKIP 3 | PASS 24 ]
+       [ FAIL 2 | WARN 1 | SKIP 3 | PASS 29 ]
        Error:
        ! Test failures.
        Warning message:
        call dbDisconnect() when finished working with a connection 
        Execution halted
-     ```
-
-*   checking re-building of vignette outputs ... ERROR
-     ```
-     ...
-     --- re-building ‘extending_etl.Rmd’ using rmarkdown
-     
-     Quitting from extending_etl.Rmd:55-59 [unnamed-chunk-2]
-     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     <error/rlang_error>
-     Error in `UseMethod()`:
-     ! no applicable method for 'src_tbls' applied to an object of class "c('etl_ggplot2', 'etl', 'src_SQLiteConnection', 'src_dbi', 'src_sql', 'src')"
-     ---
-     Backtrace:
-         ▆
-      1. └─dplyr::src_tbls(ggplots)
-     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     
-     Error: processing vignette 'extending_etl.Rmd' failed with diagnostics:
-     no applicable method for 'src_tbls' applied to an object of class "c('etl_ggplot2', 'etl', 'src_SQLiteConnection', 'src_dbi', 'src_sql', 'src')"
-     --- failed re-building ‘extending_etl.Rmd’
-     
-     --- re-building ‘using_etl.Rmd’ using rmarkdown
-     --- finished re-building ‘using_etl.Rmd’
-     
-     SUMMARY: processing the following file failed:
-       ‘extending_etl.Rmd’
-     
-     Error: Vignette re-building failed.
-     Execution halted
      ```
 
 # healthdb (0.5.0)
@@ -1060,130 +705,6 @@ Run `revdepcheck::cloud_details(, "healthdb")` for more info
      Missing or unexported object: ‘dbplyr::escape_ansi’
      ```
 
-# implyr (0.5.0)
-
-* GitHub: <https://github.com/ianmcook/implyr>
-* Email: <mailto:ianmcook@gmail.com>
-* GitHub mirror: <https://github.com/cran/implyr>
-
-Run `revdepcheck::cloud_details(, "implyr")` for more info
-
-## Newly broken
-
-*   checking whether package ‘implyr’ can be installed ... ERROR
-     ```
-     Installation failed.
-     See ‘/tmp/workdir/implyr/new/implyr.Rcheck/00install.out’ for details.
-     ```
-
-## Installation
-
-### Devel
-
-```
-* installing *source* package ‘implyr’ ...
-** this is package ‘implyr’ version ‘0.5.0’
-** package ‘implyr’ successfully unpacked and MD5 sums checked
-** using staged installation
-** R
-** byte-compile and prepare package for lazy loading
-Error: object ‘src_sql’ is not exported by 'namespace:dbplyr'
-Execution halted
-ERROR: lazy loading failed for package ‘implyr’
-* removing ‘/tmp/workdir/implyr/new/implyr.Rcheck/implyr’
-
-
-```
-### CRAN
-
-```
-* installing *source* package ‘implyr’ ...
-** this is package ‘implyr’ version ‘0.5.0’
-** package ‘implyr’ successfully unpacked and MD5 sums checked
-** using staged installation
-** R
-** byte-compile and prepare package for lazy loading
-** help
-*** installing help indices
-*** copying figures
-** building package indices
-** testing if installed package can be loaded from temporary location
-** testing if installed package can be loaded from final location
-** testing if installed package keeps a record of temporary installation path
-* DONE (implyr)
-
-
-```
-# IncidencePrevalence (1.2.1)
-
-* GitHub: <https://github.com/darwin-eu/IncidencePrevalence>
-* Email: <mailto:edward.burn@ndorms.ox.ac.uk>
-* GitHub mirror: <https://github.com/cran/IncidencePrevalence>
-
-Run `revdepcheck::cloud_details(, "IncidencePrevalence")` for more info
-
-## Newly broken
-
-*   checking tests ... ERROR
-     ```
-     ...
-        11. │           └─dbplyr:::collect.tbl_sql(x)
-        12. │             └─dbplyr::db_sql_render(x$con, x, cte = cte)
-        13. │               ├─dbplyr:::db_sql_render_dispatch(con, sql, ..., sql_options = sql_options)
-        14. │               └─dbplyr:::db_sql_render.DBIConnection(con, sql, ..., sql_options = sql_options)
-        15. │                 ├─dbplyr::sql_render(sql, con = con, ..., sql_options = sql_options)
-        16. │                 └─dbplyr:::sql_render.tbl_lazy(sql, con = con, ..., sql_options = sql_options)
-        17. │                   ├─dbplyr::sql_render(...)
-        18. │                   └─dbplyr:::sql_render.lazy_query(...)
-        19. │                     ├─dbplyr::sql_build(query, con = con, sql_options = sql_options)
-        20. │                     └─dbplyr:::sql_build.lazy_select_query(query, con = con, sql_options = sql_options)
-        21. │                       └─dbplyr:::get_select_sql(...)
-        22. │                         └─dbplyr::translate_sql_(select_expr, con, window = FALSE, context = list(clause = "SELECT"))
-        23. │                           └─base::lapply(...)
-        24. │                             └─dbplyr (local) FUN(X[[i]], ...)
-        25. │                               ├─dbplyr::escape(eval_tidy(x, mask), con = con)
-        26. │                               └─rlang::eval_tidy(x, mask)
-        27. └─dplyr::n_distinct(subject_id)
-        28.   └─duckdb:::pkg_method("glue_sql2", "dbplyr")
-        29.     └─utils::getFromNamespace(fun, pkg)
-        30.       └─base::get(x, envir = ns, inherits = FALSE)
-       
-       [ FAIL 8 | WARN 0 | SKIP 101 | PASS 0 ]
-       Error:
-       ! Test failures.
-       Execution halted
-     ```
-
-*   checking re-building of vignette outputs ... ERROR
-     ```
-     ...
-      24. │                             └─dbplyr (local) FUN(X[[i]], ...)
-      25. │                               ├─dbplyr::escape(eval_tidy(x, mask), con = con)
-      26. │                               └─rlang::eval_tidy(x, mask)
-      27. └─dplyr::n_distinct(subject_id)
-      28.   └─duckdb:::pkg_method("glue_sql2", "dbplyr")
-      29.     └─utils::getFromNamespace(fun, pkg)
-      30.       └─base::get(x, envir = ns, inherits = FALSE)
-     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     
-     Error: processing vignette 'a06_Working_with_IncidencePrevalence_Results.Rmd' failed with diagnostics:
-     object 'glue_sql2' not found
-     --- failed re-building ‘a06_Working_with_IncidencePrevalence_Results.Rmd’
-     
-     --- re-building ‘a07_benchmark.Rmd’ using rmarkdown
-     --- finished re-building ‘a07_benchmark.Rmd’
-     
-     SUMMARY: processing the following files failed:
-       ‘a01_Introduction_to_IncidencePrevalence.Rmd’
-       ‘a02_Creating_denominator_populations.Rmd’
-       ‘a03_Creating_target_denominator_populations.Rmd’
-       ‘a04_Calculating_prevalence.Rmd’ ‘a05_Calculating_incidence.Rmd’
-       ‘a06_Working_with_IncidencePrevalence_Results.Rmd’
-     
-     Error: Vignette re-building failed.
-     Execution halted
-     ```
-
 # janitor (2.2.1)
 
 * GitHub: <https://github.com/sfirke/janitor>
@@ -1277,6 +798,8 @@ Run `revdepcheck::cloud_details(, "mlr3db")` for more info
 *   checking tests ... ERROR
      ```
      ...
+        60. │                                   ├─data.table::setDT(...)
+        61. │                                   │ └─data.table::is.data.table(x)
         62. │                                   ├─dplyr::collect(...)
         63. │                                   └─dbplyr:::collect.tbl_sql(...)
         64. │                                     ├─base::withCallingHandlers(...)
@@ -1297,10 +820,8 @@ Run `revdepcheck::cloud_details(, "mlr3db")` for more info
        [ FAIL 3 | WARN 1 | SKIP 3 | PASS 1133 ]
        Error:
        ! Test failures.
-       Warning messages:
-       1: call dbDisconnect() when finished working with a connection 
-       2: In .Internal(gc(verbose, reset, full)) :
-         closing unused connection 4 (<-localhost:22532)
+       Warning message:
+       call dbDisconnect() when finished working with a connection 
        Execution halted
      ```
 
@@ -1396,16 +917,16 @@ Run `revdepcheck::cloud_details(, "PatientProfiles")` for more info
 *   checking tests ... ERROR
      ```
      ...
-        28.       └─base::get(x, envir = ns, inherits = FALSE)
+       ══ Failed tests ════════════════════════════════════════════════════════════════
        ── Failure ('test-filterInObservation.R:67:3'): test filterInObservation ───────
        Expected `... <- NULL` not to throw any errors.
        Actually got a <rlang_error> with message:
          Failed to collect lazy table.
          Caused by error in `DBI::dbSendQuery()`:
-         ! Binder Error: Referenced column "id_wex" not found in FROM clause!
-         Candidate bindings: "drug_exposure_id", "drug_exposure_end_date", "drug_exposure_start_date", "drug_exposure_end_datetime", "drug_exposure_start_datetime"
+         ! Binder Error: Referenced column "id_vgz" not found in FROM clause!
+         Candidate bindings: "sig", "visit_detail_id", "period_type_concept_id", "days_supply"
          
-         LINE 5: WHERE (id_wex <= drug_exposure_start_date AND drug_exposure_start_...
+         LINE 5: WHERE (id_vgz <= drug_exposure_start_date AND drug_exposure_start_...
                         ^
          i Context: rapi_prepare
          i Error type: BINDER
@@ -1417,40 +938,10 @@ Run `revdepcheck::cloud_details(, "PatientProfiles")` for more info
         2.   └─testthat::quasi_label(enquo(object), label)
         3.     └─rlang::eval_bare(expr, quo_get_env(quo))
        
-       [ FAIL 3 | WARN 61 | SKIP 109 | PASS 189 ]
+       [ FAIL 2 | WARN 61 | SKIP 109 | PASS 192 ]
        Error:
        ! Test failures.
        Execution halted
-     ```
-
-*   checking re-building of vignette outputs ... ERROR
-     ```
-     ...
-      16. │                 ├─dbplyr::sql_render(...)
-      17. │                 └─dbplyr:::sql_render.lazy_query(...)
-      18. │                   ├─dbplyr::sql_build(query, con = con, sql_options = sql_options)
-      19. │                   └─dbplyr:::sql_build.lazy_select_query(query, con = con, sql_options = sql_options)
-      20. │                     └─dbplyr:::get_select_sql(...)
-      21. │                       └─dbplyr::translate_sql_(select_expr, con, window = FALSE, context = list(clause = "SELECT"))
-      22. │                         └─base::lapply(...)
-      23. │                           └─dbplyr (local) FUN(X[[i]], ...)
-      24. │                             ├─dbplyr::escape(eval_tidy(x, mask), con = con)
-      25. │                             └─rlang::eval_tidy(x, mask)
-      26. └─dplyr::n_distinct(subject_id)
-      27.   └─duckdb:::pkg_method("glue_sql2", "dbplyr")
-      28.     └─utils::getFromNamespace(fun, pkg)
-      29.       └─base::get(x, envir = ns, inherits = FALSE)
-     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     
-     Error: processing vignette 'table-intersect.Rmd' failed with diagnostics:
-     object 'glue_sql2' not found
-     --- failed re-building ‘table-intersect.Rmd’
-     
-     SUMMARY: processing the following files failed:
-       ‘concept-intersect.Rmd’ ‘summarise.Rmd’ ‘table-intersect.Rmd’
-     
-     Error: Vignette re-building failed.
-     Execution halted
      ```
 
 # pool (1.0.4)
@@ -1573,53 +1064,45 @@ Run `revdepcheck::cloud_details(, "RPresto")` for more info
 
 ## Newly broken
 
-*   checking whether package ‘RPresto’ can be installed ... ERROR
+*   checking tests ... ERROR
      ```
-     Installation failed.
-     See ‘/tmp/workdir/RPresto/new/RPresto.Rcheck/00install.out’ for details.
+     ...
+         'test-presto_type.R:383:3', 'test-presto_type.R:420:3',
+         'test-presto_type.R:478:3', 'test-presto_unnest.R:13:3',
+         'test-presto_unnest.R:49:3', 'test-presto_unnest.R:84:3',
+         'test-presto_unnest.R:115:3', 'test-presto_unnest.R:144:3',
+         'test-presto_unnest.R:173:3', 'test-presto_unnest.R:207:3',
+         'test-presto_unnest.R:240:3', 'test-presto_unnest.R:273:3',
+         'test-presto_unnest.R:312:3', 'test-presto_unnest.R:354:3',
+         'test-session.property.R:19:3', 'test-session.timezone.R:21:3',
+         'test-sqlAppendTableAs.R:10:3', 'test-sqlAppendTableAs.R:39:3',
+         'test-sqlAppendTableAs.R:67:3', 'test-sqlAppendTableAs.R:99:3',
+         'test-sqlAppendTableAs.R:130:3', 'test-tbl.src_presto.R:10:3',
+         'test-tbl.src_presto.R:44:3', 'test-tbl.src_presto.R:55:3'
+       
+       ══ Failed tests ════════════════════════════════════════════════════════════════
+       ── Error ('test-db_query_fields.R:42:7'): db_query_fields works with mock ──────
+       Error in `UseMethod("db_query_fields")`: no applicable method for 'db_query_fields' applied to an object of class "c('PrestoConnection', 'DBIConnection', 'DBIObject')"
+       Backtrace:
+           ▆
+        1. ├─testthat::with_mocked_bindings(...) at test-db_query_fields.R:40:3
+        2. └─dplyr::db_query_fields(...) at test-db_query_fields.R:42:7
+       
+       [ FAIL 1 | WARN 0 | SKIP 164 | PASS 209 ]
+       Error:
+       ! Test failures.
+       Execution halted
      ```
 
-## Installation
+*   checking Rd cross-references ... WARNING
+     ```
+     Missing link(s) in Rd file 'dbplyr_function_implementations.Rd':
+       ‘[dbplyr:db-quote]{sql_escape_date}’
+       ‘[dbplyr:db-quote]{sql_escape_datetime}’
+     
+     See section 'Cross-references' in the 'Writing R Extensions' manual.
+     ```
 
-### Devel
-
-```
-* installing *source* package ‘RPresto’ ...
-** this is package ‘RPresto’ version ‘1.4.8’
-** package ‘RPresto’ successfully unpacked and MD5 sums checked
-** using staged installation
-** R
-** inst
-** byte-compile and prepare package for lazy loading
-Error: object ‘sql_optimise’ is not exported by 'namespace:dbplyr'
-Execution halted
-ERROR: lazy loading failed for package ‘RPresto’
-* removing ‘/tmp/workdir/RPresto/new/RPresto.Rcheck/RPresto’
-
-
-```
-### CRAN
-
-```
-* installing *source* package ‘RPresto’ ...
-** this is package ‘RPresto’ version ‘1.4.8’
-** package ‘RPresto’ successfully unpacked and MD5 sums checked
-** using staged installation
-** R
-** inst
-** byte-compile and prepare package for lazy loading
-** help
-*** installing help indices
-*** copying figures
-** building package indices
-** installing vignettes
-** testing if installed package can be loaded from temporary location
-** testing if installed package can be loaded from final location
-** testing if installed package keeps a record of temporary installation path
-* DONE (RPresto)
-
-
-```
 # SCDB (0.5.2)
 
 * GitHub: <https://github.com/ssi-dk/SCDB>
@@ -1718,125 +1201,6 @@ Run `revdepcheck::cloud_details(, "SCDB")` for more info
      
      Error: Vignette re-building failed.
      Execution halted
-     ```
-
-# sergeant (0.9.1)
-
-* Email: <mailto:bob@rud.is>
-* GitHub mirror: <https://github.com/cran/sergeant>
-
-Run `revdepcheck::cloud_details(, "sergeant")` for more info
-
-## Newly broken
-
-*   checking whether package ‘sergeant’ can be installed ... ERROR
-     ```
-     Installation failed.
-     See ‘/tmp/workdir/sergeant/new/sergeant.Rcheck/00install.out’ for details.
-     ```
-
-## Installation
-
-### Devel
-
-```
-* installing *source* package ‘sergeant’ ...
-** this is package ‘sergeant’ version ‘0.9.1’
-** package ‘sergeant’ successfully unpacked and MD5 sums checked
-** using staged installation
-** R
-** inst
-** byte-compile and prepare package for lazy loading
-Error: object ‘src_sql’ is not exported by 'namespace:dbplyr'
-Execution halted
-ERROR: lazy loading failed for package ‘sergeant’
-* removing ‘/tmp/workdir/sergeant/new/sergeant.Rcheck/sergeant’
-
-
-```
-### CRAN
-
-```
-* installing *source* package ‘sergeant’ ...
-** this is package ‘sergeant’ version ‘0.9.1’
-** package ‘sergeant’ successfully unpacked and MD5 sums checked
-** using staged installation
-** R
-** inst
-** byte-compile and prepare package for lazy loading
-** help
-*** installing help indices
-** building package indices
-** testing if installed package can be loaded from temporary location
-** testing if installed package can be loaded from final location
-** testing if installed package keeps a record of temporary installation path
-* DONE (sergeant)
-
-
-```
-# starwarsdb (0.1.3)
-
-* GitHub: <https://github.com/gadenbuie/starwarsdb>
-* Email: <mailto:garrick@adenbuie.com>
-* GitHub mirror: <https://github.com/cran/starwarsdb>
-
-Run `revdepcheck::cloud_details(, "starwarsdb")` for more info
-
-## Newly broken
-
-*   checking examples ... ERROR
-     ```
-     Running examples in ‘starwarsdb-Ex.R’ failed
-     The error most likely occurred in:
-     
-     > ### Name: starwars_dm
-     > ### Title: Create a Star Wars Data Model Object
-     > ### Aliases: starwars_dm starwars_dm_configure
-     > 
-     > ### ** Examples
-     > 
-     > # If the {dm} package is installed...
-     > if (requireNamespace("dm", quietly = TRUE)) {
-     +   # Create a full starwars {dm} object from local tables
-     +   starwars_dm(remote = TRUE)
-     + 
-     +   # Create a base starwars {dm} object from remote tables wihout keys
-     +   starwars_dm(configure_dm = FALSE, remote = TRUE)
-     + }
-     Error in UseMethod("src_tbls") : 
-       no applicable method for 'src_tbls' applied to an object of class "c('src_duckdb_connection', 'src_dbi', 'src_sql', 'src')"
-     Calls: starwars_dm ... <Anonymous> -> dm_from_con -> get_src_tbl_names -> src_tbls
-     Execution halted
-     ```
-
-*   checking tests ... ERROR
-     ```
-     ...
-       
-       ══ Failed tests ════════════════════════════════════════════════════════════════
-       ── Error ('test-dm.R:33:3'): starwars_dm remote full ───────────────────────────
-       Error in `UseMethod("src_tbls")`: no applicable method for 'src_tbls' applied to an object of class "c('src_duckdb_connection', 'src_dbi', 'src_sql', 'src')"
-       Backtrace:
-           ▆
-        1. └─starwarsdb::starwars_dm(remote = TRUE) at test-dm.R:33:3
-        2.   └─dm::dm_from_src(starwars_connect(), learn_keys = FALSE)
-        3.     └─dm::dm_from_con(...)
-        4.       └─dm:::get_src_tbl_names(src, ..., names = .names)
-        5.         └─dplyr::src_tbls(src)
-       ── Error ('test-dm.R:53:3'): starwars_dm remote unconfigured ───────────────────
-       Error in `UseMethod("src_tbls")`: no applicable method for 'src_tbls' applied to an object of class "c('src_duckdb_connection', 'src_dbi', 'src_sql', 'src')"
-       Backtrace:
-           ▆
-        1. └─starwarsdb::starwars_dm(remote = TRUE, configure_dm = FALSE) at test-dm.R:53:3
-        2.   └─dm::dm_from_src(starwars_connect(), learn_keys = FALSE)
-        3.     └─dm::dm_from_con(...)
-        4.       └─dm:::get_src_tbl_names(src, ..., names = .names)
-        5.         └─dplyr::src_tbls(src)
-       
-       [ FAIL 2 | WARN 1 | SKIP 0 | PASS 24 ]
-       Error:
-       ! Test failures.
-       Execution halted
      ```
 
 # taxadb (0.2.1)
@@ -1972,28 +1336,28 @@ Run `revdepcheck::cloud_details(, "TreatmentPatterns")` for more info
 *   checking tests ... ERROR
      ```
      ...
-        11. │           └─dbplyr:::collect.tbl_sql(x)
-        12. │             └─dbplyr::db_sql_render(x$con, x, cte = cte)
-        13. │               ├─dbplyr:::db_sql_render_dispatch(con, sql, ..., sql_options = sql_options)
-        14. │               └─dbplyr:::db_sql_render.DBIConnection(con, sql, ..., sql_options = sql_options)
-        15. │                 ├─dbplyr::sql_render(sql, con = con, ..., sql_options = sql_options)
-        16. │                 └─dbplyr:::sql_render.tbl_lazy(sql, con = con, ..., sql_options = sql_options)
-        17. │                   ├─dbplyr::sql_render(...)
-        18. │                   └─dbplyr:::sql_render.lazy_query(...)
-        19. │                     ├─dbplyr::sql_build(query, con = con, sql_options = sql_options)
-        20. │                     └─dbplyr:::sql_build.lazy_select_query(query, con = con, sql_options = sql_options)
-        21. │                       └─dbplyr:::get_select_sql(...)
-        22. │                         └─dbplyr::translate_sql_(select_expr, con, window = FALSE, context = list(clause = "SELECT"))
-        23. │                           └─base::lapply(...)
-        24. │                             └─dbplyr (local) FUN(X[[i]], ...)
-        25. │                               ├─dbplyr::escape(eval_tidy(x, mask), con = con)
-        26. │                               └─rlang::eval_tidy(x, mask)
-        27. └─dplyr::n_distinct(subject_id)
-        28.   └─duckdb:::pkg_method("glue_sql2", "dbplyr")
-        29.     └─utils::getFromNamespace(fun, pkg)
-        30.       └─base::get(x, envir = ns, inherits = FALSE)
+         'test-pathwaysLogical.R:1710:3', 'test-pathwaysLogical.R:1754:3',
+         'test-pathwaysLogical.R:1801:3', 'test-pathwaysLogical.R:1857:3',
+         'test-pathwaysLogical.R:1912:3'
        
-       [ FAIL 2 | WARN 0 | SKIP 119 | PASS 0 ]
+       ══ Failed tests ════════════════════════════════════════════════════════════════
+       ── Error ('test-CRAN.R:23:3'): CRAN Tests ──────────────────────────────────────
+       Error in `.local(x, i, ..., value)`: Table must be a data frame or dplyr table
+       Backtrace:
+            ▆
+         1. └─TreatmentPatterns::computePathways(...) at test-CRAN.R:23:3
+         2.   └─cdmInterface$fetchCohortTable(...)
+         3.     └─private$cdmconFetchCohortTable(...)
+         4.       └─private$dbAppendAttrition(n, andromeda, sort(cohorts$cohortId))
+         5.         └─TreatmentPatterns:::appendAttrition(...)
+         6.           ├─methods (local) `$<-`(`*tmp*`, "attrition", value = `<tbl_Andr[,5]>`)
+         7.           └─Andromeda (local) `$<-`(`*tmp*`, "attrition", value = `<tbl_Andr[,5]>`)
+         8.             ├─methods (local) `[[<-`(`*tmp*`, name, value = `<tbl_Andr[,5]>`)
+         9.             └─Andromeda (local) `[[<-`(`*tmp*`, name, value = `<tbl_Andr[,5]>`)
+        10.               └─Andromeda (local) .local(x, i, ..., value)
+        11.                 └─rlang::abort("Table must be a data frame or dplyr table")
+       
+       [ FAIL 1 | WARN 0 | SKIP 123 | PASS 0 ]
        Error:
        ! Test failures.
        Execution halted
@@ -2002,21 +1366,21 @@ Run `revdepcheck::cloud_details(, "TreatmentPatterns")` for more info
 *   checking re-building of vignette outputs ... ERROR
      ```
      ...
-      19. │         └─dbplyr:::sql_build.lazy_select_query(query, con = con, sql_options = sql_options)
-      20. │           └─dbplyr:::get_select_sql(...)
-      21. │             └─dbplyr::translate_sql_(select_expr, con, window = FALSE, context = list(clause = "SELECT"))
-      22. │               └─base::lapply(...)
-      23. │                 └─dbplyr (local) FUN(X[[i]], ...)
-      24. │                   ├─dbplyr::escape(eval_tidy(x, mask), con = con)
-      25. │                   └─rlang::eval_tidy(x, mask)
-      26. └─dplyr::n_distinct(subject_id)
-      27.   └─duckdb:::pkg_method("glue_sql2", "dbplyr")
-      28.     └─utils::getFromNamespace(fun, pkg)
-      29.       └─base::get(x, envir = ns, inherits = FALSE)
+          ▆
+       1. └─TreatmentPatterns::computePathways(...)
+       2.   └─cdmInterface$fetchCohortTable(...)
+       3.     └─private$cdmconFetchCohortTable(...)
+       4.       └─private$dbAppendAttrition(n, andromeda, sort(cohorts$cohortId))
+       5.         └─TreatmentPatterns:::appendAttrition(...)
+       6.           ├─methods (local) `$<-`(`*tmp*`, "attrition", value = `<tbl_Andr[,5]>`)
+       7.           └─Andromeda (local) `$<-`(`*tmp*`, "attrition", value = `<tbl_Andr[,5]>`)
+       8.             ├─methods (local) `[[<-`(`*tmp*`, name, value = `<tbl_Andr[,5]>`)
+       9.             └─Andromeda (local) `[[<-`(`*tmp*`, name, value = `<tbl_Andr[,5]>`)
+      10.               └─Andromeda (local) .local(x, i, ..., value)
      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      
      Error: processing vignette 'a030_Evaluating_Output.Rmd' failed with diagnostics:
-     object 'glue_sql2' not found
+     Table must be a data frame or dplyr table
      --- failed re-building ‘a030_Evaluating_Output.Rmd’
      
      --- re-building ‘a999_Strategus.Rmd’ using rmarkdown

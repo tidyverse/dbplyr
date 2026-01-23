@@ -2,8 +2,8 @@
 
 We checked 124 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
 
- * We saw 30 new problems
- * We failed to check 4 packages
+ * We saw 26 new problems
+ * We failed to check 0 packages
 
 Issues with CRAN packages are summarised below.
 
@@ -21,17 +21,8 @@ Issues with CRAN packages are summarised below.
 * bigrquery
   checking tests ... ERROR
 
-* CDMConnector
-  checking tests ... ERROR
-  checking re-building of vignette outputs ... ERROR
-
 * CohortCharacteristics
   checking tests ... ERROR
-  checking re-building of vignette outputs ... ERROR
-
-* CohortSymmetry
-  checking tests ... ERROR
-  checking re-building of vignette outputs ... ERROR
 
 * connector
   checking tests ... ERROR
@@ -50,31 +41,21 @@ Issues with CRAN packages are summarised below.
   checking examples ... ERROR
   checking tests ... ERROR
 
-* duckdb
-  checking tests ... ERROR
-
 * duckplyr
   checking tests ... ERROR
 
 * editbl
   checking examples ... ERROR
   checking tests ... ERROR
-  checking re-building of vignette outputs ... ERROR
 
 * etl
-  checking examples ... ERROR
   checking tests ... ERROR
-  checking re-building of vignette outputs ... ERROR
 
 * healthdb
   checking examples ... ERROR
   checking tests ... ERROR
   checking re-building of vignette outputs ... ERROR
   checking dependencies in R code ... WARNING
-
-* IncidencePrevalence
-  checking tests ... ERROR
-  checking re-building of vignette outputs ... ERROR
 
 * janitor
   checking tests ... ERROR
@@ -93,7 +74,6 @@ Issues with CRAN packages are summarised below.
 
 * PatientProfiles
   checking tests ... ERROR
-  checking re-building of vignette outputs ... ERROR
 
 * pool
   checking examples ... ERROR
@@ -102,14 +82,14 @@ Issues with CRAN packages are summarised below.
 * RClickhouse
   checking tests ... ERROR
 
+* RPresto
+  checking tests ... ERROR
+  checking Rd cross-references ... WARNING
+
 * SCDB
   checking examples ... ERROR
   checking tests ... ERROR
   checking re-building of vignette outputs ... ERROR
-
-* starwarsdb
-  checking examples ... ERROR
-  checking tests ... ERROR
 
 * taxadb
   checking tests ... ERROR
@@ -122,9 +102,3 @@ Issues with CRAN packages are summarised below.
   checking tests ... ERROR
   checking re-building of vignette outputs ... ERROR
 
-### Failed to check
-
-* ckanr    (NA)
-* implyr   (NA)
-* RPresto  (NA)
-* sergeant (NA)
