@@ -76,7 +76,6 @@
 * `str_like()` argument `ignore_case` has been deprecated (@edward-burn, #1630).
 * `str_like()` now uses case-sensitive `LIKE` when argument `ignore_case` is set as `FALSE` (@edward-burn, #1488).
 * `summarise()` now reports grouping immediately, rather than when you summarise.
-* `tbl_sql()` is now (soft) deprecated. It hasn't been required in a while.
 * `win_rank_tdata()` has been removed after being deprecated.
 * `window_order()` works with `dplyr::desc()` (not just `desc()`) (#1486).
 * `with_dialect()` overrides the default SQL dialect for a connection, which is useful if dbplyr guesses incorrectly (#1784).

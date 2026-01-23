@@ -1,11 +1,8 @@
 #' Create an SQL tbl (abstract)
 #'
-#' @description
-#' `r lifecycle::badge("deprecated")`
-#'
-#' This function is no longer needed, since backends don't need to create
-#' their own custom classes. Instead, rely on the default `tbl.DBIConnection()`
-#' method.
+#' This function creates a lazy tbl object from a table in a database.
+#' It's primarily intended for backend authors who need to create custom
+#' subclasses; most users should use [tbl()] instead.
 #'
 #' @keywords internal
 #' @export
@@ -21,8 +18,6 @@ tbl_sql <- function(
   vars = NULL,
   check_from = deprecated()
 ) {
-  lifecycle::deprecate_soft("2.6.0", "tbl_sql()")
-
   check_dots_empty()
 
   if (lifecycle::is_present(check_from)) {
