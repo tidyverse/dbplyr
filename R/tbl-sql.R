@@ -75,7 +75,11 @@ new_tbl_lazy <- function(con, query, subclass = NULL) {
   }
 
   is_sql <- !inherits(query, "lazy_base_local_query")
-  subclass <- c(subclass %||% class(con)[[1]], if (is_sql) "sql", "lazy")
+  subclass <- c(
+    subclass %||% class(con)[[1]],
+    if (is_sql) c("dbi", "sql"),
+    "lazy"
+  )
 
   dplyr::make_tbl(
     subclass,

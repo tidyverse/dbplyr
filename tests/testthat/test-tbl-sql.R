@@ -10,6 +10,10 @@ test_that("tbl_sql() respects subclass argument", {
 
   x <- tbl_sql("foo", src_dbi(memdb()), "abc", vars = letters)
   expect_s3_class(x, "tbl_foo")
+
+  # It always includes tbl_sql and dbi
+  expect_s3_class(x, "tbl_dbi")
+  expect_s3_class(x, "tbl_sql")
 })
 
 test_that("same_src distinguishes srcs", {
