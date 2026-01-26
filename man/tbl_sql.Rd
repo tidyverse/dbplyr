@@ -28,10 +28,8 @@ many \code{tbl}s with known variables.}
 \item{check_from}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}}
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
-
-This function is no longer needed, since backends don't need to create
-their own custom classes. Instead, rely on the default \code{tbl.DBIConnection()}
-method.
+This function creates a lazy tbl object from a table in a database.
+It's primarily intended for backend authors who need to create custom
+subclasses; most users should use \code{\link[dplyr:tbl]{dplyr::tbl()}} instead.
 }
 \keyword{internal}

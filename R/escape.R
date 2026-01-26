@@ -27,6 +27,7 @@
 #'   supported for backward compatibility.
 #' @family generic
 #' @returns A [sql] vector.
+#' @aliases db-quote
 #' @export
 #' @examples
 #' con <- dialect_ansi()
