@@ -238,6 +238,9 @@ base_scalar <- sql_translator(
     sql_if(enquo(cond), enquo(if_true), enquo(if_false))
   },
   if_else = function(condition, true, false, missing = NULL) {
+    if (missing(false)) {
+      cli_abort('argument "false" is missing, with no default')
+    }
     sql_if(
       enquo(condition),
       enquo(true),
@@ -245,7 +248,12 @@ base_scalar <- sql_translator(
       enquo(missing)
     )
   },
-  ifelse = \(test, yes, no) sql_if(enquo(test), enquo(yes), enquo(no)),
+  ifelse = function(test, yes, no) {
+    if (missing(false)) {
+      cli_abort('argument "no" is missing, with no default')
+    }
+    sql_if(enquo(test), enquo(yes), enquo(no))
+  },
 
   switch = \(x, ...) sql_switch(x, ...),
   case_when = function(..., .default = NULL, .ptype = NULL, .size = NULL) {
