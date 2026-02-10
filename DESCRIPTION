@@ -80,6 +80,7 @@ Collate:
     'translate-sql-conditional.R'
     'backend-.R'
     'backend-access.R'
+    'backend-db2.R'
     'backend-hana.R'
     'backend-hive.R'
     'backend-impala.R'

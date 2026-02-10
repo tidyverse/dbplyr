@@ -17,6 +17,7 @@ The following databases are recognized via their JDBC connection class:
 \item SQLite (\verb{org.sqlite.*}): \code{\link[=dialect_sqlite]{dialect_sqlite()}}
 \item Oracle (\verb{oracle.*}): \code{\link[=dialect_oracle]{dialect_oracle()}}
 \item SQL Server (\verb{com.microsoft.sqlserver.*}): \code{\link[=dialect_mssql]{dialect_mssql()}}
+\item IBM DB2 (\verb{com.ibm.db2.*}): \code{\link[=dialect_db2]{dialect_db2()}}
 \item SAP HANA (\verb{com.sap.db.*}): \code{\link[=dialect_hana]{dialect_hana()}}
 \item Teradata (\verb{com.teradata.*}): \code{\link[=dialect_teradata]{dialect_teradata()}}
 \item Apache Hive (\verb{org.apache.hive.*}): \code{\link[=dialect_hive]{dialect_hive()}}
