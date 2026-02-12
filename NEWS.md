@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Fix broken documentation link
+
 # dbplyr 2.5.1
 
 * Improved translations:
