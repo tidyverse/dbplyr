@@ -1,4 +1,4 @@
-# dbplyr (development version)
+# dbplyr 2.5.2
 
 * Fix broken documentation link
 
