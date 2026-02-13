@@ -171,7 +171,7 @@ df |> mutate(x %% y)
 #> 4   -10    -3     -1
 db |> mutate(x %% y)
 #> # A query:  ?? x 3
-#> # Database: sqlite 3.51.1 [:memory:]
+#> # Database: sqlite 3.51.2 [:memory:]
 #>       x     y `x%%y`
 #>   <int> <int>  <int>
 #> 1    10     3      1
@@ -361,7 +361,7 @@ lf |> transmute(z = ifelse(x > 5, "big", "small"))
 #> FROM "df"
 ```
 
-[`case_when()`](https://dplyr.tidyverse.org/reference/case_when.html),
+[`case_when()`](https://dplyr.tidyverse.org/reference/case-and-replace-when.html),
 [`case_match()`](https://dplyr.tidyverse.org/reference/case_match.html),
 and [`switch()`](https://rdrr.io/r/base/switch.html) are also supported:
 

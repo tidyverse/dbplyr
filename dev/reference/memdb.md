@@ -64,7 +64,7 @@ library(dplyr)
 df <- memdb_frame(x = runif(100), y = runif(100))
 df |> arrange(x)
 #> # A query:    ?? x 2
-#> # Database:   sqlite 3.51.1 [:memory:]
+#> # Database:   sqlite 3.51.2 [:memory:]
 #> # Ordered by: x
 #>         x      y
 #>     <dbl>  <dbl>
@@ -89,7 +89,7 @@ df |> arrange(x) |> show_query()
 iris_db <- copy_to(memdb(), iris)
 iris_db
 #> # A query:  ?? x 5
-#> # Database: sqlite 3.51.1 [:memory:]
+#> # Database: sqlite 3.51.2 [:memory:]
 #>    Sepal.Length Sepal.Width Petal.Length Petal.Width Species
 #>           <dbl>       <dbl>        <dbl>       <dbl> <chr>  
 #>  1          5.1         3.5          1.4         0.2 setosa 

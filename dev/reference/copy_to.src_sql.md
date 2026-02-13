@@ -114,7 +114,7 @@ df <- data.frame(x = 1:5, y = letters[5:1])
 db <- copy_to(memdb(), df)
 db
 #> # A query:  ?? x 2
-#> # Database: sqlite 3.51.1 [:memory:]
+#> # Database: sqlite 3.51.2 [:memory:]
 #>       x y    
 #>   <int> <chr>
 #> 1     1 e    
@@ -129,7 +129,7 @@ df2 <- data.frame(y = c("a", "d"), fruit = c("apple", "date"))
 db |> left_join(df2, copy = TRUE)
 #> Joining with `by = join_by(y)`
 #> # A query:  ?? x 3
-#> # Database: sqlite 3.51.1 [:memory:]
+#> # Database: sqlite 3.51.2 [:memory:]
 #>       x y     fruit
 #>   <int> <chr> <chr>
 #> 1     1 e     NA   

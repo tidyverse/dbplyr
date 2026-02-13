@@ -17,13 +17,13 @@ Source:
 [`DESCRIPTION`](https://github.com/tidyverse/dbplyr/blob/main/DESCRIPTION)
 
 Wickham H, Girlich M, Ruiz E (2026). *dbplyr: A 'dplyr' Back End for
-Databases*. R package version 2.5.1.9000,
+Databases*. R package version 2.5.2.9000,
 <https://dbplyr.tidyverse.org/>.
 
     @Manual{,
       title = {dbplyr: A 'dplyr' Back End for Databases},
       author = {Hadley Wickham and Maximilian Girlich and Edgar Ruiz},
       year = {2026},
-      note = {R package version 2.5.1.9000},
+      note = {R package version 2.5.2.9000},
       url = {https://dbplyr.tidyverse.org/},
     }

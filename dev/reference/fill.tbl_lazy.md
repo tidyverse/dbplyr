@@ -54,7 +54,7 @@ squirrels_db |>
   window_order(id) |>
   tidyr::fill(n_squirrels, n_squirrels2)
 #> # A query:    ?? x 6
-#> # Database:   sqlite 3.51.1 [:memory:]
+#> # Database:   sqlite 3.51.2 [:memory:]
 #> # Ordered by: id
 #>    group name     role        n_squirrels n_squirrels2    id
 #>    <dbl> <chr>    <chr>             <dbl>        <dbl> <int>

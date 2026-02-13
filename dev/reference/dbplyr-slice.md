@@ -74,8 +74,6 @@ slice_sample(.data, ..., n, prop, by = NULL, weight_by = NULL, replace = FALSE)
 
 - by:
 
-  **\[experimental\]**
-
   \<[`tidy-select`](https://dplyr.tidyverse.org/reference/dplyr_tidy_select.html)\>
   Optionally, a selection of columns to group by for just this
   operation, functioning as an alternative to
@@ -164,14 +162,14 @@ db |> group_by(y) |> slice_min(x) |> show_query()
 # than you expect
 db |> slice_min(y, n = 1)
 #> # A query:  ?? x 2
-#> # Database: sqlite 3.51.1 [:memory:]
+#> # Database: sqlite 3.51.2 [:memory:]
 #>       x     y
 #>   <int> <dbl>
 #> 1     1     1
 #> 2     2     1
 db |> slice_min(y, n = 1, with_ties = FALSE)
 #> # A query:  ?? x 2
-#> # Database: sqlite 3.51.1 [:memory:]
+#> # Database: sqlite 3.51.2 [:memory:]
 #>       x     y
 #>   <int> <dbl>
 #> 1     1     1
@@ -179,7 +177,7 @@ db |> slice_min(y, n = 1, with_ties = FALSE)
 # Non-integer group sizes are rounded down
 db |> slice_min(x, prop = 0.5)
 #> # A query:  ?? x 2
-#> # Database: sqlite 3.51.1 [:memory:]
+#> # Database: sqlite 3.51.2 [:memory:]
 #>       x     y
 #>   <int> <dbl>
 #> 1     1     1

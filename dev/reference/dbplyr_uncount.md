@@ -36,7 +36,7 @@ dbplyr_uncount(data, weights, .remove = TRUE, .id = NULL)
 df <- memdb_frame(x = c("a", "b"), n = c(1, 2))
 dbplyr_uncount(df, n)
 #> # A query:  ?? x 1
-#> # Database: sqlite 3.51.1 [:memory:]
+#> # Database: sqlite 3.51.2 [:memory:]
 #>   x    
 #>   <chr>
 #> 1 a    
@@ -44,7 +44,7 @@ dbplyr_uncount(df, n)
 #> 3 b    
 dbplyr_uncount(df, n, .id = "id")
 #> # A query:  ?? x 2
-#> # Database: sqlite 3.51.1 [:memory:]
+#> # Database: sqlite 3.51.2 [:memory:]
 #>   x        id
 #>   <chr> <int>
 #> 1 a         1
@@ -54,7 +54,7 @@ dbplyr_uncount(df, n, .id = "id")
 # You can also use constants
 dbplyr_uncount(df, 2)
 #> # A query:  ?? x 2
-#> # Database: sqlite 3.51.1 [:memory:]
+#> # Database: sqlite 3.51.2 [:memory:]
 #>   x         n
 #>   <chr> <dbl>
 #> 1 a         1
@@ -65,7 +65,7 @@ dbplyr_uncount(df, 2)
 # Or expressions
 dbplyr_uncount(df, 2 / n)
 #> # A query:  ?? x 2
-#> # Database: sqlite 3.51.1 [:memory:]
+#> # Database: sqlite 3.51.2 [:memory:]
 #>   x         n
 #>   <chr> <dbl>
 #> 1 a         1

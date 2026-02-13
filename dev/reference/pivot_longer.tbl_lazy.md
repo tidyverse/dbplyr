@@ -137,7 +137,7 @@ memdb_frame(
 ) |>
   tidyr::pivot_longer(-id)
 #> # A query:  ?? x 3
-#> # Database: sqlite 3.51.1 [:memory:]
+#> # Database: sqlite 3.51.2 [:memory:]
 #>   id    name  value
 #>   <chr> <chr> <int>
 #> 1 a     x         1

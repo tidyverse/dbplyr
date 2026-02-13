@@ -302,6 +302,10 @@
   dbplyr guesses incorrectly
   ([\#1784](https://github.com/tidyverse/dbplyr/issues/1784)).
 
+## dbplyr 2.5.2
+
+- Fix broken documentation link
+
 ## dbplyr 2.5.1
 
 CRAN release: 2025-09-10
@@ -1100,7 +1104,7 @@ CRAN release: 2023-01-16
   - [`case_match()`](https://dplyr.tidyverse.org/reference/case_match.html)
     is translated ([@mgirlich](https://github.com/mgirlich),
     [\#1020](https://github.com/tidyverse/dbplyr/issues/1020)).
-  - [`case_when()`](https://dplyr.tidyverse.org/reference/case_when.html)
+  - [`case_when()`](https://dplyr.tidyverse.org/reference/case-and-replace-when.html)
     now supports the `.default` argument
     ([@mgirlich](https://github.com/mgirlich),
     [\#1017](https://github.com/tidyverse/dbplyr/issues/1017)).
@@ -1457,7 +1461,7 @@ CRAN release: 2022-06-05
   - [`as.Date()`](https://rdrr.io/r/base/as.Date.html) for Oracle
     ([@mgirlich](https://github.com/mgirlich),
     [\#661](https://github.com/tidyverse/dbplyr/issues/661)).
-  - [`case_when()`](https://dplyr.tidyverse.org/reference/case_when.html)
+  - [`case_when()`](https://dplyr.tidyverse.org/reference/case-and-replace-when.html)
     with a final clause of the form `TRUE ~ ...` uses `ELSE ...` for
     SQLite ([@mgirlich](https://github.com/mgirlich),
     [\#754](https://github.com/tidyverse/dbplyr/issues/754)).
@@ -1499,7 +1503,7 @@ CRAN release: 2022-06-05
 - [`is.na()`](https://rdrr.io/r/base/NA.html),
   [`ifelse()`](https://rdrr.io/r/base/ifelse.html),
   [`if_else()`](https://dplyr.tidyverse.org/reference/if_else.html),
-  [`case_when()`](https://dplyr.tidyverse.org/reference/case_when.html),
+  [`case_when()`](https://dplyr.tidyverse.org/reference/case-and-replace-when.html),
   and `if()` generate slightly more compact SQL
   ([@mgirlich](https://github.com/mgirlich),
   [\#738](https://github.com/tidyverse/dbplyr/issues/738)).
@@ -2853,7 +2857,7 @@ CRAN release: 2017-06-27
   `CROSS JOIN`
   ([\#2924](https://github.com/tidyverse/dbplyr/issues/2924)).
 
-- [`case_when()`](https://dplyr.tidyverse.org/reference/case_when.html)
+- [`case_when()`](https://dplyr.tidyverse.org/reference/case-and-replace-when.html)
   now translates to SQL “CASE WHEN”
   ([\#2894](https://github.com/tidyverse/dbplyr/issues/2894))
 

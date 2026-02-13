@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.5.1.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.5.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -186,6 +186,10 @@
 <code><a href="../reference/window_order.html">window_order()</a></code> works with <code><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">dplyr::desc()</a></code> (not just <code><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc()</a></code>) (<a href="https://github.com/tidyverse/dbplyr/issues/1486" class="external-link">#1486</a>).</li>
 <li>
 <code><a href="../reference/with_dialect.html">with_dialect()</a></code> overrides the default SQL dialect for a connection, which is useful if dbplyr guesses incorrectly (<a href="https://github.com/tidyverse/dbplyr/issues/1784" class="external-link">#1784</a>).</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.5.2" id="dbplyr-252">dbplyr 2.5.2<a class="anchor" aria-label="anchor" href="#dbplyr-252"></a></h2>
+<ul><li>Fix broken documentation link</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.5.1" id="dbplyr-251">dbplyr 2.5.1<a class="anchor" aria-label="anchor" href="#dbplyr-251"></a></h2><p class="text-muted">CRAN release: 2025-09-10</p>
@@ -477,7 +481,7 @@ FROM (
 <li>
 <code><a href="https://dplyr.tidyverse.org/reference/case_match.html" class="external-link">case_match()</a></code> is translated (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1020" class="external-link">#1020</a>).</li>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when()</a></code> now supports the <code>.default</code> argument (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1017" class="external-link">#1017</a>).</li>
+<code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when()</a></code> now supports the <code>.default</code> argument (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1017" class="external-link">#1017</a>).</li>
 </ul></li>
 <li><p>Variables that aren’t found in either the data or in the environment now produce an error (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/907" class="external-link">#907</a>).</p></li>
 </ul></div>
@@ -616,7 +620,7 @@ FROM (
 <ul><li>
 <code><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date()</a></code> for Oracle (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/661" class="external-link">#661</a>).</li>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when()</a></code> with a final clause of the form <code>TRUE ~ ...</code> uses <code>ELSE ...</code> for SQLite (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/754" class="external-link">#754</a>).</li>
+<code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when()</a></code> with a final clause of the form <code>TRUE ~ ...</code> uses <code>ELSE ...</code> for SQLite (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/754" class="external-link">#754</a>).</li>
 <li>
 <code>day()</code>, <code>week()</code>, <code>isoweek()</code>, and <code>isoyear()</code> for Postgres (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/675" class="external-link">#675</a>).</li>
 <li>
@@ -635,7 +639,7 @@ FROM (
 <li><p>The backend function <code>dbplyr_fill0()</code> (used for databases that lack <code>IGNORE NULLS</code> support) now respects database specific translations (<a href="https://github.com/rsund" class="external-link">@rsund</a>, <a href="https://github.com/tidyverse/dbplyr/issues/753" class="external-link">#753</a>).</p></li>
 <li><p>Calls of the form <code>stringr::foo()</code> or <code>lubridate::foo()</code> are now evaluated in the database, rather than locally (<a href="https://github.com/tidyverse/dbplyr/issues/197" class="external-link">#197</a>).</p></li>
 <li><p>Unary plus (e.g. <code>db %&gt;% filter(x == +1)</code>) now works (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/674" class="external-link">#674</a>).</p></li>
-<li><p><code><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na()</a></code>, <code><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when()</a></code>, and <code>if()</code> generate slightly more compact SQL (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/738" class="external-link">#738</a>).</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na()</a></code>, <code><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when()</a></code>, and <code>if()</code> generate slightly more compact SQL (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/738" class="external-link">#738</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else()</a></code> now supports the <code>missing</code> argument (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/641" class="external-link">#641</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n()</a></code> now respects the window frame (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/700" class="external-link">#700</a>).</p></li>
 <li><p><code><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile()</a></code> no longer errors when using the <code>na.rm</code> argument (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/600" class="external-link">#600</a>).</p></li>
@@ -1059,7 +1063,7 @@ FROM (
 <div class="section level3">
 <h3 id="new-features-1-1-0">New features<a class="anchor" aria-label="anchor" href="#new-features-1-1-0"></a></h3>
 <ul><li><p><code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">full_join()</a></code> over non-overlapping columns <code>by = character()</code> translated to <code>CROSS JOIN</code> (<a href="https://github.com/tidyverse/dbplyr/issues/2924" class="external-link">#2924</a>).</p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when()</a></code> now translates to SQL “CASE WHEN” (<a href="https://github.com/tidyverse/dbplyr/issues/2894" class="external-link">#2894</a>)</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when()</a></code> now translates to SQL “CASE WHEN” (<a href="https://github.com/tidyverse/dbplyr/issues/2894" class="external-link">#2894</a>)</p></li>
 <li><p><code>x %in% c(1)</code> now generates the same SQL as <code>x %in% 1</code> (<a href="https://github.com/tidyverse/dbplyr/issues/2898" class="external-link">#2898</a>).</p></li>
 <li><p>New <code><a href="../reference/window_order.html">window_order()</a></code> and <code><a href="../reference/window_order.html">window_frame()</a></code> give you finer control over the window functions that dplyr creates (<a href="https://github.com/tidyverse/dbplyr/issues/2874" class="external-link">#2874</a>, <a href="https://github.com/tidyverse/dbplyr/issues/2593" class="external-link">#2593</a>).</p></li>
 <li><p>Added SQL translations for Oracle (<a href="https://github.com/edgararuiz" class="external-link">@edgararuiz</a>).</p></li>

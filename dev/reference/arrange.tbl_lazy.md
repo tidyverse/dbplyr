@@ -66,7 +66,7 @@ db |> arrange(a) |> show_query()
 # Note that NAs are sorted first
 db |> arrange(b)
 #> # A query:    ?? x 2
-#> # Database:   sqlite 3.51.1 [:memory:]
+#> # Database:   sqlite 3.51.2 [:memory:]
 #> # Ordered by: b
 #>       a     b
 #>   <dbl> <dbl>
@@ -77,7 +77,7 @@ db |> arrange(b)
 # override by sorting on is.na() first
 db |> arrange(is.na(b), b)
 #> # A query:    ?? x 2
-#> # Database:   sqlite 3.51.1 [:memory:]
+#> # Database:   sqlite 3.51.2 [:memory:]
 #> # Ordered by: is.na(b), b
 #>       a     b
 #>   <dbl> <dbl>

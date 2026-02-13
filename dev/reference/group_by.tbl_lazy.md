@@ -35,10 +35,6 @@ group_by(.data, ..., .add = FALSE, .drop = TRUE)
   will override existing groups. To add to the existing groups, use
   `.add = TRUE`.
 
-  This argument was previously called `add`, but that prevented creating
-  a new grouping variable called `add`, and conflicts with our naming
-  conventions.
-
 - .drop:
 
   Not supported by this method.

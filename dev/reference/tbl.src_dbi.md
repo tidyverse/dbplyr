@@ -65,7 +65,7 @@ copy_to(con, mtcars)
 mtcars_db <- con |> tbl("mtcars")
 mtcars_db
 #> # A query:  ?? x 11
-#> # Database: sqlite 3.51.1 [:memory:]
+#> # Database: sqlite 3.51.2 [:memory:]
 #>      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #>    <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
 #>  1  21       6  160    110  3.9   2.62  16.5     0     1     4     4
@@ -83,7 +83,7 @@ mtcars_db
 # Use `I()` for qualified table names
 con |> tbl(I("temp.mtcars")) |> head(1)
 #> # A query:  ?? x 11
-#> # Database: sqlite 3.51.1 [:memory:]
+#> # Database: sqlite 3.51.2 [:memory:]
 #>     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #>   <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
 #> 1    21     6   160   110   3.9  2.62  16.5     0     1     4     4
@@ -91,7 +91,7 @@ con |> tbl(I("temp.mtcars")) |> head(1)
 # You can also pass raw SQL if you want a more sophisticated query
 con |> tbl(sql("SELECT * FROM mtcars WHERE cyl = 8")) |> head(1)
 #> # A query:  ?? x 11
-#> # Database: sqlite 3.51.1 [:memory:]
+#> # Database: sqlite 3.51.2 [:memory:]
 #>     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #>   <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
 #> 1  18.7     8   360   175  3.15  3.44  17.0     0     0     3     2
