@@ -130,7 +130,15 @@ sql_optimise <- function(x, con = NULL, ..., subquery = FALSE) {
 }
 
 # Used by ckanr, implyr, sergeant
+#' Create a "sql src" object
+#'
+#' Deprecated: please use directly use a `DBIConnection` object instead.
+#'
+#' @param subclass Name of subclass.
+#' @param con The connection object.
+#' @param ... Other arguments passed on to individual methods.
 #' @export
+#' @keywords internal
 src_sql <- function(subclass, con, ...) {
   lifecycle::deprecate_stop(when = "1.4.0", what = "src_sql()")
 }
@@ -144,7 +152,18 @@ src_tbls.src_sql <- function(x, ...) {
 }
 
 # Used by healthdb
+#' Escape ANSI characters
+#'
+#' @description
+#' `r lifecycle::badge("deprecated")`
+#'
+#' Use [escape()] instead.
+#'
+#' @param x Object to escape.
+#' @param parens,collapse Controls parens and collapsing. Passed on to
+#'   [escape()].
 #' @export
+#' @keywords internal
 escape_ansi <- function(x, parens = NA, collapse = "") {
   lifecycle::deprecate_soft("2.6.0", "escape_ansi()", "escape()")
   escape(x, parens = parens, collapse = collapse, con = simulate_dbi())
