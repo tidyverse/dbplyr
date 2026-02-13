@@ -25,13 +25,13 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(g = c(1, 1, 1, 2, 2), x = c(4, 3, 6, 9, 2))
-#' db %>%
-#'   summarise(n()) %>%
+#' db |>
+#'   summarise(n()) |>
 #'   show_query()
 #'
-#' db %>%
-#'   group_by(g) %>%
-#'   summarise(n()) %>%
+#' db |>
+#'   group_by(g) |>
+#'   summarise(n()) |>
 #'   show_query()
 summarise.tbl_lazy <- function(.data, ..., .by = NULL, .groups = NULL) {
   check_groups(.groups)
@@ -51,7 +51,8 @@ summarise.tbl_lazy <- function(.data, ..., .by = NULL, .groups = NULL) {
 
   dots <- summarise_eval_dots(.data, ...)
   .data$lazy_query <- add_summarise(
-    .data, dots,
+    .data$lazy_query,
+    dots,
     .groups = .groups,
     env_caller = caller_env()
   )
@@ -81,7 +82,13 @@ summarise_eval_dots <- function(.data, ..., error_call = caller_env()) {
     parent.env(error_env) <- quo_get_env(dot)
     dot <- quo_set_env(dot, error_env)
 
-    dots[[i]] <- partial_eval_quo(dot, .data, error_call, dot_name, was_named[[i]])
+    dots[[i]] <- partial_eval_quo(
+      dot,
+      .data,
+      dot_name,
+      error_call = error_call,
+      was_named = was_named[[i]]
+    )
     cur_data <- summarise_bind_error(cur_data, dots, i, error_env)
   }
 
@@ -115,12 +122,15 @@ summarise_bind_error <- function(cur_data, dots, i, error_env) {
 }
 
 summarise_bind_error1 <- function(error_env, dot_name) {
-  msg <- cli::format_message(c(
+  msg <- c(
     "In {.pkg dbplyr} you cannot use a variable created in the same {.fun summarise}.",
     x = "{.var {dot_name}} was created earlier in this {.fun summarise}.",
     i = "You need an extra {.fun mutate} step to use it."
-  ))
-  env_bind_lazy(error_env, !!dot_name := {abort(msg, call = NULL)})
+  )
+  env_bind_lazy(
+    error_env,
+    !!dot_name := cli::cli_abort(msg, call = NULL)
+  )
 }
 
 check_groups <- function(.groups) {
@@ -132,47 +142,96 @@ check_groups <- function(.groups) {
     return()
   }
 
-  cli_abort(c(
-    paste0("{.arg .groups} can't be {as_label(.groups)}", if (.groups == "rowwise") " in dbplyr"),
-    i = 'Possible values are NULL (default), "drop_last", "drop", and "keep"'
-  ), call = caller_env())
+  cli_abort(
+    c(
+      paste0(
+        "{.arg .groups} can't be {as_label(.groups)}",
+        if (.groups == "rowwise") " in dbplyr"
+      ),
+      i = 'Possible values are NULL (default), "drop_last", "drop", and "keep"'
+    ),
+    call = caller_env()
+  )
 }
 
-add_summarise <- function(.data, dots, .groups, env_caller) {
-  lazy_query <- .data$lazy_query
+add_summarise <- function(lazy_query, exprs, .groups, env_caller) {
+  cur_grps <- op_grps(lazy_query)
+  summarise_message(cur_grps, .groups, env_caller)
 
-  grps <- op_grps(lazy_query)
-  message_summarise <- summarise_message(grps, .groups, env_caller)
-
-  .groups <- .groups %||% "drop_last"
-  groups_out <- switch(.groups,
-    drop_last = grps[-length(grps)],
-    keep = grps,
+  new_grps <- switch(
+    .groups %||% "drop_last",
+    drop_last = cur_grps[-length(cur_grps)],
+    keep = cur_grps,
     drop = character()
   )
 
-  vars <- c(grps, setdiff(names(dots), grps))
+  # ensure grouping variables are listed first
+  vars <- c(cur_grps, setdiff(names(exprs), cur_grps))
   select <- syms(set_names(vars))
-  select[names(dots)] <- dots
+  select[names(exprs)] <- exprs
 
-  lazy_select_query(
-    x = lazy_query,
-    select = select,
-    group_by = syms(grps),
-    group_vars = groups_out,
-    select_operation = "summarise",
-    message_summarise = message_summarise
-  )
+  if (can_inline_summarise(lazy_query)) {
+    lazy_query$select <- new_lazy_select(select, group_vars = new_grps)
+    lazy_query$select_operation <- "summarise"
+    lazy_query$group_by <- syms(cur_grps)
+    lazy_query$group_vars <- new_grps
+    lazy_query
+  } else {
+    lazy_select_query(
+      x = lazy_query,
+      select = select,
+      group_by = syms(cur_grps),
+      group_vars = new_grps,
+      select_operation = "summarise"
+    )
+  }
+}
+
+# summarise() adds GROUP BY and modifies SELECT
+# * GROUP BY is executed after WHERE but before SELECT, DISTINCT, ORDER BY, LIMIT
+#   => can inline if previous query only has WHERE or ORDER BY
+# * Can't inline after another summarise (would need to re-aggregate)
+# * Can only inline if previous SELECT is a pure projection
+can_inline_summarise <- function(lazy_query) {
+  if (!is_lazy_select_query(lazy_query)) {
+    return(FALSE)
+  }
+
+  if (lazy_query$select_operation == "summarise") {
+    return(FALSE)
+  }
+
+  if (is_true(lazy_query$distinct)) {
+    return(FALSE)
+  }
+  if (!is_null(lazy_query$limit)) {
+    return(FALSE)
+  }
+
+  if (!is_pure_projection(lazy_query$select$expr, lazy_query$select$name)) {
+    return(FALSE)
+  }
+
+  TRUE
 }
 
 summarise_message <- function(grps, .groups, env_caller) {
   verbose <- summarise_verbose(.groups, env_caller)
-  n <- length(grps)
-  if (!verbose || n <= 1) {
-    return(NULL)
+  if (!verbose) {
+    return(invisible())
   }
 
-  summarise_message <- cli::format_message("{.fun summarise} has grouped output by {.val {grps[-n]}}. You can override using the {.arg .groups} argument.")
+  n <- length(grps)
+  if (n <= 1) {
+    return(invisible())
+  }
+
+  cli::cli_inform(c(
+    "!" = "Grouped output by {.val {grps[-n]}}.",
+    i = "Override behaviour and silence this message with the {.arg .groups} argument.",
+    i = "Or use {.arg .by} instead of {.fun group_by}."
+  ))
+  invisible()
 }
 
 summarise_verbose <- function(.groups, .env) {
@@ -181,16 +240,24 @@ summarise_verbose <- function(.groups, .env) {
     !identical(getOption("dplyr.summarise.inform"), FALSE)
 }
 
-compute_by <- function(by,
-                       data,
-                       ...,
-                       by_arg = "by",
-                       data_arg = "data",
-                       error_call = caller_env()) {
+compute_by <- function(
+  by,
+  data,
+  ...,
+  by_arg = "by",
+  data_arg = "data",
+  error_call = caller_env()
+) {
   check_dots_empty0(...)
 
   by <- enquo(by)
-  check_by(by, data, by_arg = by_arg, data_arg = data_arg, error_call = error_call)
+  check_by(
+    by,
+    data,
+    by_arg = by_arg,
+    data_arg = data_arg,
+    error_call = error_call
+  )
 
   if (is_grouped_lf(data)) {
     names <- group_vars(data)
@@ -208,12 +275,14 @@ is_grouped_lf <- function(data) {
   !is_empty(group_vars(data))
 }
 
-check_by <- function(by,
-                     data,
-                     ...,
-                     by_arg = "by",
-                     data_arg = "data",
-                     error_call = caller_env()) {
+check_by <- function(
+  by,
+  data,
+  ...,
+  by_arg = "by",
+  data_arg = "data",
+  error_call = caller_env()
+) {
   check_dots_empty0(...)
 
   if (quo_is_null(by)) {
@@ -231,9 +300,7 @@ check_by <- function(by,
   invisible(NULL)
 }
 
-eval_select_by <- function(by,
-                           data,
-                           error_call = caller_env()) {
+eval_select_by <- function(by, data, error_call = caller_env()) {
   out <- tidyselect::eval_select(
     expr = by,
     data = data,

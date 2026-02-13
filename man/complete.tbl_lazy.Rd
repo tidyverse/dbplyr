@@ -16,7 +16,7 @@ more details.}
 use instead of NA for missing combinations.}
 }
 \value{
-Another \code{tbl_lazy}. Use \code{\link[dplyr:explain]{dplyr::show_query()}} to see the generated
+Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
 query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
@@ -34,9 +34,9 @@ df <- memdb_frame(
   value2 = 4:6
 )
 
-df \%>\% tidyr::complete(group, nesting(item_id, item_name))
+df |> tidyr::complete(group, nesting(item_id, item_name))
 
 # You can also choose to fill in missing values
-df \%>\% tidyr::complete(group, nesting(item_id, item_name), fill = list(value1 = 0))
+df |> tidyr::complete(group, nesting(item_id, item_name), fill = list(value1 = 0))
 \dontshow{\}) # examplesIf}
 }

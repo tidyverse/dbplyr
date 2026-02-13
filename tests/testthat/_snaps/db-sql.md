@@ -1,58 +1,67 @@
-# 2nd edition uses sql methods
+# analyse/explain sql generates expected SQL
 
     Code
-      expect_error(dbplyr_analyze(con), "db_method")
-    Condition
-      Warning:
-      <Test> uses an old dbplyr interface
-      i Please install a newer version of the package or contact the maintainer
-      This warning is displayed once every 8 hours.
+      sql_table_analyze(con, "tbl")
+    Output
+      <SQL> ANALYZE "tbl"
 
-# handles DBI error
+---
 
     Code
-      (expect_error(db_analyze(con, "tbl")))
+      sql_query_explain(con, sql("SELECT * FROM foo"))
     Output
-      <error/rlang_error>
-      Error in `db_analyze()`:
-      ! Can't analyze table tbl.
-      i Using SQL: ANALYZE `tbl`
-      Caused by error:
-      ! dummy DBI error
+      <SQL> EXPLAIN SELECT * FROM foo
+
+# sql_query_wrap generates expected SQL
+
     Code
-      (expect_error(db_create_index(con, "tbl", "col")))
+      sql_query_wrap(con, ident("table"))
     Output
-      <error/rlang_error>
-      Error in `db_create_index()`:
-      ! Can't create index on table tbl.
-      i Using SQL: CREATE INDEX `tbl_col` ON `tbl` (`col`)
-      Caused by error:
-      ! dummy DBI error
+      <SQL> "table"
+
+---
+
     Code
-      (expect_error(db_explain(con, "invalid sql")))
+      sql_query_wrap(con, in_schema("schema", "tbl"))
     Output
-      <error/rlang_error>
-      Error in `db_explain()`:
-      ! Can't explain query.
-      i Using SQL: EXPLAIN QUERY PLAN invalid sql
-      Caused by error:
-      ! dummy DBI error
+      <SQL> "schema"."tbl"
+
+---
+
     Code
-      (expect_error(db_query_fields(con, "does not exist")))
+      sql_query_wrap(con, sql("SELECT * FROM foo"))
     Output
-      <error/rlang_error>
-      Error in `db_query_fields()`:
-      ! Can't query fields.
-      i Using SQL: SELECT * FROM `does not exist` AS `q01` WHERE (0 = 1)
-      Caused by error:
-      ! dummy DBI error
+      <SQL> (SELECT * FROM foo) AS "q01"
+
+# sql_table_index generates expected SQL
+
     Code
-      (expect_error(db_save_query(con, "invalid sql", "tbl")))
+      sql_table_index(con, "tbl", c("a", "b"))
     Output
-      <error/rlang_error>
-      Error in `db_save_query()`:
-      ! Can't save query to table `tbl`.
-      i Using SQL: CREATE TEMPORARY TABLE `tbl` AS `invalid sql`
-      Caused by error:
-      ! dummy DBI error
+      <SQL> CREATE INDEX "tbl_a_b" ON "tbl" ("a", "b")
+
+---
+
+    Code
+      sql_table_index(con, "tbl", "c", unique = TRUE)
+    Output
+      <SQL> CREATE UNIQUE INDEX "tbl_c" ON "tbl" ("c")
+
+# sql_query_save generates expected SQL
+
+    Code
+      sql_query_save(con, sql, "tbl")
+    Output
+      <SQL> CREATE TEMPORARY TABLE
+      "tbl" AS
+      SELECT * FROM foo
+
+---
+
+    Code
+      sql_query_save(con, sql, "tbl", temporary = FALSE)
+    Output
+      <SQL> CREATE TABLE
+      "tbl" AS
+      SELECT * FROM foo
 

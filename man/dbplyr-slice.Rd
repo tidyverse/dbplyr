@@ -75,17 +75,17 @@ value of \code{x} in each group.
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(x = 1:3, y = c(1, 1, 2))
-db \%>\% slice_min(x) \%>\% show_query()
-db \%>\% slice_max(x) \%>\% show_query()
-db \%>\% slice_sample() \%>\% show_query()
+db |> slice_min(x) |> show_query()
+db |> slice_max(x) |> show_query()
+db |> slice_sample() |> show_query()
 
-db \%>\% group_by(y) \%>\% slice_min(x) \%>\% show_query()
+db |> group_by(y) |> slice_min(x) |> show_query()
 
 # By default, ties are includes so you may get more rows
 # than you expect
-db \%>\% slice_min(y, n = 1)
-db \%>\% slice_min(y, n = 1, with_ties = FALSE)
+db |> slice_min(y, n = 1)
+db |> slice_min(y, n = 1, with_ties = FALSE)
 
 # Non-integer group sizes are rounded down
-db \%>\% slice_min(x, prop = 0.5)
+db |> slice_min(x, prop = 0.5)
 }

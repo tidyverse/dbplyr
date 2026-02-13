@@ -19,11 +19,11 @@
 #' )
 #'
 #' # All possible combinations ---------------------------------------
-#' fruits %>% tidyr::expand(type)
-#' fruits %>% tidyr::expand(type, size)
+#' fruits |> tidyr::expand(type)
+#' fruits |> tidyr::expand(type, size)
 #'
 #' # Only combinations that already appear in the data ---------------
-#' fruits %>% tidyr::expand(nesting(type, size))
+#' fruits |> tidyr::expand(nesting(type, size))
 #' @exportS3Method tidyr::expand
 expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
   dots <- purrr::discard(quos(...), quo_is_null)
@@ -32,8 +32,14 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
     cli_abort("Must supply variables in `...`")
   }
 
+  data_vars <- op_vars(data)
   distinct_tbl_vars <- with_indexed_errors(
-    purrr::map(dots, extract_expand_dot_vars, call = NULL),
+    purrr::map(
+      dots,
+      extract_expand_dot_vars,
+      data_vars = data_vars,
+      call = NULL
+    ),
     message = function(cnd) {
       dot <- as_label(dots[[cnd$location]])
       cli::format_inline("In expression {.code {dot}}:")
@@ -49,7 +55,8 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
   out_names_list <- vctrs::vec_split(out_names_repaired, indices)$val
 
   distinct_tables <- purrr::map2(
-    distinct_tbl_vars, out_names_list,
+    distinct_tbl_vars,
+    out_names_list,
     ~ {
       args <- set_names(.x, .y)
       distinct(data, !!!args)
@@ -66,10 +73,12 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
   }
 }
 
-extract_expand_dot_vars <- function(dot, call) {
+extract_expand_dot_vars <- function(dot, data_vars, call) {
   # ugly hack to deal with `nesting()`
   if (!quo_is_call(dot, name = "nesting", ns = c("", "tidyr"))) {
-    return(list(quo_get_expr(dot)))
+    expr <- quo_get_expr(dot)
+    check_expand_expr(expr, data_vars, call = call)
+    return(list(expr))
   }
 
   x_expr <- quo_get_expr(dot)
@@ -79,8 +88,24 @@ extract_expand_dot_vars <- function(dot, call) {
   args[[".name_repair"]] <- NULL
 
   args_named <- exprs_auto_name(args)
+  for (expr in args_named) {
+    check_expand_expr(expr, data_vars, call = call)
+  }
   nms <- vctrs::vec_as_names(names(args_named), repair = repair, call = call)
   exprs(!!!set_names(args_named, nms))
+}
+
+check_expand_expr <- function(expr, data_vars, call = NULL) {
+  expr_vars <- all_names(expr)
+  if (length(intersect(expr_vars, data_vars)) == 0) {
+    cli_abort(
+      c(
+        "Every expression must use at least one data column",
+        i = "{.code {as_label(expr)}} doesn't use any columns."
+      ),
+      call = call
+    )
+  }
 }
 
 #' Complete a SQL table with missing combinations of data
@@ -103,10 +128,10 @@ extract_expand_dot_vars <- function(dot, call) {
 #'   value2 = 4:6
 #' )
 #'
-#' df %>% tidyr::complete(group, nesting(item_id, item_name))
+#' df |> tidyr::complete(group, nesting(item_id, item_name))
 #'
 #' # You can also choose to fill in missing values
-#' df %>% tidyr::complete(group, nesting(item_id, item_name), fill = list(value1 = 0))
+#' df |> tidyr::complete(group, nesting(item_id, item_name), fill = list(value1 = 0))
 #' @exportS3Method tidyr::complete
 complete.tbl_lazy <- function(data, ..., fill = list()) {
   full <- tidyr::expand(data, ...)
@@ -128,7 +153,7 @@ complete.tbl_lazy <- function(data, ..., fill = list()) {
 #'
 #' @examplesIf rlang::is_installed("tidyr", version = "1.0.0")
 #' df <- memdb_frame(x = c(1, 2, NA), y = c("a", NA, "b"))
-#' df %>% tidyr::replace_na(list(x = 0, y = "unknown"))
+#' df |> tidyr::replace_na(list(x = 0, y = "unknown"))
 #' @exportS3Method tidyr::replace_na
 replace_na.tbl_lazy <- function(data, replace = list(), ...) {
   check_list(replace)
@@ -148,5 +173,3 @@ replace_na.tbl_lazy <- function(data, replace = list(), ...) {
 
   mutate(data, !!!coalesce_expr)
 }
-
-utils::globalVariables(c("coalesce", "expand", "replace_na"))

@@ -4,9 +4,7 @@
 #' @importFrom cli cli_abort
 #' @importFrom dplyr n join_by
 #' @import rlang
-#' @import DBI
 #' @importFrom tibble tibble as_tibble
-#' @importFrom magrittr %>%
 #' @importFrom lifecycle deprecated
 #' @keywords internal
 "_PACKAGE"

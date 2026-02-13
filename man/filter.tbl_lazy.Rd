@@ -20,7 +20,7 @@ details and examples, see \link[dplyr:dplyr_by]{?dplyr_by}.}
 \item{.preserve}{Not supported by this method.}
 }
 \value{
-Another \code{tbl_lazy}. Use \code{\link[dplyr:explain]{dplyr::show_query()}} to see the generated
+Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
 query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
@@ -32,6 +32,6 @@ This is a method for the dplyr \code{\link[dplyr:filter]{dplyr::filter()}} gener
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(x = c(2, NA, 5, NA, 10), y = 1:5)
-db \%>\% filter(x < 5) \%>\% show_query()
-db \%>\% filter(is.na(x)) \%>\% show_query()
+db |> filter(x < 5) |> show_query()
+db |> filter(is.na(x)) |> show_query()
 }

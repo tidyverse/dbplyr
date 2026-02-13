@@ -3,93 +3,58 @@
 \name{tbl.src_dbi}
 \alias{tbl.src_dbi}
 \alias{tbl_dbi}
-\title{Use dplyr verbs with a remote database table}
+\title{Create a lazy query backed by a database}
 \usage{
-\method{tbl}{src_dbi}(src, from, ...)
+\method{tbl}{src_dbi}(src, from, vars = NULL, ...)
 }
 \arguments{
-\item{src}{A \code{DBIConnection} object produced by \code{DBI::dbConnect()}.}
+\item{src}{A \code{DBIConnection} object produced by \code{\link[DBI:dbConnect]{DBI::dbConnect()}}.}
 
 \item{from}{Either a table identifier or a literal \code{\link[=sql]{sql()}} string.
 
-Use a string to identify a table in the current schema/catalog. We
-recommend using \code{I()} to identify a table outside the default catalog or
-schema, e.g. \code{I("schema.table")} or \code{I("catalog.schema.table")}. You can
-also use \code{\link[=in_schema]{in_schema()}}/\code{\link[=in_catalog]{in_catalog()}} or \code{\link[DBI:Id]{DBI::Id()}}.}
+Use a string to identify a table in the current schema/catalog or
+\code{I()} for a table elsewhere, e.g. \code{I("schema.table")} or
+\code{I("catalog.schema.table")}. For backward compatibility, you can also use
+\code{\link[=in_schema]{in_schema()}}/\code{\link[=in_catalog]{in_catalog()}} or \code{\link[DBI:Id]{DBI::Id()}}.}
+
+\item{vars}{Optionally, provide a character vector of column names. If
+not supplied, will be retrieved from the database by running a simple
+query. This argument is mainly useful for better performance when creating
+many \code{tbl}s with known variables.}
 
 \item{...}{Passed on to \code{\link[=tbl_sql]{tbl_sql()}}}
 }
 \description{
-All data manipulation on SQL tbls are lazy: they will not actually
-run the query or retrieve the data unless you ask for it: they all return
-a new \code{tbl_dbi} object. Use \code{\link[dplyr:compute]{dplyr::compute()}} to run the query and save the
-results in a temporary table in the database, or use \code{\link[dplyr:compute]{dplyr::collect()}} to retrieve the
-results to R. You can see the query with \code{\link[dplyr:explain]{dplyr::show_query()}}.
-}
-\details{
-For best performance, the database should have an index on the variables
-that you are grouping by. Use \code{\link[dplyr:explain]{dplyr::explain()}} to check that the database is using
-the indexes that you expect.
+Use \code{tbl()} to create a SQL query backed by a database. Manipulating this
+object with dplyr verbs then builds up a SQL query that will only be executed
+when you explicitly ask for it, either by printing the object, calling
+\code{\link[dplyr:compute]{dplyr::collect()}} to bring the data back to R or calling \code{\link[dplyr:compute]{dplyr::compute()}} to create a
+new table in the database. You can see the query without executing it with
+\code{\link[=show_query]{show_query()}}.
 
-There is one verb that is not lazy: \code{\link[dplyr:do]{dplyr::do()}} is eager because it must pull
-the data into R.
+Learn more in \code{vignette("dbplyr")}.
 }
 \examples{
 library(dplyr)
 
-# Connect to a temporary in-memory SQLite database
+# Connect to a temporary in-memory SQLite database and add some data
 con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-
-# Add some data
 copy_to(con, mtcars)
-DBI::dbListTables(con)
 
 # To retrieve a single table from a source, use `tbl()`
-con \%>\% tbl("mtcars")
+mtcars_db <- con |> tbl("mtcars")
+mtcars_db
 
 # Use `I()` for qualified table names
-con \%>\% tbl(I("temp.mtcars")) \%>\% head(1)
+con |> tbl(I("temp.mtcars")) |> head(1)
 
-# You can also use pass raw SQL if you want a more sophisticated query
-con \%>\% tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))
+# You can also pass raw SQL if you want a more sophisticated query
+con |> tbl(sql("SELECT * FROM mtcars WHERE cyl = 8")) |> head(1)
 
-# If you just want a temporary in-memory database, use src_memdb()
-src2 <- src_memdb()
-
-# To show off the full features of dplyr's database integration,
-# we'll use the Lahman database. lahman_sqlite() takes care of
-# creating the database.
-
-if (requireNamespace("Lahman", quietly = TRUE)) {
-batting <- copy_to(con, Lahman::Batting)
-batting
-
-# Basic data manipulation verbs work in the same way as with a tibble
-batting \%>\% filter(yearID > 2005, G > 130)
-batting \%>\% select(playerID:lgID)
-batting \%>\% arrange(playerID, desc(yearID))
-batting \%>\% summarise(G = mean(G), n = n())
-
-# There are a few exceptions. For example, databases give integer results
-# when dividing one integer by another. Multiply by 1 to fix the problem
-batting \%>\%
-  select(playerID:lgID, AB, R, G) \%>\%
-  mutate(
-   R_per_game1 = R / G,
-   R_per_game2 = R * 1.0 / G
- )
-
-# All operations are lazy: they don't do anything until you request the
-# data, either by `print()`ing it (which shows the first ten rows),
-# or by `collect()`ing the results locally.
-system.time(recent <- filter(batting, yearID > 2010))
-system.time(collect(recent))
-
-# You can see the query that dplyr creates with show_query()
-batting \%>\%
-  filter(G > 0) \%>\%
-  group_by(playerID) \%>\%
-  summarise(n = n()) \%>\%
+# But in most cases, you'll rely on dbplyr to construct the SQL:
+mtcars_db |>
+  filter(vs == 1) |>
+  summarise(mpg = mean(mpg, na.rm = TRUE), .by = cyl) |>
   show_query()
-}
+
 }

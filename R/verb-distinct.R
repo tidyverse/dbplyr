@@ -12,8 +12,8 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(x = c(1, 1, 2, 2), y = c(1, 2, 1, 1))
-#' db %>% distinct() %>% show_query()
-#' db %>% distinct(x) %>% show_query()
+#' db |> distinct() |> show_query()
+#' db |> distinct(x) |> show_query()
 distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
   grps <- syms(op_grps(.data))
   empty_dots <- dots_n(...) == 0
@@ -23,16 +23,16 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
 
     if (needs_dummy_order) {
       dummy_order_vars <- colnames(.data)[[1]]
-      .data <- .data %>% window_order(!!sym(dummy_order_vars))
+      .data <- .data |> window_order(!!sym(dummy_order_vars))
     }
 
-    .data <- .data %>%
-      group_by(..., .add = TRUE) %>%
-      filter(row_number() == 1L) %>%
+    .data <- .data |>
+      group_by(..., .add = TRUE) |>
+      filter(row_number() == 1L) |>
       group_by(!!!grps)
 
     if (needs_dummy_order) {
-      .data <- .data %>% window_order()
+      .data <- .data |> window_order()
     }
 
     return(.data)
@@ -47,19 +47,20 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
   prep <- distinct_prepare_compat(.data, dots, group_vars = group_vars(.data))
   out <- dplyr::select(prep$data, prep$keep)
 
-  out$lazy_query <- add_distinct(out)
+  out$lazy_query <- add_distinct(out$lazy_query)
   out
 }
 
 # copied from dplyr with minor changes (names -> colnames)
 # https://github.com/tidyverse/dplyr/blob/main/R/distinct.R
-distinct_prepare_compat <- function(.data,
-                             vars,
-                             group_vars = character(),
-                             .keep_all = FALSE,
-                             caller_env = caller_env(2),
-                             error_call = caller_env()
-                             ) {
+distinct_prepare_compat <- function(
+  .data,
+  vars,
+  group_vars = character(),
+  .keep_all = FALSE,
+  caller_env = caller_env(2),
+  error_call = caller_env()
+) {
   stopifnot(is_quosures(vars), is.character(group_vars))
 
   # If no input, keep all variables
@@ -82,9 +83,12 @@ distinct_prepare_compat <- function(.data,
   if (length(missing_vars) > 0) {
     bullets <- c(
       "Must use existing variables.",
-      set_names(glue("`{missing_vars}` not found in `.data`."), rep("x", length(missing_vars)))
+      set_names(
+        glue("`{missing_vars}` not found in `.data`."),
+        rep("x", length(missing_vars))
+      )
     )
-    abort(bullets, call = error_call)
+    cli::cli_abort(bullets, call = error_call)
   }
 
   # Only keep unique vars
@@ -103,14 +107,18 @@ distinct_prepare_compat <- function(.data,
 
 # copied from dplyr
 # https://github.com/tidyverse/dplyr/blob/main/R/group-by.R#L243
-add_computed_columns <- function(.data,
-                                 vars,
-                                 error_call = caller_env()) {
+add_computed_columns <- function(.data, vars, error_call = caller_env()) {
   is_symbol <- purrr::map_lgl(vars, quo_is_variable_reference)
   needs_mutate <- have_name(vars) | !is_symbol
 
   if (any(needs_mutate)) {
-    out <- mutate(.data, !!!vars)
+    # Ungroup before mutate to match dplyr behavior: distinct() calculations
+    # apply to the entire dataset, not per-group (#1081)
+    grps <- op_grps(.data)
+    out <- .data |>
+      ungroup() |>
+      mutate(!!!vars) |>
+      group_by(!!!syms(grps))
     col_names <- names(exprs_auto_name(vars))
   } else {
     out <- .data
@@ -146,31 +154,36 @@ quo_is_variable_reference <- function(quo) {
 }
 
 
-add_distinct <- function(.data) {
-  lazy_query <- .data$lazy_query
+add_distinct <- function(lazy_query) {
+  if (can_inline_distinct(lazy_query)) {
+    lazy_query$distinct <- TRUE
+    lazy_query
+  } else {
+    lazy_select_query(x = lazy_query, distinct = TRUE)
+  }
+}
 
-  out <- lazy_select_query(
-    x = lazy_query,
-    distinct = TRUE
-  )
-  # TODO this could also work for joins
+# Optimisation overview
+# * `distinct()` adds the `DISTINCT` clause to `SELECT`
+# * `WHERE`, `GROUP BY`, and `HAVING` are executed before `SELECT`
+#   => they do not matter
+# * `ORDER BY`
+#   => but `arrange()` should not have an influence on `distinct()` so it
+#      should not matter
+# * `LIMIT` are executed after `SELECT`
+#   => needs a subquery
+can_inline_distinct <- function(lazy_query) {
+  if (inherits(lazy_query, "lazy_multi_join_query")) {
+    return(TRUE)
+  }
+
   if (!is_lazy_select_query(lazy_query)) {
-    return(out)
+    return(FALSE)
   }
 
-  # Optimisation overview
-  # * `distinct()` adds the `DISTINCT` clause to `SELECT`
-  # * `WHERE`, `GROUP BY`, and `HAVING` are executed before `SELECT`
-  #   => they do not matter
-  # * `ORDER BY`
-  #   => but `arrange()` should not have an influence on `distinct()` so it
-  #      should not matter
-  # * `LIMIT` are executed after `SELECT`
-  #   => needs a subquery
   if (!is_null(lazy_query$limit)) {
-    return(out)
+    return(FALSE)
   }
 
-  lazy_query$distinct <- TRUE
-  lazy_query
+  TRUE
 }

@@ -11,9 +11,9 @@
 #'
 #' @param ...,dots Expressions to translate. `translate_sql()`
 #'   automatically quotes them for you.  `translate_sql_()` expects
-#'   a list of already quoted objects.
-#' @param con An optional database connection to control the details of
-#'   the translation. The default, `NULL`, generates ANSI SQL.
+#'   a list of expression objects.
+#' @param con A [sql_dialect] object or database connection. Connections are
+#'   supported for backward compatibility.
 #' @param vars_group,vars_order,vars_frame Parameters used in the `OVER`
 #'   expression of windowed functions.
 #' @param window Use `FALSE` to suppress generation of the `OVER`
@@ -22,7 +22,7 @@
 #' @param context Use to carry information for special translation cases. For example, MS SQL needs a different conversion for is.na() in WHERE vs. SELECT clauses.  Expects a list.
 #' @export
 #' @examples
-#' con <- simulate_dbi()
+#' con <- dialect_ansi()
 #'
 #' # Regular maths is translated in a very straightforward way
 #' translate_sql(x + 1, con = con)
@@ -51,7 +51,7 @@
 #'
 #' # If you have an already quoted object, use translate_sql_:
 #' x <- quote(y + 1 / sin(t))
-#' translate_sql_(list(x), con = simulate_dbi())
+#' translate_sql_(list(x), con = dialect_ansi())
 #'
 #' # Windowed translation --------------------------------------------
 #' # Known window functions automatically get OVER()
@@ -66,31 +66,17 @@
 #' # and vars_order controls ordering for those functions that need it
 #' translate_sql(cumsum(mpg), con = con)
 #' translate_sql(cumsum(mpg), vars_order = "mpg", con = con)
-translate_sql <- function(...,
-                          con,
-                          vars_group = NULL,
-                          vars_order = NULL,
-                          vars_frame = NULL,
-                          window = TRUE) {
+translate_sql <- function(
+  ...,
+  con,
+  vars_group = NULL,
+  vars_order = NULL,
+  vars_frame = NULL,
+  window = TRUE
+) {
   translate_sql_(
-    quos(...),
+    exprs(...),
     con = con,
-    vars_group = vars_group,
-    vars_order = vars_order,
-    vars_frame = vars_frame,
-    window = window
-  )
-}
-
-test_translate_sql <- function(...,
-                          con = NULL,
-                          vars_group = NULL,
-                          vars_order = NULL,
-                          vars_frame = NULL,
-                          window = TRUE) {
-  translate_sql(
-    ...,
-    con = con %||% sql_current_con(),
     vars_group = vars_group,
     vars_order = vars_order,
     vars_frame = vars_frame,
@@ -100,13 +86,15 @@ test_translate_sql <- function(...,
 
 #' @export
 #' @rdname translate_sql
-translate_sql_ <- function(dots,
-                           con,
-                           vars_group = NULL,
-                           vars_order = NULL,
-                           vars_frame = NULL,
-                           window = TRUE,
-                           context = list()) {
+translate_sql_ <- function(
+  dots,
+  con,
+  vars_group = NULL,
+  vars_order = NULL,
+  vars_frame = NULL,
+  window = TRUE,
+  context = list()
+) {
   check_con(con)
 
   if (length(dots) == 0) {
@@ -140,10 +128,10 @@ translate_sql_ <- function(dots,
 
   variant <- dbplyr_sql_translation(con)
   pieces <- lapply(dots, function(x) {
-    if (is_null(get_expr(x))) {
+    if (is_null(x)) {
       NULL
-    } else if (is_atomic(get_expr(x))) {
-      escape(get_expr(x), con = con)
+    } else if (is_atomic(x) || is.sql(x)) {
+      escape(x, con = con)
     } else {
       mask <- sql_data_mask(x, variant, con = con, window = window)
       escape(eval_tidy(x, mask), con = con)
@@ -153,17 +141,19 @@ translate_sql_ <- function(dots,
   sql(unlist(pieces))
 }
 
-sql_data_mask <- function(expr,
-                          variant,
-                          con,
-                          window = FALSE,
-                          strict = getOption("dplyr.strict_sql", FALSE)) {
+sql_data_mask <- function(
+  expr,
+  variant,
+  con,
+  window = FALSE,
+  strict = getOption("dplyr.strict_sql", FALSE)
+) {
   stopifnot(is.sql_variant(variant))
 
   # Default for unknown functions
   unknown <- setdiff(all_calls(expr), names(variant))
   op <- if (strict) missing_op else default_op
-  top_env <- ceply(unknown, op, parent = empty_env(), env = get_env(expr))
+  top_env <- ceply(unknown, op, parent = empty_env())
 
   # Known R -> SQL functions
   special_calls <- copy_env(variant$scalar, parent = top_env)
@@ -185,47 +175,54 @@ sql_data_mask <- function(expr,
     if (env_has(special_calls2, name) || env_has(special_calls, name)) {
       env_get(special_calls2, name, inherit = TRUE)
     } else {
-      cli_abort("No known SQL translation", call = call2(call2("::", sym(pkg), sym(name))))
+      cli_abort(
+        "No known SQL translation",
+        call = call2(call2("::", sym(pkg), sym(name)))
+      )
     }
-  }
-
-  special_calls2$sql <- function(...) {
-    dots <- exprs(...)
-
-    env <- get_env(expr)
-    dots <- purrr::map(dots, eval_tidy, env = env)
-
-    exec(sql, !!!dots)
   }
 
   # Existing symbols in expression
   names <- all_names(expr)
-  idents <- lapply(names, ident)
-  name_env <- ceply(idents, escape, con = con, parent = special_calls2)
+  idents <- set_names(lapply(names, ident), names)
+  name_env <- list2env(idents, parent = special_calls2)
 
-  # Known sql expressions
-  symbol_env <- env_clone(base_symbols, parent = name_env)
-
-  new_data_mask(symbol_env, top_env)
+  new_data_mask(name_env, top_env)
 }
 
 is_infix_base <- function(x) {
-  x %in% c("::", "$", "@", "^", "*", "/", "+", "-", ">", ">=", "<", "<=",
-    "==", "!=", "!", "&", "&&", "|", "||", "~", "<-", "<<-")
+  x %in%
+    c(
+      "::",
+      "$",
+      "@",
+      "^",
+      "*",
+      "/",
+      "+",
+      "-",
+      ">",
+      ">=",
+      "<",
+      "<=",
+      "==",
+      "!=",
+      "!",
+      "&",
+      "&&",
+      "|",
+      "||",
+      "~",
+      "<-",
+      "<<-"
+    )
 }
 is_infix_user <- function(x) {
   grepl("^%.*%$", x)
 }
 
-default_op <- function(x, env) {
+default_op <- function(x) {
   check_string(x)
-
-  # Check for shiny reactives; these are zero-arg functions
-  # so need special handling to give a useful error
-  obj <- env_get(env, x, default = NULL, inherit = TRUE)
-  if (inherits(obj, "reactive")) {
-    error_embed("a shiny reactive", "foo()")
-  }
 
   if (is_infix_base(x)) {
     sql_infix(x)
@@ -237,7 +234,7 @@ default_op <- function(x, env) {
   }
 }
 
-missing_op <- function(x, env) {
+missing_op <- function(x) {
   force(x)
 
   function(...) {
@@ -252,24 +249,30 @@ missing_op <- function(x, env) {
 }
 
 all_calls <- function(x) {
-  if (is_quosure(x)) return(all_calls(quo_get_expr(x)))
-  if (!is.call(x)) return(NULL)
+  if (!is.call(x)) {
+    return(NULL)
+  }
 
   fname <- as.character(x[[1]])
   unique(c(fname, unlist(lapply(x[-1], all_calls), use.names = FALSE)))
 }
 
 all_names <- function(x) {
-  if (is.name(x)) return(as.character(x))
-  if (is_quosure(x)) return(all_names(quo_get_expr(x)))
-  if (!is.call(x)) return(NULL)
+  if (is.name(x)) {
+    return(as.character(x))
+  }
+  if (!is.call(x)) {
+    return(NULL)
+  }
 
   unique(unlist(lapply(x[-1], all_names), use.names = FALSE))
 }
 
 # character vector -> environment
 ceply <- function(x, f, ..., parent = parent.frame()) {
-  if (length(x) == 0) return(new.env(parent = parent))
+  if (length(x) == 0) {
+    return(new.env(parent = parent))
+  }
   l <- lapply(x, f, ...)
   names(l) <- x
   list2env(l, parent = parent)

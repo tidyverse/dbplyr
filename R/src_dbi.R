@@ -1,102 +1,73 @@
-#' Use dplyr verbs with a remote database table
+#' Create a lazy query backed by a database
 #'
-#' All data manipulation on SQL tbls are lazy: they will not actually
-#' run the query or retrieve the data unless you ask for it: they all return
-#' a new `tbl_dbi` object. Use [compute()] to run the query and save the
-#' results in a temporary table in the database, or use [collect()] to retrieve the
-#' results to R. You can see the query with [show_query()].
+#' @description
+#' Use `tbl()` to create a SQL query backed by a database. Manipulating this
+#' object with dplyr verbs then builds up a SQL query that will only be executed
+#' when you explicitly ask for it, either by printing the object, calling
+#' [collect()] to bring the data back to R or calling [compute()] to create a
+#' new table in the database. You can see the query without executing it with
+#' [show_query()].
 #'
-#' @details
-#' For best performance, the database should have an index on the variables
-#' that you are grouping by. Use [explain()] to check that the database is using
-#' the indexes that you expect.
+#' Learn more in `vignette("dbplyr")`.
 #'
-#' There is one verb that is not lazy: [do()] is eager because it must pull
-#' the data into R.
-#'
-#' @param src A `DBIConnection` object produced by `DBI::dbConnect()`.
+#' @param src A `DBIConnection` object produced by [DBI::dbConnect()].
 #' @param from Either a table identifier or a literal [sql()] string.
 #'
-#'   Use a string to identify a table in the current schema/catalog. We
-#'   recommend using `I()` to identify a table outside the default catalog or
-#'   schema, e.g. `I("schema.table")` or `I("catalog.schema.table")`. You can
-#'   also use [in_schema()]/[in_catalog()] or [DBI::Id()].
+#'   Use a string to identify a table in the current schema/catalog or
+#'   `I()` for a table elsewhere, e.g. `I("schema.table")` or
+#'   `I("catalog.schema.table")`. For backward compatibility, you can also use
+#'   [in_schema()]/[in_catalog()] or [DBI::Id()].
+#' @param vars Optionally, provide a character vector of column names. If
+#'   not supplied, will be retrieved from the database by running a simple
+#'   query. This argument is mainly useful for better performance when creating
+#'   many `tbl`s with known variables.
 #' @param ... Passed on to [tbl_sql()]
 #' @export
 #' @examples
 #' library(dplyr)
 #'
-#' # Connect to a temporary in-memory SQLite database
+#' # Connect to a temporary in-memory SQLite database and add some data
 #' con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-#'
-#' # Add some data
 #' copy_to(con, mtcars)
-#' DBI::dbListTables(con)
 #'
 #' # To retrieve a single table from a source, use `tbl()`
-#' con %>% tbl("mtcars")
+#' mtcars_db <- con |> tbl("mtcars")
+#' mtcars_db
 #'
 #' # Use `I()` for qualified table names
-#' con %>% tbl(I("temp.mtcars")) %>% head(1)
+#' con |> tbl(I("temp.mtcars")) |> head(1)
 #'
-#' # You can also use pass raw SQL if you want a more sophisticated query
-#' con %>% tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))
+#' # You can also pass raw SQL if you want a more sophisticated query
+#' con |> tbl(sql("SELECT * FROM mtcars WHERE cyl = 8")) |> head(1)
 #'
-#' # If you just want a temporary in-memory database, use src_memdb()
-#' src2 <- src_memdb()
-#'
-#' # To show off the full features of dplyr's database integration,
-#' # we'll use the Lahman database. lahman_sqlite() takes care of
-#' # creating the database.
-#'
-#' if (requireNamespace("Lahman", quietly = TRUE)) {
-#' batting <- copy_to(con, Lahman::Batting)
-#' batting
-#'
-#' # Basic data manipulation verbs work in the same way as with a tibble
-#' batting %>% filter(yearID > 2005, G > 130)
-#' batting %>% select(playerID:lgID)
-#' batting %>% arrange(playerID, desc(yearID))
-#' batting %>% summarise(G = mean(G), n = n())
-#'
-#' # There are a few exceptions. For example, databases give integer results
-#' # when dividing one integer by another. Multiply by 1 to fix the problem
-#' batting %>%
-#'   select(playerID:lgID, AB, R, G) %>%
-#'   mutate(
-#'    R_per_game1 = R / G,
-#'    R_per_game2 = R * 1.0 / G
-#'  )
-#'
-#' # All operations are lazy: they don't do anything until you request the
-#' # data, either by `print()`ing it (which shows the first ten rows),
-#' # or by `collect()`ing the results locally.
-#' system.time(recent <- filter(batting, yearID > 2010))
-#' system.time(collect(recent))
-#'
-#' # You can see the query that dplyr creates with show_query()
-#' batting %>%
-#'   filter(G > 0) %>%
-#'   group_by(playerID) %>%
-#'   summarise(n = n()) %>%
+#' # But in most cases, you'll rely on dbplyr to construct the SQL:
+#' mtcars_db |>
+#'   filter(vs == 1) |>
+#'   summarise(mpg = mean(mpg, na.rm = TRUE), .by = cyl) |>
 #'   show_query()
-#' }
+#'
 #' @importFrom dplyr tbl
 #' @aliases tbl_dbi
-tbl.src_dbi <- function(src, from, ...) {
-  subclass <- class(src$con)[[1]] # prefix added by dplyr::make_tbl
-  tbl_sql(c(subclass, "dbi"), src = src, from = from, ...)
+tbl.src_dbi <- function(src, from, vars = NULL, ...) {
+  check_dots_empty()
+  db_table(src$con, from, vars = vars)
 }
 
-# Internal calls to `tbl()` should be avoided in favor of tbl_src_dbi().
-# The former may query the database for column names if `vars` is omitted,
-# the latter always requires `vars`.
-tbl_src_dbi <- function(src, from, vars) {
-  force(vars)
-  tbl(src, from, vars = vars)
+db_table <- function(
+  con,
+  from,
+  vars = NULL,
+  subclass = NULL,
+  call = caller_env()
+) {
+  check_con(con)
+  source <- as_table_source(from, con = con, error_call = call)
+
+  check_character(vars, allow_null = TRUE, call = call)
+  vars <- vars %||% find_variables(con, from, call = call)
+
+  new_tbl_sql(con = con, source = source, vars = vars, subclass = subclass)
 }
-
-
 
 #' Database src
 #'
@@ -149,7 +120,7 @@ db_disconnector <- function(con, quiet = FALSE) {
     if (!quiet) {
       message("Auto-disconnecting ", class(con)[[1]])
     }
-    dbDisconnect(con)
+    DBI::dbDisconnect(con)
   })
   environment()
 }

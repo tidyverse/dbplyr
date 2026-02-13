@@ -1,21 +1,50 @@
-# print method doesn't change unexpectedly
+# multi_join where clause uses qualified column names
 
     Code
-      left_join(lf1, lf2, by = "x") %>% left_join(lf3, by = "x") %>% sql_build()
+      filter(left_join(lf1, lf2, by = "x"), y > 1)
     Output
-      <SQL JOINS>
-      X:
-        <table_path> `lf1`
-      Type: left
-      By:
-        x-x
-      Y:
-        <table_path> `lf2`
-      Type: left
-      By:
-        x-x
-      Y:
-        <table_path> `lf3`
+      <SQL>
+      SELECT "df_LHS".*, "z"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" = "df_RHS"."x")
+      WHERE ("df_LHS"."y" > 1.0)
+
+---
+
+    Code
+      filter(left_join(lf1, lf2, by = "x"), z > 1)
+    Output
+      <SQL>
+      SELECT "df_LHS".*, "z"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" = "df_RHS"."x")
+      WHERE ("df_RHS"."z" > 1.0)
+
+---
+
+    Code
+      filter(left_join(lf1, lf2, by = "x"), y > 1, z < 5)
+    Output
+      <SQL>
+      SELECT "df_LHS".*, "z"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" = "df_RHS"."x")
+      WHERE ("df_LHS"."y" > 1.0) AND ("df_RHS"."z" < 5.0)
+
+---
+
+    Code
+      filter(left_join(lf1, lf3, by = "x"), y.x > 1)
+    Output
+      <SQL>
+      SELECT "df_LHS"."x" AS "x", "df_LHS"."y" AS "y.x", "df_RHS"."y" AS "y.y"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" = "df_RHS"."x")
+      WHERE ("df_LHS"."y" > 1.0)
 
 # generated sql doesn't change unexpectedly
 
@@ -25,10 +54,10 @@
       Joining with `by = join_by(x, y)`
     Output
       <SQL>
-      SELECT `df_LHS`.*
-      FROM `df` AS `df_LHS`
-      INNER JOIN `df` AS `df_RHS`
-        ON (`df_LHS`.`x` = `df_RHS`.`x` AND `df_LHS`.`y` = `df_RHS`.`y`)
+      SELECT "df_LHS".*
+      FROM "df" AS "df_LHS"
+      INNER JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" = "df_RHS"."x" AND "df_LHS"."y" = "df_RHS"."y")
 
 ---
 
@@ -38,51 +67,21 @@
       Joining with `by = join_by(x, y)`
     Output
       <SQL>
-      SELECT `df_LHS`.*
-      FROM `df` AS `df_LHS`
-      LEFT JOIN `df` AS `df_RHS`
-        ON (`df_LHS`.`x` = `df_RHS`.`x` AND `df_LHS`.`y` = `df_RHS`.`y`)
-
----
-
-    Code
-      right_join(lf, lf)
-    Message
-      Joining with `by = join_by(x, y)`
-    Output
-      <SQL>
-      SELECT `df_RHS`.*
-      FROM `df` AS `df_LHS`
-      RIGHT JOIN `df` AS `df_RHS`
-        ON (`df_LHS`.`x` = `df_RHS`.`x` AND `df_LHS`.`y` = `df_RHS`.`y`)
-
----
-
-    Code
-      full_join(lf, lf)
-    Message
-      Joining with `by = join_by(x, y)`
-    Output
-      <SQL>
-      SELECT
-        COALESCE(`df_LHS`.`x`, `df_RHS`.`x`) AS `x`,
-        COALESCE(`df_LHS`.`y`, `df_RHS`.`y`) AS `y`
-      FROM `df` AS `df_LHS`
-      FULL JOIN `df` AS `df_RHS`
-        ON (`df_LHS`.`x` = `df_RHS`.`x` AND `df_LHS`.`y` = `df_RHS`.`y`)
+      SELECT "df_LHS".*
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" = "df_RHS"."x" AND "df_LHS"."y" = "df_RHS"."y")
 
 # only disambiguates shared variables
 
     Code
-      left_join(lf1, lf2)
-    Message
-      Joining with `by = join_by(x)`
+      left_join(lf1, lf2, by = c(x = "x"))
     Output
       <SQL>
-      SELECT `df_LHS`.*, `z`
-      FROM `df` AS `df_LHS`
-      LEFT JOIN `df` AS `df_RHS`
-        ON (`df_LHS`.`x` = `df_RHS`.`x`)
+      SELECT "df_LHS".*, "z"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" = "df_RHS"."x")
 
 ---
 
@@ -90,10 +89,10 @@
       left_join(lf1, lf2, by = c(y = "z"))
     Output
       <SQL>
-      SELECT `df_LHS`.`x` AS `x.x`, `y`, `df_RHS`.`x` AS `x.y`
-      FROM `df` AS `df_LHS`
-      LEFT JOIN `df` AS `df_RHS`
-        ON (`df_LHS`.`y` = `df_RHS`.`z`)
+      SELECT "df_LHS"."x" AS "x.x", "y", "df_RHS"."x" AS "x.y"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."y" = "df_RHS"."z")
 
 # disambiguate variables that only differ in case
 
@@ -101,24 +100,10 @@
       left_join(lf1, lf2, by = "y")
     Output
       <SQL>
-      SELECT `df_LHS`.*, `df_RHS`.`X` AS `X`
-      FROM `df` AS `df_LHS`
-      LEFT JOIN `df` AS `df_RHS`
-        ON (`df_LHS`.`y` = `df_RHS`.`y`)
-
----
-
-    Code
-      full_join(lf1, lf2, by = "y")
-    Output
-      <SQL>
-      SELECT
-        `df_LHS`.`x` AS `x`,
-        COALESCE(`df_LHS`.`y`, `df_RHS`.`y`) AS `y`,
-        `df_RHS`.`X` AS `X`
-      FROM `df` AS `df_LHS`
-      FULL JOIN `df` AS `df_RHS`
-        ON (`df_LHS`.`y` = `df_RHS`.`y`)
+      SELECT "df_LHS".*, "df_RHS"."X" AS "X"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."y" = "df_RHS"."y")
 
 # sql_on query doesn't change unexpectedly
 
@@ -126,9 +111,9 @@
       inner_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
-      FROM `df` AS `LHS`
-      INNER JOIN `df` AS `RHS`
+      SELECT "LHS"."x" AS "x.x", "y", "RHS"."x" AS "x.y", "z"
+      FROM "df" AS "LHS"
+      INNER JOIN "df" AS "RHS"
         ON (LHS.y < RHS.z)
 
 ---
@@ -137,56 +122,8 @@
       left_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
-      FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
+      SELECT "LHS"."x" AS "x.x", "y", "RHS"."x" AS "x.y", "z"
+      FROM "df" AS "LHS"
+      LEFT JOIN "df" AS "RHS"
         ON (LHS.y < RHS.z)
-
----
-
-    Code
-      right_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
-    Output
-      <SQL>
-      SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
-      FROM `df` AS `LHS`
-      RIGHT JOIN `df` AS `RHS`
-        ON (LHS.y < RHS.z)
-
----
-
-    Code
-      full_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
-    Output
-      <SQL>
-      SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
-      FROM `df` AS `LHS`
-      FULL JOIN `df` AS `RHS`
-        ON (LHS.y < RHS.z)
-
----
-
-    Code
-      semi_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
-    Output
-      <SQL>
-      SELECT `LHS`.*
-      FROM `df` AS `LHS`
-      WHERE EXISTS (
-        SELECT 1 FROM `df` AS `RHS`
-        WHERE (LHS.y < RHS.z)
-      )
-
----
-
-    Code
-      anti_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
-    Output
-      <SQL>
-      SELECT `LHS`.*
-      FROM `df` AS `LHS`
-      WHERE NOT EXISTS (
-        SELECT 1 FROM `df` AS `RHS`
-        WHERE (LHS.y < RHS.z)
-      )
 

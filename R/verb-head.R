@@ -10,6 +10,8 @@
 #' means is subject to interpretation. Most databases will respect ordering
 #' performed with `arrange()`, but it's not guaranteed. `tail()` is not
 #' supported at all because the situation is even murkier for the "last" rows.
+#' Additionally, `LIMIT` clauses can not generally appear in subqueries, which
+#' means that you should use `head()` as late as possible in your pipelines.
 #'
 #' @param x A lazy data frame backed by a database query.
 #' @param n Number of rows to return
@@ -20,34 +22,34 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(x = 1:100)
-#' db %>% head() %>% show_query()
+#' db |> head() |> show_query()
 #'
 #' # Pretend we have data in a SQL server database
-#' db2 <- lazy_frame(x = 1:100, con = simulate_mssql())
-#' db2 %>% head() %>% show_query()
+#' db2 <- lazy_frame(x = 1:100, con = dialect_mssql())
+#' db2 |> head() |> show_query()
 head.tbl_lazy <- function(x, n = 6L, ...) {
   if (!is.numeric(n) || length(n) != 1L || n < 0) {
     cli_abort("{.arg n} must be a non-negative integer")
   }
   n <- trunc(n)
 
-  x$lazy_query <- add_head(x, n)
+  x$lazy_query <- add_head(x$lazy_query, n)
   x
 }
 
-add_head <- function(x, n) {
-  lazy_query <- x$lazy_query
-  if (!is_lazy_select_query(lazy_query)) {
-    lazy_query <- lazy_select_query(
-      x = lazy_query,
-      limit = n
-    )
-
-    return(lazy_query)
+add_head <- function(lazy_query, n) {
+  if (can_inline_head(lazy_query)) {
+    lazy_query$limit <- min(lazy_query$limit, n)
+    lazy_query
+  } else {
+    lazy_select_query(x = lazy_query, limit = n)
   }
+}
 
-  lazy_query$limit <- min(lazy_query$limit, n)
-  lazy_query
+# head() modifies the LIMIT clause
+# LIMIT happens last so can always inline
+can_inline_head <- function(lazy_query) {
+  is_lazy_select_query(lazy_query)
 }
 
 #' @export

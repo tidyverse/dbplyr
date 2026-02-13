@@ -1,65 +1,75 @@
-#' Generate SQL expression for window functions
+#' SQL helpers for window functions
 #'
-#' `win_over()` makes it easy to generate the window function specification.
-#' `win_absent()`, `win_rank()`, `win_aggregate()`, and `win_cumulative()`
-#' provide helpers for constructing common types of window functions.
-#' `win_current_group()` and `win_current_order()` allow you to access
-#' the grouping and order context set up by [group_by()] and [arrange()].
+#' @description
+#' These functions help you create custom window SQL translations when
+#' implementing a new backend. They are typically used within [sql_translator()]
+#' to define how R window functions should be translated to SQL.
 #'
-#' @param expr The window expression
-#' @param partition Variables to partition over
-#' @param order Variables to order by
+#' * `win_over()` makes it easy to generate the window function specification.
+#' * `win_absent()`, `win_rank()`, `win_aggregate()`, and `win_cumulative()`
+#'   provide helpers for constructing common types of window functions.
+#' * `win_current_group()` and `win_current_order()` allow you to access
+#'   the grouping and order context set up by [group_by()] and [arrange()].
+#'
+#' @param expr The window expression.
+#' @param partition Variables to partition over.
+#' @param order Variables to order by.
 #' @param frame A numeric vector of length two defining the frame.
-#' @param f The name of an sql function as a string
-#' @param empty_order A logical value indicating whether to order by NULL if `order` is not specified
+#' @param f The name of an SQL function as a string.
+#' @param empty_order A logical value indicating whether to order by NULL if
+#'   `order` is not specified.
+#' @param con A [sql_dialect] object or database connection. Connections are
+#'   supported for backward compatibility.
+#' @family SQL translation helpers
+#' @name sql_translation_window
 #' @export
-#' @keywords internal
 #' @examples
-#' con <- simulate_dbi()
+#' con <- dialect_ansi()
 #'
 #' win_over(sql("avg(x)"), con = con)
 #' win_over(sql("avg(x)"), "y", con = con)
 #' win_over(sql("avg(x)"), order = "y", con = con)
 #' win_over(sql("avg(x)"), order = c("x", "y"), con = con)
 #' win_over(sql("avg(x)"), frame = c(-Inf, 0), order = "y", con = con)
-win_over <- function(expr,
-                     partition = NULL,
-                     order = NULL,
-                     frame = NULL,
-                     con = sql_current_con()) {
+win_over <- function(
+  expr,
+  partition = NULL,
+  order = NULL,
+  frame = NULL,
+  con = sql_current_con()
+) {
   if (length(partition) > 0) {
-    partition <- as.sql(partition, con = con)
-    partition <- glue_sql2(con, "PARTITION BY {.val partition*}")
+    partition <- as_ident_or_sql(partition)
+    partition <- sql_glue2(con, "PARTITION BY {partition}")
   }
 
   if (length(order) > 0) {
-    order <- as.sql(order, con = con)
-    order <- glue_sql2(con, "ORDER BY {.val order*}")
+    order <- as_ident_or_sql(order)
+    order <- sql_glue2(con, "ORDER BY {order}")
   }
   if (length(frame) > 0) {
     if (length(order) == 0) {
       cli::cli_warn(c(
         "Windowed expression `{expr}` does not have explicit order.",
-        i = "Please use {.fun arrange} or {.fun window_order} to make deterministic."
+        i = "Please use {.fun arrange}, {.fun window_order}, or {.arg .order} to make deterministic."
       ))
     }
 
-    if (is.numeric(frame)) frame <- rows(frame[1], frame[2])
-    frame <- glue_sql2(con, "ROWS {frame}")
+    if (is.numeric(frame)) {
+      frame <- rows(frame[1], frame[2])
+    }
+    frame <- sql_glue2(con, "ROWS {.sql frame}")
   }
 
-  over <- sql_vector(
-    purrr::compact(list(partition, order, frame)),
-    parens = TRUE,
-    con = con
-  )
+  over <- sql_collapse(c(partition, order, frame), parens = TRUE)
 
   if (sql_context$register_windows) {
     win_register(over)
   } else {
     over <- win_get(over, con)
   }
-  glue_sql2(con, "{.val expr} OVER {.val over}")
+
+  sql_glue2(con, "{expr} OVER {over}")
 }
 
 win_register_activate <- function() {
@@ -71,7 +81,7 @@ win_register_deactivate <- function() {
 }
 
 win_register <- function(over) {
-  sql_context$windows <- append(sql_context$windows, over)
+  sql_context$windows <- sql(c(sql_context$windows, over))
 }
 
 win_register_names <- function() {
@@ -79,11 +89,11 @@ win_register_names <- function() {
 
   window_count <- vctrs::vec_count(windows, sort = "location")
   window_count <- vctrs::vec_slice(window_count, window_count$count > 1)
-  if (nrow(window_count) > 0) {
-    window_count$name <- ident(paste0("win", seq_along(window_count$key)))
-  } else {
-    window_count$name <- ident()
-  }
+  window_count$name <- paste0(
+    "win",
+    seq_along(window_count$key),
+    recycle0 = TRUE
+  )
   window_count$key <- window_count$key
 
   sql_context$window_names <- window_count
@@ -95,7 +105,7 @@ win_get <- function(over, con) {
 
   if (vctrs::vec_in(over, windows$key)) {
     id <- vctrs::vec_match(over, windows$key)
-    ident(windows$name[[id]])
+    sql_escape_ident(con, windows$name[[id]])
   } else {
     over
   }
@@ -103,50 +113,69 @@ win_get <- function(over, con) {
 
 win_reset <- function() {
   sql_context$window_names <- NULL
-  sql_context$windows <- list()
+  sql_context$windows <- sql()
 }
 
 rows <- function(from = -Inf, to = 0) {
-  if (from >= to) cli_abort("{.arg from} ({from}) must be less than {.arg to} ({to})")
+  if (from >= to) {
+    cli_abort("{.arg from} ({from}) must be less than {.arg to} ({to})")
+  }
 
   dir <- function(x) if (x < 0) "PRECEDING" else "FOLLOWING"
   val <- function(x) if (is.finite(x)) as.integer(abs(x)) else "UNBOUNDED"
   bound <- function(x) {
-    if (x == 0) return("CURRENT ROW")
-    paste(val(x), dir(x))
+    if (x == 0) {
+      sql("CURRENT ROW")
+    } else {
+      sql(paste(val(x), dir(x)))
+    }
   }
 
   if (to == 0) {
     sql(bound(from))
   } else {
-    glue_sql2(sql_current_con(), "BETWEEN {bound(from)} AND {bound(to)}")
+    sql_glue("BETWEEN {bound(from)} AND {bound(to)}")
   }
 }
 
-#' @rdname win_over
+#' @rdname sql_translation_window
 #' @export
 win_rank <- function(f, empty_order = FALSE) {
-  force(f)
   check_bool(empty_order)
 
   function(order = NULL) {
     group <- win_current_group()
-    order <- unwrap_order_expr({{ order }}, f = f)
+    order <- unwrap_order_expr(enexpr(order), f = f)
     con <- sql_current_con()
 
     if (!is_null(order)) {
       order_over <- translate_sql_(order, con = con)
 
-      order_symbols <- purrr::map_if(order, ~ quo_is_call(.x, "desc", n = 1L), ~ call_args(.x)[[1L]])
+      # Ensuring NULLs get a NULL rank in SQL requires two pieces:
+      # * We need to ensure that a NULL gets a rank of NULL. We can't do this
+      #   inside of RANK() so we use a CASE WHEN outside of it
+      # * We need to ensure those NULLs don't affect the ranks of other
+      #   values. We do this by PARTITIONING the NULLs into their own bucket
+      #   (NULLS LAST is not yet widely supported)
 
-      is_na_exprs <- purrr::map(order_symbols, ~ expr(is.na(!!.x)))
-      any_na_expr <- purrr::reduce(is_na_exprs, ~ call2("|", .x, .y))
+      order_symbols <- purrr::map_if(
+        order,
+        \(x) is_call(x, "desc", n = 1L),
+        \(x) call_args(x)[[1L]]
+      )
 
-      cond <- translate_sql((case_when(!!any_na_expr ~ 1L, TRUE ~ 0L)), con = con)
+      is_na_exprs <- purrr::map(order_symbols, \(sym) expr(is.na(!!sym)))
+      is_missing <- purrr::reduce(is_na_exprs, function(lhs, rhs) {
+        call2("|", lhs, rhs)
+      })
+      # e.g. X IS NULL OR Y IS NULL
+      not_missing <- call2("!", is_missing)
+
+      cond <- translate_sql(
+        (case_when(!!is_missing ~ 1L, TRUE ~ 0L)),
+        con = con
+      )
       group <- sql(group, cond)
-
-      not_is_na_exprs <- purrr::map(order_symbols, ~ expr(!is.na(!!.x)))
-      no_na_expr <- purrr::reduce(not_is_na_exprs, ~ call2("&", .x, .y))
     } else {
       order_over <- win_current_order()
       if (empty_order & is_empty(order_over)) {
@@ -158,7 +187,7 @@ win_rank <- function(f, empty_order = FALSE) {
     }
 
     rank_sql <- win_over(
-      sql(glue("{f}()")),
+      sql_glue("{.sql f}()"),
       partition = group,
       order = order_over,
       frame = win_current_frame()
@@ -167,21 +196,20 @@ win_rank <- function(f, empty_order = FALSE) {
     if (is_null(order)) {
       rank_sql
     } else {
-      translate_sql(case_when(!!no_na_expr ~ !!rank_sql), con = con)
+      translate_sql(case_when(!!not_missing ~ !!rank_sql), con = con)
     }
   }
 }
 
-#' @rdname win_over
+#' @rdname sql_translation_window
 #' @export
 win_aggregate <- function(f) {
-  force(f)
   function(x, na.rm = FALSE) {
-    check_na_rm(na.rm)
+    sql_check_na_rm(na.rm)
     frame <- win_current_frame()
 
     win_over(
-      glue_sql2(sql_current_con(), "{f}({.val x})"),
+      sql_glue("{.sql f}({x})"),
       partition = win_current_group(),
       order = if (!is.null(frame)) win_current_order(),
       frame = frame
@@ -189,15 +217,14 @@ win_aggregate <- function(f) {
   }
 }
 
-#' @rdname win_over
+#' @rdname sql_translation_window
 #' @export
 win_aggregate_2 <- function(f) {
-
   function(x, y) {
     frame <- win_current_frame()
 
     win_over(
-      glue_sql2(sql_current_con(), "{f}({.val x}, {.val y})"),
+      sql_glue("{.sql f}({x}, {y})"),
       partition = win_current_group(),
       order = if (!is.null(frame)) win_current_order(),
       frame = frame
@@ -205,19 +232,18 @@ win_aggregate_2 <- function(f) {
   }
 }
 
-#' @rdname win_over
+#' @rdname sql_translation_window
 #' @usage NULL
 #' @export
 win_recycled <- win_aggregate
 
 
-#' @rdname win_over
+#' @rdname sql_translation_window
 #' @export
 win_cumulative <- function(f) {
-  force(f)
   function(x, order = NULL) {
     win_over(
-      glue_sql2(sql_current_con(), "{f}({.val x})"),
+      sql_glue("{.sql f}({x})"),
       partition = win_current_group(),
       order = order %||% win_current_order(),
       frame = c(-Inf, 0)
@@ -225,12 +251,14 @@ win_cumulative <- function(f) {
   }
 }
 
-sql_nth <- function(x,
-                    n,
-                    order_by = NULL,
-                    na_rm = FALSE,
-                    ignore_nulls = c("inside", "outside", "bool"),
-                    error_call = caller_env()) {
+sql_nth <- function(
+  x,
+  n,
+  order_by = NULL,
+  na_rm = FALSE,
+  ignore_nulls = c("inside", "outside", "bool"),
+  error_call = caller_env()
+) {
   check_bool(na_rm, call = error_call)
   ignore_nulls <- arg_match(ignore_nulls, error_call = error_call)
   con <- sql_current_con()
@@ -238,39 +266,39 @@ sql_nth <- function(x,
   frame <- win_current_frame()
   args <- translate_sql(!!x, con = con)
   if (n == 1) {
-    sql_f <- "FIRST_VALUE"
+    f <- "FIRST_VALUE"
   } else if (is.infinite(n) && n > 0) {
-    sql_f <- "LAST_VALUE"
+    f <- "LAST_VALUE"
     frame <- frame %||% c(-Inf, Inf)
   } else {
-    sql_f <- "NTH_VALUE"
+    f <- "NTH_VALUE"
     if (is.numeric(n)) {
       n <- as.integer(n)
     }
-    args <- glue_sql2(con, "{args}, {.val n}")
+    args <- sql_glue2(con, "{args}, {n}")
   }
 
   if (na_rm) {
     if (ignore_nulls == "inside") {
-      sql_expr <- "{sql_f}({args} IGNORE NULLS)"
+      sql_expr <- "{.sql f}({args} IGNORE NULLS)"
     } else if (ignore_nulls == "outside") {
-      sql_expr <- "{sql_f}({args}) IGNORE NULLS"
+      sql_expr <- "{.sql f}({args}) IGNORE NULLS"
     } else {
-      sql_expr <- "{sql_f}({args}, TRUE)"
+      sql_expr <- "{.sql f}({args}, TRUE)"
     }
   } else {
-    sql_expr <- "{sql_f}({args})"
+    sql_expr <- "{.sql f}({args})"
   }
 
   win_over(
-    glue_sql2(con, sql_expr),
+    sql_glue2(con, sql_expr),
     win_current_group(),
     order_by %||% win_current_order(),
     frame
   )
 }
 
-#' @rdname win_over
+#' @rdname sql_translation_window
 #' @export
 win_absent <- function(f) {
   force(f)
@@ -304,12 +332,6 @@ set_current_con <- function(con) {
   invisible(old)
 }
 
-local_con <- function(con, env = parent.frame()) {
-  old <- set_current_con(con)
-  withr::defer(set_current_con(old), envir = env)
-  invisible()
-}
-
 set_win_current_group <- function(vars) {
   check_character(vars, allow_null = TRUE)
 
@@ -334,20 +356,30 @@ set_win_current_frame <- function(frame) {
   invisible(old)
 }
 #' @export
-#' @rdname win_over
+#' @rdname sql_translation_window
 win_current_group <- function() sql_context$group_by
 
 #' @export
-#' @rdname win_over
+#' @rdname sql_translation_window
 win_current_order <- function() sql_context$order_by
 
 #' @export
-#' @rdname win_over
+#' @rdname sql_translation_window
 win_current_frame <- function() sql_context$frame
 
 # Not exported, because you shouldn't need it
 sql_current_con <- function() {
   sql_context$con
+}
+
+local_con <- function(con, frame = caller_env()) {
+  check_con(con)
+
+  old <- sql_context$con
+  withr::defer(sql_context$con <- old, envir = frame)
+
+  sql_context$con <- con
+  invisible(old)
 }
 
 # Functions to manage information for special cases
@@ -371,15 +403,14 @@ uses_window_fun <- function(x, con, lq) {
   check_list(x)
 
   calls <- unlist(lapply(x, all_calls))
-  win_f <- ls(envir = dbplyr_sql_translation(con)$window)
-  any(calls %in% win_f)
+  any(calls %in% window_funs(con))
+}
+
+window_funs <- function(con = simulate_dbi()) {
+  env_names(sql_translation(con)$window)
 }
 
 is_aggregating <- function(x, non_group_cols, agg_f) {
-  if (is_quosure(x)) {
-    x <- quo_get_expr(x)
-  }
-
   if (is_symbol(x)) {
     xc <- as_name(x)
     return(!(xc %in% non_group_cols))
@@ -397,10 +428,6 @@ is_aggregating <- function(x, non_group_cols, agg_f) {
   return(TRUE)
 }
 
-common_window_funs <- function() {
-  ls(dbplyr_sql_translation(NULL)$window) # nocov
-}
-
 #' @noRd
 #' @examples
 #' translate_window_where(quote(1))
@@ -409,8 +436,11 @@ common_window_funs <- function() {
 #' translate_window_where(quote(x == 1 && y == 2))
 #' translate_window_where(quote(n() > 10))
 #' translate_window_where(quote(rank() > cumsum(AB)))
-translate_window_where <- function(expr, window_funs = common_window_funs()) {
-  switch(typeof(expr),
+translate_window_where <- function(expr, window_funs = NULL) {
+  window_funs <- window_funs %||% window_funs()
+
+  switch(
+    typeof(expr),
     logical = ,
     integer = ,
     double = ,
@@ -425,26 +455,29 @@ translate_window_where <- function(expr, window_funs = common_window_funs()) {
         name <- unique_column_name()
         window_where(sym(name), set_names(list(expr), name))
       } else {
-        args <- lapply(expr[-1], translate_window_where, window_funs = window_funs)
+        args <- lapply(
+          expr[-1],
+          translate_window_where,
+          window_funs = window_funs
+        )
         expr <- call2(node_car(expr), splice(lapply(args, "[[", "expr")))
 
         window_where(
           expr = expr,
           comp = unlist(lapply(args, "[[", "comp"), recursive = FALSE)
         )
-
       }
     },
     cli_abort("Unknown type: {typeof(expr)}") # nocov
   )
 }
 
-
 #' @noRd
 #' @examples
 #' translate_window_where_all(list(quote(x == 1), quote(n() > 2)))
 #' translate_window_where_all(list(quote(cumsum(x) == 10), quote(n() > 2)))
-translate_window_where_all <- function(x, window_funs = common_window_funs()) {
+translate_window_where_all <- function(x, window_funs = NULL) {
+  window_funs <- window_funs %||% window_funs()
   out <- lapply(x, translate_window_where, window_funs = window_funs)
 
   list(

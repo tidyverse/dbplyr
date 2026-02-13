@@ -13,26 +13,22 @@ test_that("can copy to from remote sources", {
   expect_equal(collect(df_3), df)
 })
 
-test_that("can round trip basic data frame", {
-  df <- test_frame(x = c(1, 10, 9, NA), y = letters[1:4])
-  expect_equal_tbls(df)
-})
-
-test_that("NAs in character fields handled by db sources (#2256)", {
-  df <- test_frame(
-    x = c("a", "aa", NA),
-    y = c(NA, "b", "bb"),
-    z = c("cc", NA, "c")
-  )
-  expect_equal_tbls(df)
-})
-
 test_that("only overwrite existing table if explicitly requested", {
   con <- local_sqlite_connection()
   local_db_table(con, data.frame(x = 1:5), "df")
 
   expect_error(copy_to(con, data.frame(x = 1), name = "df"), "exists")
   expect_silent(copy_to(con, data.frame(x = 1), name = "df", overwrite = TRUE))
+})
+
+test_that("overwrite flag works when copying *within* db sources", {
+  con <- local_sqlite_connection()
+  df <- copy_to(con, tibble(x = 1), "df", temporary = FALSE)
+  copy_to(con, df, "df2", temporary = FALSE)
+
+  df2 <- tibble(x = 2)
+  out <- copy_to(con, df2, name = "df2", temporary = FALSE, overwrite = TRUE)
+  expect_equal(collect(out), df2)
 })
 
 test_that("can create a new table in non-default schema", {
@@ -45,7 +41,13 @@ test_that("can create a new table in non-default schema", {
   expect_equal(collect(db1), df1)
 
   # And can overwrite
-  db2 <- copy_to(con, df2, in_schema("aux", "df"), temporary = FALSE, overwrite = TRUE)
+  db2 <- copy_to(
+    con,
+    df2,
+    in_schema("aux", "df"),
+    temporary = FALSE,
+    overwrite = TRUE
+  )
   expect_equal(collect(db2), df2)
 })
 
@@ -55,81 +57,53 @@ test_that("df must be a local or remote table", {
   expect_snapshot(error = TRUE, copy_to(con, list(x = 1), name = "df"))
 })
 
-# copy_inline() -----------------------------------------------------------
+# as_copy() ---------------------------------------------------------------
 
-test_that("can translate a table", {
-  con <- local_sqlite_connection()
-  df <- tibble(
-    lgl = TRUE,
-    int = 1L,
-    dbl = 1.5,
-    chr = "a",
-    date = as.Date("2020-01-01", tz = "UTC"),
-    dtt = as.POSIXct("2020-01-01 01:23:45", tz = "UTC")
-  )
-
-  expect_snapshot(copy_inline(con, df) %>% remote_query())
-
-  expect_equal(
-    copy_inline(con, df) %>% collect(),
-    tibble(
-      lgl = 1L,
-      int = 1L,
-      dbl = 1.5,
-      chr = "a",
-      date = "2020-01-01",
-      dtt = "2020-01-01T01:23:45Z"
-    )
-  )
-
-  expect_equal(
-    copy_inline(con, tibble(date = as.Date(c("2020-01-01", "2020-01-02"), tz = "UTC"))) %>%
-      collect(),
-    tibble(date = c("2020-01-01", "2020-01-02"))
-  )
+test_that("as_copy() converts TRUE/FALSE to enum", {
+  expect_equal(as_copy(TRUE), "temp-table")
+  expect_equal(as_copy(FALSE), "none")
 })
 
-test_that("can translate 1-column tables", {
-  con <- local_sqlite_connection()
-  expect_snapshot(
-    copy_inline(con, tibble(dbl = 1.5)) %>%
-      remote_query()
-  )
+test_that("as_copy() passes through valid strings", {
+  expect_equal(as_copy("none"), "none")
+  expect_equal(as_copy("temp-table"), "temp-table")
+  expect_equal(as_copy("inline"), "inline")
 })
 
-test_that("zero row table works", {
-  con <- local_sqlite_connection()
-  expect_snapshot(
-    copy_inline(con, tibble(dbl = numeric(), chr = character())) %>%
-      remote_query()
-  )
-
-  expect_snapshot(
-    copy_inline(con, tibble(dbl = numeric())) %>%
-      remote_query()
-  )
+test_that("as_copy() errors on invalid values", {
+  expect_snapshot(as_copy("other"), error = TRUE)
 })
 
-test_that("types argument works", {
-  con <- local_sqlite_connection()
+# dbplyr_auto_copy() ----------------------------------------------------
 
-  df <- tibble(x = "1", y = 2L)
-  expect_equal(copy_inline(con, df) %>% collect(), df)
-
-  expect_equal(
-    copy_inline(con, df, types = c(x = "INTEGER", y = "TEXT")) %>% collect(),
-    tibble(x = 1L, y = "2")
-  )
+test_that("dbplyr_auto_copy() returns y if same source", {
+  df <- local_memdb_frame(x = 1:3)
+  expect_identical(dbplyr_auto_copy(df, df, copy = FALSE), df)
 })
 
-test_that("checks inputs", {
-  con <- simulate_dbi()
+test_that("dbplyr_auto_copy() errors when copy = FALSE and different sources", {
+  df <- local_memdb_frame(x = 1:3)
+  local_df <- tibble(x = 1:3)
 
-  expect_snapshot({
-    (expect_error(copy_inline(con, tibble())))
-    (expect_error(copy_inline(con, lazy_frame(a = 1))))
+  expect_snapshot(dbplyr_auto_copy(df, local_df, copy = FALSE), error = TRUE)
+  expect_snapshot(dbplyr_auto_copy(df, local_df, copy = "none"), error = TRUE)
+})
 
-    (expect_error(copy_inline(con, tibble(a = 1), types = c(b = "bigint"))))
-    (expect_error(copy_inline(con, tibble(a = 1), types = c(b = 1))))
-  })
+test_that("dbplyr_auto_copy() with copy = TRUE copies to temp table", {
+  df <- local_memdb_frame(x = 1:3)
+  local_df <- tibble(x = 1:3)
+
+  out <- dbplyr_auto_copy(df, local_df, copy = TRUE)
+  expect_s3_class(out, "tbl_sql")
+  expect_equal(collect(out), local_df)
+})
+
+test_that("dbplyr_auto_copy() with copy = 'inline' uses copy_inline", {
+  df <- local_memdb_frame(x = 1:3)
+  local_df <- tibble(x = 1:3)
+
+  out <- dbplyr_auto_copy(df, local_df, copy = "inline")
+  expect_s3_class(out, "tbl_sql")
+  expect_s3_class(out$lazy_query, "lazy_base_values_query")
+  expect_equal(collect(out), local_df)
 })

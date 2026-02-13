@@ -1,42 +1,4 @@
-# print method doesn't change unexpectedly
-
-    Code
-      sql_build(union(lf1, lf2) %>% union_all(lf3))
-    Output
-        <SQL SELECT>
-        From:
-          <table_path> `lf1`
-        Select:   `lf1`.*, NULL
-      
-        UNION
-      
-        <SQL SELECT>
-        From:
-          <table_path> `lf2`
-        Select:   `x`, NULL, `z`
-      
-        UNION ALL
-      
-        <SQL SELECT>
-        From:
-          <table_path> `lf3`
-        Select:   `x`, NULL, `z`
-
 # generated sql doesn't change unexpectedly
-
-    Code
-      union(lf, lf)
-    Output
-      <SQL>
-      SELECT *
-      FROM `df`
-      
-      UNION
-      
-      SELECT *
-      FROM `df`
-
----
 
     Code
       setdiff(lf, lf)
@@ -44,12 +6,12 @@
       <SQL>
       (
         SELECT *
-        FROM `df`
+        FROM "df"
       )
       EXCEPT
       (
         SELECT *
-        FROM `df`
+        FROM "df"
       )
 
 ---
@@ -60,27 +22,13 @@
       <SQL>
       (
         SELECT *
-        FROM `df`
+        FROM "df"
       )
       INTERSECT
       (
         SELECT *
-        FROM `df`
+        FROM "df"
       )
-
----
-
-    Code
-      union(lf, lf, all = TRUE)
-    Output
-      <SQL>
-      SELECT *
-      FROM `df`
-      
-      UNION ALL
-      
-      SELECT *
-      FROM `df`
 
 ---
 
@@ -90,12 +38,12 @@
       <SQL>
       (
         SELECT *
-        FROM `df`
+        FROM "df"
       )
       EXCEPT ALL
       (
         SELECT *
-        FROM `df`
+        FROM "df"
       )
 
 ---
@@ -106,11 +54,11 @@
       <SQL>
       (
         SELECT *
-        FROM `df`
+        FROM "df"
       )
       INTERSECT ALL
       (
         SELECT *
-        FROM `df`
+        FROM "df"
       )
 

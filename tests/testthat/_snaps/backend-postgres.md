@@ -1,7 +1,7 @@
 # pasting translated correctly
 
     Code
-      test_translate_sql(paste0(x, collapse = ""), window = FALSE)
+      translate_sql(paste0(x, collapse = ""), con = con, window = FALSE)
     Condition
       Error in `check_collapse()`:
       ! `collapse` not supported in DB translation of `paste()`.
@@ -10,7 +10,7 @@
 # custom lubridate functions translated correctly
 
     Code
-      test_translate_sql(quarter(x, fiscal_start = 2))
+      translate_sql(quarter(x, fiscal_start = 2), con = con)
     Condition
       Error in `quarter()`:
       ! `fiscal_start = 2` isn't supported in PostgreSQL translation.
@@ -19,7 +19,7 @@
 # custom clock functions translated correctly
 
     Code
-      test_translate_sql(date_count_between(date_column_1, date_column_2, "year"))
+      translate_sql(date_count_between(date_column_1, date_column_2, "year"), con = con)
     Condition
       Error in `date_count_between()`:
       ! `precision = "year"` isn't supported on database backends.
@@ -28,7 +28,8 @@
 ---
 
     Code
-      test_translate_sql(date_count_between(date_column_1, date_column_2, "day", n = 5))
+      translate_sql(date_count_between(date_column_1, date_column_2, "day", n = 5),
+      con = con)
     Condition
       Error in `date_count_between()`:
       ! `n = 5` isn't supported on database backends.
@@ -37,7 +38,7 @@
 # difftime is translated correctly
 
     Code
-      test_translate_sql(difftime(start_date, end_date, units = "auto"))
+      translate_sql(difftime(start_date, end_date, units = "auto"), con = con)
     Condition
       Error in `difftime()`:
       ! `units = "auto"` isn't supported on database backends.
@@ -46,7 +47,7 @@
 ---
 
     Code
-      test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days"))
+      translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days"), con = con)
     Condition
       Error in `difftime()`:
       ! Argument `tz` isn't supported on database backends.
@@ -54,22 +55,22 @@
 # custom window functions translated correctly
 
     Code
-      test_translate_sql(quantile(x, 0.3, na.rm = TRUE), window = TRUE)
+      translate_sql(quantile(x, 0.3, na.rm = TRUE), con = con, window = TRUE)
     Condition
       Error in `quantile()`:
       ! Translation of `quantile()` in `mutate()` is not supported for PostgreSQL.
       i Use a combination of `summarise()` and `left_join()` instead:
-        `df %>% left_join(summarise(<col> = quantile(x, 0.3, na.rm = TRUE)))`.
+        `df |> left_join(summarise(<col> = quantile(x, 0.3, na.rm = TRUE)))`.
 
 ---
 
     Code
-      test_translate_sql(median(x, na.rm = TRUE), window = TRUE)
+      translate_sql(median(x, na.rm = TRUE), con = con, window = TRUE)
     Condition
       Error in `median()`:
       ! Translation of `median()` in `mutate()` is not supported for PostgreSQL.
       i Use a combination of `summarise()` and `left_join()` instead:
-        `df %>% left_join(summarise(<col> = median(x, na.rm = TRUE)))`.
+        `df |> left_join(summarise(<col> = median(x, na.rm = TRUE)))`.
 
 # custom SQL translation
 
@@ -77,26 +78,26 @@
       left_join(lf, lf, by = "x", na_matches = "na")
     Output
       <SQL>
-      SELECT `df_LHS`.`x` AS `x`
-      FROM `df` AS `df_LHS`
-      LEFT JOIN `df` AS `df_RHS`
-        ON (`df_LHS`.`x` IS NOT DISTINCT FROM `df_RHS`.`x`)
+      SELECT "df_LHS"."x" AS "x"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" IS NOT DISTINCT FROM "df_RHS"."x")
 
 ---
 
     Code
-      copy_inline(con, tibble(x = integer(), y = character())) %>% remote_query()
+      remote_query(copy_inline(con, tibble(x = integer(), y = character())))
     Output
-      <SQL> SELECT CAST(NULL AS INTEGER) AS `x`, CAST(NULL AS TEXT) AS `y`
+      <SQL> SELECT CAST(NULL AS INTEGER) AS "x", CAST(NULL AS TEXT) AS "y"
       WHERE (0 = 1)
 
 ---
 
     Code
-      copy_inline(con, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
+      remote_query(copy_inline(con, tibble(x = 1:2, y = letters[1:2])))
     Output
-      <SQL> SELECT CAST(`x` AS INTEGER) AS `x`, CAST(`y` AS TEXT) AS `y`
-      FROM (  VALUES (1, 'a'), (2, 'b')) AS drvd(`x`, `y`)
+      <SQL> SELECT CAST("x" AS INTEGER) AS "x", CAST("y" AS TEXT) AS "y"
+      FROM (  VALUES (1, 'a'), (2, 'b')) AS drvd("x", "y")
 
 # `sql_query_insert()` works
 
@@ -116,15 +117,15 @@
         lvl = 1), insert_cols = colnames(df_y), by = c("a", "b"), conflict = "ignore",
       returning_cols = c("a", b2 = "b"))
     Output
-      <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
+      <SQL> INSERT INTO "df_x" ("a", "b", "c", "d")
       SELECT *
       FROM (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
-      ) AS `...y`
-      ON CONFLICT (`a`, `b`)
+        SELECT "a", "b", "c" + 1.0 AS "c", "d"
+        FROM "df_y"
+      ) AS "...y"
+      ON CONFLICT ("a", "b")
       DO NOTHING
-      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
+      RETURNING "df_x"."a", "df_x"."b" AS "b2"
 
 # `sql_query_upsert()` with method = 'on_conflict' is correct
 
@@ -133,43 +134,30 @@
         lvl = 1), by = c("c", "d"), update_cols = c("a", "b"), returning_cols = c("a",
         b2 = "b"), method = "on_conflict")
     Output
-      <SQL> INSERT INTO `df_x` (`c`, `d`, `a`, `b`)
-      SELECT `c`, `d`, `a`, `b`
+      <SQL> INSERT INTO "df_x" ("c", "d", "a", "b")
+      SELECT "c", "d", "a", "b"
       FROM (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
-      ) AS `...y`
+        SELECT "a", "b", "c" + 1.0 AS "c", "d"
+        FROM "df_y"
+      ) AS "...y"
       WHERE true
-      ON CONFLICT  (`c`, `d`)
+      ON CONFLICT ("c", "d")
       DO UPDATE
-      SET `a` = `excluded`.`a`, `b` = `excluded`.`b`
-      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
+      SET "a" = "excluded"."a", "b" = "excluded"."b"
+      RETURNING "df_x"."a", "df_x"."b" AS "b2"
 
 # can explain
 
     Code
-      db %>% mutate(y = x + 1) %>% explain()
+      explain(mutate(db, y = x + 1))
     Output
       <SQL>
-      SELECT "test".*, "x" + 1.0 AS "y"
+      SELECT *, "x" + 1.0 AS "y"
       FROM "test"
       
       <PLAN>
                                                  QUERY PLAN
       1 Seq Scan on test  (cost=0.00..1.04 rows=3 width=36)
-
----
-
-    Code
-      db %>% mutate(y = x + 1) %>% explain(format = "json")
-    Output
-      <SQL>
-      SELECT "test".*, "x" + 1.0 AS "y"
-      FROM "test"
-      
-      <PLAN>
-                                                                                                                                                                                                                                                                                                QUERY PLAN
-      1 [\n  {\n    "Plan": {\n      "Node Type": "Seq Scan",\n      "Parallel Aware": false,\n      "Async Capable": false,\n      "Relation Name": "test",\n      "Alias": "test",\n      "Startup Cost": 0.00,\n      "Total Cost": 1.04,\n      "Plan Rows": 3,\n      "Plan Width": 36\n    }\n  }\n]
 
 # can insert with returning
 

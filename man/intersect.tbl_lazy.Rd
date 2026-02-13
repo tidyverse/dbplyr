@@ -7,28 +7,36 @@
 \alias{setdiff.tbl_lazy}
 \title{SQL set operations}
 \usage{
-\method{intersect}{tbl_lazy}(x, y, copy = FALSE, ..., all = FALSE)
+\method{intersect}{tbl_lazy}(x, y, copy = "none", ..., all = FALSE)
 
-\method{union}{tbl_lazy}(x, y, copy = FALSE, ..., all = FALSE)
+\method{union}{tbl_lazy}(x, y, copy = "none", ..., all = FALSE)
 
-\method{union_all}{tbl_lazy}(x, y, copy = FALSE, ...)
+\method{union_all}{tbl_lazy}(x, y, copy = "none", ...)
 
-\method{setdiff}{tbl_lazy}(x, y, copy = FALSE, ..., all = FALSE)
+\method{setdiff}{tbl_lazy}(x, y, copy = "none", ..., all = FALSE)
 }
 \arguments{
 \item{x, y}{A pair of lazy data frames backed by database queries.}
 
-\item{copy}{If \code{x} and \code{y} are not from the same data source,
-and \code{copy} is \code{TRUE}, then \code{y} will be copied into a
-temporary table in same database as \code{x}. \verb{*_join()} will automatically
-run \code{ANALYZE} on the created table in the hope that this will make
-you queries as efficient as possible by giving more data to the query
-planner.
+\item{copy}{If \code{x} and \code{y} are not from the same data source, \code{copy}
+controls how \code{y} is copied into the same source as \code{x}. There are three
+options:
+\itemize{
+\item \code{"none"}, the default, will error if \code{y} needs to be copied. This ensures
+that you don't accidentally copy large datasets from R to the database.
+\item \code{"temp-table"}: copies \code{y} into a temporary table in the same
+database as \code{x}. \verb{*_join()} will automatically run \code{ANALYZE} on the
+created table in the hope that this will make your queries as efficient
+as possible by giving more data to the query planner.
+\item \code{"inline"}: \code{y} will be inlined into the query using \code{\link[=copy_inline]{copy_inline()}}.
+This is should faster for small datasets and doesn't require write
+access.
+}
 
-This allows you to join tables across srcs, but it's potentially expensive
-operation so you must opt into it.}
+\code{TRUE} (\code{"temp-table"}) and \code{FALSE} (\code{"none"}) are also accepted for
+backward compatibility.}
 
-\item{...}{Not currently used; provided for future extensions.}
+\item{...}{Must be empty.}
 
 \item{all}{If \code{TRUE}, includes all matches in output, not just unique rows.}
 }

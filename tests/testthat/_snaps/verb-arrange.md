@@ -3,7 +3,7 @@
     Code
       sql_render(out)
     Output
-      <SQL> SELECT `test-verb-arrange`.*
+      <SQL> SELECT *
       FROM `test-verb-arrange`
       ORDER BY `y`
 
@@ -13,128 +13,130 @@
       # # arrange renders correctly
       lf <- lazy_frame(a = 1:3, b = 3:1)
       # basic
-      lf %>% arrange(a)
+      arrange(lf, a)
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      ORDER BY `a`
+      SELECT *
+      FROM "df"
+      ORDER BY "a"
     Code
       # double arrange
-      lf %>% arrange(a) %>% arrange(b)
+      arrange(arrange(lf, a), b)
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      ORDER BY `b`
+      SELECT *
+      FROM "df"
+      ORDER BY "b", "a"
     Code
       # remove ordered by
-      lf %>% arrange(a) %>% select(-a)
+      select(arrange(lf, a), -a)
     Output
       <SQL>
-      SELECT `b`
-      FROM `df`
-      ORDER BY `a`
+      SELECT "b"
+      FROM "df"
+      ORDER BY "a"
     Code
-      lf %>% arrange(a) %>% select(-a) %>% arrange(b)
+      arrange(select(arrange(lf, a), -a), b)
     Output
       <SQL>
-      SELECT `b`
-      FROM `df`
-      ORDER BY `b`
+      SELECT "b"
+      FROM "df"
+      ORDER BY "b"
     Code
       # un-arrange
-      lf %>% arrange(a) %>% arrange()
+      arrange(arrange(lf, a))
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
+      SELECT *
+      FROM "df"
+      ORDER BY "a"
     Code
-      lf %>% arrange(a) %>% select(-a) %>% arrange()
+      arrange(select(arrange(lf, a), -a))
     Output
       <SQL>
-      SELECT `b`
-      FROM `df`
+      SELECT "b"
+      FROM "df"
+      ORDER BY "a"
     Code
       # use order
-      lf %>% arrange(a) %>% select(-a) %>% mutate(c = lag(b))
+      mutate(select(arrange(lf, a), -a), c = lag(b))
     Output
       <SQL>
-      SELECT `b`, LAG(`b`, 1, NULL) OVER () AS `c`
-      FROM `df`
-      ORDER BY `a`
+      SELECT "b", LAG("b", 1, NULL) OVER () AS "c"
+      FROM "df"
+      ORDER BY "a"
 
 # arrange renders correctly for single-table verbs (#373)
 
     Code
       lf <- lazy_frame(a = 1:3, b = 3:1)
       # head
-      lf %>% head(1) %>% arrange(a)
+      arrange(head(lf, 1), a)
     Output
       <SQL>
-      SELECT `q01`.*
+      SELECT *
       FROM (
-        SELECT `df`.*
-        FROM `df`
+        SELECT *
+        FROM "df"
         LIMIT 1
-      ) AS `q01`
-      ORDER BY `a`
+      ) AS "q01"
+      ORDER BY "a"
     Code
-      lf %>% arrange(a) %>% head(1)
+      head(arrange(lf, a), 1)
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
-      ORDER BY `a`
+      SELECT *
+      FROM "df"
+      ORDER BY "a"
       LIMIT 1
     Code
-      lf %>% arrange(a) %>% head(1) %>% arrange(b)
+      arrange(head(arrange(lf, a), 1), b)
     Output
       <SQL>
-      SELECT `q01`.*
+      SELECT *
       FROM (
-        SELECT `df`.*
-        FROM `df`
-        ORDER BY `a`
+        SELECT *
+        FROM "df"
+        ORDER BY "a"
         LIMIT 1
-      ) AS `q01`
-      ORDER BY `b`
+      ) AS "q01"
+      ORDER BY "b", "a"
     Code
       # mutate
-      lf %>% mutate(a = b) %>% arrange(a)
+      arrange(mutate(lf, a = b), a)
     Output
       <SQL>
-      SELECT `b` AS `a`, `b`
-      FROM `df`
-      ORDER BY `a`
+      SELECT "b" AS "a", "b"
+      FROM "df"
+      ORDER BY "a"
     Code
       # complex mutate
-      lf %>% arrange(a) %>% mutate(a = b) %>% arrange(a)
+      arrange(mutate(arrange(lf, a), a = b), a)
     Output
       <SQL>
-      SELECT `b` AS `a`, `b`
-      FROM `df`
-      ORDER BY `a`
+      SELECT "b" AS "a", "b"
+      FROM "df"
+      ORDER BY "a"
     Code
-      lf %>% arrange(a) %>% mutate(a = 1) %>% arrange(b)
+      arrange(mutate(arrange(lf, a), a = 1), b)
     Output
       <SQL>
-      SELECT 1.0 AS `a`, `b`
-      FROM `df`
-      ORDER BY `b`
+      SELECT 1.0 AS "a", "b"
+      FROM "df"
+      ORDER BY "b", "a"
     Code
-      lf %>% mutate(a = -a) %>% arrange(a) %>% mutate(a = -a)
+      mutate(arrange(mutate(lf, a = -a), a), a = -a)
     Condition
       Warning:
       ORDER BY is ignored in subqueries without LIMIT
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
-      SELECT -`a` AS `a`, `b`
+      SELECT -"a" AS "a", "b"
       FROM (
-        SELECT -`a` AS `a`, `b`
-        FROM `df`
-      ) AS `q01`
+        SELECT -"a" AS "a", "b"
+        FROM "df"
+      ) AS "q01"
 
 # can combine arrange with dual table verbs
 
@@ -142,7 +144,7 @@
       lf <- lazy_frame(a = 1:3, b = 3:1)
       rf <- lazy_frame(a = 1:3, c = 4:6)
       # warn if arrange before join
-      lf %>% arrange(a) %>% left_join(rf)
+      left_join(arrange(lf, a), rf)
     Message
       Joining with `by = join_by(a)`
     Condition
@@ -151,15 +153,15 @@
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
-      SELECT `LHS`.*, `c`
+      SELECT "LHS".*, "c"
       FROM (
-        SELECT `df`.*
-        FROM `df`
-      ) AS `LHS`
-      LEFT JOIN `df`
-        ON (`LHS`.`a` = `df`.`a`)
+        SELECT *
+        FROM "df"
+      ) AS "LHS"
+      LEFT JOIN "df"
+        ON ("LHS"."a" = "df"."a")
     Code
-      lf %>% arrange(a) %>% semi_join(rf)
+      semi_join(arrange(lf, a), rf)
     Message
       Joining with `by = join_by(a)`
     Condition
@@ -168,71 +170,80 @@
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
-      SELECT `LHS`.*
+      SELECT "LHS".*
       FROM (
-        SELECT `df`.*
-        FROM `df`
-      ) AS `LHS`
+        SELECT *
+        FROM "df"
+      ) AS "LHS"
       WHERE EXISTS (
-        SELECT 1 FROM `df`
-        WHERE (`LHS`.`a` = `df`.`a`)
+        SELECT 1 FROM "df"
+        WHERE ("LHS"."a" = "df"."a")
       )
     Code
-      lf %>% arrange(a) %>% union(rf)
+      union(arrange(lf, a), rf)
     Output
       <SQL>
-      SELECT `df`.*, NULL AS `c`
-      FROM `df`
-      ORDER BY `a`
+      SELECT *, NULL AS "c"
+      FROM "df"
+      ORDER BY "a"
       
       UNION
       
-      SELECT `a`, NULL AS `b`, `c`
-      FROM `df`
+      SELECT "a", NULL AS "b", "c"
+      FROM "df"
     Code
       # can arrange after join
-      lf %>% left_join(rf) %>% arrange(a)
+      arrange(left_join(lf, rf), a)
     Message
       Joining with `by = join_by(a)`
     Output
       <SQL>
-      SELECT `q01`.*
+      SELECT *
       FROM (
-        SELECT `df_LHS`.*, `c`
-        FROM `df` AS `df_LHS`
-        LEFT JOIN `df` AS `df_RHS`
-          ON (`df_LHS`.`a` = `df_RHS`.`a`)
-      ) AS `q01`
-      ORDER BY `a`
+        SELECT "df_LHS".*, "c"
+        FROM "df" AS "df_LHS"
+        LEFT JOIN "df" AS "df_RHS"
+          ON ("df_LHS"."a" = "df_RHS"."a")
+      ) AS "q01"
+      ORDER BY "a"
     Code
-      lf %>% semi_join(rf) %>% arrange(a)
+      arrange(semi_join(lf, rf), a)
     Message
       Joining with `by = join_by(a)`
     Output
       <SQL>
-      SELECT `q01`.*
+      SELECT *
       FROM (
-        SELECT `df_LHS`.*
-        FROM `df` AS `df_LHS`
+        SELECT "df_LHS".*
+        FROM "df" AS "df_LHS"
         WHERE EXISTS (
-          SELECT 1 FROM `df` AS `df_RHS`
-          WHERE (`df_LHS`.`a` = `df_RHS`.`a`)
+          SELECT 1 FROM "df" AS "df_RHS"
+          WHERE ("df_LHS"."a" = "df_RHS"."a")
         )
-      ) AS `q01`
-      ORDER BY `a`
+      ) AS "q01"
+      ORDER BY "a"
     Code
-      lf %>% union(rf) %>% arrange(a)
+      arrange(union(lf, rf), a)
     Output
       <SQL>
-      SELECT `q01`.*
+      SELECT *
       FROM (
-        SELECT `df`.*, NULL AS `c`
-        FROM `df`
+        SELECT *, NULL AS "c"
+        FROM "df"
       
         UNION
       
-        SELECT `a`, NULL AS `b`, `c`
-        FROM `df`
-      ) AS `q01`
-      ORDER BY `a`
+        SELECT "a", NULL AS "b", "c"
+        FROM "df"
+      ) AS "q01"
+      ORDER BY "a"
+
+# unwrap_order_expr informatively errors on c()
+
+    Code
+      unwrap_order_expr(expr(c(x, y)), "slice_min")
+    Condition
+      Error:
+      ! Can't use `c()` in `slice_min()`
+      i Did you mean to use `tibble(x, y)` instead?
 

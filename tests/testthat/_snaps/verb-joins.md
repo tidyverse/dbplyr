@@ -4,10 +4,10 @@
       left_join(lf1, lf2, by = "x", x_as = "df1", y_as = "df2")
     Output
       <SQL>
-      SELECT `df1`.`x` AS `x`, `y`
-      FROM `lf1` AS `df1`
-      LEFT JOIN `lf2` AS `df2`
-        ON (`df1`.`x` = `df2`.`x`)
+      SELECT "df1"."x" AS "x", "y"
+      FROM "lf1" AS "df1"
+      LEFT JOIN "lf2" AS "df2"
+        ON ("df1"."x" = "df2"."x")
 
 # complete semi join works with SQLite and table alias
 
@@ -15,15 +15,15 @@
       inner_join(lf1, lf2, by = "x", x_as = "df1", y_as = "df2")
     Output
       <SQL>
-      SELECT `df1`.*
-      FROM `df` AS `df1`
-      INNER JOIN `df` AS `df2`
-        ON (`df1`.`x` = `df2`.`x`)
+      SELECT "df1".*
+      FROM "df" AS "df1"
+      INNER JOIN "df" AS "df2"
+        ON ("df1"."x" = "df2"."x")
 
 # join works with in_schema
 
     Code
-      left_join(df1, df2, by = "x") %>% remote_query()
+      remote_query(left_join(df1, df2, by = "x"))
     Output
       <SQL> SELECT `df`.*, `z`
       FROM `foo`.`df`
@@ -33,7 +33,7 @@
 ---
 
     Code
-      left_join(df1, df3, by = "x") %>% remote_query()
+      remote_query(left_join(df1, df3, by = "x"))
     Output
       <SQL> SELECT `df_LHS`.*, `z`
       FROM `foo`.`df` AS `df_LHS`
@@ -43,7 +43,7 @@
 ---
 
     Code
-      left_join(df4, df5, by = "x") %>% remote_query()
+      remote_query(left_join(df4, df5, by = "x"))
     Output
       <SQL> SELECT `df_LHS`.*, `z`
       FROM foo.df AS `df_LHS`
@@ -53,7 +53,7 @@
 # alias truncates long table names at database limit
 
     Code
-      self_join2 %>% remote_query()
+      remote_query(self_join2)
     Output
       <SQL> SELECT "a01234567890123456789012345678901234567890123456789012345678901".*
       FROM "a01234567890123456789012345678901234567890123456789012345678901"
@@ -66,7 +66,7 @@
 ---
 
     Code
-      self_join3 %>% remote_query()
+      remote_query(self_join3)
     Output
       <SQL> SELECT
         "a01234567890123456789012345678901234567890123456789012345678901"."x" AS "x",
@@ -118,10 +118,21 @@
       out_left
     Output
       <SQL>
-      SELECT `a` AS `a2`, `x1` AS `x`, `b`
-      FROM `lf1`
-      LEFT JOIN `lf2`
-        ON (`lf1`.`x1` = `lf2`.`x2`)
+      SELECT "a" AS "a2", "x1" AS "x", "b"
+      FROM "lf1"
+      LEFT JOIN "lf2"
+        ON ("lf1"."x1" = "lf2"."x2")
+
+# rename works with duplicate column names in join_by (#1572)
+
+    Code
+      out
+    Output
+      <SQL>
+      SELECT "x", "y" AS "z"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" >= "df_RHS"."y" AND "df_LHS"."x" <= "df_RHS"."y")
 
 # select() before semi_join is inlined
 
@@ -129,60 +140,60 @@
       out_semi
     Output
       <SQL>
-      SELECT `a` AS `a2`, `x1` AS `x`
-      FROM `lf1`
+      SELECT "a" AS "a2", "x1" AS "x"
+      FROM "lf1"
       WHERE EXISTS (
-        SELECT 1 FROM `lf2`
-        WHERE (`lf1`.`x1` = `lf2`.`x2`)
+        SELECT 1 FROM "lf2"
+        WHERE ("lf1"."x1" = "lf2"."x2")
       )
 
 # can combine full_join with other joins #1178
 
     Code
-      full_join(lf1, lf2, by = "x") %>% left_join(lf3, by = "x")
+      left_join(full_join(lf1, lf2, by = "x"), lf3, by = "x")
     Output
       <SQL>
-      SELECT `LHS`.*, `z`
+      SELECT "LHS".*, "z"
       FROM (
-        SELECT COALESCE(`df_LHS`.`x`, `df_RHS`.`x`) AS `x`, `y`
-        FROM `df` AS `df_LHS`
-        FULL JOIN `df` AS `df_RHS`
-          ON (`df_LHS`.`x` = `df_RHS`.`x`)
-      ) AS `LHS`
-      LEFT JOIN `df`
-        ON (`LHS`.`x` = `df`.`x`)
+        SELECT COALESCE("df_LHS"."x", "df_RHS"."x") AS "x", "y"
+        FROM "df" AS "df_LHS"
+        FULL JOIN "df" AS "df_RHS"
+          ON ("df_LHS"."x" = "df_RHS"."x")
+      ) AS "LHS"
+      LEFT JOIN "df"
+        ON ("LHS"."x" = "df"."x")
 
 ---
 
     Code
-      left_join(lf1, lf2, by = "x") %>% full_join(lf3, by = "x")
+      full_join(left_join(lf1, lf2, by = "x"), lf3, by = "x")
     Output
       <SQL>
-      SELECT COALESCE(`LHS`.`x`, `df`.`x`) AS `x`, `y`, `z`
+      SELECT COALESCE("LHS"."x", "df"."x") AS "x", "y", "z"
       FROM (
-        SELECT `df_LHS`.`x` AS `x`, `y`
-        FROM `df` AS `df_LHS`
-        LEFT JOIN `df` AS `df_RHS`
-          ON (`df_LHS`.`x` = `df_RHS`.`x`)
-      ) AS `LHS`
-      FULL JOIN `df`
-        ON (`LHS`.`x` = `df`.`x`)
+        SELECT "df_LHS"."x" AS "x", "y"
+        FROM "df" AS "df_LHS"
+        LEFT JOIN "df" AS "df_RHS"
+          ON ("df_LHS"."x" = "df_RHS"."x")
+      ) AS "LHS"
+      FULL JOIN "df"
+        ON ("LHS"."x" = "df"."x")
 
 ---
 
     Code
-      full_join(lf1, lf2, by = "x") %>% full_join(lf3, by = "x")
+      full_join(full_join(lf1, lf2, by = "x"), lf3, by = "x")
     Output
       <SQL>
-      SELECT COALESCE(`LHS`.`x`, `df`.`x`) AS `x`, `y`, `z`
+      SELECT COALESCE("LHS"."x", "df"."x") AS "x", "y", "z"
       FROM (
-        SELECT COALESCE(`df_LHS`.`x`, `df_RHS`.`x`) AS `x`, `y`
-        FROM `df` AS `df_LHS`
-        FULL JOIN `df` AS `df_RHS`
-          ON (`df_LHS`.`x` = `df_RHS`.`x`)
-      ) AS `LHS`
-      FULL JOIN `df`
-        ON (`LHS`.`x` = `df`.`x`)
+        SELECT COALESCE("df_LHS"."x", "df_RHS"."x") AS "x", "y"
+        FROM "df" AS "df_LHS"
+        FULL JOIN "df" AS "df_RHS"
+          ON ("df_LHS"."x" = "df_RHS"."x")
+      ) AS "LHS"
+      FULL JOIN "df"
+        ON ("LHS"."x" = "df"."x")
 
 # filter() before semi join is inlined
 
@@ -190,14 +201,14 @@
       out
     Output
       <SQL>
-      SELECT `df_LHS`.*
-      FROM `df` AS `df_LHS`
+      SELECT "df_LHS".*
+      FROM "df" AS "df_LHS"
       WHERE EXISTS (
-        SELECT 1 FROM `df` AS `df_RHS`
+        SELECT 1 FROM "df" AS "df_RHS"
         WHERE
-          (`df_LHS`.`x` = `df_RHS`.`x2`) AND
-          (`df_RHS`.`a` = 1) AND
-          (`df_RHS`.`b` = 2)
+          ("df_LHS"."x" = "df_RHS"."x2") AND
+          ("df_RHS"."a" = 1) AND
+          ("df_RHS"."b" = 2)
       )
 
 # filtered aggregates with subsequent select are not inlined away in semi_join (#1474)
@@ -206,16 +217,32 @@
       out
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
+      SELECT "df".*
+      FROM "df"
       WHERE EXISTS (
         SELECT 1 FROM (
-        SELECT `x`
-        FROM `df`
-        GROUP BY `x`
+        SELECT "x"
+        FROM "df"
+        GROUP BY "x"
         HAVING (COUNT(*) = 1.0)
+      ) AS "RHS"
+        WHERE ("df"."x" = "RHS"."x")
+      )
+
+# filtered window joins work in a semi_join
+
+    Code
+      show_query(out)
+    Output
+      <SQL>
+      SELECT `df1`.*
+      FROM `df1`
+      WHERE NOT EXISTS (
+        SELECT 1 FROM (
+        SELECT *, ROW_NUMBER() OVER () AS `col01`
+        FROM `df2`
       ) AS `RHS`
-        WHERE (`df`.`x` = `RHS`.`x`)
+        WHERE (`df1`.`id` = `RHS`.`id`) AND (`RHS`.`col01` <= 3.0)
       )
 
 # multiple joins create a single query
@@ -224,41 +251,41 @@
       out
     Output
       <SQL>
-      SELECT `df1`.*, `df2`.`b` AS `b.x`, `df3`.`b` AS `b.y`
-      FROM `df1`
-      LEFT JOIN `df2`
-        ON (`df1`.`x` = `df2`.`x`)
-      INNER JOIN `df3`
-        ON (`df1`.`x` = `df3`.`x`)
+      SELECT "df1".*, "df2"."b" AS "b.x", "df3"."b" AS "b.y"
+      FROM "df1"
+      LEFT JOIN "df2"
+        ON ("df1"."x" = "df2"."x")
+      INNER JOIN "df3"
+        ON ("df1"."x" = "df3"."x")
 
 # can join 4 tables with same column #1101
 
     Code
       remote_query(out)
     Output
-      <SQL> SELECT `lf1`.*, `b`, `c`, `lf4`.`a` AS `a4`
-      FROM `lf1`
-      INNER JOIN `lf2`
-        ON (`lf1`.`x` = `lf2`.`x`)
-      INNER JOIN `lf3`
-        ON (`lf1`.`x` = `lf3`.`x`)
-      INNER JOIN `lf4`
-        ON (`lf1`.`x` = `lf4`.`x`)
+      <SQL> SELECT "lf1".*, "b", "c", "lf4"."a" AS "a4"
+      FROM "lf1"
+      INNER JOIN "lf2"
+        ON ("lf1"."x" = "lf2"."x")
+      INNER JOIN "lf3"
+        ON ("lf1"."x" = "lf3"."x")
+      INNER JOIN "lf4"
+        ON ("lf1"."x" = "lf4"."x")
 
 # multiple joins produce separate queries if using right/full join
 
     Code
       remote_query(out)
     Output
-      <SQL> SELECT `df3`.`x` AS `x`, `a`, `LHS`.`b` AS `b.x`, `df3`.`b` AS `b.y`
+      <SQL> SELECT "df3"."x" AS "x", "a", "LHS"."b" AS "b.x", "df3"."b" AS "b.y"
       FROM (
-        SELECT `df1`.*, `b`
-        FROM `df1`
-        LEFT JOIN `df2`
-          ON (`df1`.`x` = `df2`.`x`)
-      ) AS `LHS`
-      RIGHT JOIN `df3`
-        ON (`LHS`.`x` = `df3`.`x`)
+        SELECT "df1".*, "b"
+        FROM "df1"
+        LEFT JOIN "df2"
+          ON ("df1"."x" = "df2"."x")
+      ) AS "LHS"
+      RIGHT JOIN "df3"
+        ON ("LHS"."x" = "df3"."x")
 
 # can't use `keep = FALSE` with non-equi conditions (#6499)
 
@@ -283,18 +310,18 @@
     Output
       <SQL>
       SELECT
-        `df_LHS`.`a` AS `a.x`,
-        `df_LHS`.`b` AS `b.x`,
-        `df_LHS`.`c` AS `c.x`,
-        `df_RHS`.`a` AS `a.y`,
-        `df_RHS`.`b` AS `b.y`,
-        `df_RHS`.`c` AS `c.y`
-      FROM `df` AS `df_LHS`
-      LEFT JOIN `df` AS `df_RHS`
+        "df_LHS"."a" AS "a.x",
+        "df_LHS"."b" AS "b.x",
+        "df_LHS"."c" AS "c.x",
+        "df_RHS"."a" AS "a.y",
+        "df_RHS"."b" AS "b.y",
+        "df_RHS"."c" AS "c.y"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
         ON (
-          `df_LHS`.`a` = `df_RHS`.`a` AND
-          `df_LHS`.`b` >= `df_RHS`.`b` AND
-          `df_LHS`.`c` < `df_RHS`.`c`
+          "df_LHS"."a" = "df_RHS"."a" AND
+          "df_LHS"."b" >= "df_RHS"."b" AND
+          "df_LHS"."c" < "df_RHS"."c"
         )
 
 # rolling joins aren't supported
@@ -378,10 +405,10 @@
       left_join(lf1, lf2, by = "x", na_matches = "na")
     Output
       <SQL>
-      SELECT `lf1`.`x` AS `x`
-      FROM `lf1`
-      LEFT JOIN `lf2`
-        ON (`lf1`.`x` IS NOT DISTINCT FROM `lf2`.`x`)
+      SELECT "lf1"."x" AS "x"
+      FROM "lf1"
+      LEFT JOIN "lf2"
+        ON ("lf1"."x" IS NOT DISTINCT FROM "lf2"."x")
 
 ---
 
@@ -389,12 +416,26 @@
       semi_join(lf1, lf2, by = "x", na_matches = "na")
     Output
       <SQL>
-      SELECT `lf1`.*
-      FROM `lf1`
+      SELECT "lf1".*
+      FROM "lf1"
       WHERE EXISTS (
-        SELECT 1 FROM `lf2`
-        WHERE (`lf1`.`x` IS NOT DISTINCT FROM `lf2`.`x`)
+        SELECT 1 FROM "lf2"
+        WHERE ("lf1"."x" IS NOT DISTINCT FROM "lf2"."x")
       )
+
+---
+
+    Code
+      left_join(lf1, lf3, by = by, na_matches = "na")
+    Output
+      <SQL>
+      SELECT "x", "lf3".*
+      FROM "lf1"
+      LEFT JOIN "lf3"
+        ON (
+          ("lf1"."x" >= "lf3"."lower" OR ("lf1"."x" IS NULL AND "lf3"."lower" IS NULL)) AND
+          ("lf1"."x" <= "lf3"."upper" OR ("lf1"."x" IS NULL AND "lf3"."upper" IS NULL))
+        )
 
 # suffix arg is checked
 
@@ -414,20 +455,33 @@
 # joins reuse queries in cte mode
 
     Code
-      left_join(lf, lf) %>% remote_query(sql_options = sql_options(cte = TRUE))
-    Message
-      Joining with `by = join_by(x)`
+      remote_query(left_join(lf, lf, by = "x"), sql_options = sql_options(cte = TRUE))
     Output
-      <SQL> WITH `q01` AS (
-        SELECT `lf1_LHS`.`x` AS `x`
-        FROM `lf1` AS `lf1_LHS`
-        INNER JOIN `lf1` AS `lf1_RHS`
-          ON (`lf1_LHS`.`x` = `lf1_RHS`.`x`)
+      <SQL> WITH "q01" AS (
+        SELECT "lf1_LHS"."x" AS "x"
+        FROM "lf1" AS "lf1_LHS"
+        INNER JOIN "lf1" AS "lf1_RHS"
+          ON ("lf1_LHS"."x" = "lf1_RHS"."x")
       )
-      SELECT `lf1...1`.`x` AS `x`
-      FROM `lf1` AS `lf1...1`
-      INNER JOIN `lf1` AS `lf1...2`
-        ON (`lf1...1`.`x` = `lf1...2`.`x`)
-      LEFT JOIN `q01` AS `...3`
-        ON (`lf1...1`.`x` = `...3`.`x`)
+      SELECT "lf1...1"."x" AS "x"
+      FROM "lf1" AS "lf1...1"
+      INNER JOIN "lf1" AS "lf1...2"
+        ON ("lf1...1"."x" = "lf1...2"."x")
+      LEFT JOIN "q01" AS "...3"
+        ON ("lf1...1"."x" = "...3"."x")
+
+# joins correctly quote reused queries in CTEs
+
+    Code
+      show_query(left_join(lf, lf, by = join_by(z)), sql_options = sql_options(cte = TRUE))
+    Output
+      <SQL>
+      WITH "q01" AS (
+        SELECT *, "x" * 2.0 AS "z"
+        FROM "lf"
+      )
+      SELECT "LHS"."x" AS "x.x", "LHS"."z" AS "z", "RHS"."x" AS "x.y"
+      FROM "q01" AS "LHS"
+      LEFT JOIN "q01" AS "RHS"
+        ON ("LHS"."z" = "RHS"."z")
 

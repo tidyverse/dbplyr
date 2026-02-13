@@ -1,16 +1,16 @@
 test_that("adds src class", {
-  tb <- tbl_lazy(mtcars, con = simulate_sqlite())
-  expect_s3_class(tb, "tbl_SQLiteConnection")
+  tb <- tbl_lazy(mtcars, con = dialect_sqlite())
+  expect_s3_class(tb, "tbl_sql_dialect_sqlite")
 })
 
 test_that("argument src is deprecated", {
-  expect_snapshot(error = TRUE, tbl_lazy(mtcars, src = simulate_sqlite()))
+  expect_snapshot(error = TRUE, tbl_lazy(mtcars, src = dialect_sqlite()))
 })
 
 test_that("cannot convert tbl_lazy to data.frame", {
   expect_snapshot(
     error = TRUE,
-    as.data.frame(tbl_lazy(mtcars, con = simulate_sqlite()))
+    as.data.frame(tbl_lazy(mtcars, con = dialect_sqlite()))
   )
 })
 
@@ -23,22 +23,22 @@ test_that("has print method", {
 })
 
 test_that("support colwise variants", {
-  mf <- memdb_frame(x = 1:5, y = factor(letters[1:5]))
-  exp <- mf %>% collect() %>% mutate(y = as.character(y))
+  mf <- local_memdb_frame(x = 1:5, y = factor(letters[1:5]))
+  exp <- mf |> collect() |> mutate(y = as.character(y))
 
   expect_message(
     mf1 <- dplyr::mutate_if(mf, is.factor, as.character),
     "on the first 100 rows"
   )
-  compare_tbl(mf1, exp)
+  expect_equal(collect(mf1), exp)
 
   mf2 <- dplyr::mutate_at(mf, "y", as.character)
-  compare_tbl(mf2, exp)
+  expect_equal(collect(mf2), exp)
 })
 
 test_that("base source of tbl_lazy is always 'df'", {
-  out <- lazy_frame(x = 1, y = 5) %>% sql_build()
-  expect_equal(out, base_query(table_path("`df`")))
+  out <- lazy_frame(x = 1, y = 5) |> sql_build()
+  expect_equal(out, base_query(table_path('"df"')))
 })
 
 test_that("names() inform that they aren't meant to be used", {

@@ -15,7 +15,7 @@
   x,
   y,
   by = NULL,
-  copy = FALSE,
+  copy = "none",
   suffix = NULL,
   ...,
   keep = NULL,
@@ -33,7 +33,7 @@
   x,
   y,
   by = NULL,
-  copy = FALSE,
+  copy = "none",
   suffix = NULL,
   ...,
   keep = NULL,
@@ -51,7 +51,7 @@
   x,
   y,
   by = NULL,
-  copy = FALSE,
+  copy = "none",
   suffix = NULL,
   ...,
   keep = NULL,
@@ -69,7 +69,7 @@
   x,
   y,
   by = NULL,
-  copy = FALSE,
+  copy = "none",
   suffix = NULL,
   ...,
   keep = NULL,
@@ -86,7 +86,7 @@
   x,
   y,
   ...,
-  copy = FALSE,
+  copy = "none",
   suffix = c(".x", ".y"),
   x_as = NULL,
   y_as = NULL
@@ -96,7 +96,7 @@
   x,
   y,
   by = NULL,
-  copy = FALSE,
+  copy = "none",
   ...,
   na_matches = c("never", "na"),
   sql_on = NULL,
@@ -109,7 +109,7 @@
   x,
   y,
   by = NULL,
-  copy = FALSE,
+  copy = "none",
   ...,
   na_matches = c("never", "na"),
   sql_on = NULL,
@@ -150,15 +150,23 @@ use a named character vector like \code{by = c("x_a" = "y_a", "x_b" = "y_b")}.
 To perform a cross-join, generating all combinations of \code{x} and \code{y}, see
 \code{\link[dplyr:cross_join]{cross_join()}}.}
 
-\item{copy}{If \code{x} and \code{y} are not from the same data source,
-and \code{copy} is \code{TRUE}, then \code{y} will be copied into a
-temporary table in same database as \code{x}. \verb{*_join()} will automatically
-run \code{ANALYZE} on the created table in the hope that this will make
-you queries as efficient as possible by giving more data to the query
-planner.
+\item{copy}{If \code{x} and \code{y} are not from the same data source, \code{copy}
+controls how \code{y} is copied into the same source as \code{x}. There are three
+options:
+\itemize{
+\item \code{"none"}, the default, will error if \code{y} needs to be copied. This ensures
+that you don't accidentally copy large datasets from R to the database.
+\item \code{"temp-table"}: copies \code{y} into a temporary table in the same
+database as \code{x}. \verb{*_join()} will automatically run \code{ANALYZE} on the
+created table in the hope that this will make your queries as efficient
+as possible by giving more data to the query planner.
+\item \code{"inline"}: \code{y} will be inlined into the query using \code{\link[=copy_inline]{copy_inline()}}.
+This is should faster for small datasets and doesn't require write
+access.
+}
 
-This allows you to join tables across srcs, but it's potentially expensive
-operation so you must opt into it.}
+\code{TRUE} (\code{"temp-table"}) and \code{FALSE} (\code{"none"}) are also accepted for
+backward compatibility.}
 
 \item{suffix}{If there are non-joined duplicate variables in \code{x} and
 \code{y}, these suffixes will be added to the output to disambiguate them.
@@ -202,7 +210,7 @@ there are matching indexes in \code{x}.}
 \code{"RHS"}}
 }
 \value{
-Another \code{tbl_lazy}. Use \code{\link[dplyr:explain]{dplyr::show_query()}} to see the generated
+Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
 query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
@@ -221,25 +229,25 @@ to the following SQL queries:
 \examples{
 library(dplyr, warn.conflicts = FALSE)
 
-band_db <- tbl_memdb(dplyr::band_members)
-instrument_db <- tbl_memdb(dplyr::band_instruments)
-band_db \%>\% left_join(instrument_db) \%>\% show_query()
+band_db <- copy_to(memdb(), dplyr::band_members)
+instrument_db <- copy_to(memdb(), dplyr::band_instruments)
+band_db |> left_join(instrument_db) |> show_query()
 
 # Can join with local data frames by setting copy = TRUE
-band_db \%>\%
+band_db |>
   left_join(dplyr::band_instruments, copy = TRUE)
 
 # Unlike R, joins in SQL don't usually match NAs (NULLs)
 db <- memdb_frame(x = c(1, 2, NA))
 label <- memdb_frame(x = c(1, NA), label = c("one", "missing"))
-db \%>\% left_join(label, by = "x")
+db |> left_join(label, by = "x")
 # But you can activate R's usual behaviour with the na_matches argument
-db \%>\% left_join(label, by = "x", na_matches = "na")
+db |> left_join(label, by = "x", na_matches = "na")
 
 # By default, joins are equijoins, but you can use `sql_on` to
 # express richer relationships
 db1 <- memdb_frame(x = 1:5)
 db2 <- memdb_frame(x = 1:3, y = letters[1:3])
-db1 \%>\% left_join(db2) \%>\% show_query()
-db1 \%>\% left_join(db2, sql_on = "LHS.x < RHS.x") \%>\% show_query()
+db1 |> left_join(db2) |> show_query()
+db1 |> left_join(db2, sql_on = "LHS.x < RHS.x") |> show_query()
 }

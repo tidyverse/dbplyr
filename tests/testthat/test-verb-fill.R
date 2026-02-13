@@ -1,107 +1,70 @@
-df <- tibble::tribble(
-  ~ id, ~group, ~letter, ~n1, ~ n2,
-     1,      1,      NA,  NA,    1,
-     2,      1,     "a",   2,   NA,
-     3,      1,      NA,  NA,   NA,
-     4,      1,     "a",  NA,    4,
-     5,      2,     "a",   5,   NA,
-     6,      2,      NA,  NA,    6,
-)
-df_db <- copy_to(src_memdb(), df, name = "df", overwrite = TRUE)
+test_that("fill returns same results as tidyr", {
+  df <- tibble::tribble(
+    ~id , ~group , ~letter , ~n1 , ~n2 ,
+      1 ,      1 , NA      , NA  ,   1 ,
+      2 ,      1 , "a"     ,   2 , NA  ,
+      3 ,      1 , NA      , NA  , NA  ,
+      4 ,      1 , "a"     , NA  ,   4 ,
+      5 ,      2 , "a"     ,   5 , NA  ,
+      6 ,      2 , NA      , NA  ,   6 ,
+  )
+  df_db <- copy_to(memdb(), df, overwrite = TRUE)
+  withr::defer(DBI::dbRemoveTable(memdb(), "df"))
 
-df <- tibble::tribble(
-  ~ id, ~group, ~n1,
-     1,      1,  NA,
-     2,      1,   2,
-     3,      1,  NA,
-     4,      1,  NA,
-     5,      2,   5,
-     6,      2,  NA,
-)
-df_lazy_ns <- tbl_lazy(df, con = simulate_sqlite())
-df_lazy_std <- tbl_lazy(df)
-
-test_that("fill works", {
   expect_equal(
-    df_db %>%
-      window_order(id) %>%
-      group_by(group) %>%
-      tidyr::fill(n1, n2) %>%
+    df_db |>
+      window_order(id) |>
+      group_by(group) |>
+      tidyr::fill(n1, n2) |>
       collect(),
-    tibble::tribble(
-      ~ id, ~group, ~letter, ~n1, ~ n2,
-         1,      1,      NA,  NA,    1,
-         2,      1,     "a",   2,    1,
-         3,      1,      NA,   2,    1,
-         4,      1,     "a",   2,    4,
-         5,      2,     "a",   5,   NA,
-         6,      2,      NA,   5,    6,
-    ) %>%
-      group_by(group)
+    df |> group_by(group) |> tidyr::fill(n1, n2)
   )
 })
 
-test_that("up-direction works", {
+test_that("generates valid sql for all directions", {
+  lf <- lazy_frame(id = 1, group = 1, n1 = 1)
+
+  lf_asc <- lf |> window_order(id)
+  lf_desc <- lf |> window_order(desc(id))
+
+  expect_snapshot({
+    lf_asc |> tidyr::fill(n1, .direction = "up")
+    lf_desc |> tidyr::fill(n1, .direction = "up")
+
+    lf_asc |> tidyr::fill(n1, .direction = "updown")
+    lf_asc |> tidyr::fill(n1, .direction = "downup")
+  })
+})
+
+test_that("fill() respects grouping", {
+  lf <- lazy_frame(id = 1, group = 1, n1 = 1)
   expect_snapshot(
-    df_lazy_ns %>%
-      window_order(id) %>%
-      tidyr::fill(n1, .direction = "up")
-  )
-  expect_snapshot(
-    df_lazy_std %>%
-      window_order(id) %>%
-      tidyr::fill(n1, .direction = "up")
+    lf |> group_by(group) |> window_order(id) |> tidyr::fill(n1)
   )
 })
 
-test_that("up-direction works", {
-  expect_snapshot(
-    df_lazy_std %>%
-      window_order(id) %>%
-      tidyr::fill(n1, .direction = "updown")
-  )
-  expect_snapshot(
-    df_lazy_std %>%
-      window_order(id) %>%
-      tidyr::fill(n1, .direction = "downup")
-  )
-})
+test_that("can generate variant SQL", {
+  lf <- lazy_frame(id = 1, group = 1, n1 = 1, con = dialect_sqlite())
 
-test_that("up-direction works with descending", {
-  expect_snapshot(
-    df_lazy_ns %>%
-      window_order(desc(id)) %>%
-      tidyr::fill(n1, .direction = "up")
-  )
-  expect_snapshot(
-    df_lazy_std %>%
-      window_order(desc(id)) %>%
-      tidyr::fill(n1, .direction = "up")
-  )
-})
-
-test_that("groups are respected", {
-  expect_snapshot(
-    group_by(df_lazy_ns, group) %>%
-      window_order(id) %>%
-      tidyr::fill(n1)
-  )
-
-  expect_snapshot(
-    group_by(df_lazy_std, group) %>%
-      window_order(id) %>%
-      tidyr::fill(n1)
-  )
+  expect_snapshot({
+    lf |> window_order(id) |> tidyr::fill(n1)
+    lf |> window_order(desc(id)) |> tidyr::fill(n1)
+    lf |> group_by(group) |> window_order(id) |> tidyr::fill(n1)
+  })
 })
 
 test_that("fill errors on unsorted data", {
-  expect_snapshot({
-    (expect_error(df_db %>% tidyr::fill(n1)))
-  })
+  df <- local_memdb_frame(x = 1)
+
+  expect_snapshot(tidyr::fill(df), error = TRUE)
+})
+
+test_that("fill() errors on attempted rename", {
+  lf <- lazy_frame(x = 1)
+  expect_snapshot(tidyr::fill(lf, y = x), error = TRUE)
 })
 
 test_that("fill() produces nice error messages", {
-  expect_snapshot(error = TRUE, {
-    lazy_frame(x = 1) %>% tidyr::fill(non_existent)
-  })
+  lf <- lazy_frame(x = 1)
+  expect_snapshot(tidyr::fill(lf, non_existent), error = TRUE)
 })

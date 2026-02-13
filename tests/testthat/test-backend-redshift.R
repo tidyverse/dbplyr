@@ -1,99 +1,196 @@
+test_that("simulate_redshift() still works", {
+  expect_translation(simulate_redshift(), x + 1, '"x" + 1.0')
+})
+
 test_that("defaults to postgres translations", {
-  local_con(simulate_redshift())
-  expect_equal(test_translate_sql(log10(x)), sql("LOG(`x`)"))
+  con <- dialect_redshift()
+  expect_translation(con, log10(x), 'LOG("x")')
 })
 
 test_that("string translations", {
-  local_con(simulate_redshift())
+  con <- dialect_redshift()
 
   expect_error(
-    test_translate_sql(str_replace("xx", ".", "a")),
+    translate_sql(str_replace("xx", ".", "a"), con = con),
     class = "dbplyr_error_unsupported_fn"
   )
-  expect_equal(test_translate_sql(str_replace_all("xx", ".", "a")), sql("REGEXP_REPLACE('xx', '.', 'a')"))
+  expect_translation(
+    con,
+    str_replace_all("xx", ".", "a"),
+    "REGEXP_REPLACE('xx', '.', 'a')"
+  )
 
-  expect_equal(test_translate_sql(substr(x, 2, 2)), sql("SUBSTRING(`x`, 2, 1)"))
-  expect_equal(test_translate_sql(str_sub(x, 2, -2)), sql("SUBSTRING(`x`, 2, LEN(`x`) - 2)"))
+  expect_translation(con, substr(x, 2, 2), 'SUBSTRING("x", 2, 1)')
+  expect_translation(
+    con,
+    str_sub(x, 2, -2),
+    'SUBSTRING("x", 2, LEN("x") - 2)'
+  )
 
-  expect_equal(test_translate_sql(paste("x", "y")), sql("'x' || ' ' || 'y'"))
-  expect_equal(test_translate_sql(paste0("x", "y")), sql("'x' || 'y'"))
-  expect_equal(test_translate_sql(str_c("x", "y")), sql("'x' || 'y'"))
+  expect_translation(con, paste("x", "y"), "'x' || ' ' || 'y'")
+  expect_translation(con, paste0("x", "y"), "'x' || 'y'")
+  expect_translation(con, str_c("x", "y"), "'x' || 'y'")
+  expect_translation(con, str_ilike(x, y), '"x" ILIKE "y"')
 })
 
 test_that("numeric translations", {
-  local_con(simulate_redshift())
+  con <- dialect_redshift()
 
-  expect_equal(test_translate_sql(as.numeric(x)), sql("CAST(`x` AS FLOAT)"))
-  expect_equal(test_translate_sql(as.double(x)), sql("CAST(`x` AS FLOAT)"))
-  expect_equal(test_translate_sql(round(1.234, 1)), sql("ROUND((1.234) :: float, 1)"))
+  expect_translation(con, as.numeric(x), 'CAST("x" AS FLOAT)')
+  expect_translation(con, as.double(x), 'CAST("x" AS FLOAT)')
+  expect_translation(con, round(1.234, 1), "ROUND((1.234)::float, 1)")
 })
 
 test_that("aggregate functions", {
-  local_con(simulate_redshift())
+  con <- dialect_redshift()
 
-  expect_equal(test_translate_sql(str_flatten(x, y), window = FALSE), sql("LISTAGG(`x`, `y`)"))
-  expect_equal(test_translate_sql(str_flatten(x, y), window = TRUE), sql("LISTAGG(`x`, `y`) OVER ()"))
-  expect_equal(test_translate_sql(order_by(z, str_flatten(x, y))), sql("LISTAGG(`x`, `y`) WITHIN GROUP (ORDER BY `z`) OVER ()"))
+  expect_translation(
+    con,
+    str_flatten(x, y),
+    'LISTAGG("x", "y")',
+    window = FALSE
+  )
+  expect_translation(
+    con,
+    str_flatten(x, y),
+    'LISTAGG("x", "y") OVER ()',
+    window = TRUE
+  )
+  expect_translation(
+    con,
+    order_by(z, str_flatten(x, y)),
+    'LISTAGG("x", "y") WITHIN GROUP (ORDER BY "z") OVER ()'
+  )
 })
 
 test_that("lag and lead translation", {
-  local_con(simulate_redshift())
+  con <- dialect_redshift()
 
-  expect_equal(test_translate_sql(lead(x)), sql("LEAD(`x`, 1) OVER ()"))
-  expect_equal(test_translate_sql(lag(x)), sql("LAG(`x`, 1) OVER ()"))
+  expect_translation(con, lead(x), 'LEAD("x", 1) OVER ()')
+  expect_translation(con, lag(x), 'LAG("x", 1) OVER ()')
 })
 
 test_that("copy_inline uses UNION ALL", {
-  con <- simulate_redshift()
+  con <- dialect_redshift()
   y <- tibble::tibble(id = 1L, arr = "{1,2,3}")
 
   types <- c(id = "bigint", arr = "integer[]")
   expect_snapshot({
-    copy_inline(con, y %>% slice(0)) %>% remote_query()
-    copy_inline(con, y) %>% remote_query()
+    copy_inline(con, y |> slice(0)) |> remote_query()
+    copy_inline(con, y) |> remote_query()
 
     # with `types`
-    copy_inline(con, y %>% slice(0), types = types) %>% remote_query()
-    copy_inline(con, y, types = types) %>% remote_query()
+    copy_inline(con, y |> slice(0), types = types) |> remote_query()
+    copy_inline(con, y, types = types) |> remote_query()
   })
 })
 
 test_that("custom clock functions translated correctly", {
-  local_con(simulate_redshift())
-  expect_equal(test_translate_sql(add_years(x, 1)), sql("DATEADD(YEAR, 1.0, `x`)"))
-  expect_equal(test_translate_sql(add_days(x, 1)), sql("DATEADD(DAY, 1.0, `x`)"))
+  con <- dialect_redshift()
+  expect_translation(
+    con,
+    add_years(x, 1),
+    'DATEADD(YEAR, 1.0, "x")'
+  )
+  expect_translation(
+    con,
+    add_days(x, 1),
+    'DATEADD(DAY, 1.0, "x")'
+  )
   expect_error(
-    test_translate_sql(add_days(x, 1, "dots", "must", "be empty")),
+    translate_sql(add_days(x, 1, "dots", "must", "be empty"), con = con),
     class = "rlib_error_dots_nonempty"
   )
-  expect_equal(test_translate_sql(date_build(2020, 1, 1)), sql("TO_DATE(CAST(2020.0 AS TEXT) || '-' CAST(1.0 AS TEXT) || '-' || CAST(1.0 AS TEXT)), 'YYYY-MM-DD')"))
-  expect_equal(test_translate_sql(date_build(year_column, 1L, 1L)), sql("TO_DATE(CAST(`year_column` AS TEXT) || '-' CAST(1 AS TEXT) || '-' || CAST(1 AS TEXT)), 'YYYY-MM-DD')"))
-  expect_equal(test_translate_sql(get_year(date_column)), sql("DATE_PART('year', `date_column`)"))
-  expect_equal(test_translate_sql(get_month(date_column)), sql("DATE_PART('month', `date_column`)"))
-  expect_equal(test_translate_sql(get_day(date_column)), sql("DATE_PART('day', `date_column`)"))
-  expect_equal(test_translate_sql(date_count_between(date_column_1, date_column_2, "day")),
-               sql("DATEDIFF(DAY, `date_column_1`, `date_column_2`)"))
-  expect_snapshot(
-    error = TRUE,
-    test_translate_sql(date_count_between(date_column_1, date_column_2, "year"))
+  expect_translation(
+    con,
+    date_build(2020, 1, 1),
+    "TO_DATE(CAST(2020.0 AS TEXT) || '-' || CAST(1.0 AS TEXT) || '-' || CAST(1.0 AS TEXT), 'YYYY-MM-DD')"
+  )
+  expect_translation(
+    con,
+    date_build(year_column, 1L, 1L),
+    'TO_DATE(CAST("year_column" AS TEXT) || \'-\' || CAST(1 AS TEXT) || \'-\' || CAST(1 AS TEXT), \'YYYY-MM-DD\')'
+  )
+  expect_translation(
+    con,
+    get_year(date_column),
+    'DATE_PART(\'year\', "date_column")'
+  )
+  expect_translation(
+    con,
+    get_month(date_column),
+    'DATE_PART(\'month\', "date_column")'
+  )
+  expect_translation(
+    con,
+    get_day(date_column),
+    'DATE_PART(\'day\', "date_column")'
+  )
+  expect_translation(
+    con,
+    date_count_between(date_column_1, date_column_2, "day"),
+    'DATEDIFF(DAY, "date_column_1", "date_column_2")'
   )
   expect_snapshot(
     error = TRUE,
-    test_translate_sql(date_count_between(date_column_1, date_column_2, "day", n = 5))
+    translate_sql(
+      date_count_between(date_column_1, date_column_2, "year"),
+      con = con
+    )
+  )
+  expect_snapshot(
+    error = TRUE,
+    translate_sql(
+      date_count_between(
+        date_column_1,
+        date_column_2,
+        "day",
+        n = 5
+      ),
+      con = con
+    )
   )
 })
 
 test_that("difftime is translated correctly", {
-  local_con(simulate_redshift())
-  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("DATEDIFF(DAY, `end_date`, `start_date`)"))
-  expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("DATEDIFF(DAY, `end_date`, `start_date`)"))
+  con <- dialect_redshift()
+  expect_translation(
+    con,
+    difftime(start_date, end_date, units = "days"),
+    'DATEDIFF(DAY, "end_date", "start_date")'
+  )
+  expect_translation(
+    con,
+    difftime(start_date, end_date),
+    'DATEDIFF(DAY, "end_date", "start_date")'
+  )
 
   expect_snapshot(
     error = TRUE,
-    test_translate_sql(difftime(start_date, end_date, units = "auto"))
+    translate_sql(difftime(start_date, end_date, units = "auto"), con = con)
   )
   expect_snapshot(
     error = TRUE,
-    test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days"))
+    translate_sql(
+      difftime(
+        start_date,
+        end_date,
+        tz = "UTC",
+        units = "days"
+      ),
+      con = con
+    )
+  )
+})
+
+test_that("window functions with redshift specific error message", {
+  con <- dialect_redshift()
+  expect_error(
+    translate_sql(quantile(x, 0.3, na.rm = TRUE), window = TRUE, con = con),
+    "Redshift"
+  )
+  expect_error(
+    translate_sql(median(x, na.rm = TRUE), window = TRUE, con = con),
+    "Redshift"
   )
 })

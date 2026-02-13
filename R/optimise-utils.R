@@ -14,11 +14,14 @@ uses_mutated_vars <- function(dots, select) {
 }
 
 expr_uses_var <- function(x, vars) {
-  if (is.sql(x)) return(TRUE)
-  if (is_call(x, "sql")) return(TRUE)
-  if (is_quosure(x)) return(expr_uses_var(quo_get_expr(x), vars))
+  if (is.sql(x)) {
+    return(TRUE)
+  }
   if (is_symbol(x)) {
     return(is_symbol(x, vars))
+  }
+  if (!is_call(x)) {
+    return(FALSE)
   }
 
   any(purrr::map_lgl(as.list(x[-1]), expr_uses_var, vars))
@@ -29,11 +32,12 @@ any_expr_uses_sql <- function(dots) {
 }
 
 expr_uses_sql <- function(x) {
-  if (is.sql(x)) return(TRUE)
-  if (is_call(x, "sql")) return(TRUE)
-  if (is_quosure(x)) return(expr_uses_sql(quo_get_expr(x)))
-
-  if (!is_call(x)) return(FALSE)
+  if (is.sql(x)) {
+    return(TRUE)
+  }
+  if (!is_call(x)) {
+    return(FALSE)
+  }
 
   any(purrr::map_lgl(as.list(x[-1]), expr_uses_sql))
 }

@@ -5,12 +5,13 @@
 #' `INTERSECT`, `UNION`, and `EXCEPT` respectively.
 #'
 #' @inheritParams left_join.tbl_lazy
-#' @param ... Not currently used; provided for future extensions.
+#' @param ... Must be empty.
 #' @param all If `TRUE`, includes all matches in output, not just unique rows.
 #' @exportS3Method dplyr::intersect
 #' @importFrom dplyr intersect
-intersect.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
-  lazy_query <- add_set_op(x, y, "INTERSECT", copy = copy, ..., all = all)
+intersect.tbl_lazy <- function(x, y, copy = "none", ..., all = FALSE) {
+  check_dots_empty()
+  lazy_query <- add_set_op(x, y, "INTERSECT", copy = copy, all = all)
 
   x$lazy_query <- lazy_query
   x
@@ -18,8 +19,9 @@ intersect.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
 #' @importFrom dplyr union
 #' @exportS3Method dplyr::union
 #' @rdname intersect.tbl_lazy
-union.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
-  lazy_query <- add_union(x, y, all = all, copy = copy, ...)
+union.tbl_lazy <- function(x, y, copy = "none", ..., all = FALSE) {
+  check_dots_empty()
+  lazy_query <- add_union(x, y, all = all, copy = copy)
 
   x$lazy_query <- lazy_query
   x
@@ -28,8 +30,9 @@ union.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
 #' @importFrom dplyr union_all
 #' @exportS3Method dplyr::union_all
 #' @rdname intersect.tbl_lazy
-union_all.tbl_lazy <- function(x, y, copy = FALSE, ...) {
-  lazy_query <- add_union(x, y, all = TRUE, copy = copy, ...)
+union_all.tbl_lazy <- function(x, y, copy = "none", ...) {
+  check_dots_empty()
+  lazy_query <- add_union(x, y, all = TRUE, copy = copy)
 
   x$lazy_query <- lazy_query
   x
@@ -37,15 +40,16 @@ union_all.tbl_lazy <- function(x, y, copy = FALSE, ...) {
 #' @importFrom dplyr setdiff
 #' @exportS3Method dplyr::setdiff
 #' @rdname intersect.tbl_lazy
-setdiff.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
-  lazy_query <- add_set_op(x, y, "EXCEPT", copy = copy, ..., all = all)
+setdiff.tbl_lazy <- function(x, y, copy = "none", ..., all = FALSE) {
+  check_dots_empty()
+  lazy_query <- add_set_op(x, y, "EXCEPT", copy = copy, all = all)
 
   x$lazy_query <- lazy_query
   x
 }
 
-add_union <- function(x, y, all, copy = FALSE, ..., call = caller_env()) {
-  y <- auto_copy(x, y, copy)
+add_union <- function(x, y, all, copy = "none", call = caller_env()) {
+  y <- dbplyr_auto_copy(x, y, copy = copy, call = call)
   check_set_op_sqlite(x, y, call = call)
 
   # Ensure each has same variables
@@ -56,7 +60,9 @@ add_union <- function(x, y, all, copy = FALSE, ..., call = caller_env()) {
     tmp <- list(lazy_query = x_lq$x)
     class(tmp) <- "tbl_lazy"
     x_lq$x <- fill_vars(tmp, vars)$lazy_query
-    x_lq$unions$table <- purrr::map(x_lq$unions$table, function(table) fill_vars(table, vars))
+    x_lq$unions$table <- purrr::map(x_lq$unions$table, function(table) {
+      fill_vars(table, vars)
+    })
     y <- fill_vars(y, vars)
 
     x_lq$unions$table <- c(x_lq$unions$table, list(y))
@@ -79,8 +85,15 @@ add_union <- function(x, y, all, copy = FALSE, ..., call = caller_env()) {
   )
 }
 
-add_set_op <- function(x, y, type, copy = FALSE, ..., all = FALSE, call = caller_env()) {
-  y <- auto_copy(x, y, copy)
+add_set_op <- function(
+  x,
+  y,
+  type,
+  copy = "none",
+  all = FALSE,
+  call = caller_env()
+) {
+  y <- dbplyr_auto_copy(x, y, copy = copy, call = call)
   check_set_op_sqlite(x, y, call = call)
 
   # Ensure each has same variables
@@ -89,7 +102,8 @@ add_set_op <- function(x, y, type, copy = FALSE, ..., all = FALSE, call = caller
   y <- fill_vars(y, vars)
 
   lazy_set_op_query(
-    x$lazy_query, y$lazy_query,
+    x$lazy_query,
+    y$lazy_query,
     type = type,
     all = all,
     call = call
@@ -97,7 +111,7 @@ add_set_op <- function(x, y, type, copy = FALSE, ..., all = FALSE, call = caller
 }
 
 check_set_op_sqlite <- function(x, y, call) {
-  if (inherits(x$src$con, "SQLiteConnection")) {
+  if (inherits(x$con, "SQLiteConnection")) {
     # LIMIT only part the compound-select-statement not the select-core.
     #
     # https://www.sqlite.org/syntax/compound-select-stmt.html

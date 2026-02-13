@@ -16,12 +16,19 @@
 #' modifying the underlying table on the database.
 #'
 #' @export
+#' @inheritParams left_join.tbl_lazy
 #' @param x A lazy table.
 #'   For `in_place = TRUE`, this must be a table instantiated with [tbl()] or
 #'   [compute()], not to a lazy query. The [remote_name()] function is used to
 #'   determine the name of the table to be updated.
 #' @param y A lazy table, data frame, or data frame extensions (e.g. a tibble).
-#' @inheritParams dplyr::rows_insert
+#' @param by An unnamed character vector giving the key columns. The key columns
+#'   must exist in both `x` and `y`. Keys typically uniquely identify each row,
+#'   but this is only enforced for the key values of `y` when `rows_update()`,
+#'   `rows_patch()`, or `rows_upsert()` are used.
+#'
+#'   By default, we use the first column in `y`, since the first column is
+#'   a reasonable place to put an identifier variable.
 #' @param conflict For `rows_insert()`, how should keys in `y` that conflict
 #'   with keys in `x` be handled? A conflict arises if there is a key in `y`
 #'   that already exists in `x`.
@@ -84,15 +91,17 @@
 #' # In this case `rows_insert()` returns nothing and the underlying
 #' # data is modified
 #' ponies
-rows_insert.tbl_lazy <- function(x,
-                                 y,
-                                 by = NULL,
-                                 ...,
-                                 conflict = c("error", "ignore"),
-                                 copy = FALSE,
-                                 in_place = FALSE,
-                                 returning = NULL,
-                                 method = NULL) {
+rows_insert.tbl_lazy <- function(
+  x,
+  y,
+  by = NULL,
+  ...,
+  conflict = c("error", "ignore"),
+  copy = "none",
+  in_place = FALSE,
+  returning = NULL,
+  method = NULL
+) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
   table <- target_table(x, in_place)
@@ -130,9 +139,9 @@ rows_insert.tbl_lazy <- function(x,
 
     if (!is_empty(returning_cols)) {
       # Need to `union_all()` with `x` so that all columns of `x` exist in the result
-      returned_rows <- anti_join(y, x, by = by) %>%
-        union_all(x %>% filter(0 == 1)) %>%
-        select(!!!returning_cols) %>%
+      returned_rows <- anti_join(y, x, by = by) |>
+        union_all(x |> filter(0 == 1)) |>
+        select(!!!returning_cols) |>
         collect()
       out <- set_returned_rows(out, returned_rows)
     }
@@ -146,12 +155,14 @@ rows_insert.tbl_lazy <- function(x,
 #' @export
 #' @importFrom dplyr rows_append
 #' @rdname rows-db
-rows_append.tbl_lazy <- function(x,
-                                 y,
-                                 ...,
-                                 copy = FALSE,
-                                 in_place = FALSE,
-                                 returning = NULL) {
+rows_append.tbl_lazy <- function(
+  x,
+  y,
+  ...,
+  copy = "none",
+  in_place = FALSE,
+  returning = NULL
+) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
   table <- target_table(x, in_place)
@@ -177,8 +188,8 @@ rows_append.tbl_lazy <- function(x,
 
     if (!is_empty(returning_cols)) {
       # Need to `union_all()` with `x` so that all columns of `x` exist in the result
-      returned_rows <- union_all(y, x %>% filter(0 == 1)) %>%
-        select(!!!returning_cols) %>%
+      returned_rows <- union_all(y, x |> filter(0 == 1)) |>
+        select(!!!returning_cols) |>
         collect()
       out <- set_returned_rows(out, returned_rows)
     }
@@ -192,14 +203,16 @@ rows_append.tbl_lazy <- function(x,
 #' @export
 #' @importFrom dplyr rows_update
 #' @rdname rows-db
-rows_update.tbl_lazy <- function(x,
-                                 y,
-                                 by = NULL,
-                                 ...,
-                                 unmatched = c("error", "ignore"),
-                                 copy = FALSE,
-                                 in_place = FALSE,
-                                 returning = NULL) {
+rows_update.tbl_lazy <- function(
+  x,
+  y,
+  by = NULL,
+  ...,
+  unmatched = c("error", "ignore"),
+  copy = "none",
+  in_place = FALSE,
+  returning = NULL
+) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
   table <- target_table(x, in_place)
@@ -218,7 +231,6 @@ rows_update.tbl_lazy <- function(x,
 
   returning_cols <- rows_check_returning(x, returning, enexpr(returning))
 
-
   if (!is_null(table)) {
     # TODO handle `returning_cols` here
     if (is_empty(new_columns)) {
@@ -228,7 +240,7 @@ rows_update.tbl_lazy <- function(x,
     con <- remote_con(x)
     update_cols <- setdiff(colnames(y), by)
     update_values <- set_names(
-      sql_table_prefix(con, update_cols, "...y"),
+      sql_table_prefix(con, "...y", update_cols),
       update_cols
     )
 
@@ -245,8 +257,8 @@ rows_update.tbl_lazy <- function(x,
     rows_get_or_execute(x, sql, returning_cols)
   } else {
     existing_columns <- setdiff(colnames(x), new_columns)
-    updated <- x %>%
-      select(!!!existing_columns) %>%
+    updated <- x |>
+      select(!!!existing_columns) |>
       inner_join(y, by = by)
 
     if (is_empty(new_columns)) {
@@ -257,8 +269,8 @@ rows_update.tbl_lazy <- function(x,
     }
 
     if (!is_empty(returning_cols)) {
-      returned_rows <- updated %>%
-        select(!!!returning_cols) %>%
+      returned_rows <- updated |>
+        select(!!!returning_cols) |>
         collect()
       out <- set_returned_rows(out, returned_rows)
     }
@@ -272,14 +284,16 @@ rows_update.tbl_lazy <- function(x,
 #' @export
 #' @importFrom dplyr rows_patch
 #' @rdname rows-db
-rows_patch.tbl_lazy <- function(x,
-                                y,
-                                by = NULL,
-                                ...,
-                                unmatched = c("error", "ignore"),
-                                copy = FALSE,
-                                in_place = FALSE,
-                                returning = NULL) {
+rows_patch.tbl_lazy <- function(
+  x,
+  y,
+  by = NULL,
+  ...,
+  unmatched = c("error", "ignore"),
+  copy = "none",
+  in_place = FALSE,
+  returning = NULL
+) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
   table <- target_table(x, in_place)
@@ -308,8 +322,8 @@ rows_patch.tbl_lazy <- function(x,
 
     update_cols <- setdiff(colnames(y), by)
     update_values <- sql_coalesce(
-      sql_table_prefix(con, update_cols, table),
-      sql_table_prefix(con, update_cols, "...y")
+      sql_table_prefix(con, table, update_cols),
+      sql_table_prefix(con, "...y", update_cols)
     )
     update_values <- set_names(update_values, update_cols)
 
@@ -326,7 +340,8 @@ rows_patch.tbl_lazy <- function(x,
     rows_get_or_execute(x, sql, returning_cols)
   } else {
     to_patch <- inner_join(
-      x, y,
+      x,
+      y,
       by = by,
       suffix = c("", "...y")
     )
@@ -335,23 +350,25 @@ rows_patch.tbl_lazy <- function(x,
     patch_quos <-
       lapply(
         seq_along(new_columns),
-        function(.x) quo(coalesce(!!sym(new_columns[.x]), !!sym(patch_columns_y[.x])))
-      ) %>%
+        function(.x) {
+          quo(coalesce(!!sym(new_columns[.x]), !!sym(patch_columns_y[.x])))
+        }
+      ) |>
       rlang::set_names(new_columns)
     if (is_empty(new_columns)) {
       patched <- to_patch
       out <- x
     } else {
-      patched <- to_patch %>%
-        mutate(!!!patch_quos) %>%
+      patched <- to_patch |>
+        mutate(!!!patch_quos) |>
         select(-all_of(patch_columns_y))
       unchanged <- anti_join(x, y, by = by)
       out <- union_all(unchanged, patched)
     }
 
     if (!is_empty(returning_cols)) {
-      returned_rows <- patched %>%
-        select(!!!returning_cols) %>%
+      returned_rows <- patched |>
+        select(!!!returning_cols) |>
         collect()
       out <- set_returned_rows(out, returned_rows)
     }
@@ -365,14 +382,16 @@ rows_patch.tbl_lazy <- function(x,
 #'
 #' @importFrom dplyr rows_upsert
 #' @rdname rows-db
-rows_upsert.tbl_lazy <- function(x,
-                                 y,
-                                 by = NULL,
-                                 ...,
-                                 copy = FALSE,
-                                 in_place = FALSE,
-                                 returning = NULL,
-                                 method = NULL) {
+rows_upsert.tbl_lazy <- function(
+  x,
+  y,
+  by = NULL,
+  ...,
+  copy = "none",
+  in_place = FALSE,
+  returning = NULL,
+  method = NULL
+) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
   table <- target_table(x, in_place)
@@ -416,8 +435,8 @@ rows_upsert.tbl_lazy <- function(x,
     } else {
       unchanged <- anti_join(x, y, by = by)
       existing_columns <- setdiff(colnames(x), new_columns)
-      updated <- x %>%
-        select(!!!existing_columns) %>%
+      updated <- x |>
+        select(!!!existing_columns) |>
         inner_join(y, by = by)
       upserted <- union_all(updated, inserted)
     }
@@ -425,8 +444,8 @@ rows_upsert.tbl_lazy <- function(x,
     out <- union_all(unchanged, upserted)
 
     if (!is_empty(returning_cols)) {
-      returned_rows <- upserted %>%
-        select(!!!returning_cols) %>%
+      returned_rows <- upserted |>
+        select(!!!returning_cols) |>
         collect()
       out <- set_returned_rows(out, returned_rows)
     }
@@ -440,14 +459,16 @@ rows_upsert.tbl_lazy <- function(x,
 #'
 #' @importFrom dplyr rows_delete
 #' @rdname rows-db
-rows_delete.tbl_lazy <- function(x,
-                                 y,
-                                 by = NULL,
-                                 ...,
-                                 unmatched = c("error", "ignore"),
-                                 copy = FALSE,
-                                 in_place = FALSE,
-                                 returning = NULL) {
+rows_delete.tbl_lazy <- function(
+  x,
+  y,
+  by = NULL,
+  ...,
+  unmatched = c("error", "ignore"),
+  copy = "none",
+  in_place = FALSE,
+  returning = NULL
+) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
   table <- target_table(x, in_place)
@@ -467,7 +488,10 @@ rows_delete.tbl_lazy <- function(x,
   extra <- setdiff(colnames(y), by)
   if (!is_empty(extra)) {
     message <- glue("Ignoring extra `y` columns: ", commas(tick(extra)))
-    inform(message, class = c("dplyr_message_delete_extra_cols", "dplyr_message"))
+    inform(
+      message,
+      class = c("dplyr_message_delete_extra_cols", "dplyr_message")
+    )
   }
 
   if (!is_null(table)) {
@@ -485,8 +509,8 @@ rows_delete.tbl_lazy <- function(x,
     out <- anti_join(x, y, by = by)
 
     if (!is_empty(returning_cols)) {
-      returned_rows <- semi_join(x, y, by = by) %>%
-        select(!!!returning_cols) %>%
+      returned_rows <- semi_join(x, y, by = by) |>
+        select(!!!returning_cols) |>
         collect()
       out <- set_returned_rows(out, returned_rows)
     }
@@ -619,12 +643,14 @@ rows_check_containment <- function(x, y, ..., error_call = caller_env()) {
   invisible()
 }
 
-rows_check_key <- function(x,
-                           by,
-                           arg,
-                           ...,
-                           unique = FALSE,
-                           error_call = caller_env()) {
+rows_check_key <- function(
+  x,
+  by,
+  arg,
+  ...,
+  unique = FALSE,
+  error_call = caller_env()
+) {
   check_dots_empty()
 
   missing <- setdiff(by, colnames(x))
@@ -644,10 +670,15 @@ rows_check_key <- function(x,
 rows_check_in_place <- function(df, in_place, call = caller_env()) {
   check_bool(in_place, call = call)
 
-  if (!in_place) return()
+  if (!in_place) {
+    return()
+  }
 
   if (inherits(df, "tbl_TestConnection")) {
-    cli_abort("{.code in_place = TRUE} does not work for simulated connections.", call = call)
+    cli_abort(
+      "{.code in_place = TRUE} does not work for simulated connections.",
+      call = call
+    )
   }
 }
 
@@ -676,14 +707,24 @@ rows_check_ummatched <- function(unmatched, error_call = caller_env()) {
   unmatched
 }
 
-rows_check_returning <- function(df, returning, returning_expr, error_call = caller_env()) {
+rows_check_returning <- function(
+  df,
+  returning,
+  returning_expr,
+  error_call = caller_env()
+) {
   locs <- tidyselect::eval_select(returning_expr, df, error_call = error_call)
   returning_cols <- set_names(colnames(df)[locs], names(locs))
 
-  if (is_empty(returning_cols)) return(returning_cols)
+  if (is_empty(returning_cols)) {
+    return(returning_cols)
+  }
 
   if (inherits(df, "tbl_TestConnection")) {
-    cli_abort("{.arg returning} does not work for simulated connections.", call = error_call)
+    cli_abort(
+      "{.arg returning} does not work for simulated connections.",
+      call = error_call
+    )
   }
 
   returning_cols
@@ -697,7 +738,11 @@ err_vars <- function(x) {
     x <- encodeString(x, quote = "`")
   }
 
-  glue::glue_collapse(x, sep = ", ", last = if (length(x) <= 2) " and " else ", and ")
+  glue::glue_collapse(
+    x,
+    sep = ", ",
+    last = if (length(x) <= 2) " and " else ", and "
+  )
 }
 
 commas <- function(...) paste0(..., collapse = ", ")
@@ -716,19 +761,20 @@ target_table <- function(x, in_place) {
 
   table <- remote_table(x)
   if (is_null(table)) {
-    cli_abort("Can't determine name for target table. Set {.code in_place = FALSE} to return a lazy table.")
+    cli_abort(
+      "Can't determine name for target table. Set {.code in_place = FALSE} to return a lazy table."
+    )
   }
 
   table
 }
 
 rows_prep <- function(con, table, from, by, lvl = 0) {
-  y_name <- "...y"
-  join_by <- list(x = by, y = by, x_as = y_name, y_as = table, condition = "=")
+  join_by <- new_join_by(by, x_as = "...y", y_as = table)
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
 
   list(
-    from = sql_query_wrap(con, from, y_name, lvl = lvl),
+    from = sql_query_wrap(con, from, join_by$x_as, lvl = lvl),
     where = where
   )
 }
@@ -736,12 +782,13 @@ rows_prep <- function(con, table, from, by, lvl = 0) {
 rows_insert_prep <- function(con, table, from, cols, by, lvl = 0) {
   out <- rows_prep(con, table, from, by, lvl = lvl)
 
-  join_by <- list(x = by, y = by, x_as = table, y_as = "...y", condition = "=")
+  join_by <- new_join_by(by, x_as = table, y_as = "...y")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
-  out$conflict_clauses <- sql_clause_where_exists(table, where, not = TRUE)
+  table_sql <- sql_escape_table_source(con, table)
+  out$conflict_clauses <- sql_clause_where_exists(table_sql, where, not = TRUE)
 
-  insert_cols <- escape(ident(cols), collapse = ", ", parens = TRUE, con = con)
-  out$insert_clause <- sql_clause_insert(con, insert_cols, table)
+  cols_sql <- sql_escape_ident(con, cols)
+  out$insert_clause <- sql_clause_insert(cols_sql, table_sql)
 
   out
 }
@@ -759,7 +806,7 @@ rows_auto_copy <- function(x, y, copy, call = caller_env()) {
     x_types <- x_types[colnames(y)]
   }
 
-  auto_copy(x, y, copy = copy, types = x_types)
+  dbplyr_auto_copy(x, y, copy = copy, types = x_types, call = call)
 }
 
 rows_get_or_execute <- function(x, sql, returning_cols, call = caller_env()) {

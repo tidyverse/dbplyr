@@ -15,13 +15,13 @@
   by = NULL,
   ...,
   conflict = c("error", "ignore"),
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL,
   method = NULL
 )
 
-\method{rows_append}{tbl_lazy}(x, y, ..., copy = FALSE, in_place = FALSE, returning = NULL)
+\method{rows_append}{tbl_lazy}(x, y, ..., copy = "none", in_place = FALSE, returning = NULL)
 
 \method{rows_update}{tbl_lazy}(
   x,
@@ -29,7 +29,7 @@
   by = NULL,
   ...,
   unmatched = c("error", "ignore"),
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL
 )
@@ -40,7 +40,7 @@
   by = NULL,
   ...,
   unmatched = c("error", "ignore"),
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL
 )
@@ -50,7 +50,7 @@
   y,
   by = NULL,
   ...,
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL,
   method = NULL
@@ -62,7 +62,7 @@
   by = NULL,
   ...,
   unmatched = c("error", "ignore"),
-  copy = FALSE,
+  copy = "none",
   in_place = FALSE,
   returning = NULL
 )
@@ -98,10 +98,23 @@ same behaviour add a unique index on the \code{by} columns and use
 \code{x}.
 }}
 
-\item{copy}{If \code{x} and \code{y} are not from the same data source,
-and \code{copy} is \code{TRUE}, then \code{y} will be copied into the
-same src as \code{x}.  This allows you to join tables across srcs, but
-it is a potentially expensive operation so you must opt into it.}
+\item{copy}{If \code{x} and \code{y} are not from the same data source, \code{copy}
+controls how \code{y} is copied into the same source as \code{x}. There are three
+options:
+\itemize{
+\item \code{"none"}, the default, will error if \code{y} needs to be copied. This ensures
+that you don't accidentally copy large datasets from R to the database.
+\item \code{"temp-table"}: copies \code{y} into a temporary table in the same
+database as \code{x}. \verb{*_join()} will automatically run \code{ANALYZE} on the
+created table in the hope that this will make your queries as efficient
+as possible by giving more data to the query planner.
+\item \code{"inline"}: \code{y} will be inlined into the query using \code{\link[=copy_inline]{copy_inline()}}.
+This is should faster for small datasets and doesn't require write
+access.
+}
+
+\code{TRUE} (\code{"temp-table"}) and \code{FALSE} (\code{"none"}) are also accepted for
+backward compatibility.}
 
 \item{in_place}{Should \code{x} be modified in place? If \code{FALSE} will
 generate a \code{SELECT} query that returns the modified table; if \code{TRUE}

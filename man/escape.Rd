@@ -2,13 +2,28 @@
 % Please edit documentation in R/escape.R
 \name{escape}
 \alias{escape}
-\alias{escape_ansi}
+\alias{sql_escape_ident}
+\alias{sql_escape_logical}
+\alias{sql_escape_date}
+\alias{sql_escape_datetime}
+\alias{sql_escape_string}
+\alias{sql_escape_raw}
 \alias{sql_vector}
-\title{Escape/quote a string.}
+\title{Escape/quote a value}
 \usage{
 escape(x, parens = NA, collapse = " ", con = NULL)
 
-escape_ansi(x, parens = NA, collapse = "")
+sql_escape_ident(con, x)
+
+sql_escape_logical(con, x)
+
+sql_escape_date(con, x)
+
+sql_escape_datetime(con, x)
+
+sql_escape_string(con, x)
+
+sql_escape_raw(con, x)
 
 sql_vector(x, parens = NA, collapse = " ", con = NULL)
 }
@@ -26,24 +41,50 @@ Default behaviour: lists are always wrapped in parens and separated by
 commas, identifiers are separated by commas and never wrapped,
 atomic vectors are separated by spaces and wrapped in parens if needed.}
 
-\item{con}{Database connection.}
+\item{con}{A \link{sql_dialect} object or database connection. Connections are
+supported for backward compatibility.}
+}
+\value{
+A \link{sql} vector.
 }
 \description{
-\code{escape()} requires you to provide a database connection to control the
-details of escaping. \code{escape_ansi()} uses the SQL 92 ANSI standard.
+\code{escape()} turns R values into SQL literals. It implements double dispatch
+via two sets of generics: first \code{escape()} dispatches on the class of \code{x},
+then that method calls \code{sql_escape_ident()}, \code{sql_escape_logical()}, etc,
+which dispatch on \code{con}.
+
+These generics translate individual values into SQL. The core
+generics are \code{\link[DBI:dbQuoteIdentifier]{DBI::dbQuoteIdentifier()}} and \code{\link[DBI:dbQuoteString]{DBI::dbQuoteString()}}
+for quoting identifiers and strings, but dbplyr needs additional
+tools for inserting logical, date, date-time, and raw values into
+queries.
 }
 \examples{
+con <- dialect_ansi()
+
 # Doubles vs. integers
-escape_ansi(1:5)
-escape_ansi(c(1, 5.4))
+escape(1:5, con = con)
+escape(c(1, 5.4), con = con)
 
 # String vs known sql vs. sql identifier
-escape_ansi("X")
-escape_ansi(sql("X"))
-escape_ansi(ident("X"))
+escape("X", con = con)
+escape(sql("X"), con = con)
+escape(ident("X"), con = con)
 
 # Escaping is idempotent
-escape_ansi("X")
-escape_ansi(escape_ansi("X"))
-escape_ansi(escape_ansi(escape_ansi("X")))
+escape("X", con = con)
+escape(escape("X", con = con), con = con)
+
+# Database specific generics
+sql_escape_logical(con, c(TRUE, FALSE, NA))
+sql_escape_date(con, Sys.Date())
+sql_escape_date(con, Sys.time())
+sql_escape_raw(con, charToRaw("hi"))
 }
+\seealso{
+Other generic: 
+\code{\link{db-sql}},
+\code{\link{db_connection_describe}()},
+\code{\link{db_copy_to}()}
+}
+\concept{generic}

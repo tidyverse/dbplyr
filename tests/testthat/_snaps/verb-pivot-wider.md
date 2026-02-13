@@ -1,20 +1,19 @@
 # can pivot all cols to wide
 
     Code
-      lazy_frame(key = c("x", "y", "z"), val = 1:3) %>% dbplyr_pivot_wider_spec(spec)
+      dbplyr_pivot_wider_spec(lazy_frame(key = c("x", "y", "z"), val = 1:3), spec)
     Output
       <SQL>
       SELECT
-        MAX(CASE WHEN (`key` = 'x') THEN `val` END) AS `x`,
-        MAX(CASE WHEN (`key` = 'y') THEN `val` END) AS `y`,
-        MAX(CASE WHEN (`key` = 'z') THEN `val` END) AS `z`
-      FROM `df`
+        MAX(CASE WHEN ("key" = 'x') THEN "val" END) AS "x",
+        MAX(CASE WHEN ("key" = 'y') THEN "val" END) AS "y",
+        MAX(CASE WHEN ("key" = 'z') THEN "val" END) AS "z"
+      FROM "df"
 
 # implicit missings turn into explicit missings
 
     Code
-      lazy_frame(a = 1:2, key = c("x", "y"), val = 1:2) %>% dbplyr_pivot_wider_spec(
-        spec)
+      show_query(dbplyr_pivot_wider_spec(df, spec))
     Output
       <SQL>
       SELECT
@@ -40,9 +39,9 @@
       suppressWarnings(dbplyr_pivot_wider_spec(df, spec1, values_fn = sum))
     Output
       <SQL>
-      SELECT `a`, SUM(CASE WHEN (`key` = 'x') THEN `val` END) AS `x`
-      FROM `df`
-      GROUP BY `a`
+      SELECT "a", SUM(CASE WHEN ("key" = 'x') THEN "val" END) AS "x"
+      FROM "df"
+      GROUP BY "a"
 
 # values_fn can be a formula
 
@@ -50,9 +49,9 @@
       dbplyr_pivot_wider_spec(df, spec1, values_fn = ~ sum(.x, na.rm = TRUE))
     Output
       <SQL>
-      SELECT `a`, SUM(CASE WHEN (`key` = 'x') THEN `val` END) AS `x`
-      FROM `df`
-      GROUP BY `a`
+      SELECT "a", SUM(CASE WHEN ("key" = 'x') THEN "val" END) AS "x"
+      FROM "df"
+      GROUP BY "a"
 
 # values_fn can be a named list
 
@@ -88,11 +87,11 @@
     Output
       <SQL>
       SELECT
-        `g`,
-        MAX(CASE WHEN (`name` = 'x') THEN `value` WHEN NOT (`name` = 'x') THEN 0.0 END) AS `x`,
-        MAX(CASE WHEN (`name` = 'y') THEN `value` WHEN NOT (`name` = 'y') THEN 0.0 END) AS `y`
-      FROM `df`
-      GROUP BY `g`
+        "g",
+        MAX(CASE WHEN ("name" = 'x') THEN "value" WHEN NOT ("name" = 'x') THEN 0.0 END) AS "x",
+        MAX(CASE WHEN ("name" = 'y') THEN "value" WHEN NOT ("name" = 'y') THEN 0.0 END) AS "y"
+      FROM "df"
+      GROUP BY "g"
 
 ---
 
@@ -101,11 +100,11 @@
     Output
       <SQL>
       SELECT
-        `g`,
-        MAX(CASE WHEN (`name` = 'x') THEN `value` WHEN NOT (`name` = 'x') THEN 0.0 END) AS `x`,
-        MAX(CASE WHEN (`name` = 'y') THEN `value` WHEN NOT (`name` = 'y') THEN 0.0 END) AS `y`
-      FROM `df`
-      GROUP BY `g`
+        "g",
+        MAX(CASE WHEN ("name" = 'x') THEN "value" WHEN NOT ("name" = 'x') THEN 0.0 END) AS "x",
+        MAX(CASE WHEN ("name" = 'y') THEN "value" WHEN NOT ("name" = 'y') THEN 0.0 END) AS "y"
+      FROM "df"
+      GROUP BY "g"
 
 # values_fill is checked
 

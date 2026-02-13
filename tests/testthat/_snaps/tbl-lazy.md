@@ -1,17 +1,17 @@
 # argument src is deprecated
 
     Code
-      tbl_lazy(mtcars, src = simulate_sqlite())
+      tbl_lazy(mtcars, src = dialect_sqlite())
     Condition
       Error in `tbl_lazy()`:
       ! `...` must be empty.
       x Problematic argument:
-      * src = simulate_sqlite()
+      * src = dialect_sqlite()
 
 # cannot convert tbl_lazy to data.frame
 
     Code
-      as.data.frame(tbl_lazy(mtcars, con = simulate_sqlite()))
+      as.data.frame(tbl_lazy(mtcars, con = dialect_sqlite()))
     Condition
       Error in `as.data.frame()`:
       ! Can not coerce <tbl_lazy> to <data.frame>
@@ -23,7 +23,7 @@
     Output
       <SQL>
       SELECT *
-      FROM `df`
+      FROM "df"
 
 # names() inform that they aren't meant to be used
 
@@ -33,7 +33,7 @@
       ! The `names()` method of <tbl_lazy> is for internal use only.
       i Did you mean `colnames()`?
     Output
-      [1] "lazy_query" "src"       
+      [1] "con"        "src"        "lazy_query"
 
 # $ aborts when not used with src or lazy_query
 

@@ -10,16 +10,16 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(g = rep(1:2, each = 5), y = runif(10), z = 1:10)
-#' db %>%
-#'   window_order(y) %>%
-#'   mutate(z = cumsum(y)) %>%
+#' db |>
+#'   window_order(y) |>
+#'   mutate(z = cumsum(y)) |>
 #'   show_query()
 #'
-#' db %>%
-#'   group_by(g) %>%
-#'   window_frame(-3, 0) %>%
-#'   window_order(z) %>%
-#'   mutate(z = sum(y)) %>%
+#' db |>
+#'   group_by(g) |>
+#'   window_frame(-3, 0) |>
+#'   window_order(z) |>
+#'   mutate(z = sum(y)) |>
 #'   show_query()
 window_order <- function(.data, ...) {
   if (!is_tbl_lazy(.data)) {
@@ -31,44 +31,38 @@ window_order <- function(.data, ...) {
   }
   dots <- partial_eval_dots(.data, ..., .named = FALSE)
   names(dots) <- NULL
-  dots <- check_window_order_dots(dots)
+  check_window_order_dots(dots)
 
-  .data$lazy_query <- add_order(.data, dots)
+  .data$lazy_query <- add_order(.data$lazy_query, dots)
   .data
 }
 
 # We want to preserve this ordering (for window functions) without
 # imposing an additional arrange, so we have a special op_order
-add_order <- function(.data, dots) {
-  .data$lazy_query$order_vars <- unname(dots)
-  .data$lazy_query
+add_order <- function(lazy_query, exprs) {
+  lazy_query$order_vars <- unname(exprs)
+  lazy_query
 }
 
-check_window_order_dots <- function(dots, call = caller_env()) {
+check_window_order_dots <- function(dots, arg = "...", call = caller_env()) {
   for (i in seq_along(dots)) {
     x <- dots[[i]]
-    if (is_quosure(x)) {
-      x <- quo_get_expr(x)
-    }
 
     if (is_call(x, "desc", n = 1)) {
       x <- call_args(x)[[1]]
     }
 
-    dot <- dots[[i]]
     if (!is_symbol(x)) {
-      dot <- as_label(dot)
+      dot_label <- as_label(dots[[i]])
       msg <- c(
-        `!` = "Each element of {.code ...} must be a single column name or a column wrapped in {.fn desc}.",
-        x = "Element {i} is {.code {dot}}."
+        `!` = "Every element of {.code {arg}} must be a single column name or a column wrapped in {.fn desc}.",
+        x = "Element {i} is {.code {dot_label}}."
       )
       cli_abort(msg, call = call)
     }
-
-    dots[[i]] <- quo_get_expr(dot)
   }
 
-  dots
+  invisible()
 }
 
 
@@ -105,6 +99,16 @@ check_frame_range <- function(range, call = caller_env()) {
   }
 
   vctrs::vec_assert(range, size = 2L, arg = "frame", call = call)
-  check_number_whole(range[1], allow_infinite = TRUE, arg = "frame", call = call)
-  check_number_whole(range[2], allow_infinite = TRUE, arg = "frame", call = call)
+  check_number_whole(
+    range[1],
+    allow_infinite = TRUE,
+    arg = "frame",
+    call = call
+  )
+  check_number_whole(
+    range[2],
+    allow_infinite = TRUE,
+    arg = "frame",
+    call = call
+  )
 }

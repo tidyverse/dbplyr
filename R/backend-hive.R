@@ -1,30 +1,48 @@
-#' Backend: Hive
+#' Hive backend
 #'
 #' @description
-#' See `vignette("translation-function")` and `vignette("translation-verb")` for
-#' details of overall translation technology. Key differences for this backend
-#' are a scattering of custom translations provided by users.
+#' This backend supports Apache Hive, typically accessed via odbc. Use
+#' `dialect_hive()` with `lazy_frame()` to see simulated SQL without connecting
+#' to a live database.
 #'
-#' Use `simulate_hive()` with `lazy_frame()` to see simulated SQL without
-#' converting to live access database.
+#' Key differences for this backend are a scattering of custom translations
+#' provided by users.
+#'
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
+#' details of overall translation technology.
 #'
 #' @name backend-hive
 #' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
-#' lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = simulate_hive())
-#' lf %>% transmute(x = cot(b))
-#' lf %>% transmute(x = bitwShiftL(c, 1L))
-#' lf %>% transmute(x = str_replace_all(c, "a", "b"))
+#' lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = dialect_hive())
+#' lf |> transmute(x = cot(b))
+#' lf |> transmute(x = bitwShiftL(c, 1L))
+#' lf |> transmute(x = str_replace_all(c, "a", "b"))
 #'
-#' lf %>% summarise(x = median(d, na.rm = TRUE))
-#' lf %>% summarise(x = var(c, na.rm = TRUE))
+#' lf |> summarise(x = median(d, na.rm = TRUE))
+#' lf |> summarise(x = var(c, na.rm = TRUE))
 NULL
 
 #' @export
 #' @rdname backend-hive
+dialect_hive <- function() {
+  new_sql_dialect(
+    "hive",
+    quote_identifier = function(x) sql_quote(x, '"'),
+    has_window_clause = TRUE
+  )
+}
+
+#' @export
+#' @rdname backend-hive
 simulate_hive <- function() simulate_dbi("Hive")
+
+#' @export
+sql_dialect.Hive <- function(con) {
+  dialect_hive()
+}
 
 #' @export
 dbplyr_edition.Hive <- function(con) {
@@ -32,26 +50,29 @@ dbplyr_edition.Hive <- function(con) {
 }
 
 #' @export
-sql_translation.Hive <- function(con) {
+sql_translation.sql_dialect_hive <- function(con) {
   sql_variant(
-    sql_translator(.parent = base_odbc_scalar,
-      bitwShiftL    = sql_prefix("SHIFTLEFT", 2),
-      bitwShiftR    = sql_prefix("SHIFTRIGHT", 2),
+    sql_translator(
+      .parent = base_odbc_scalar,
+      bitwShiftL = sql_prefix("SHIFTLEFT", 2),
+      bitwShiftR = sql_prefix("SHIFTRIGHT", 2),
 
-      cot = function(x){
-        sql_expr(1 / tan(!!x))
+      cot = function(x) {
+        sql_glue("1.0 / TAN({x})")
       },
 
       str_replace_all = function(string, pattern, replacement) {
-        sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
+        sql_glue("REGEXP_REPLACE({string}, {pattern}, {replacement})")
       }
     ),
-    sql_translator(.parent = base_odbc_agg,
+    sql_translator(
+      .parent = base_odbc_agg,
       var = sql_aggregate("VARIANCE", "var"),
       quantile = sql_quantile("PERCENTILE"),
       median = sql_median("PERCENTILE")
     ),
-    sql_translator(.parent = base_odbc_win,
+    sql_translator(
+      .parent = base_odbc_win,
       var = win_aggregate("VARIANCE"),
       quantile = sql_quantile("PERCENTILE", window = TRUE),
       median = sql_median("PERCENTILE", window = TRUE),
@@ -87,28 +108,14 @@ sql_translation.Hive <- function(con) {
 }
 
 #' @export
-sql_table_analyze.Hive <- function(con, table, ...) {
+sql_table_analyze.sql_dialect_hive <- function(con, table, ...) {
   # https://cwiki.apache.org/confluence/display/Hive/StatsDev
-  glue_sql2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
+  sql_glue2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
 }
 
 #' @export
-sql_query_set_op.Hive <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
-  check_bool(all)
-  # parentheses are not allowed
-  method <- paste0(method, if (all) " ALL")
-  glue_sql2(
-    con,
-    "\n", # dummy line to protect indent
-    "{x}\n",
-    lvl_indent(lvl), "{.kw method}\n",
-    y
-  )
+sql_query_set_op.sql_dialect_hive <- function(con, x, y, method, ..., lvl = 0) {
+  # compared to default method, can't use parentheses
+  method <- sql_set_op_method(con, method)
+  sql_glue2(con, "{x}\n{.sql method}\n{y}")
 }
-
-#' @export
-supports_window_clause.Hive <- function(con) {
-  TRUE
-}
-
-utils::globalVariables("regexp_replace")

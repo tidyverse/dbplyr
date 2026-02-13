@@ -1,22 +1,24 @@
 test_that("expand completes all values", {
   expect_equal(
-    memdb_frame(x = 1:2, y = 1:2) %>% tidyr::expand(x, y) %>% collect(),
+    local_memdb_frame(x = 1:2, y = 1:2) |>
+      tidyr::expand(x, y) |>
+      collect(),
     tibble(x = c(1, 1, 2, 2), y = c(1, 2, 1, 2))
   )
 
-  expect_snapshot(lazy_frame(x = 1, y = 1) %>% tidyr::expand(x, y))
+  expect_snapshot(lazy_frame(x = 1, y = 1) |> tidyr::expand(x, y))
 })
 
 test_that("nesting doesn't expand values", {
   df <- tibble(x = 1:2, y = 1:2)
   expect_equal(
-    tidyr::expand(memdb_frame(!!!df), nesting(x, y)) %>%
+    tidyr::expand(local_memdb_frame(!!!df), nesting(x, y)) |>
       collect(),
     df
   )
 
   df_lazy <- lazy_frame(!!!df)
-  expect_snapshot(df_lazy %>% tidyr::expand(nesting(x, y)))
+  expect_snapshot(df_lazy |> tidyr::expand(nesting(x, y)))
 })
 
 test_that("expand accepts expressions", {
@@ -27,7 +29,7 @@ test_that("expand accepts expressions", {
 
 test_that("works with tidyr::nesting", {
   df_lazy <- lazy_frame(x = 1:2, y = 1:2)
-  expect_snapshot(df_lazy %>% tidyr::expand(tidyr::nesting(x, y)))
+  expect_snapshot(df_lazy |> tidyr::expand(tidyr::nesting(x, y)))
 })
 
 test_that("expand respects groups", {
@@ -37,17 +39,20 @@ test_that("expand respects groups", {
     c = c("b", "a", "a")
   )
   expect_equal(
-    memdb_frame(!!!df) %>% group_by(a) %>% tidyr::expand(b, c) %>% collect(),
+    local_memdb_frame(!!!df) |>
+      group_by(a) |>
+      tidyr::expand(b, c) |>
+      collect(),
     tibble(
       a = c(1, 1, 1, 1, 2),
       b = c(1, 1, 2, 2, 1),
       c = c("b", "a", "b", "a", "a")
-    ) %>%
+    ) |>
       group_by(a)
   )
 
   df_lazy <- lazy_frame(!!!df)
-  expect_snapshot(df_lazy %>% group_by(a) %>% tidyr::expand(b, c))
+  expect_snapshot(df_lazy |> group_by(a) |> tidyr::expand(b, c))
 })
 
 test_that("NULL inputs", {
@@ -55,23 +60,35 @@ test_that("NULL inputs", {
 })
 
 test_that("expand() errors when expected", {
-  expect_snapshot(error = TRUE, tidyr::expand(memdb_frame(x = 1)))
-  expect_snapshot(error = TRUE, tidyr::expand(memdb_frame(x = 1), x = NULL))
+  expect_snapshot(error = TRUE, tidyr::expand(local_memdb_frame(x = 1)))
+  expect_snapshot(
+    error = TRUE,
+    tidyr::expand(local_memdb_frame(x = 1), x = NULL)
+  )
+})
+
+test_that("expand() errors for non-column expressions", {
+  lf <- lazy_frame(x = 1, y = 1)
+  expect_snapshot(error = TRUE, {
+    tidyr::expand(lf, x, 1:3)
+    tidyr::expand(lazy_frame(x = 1, y = 1), nesting(x, 1))
+  })
 })
 
 test_that("nesting() respects .name_repair", {
-  expect_snapshot(error = TRUE, 
+  expect_snapshot(
+    error = TRUE,
     tidyr::expand(
-      memdb_frame(x = 1, y = 1),
+      local_memdb_frame(x = 1, y = 1),
       nesting(x, x = x + 1)
     )
   )
 
   vars <- suppressMessages(
     tidyr::expand(
-      memdb_frame(x = 1, y = 1),
+      local_memdb_frame(x = 1, y = 1),
       nesting(x, x = x + 1, .name_repair = "unique")
-    ) %>%
+    ) |>
       op_vars()
   )
 
@@ -80,8 +97,14 @@ test_that("nesting() respects .name_repair", {
 
 test_that("expand respect .name_repair", {
   vars <- suppressMessages(
-    memdb_frame(x = integer(), z = integer()) %>%
-      tidyr::expand(x, z = x, nesting(x), nesting(z), .name_repair = "unique") %>%
+    local_memdb_frame(x = integer(), z = integer()) |>
+      tidyr::expand(
+        x,
+        z = x,
+        nesting(x),
+        nesting(z),
+        .name_repair = "unique"
+      ) |>
       op_vars()
   )
 
@@ -92,8 +115,8 @@ test_that("expand respect .name_repair", {
 
 test_that("replace_na replaces missing values", {
   expect_equal(
-    memdb_frame(x = c(1, NA), y = c(NA, "b")) %>%
-      tidyr::replace_na(list(x = 0, y = "unknown")) %>%
+    local_memdb_frame(x = c(1, NA), y = c(NA, "b")) |>
+      tidyr::replace_na(list(x = 0, y = "unknown")) |>
       collect(),
     tibble(
       x = c(1, 0),
@@ -102,12 +125,12 @@ test_that("replace_na replaces missing values", {
   )
 
   expect_snapshot(
-    lazy_frame(x = 1, y = "a") %>% tidyr::replace_na(list(x = 0, y = "unknown"))
+    lazy_frame(x = 1, y = "a") |> tidyr::replace_na(list(x = 0, y = "unknown"))
   )
 })
 
 test_that("replace_na ignores missing columns", {
-  expect_snapshot(lazy_frame(x = 1) %>% tidyr::replace_na(list(not_there = 0)))
+  expect_snapshot(lazy_frame(x = 1) |> tidyr::replace_na(list(not_there = 0)))
 })
 
 # complete ----------------------------------------------------------------
@@ -120,7 +143,9 @@ test_that("complete completes missing combinations", {
   )
 
   expect_equal(
-    memdb_frame(!!!df) %>% tidyr::complete(x, y, fill = list(z = "c")) %>% collect(),
+    local_memdb_frame(!!!df) |>
+      tidyr::complete(x, y, fill = list(z = "c")) |>
+      collect(),
     tibble(
       x = c(1, 1, 2, 2),
       y = c(1, 2, 1, 2),
@@ -129,5 +154,5 @@ test_that("complete completes missing combinations", {
   )
 
   df_lazy <- lazy_frame(!!!df)
-  expect_snapshot(df_lazy %>% tidyr::complete(x, y, fill = list(z = "c")))
+  expect_snapshot(df_lazy |> tidyr::complete(x, y, fill = list(z = "c")))
 })

@@ -32,19 +32,19 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(x = 1:3, y = c(1, 1, 2))
-#' db %>% slice_min(x) %>% show_query()
-#' db %>% slice_max(x) %>% show_query()
-#' db %>% slice_sample() %>% show_query()
+#' db |> slice_min(x) |> show_query()
+#' db |> slice_max(x) |> show_query()
+#' db |> slice_sample() |> show_query()
 #'
-#' db %>% group_by(y) %>% slice_min(x) %>% show_query()
+#' db |> group_by(y) |> slice_min(x) |> show_query()
 #'
 #' # By default, ties are includes so you may get more rows
 #' # than you expect
-#' db %>% slice_min(y, n = 1)
-#' db %>% slice_min(y, n = 1, with_ties = FALSE)
+#' db |> slice_min(y, n = 1)
+#' db |> slice_min(y, n = 1, with_ties = FALSE)
 #'
 #' # Non-integer group sizes are rounded down
-#' db %>% slice_min(x, prop = 0.5)
+#' db |> slice_min(x, prop = 0.5)
 NULL
 
 #' @importFrom dplyr slice
@@ -68,60 +68,56 @@ slice_tail.tbl_lazy <- function(.data, ..., n, prop, by = NULL) {
 #' @rdname dbplyr-slice
 #' @importFrom dplyr slice_min
 #' @export
-slice_min.tbl_lazy <- function(.data,
-                               order_by,
-                               ...,
-                               n,
-                               prop,
-                               by = NULL,
-                               with_ties = TRUE,
-                               na_rm = TRUE) {
+slice_min.tbl_lazy <- function(
+  .data,
+  order_by,
+  ...,
+  n,
+  prop,
+  by = NULL,
+  with_ties = TRUE,
+  na_rm = TRUE
+) {
   size <- check_slice_size(n, prop)
   check_unsupported_arg(na_rm, allowed = TRUE)
-  order_by <- unwrap_order_expr({{ order_by }}, f = "slice_min")
-  slice_by(
-    .data,
-    order_by,
-    size,
-    {{ by }},
-    with_ties = with_ties
-  )
+  order_by_expr <- partial_eval_quo(enquo(order_by), .data, "order_by")
+  order_by <- unwrap_order_expr(order_by_expr, f = "slice_min")
+  slice_by(.data, order_by, size, {{ by }}, with_ties = with_ties)
 }
 
 #' @rdname dbplyr-slice
 #' @importFrom dplyr slice_max
 #' @export
-slice_max.tbl_lazy <- function(.data,
-                               order_by,
-                               ...,
-                               n,
-                               by = NULL,
-                               prop,
-                               with_ties = TRUE,
-                               na_rm = TRUE) {
+slice_max.tbl_lazy <- function(
+  .data,
+  order_by,
+  ...,
+  n,
+  by = NULL,
+  prop,
+  with_ties = TRUE,
+  na_rm = TRUE
+) {
   size <- check_slice_size(n, prop)
   check_unsupported_arg(na_rm, allowed = TRUE)
-  order_by <- unwrap_order_expr({{ order_by }}, f = "slice_max")
+  order_by_expr <- partial_eval_quo(enquo(order_by), .data, "order_by")
+  order_by <- unwrap_order_expr(order_by_expr, f = "slice_max")
   order_by <- purrr::map(order_by, swap_order_direction)
-  slice_by(
-    .data,
-    order_by,
-    size,
-    {{ by }},
-    with_ties = with_ties
-  )
+  slice_by(.data, order_by, size, {{ by }}, with_ties = with_ties)
 }
 
 #' @rdname dbplyr-slice
 #' @importFrom dplyr slice_sample
 #' @export
-slice_sample.tbl_lazy <- function(.data,
-                                  ...,
-                                  n,
-                                  prop,
-                                  by = NULL,
-                                  weight_by = NULL,
-                                  replace = FALSE) {
+slice_sample.tbl_lazy <- function(
+  .data,
+  ...,
+  n,
+  prop,
+  by = NULL,
+  weight_by = NULL,
+  replace = FALSE
+) {
   size <- check_slice_size(n, prop)
   weight_by <- enquo(weight_by)
   if (size$type == "prop") {
@@ -139,39 +135,50 @@ slice_sample.tbl_lazy <- function(.data,
   slice_by(.data, order_by, size, {{ by }}, with_ties = FALSE)
 }
 
-slice_by <- function(.data, order_by, size, .by, with_ties = FALSE) {
+slice_by <- function(
+  .data,
+  order_by,
+  size,
+  .by,
+  with_ties = FALSE,
+  call = caller_env()
+) {
   by <- compute_by(
     {{ .by }},
     .data,
     by_arg = "by",
     data_arg = "data",
-    error_call = caller_env()
+    error_call = call
   )
   if (by$from_by) {
     .data$lazy_query$group_vars <- by$names
   }
 
-  old_frame <- op_sort(.data)
-
+  value <- switch(size$type, n = size$n, prop = size$prop)
   if (with_ties) {
-    window_fun <- switch(size$type,
-      n = expr(min_rank() <= !!size$n),
-      prop = expr(cume_dist() <= !!size$prop)
-    )
+    fun_name <- switch(size$type, n = "min_rank", prop = "cume_dist")
   } else {
-    window_fun <- switch(size$type,
-      n = expr(row_number() <= !!size$n),
-      prop = cli_abort("Can only use {.arg prop} when {.code with_ties = TRUE}")
-    )
+    if (size$type == "prop") {
+      cli_abort(
+        "Can only use {.arg prop} when {.code with_ties = TRUE}",
+        call = call
+      )
+    }
+    fun_name <- "row_number"
   }
 
-  # must use `add_order()` as `window_order()` only allows variables
-  # this is only okay to do because the previous, legal window order is restored
-  dots <- partial_eval_dots(.data, !!!order_by, .named = FALSE)
-  .data$lazy_query <- add_order(.data, dots)
-
-  out <- filter(.data, !!window_fun) %>%
-    window_order(!!!old_frame)
+  # We generate a call to min_rank() and friends because we already do
+  # a lot work in win_rank() to correctly handle NULLs. Currently this
+  # layer of indirection isn't really needed since window functions have
+  # same translations for all backends, but in the future we might add
+  # more capability info to the dialect object so that we could generate
+  # simpler SQL.
+  if (length(order_by) == 1) {
+    window_fun <- call2(fun_name, order_by[[1]])
+  } else {
+    window_fun <- call2(fun_name, call2("tibble", !!!order_by))
+  }
+  out <- filter(.data, !!window_fun <= !!value)
 
   if (by$from_by) {
     out$lazy_query$group_vars <- character()
@@ -191,7 +198,10 @@ check_slice_size <- function(n, prop) {
       cli_abort("{.arg n} must be a single number.", call = caller_env())
     }
     if (is.na(n) || n < 0) {
-      cli_abort("{.arg n} must be a non-missing positive number.", call = caller_env())
+      cli_abort(
+        "{.arg n} must be a non-missing positive number.",
+        call = caller_env()
+      )
     }
 
     list(type = "n", n = as.integer(n))
@@ -200,12 +210,24 @@ check_slice_size <- function(n, prop) {
       cli_abort("{.arg prop} must be a single number", call = caller_env())
     }
     if (is.na(prop) || prop < 0) {
-      cli_abort("{.arg prop} must be a non-missing positive number.", call = caller_env())
+      cli_abort(
+        "{.arg prop} must be a non-missing positive number.",
+        call = caller_env()
+      )
     }
     list(type = "prop", prop = prop)
   } else {
-    cli_abort("Must supply exactly one of {.arg n} and {.arg prop} arguments.", call = caller_env())
+    cli_abort(
+      "Must supply exactly one of {.arg n} and {.arg prop} arguments.",
+      call = caller_env()
+    )
   }
 }
 
-utils::globalVariables(c("min_rank", "cume_dist", "row_number", "desc", "runif"))
+utils::globalVariables(c(
+  "min_rank",
+  "cume_dist",
+  "row_number",
+  "desc",
+  "runif"
+))

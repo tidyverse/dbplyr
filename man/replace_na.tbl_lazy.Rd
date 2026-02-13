@@ -15,7 +15,7 @@ has NA values to be replaced.}
 \item{...}{Unused; included for compatibility with generic.}
 }
 \value{
-Another \code{tbl_lazy}. Use \code{\link[dplyr:explain]{dplyr::show_query()}} to see the generated
+Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
 query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
@@ -25,6 +25,6 @@ This is a method for the \code{\link[tidyr:replace_na]{tidyr::replace_na()}} gen
 \examples{
 \dontshow{if (rlang::is_installed("tidyr", version = "1.0.0")) withAutoprint(\{ # examplesIf}
 df <- memdb_frame(x = c(1, 2, NA), y = c("a", NA, "b"))
-df \%>\% tidyr::replace_na(list(x = 0, y = "unknown"))
+df |> tidyr::replace_na(list(x = 0, y = "unknown"))
 \dontshow{\}) # examplesIf}
 }

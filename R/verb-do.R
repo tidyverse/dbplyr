@@ -1,5 +1,11 @@
 #' Perform arbitrary computation on remote backend
 #'
+#' @description
+#' `r lifecycle::badge("deprecated")`
+#'
+#' `do()` is deprecated. Instead of `do()` you should use [collect()] and then
+#' your favourite combination of purrr and dplyr functions.
+#'
 #' @inheritParams dplyr::do
 #' @param .chunk_size The size of each chunk to pull into R. If this number is
 #'   too big, the process will be slow because R has to allocate and free a lot
@@ -8,6 +14,7 @@
 #' @export
 #' @importFrom dplyr do
 do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
+  lifecycle::deprecate_warn("2.6.0", "do()")
   groups_sym <- groups(.data)
 
   if (length(groups_sym) == 0) {
@@ -19,9 +26,9 @@ do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
   named <- named_args(args)
 
   # Create data frame of labels
-  labels <- .data %>%
-    select(!!! groups_sym) %>%
-    summarise() %>%
+  labels <- .data |>
+    select(!!!groups_sym) |>
+    summarise() |>
     collect()
 
   con <- .data$src$con
@@ -57,7 +64,7 @@ do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
     }
 
     # Create an id for each group
-    grouped <- chunk %>% dplyr::group_by(!!! syms(names(chunk)[gvars]))
+    grouped <- chunk |> dplyr::group_by(!!!syms(names(chunk)[gvars]))
 
     index <- dplyr::group_rows(grouped)
     n <- length(index)
@@ -129,11 +136,11 @@ label_output_list <- function(labels, out, groups) {
     labels[names(out)] <- out
     dplyr::rowwise(labels)
   } else {
-     # nocov start
+    # nocov start
     class(out) <- "data.frame"
     attr(out, "row.names") <- .set_row_names(length(out[[1]]))
     dplyr::rowwise(out)
-     # nocov end
+    # nocov end
   }
 }
 

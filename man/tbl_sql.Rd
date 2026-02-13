@@ -9,18 +9,29 @@ tbl_sql(subclass, src, from, ..., vars = NULL, check_from = deprecated())
 \arguments{
 \item{subclass}{name of subclass}
 
+\item{src}{A \code{DBIConnection} object produced by \code{\link[DBI:dbConnect]{DBI::dbConnect()}}.}
+
+\item{from}{Either a table identifier or a literal \code{\link[=sql]{sql()}} string.
+
+Use a string to identify a table in the current schema/catalog or
+\code{I()} for a table elsewhere, e.g. \code{I("schema.table")} or
+\code{I("catalog.schema.table")}. For backward compatibility, you can also use
+\code{\link[=in_schema]{in_schema()}}/\code{\link[=in_catalog]{in_catalog()}} or \code{\link[DBI:Id]{DBI::Id()}}.}
+
 \item{...}{needed for agreement with generic. Not otherwise used.}
 
-\item{vars}{Provide column names as a character vector
-to avoid retrieving them from the database.
-Mainly useful for better performance when creating
-multiple \code{tbl} objects.}
+\item{vars}{Optionally, provide a character vector of column names. If
+not supplied, will be retrieved from the database by running a simple
+query. This argument is mainly useful for better performance when creating
+many \code{tbl}s with known variables.}
 
 \item{check_from}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}}
 }
 \description{
-Generally, you should no longer need to provide a custom \code{tbl()}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+
+This function is no longer needed, since backends don't need to create
+their own custom classes. Instead, rely on the default \code{tbl.DBIConnection()}
 method.
-The default \code{tbl.DBIConnect} method should work in most cases.
 }
 \keyword{internal}

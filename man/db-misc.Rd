@@ -32,22 +32,11 @@ See below for more details.
 \item \code{db_col_types()} returns the column types of a table.
 }
 }
-\section{dbplyr 2.0.0}{
-
-dbplyr 2.0.0 renamed a number of generics so that they could be cleanly moved
-from dplyr to dbplyr. If you have an existing backend, you'll need to rename
-the following methods.
-\itemize{
-\item \code{dplyr::db_desc()} -> \code{dbplyr::db_connection_describe()} (also note that
-the argument named changed from \code{x} to \code{con}).
-}
-}
-
 \seealso{
 Other generic: 
 \code{\link{db-sql}},
 \code{\link{db_copy_to}()},
-\code{\link{sql_escape_logical}()}
+\code{\link{escape}()}
 }
 \concept{generic}
 \keyword{internal}

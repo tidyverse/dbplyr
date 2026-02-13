@@ -109,11 +109,17 @@ table_path_name <- function(x, con) {
 #' @export
 #' @rdname is_table_path
 table_path_components <- function(x, con) {
+  dialect <- sql_dialect(con)
+  return(table_path_components_(x, dialect))
+
   UseMethod("table_path_components", con)
+}
+table_path_components_ <- function(x, dialect) {
+  UseMethod("table_path_components", dialect)
 }
 
 #' @export
-table_path_components.default <- function(x, con) {
+table_path_components.DBIConnection <- function(x, con) {
   quote_char <- substr(sql_escape_ident(con, ""), 1, 1)
 
   lapply(x, function(x) {
@@ -129,20 +135,34 @@ table_path_components.default <- function(x, con) {
 }
 
 #' @export
-escape.dbplyr_table_path <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
+table_path_components.sql_dialect <- table_path_components.DBIConnection
+
+sql_escape_table_source <- function(con, x) {
+  if (is.sql(x)) {
+    x
+  } else if (is_table_path(x)) {
+    sql_escape_table_path(con, x)
+  } else {
+    cli::cli_abort(
+      "{.arg x} must be a table path or SQL.",
+      .internal = TRUE
+    )
+  }
+}
+
+sql_escape_table_path <- function(con, x) {
   # names are always already escaped
   alias <- names2(x)
   table_path <- as_table_path(table_path_name(x, con), con)
   has_alias <- alias == "" | alias == table_path
 
-  if (db_supports_table_alias_with_as(con)) {
+  if (sql_has_table_alias_with_as(con)) {
     as_sql <- style_kw(" AS ")
   } else {
     as_sql <- " "
   }
 
-  out <- ifelse(has_alias, unname(x), paste0(x, as_sql, alias))
-  sql_vector(out, parens, collapse, con = con)
+  sql(ifelse(has_alias, unname(x), paste0(x, as_sql, alias)))
 }
 
 # table id ----------------------------------------------------------------
@@ -154,8 +174,7 @@ check_table_id <- function(x, arg = caller_arg(x), call = caller_env()) {
 }
 
 is_table_id <- function(x) {
-  is.ident(x) ||
-    methods::is(x, "Id") ||
+  methods::is(x, "Id") ||
     is_catalog(x) ||
     is_schema(x) ||
     ((is.character(x) || is_table_path(x)) && length(x) == 1)
@@ -163,9 +182,11 @@ is_table_id <- function(x) {
 
 #' @export
 #' @rdname is_table_path
-check_table_path <- function(x,
-                             error_arg = caller_arg(x),
-                             error_call = caller_env()) {
+check_table_path <- function(
+  x,
+  error_arg = caller_arg(x),
+  error_call = caller_env()
+) {
   if (!is_table_path(x)) {
     cli::cli_abort(
       "{.arg {error_arg}} must be a <table_path>, not {.obj_type_friendly x}.",
@@ -177,10 +198,12 @@ check_table_path <- function(x,
 
 #' @export
 #' @rdname is_table_path
-as_table_path <- function(x,
-                          con,
-                          error_arg = caller_arg(x),
-                          error_call = caller_env()) {
+as_table_path <- function(
+  x,
+  con,
+  error_arg = caller_arg(x),
+  error_call = caller_env()
+) {
   check_required(con)
 
   if (is_table_path(x)) {
@@ -204,7 +227,12 @@ as_table_path <- function(x,
   } else if (inherits(x, "dbplyr_schema")) {
     make_table_path(list(x$schema, x$table), con)
   } else if (inherits(x, "AsIs")) {
-    check_string(unclass(x), allow_empty = FALSE, arg = error_arg, call = error_call)
+    check_string(
+      unclass(x),
+      allow_empty = FALSE,
+      arg = error_arg,
+      call = error_call
+    )
     table_path(unclass(x))
   } else if (is.character(x)) {
     check_string(x, allow_empty = FALSE, arg = error_arg, call = error_call)
@@ -220,7 +248,13 @@ as_table_path <- function(x,
 # table source ------------------------------------------------------------
 
 # Returns either SQL (representing a custom query) or a table name
-as_table_source <- function(x, con, ..., error_arg = caller_arg(x), error_call = caller_env()) {
+as_table_source <- function(
+  x,
+  con,
+  ...,
+  error_arg = caller_arg(x),
+  error_call = caller_env()
+) {
   if (is.sql(x)) {
     x
   } else if (is_table_id(x)) {
@@ -232,7 +266,10 @@ as_table_source <- function(x, con, ..., error_arg = caller_arg(x), error_call =
 
 check_table_source <- function(x, arg = caller_arg(x), call = caller_env()) {
   if (!is.sql(x) && !is_table_id(x)) {
-    stop_input_type(x, "a table source (SQL or a table identifier)")
+    stop_input_type(
+      x,
+      "a table source (SQL or a table identifier)",
+      call = call
+    )
   }
 }
-

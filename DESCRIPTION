@@ -1,7 +1,7 @@
 Type: Package
 Package: dbplyr
 Title: A 'dplyr' Back End for Databases
-Version: 2.5.2
+Version: 2.5.2.9000
 Authors@R: c(
     person("Hadley", "Wickham", , "hadley@posit.co", role = c("aut", "cre")),
     person("Maximilian", "Girlich", role = "aut"),
@@ -17,7 +17,7 @@ License: MIT + file LICENSE
 URL: https://dbplyr.tidyverse.org/, https://github.com/tidyverse/dbplyr
 BugReports: https://github.com/tidyverse/dbplyr/issues
 Depends: 
-    R (>= 3.6)
+    R (>= 4.1)
 Imports: 
     blob (>= 1.2.0),
     cli (>= 3.6.1),
@@ -44,6 +44,7 @@ Suggests:
     Lahman,
     nycflights13,
     odbc (>= 1.4.2),
+    RJDBC,
     RMariaDB (>= 1.2.2),
     rmarkdown,
     RPostgres (>= 1.4.5),
@@ -60,7 +61,10 @@ Language: en-gb
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Collate: 
+    'verb-copy-inline.R'
+    'verb-copy-to.R'
     'db-sql.R'
+    'db.R'
     'utils-check.R'
     'import-standalone-types-check.R'
     'import-standalone-obj-type.R'
@@ -68,9 +72,9 @@ Collate:
     'sql.R'
     'escape.R'
     'translate-sql-cut.R'
-    'translate-sql-quantile.R'
     'translate-sql-string.R'
-    'translate-sql-paste.R'
+    'translate-sql-aggregate.R'
+    'translate-sql-scalar.R'
     'translate-sql-helpers.R'
     'translate-sql-window.R'
     'translate-sql-conditional.R'
@@ -79,7 +83,7 @@ Collate:
     'backend-hana.R'
     'backend-hive.R'
     'backend-impala.R'
-    'verb-copy-to.R'
+    'backend-jdbc.R'
     'backend-mssql.R'
     'backend-mysql.R'
     'backend-odbc.R'
@@ -91,59 +95,56 @@ Collate:
     'backend-spark-sql.R'
     'backend-sqlite.R'
     'backend-teradata.R'
-    'build-sql.R'
+    'bind-queries.R'
     'data-cache.R'
     'data-lahman.R'
     'data-nycflights13.R'
-    'db-escape.R'
     'db-io.R'
-    'db.R'
     'dbplyr.R'
-    'explain.R'
     'ident.R'
     'import-standalone-s3-register.R'
     'join-by-compat.R'
     'join-cols-compat.R'
-    'lazy-join-query.R'
     'lazy-ops.R'
-    'lazy-query.R'
-    'lazy-select-query.R'
-    'lazy-set-op-query.R'
     'memdb.R'
     'optimise-utils.R'
-    'pillar.R'
     'progress.R'
-    'sql-build.R'
+    'query-base.R'
     'query-join.R'
+    'query-rf-join.R'
     'query-select.R'
     'query-semi-join.R'
     'query-set-op.R'
+    'query-union.R'
     'query.R'
-    'reexport.R'
     'remote.R'
     'rows.R'
     'schema.R'
-    'simulate.R'
+    'sql-build.R'
     'sql-clause.R'
-    'sql-expr.R'
+    'sql-dialect.R'
+    'sql-glue.R'
+    'sql-quote.R'
+    'sql-superseded.R'
     'src-sql.R'
     'src_dbi.R'
     'table-name.R'
     'tbl-lazy.R'
     'tbl-sql.R'
-    'test-frame.R'
-    'testthat.R'
     'tidyeval-across.R'
     'tidyeval.R'
     'translate-sql.R'
     'utils-format.R'
     'verb-arrange.R'
+    'verb-collapse.R'
+    'verb-collect.R'
     'verb-compute.R'
     'verb-count.R'
     'verb-distinct.R'
     'verb-do-query.R'
     'verb-do.R'
     'verb-expand.R'
+    'verb-explain.R'
     'verb-fill.R'
     'verb-filter.R'
     'verb-group_by.R'
@@ -159,4 +160,5 @@ Collate:
     'verb-summarise.R'
     'verb-uncount.R'
     'verb-window.R'
+    'with-dialect.R'
     'zzz.R'

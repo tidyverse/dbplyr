@@ -1,83 +1,83 @@
 # select after distinct produces subquery
 
     Code
-      lf %>% distinct() %>% select(x)
+      select(distinct(lf), x)
     Output
       <SQL>
-      SELECT `x`
+      SELECT "x"
       FROM (
-        SELECT DISTINCT `df`.*
-        FROM `df`
-      ) AS `q01`
+        SELECT DISTINCT *
+        FROM "df"
+      ) AS "q01"
 
 # rename/relocate after distinct is inlined #1141
 
     Code
-      lf %>% distinct() %>% rename(z = y)
+      rename(distinct(lf), z = y)
     Output
       <SQL>
-      SELECT DISTINCT `x`, `y` AS `z`
-      FROM `df`
+      SELECT DISTINCT "x", "y" AS "z"
+      FROM "df"
     Code
-      lf %>% distinct() %>% relocate(y)
+      relocate(distinct(lf), y)
     Output
       <SQL>
-      SELECT DISTINCT `y`, `x`
-      FROM `df`
+      SELECT DISTINCT "y", "x"
+      FROM "df"
 
 # select preserves grouping vars
 
     Code
-      out <- mf %>% select(a) %>% collect()
+      out <- collect(select(mf, a))
     Message
       Adding missing grouping variables: `b`
 
 # select() after left_join() is inlined
 
     Code
-      (out <- left_join(lf1, lf2, by = "x") %>% select(b, x))
+      (out <- select(left_join(lf1, lf2, by = "x"), b, x))
     Output
       <SQL>
-      SELECT `b`, `lf1`.`x` AS `x`
-      FROM `lf1`
-      LEFT JOIN `lf2`
-        ON (`lf1`.`x` = `lf2`.`x`)
+      SELECT "b", "lf1"."x" AS "x"
+      FROM "lf1"
+      LEFT JOIN "lf2"
+        ON ("lf1"."x" = "lf2"."x")
 
 ---
 
     Code
-      (out <- left_join(lf1, lf2, by = "x") %>% relocate(b))
+      (out <- relocate(left_join(lf1, lf2, by = "x"), b))
     Output
       <SQL>
-      SELECT `b`, `lf1`.*
-      FROM `lf1`
-      LEFT JOIN `lf2`
-        ON (`lf1`.`x` = `lf2`.`x`)
+      SELECT "b", "lf1".*
+      FROM "lf1"
+      LEFT JOIN "lf2"
+        ON ("lf1"."x" = "lf2"."x")
 
 # select() after semi_join() is inlined
 
     Code
-      (out <- semi_join(lf1, lf2, by = "x") %>% select(x, a2 = a))
+      (out <- select(semi_join(lf1, lf2, by = "x"), x, a2 = a))
     Output
       <SQL>
-      SELECT `x`, `a` AS `a2`
-      FROM `lf1`
+      SELECT "x", "a" AS "a2"
+      FROM "lf1"
       WHERE EXISTS (
-        SELECT 1 FROM `lf2`
-        WHERE (`lf1`.`x` = `lf2`.`x`)
+        SELECT 1 FROM "lf2"
+        WHERE ("lf1"."x" = "lf2"."x")
       )
 
 ---
 
     Code
-      (out <- anti_join(lf1, lf2, by = "x") %>% relocate(a))
+      (out <- relocate(anti_join(lf1, lf2, by = "x"), a))
     Output
       <SQL>
-      SELECT `a`, `x`
-      FROM `lf1`
+      SELECT "a", "x"
+      FROM "lf1"
       WHERE NOT EXISTS (
-        SELECT 1 FROM `lf2`
-        WHERE (`lf1`.`x` = `lf2`.`x`)
+        SELECT 1 FROM "lf2"
+        WHERE ("lf1"."x" = "lf2"."x")
       )
 
 # select() after join handles previous select
@@ -86,11 +86,11 @@
       print(lf)
     Output
       <SQL>
-      SELECT `x` AS `x2`, `y` AS `y3`, `z`
-      FROM `df` AS `df_LHS`
+      SELECT "x" AS "x2", "y" AS "y3", "z"
+      FROM "df" AS "df_LHS"
       WHERE EXISTS (
-        SELECT 1 FROM `df` AS `df_RHS`
-        WHERE (`df_LHS`.`x` = `df_RHS`.`x`)
+        SELECT 1 FROM "df" AS "df_RHS"
+        WHERE ("df_LHS"."x" = "df_RHS"."x")
       )
 
 ---
@@ -99,21 +99,21 @@
       print(lf2)
     Output
       <SQL>
-      SELECT `df_LHS`.`x` AS `x2`, `df_LHS`.`y` AS `y3`, `z`
-      FROM `df` AS `df_LHS`
-      LEFT JOIN `df` AS `df_RHS`
-        ON (`df_LHS`.`x` = `df_RHS`.`x`)
+      SELECT "df_LHS"."x" AS "x2", "df_LHS"."y" AS "y3", "z"
+      FROM "df" AS "df_LHS"
+      LEFT JOIN "df" AS "df_RHS"
+        ON ("df_LHS"."x" = "df_RHS"."x")
 
 # select() produces nice error messages
 
     Code
-      lf %>% select(non_existent)
+      select(lf, non_existent)
     Condition
       Error in `select()`:
       ! Can't select columns that don't exist.
       x Column `non_existent` doesn't exist.
     Code
-      lf %>% select(non_existent + 1)
+      select(lf, non_existent + 1)
     Condition
       Error in `select()`:
       i In argument: `non_existent + 1`.
@@ -123,13 +123,13 @@
 ---
 
     Code
-      lf %>% relocate(non_existent)
+      relocate(lf, non_existent)
     Condition
       Error in `relocate()`:
       ! Can't relocate columns that don't exist.
       x Column `non_existent` doesn't exist.
     Code
-      lf %>% relocate(non_existent + 1)
+      relocate(lf, non_existent + 1)
     Condition
       Error in `relocate()`:
       i In argument: `non_existent + 1`.
@@ -139,18 +139,18 @@
 ---
 
     Code
-      lf %>% rename(x)
+      rename(lf, x)
     Condition
       Error in `rename()`:
       ! All renaming inputs must be named.
     Code
-      lf %>% rename(y = non_existent)
+      rename(lf, y = non_existent)
     Condition
       Error in `rename()`:
       ! Can't rename columns that don't exist.
       x Column `non_existent` doesn't exist.
     Code
-      lf %>% rename(y = non_existent + 1)
+      rename(lf, y = non_existent + 1)
     Condition
       Error in `rename()`:
       i In argument: `non_existent + 1`.
@@ -160,13 +160,13 @@
 ---
 
     Code
-      lf %>% rename_with(toupper, .cols = non_existent)
+      rename_with(lf, toupper, .cols = non_existent)
     Condition
       Error in `rename_with()`:
       ! Can't select columns that don't exist.
       x Column `non_existent` doesn't exist.
     Code
-      lf %>% rename_with(toupper, .cols = non_existent + 1)
+      rename_with(lf, toupper, .cols = non_existent + 1)
     Condition
       Error in `rename_with()`:
       i In argument: `non_existent + 1`.
@@ -176,7 +176,7 @@
 # where() isn't suppored
 
     Code
-      lf %>% select(where(is.integer))
+      select(lf, where(is.integer))
     Condition
       Error in `select()`:
       ! This tidyselect interface doesn't support predicates.
@@ -184,63 +184,63 @@
 # arranged computed columns are not inlined away
 
     Code
-      lf %>% mutate(z = 1) %>% arrange(x, z) %>% select(x)
+      select(arrange(mutate(lf, z = 1), x, z), x)
     Condition
       Warning:
       ORDER BY is ignored in subqueries without LIMIT
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
-      SELECT `x`
+      SELECT "x"
       FROM (
-        SELECT `df`.*, 1.0 AS `z`
-        FROM `df`
-      ) AS `q01`
+        SELECT *, 1.0 AS "z"
+        FROM "df"
+      ) AS "q01"
 
 # multiple selects are collapsed
 
     Code
-      lf %>% select(2:1) %>% select(2:1)
+      select(select(lf, 2:1), 2:1)
     Output
       <SQL>
-      SELECT `df`.*
-      FROM `df`
+      SELECT *
+      FROM "df"
 
 ---
 
     Code
-      lf %>% select(2:1) %>% select(2:1) %>% select(2:1)
+      select(select(select(lf, 2:1), 2:1), 2:1)
     Output
       <SQL>
-      SELECT `y`, `x`
-      FROM `df`
+      SELECT "y", "x"
+      FROM "df"
 
 ---
 
     Code
-      lf %>% select(x1 = x) %>% select(x2 = x1)
+      select(select(lf, x1 = x), x2 = x1)
     Output
       <SQL>
-      SELECT `x` AS `x2`
-      FROM `df`
+      SELECT "x" AS "x2"
+      FROM "df"
 
 # mutate collapses over nested select
 
     Code
-      lf %>% mutate(a = 1, b = 2) %>% select(a)
+      select(mutate(lf, a = 1, b = 2), a)
     Output
       <SQL>
-      SELECT 1.0 AS `a`
-      FROM `df`
+      SELECT 1.0 AS "a"
+      FROM "df"
 
 ---
 
     Code
-      lf %>% mutate(a = 1, b = 2) %>% select(x)
+      select(mutate(lf, a = 1, b = 2), x)
     Output
       <SQL>
-      SELECT `x`
-      FROM `df`
+      SELECT "x"
+      FROM "df"
 
 # output is styled
 
@@ -248,22 +248,22 @@
       show_query(out, sql_options = sql_options(cte = TRUE))
     Output
       <SQL>
-      [34mWITH[39m `q01` [34mAS[39m (
-        [34mSELECT[39m `x`, AVG(`y`) OVER (PARTITION BY `x`)[34m AS [39m`y`, `z` + 1.0[34m AS [39m`z`
-        [34mFROM[39m `df`
+      WITH "q01" AS (
+        [34mSELECT[39m "x", AVG("y") OVER (PARTITION BY "x")[34m AS [39m"y", "z" + 1.0[34m AS [39m"z"
+        [34mFROM[39m "df"
       ),
-      `q02` [34mAS[39m (
-        [34mSELECT[39m `q01`.*
-        [34mFROM[39m `q01`
-        [34mWHERE[39m (`z` = 1.0)
+      "q02" AS (
+        [34mSELECT[39m *
+        [34mFROM[39m "q01"
+        [34mWHERE[39m ("z" = 1.0)
       )
       [34mSELECT[39m
-        `LHS`.`x`[34m AS [39m`x`,
-        `LHS`.`y`[34m AS [39m`y.x`,
-        `LHS`.`z`[34m AS [39m`z.x`,
-        `df`.`y`[34m AS [39m`y.y`,
-        `df`.`z`[34m AS [39m`z.y`
-      [34mFROM[39m `q02`[34m AS [39m`LHS`
-      [34mLEFT JOIN[39m `df`
-        [34mON[39m (`LHS`.`x` = `df`.`x`)
+        "LHS"."x"[34m AS [39m"x",
+        "LHS"."y"[34m AS [39m"y.x",
+        "LHS"."z"[34m AS [39m"z.x",
+        "df"."y"[34m AS [39m"y.y",
+        "df"."z"[34m AS [39m"z.y"
+      [34mFROM[39m "q02"[34m AS [39m"LHS"
+      [34mLEFT JOIN[39m "df"
+        [34mON[39m ("LHS"."x" = "df"."x")
 
