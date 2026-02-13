@@ -12,13 +12,12 @@ src_sql(subclass, con, ...)
 
 - subclass:
 
-  name of subclass. "src_sql" is an abstract base class, so you must
-  supply this value. `src_` is automatically prepended to the class name
+  Name of subclass.
 
 - con:
 
-  the connection object
+  The connection object.
 
 - ...:
 
-  fields used by object
+  Other arguments passed on to individual methods.

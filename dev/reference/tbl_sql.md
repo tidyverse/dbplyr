@@ -1,10 +1,10 @@
 # Create an SQL tbl (abstract)
 
-**\[deprecated\]**
-
-This function is no longer needed, since backends don't need to create
-their own custom classes. Instead, rely on the default
-`tbl.DBIConnection()` method.
+This function creates a lazy tbl object from a table in a database. It's
+primarily intended for backend authors who need to create custom
+subclasses; most users should use
+[`dplyr::tbl()`](https://dplyr.tidyverse.org/reference/tbl.html)
+instead.
 
 ## Usage
 

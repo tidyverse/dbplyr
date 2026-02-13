@@ -66,23 +66,23 @@ df |> arrange(x)
 #> # A query:    ?? x 2
 #> # Database:   sqlite 3.51.2 [:memory:]
 #> # Ordered by: x
-#>         x      y
-#>     <dbl>  <dbl>
-#>  1 0.0162 0.400 
-#>  2 0.0181 0.295 
-#>  3 0.0237 0.830 
-#>  4 0.0275 0.346 
-#>  5 0.0406 0.213 
-#>  6 0.0472 0.931 
-#>  7 0.0612 0.980 
-#>  8 0.0701 0.324 
-#>  9 0.0718 0.346 
-#> 10 0.0919 0.0265
+#>          x     y
+#>      <dbl> <dbl>
+#>  1 0.00851 0.960
+#>  2 0.0162  0.400
+#>  3 0.0181  0.295
+#>  4 0.0237  0.830
+#>  5 0.0275  0.346
+#>  6 0.0406  0.213
+#>  7 0.0472  0.931
+#>  8 0.0612  0.980
+#>  9 0.0701  0.324
+#> 10 0.0718  0.346
 #> # ℹ more rows
 df |> arrange(x) |> show_query()
 #> <SQL>
 #> SELECT *
-#> FROM `dbplyr_tmp_pjGw3nPZis`
+#> FROM `dbplyr_tmp_INtPiNWcEg`
 #> ORDER BY `x`
 
 # Use memdb() + copy_to() to copy an existing data frame

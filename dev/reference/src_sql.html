@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.5.1.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.5.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,10 +19,8 @@
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/backend-2.html">dbplyr 2.0.0 backend API</a></li>
-    <li><a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/new-backend.html">Developing a dbplyr backend</a></li>
     <li><a class="dropdown-item" href="../articles/reprex.html">Reprexes for dbplyr</a></li>
-    <li><a class="dropdown-item" href="../articles/sql.html">Writing SQL with dbplyr</a></li>
     <li><a class="dropdown-item" href="../articles/translation-function.html">Function translation</a></li>
     <li><a class="dropdown-item" href="../articles/translation-verb.html">Verb translation</a></li>
   </ul></li>
@@ -53,7 +51,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Create a "sql src" object</h1>
-      <small class="dont-index">Source: <a href="https://github.com/tidyverse/dbplyr/blob/main/R/src-sql.R" class="external-link"><code>R/src-sql.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/tidyverse/dbplyr/blob/main/R/backward-compatibility.R" class="external-link"><code>R/backward-compatibility.R</code></a></small>
       <div class="d-none name"><code>src_sql.Rd</code></div>
     </div>
 
@@ -71,17 +69,15 @@
 
 
 <dl><dt id="arg-subclass">subclass<a class="anchor" aria-label="anchor" href="#arg-subclass"></a></dt>
-<dd><p>name of subclass. "src_sql" is an abstract base class, so you
-must supply this value. <code>src_</code> is automatically prepended to the
-class name</p></dd>
+<dd><p>Name of subclass.</p></dd>
 
 
 <dt id="arg-con">con<a class="anchor" aria-label="anchor" href="#arg-con"></a></dt>
-<dd><p>the connection object</p></dd>
+<dd><p>The connection object.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>fields used by object</p></dd>
+<dd><p>Other arguments passed on to individual methods.</p></dd>
 
 </dl></div>
 

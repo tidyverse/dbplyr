@@ -50,6 +50,7 @@
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/do.tbl_sql.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/dot-sql.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/escape.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/escape_ansi.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/expand.tbl_lazy.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/fill.tbl_lazy.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/filter.tbl_lazy.html</loc></url>
@@ -85,6 +86,7 @@
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_dialect.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_expr.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_glue.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_optimise.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_options.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_query_insert.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_quote.html</loc></url>
@@ -95,6 +97,7 @@
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_variant.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/src_dbi.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/src_memdb.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/src_sql.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/summarise.tbl_lazy.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/tbl.src_dbi.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/tbl_lazy.html</loc></url>
