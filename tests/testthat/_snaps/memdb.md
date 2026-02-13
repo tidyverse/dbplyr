@@ -16,3 +16,12 @@
       `tbl_memdb()` was deprecated in dbplyr 2.6.0.
       i Use `copy_to(memdb(), df)` instead
 
+# memdb_frame() with data frame is deprecated
+
+    Code
+      . <- memdb_frame(data.frame(x = 1))
+    Condition
+      Warning:
+      memdb_frame(data.frame(...)) was deprecated in dbplyr 2.6.0.
+      i Use `copy_to(memdb(), df)` instead.
+

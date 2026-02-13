@@ -1,15 +1,15 @@
 test_that("tbl_sql() works with string argument", {
-  withr::local_options(lifecycle_verbosity = "quiet")
-
   db <- local_memdb_frame("db", a = 1)
   expect_equal(collect(tbl_sql("sqlite", src_dbi(memdb()), "db")), collect(db))
 })
 
 test_that("tbl_sql() respects subclass argument", {
-  withr::local_options(lifecycle_verbosity = "quiet")
-
   x <- tbl_sql("foo", src_dbi(memdb()), "abc", vars = letters)
   expect_s3_class(x, "tbl_foo")
+
+  # It always includes tbl_sql and dbi
+  expect_s3_class(x, "tbl_dbi")
+  expect_s3_class(x, "tbl_sql")
 })
 
 test_that("same_src distinguishes srcs", {

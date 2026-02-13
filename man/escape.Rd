@@ -2,6 +2,7 @@
 % Please edit documentation in R/escape.R
 \name{escape}
 \alias{escape}
+\alias{db-quote}
 \alias{sql_escape_ident}
 \alias{sql_escape_logical}
 \alias{sql_escape_date}
