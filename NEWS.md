@@ -15,6 +15,7 @@
 * Single-table SELECT queries now use unqualified `*` (e.g., `SELECT *`) instead of table-qualified `*` (e.g., `SELECT "df".*`) for most backends. Oracle and Teradata continue to use qualified stars as required by their syntax (#1577, #1485).
 * The `copy` argument of join, set, and row operations now accepts `"inline"` to use `copy_inline()` instead of copying to a temporary table (#863).
 * The print method no longer mentions the "source" in the header, because it's an outdated dplyr concept (#897).
+* IBM DB2: new backend with support for FETCH FIRST n ROWS ONLY syntax and automatic detection for JDBC connections using com.ibm.db2 drivers.
 * MS Access: correctly generates SQL for multiple joins by adding required parentheses (#1576).
 * MySQL: gains slightly better translation for `as.integer()` and `as.integer64()` (#1647).
 * Oracle: temporary tables now use private temporary tables (Oracle 18c+) instead of global temporary tables. This ensures data persists correctly and table names are automatically prefixed with `ORA$PTT_` (#750).
