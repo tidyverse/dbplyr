@@ -80,6 +80,10 @@
 * `window_order()` works with `dplyr::desc()` (not just `desc()`) (#1486).
 * `with_dialect()` overrides the default SQL dialect for a connection, which is useful if dbplyr guesses incorrectly (#1784).
 
+# dbplyr 2.5.2
+
+* Fix broken documentation link
+
 # dbplyr 2.5.1
 
 * Improved translations:
