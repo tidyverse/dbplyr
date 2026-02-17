@@ -151,6 +151,26 @@ src_tbls.src_sql <- function(x, ...) {
   DBI::dbListTables(x$con)
 }
 
+#' @importFrom dplyr same_src
+#' @export
+same_src.src_sql <- function(x, y) {
+  if (!inherits(y, "src_sql")) {
+    return(FALSE)
+  }
+  identical(x$con, y$con)
+}
+
+# dplyr:::print.src calls format, so we need to retain this method
+#' @export
+format.src_sql <- function(x, ...) {
+  paste0(
+    "src:  ",
+    dbplyr_connection_describe(x$con),
+    "\n",
+    wrap("tbls: ", paste0(sort(src_tbls(x)), collapse = ", "))
+  )
+}
+
 # Used by healthdb
 #' Escape ANSI characters
 #'
