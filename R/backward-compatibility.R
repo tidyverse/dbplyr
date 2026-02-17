@@ -165,7 +165,7 @@ same_src.src_sql <- function(x, y) {
 format.src_sql <- function(x, ...) {
   paste0(
     "src:  ",
-    dbplyr_connection_describe(x$con),
+    db_connection_describe(x$con),
     "\n",
     wrap("tbls: ", paste0(sort(src_tbls(x)), collapse = ", "))
   )
