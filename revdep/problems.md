@@ -38,46 +38,6 @@ Run `revdepcheck::cloud_details(, "bigrquery")` for more info
        Execution halted
      ```
 
-# CohortCharacteristics (1.1.0)
-
-* GitHub: <https://github.com/darwin-eu/CohortCharacteristics>
-* Email: <mailto:marti.catalasabate@ndorms.ox.ac.uk>
-* GitHub mirror: <https://github.com/cran/CohortCharacteristics>
-
-Run `revdepcheck::cloud_details(, "CohortCharacteristics")` for more info
-
-## Newly broken
-
-*   checking tests ... ERROR
-     ```
-     ...
-        11. │           └─DBI::dbSendStatement(conn, statement, ...)
-        12. │             ├─DBI::dbSendQuery(conn, statement, ...)
-        13. │             └─duckdb::dbSendQuery(conn, statement, ...)
-        14. │               └─duckdb (local) .local(conn, statement, ...)
-        15. │                 └─duckdb:::rethrow_rapi_prepare(conn@conn_ref, statement, env)
-        16. │                   ├─rlang::try_fetch(...)
-        17. │                   │ ├─base::tryCatch(...)
-        18. │                   │ │ └─base (local) tryCatchList(expr, classes, parentenv, handlers)
-        19. │                   │ │   └─base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
-        20. │                   │ │     └─base (local) doTryCatch(return(expr), name, parentenv, handler)
-        21. │                   │ └─base::withCallingHandlers(...)
-        22. │                   └─duckdb:::rapi_prepare(conn, query, env)
-        23. ├─duckdb (local) `<fn>`(...)
-        24. │ └─rlang::abort(error_parts, class = "duckdb_error", !!!fields)
-        25. │   └─rlang:::signal_abort(cnd, .file)
-        26. │     └─base::signalCondition(cnd)
-        27. └─rlang (local) `<fn>`(`<dckdb_rr>`)
-        28.   └─handlers[[1L]](cnd)
-        29.     └─duckdb:::rethrow_error_from_rapi(e, call)
-        30.       └─rlang::abort(msg, call = call)
-       
-       [ FAIL 1 | WARN 17 | SKIP 24 | PASS 228 ]
-       Error:
-       ! Test failures.
-       Execution halted
-     ```
-
 # dbi.table (1.0.6)
 
 * GitHub: <https://github.com/kjellpk/dbi.table>
@@ -136,21 +96,21 @@ Run `revdepcheck::cloud_details(, "diseasystore")` for more info
        Caused by error in `pmap()`:
        i In index: 1.
        Caused by error:
-       ! no such table: `SCDB_digest_to_checksum_BrP2VHaKPx`
+       ! no such table: `SCDB_digest_to_checksum_l6CkPtKc93`
        ── Error ('test-drop_diseasystore.R:127:5'): drop_diseasystore can delete single table in default schema ──
        <purrr_error_indexed/rlang_error/error/condition>
        Error in `map(.x, .f, ..., .progress = .progress)`: i In index: 1.
        Caused by error in `pmap()`:
        i In index: 1.
        Caused by error:
-       ! no such table: `SCDB_digest_to_checksum_KFxPNpSEmX`
+       ! no such table: `SCDB_digest_to_checksum_Ns6SdA1KeY`
        ── Failure ('test-zzz.R:12:3'): data is not written locally ────────────────────
        Expected `dir(recursive = TRUE)` to have the same values as `current_files`.
        Actual: "_problems/test-DiseasystoreBase-134.R", "_problems/test-DiseasystoreBase-290.R", "_problems/test-DiseasystoreEcdcRespitoryViruses-14.R", "_problems/test-DiseasystoreGoogleCovid19-11.R", "_problems/test-drop_diseasystore-128.R", "_problems/test-drop_diseasystore-69.R", "helper-setup.R", "setup.R", "test-0_R6_utils.R", ...
        Expected: "helper-setup.R", "setup.R", "test-0_R6_utils.R", "test-0_documentation.R", "test-0_linters.R", "test-0_rd_files.R", "test-DiseasystoreBase.R", "test-DiseasystoreEcdcRespitoryViruses.R", "test-DiseasystoreGoogleCovid19.R", ...
        Needs: "_problems/test-DiseasystoreBase-134.R", "_problems/test-DiseasystoreBase-290.R", "_problems/test-DiseasystoreEcdcRespitoryViruses-14.R", "_problems/test-DiseasystoreGoogleCovid19-11.R", "_problems/test-drop_diseasystore-128.R", "_problems/test-drop_diseasystore-69.R"
        
-       [ FAIL 22 | WARN 5 | SKIP 12 | PASS 443 ]
+       [ FAIL 23 | WARN 47 | SKIP 12 | PASS 427 ]
        Error:
        ! Test failures.
        Warning message:
@@ -161,22 +121,22 @@ Run `revdepcheck::cloud_details(, "diseasystore")` for more info
 *   checking re-building of vignette outputs ... ERROR
      ```
      ...
-          ▆
-       1. └─`<fn>`(`<Logger>`)
-       2.   └─.subset2(e, ".__enclos_env__")$private$finalize()
-       3.     └─self$finalize_db_entry()
-       4.       └─dbplyr::build_sql(...)
-       5.         └─purrr::map_chr(enexprs(...), escape_expr, con = con)
-       6.           └─purrr:::map_("character", .x, .f, ..., .progress = .progress)
-       7.             ├─purrr:::with_indexed_errors(...)
-       8.             │ └─base::withCallingHandlers(...)
-       9.             ├─purrr:::call_with_cleanup(...)
-      10.             └─dbplyr (local) .f(.x[[i]], ...)
-      11.               ├─dbplyr::escape(val, con = con)
-      12.               └─dbplyr:::escape.default(val, con = con)
-      13.                 └─dbplyr:::error_embed(obj_type_friendly(x), "x")
-      14.                   └─cli::cli_abort(...)
-      15.                     └─rlang::abort(...)
+      25.                     └─diseasystore (local) .f(start_date = .l[[1L]][[i]], end_date = .l[[2L]][[i]], ...)
+      26.                       └─SCDB::update_snapshot(...)
+      27.                         ├─DBI::dbSendQuery(conn, sql_insert)
+      28.                         └─DBI::dbSendQuery(conn, sql_insert)
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     
+     Error: processing vignette 'extending-diseasystore-example.Rmd' failed with diagnostics:
+     ℹ In index: 1.
+     Caused by error in `pmap()`:
+     ℹ In index: 1.
+     Caused by error in `DBI::dbSendQuery()`:
+     ! Binder Error: Cannot extract field 'checksum' from expression "'dbplyr_tmp_54B4idg8WV'" because it is not a struct, union, map, or json
+     ℹ Context: rapi_prepare
+     ℹ Error type: BINDER
+     --- failed re-building ‘extending-diseasystore-example.Rmd’
+     
      Warning: Connection already closed.
      --- re-building ‘extending-diseasystore.Rmd’ using rmarkdown
      --- finished re-building ‘extending-diseasystore.Rmd’
@@ -258,44 +218,14 @@ Run `revdepcheck::cloud_details(, "dm")` for more info
        Execution halted
      ```
 
-# etl (0.4.2)
+## In both
 
-* GitHub: <https://github.com/beanumber/etl>
-* Email: <mailto:ben.baumer@gmail.com>
-* GitHub mirror: <https://github.com/cran/etl>
-
-Run `revdepcheck::cloud_details(, "etl")` for more info
-
-## Newly broken
-
-*   checking tests ... ERROR
+*   checking Rd cross-references ... WARNING
      ```
-     ...
-       
-           intersect, setdiff, setequal, union
-       
-       > 
-       > test_check("etl")
-       Saving _problems/test-etl-97.R
-       [ FAIL 1 | WARN 1 | SKIP 3 | PASS 30 ]
-       
-       ══ Skipped tests (3) ═══════════════════════════════════════════════════════════
-       • On CRAN (2): 'test-etl.R:102:3', 'test-etl.R:119:3'
-       • empty test (1): 'test-etl.R:51:1'
-       
-       ══ Failed tests ════════════════════════════════════════════════════════════════
-       ── Failure ('test-etl.R:97:3'): etl works ──────────────────────────────────────
-       Expected output from `print(cars)` to match regexp "sqlite".
-       Actual output:
-       ✖ │ dir:  2 files occupying 0 GB
-         │ <S4 class 'SQLiteConnection' [package "RSQLite"] with 8 slots>NULL
-       
-       [ FAIL 1 | WARN 1 | SKIP 3 | PASS 30 ]
-       Error:
-       ! Test failures.
-       Warning message:
-       call dbDisconnect() when finished working with a connection 
-       Execution halted
+     Missing link(s) in Rd file 'copy_dm_to.Rd':
+       ‘[dplyr:src_dbi]{dplyr::src_dbi}’
+     
+     See section 'Cross-references' in the 'Writing R Extensions' manual.
      ```
 
 # healthdb (0.5.0)
@@ -408,13 +338,13 @@ Run `revdepcheck::cloud_details(, "mlr3db")` for more info
         76.     └─cli::cli_abort("Failed to collect lazy table.", parent = cnd)
         77.       └─rlang::abort(...)
        
-       [ FAIL 3 | WARN 1 | SKIP 3 | PASS 1133 ]
+       [ FAIL 3 | WARN 2 | SKIP 3 | PASS 1133 ]
        Error:
        ! Test failures.
        Warning messages:
        1: call dbDisconnect() when finished working with a connection 
        2: In .Internal(gc(verbose, reset, full)) :
-         closing unused connection 4 (<-localhost:33345)
+         closing unused connection 4 (<-localhost:29509)
        Execution halted
      ```
 
@@ -492,7 +422,7 @@ Run `revdepcheck::cloud_details(, "PatientProfiles")` for more info
         2.   └─testthat::quasi_label(enquo(object), label)
         3.     └─rlang::eval_bare(expr, quo_get_env(quo))
        
-       [ FAIL 2 | WARN 61 | SKIP 109 | PASS 192 ]
+       [ FAIL 2 | WARN 73 | SKIP 109 | PASS 192 ]
        Error:
        ! Test failures.
        Execution halted
@@ -507,36 +437,6 @@ Run `revdepcheck::cloud_details(, "PatientProfiles")` for more info
 Run `revdepcheck::cloud_details(, "pool")` for more info
 
 ## Newly broken
-
-*   checking examples ... ERROR
-     ```
-     ...
-     > 
-     > ### ** Examples
-     > 
-     > library(dplyr)
-     
-     Attaching package: ‘dplyr’
-     
-     The following objects are masked from ‘package:stats’:
-     
-         filter, lag
-     
-     The following objects are masked from ‘package:base’:
-     
-         intersect, setdiff, setequal, union
-     
-     > 
-     > pool <- dbPool(RSQLite::SQLite())
-     > # copy a table into the database
-     > copy_to(pool, mtcars, "mtcars", temporary = FALSE)
-     Error in UseMethod("sql_escape_ident", sql_dialect(con)) : 
-       no applicable method for 'sql_escape_ident' applied to an object of class "c('Pool', 'R6')"
-     Calls: copy_to ... as_table_path -> make_table_path -> sql_escape_ident
-     Execution halted
-     <pool> Checked-out object deleted before being returned.
-     <pool> Make sure to `poolReturn()` all objects retrieved with `poolCheckout().`
-     ```
 
 *   checking tests ... ERROR
      ```
@@ -566,6 +466,56 @@ Run `revdepcheck::cloud_details(, "pool")` for more info
        Error:
        ! Test failures.
        Execution halted
+     ```
+
+## In both
+
+*   checking examples ... ERROR
+     ```
+     Running examples in ‘pool-Ex.R’ failed
+     The error most likely occurred in:
+     
+     > ### Name: dbPool
+     > ### Title: Create a pool of database connections
+     > ### Aliases: dbPool
+     > 
+     > ### ** Examples
+     > 
+     > # You use a dbPool in the same way as a standard DBI connection
+     > pool <- dbPool(RSQLite::SQLite(), dbname = demoDb())
+     Error: Could not connect to database:
+     unable to open database file
+     Execution halted
+     ```
+
+*   checking re-building of vignette outputs ... ERROR
+     ```
+     ...
+          ▆
+       1. ├─DBI::dbConnect(RSQLite::SQLite(), dbname = pool::demoDb())
+       2. ├─DBI::dbConnect(RSQLite::SQLite(), dbname = pool::demoDb())
+       3. │ └─RSQLite (local) .local(drv, ...)
+       4. │   └─base::stopifnot(length(dbname) == 1, !is.na(dbname))
+       5. └─pool::demoDb()
+       6.   ├─DBI::dbConnect(RSQLite::SQLite(), path)
+       7.   └─DBI::dbConnect(RSQLite::SQLite(), path)
+       8.     └─RSQLite (local) .local(drv, ...)
+       9.       ├─methods::new(...)
+      10.       │ ├─methods::initialize(value, ...)
+      11.       │ └─methods::initialize(value, ...)
+      12.       └─RSQLite:::connection_connect(...)
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     
+     Error: processing vignette 'why-pool.Rmd' failed with diagnostics:
+     Could not connect to database:
+     unable to open database file
+     --- failed re-building ‘why-pool.Rmd’
+     
+     SUMMARY: processing the following file failed:
+       ‘why-pool.Rmd’
+     
+     Error: Vignette re-building failed.
+     Execution halted
      ```
 
 # RClickhouse (0.6.10)
@@ -648,7 +598,7 @@ Run `revdepcheck::cloud_details(, "RPresto")` for more info
        Execution halted
      ```
 
-# SCDB (0.5.2)
+# SCDB (0.6.0)
 
 * GitHub: <https://github.com/ssi-dk/SCDB>
 * Email: <mailto:rske@ssi.dk>
@@ -661,29 +611,29 @@ Run `revdepcheck::cloud_details(, "SCDB")` for more info
 *   checking examples ... ERROR
      ```
      ...
-     + 
-     +   dplyr::tbl(conn, "test.mtcars")
-     + 
-     +   close_connection(conn)
      + ## Don't show: 
      + }) # examplesIf
      > conn <- get_connection()
      > data <- dplyr::copy_to(conn, mtcars)
      > update_snapshot(head(data, 3), conn = conn, db_table = "test.mtcars", 
-     +     timestamp = Sys.time())
+     +     timestamp = "2020-01-01")
      Warning: `log_path` and `log_tbl` are both `NULL` and therefore NO file or database logging will be done.
      Consider adding options SCDB.log_table_id and/or SCDB.log_path to your .Rprofile
-     2026-01-23 15:10:28.382 - root - INFO - Started
-     2026-01-23 15:10:28.382 - root - INFO - Parsing data for table main.test.mtcars started
-     2026-01-23 15:10:28.382 - root - INFO - Given timestamp for table is 2026-01-23 15:10:28.382749
-     2026-01-23 15:10:28.583 - root - INFO - Calculated checksums
-     2026-01-23 15:10:28.693 - root - INFO - Deactivating records
+     2026-02-17 14:25:33.630 - root - INFO - Started
+     2026-02-17 14:25:33.630 - root - INFO - Parsing data for table main.test.mtcars started
+     2026-02-17 14:25:33.630 - root - INFO - Given timestamp for table is 2020-01-01
+     2026-02-17 14:25:34.017 - root - INFO - Calculated checksums
+     2026-02-17 14:25:34.128 - root - INFO - Deactivating records
      Warning: `as.sql()` was deprecated in dbplyr 2.6.0.
      ℹ Please use `as_table_path()` instead.
      ℹ The deprecated feature was likely used in the SCDB package.
        Please report the issue at <https://github.com/ssi-dk/SCDB/issues>.
-     2026-01-23 15:10:28.776 - root - INFO - Deactivate records count: 0
-     2026-01-23 15:10:28.776 - root - INFO - Adding new records
+     Warning: `table` uses SQL where a table identifier is expected.
+     ℹ If you want to use a literal (unquoted) identifier use `I()` instead.
+     2026-02-17 14:25:34.305 - root - INFO - Deactivate records count: 0
+     2026-02-17 14:25:34.305 - root - INFO - Adding new records
+     Warning: `table` uses SQL where a table identifier is expected.
+     ℹ If you want to use a literal (unquoted) identifier use `I()` instead.
      Error: no such table: `SCDB_digest_to_checksum_Ry23f5MYPf`
      Execution halted
      ```
@@ -691,58 +641,58 @@ Run `revdepcheck::cloud_details(, "SCDB")` for more info
 *   checking tests ... ERROR
      ```
      ...
-       Warning message:
-       call dbDisconnect() when finished working with a connection 
+       Actually got a <simpleError> with message:
+         no such table: `SCDB_digest_to_checksum_7inlJRjaET`
+       ── Failure ('test-update_snapshot.R:624:5'): update_snapshot() works with across connection ──
+       Expected `update_snapshot(...)` not to throw any errors.
+       Actually got a <simpleError> with message:
+         no such table: `SCDB_digest_to_checksum_Ogjc8taSOO`
+       ── Failure ('test-update_snapshot.R:670:5'): update_snapshot() works with across connection ──
+       Expected `update_snapshot(...)` not to throw any errors.
+       Actually got a <simpleError> with message:
+         no such table: `SCDB_digest_to_checksum_iaPNjfx4yZ`
+       ── Failure ('test-update_snapshot.R:670:5'): update_snapshot() works with across connection ──
+       Expected `update_snapshot(...)` not to throw any errors.
+       Actually got a <simpleError> with message:
+         no such table: `SCDB_digest_to_checksum_0E6hznIxsB`
+       
+       [ FAIL 22 | WARN 82 | SKIP 1 | PASS 633 ]
+       Error:
+       ! Test failures.
+       Warning messages:
+       1: `as.sql()` was deprecated in dbplyr 2.6.0.
+       i Please use `as_table_path()` instead. 
+       2: `as.sql()` was deprecated in dbplyr 2.6.0.
+       i Please use `as_table_path()` instead. 
+       3: call dbDisconnect() when finished working with a connection 
        Execution halted
-       Error in `purrr::map_chr()`:
-       ℹ In index: 2.
-       Caused by error:
-       ! Cannot translate a <Id> object to SQL.
-       ℹ Do you want to force evaluation in R with (e.g.) `!!x` or `local(x)`?
-       Backtrace:
-            ▆
-         1. └─`<fn>`(`<Logger>`)
-         2.   └─.subset2(e, ".__enclos_env__")$private$finalize()
-         3.     └─self$finalize_db_entry()
-         4.       └─dbplyr::build_sql(...)
-         5.         └─purrr::map_chr(enexprs(...), escape_expr, con = con)
-         6.           └─purrr:::map_("character", .x, .f, ..., .progress = .progress)
-         7.             ├─purrr:::with_indexed_errors(...)
-         8.             │ └─base::withCallingHandlers(...)
-         9.             ├─purrr:::call_with_cleanup(...)
-        10.             └─dbplyr (local) .f(.x[[i]], ...)
-        11.               ├─dbplyr::escape(val, con = con)
-        12.               └─dbplyr:::escape.default(val, con = con)
-        13.                 └─dbplyr:::error_embed(obj_type_friendly(x), "x")
-        14.                   └─cli::cli_abort(...)
-        15.                     └─rlang::abort(...)
      ```
 
 *   checking re-building of vignette outputs ... ERROR
      ```
      ...
-      5.       └─RSQLite (local) .local(conn, statement, ...)
-      6.         ├─methods::new(...)
-      7.         │ ├─methods::initialize(value, ...)
-      8.         │ └─methods::initialize(value, ...)
-      9.         └─RSQLite:::result_create(conn@ptr, statement)
+     ℹ Error type: BINDER
+     ---
+     Backtrace:
+         ▆
+      1. └─global update_snapshot(...)
+      2.   └─SCDB::update_snapshot(logger = SCDB::LoggerNull$new(), ...)
+      3.     ├─DBI::dbSendQuery(conn, sql_insert)
+      4.     └─DBI::dbSendQuery(conn, sql_insert)
      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      
-     Error: processing vignette 'SCDB.Rmd' failed with diagnostics:
-     no such table: `SCDB_digest_to_checksum_qs6CYZ5vrf`
-     --- failed re-building ‘SCDB.Rmd’
-     
-     --- re-building ‘benchmarks.Rmd’ using rmarkdown
-     Loading required namespace: here
-     fatal: not a git repository (or any of the parent directories): .git
-     --- finished re-building ‘benchmarks.Rmd’
+     Error: processing vignette 'delta-loading.Rmd' failed with diagnostics:
+     Binder Error: Cannot extract field 'checksum' from expression "'dbplyr_tmp_figO7WgyHI'" because it is not a struct, union, map, or json
+     ℹ Context: rapi_prepare
+     ℹ Error type: BINDER
+     --- failed re-building ‘delta-loading.Rmd’
      
      --- re-building ‘slowly-changing-dimension.Rmd’ using rmarkdown
      Loading required namespace: tidyverse
      --- finished re-building ‘slowly-changing-dimension.Rmd’
      
-     SUMMARY: processing the following file failed:
-       ‘SCDB.Rmd’
+     SUMMARY: processing the following files failed:
+       ‘SCDB.Rmd’ ‘delta-loading.Rmd’
      
      Error: Vignette re-building failed.
      Execution halted

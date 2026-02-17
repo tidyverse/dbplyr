@@ -1,9 +1,9 @@
 ## revdepcheck results
 
-We checked 124 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
+We checked 128 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
 
- * We saw 15 new problems
- * We failed to check 0 packages
+ * We saw 13 new problems
+ * We failed to check 1 packages
 
 Issues with CRAN packages are summarised below.
 
@@ -11,9 +11,6 @@ Issues with CRAN packages are summarised below.
 (This reports the first line of each new failure)
 
 * bigrquery
-  checking tests ... ERROR
-
-* CohortCharacteristics
   checking tests ... ERROR
 
 * dbi.table
@@ -25,9 +22,6 @@ Issues with CRAN packages are summarised below.
 
 * dm
   checking examples ... ERROR
-  checking tests ... ERROR
-
-* etl
   checking tests ... ERROR
 
 * healthdb
@@ -46,7 +40,6 @@ Issues with CRAN packages are summarised below.
   checking tests ... ERROR
 
 * pool
-  checking examples ... ERROR
   checking tests ... ERROR
 
 * RClickhouse
@@ -60,3 +53,6 @@ Issues with CRAN packages are summarised below.
   checking tests ... ERROR
   checking re-building of vignette outputs ... ERROR
 
+### Failed to check
+
+* vegdata (NA)
