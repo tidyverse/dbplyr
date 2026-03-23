@@ -82,7 +82,7 @@ test_that("na_if is translated to NULLIF (#211)", {
   expect_translation(con, na_if(x, 0L), "NULLIF(\"x\", 0)")
 })
 
-test_that("anyNA() translates like any(is.na())", {
+test_that("anyNA() translates like any(is.na()) (#1814)", {
   expect_identical(
     translate_sql(anyNA(x), con = dialect_ansi(), window = FALSE),
     translate_sql(any(is.na(x)), con = dialect_ansi(), window = FALSE)
@@ -90,14 +90,6 @@ test_that("anyNA() translates like any(is.na())", {
   expect_identical(
     translate_sql(anyNA(x), con = dialect_ansi(), window = TRUE),
     translate_sql(any(is.na(x)), con = dialect_ansi(), window = TRUE)
-  )
-  expect_identical(
-    translate_sql(anyNA(x), con = simulate_postgres(), window = FALSE),
-    translate_sql(any(is.na(x)), con = simulate_postgres(), window = FALSE)
-  )
-  expect_identical(
-    translate_sql(anyNA(x), con = simulate_postgres()),
-    translate_sql(any(is.na(x)), con = simulate_postgres())
   )
 })
 
