@@ -639,6 +639,7 @@ base_no_win <- sql_translator(
   max = win_absent("max"),
   all = win_absent("all"),
   any = win_absent("any"),
+  anyNA = win_absent("anyNA"),
   median = win_absent("median"),
   quantile = win_absent("quantile"),
   n = win_absent("n"),
