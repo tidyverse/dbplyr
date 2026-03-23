@@ -83,13 +83,14 @@ test_that("na_if is translated to NULLIF (#211)", {
 })
 
 test_that("anyNA() translates like any(is.na()) (#1814)", {
+  con <- dialect_ansi()
   expect_identical(
-    translate_sql(anyNA(x), con = dialect_ansi(), window = FALSE),
-    translate_sql(any(is.na(x)), con = dialect_ansi(), window = FALSE)
+    translate_sql(anyNA(x), con = con, window = FALSE),
+    translate_sql(any(is.na(x)), con = con, window = FALSE)
   )
   expect_identical(
-    translate_sql(anyNA(x), con = dialect_ansi(), window = TRUE),
-    translate_sql(any(is.na(x)), con = dialect_ansi(), window = TRUE)
+    translate_sql(anyNA(x), con = con, window = TRUE),
+    translate_sql(any(is.na(x)), con = con, window = TRUE)
   )
 })
 
