@@ -82,6 +82,25 @@ test_that("na_if is translated to NULLIF (#211)", {
   expect_translation(con, na_if(x, 0L), "NULLIF(\"x\", 0)")
 })
 
+test_that("anyNA() translates like any(is.na())", {
+  expect_identical(
+    translate_sql(anyNA(x), con = dialect_ansi(), window = FALSE),
+    translate_sql(any(is.na(x)), con = dialect_ansi(), window = FALSE)
+  )
+  expect_identical(
+    translate_sql(anyNA(x), con = dialect_ansi(), window = TRUE),
+    translate_sql(any(is.na(x)), con = dialect_ansi(), window = TRUE)
+  )
+  expect_identical(
+    translate_sql(anyNA(x), con = simulate_postgres(), window = FALSE),
+    translate_sql(any(is.na(x)), con = simulate_postgres(), window = FALSE)
+  )
+  expect_identical(
+    translate_sql(anyNA(x), con = simulate_postgres()),
+    translate_sql(any(is.na(x)), con = simulate_postgres())
+  )
+})
+
 test_that("connection affects quoting character", {
   lf <- lazy_frame(field1 = 1, field2 = 2, con = dialect_sqlite())
   out <- select(lf, field1)

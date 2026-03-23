@@ -449,6 +449,14 @@ sql_exp <- function(a, x) {
   }
 }
 
+sql_any_na <- function(x, window = FALSE) {
+  variant <- dbplyr_sql_translation(sql_current_con())
+  is_na <- variant$scalar$is.na(x)
+  any <- if (window) variant$window$any else variant$aggregate$any
+
+  any(is_na)
+}
+
 #' @export
 #' @rdname sql_variant
 #' @format NULL
@@ -464,6 +472,7 @@ base_agg <- sql_translator(
   # https://blog.jooq.org/a-true-sql-gem-you-didnt-know-yet-the-every-aggregate-function/#comment-344695
   all = sql_aggregate("MIN"),
   any = sql_aggregate("MAX"),
+  anyNA = \(x) sql_any_na(x, window = FALSE),
 
   sd = sql_not_supported("sd"),
   var = sql_not_supported("var"),
@@ -564,6 +573,7 @@ base_win <- sql_translator(
 
   all = win_aggregate("MIN"),
   any = win_aggregate("MAX"),
+  anyNA = \(x) sql_any_na(x, window = TRUE),
 
   sd = sql_not_supported("sd"),
   var = sql_not_supported("var"),
