@@ -165,7 +165,11 @@ sql_escape_string <- function(con, x) {
 }
 #' @export
 sql_escape_string.default <- function(con, x) {
-  sql(sql_quote(x, "'"))
+  if (inherits(x, "SQL")) {
+    sql(unclass(x))
+  } else {
+    sql(sql_quote(x, "'"))
+  }
 }
 
 # double ------------------------------------------------------------------
