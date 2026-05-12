@@ -60,6 +60,21 @@ test_that("as.sql() only affects character vectors", {
   expect_equal(as.sql(x3), x3)
 })
 
+test_that("as.sql() converts DBI::Id to quoted identifier", {
+  local_options(lifecycle_verbosity = "quiet")
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  on.exit(DBI::dbDisconnect(con))
+
+  expect_equal(
+    as.sql(DBI::Id(table = "x"), con = con),
+    sql("`x`")
+  )
+  expect_equal(
+    as.sql(DBI::Id(schema = "s", table = "x"), con = con),
+    sql("`s`.`x`")
+  )
+})
+
 # ident_q() --------------------------------------------------------------------
 
 test_that("quoted identifier correctly escaped", {

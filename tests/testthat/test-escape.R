@@ -86,6 +86,15 @@ test_that("logical is SQL-99 compatible (by default)", {
   expect_equal(escape(NA, con = con), sql("NULL"))
 })
 
+# String -----------------------------------------------------------------
+
+test_that("can escape strings", {
+  con <- dialect_ansi()
+
+  expect_equal(escape("x", con = con), sql("'x'"))
+  expect_equal(escape(DBI::SQL("x"), con = con), sql("x"))
+})
+
 # Date-time ---------------------------------------------------------------
 
 test_that("date and date-times are converted to ISO 8601", {

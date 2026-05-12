@@ -1,8 +1,8 @@
 ## revdepcheck results
 
-We checked 124 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
+We checked 131 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
 
- * We saw 15 new problems
+ * We saw 13 new problems
  * We failed to check 0 packages
 
 Issues with CRAN packages are summarised below.
@@ -13,12 +13,6 @@ Issues with CRAN packages are summarised below.
 * bigrquery
   checking tests ... ERROR
 
-* CohortCharacteristics
-  checking tests ... ERROR
-
-* dbi.table
-  checking tests ... ERROR
-
 * diseasystore
   checking tests ... ERROR
   checking re-building of vignette outputs ... ERROR
@@ -27,14 +21,8 @@ Issues with CRAN packages are summarised below.
   checking examples ... ERROR
   checking tests ... ERROR
 
-* etl
-  checking tests ... ERROR
-
 * healthdb
   checking tests ... ERROR
-
-* lazysf
-  checking examples ... ERROR
 
 * mlr3db
   checking tests ... ERROR
@@ -52,6 +40,11 @@ Issues with CRAN packages are summarised below.
 * RClickhouse
   checking tests ... ERROR
 
+* rolap
+  checking examples ... ERROR
+  checking tests ... ERROR
+  checking re-building of vignette outputs ... ERROR
+
 * RPresto
   checking tests ... ERROR
 
@@ -59,4 +52,7 @@ Issues with CRAN packages are summarised below.
   checking examples ... ERROR
   checking tests ... ERROR
   checking re-building of vignette outputs ... ERROR
+
+* when
+  checking tests ... ERROR
 

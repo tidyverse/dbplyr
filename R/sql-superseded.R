@@ -151,7 +151,9 @@ replace_expr <- function(x, con) {
 #' @export
 as.sql <- function(x, con) {
   lifecycle::deprecate_warn("2.6.0", "as.sql()", "as_table_path()")
-  if (is_bare_character(x)) {
+  if (methods::is(x, "Id")) {
+    sql(DBI::dbQuoteIdentifier(con, x))
+  } else if (is_bare_character(x)) {
     ident(x)
   } else {
     x
