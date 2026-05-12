@@ -30,21 +30,35 @@ sql_escape_string.default <- function(con, x) {
 
 or revert to `sql(DBI::dbQuoteString(con, x))`.
 
-## Cluster 2: `escape.dbplyr_table_path()` removed (commit `c1f77a6b`)
+## Cluster 2: `remote_table()` no longer returns a `dbplyr_table_path`
 
-`remote_table()` returns a `dbplyr_table_path` (which inherits from
-`character`). Without the dedicated escape method, `build_sql()` falls through
-to `escape.character()` and renders the table name as a string literal
-(`'dbplyr_tmp_XXX'`). SQLite reports "no such table"; DuckDB reports
-`Cannot extract field 'checksum' from expression '...'`.
+The internal `dbplyr_table_path` type was never user-facing. After dropping
+`escape.dbplyr_table_path()` (commit `c1f77a6b`), `remote_table()` was
+changed to return a `sql()` object containing the correctly quoted table
+identifier. This makes the result suitable for inlining into `build_sql()` /
+`sql_glue2()` without a special escape method.
 
 Hits: **SCDB**, **diseasystore** (cascades from SCDB).
 
-SCDB's `update_snapshot()` interpolates `dbplyr::remote_table(snapshot)` into
-`dbplyr::build_sql(...)` — a documented public API.
+- **SCDB's `update_snapshot()`** interpolates `dbplyr::remote_table(snapshot)`
+  into `dbplyr::build_sql(...)`. With the dev dbplyr this now generates valid
+  SQL — the original "no such table: `dbplyr_tmp_XXX`" / `Cannot extract
+  field 'checksum' from expression '...'` failure is gone.
+- **SCDB's `id.tbl_dbi()`** branches on the return type with
+  `if (inherits(table_ident, "dbplyr_table_path"))`, falling through to a
+  branch that assumes a `DBI::Id` (with `$catalog` / `$schema` / `$table`).
+  A `sql()` matches neither, so `table` / `schema` / `catalog` are all `NULL`
+  and the subsequent `filter(.data$table == !!NULL)` aborts with
+  `..1 must be of size 1, not size 0`.
 
-Suggested fix in dbplyr: revert the `R/table-name.R` / `NAMESPACE` hunks of
-`c1f77a6b` to re-introduce `escape.dbplyr_table_path()`.
+**Fix in SCDB.** Replace the type dispatch in `id.tbl_dbi()` with one of:
+
+- `dbplyr::remote_name(db_table)` for the bare table name, plus
+  `dbplyr::table_path_components(dbplyr:::remote_table_path(db_table), con)`
+  when schema/catalog are also needed; or
+- continue using `dbplyr::remote_table()` and parse the returned `sql()`
+  via `dbplyr::table_path_components()` (which accepts `sql`/character
+  input) — no type branching needed.
 
 ## Cluster 3: tbl-construction refactor (commit `133f1a14`, PR #1680)
 
@@ -96,7 +110,7 @@ Suggested fix in dbplyr: revert the `R/table-name.R` / `NAMESPACE` hunks of
 
 | Package         | Cluster                                    | Suggested fix location |
 |-----------------|--------------------------------------------|------------------------|
-| diseasystore    | 2 (escape.dbplyr_table_path)               | dbplyr                 |
+| diseasystore    | 2 (remote_table return type)               | SCDB                   |
 | dm              | 1 (sql_escape_string) + tbl_sum removal    | dbplyr + dm            |
 | healthdb        | 4 (%in% guard)                             | dbplyr                 |
 | mlr3db          | 3 (tbl refactor)                           | mlr3db                 |
@@ -104,8 +118,9 @@ Suggested fix in dbplyr: revert the `R/table-name.R` / `NAMESPACE` hunks of
 | PatientProfiles | 4 (filter-inlined join + select)           | dbplyr                 |
 | pool            | 4 (sql_escape_ident default removed)       | dbplyr                 |
 | rolap           | 1 (sql_escape_string)                      | dbplyr                 |
-| SCDB            | 2 (escape.dbplyr_table_path)               | dbplyr                 |
+| SCDB            | 2 (remote_table return type)               | SCDB                   |
 | when            | 1 (sql_escape_string)                      | dbplyr                 |
 
-9 of 10 failures point to a dbplyr-side fix; only mlr3db is a clean downstream
-issue, and dm has one downstream component on top of the dbplyr regression.
+7 of 10 failures point to a dbplyr-side fix; SCDB (and its dependent
+diseasystore) and mlr3db are downstream, and dm has one downstream component
+on top of the dbplyr regression.
