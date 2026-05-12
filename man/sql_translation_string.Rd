@@ -47,10 +47,10 @@ like \code{||}.
 }
 }
 \seealso{
-Other SQL translation helpers: 
+Other SQL translation helpers:
 \code{\link{sql_translation_agg}},
 \code{\link{sql_translation_scalar}},
 \code{\link{sql_translation_window}},
-\code{\link{sql_variant}()}
+\code{\link[=sql_variant]{sql_variant()}}
 }
 \concept{SQL translation helpers}

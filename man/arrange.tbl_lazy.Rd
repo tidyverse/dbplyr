@@ -22,7 +22,7 @@ query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
 \description{
-This is an method for the dplyr \code{\link[dplyr:arrange]{dplyr::arrange()}} generic. It generates
+This is an method for the dplyr \code{\link[dplyr:arrange]{arrange()}} generic. It generates
 the \verb{ORDER BY} clause of the SQL query. It also affects the
 \code{\link[=window_order]{window_order()}} of windowed expressions in \code{\link[=mutate.tbl_lazy]{mutate.tbl_lazy()}}.
 

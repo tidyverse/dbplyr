@@ -2,7 +2,7 @@
 #'
 #' @description
 #' These are methods for the dplyr generics [slice_min()], [slice_max()], and
-#' [slice_sample()]. They are translated to SQL using [filter()] and
+#' [slice_sample()]. They are translated to SQL using [dplyr::filter()] and
 #' window functions (`ROWNUMBER`, `MIN_RANK`, or `CUME_DIST` depending on
 #' arguments). `slice()`, `slice_head()`, and `slice_tail()` are not supported
 #' since database tables have no intrinsic order.
