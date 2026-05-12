@@ -188,7 +188,7 @@ inequality conditions.
 
 \item{na_matches}{Should NA (NULL) values match one another?
 The default, "never", is how databases usually work. \code{"na"} makes
-the joins behave like the dplyr join functions, \code{\link[=merge]{merge()}}, \code{\link[bit64:bit64S3]{bit64::match()}},
+the joins behave like the dplyr join functions, \code{\link[=merge]{merge()}}, \code{\link[base:match]{base::match()}},
 and \code{\%in\%}.}
 
 \item{multiple, unmatched}{Unsupported in database backends. As a workaround
@@ -215,7 +215,7 @@ query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
 \description{
-These are methods for the dplyr \link[dplyr:mutate-joins]{dplyr::join} generics. They are translated
+These are methods for the dplyr \link[dplyr:join]{join} generics. They are translated
 to the following SQL queries:
 \itemize{
 \item \code{inner_join(x, y)}: \verb{SELECT * FROM x JOIN y ON x.a = y.a}

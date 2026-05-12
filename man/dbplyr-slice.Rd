@@ -61,8 +61,8 @@ reach \code{n}/\code{prop}.}
 \item{weight_by, replace}{Not supported for database backends.}
 }
 \description{
-These are methods for the dplyr generics \code{\link[dplyr:slice]{dplyr::slice_min()}}, \code{\link[dplyr:slice]{dplyr::slice_max()}}, and
-\code{\link[dplyr:slice]{dplyr::slice_sample()}}. They are translated to SQL using \code{\link[dplyr:filter]{dplyr::filter()}} and
+These are methods for the dplyr generics \code{\link[dplyr:slice_min]{slice_min()}}, \code{\link[dplyr:slice_max]{slice_max()}}, and
+\code{\link[dplyr:slice_sample]{slice_sample()}}. They are translated to SQL using \code{\link[dplyr:filter]{dplyr::filter()}} and
 window functions (\code{ROWNUMBER}, \code{MIN_RANK}, or \code{CUME_DIST} depending on
 arguments). \code{slice()}, \code{slice_head()}, and \code{slice_tail()} are not supported
 since database tables have no intrinsic order.

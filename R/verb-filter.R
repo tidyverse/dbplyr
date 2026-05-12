@@ -1,6 +1,6 @@
 #' Subset rows using column values
 #'
-#' This is a method for the dplyr [filter()] generic. It generates the
+#' This is a method for the dplyr [dplyr::filter()] generic. It generates the
 #' `WHERE` clause of the SQL query.
 #'
 #' @inheritParams arrange.tbl_lazy
@@ -14,6 +14,7 @@
 #' db |> filter(x < 5) |> show_query()
 #' db |> filter(is.na(x)) |> show_query()
 #' @importFrom dplyr filter
+#' @exportS3Method NULL
 # Registered onLoad
 filter.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
   check_unsupported_arg(.preserve, FALSE)

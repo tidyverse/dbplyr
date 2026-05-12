@@ -61,14 +61,14 @@ and \code{\link[DBI:dbFetch]{DBI::dbFetch()}}.
 schemes for temporary tables (e.g. SQL server and SAP HANA require
 temporary tables to start with \verb{#})
 \item \code{db_table_drop_if_exists()} is used to drop a table if it exists. This
-is used when \code{overwrite = TRUE} in \code{\link[dplyr:copy_to]{dplyr::copy_to()}} and \code{\link[dplyr:compute]{dplyr::compute()}}.
+is used when \code{overwrite = TRUE} in \code{\link[dplyr:copy_to]{copy_to()}} and \code{\link[dplyr:compute]{compute()}}.
 }
 }
 \seealso{
-Other generic: 
+Other generic:
 \code{\link{db-sql}},
-\code{\link{db_connection_describe}()},
-\code{\link{escape}()}
+\code{\link[=db_connection_describe]{db_connection_describe()}},
+\code{\link[=escape]{escape()}}
 }
 \concept{generic}
 \keyword{internal}

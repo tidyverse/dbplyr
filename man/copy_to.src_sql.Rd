@@ -64,7 +64,7 @@ query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
 \description{
-This is an implementation of the dplyr \code{\link[dplyr:copy_to]{dplyr::copy_to()}} generic and it mostly
+This is an implementation of the dplyr \code{\link[dplyr:copy_to]{copy_to()}} generic and it mostly
 a wrapper around \code{\link[DBI:dbWriteTable]{DBI::dbWriteTable()}}.
 
 It is useful for copying small amounts of data to a database for examples,
