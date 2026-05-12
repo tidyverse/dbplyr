@@ -219,6 +219,15 @@
 - `na_matches = "na"` now works correctly with inequality and overlap
   joins, preserving the comparison operator instead of converting to
   equality ([\#1505](https://github.com/tidyverse/dbplyr/issues/1505)).
+- [`remote_table()`](https://dbplyr.tidyverse.org/dev/reference/remote_name.md)
+  now returns
+  [`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md)
+  containing the (correctly quoted) table identifier, rather than the
+  internal `dbplyr_table_path`. This makes the result suitable for
+  inlining into
+  [`build_sql()`](https://dbplyr.tidyverse.org/dev/reference/build_sql.md)
+  and
+  [`sql_glue2()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md).
 - [`semi_join()`](https://dplyr.tidyverse.org/reference/filter-joins.html)
   and
   [`anti_join()`](https://dplyr.tidyverse.org/reference/filter-joins.html)
