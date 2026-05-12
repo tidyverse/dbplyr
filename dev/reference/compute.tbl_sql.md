@@ -80,10 +80,10 @@ db <- memdb_frame(a = c(3, 4, 1, 2), b = c(5, 1, 2, NA))
 db |> filter(a <= 2) |> show_query()
 #> <SQL>
 #> SELECT *
-#> FROM `dbplyr_tmp_orR1u5CjcJ`
+#> FROM `dbplyr_tmp_YO68LSSy0I`
 #> WHERE (`a` <= 2.0)
 db |> filter(a <= 2) |> compute() |> show_query()
 #> <SQL>
 #> SELECT *
-#> FROM `dbplyr_tmp_jx2iyjisyY`
+#> FROM `dbplyr_tmp_acgWfAlMkP`
 ```

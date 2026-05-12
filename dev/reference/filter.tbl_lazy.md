@@ -54,11 +54,11 @@ db <- memdb_frame(x = c(2, NA, 5, NA, 10), y = 1:5)
 db |> filter(x < 5) |> show_query()
 #> <SQL>
 #> SELECT *
-#> FROM `dbplyr_tmp_RTXYj8SWnm`
+#> FROM `dbplyr_tmp_Pg2ZRmBV2z`
 #> WHERE (`x` < 5.0)
 db |> filter(is.na(x)) |> show_query()
 #> <SQL>
 #> SELECT *
-#> FROM `dbplyr_tmp_RTXYj8SWnm`
+#> FROM `dbplyr_tmp_Pg2ZRmBV2z`
 #> WHERE ((`x` IS NULL))
 ```

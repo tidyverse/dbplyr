@@ -7,6 +7,7 @@ how individual expressions (function calls) are translated;
 describes how entire verbs are translated.
 
 ``` r
+
 library(dbplyr)
 library(dplyr, warn.conflicts = FALSE)
 ```
@@ -19,6 +20,7 @@ to create a toy lazy table that allows us to see the translation without
 needing to connect to a real database:
 
 ``` r
+
 lf <- lazy_frame(x = 1, y = 2, g = "a")
 lf |> mutate(z = (x + y) / 2)
 #> <SQL>
@@ -36,6 +38,7 @@ SQL; see
 for more details.
 
 ``` r
+
 lf_sqlite <- lazy_frame(x = 1, con = simulate_sqlite())
 lf_access <- lazy_frame(x = 1, con = simulate_access())
 
@@ -84,6 +87,7 @@ There are two fundamental differences between R and SQL:
   used for strings.
 
   ``` r
+
   lf |> filter(x == "x")
   #> <SQL>
   #> SELECT *
@@ -96,6 +100,7 @@ There are two fundamental differences between R and SQL:
   real.
 
   ``` r
+
   lf |> transmute(z = 1)
   #> <SQL>
   #> SELECT 1.0 AS "z"
@@ -132,6 +137,7 @@ There are two fundamental differences between R and SQL:
   [`round()`](https://rdrr.io/r/base/Round.html)
 
 ``` r
+
 lf |> transmute(x = x / 2, y = x^2 + y^2)
 #> <SQL>
 #> SELECT "x", (POWER("x", 2.0)) + POWER("y", 2.0) AS "y"
@@ -155,6 +161,7 @@ mathematically preferred floored division with the modulo sign taking
 the sign of the divisor.
 
 ``` r
+
 df <- tibble(
   x = c(10L, 10L, -10L, -10L),
   y = c(3L, -3L, 3L, -3L)
@@ -171,7 +178,7 @@ df |> mutate(x %% y)
 #> 4   -10    -3     -1
 db |> mutate(x %% y)
 #> # A query:  ?? x 3
-#> # Database: sqlite 3.51.2 [:memory:]
+#> # Database: sqlite 3.52.0 [:memory:]
 #>       x     y `x%%y`
 #>   <int> <int>  <int>
 #> 1    10     3      1
@@ -191,6 +198,7 @@ cross-database translation available.
   [`xor()`](https://rdrr.io/r/base/Logic.html)
 
 ``` r
+
 lf |> filter(x > 5 | y == 2)
 #> <SQL>
 #> SELECT *
@@ -220,6 +228,7 @@ lf |> filter(between(x, 1, 5))
 [`bitwShiftR()`](https://rdrr.io/r/base/bitwise.html) are all supported:
 
 ``` r
+
 lf |> transmute(x = bitwAnd(x, 3L), y = bitwShiftL(x, 2L))
 #> <SQL>
 #> SELECT "x", "x" << 2 AS "y"
@@ -234,6 +243,7 @@ lf |> transmute(x = bitwAnd(x, 3L), y = bitwShiftL(x, 2L))
 Type coercion functions use the corresponding SQL `CAST()` call:
 
 ``` r
+
 lf |> transmute(x = as.integer(y), y = as.character(x))
 #> <SQL>
 #> SELECT "x", CAST("x" AS TEXT) AS "y"
@@ -256,6 +266,7 @@ For database-specific types not covered by these functions, use
 [`as()`](https://rdrr.io/r/methods/as.html):
 
 ``` r
+
 lf |> transmute(x = as(x, "TIME"), y = as(y, "DECIMAL(10, 2)"))
 #> <SQL>
 #> SELECT CAST("x" AS TIME) AS "x", CAST("y" AS DECIMAL(10, 2)) AS "y"
@@ -272,6 +283,7 @@ lf |> transmute(x = as(x, "TIME"), y = as(y, "DECIMAL(10, 2)"))
   replace `NULL` with a default value.
 
 ``` r
+
 lf |> filter(!is.na(x))
 #> <SQL>
 #> SELECT *
@@ -301,6 +313,7 @@ ask nicely. The aggregation functions warn you about this important
 difference:
 
 ``` r
+
 lf |> summarise(z = mean(x))
 #> Warning: Missing values are always removed in SQL aggregation functions.
 #> Use `na.rm = TRUE` to silence this warning
@@ -320,6 +333,7 @@ Note that aggregation functions used inside
 a window translation:
 
 ``` r
+
 lf |> mutate(z = mean(x, na.rm = TRUE))
 #> <SQL>
 #> SELECT *, AVG("x") OVER () AS "z"
@@ -355,6 +369,7 @@ Most backends also support:
 translated to `CASE WHEN`:
 
 ``` r
+
 lf |> transmute(z = ifelse(x > 5, "big", "small"))
 #> <SQL>
 #> SELECT CASE WHEN ("x" > 5.0) THEN 'big' WHEN NOT ("x" > 5.0) THEN 'small' END AS "z"
@@ -366,6 +381,7 @@ lf |> transmute(z = ifelse(x > 5, "big", "small"))
 and [`switch()`](https://rdrr.io/r/base/switch.html) are also supported:
 
 ``` r
+
 lf |> 
   mutate(z = case_when(
     x > 10 ~ "medium",
@@ -404,6 +420,7 @@ supported:
   [`substring()`](https://rdrr.io/r/base/substr.html), `str_sub()`
 
 ``` r
+
 lf |> transmute(x = paste0(g, " dog"))
 #> <SQL>
 #> SELECT CONCAT_WS('', "g", ' dog') AS "x"
@@ -429,6 +446,7 @@ dbplyr supports many lubridate functions for extracting date components:
   `second()`
 
 ``` r
+
 lf_dt <- lazy_frame(dt = Sys.time())
 
 lf_dt |> transmute(
@@ -483,6 +501,7 @@ be used directly.
 Any function that dbplyr doesn’t know about will be left as is:
 
 ``` r
+
 lf |> mutate(z = foofify(x, y))
 #> <SQL>
 #> SELECT *, foofify("x", "y") AS "z"
@@ -493,6 +512,7 @@ But to make it clear that you’re deliberately calling a SQL function, we
 recommend using the `.sql` pronoun:
 
 ``` r
+
 lf |> transmute(z = .sql$foofify(x, y))
 #> <SQL>
 #> SELECT foofify("x", "y") AS "z"
@@ -511,6 +531,7 @@ to use expressions like `LIKE`, which does a limited form of pattern
 matching:
 
 ``` r
+
 lf |> filter(x %LIKE% "%foo%")
 #> <SQL>
 #> SELECT *
@@ -521,6 +542,7 @@ lf |> filter(x %LIKE% "%foo%")
 You can also use `str_like()` for this common case:
 
 ``` r
+
 lf |> filter(str_like(x, "%foo%"))
 #> <SQL>
 #> SELECT *
@@ -533,6 +555,7 @@ more R-like to use [`paste()`](https://rdrr.io/r/base/paste.html) or
 [`paste0()`](https://rdrr.io/r/base/paste.html):
 
 ``` r
+
 lf |> transmute(z = x %||% y)
 #> <SQL>
 #> SELECT "x" || "y" AS "z"
@@ -556,6 +579,7 @@ literal SQL inside
 [`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md):
 
 ``` r
+
 lf |> transmute(z = sql("x!"))
 #> <SQL>
 #> SELECT x! AS "z"
@@ -569,6 +593,7 @@ lf |> transmute(z = x == sql("ANY VALUES(1, 2, 3)"))
 This gives you a lot of freedom to generate the SQL you need:
 
 ``` r
+
 lf |> transmute(factorial = sql("x!"))
 #> <SQL>
 #> SELECT x! AS "factorial"
@@ -585,6 +610,7 @@ If needed, you can also use the `dplyr.strict_sql` option to force
 dbplyr to error if it doesn’t know how to translate a function:
 
 ``` r
+
 options(dplyr.strict_sql = TRUE)
 lf |> mutate(z = glob(x, y))
 #> Error in `glob()`:
@@ -679,6 +705,7 @@ To see how individual window functions are translated to SQL, we can use
 [`transmute()`](https://dplyr.tidyverse.org/reference/transmute.html):
 
 ``` r
+
 lf <- lazy_frame(g = 1, year = 2020, id = 3, con = simulate_dbi())
 
 lf |> transmute(
@@ -706,6 +733,7 @@ pipeline, then dbplyr will use that information to set the “partition
 by” and “order by” clauses:
 
 ``` r
+
 lf |> arrange(year) |> mutate(z = cummean(g))
 #> <SQL>
 #> SELECT *, AVG("g") OVER (ORDER BY "year" ROWS UNBOUNDED PRECEDING) AS "z"
@@ -743,6 +771,7 @@ which window function you’re using:
 The three options are illustrated in the snippet below:
 
 ``` r
+
 lf |> transmute(
   x1 = min_rank(g),
   x2 = order_by(year, cumsum(g)),

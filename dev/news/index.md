@@ -306,6 +306,8 @@
 
 ## dbplyr 2.5.2
 
+CRAN release: 2026-02-13
+
 - Fix broken documentation link
 
 ## dbplyr 2.5.1
@@ -2934,6 +2936,7 @@ CRAN release: 2017-06-09
   is no longer a need to generate a dplyr src.
 
   ``` r
+
   library(dplyr)
 
   con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")

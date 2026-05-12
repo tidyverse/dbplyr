@@ -16,6 +16,7 @@ and
 ## Installation
 
 ``` r
+
 # The easiest way to get dbplyr is to install the whole tidyverse:
 install.packages("tidyverse")
 
@@ -34,6 +35,7 @@ data frames. To demonstrate this I’ll first create an in-memory SQLite
 database and copy over a dataset:
 
 ``` r
+
 library(dplyr, warn.conflicts = FALSE)
 
 con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
@@ -52,6 +54,7 @@ Now you can retrieve a table using
 for more details). Printing it just retrieves the first few rows:
 
 ``` r
+
 mtcars2 <- tbl(con, "mtcars")
 mtcars2
 #> # Source:   table<`mtcars`> [?? x 11]
@@ -75,6 +78,7 @@ All dplyr calls are evaluated lazily, generating SQL that is only sent
 to the database when you request the data.
 
 ``` r
+
 # lazily generates query
 summary <- mtcars2 |> 
   group_by(cyl) |> 

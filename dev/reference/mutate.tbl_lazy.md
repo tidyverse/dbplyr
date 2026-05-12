@@ -115,7 +115,7 @@ db |>
   show_query()
 #> <SQL>
 #> SELECT *, (`x` + `y`) / 2.0 AS `a`, SQRT((POWER(`x`, 2)) + POWER(`y`, 2)) AS `b`
-#> FROM `dbplyr_tmp_6Ojtgl00si`
+#> FROM `dbplyr_tmp_LBw8zKN1yQ`
 
 # dbplyr automatically creates subqueries as needed
 db |>
@@ -125,7 +125,7 @@ db |>
 #> SELECT *, `x1` * 2.0 AS `x2`
 #> FROM (
 #>   SELECT *, `x` + 1.0 AS `x1`
-#>   FROM `dbplyr_tmp_6Ojtgl00si`
+#>   FROM `dbplyr_tmp_LBw8zKN1yQ`
 #> ) AS `q01`
 
 # `.order` and `.frame` control window functions
@@ -140,5 +140,5 @@ db |>
 #> SELECT
 #>   *,
 #>   SUM(`x`) OVER (PARTITION BY `g` ORDER BY `x` ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING) AS `rolling_sum`
-#> FROM `dbplyr_tmp_lBpEtJTVTw`
+#> FROM `dbplyr_tmp_l623TKpjGw`
 ```

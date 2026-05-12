@@ -25,6 +25,7 @@ set up your own database.
 To use databases with dplyr you need to first install dbplyr:
 
 ``` r
+
 install.packages("dbplyr")
 ```
 
@@ -71,6 +72,7 @@ about if you need to do things to the database that are beyond the scope
 of dplyr.
 
 ``` r
+
 library(dbplyr)
 library(dplyr, warn.conflicts = FALSE)
 con <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
@@ -97,6 +99,7 @@ another server. That means in real-life that your code will look more
 like this:
 
 ``` r
+
 con <- DBI::dbConnect(RMariaDB::MariaDB(), 
   host = "database.rstudio.com",
   user = "hadley",
@@ -118,6 +121,7 @@ function. This is a quick and dirty way of getting data into a database
 and is useful primarily for demos and other small jobs.
 
 ``` r
+
 copy_to(con, nycflights13::flights, "flights", temporary = FALSE)
 ```
 
@@ -126,6 +130,7 @@ Now that we’ve copied the data, we can use
 reference to it:
 
 ``` r
+
 flights_db <- tbl(con, "flights")
 ```
 
@@ -133,9 +138,10 @@ When you print it out, you’ll notice that it mostly looks like a regular
 tibble:
 
 ``` r
+
 flights_db 
 #> # A query:  ?? x 19
-#> # Database: sqlite 3.51.2 [:memory:]
+#> # Database: sqlite 3.52.0 [:memory:]
 #>    year month   day dep_time sched_dep_time dep_delay arr_time
 #>   <int> <int> <int>    <int>          <int>     <dbl>    <int>
 #> 1  2013     1     1      517            515         2      830
@@ -167,10 +173,11 @@ Most of the time you don’t need to know anything about SQL, and you can
 continue to use the dplyr verbs that you’re already familiar with:
 
 ``` r
+
 flights_db |> 
   select(year:day, dep_delay, arr_delay)
 #> # A query:  ?? x 5
-#> # Database: sqlite 3.51.2 [:memory:]
+#> # Database: sqlite 3.52.0 [:memory:]
 #>    year month   day dep_delay arr_delay
 #>   <int> <int> <int>     <dbl>     <dbl>
 #> 1  2013     1     1         2        11
@@ -184,7 +191,7 @@ flights_db |>
 flights_db |> 
   filter(dep_delay > 240)
 #> # A query:  ?? x 19
-#> # Database: sqlite 3.51.2 [:memory:]
+#> # Database: sqlite 3.52.0 [:memory:]
 #>    year month   day dep_time sched_dep_time dep_delay arr_time
 #>   <int> <int> <int>    <int>          <int>     <dbl>    <int>
 #> 1  2013     1     1      848           1835       853     1001
@@ -203,7 +210,7 @@ flights_db |>
   group_by(dest) |>
   summarise(delay = mean(dep_delay, na.rm = TRUE))
 #> # A query:  ?? x 2
-#> # Database: sqlite 3.51.2 [:memory:]
+#> # Database: sqlite 3.52.0 [:memory:]
 #>   dest  delay
 #>   <chr> <dbl>
 #> 1 ABQ   13.7 
@@ -240,6 +247,7 @@ When working with databases, dplyr tries to be as lazy as possible:
 For example, take the following code:
 
 ``` r
+
 tailnum_delay_db <- flights_db |> 
   group_by(tailnum) |>
   summarise(
@@ -257,12 +265,13 @@ Even then it tries to do as little work as possible and only pulls down
 a few rows.
 
 ``` r
+
 tailnum_delay_db
 #> Warning: Missing values are always removed in SQL aggregation functions.
 #> Use `na.rm = TRUE` to silence this warning
 #> This warning is displayed once every 8 hours.
 #> # A query:    ?? x 3
-#> # Database:   sqlite 3.51.2 [:memory:]
+#> # Database:   sqlite 3.52.0 [:memory:]
 #> # Ordered by: desc(delay)
 #>   tailnum delay     n
 #>   <chr>   <dbl> <int>
@@ -280,6 +289,7 @@ see the SQL it’s generating with
 [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md):
 
 ``` r
+
 tailnum_delay_db |> show_query()
 #> <SQL>
 #> SELECT `tailnum`, AVG(`arr_delay`) AS `delay`, COUNT(*) AS `n`
@@ -298,6 +308,7 @@ you need from the database. Once you’ve figured it out, use
 pull all the data down into a local tibble:
 
 ``` r
+
 tailnum_delay <- tailnum_delay_db |> collect()
 tailnum_delay
 #> # A tibble: 1,201 × 3
@@ -325,6 +336,7 @@ performing expensive query operations:
   query, you can’t use [`tail()`](https://rdrr.io/r/utils/head.html).
 
 ``` r
+
 nrow(tailnum_delay_db)
 #> [1] NA
 
@@ -348,6 +360,7 @@ variable in
 [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html):
 
 ``` r
+
 db <- lazy_frame(x = 1, y = 2)
 
 db |> 
@@ -382,6 +395,7 @@ cases, you’ll need to write SQL code directly.
 Any function that dbplyr doesn’t know about will be left as is:
 
 ``` r
+
 db |>
   mutate(z = foofify(x, y))
 #> <SQL>
@@ -400,6 +414,7 @@ To make it more clear that you’re calling a SQL function, not an R
 function, you can use the `.sql` pronoun:
 
 ``` r
+
 db |>
   mutate(z = .sql$foofify(x, y))
 #> <SQL>
@@ -414,6 +429,7 @@ literal SQL inside
 [`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md):
 
 ``` r
+
 db |>
   transmute(factorial = sql("x!"))
 #> <SQL>

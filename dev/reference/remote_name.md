@@ -65,7 +65,7 @@ mf <- memdb_frame(x = 1:5, y = 5:1, .name = "blorp")
 remote_name(mf)
 #> [1] "blorp"
 remote_src(mf)
-#> <S4 class ‘SQLiteConnection’ [package “RSQLite”] with 8 slots>NULL
+#> <SQLiteConnection> :memory: (with extensions)NULL
 remote_con(mf)
 #> <SQLiteConnection>
 #>   Path: :memory:
@@ -78,7 +78,7 @@ mf2 <- dplyr::filter(mf, x > 3)
 remote_name(mf2)
 #> NULL
 remote_src(mf2)
-#> <S4 class ‘SQLiteConnection’ [package “RSQLite”] with 8 slots>NULL
+#> <SQLiteConnection> :memory: (with extensions)NULL
 remote_con(mf2)
 #> <SQLiteConnection>
 #>   Path: :memory:

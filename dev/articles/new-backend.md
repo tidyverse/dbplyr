@@ -23,6 +23,7 @@ For interactive exploitation, attach dplyr and DBI. If you’re creating a
 package, you’ll need to import dplyr and DBI.
 
 ``` r
+
 library(dplyr)
 library(dbplyr)
 library(DBI)
@@ -31,12 +32,13 @@ library(DBI)
 Check that you can create a tbl from a connection, like:
 
 ``` r
+
 con <- DBI::dbConnect(RSQLite::SQLite(), path = ":memory:")
 DBI::dbWriteTable(con, "mtcars", mtcars)
 
 tbl(con, "mtcars")
 #> # A query:  ?? x 11
-#> # Database: sqlite 3.51.2 []
+#> # Database: sqlite 3.52.0 []
 #>     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #>   <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
 #> 1  21       6   160   110  3.9   2.62  16.5     0     1     4     4
@@ -59,6 +61,7 @@ The first method of your dbplyr backend should always be for the
 generic:
 
 ``` r
+
 #' @importFrom dbplyr dbplyr_edition
 #' @export
 dbplyr_edition.myConnectionClass <- function(con) 2L
@@ -76,6 +79,7 @@ and
 A dialect encapsulates the SQL syntax rules for your database:
 
 ``` r
+
 #' @export
 sql_dialect.myConnectionClass <- function(con) {
   new_sql_dialect(
@@ -176,6 +180,7 @@ If you need to generate your own SQL, we recommend using
 It uses glue syntax with type markers for safe SQL generation:
 
 ``` r
+
 con <- simulate_dbi()
 
 # Create an index
@@ -296,6 +301,7 @@ your dialect class. Using the dialect class is recommended as it allows
 sharing translations between different connection types:
 
 ``` r
+
 # Method on dialect class (recommended)
 sql_translation.sql_dialect_mybackend <- function(con) {
   sql_variant(
@@ -310,6 +316,7 @@ Each translator will inherits from the base (ANSI SQL) translator and
 overrides only what’s different for your backend:
 
 ``` r
+
 sql_translator(
   base_scalar, # Inherit most translations
   # Override specific functions for your backend
@@ -332,6 +339,7 @@ R functions to SQL:
 Here’s an example showing all of these helpers in use:
 
 ``` r
+
 sql_translation.sql_dialect_mybackend <- function(con) {
   sql_variant(
     scalar = sql_translator(
@@ -362,6 +370,7 @@ sql_translation.sql_dialect_mybackend <- function(con) {
   functions.
 
 ``` r
+
 sql_translation.sql_dialect_mybackend <- function(con) {
   sql_variant(
     scalar = sql_translator(base_scalar),
@@ -397,6 +406,7 @@ Window functions have their own set of helpers:
 Here’s an example showing all of these helpers in use:
 
 ``` r
+
 window = sql_translator(
   base_win,
   # Ranking functions
@@ -421,6 +431,7 @@ return SQL expressions using
 This uses glue syntax for string interpolation with automatic escaping.
 
 ``` r
+
 scalar = sql_translator(
   base_scalar,
 

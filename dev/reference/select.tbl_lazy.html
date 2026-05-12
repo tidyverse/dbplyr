@@ -5,7 +5,10 @@ These functions do not support predicate functions, i.e. you can
 not use where(is.numeric) to select all numeric variables."><meta property="og:description" content="These are methods for the dplyr dplyr::select(), dplyr::rename(), and dplyr::relocate()
 generics. They generate the SELECT clause of the SQL query.
 These functions do not support predicate functions, i.e. you can
-not use where(is.numeric) to select all numeric variables."><meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png"><meta name="robots" content="noindex"><script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js" data-max-height="43" data-light-bg="#666f76" data-light-fg="#f9f9f9"></script><script defer data-domain="dbplyr.tidyverse.org,all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script></head><body>
+not use where(is.numeric) to select all numeric variables."><meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png"><meta name="robots" content="noindex"><script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js" data-max-height="43" data-light-bg="#666f76" data-light-fg="#f9f9f9"></script><!-- Privacy-friendly analytics by Plausible --><script async src="https://plausible.io/js/pa-66QOPBea_pVbl3n8uBPHA.js"></script><script>
+  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+  plausible.init()
+</script></head><body>
     <a href="#container" class="visually-hidden-focusable">Skip to content</a>
 
 
@@ -122,15 +125,15 @@ left-hand side; specifying both is an error.</p></dd>
 <span class="r-in"><span><span class="va">db</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">y</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `x`, `z`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_d9QWhdDrot`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_MwoLvteQFd`</span>
 <span class="r-in"><span><span class="va">db</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/relocate.html" class="external-link">relocate</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `z`, `x`, `y`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_d9QWhdDrot`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_MwoLvteQFd`</span>
 <span class="r-in"><span><span class="va">db</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>first <span class="op">=</span> <span class="va">x</span>, last <span class="op">=</span> <span class="va">z</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `x`<span style="color: #0000BB;"> AS </span>`first`, `y`, `z`<span style="color: #0000BB;"> AS </span>`last`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_d9QWhdDrot`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_tmp_MwoLvteQFd`</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

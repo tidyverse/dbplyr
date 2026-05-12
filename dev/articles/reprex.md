@@ -24,6 +24,7 @@ work anywhere:
   to simulate SQL generation of columnar expression.
 
 ``` r
+
 library(dplyr)
 library(dbplyr)
 ```
@@ -40,10 +41,11 @@ You can easily create a SQLite in-memory database table using
 [`memdb_frame()`](https://dbplyr.tidyverse.org/dev/reference/memdb.md):
 
 ``` r
+
 mf <- memdb_frame(g = c(1, 1, 2, 2, 2), x = 1:5, y = 5:1)
 mf
 #> # A query:  ?? x 3
-#> # Database: sqlite 3.51.2 [:memory:]
+#> # Database: sqlite 3.52.0 [:memory:]
 #>       g     x     y
 #>   <dbl> <int> <int>
 #> 1     1     1     5
@@ -56,7 +58,7 @@ mf |>
   group_by(g) |> 
   summarise_all(mean, na.rm = TRUE)
 #> # A query:  ?? x 3
-#> # Database: sqlite 3.51.2 [:memory:]
+#> # Database: sqlite 3.52.0 [:memory:]
 #>       g     x     y
 #>   <dbl> <dbl> <dbl>
 #> 1     1   1.5   4.5
@@ -69,6 +71,7 @@ but if you do want to use an existing data frame you can use
 [`memdb()`](https://dbplyr.tidyverse.org/dev/reference/memdb.md):
 
 ``` r
+
 mtcars_db <- copy_to(memdb(), mtcars)
 mtcars_db |> 
   group_by(cyl) |> 
@@ -93,6 +96,7 @@ Both take an `con` argument which takes a database “simulator” like
 etc.
 
 ``` r
+
 x <- c("abc", "def", "ghif")
 
 lazy_frame(x = x, con = simulate_postgres()) |> 
@@ -122,6 +126,7 @@ your reprex even simpler with
 [`translate_sql()`](https://dbplyr.tidyverse.org/dev/reference/translate_sql.md):
 
 ``` r
+
 translate_sql(substr(x, 1, 2), con = simulate_postgres())
 #> <SQL> SUBSTR("x", 1, 2)
 translate_sql(substr(x, 1, 2), con = simulate_sqlite())

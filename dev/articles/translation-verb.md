@@ -10,6 +10,7 @@ All dplyr verbs generate a `SELECT` statement. To demonstrate we’ll make
 a temporary database with a couple of tables
 
 ``` r
+
 library(dbplyr)
 library(dplyr)
 
@@ -25,6 +26,7 @@ airports <- copy_to(con, nycflights13::airports)
   the `SELECT` clause:
 
   ``` r
+
   flights |>
     select(contains("delay")) |>
     show_query()
@@ -45,6 +47,7 @@ airports <- copy_to(con, nycflights13::airports)
   generates a `WHERE` clause:
 
   ``` r
+
   flights |> 
     filter(month == 1, day == 1) |>
     show_query()
@@ -58,6 +61,7 @@ airports <- copy_to(con, nycflights13::airports)
   generates an `ORDER BY` clause:
 
   ``` r
+
   flights |> 
     arrange(carrier, desc(arr_delay)) |>
     show_query()
@@ -73,6 +77,7 @@ airports <- copy_to(con, nycflights13::airports)
   work together to generate a `GROUP BY` clause:
 
   ``` r
+
   flights |>
     group_by(month, day) |>
     summarise(delay = mean(dep_delay, na.rm = TRUE)) |>
@@ -95,6 +100,7 @@ come from another table; you can’t refer to a variable that you just
 created. For that reason, dbplyr will create subqueries where needed:
 
 ``` r
+
 flights |>
   select(distance, air_time) |>  
   mutate(
@@ -112,6 +118,7 @@ flights |>
 It’s also possible to use a CTE if you so desire:
 
 ``` r
+
 flights |>
   select(distance, air_time) |>  
   mutate(
@@ -140,17 +147,17 @@ late as possible in your pipeline.
 
 ## Dual table verbs
 
-| R                                                                         | SQL                                                                  |
-|---------------------------------------------------------------------------|----------------------------------------------------------------------|
-| [`inner_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html) | `SELECT * FROM x JOIN y ON x.a = y.a`                                |
-| [`left_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html)  | `SELECT * FROM x LEFT JOIN y ON x.a = y.a`                           |
-| [`right_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html) | `SELECT * FROM x RIGHT JOIN y ON x.a = y.a`                          |
-| [`full_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html)  | `SELECT * FROM x FULL JOIN y ON x.a = y.a`                           |
-| [`semi_join()`](https://dplyr.tidyverse.org/reference/filter-joins.html)  | `SELECT * FROM x WHERE EXISTS (SELECT 1 FROM y WHERE x.a = y.a)`     |
-| [`anti_join()`](https://dplyr.tidyverse.org/reference/filter-joins.html)  | `SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = y.a)` |
-| `intersect(x, y)`                                                         | `SELECT * FROM x INTERSECT SELECT * FROM y`                          |
-| `union(x, y)`                                                             | `SELECT * FROM x UNION SELECT * FROM y`                              |
-| `setdiff(x, y)`                                                           | `SELECT * FROM x EXCEPT SELECT * FROM y`                             |
+| R | SQL |
+|----|----|
+| [`inner_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html) | `SELECT * FROM x JOIN y ON x.a = y.a` |
+| [`left_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html) | `SELECT * FROM x LEFT JOIN y ON x.a = y.a` |
+| [`right_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html) | `SELECT * FROM x RIGHT JOIN y ON x.a = y.a` |
+| [`full_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html) | `SELECT * FROM x FULL JOIN y ON x.a = y.a` |
+| [`semi_join()`](https://dplyr.tidyverse.org/reference/filter-joins.html) | `SELECT * FROM x WHERE EXISTS (SELECT 1 FROM y WHERE x.a = y.a)` |
+| [`anti_join()`](https://dplyr.tidyverse.org/reference/filter-joins.html) | `SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = y.a)` |
+| `intersect(x, y)` | `SELECT * FROM x INTERSECT SELECT * FROM y` |
+| `union(x, y)` | `SELECT * FROM x UNION SELECT * FROM y` |
+| `setdiff(x, y)` | `SELECT * FROM x EXCEPT SELECT * FROM y` |
 
 `x` and `y` don’t have to be tables in the same database. If you specify
 `copy = TRUE`, dplyr will copy the `y` table into the same location as

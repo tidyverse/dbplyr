@@ -64,32 +64,32 @@ library(dplyr)
 df <- memdb_frame(x = runif(100), y = runif(100))
 df |> arrange(x)
 #> # A query:    ?? x 2
-#> # Database:   sqlite 3.51.2 [:memory:]
+#> # Database:   sqlite 3.52.0 [:memory:]
 #> # Ordered by: x
-#>          x     y
-#>      <dbl> <dbl>
-#>  1 0.00851 0.960
-#>  2 0.0162  0.400
-#>  3 0.0181  0.295
-#>  4 0.0237  0.830
-#>  5 0.0275  0.346
-#>  6 0.0406  0.213
-#>  7 0.0472  0.931
-#>  8 0.0612  0.980
-#>  9 0.0701  0.324
-#> 10 0.0718  0.346
+#>         x      y
+#>     <dbl>  <dbl>
+#>  1 0.0110 0.270 
+#>  2 0.0372 0.996 
+#>  3 0.0478 0.614 
+#>  4 0.0587 0.171 
+#>  5 0.0626 0.0612
+#>  6 0.0743 0.344 
+#>  7 0.0805 0.400 
+#>  8 0.0939 0.886 
+#>  9 0.100  0.502 
+#> 10 0.150  0.918 
 #> # ℹ more rows
 df |> arrange(x) |> show_query()
 #> <SQL>
 #> SELECT *
-#> FROM `dbplyr_tmp_INtPiNWcEg`
+#> FROM `dbplyr_tmp_EGgYqj4qNZ`
 #> ORDER BY `x`
 
 # Use memdb() + copy_to() to copy an existing data frame
 iris_db <- copy_to(memdb(), iris)
 iris_db
 #> # A query:  ?? x 5
-#> # Database: sqlite 3.51.2 [:memory:]
+#> # Database: sqlite 3.52.0 [:memory:]
 #>    Sepal.Length Sepal.Width Petal.Length Petal.Width Species
 #>           <dbl>       <dbl>        <dbl>       <dbl> <chr>  
 #>  1          5.1         3.5          1.4         0.2 setosa 

@@ -3,7 +3,10 @@
 the current catalog/schema. However, we now recommend using I() as it's
 typically less typing."><meta property="og:description" content="in_schema() and in_catalog() can be used to refer to tables outside of
 the current catalog/schema. However, we now recommend using I() as it's
-typically less typing."><meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png"><meta name="robots" content="noindex"><script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js" data-max-height="43" data-light-bg="#666f76" data-light-fg="#f9f9f9"></script><script defer data-domain="dbplyr.tidyverse.org,all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script></head><body>
+typically less typing."><meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png"><meta name="robots" content="noindex"><script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js" data-max-height="43" data-light-bg="#666f76" data-light-fg="#f9f9f9"></script><!-- Privacy-friendly analytics by Plausible --><script async src="https://plausible.io/js/pa-66QOPBea_pVbl3n8uBPHA.js"></script><script>
+  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+  plausible.init()
+</script></head><body>
     <a href="#container" class="visually-hidden-focusable">Skip to content</a>
 
 
@@ -115,7 +118,7 @@ that won't get quoted.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">con</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html" class="external-link">tbl</a></span><span class="op">(</span><span class="st">"df"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A query:  ?? x 5</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.51.2 [:memory:]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.52.0 [:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Sepal.Length Sepal.Width Petal.Length Petal.Width Species</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>          5.1         3.5          1.4         0.2 setosa </span>
@@ -131,7 +134,7 @@ that won't get quoted.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ more rows</span></span>
 <span class="r-in"><span><span class="va">con</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html" class="external-link">tbl</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="st">"aux.df"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A query:  ?? x 11</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.51.2 [:memory:]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.52.0 [:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>  21       6  160    110  3.9   2.62  16.5     0     1     4     4</span>

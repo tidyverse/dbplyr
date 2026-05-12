@@ -35,7 +35,7 @@ is.sql(sql("x + 1"))
 db <- memdb_frame(x = 1:3)
 db |> mutate(y = sql("CAST(x as VARCHAR)"))
 #> # A query:  ?? x 2
-#> # Database: sqlite 3.51.2 [:memory:]
+#> # Database: sqlite 3.52.0 [:memory:]
 #>       x y    
 #>   <int> <chr>
 #> 1     1 1    
