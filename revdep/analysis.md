@@ -1,66 +1,111 @@
-# Revdep analysis
+# Revdep failure analysis
 
-## bigrquery (1.6.1)
+10 downstream packages investigated. Most failures cluster on three dbplyr
+changes; the table at the bottom maps each package to its root cause.
 
-3 test failures. Tests inspect `sql$select[[n]]` and expect bare expressions like `"SAFE_CAST(\`x\` AS FLOAT64)"` but now get aliased expressions like `"SAFE_CAST(\`x\` AS FLOAT64) AS \`z\`"` with class `c("sql", "character")` instead of plain character. The tests are too tightly coupled to dbplyr's internal select clause representation. bigrquery needs to update its test expectations.
+## Cluster 1: `sql_escape_string.default` no longer passes `SQL` through (PR #1701, commit `3e7389cd`)
 
-## CohortCharacteristics (1.1.0)
+`sql_escape_string.default` was simplified from `DBI::dbQuoteString(con, x)`
+(which is idempotent for `DBI::SQL` inputs) to `sql(sql_quote(x, "'"))`, which
+unconditionally wraps the value in single quotes. Downstream code that calls
+`dbplyr::escape(DBI::dbQuoteIdentifier(con, name), con = con)` now produces
+double-quoted output like `` '`name`' `` instead of `` `name` ``.
 
-1 test failure. `summariseCohortOverlap()` produces SQL with an ambiguous column reference: `cohort_definition_id` exists in both `pp_test_table` and `pp_test_table_set` after a join but is referenced without a table qualifier. DuckDB's binder rejects this. Likely caused by a change in how dbplyr qualifies column references in joins.
+Hits: **dm**, **rolap**, **when**.
 
-## dbi.table (1.0.6)
+- **rolap** & **when**: `dm::copy_dm_to()` uses this pattern in
+  `ddl_get_index_defs()` / `ddl_quote_table_names()`. `DBI::dbUnquoteIdentifier()`
+  then rejects the double-quoted output, and SQLite stores tables under literal
+  names like `` `date` ``.
+- **dm**: same regression, plus a separate issue (see Cluster 4 below).
 
-1 test failure. Test expects `dbplyr::translate_sql_()` to throw an error, but the backward-compat branch restored this function. This is a **false positive** -- the test was defensively checking that `translate_sql_()` was broken, and restoring it causes the assumption to fail. Fix belongs in dbi.table.
+Suggested fix in dbplyr (`R/escape.R:167`):
 
-## diseasystore (0.3.2)
+```r
+sql_escape_string.default <- function(con, x) {
+  if (inherits(x, "SQL")) return(sql(unclass(x)))
+  sql(sql_quote(x, "'"))
+}
+```
 
-22 test failures + vignette error via SCDB dependency. **Fixed** by restoring `DBI::Id` handling in `as.sql()`.
+or revert to `sql(DBI::dbQuoteString(con, x))`.
 
-## dm (1.0.12)
+## Cluster 2: `escape.dbplyr_table_path()` removed (commit `c1f77a6b`)
 
-2 errors (examples + tests):
+`remote_table()` returns a `dbplyr_table_path` (which inherits from
+`character`). Without the dedicated escape method, `build_sql()` falls through
+to `escape.character()` and renders the table name as a string literal
+(`'dbplyr_tmp_XXX'`). SQLite reports "no such table"; DuckDB reports
+`Cannot extract field 'checksum' from expression '...'`.
 
-1. **Examples**: `DBI::dbUnquoteIdentifier()` fails on table names -- the format of `remote_name` changed so it can no longer be unquoted.
-2. **Tests**: Setup fails because `tbl_sum.tbl_sql` method no longer exists, breaking `testthat::local_mocked_bindings()`.
+Hits: **SCDB**, **diseasystore** (cascades from SCDB).
 
-`dbplyr_connection_describe()` restored, which may fix the `tbl_sum` issue if dm was using it indirectly.
+SCDB's `update_snapshot()` interpolates `dbplyr::remote_table(snapshot)` into
+`dbplyr::build_sql(...)` — a documented public API.
 
-## etl (0.4.2)
+Suggested fix in dbplyr: revert the `R/table-name.R` / `NAMESPACE` hunks of
+`c1f77a6b` to re-introduce `escape.dbplyr_table_path()`.
 
-1 test failure. `print(cars)` output no longer contains `"sqlite"` (lowercase). The print representation of database-backed objects changed. The test has a fragile regex assertion on print output. Fix belongs in etl.
+## Cluster 3: tbl-construction refactor (commit `133f1a14`, PR #1680)
 
-## healthdb (0.5.0)
+`tbl_sql()`/`tbl_lazy()` were refactored so the lazy tbl carries a top-level
+`con` field; `src$con` is kept only as a backward-compat shim.
 
-13 test failures. All fail with SQLite error `"row value misused"`. The `identify_rows()` and `define_case()` functions use `if_any()`/`if_all()` with `%in%`, and dbplyr now generates SQL with row value expressions that SQLite doesn't support. Previously this was likely expanded into individual `OR`-ed conditions.
+- **mlr3db**: `DataBackendDplyr$.reconnect()` swaps `private$.data$src$con <-
+  con`, which now only updates the stale shim. Top-level `x$con` still
+  references the closed connection, so queries hit `bad_weak_ptr`. **Fix in
+  mlr3db**: also assign `private$.data$con <- con` (dbplyr never promised that
+  mutating `src$con` was supported).
+- **osdc**: duckplyr's `as_tbl()` attaches a finalizer-bearing environment as
+  `attr(., "duckplyr_scope_guard")` to keep its temp view alive. Somewhere
+  along the new tbl construction chain that attribute is not propagated, so GC
+  drops the view before `collect()` runs, leading to `Table as_tbl_duckplyr_XXX
+  does not exist`. Exact drop point not pinpointed — needs an
+  attribute-propagation trace through `new_tbl_lazy()` / `make_tbl()` and the
+  intermediate verbs. **Fix likely in dbplyr.**
 
-## lazysf (0.2.0)
+## Cluster 4: individual regressions
 
-1 example error. `SFSQLConnection` uses dbplyr's 1st edition interface, which is no longer supported. lazysf maintainer needs to update to 2nd edition.
+- **pool**: `sql_escape_ident()` was rewritten in PR #1760 to dispatch via
+  `sql_dialect(con)` and lost its `default` method. Pool (R6, not a
+  `DBIConnection`) implements `dbQuoteIdentifier` via S4 but no longer matches
+  any `sql_escape_ident` method, so `UseMethod` aborts. **Fix in dbplyr**:
+  restore `sql_escape_ident.default <- function(con, x) sql(DBI::dbQuoteIdentifier(con, x))`.
+  Audit sibling generics (`sql_escape_string`, `sql_escape_logical`,
+  `sql_escape_date`, `sql_escape_datetime`, `sql_escape_raw`).
+- **healthdb**: in PR #1691 the `%in%` guard was narrowed from `is.sql(table)`
+  to `is.ident(table)`, so a pre-parenthesised `sql()` RHS now gets wrapped in
+  an extra set of parens producing `IN ((...))`, which SQLite rejects as a row
+  value. healthdb's `identify_rows_sql()` uses
+  `escape_ansi(vals, collapse = ",", parens = TRUE)` inside `sql()`. **Fix in
+  dbplyr** (`R/backend-.R:164-175`): broaden the guard back to `is.sql(table)`.
+- **PatientProfiles**: regression from PR #1761 ("Inline `filter()` after a
+  left/inner join"). `add_select()` mutates
+  `lazy_multi_join_query$vars` but doesn't update `$where`, so a
+  `join |> filter(renamed_col) |> select(!renamed_col)` pattern leaks the
+  dropped/renamed column into the WHERE clause as an unqualified symbol. **Fix
+  in dbplyr** (`R/verb-select.R`): also rewrite/refresh `lazy_query$where`, or
+  fall through to `lazy_select_query()` when any symbol in `where` would be
+  dropped by the `select`.
+- **dm** also has an independent issue: `tbl_sum.tbl_sql` was deleted in PR
+  #1679. dm's `tests/testthat/setup.R` calls
+  `local_mocked_bindings(tbl_sum.tbl_sql = ..., .package = "dbplyr")` and now
+  aborts. This is intentional dbplyr removal — **fix in dm**.
 
-## mlr3db (0.7.0)
+## Summary table
 
-3 test failures. All fail with `"bad_weak_ptr"` from RSQLite -- the C++ pointer inside the connection is invalid (stale/serialized connection). Tests involve reconnection and parallel execution scenarios. Likely an mlr3db issue with connection management, exposed by changes in dbplyr's error handling.
+| Package         | Cluster                                    | Suggested fix location |
+|-----------------|--------------------------------------------|------------------------|
+| diseasystore    | 2 (escape.dbplyr_table_path)               | dbplyr                 |
+| dm              | 1 (sql_escape_string) + tbl_sum removal    | dbplyr + dm            |
+| healthdb        | 4 (%in% guard)                             | dbplyr                 |
+| mlr3db          | 3 (tbl refactor)                           | mlr3db                 |
+| osdc            | 3 (tbl refactor — attribute propagation)   | dbplyr                 |
+| PatientProfiles | 4 (filter-inlined join + select)           | dbplyr                 |
+| pool            | 4 (sql_escape_ident default removed)       | dbplyr                 |
+| rolap           | 1 (sql_escape_string)                      | dbplyr                 |
+| SCDB            | 2 (escape.dbplyr_table_path)               | dbplyr                 |
+| when            | 1 (sql_escape_string)                      | dbplyr                 |
 
-## osdc (0.9.19)
-
-1 test failure. DuckDB temporary table `as_tbl_duckplyr_XMUENgxduz` does not exist when the final query is collected. A different table name exists (`pwmXguVtkD`), suggesting the table was garbage-collected or re-registered mid-pipeline. Likely a duckplyr interaction issue.
-
-## PatientProfiles (1.4.5)
-
-2 test failures. `filterInObservation()` generates SQL referencing column `"id_vgz"` which doesn't exist in the FROM clause. This appears to be an internal/generated column alias that doesn't get propagated to the outer query scope. A change in dbplyr's column aliasing/subquery scoping causes this.
-
-## pool (1.0.4)
-
-5 test failures + example error. `sql_escape_ident()` has no method for `Pool` objects. dbplyr's `make_table_path()` now calls `sql_escape_ident(con, ...)` where `con` is a raw Pool object rather than a checked-out DBI connection. pool needs to add a `sql_escape_ident.Pool` method, or dbplyr needs to handle non-DBI connection wrappers.
-
-## RClickhouse (0.6.10)
-
-2 test failures. `ClickhouseConnection` uses dbplyr's 1st edition interface, which is no longer supported. RClickhouse maintainer needs to update to 2nd edition.
-
-## RPresto (1.4.8)
-
-1 test failure. Test calls `dplyr::db_query_fields()` but that generic no longer has a method for `PrestoConnection`. The generic was likely removed or its dispatch path changed.
-
-## SCDB (0.5.2)
-
-16 test failures + example error + vignette error. Root cause: `as.sql()` was collapsed from a generic with an `as.sql.Id` method to a plain function that passed `DBI::Id` objects through unchanged, causing `escape.default()` to reject them. **Fixed** by restoring `DBI::Id` handling in `as.sql()`.
+9 of 10 failures point to a dbplyr-side fix; only mlr3db is a clean downstream
+issue, and dm has one downstream component on top of the dbplyr regression.
