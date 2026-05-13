@@ -94,14 +94,20 @@ add_select <- function(lazy_query, vars) {
     inherits(lazy_query, "lazy_rf_join_query") ||
     inherits(lazy_query, "lazy_semi_join_query")
   if (is_join) {
-    idx <- vctrs::vec_match(vars, vars_data)
+    if (can_inline_select_into_join(lazy_query, vars)) {
+      idx <- vctrs::vec_match(vars, vars_data)
 
-    lazy_query$vars <- vctrs::vec_slice(lazy_query$vars, idx)
-    lazy_query$vars$name <- names(vars)
-    return(lazy_query)
-  }
-
-  if (can_inline_select(lazy_query, vars)) {
+      lazy_query$vars <- vctrs::vec_slice(lazy_query$vars, idx)
+      lazy_query$vars$name <- names(vars)
+      lazy_query
+    } else {
+      lazy_select_query(
+        x = lazy_query,
+        select_operation = "select",
+        select = syms(vars)
+      )
+    }
+  } else if (can_inline_select(lazy_query, vars)) {
     idx <- vctrs::vec_match(vars, vars_data)
 
     lazy_query$select <- vctrs::vec_slice(lazy_query$select, idx)
@@ -114,6 +120,22 @@ add_select <- function(lazy_query, vars) {
       select = syms(vars)
     )
   }
+}
+
+# select() rewrites the join's projection
+# * WHERE is back-qualified at sql_build using vars$name
+#   => columns referenced in WHERE must survive the select unchanged
+can_inline_select_into_join <- function(lazy_query, vars) {
+  if (!inherits(lazy_query, "lazy_multi_join_query")) {
+    return(TRUE)
+  }
+  if (length(lazy_query$where) == 0) {
+    return(TRUE)
+  }
+
+  where_names <- unique(unlist(lapply(lazy_query$where, all_names)))
+  identity_kept <- unname(vars[names(vars) == vars])
+  all(where_names %in% identity_kept)
 }
 
 # select() modifies the SELECT clause
