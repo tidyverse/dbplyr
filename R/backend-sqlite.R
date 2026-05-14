@@ -56,6 +56,28 @@ db_connection_describe.SQLiteConnection <- function(con, ...) {
 }
 
 #' @export
+db_col_types.SQLiteConnection <- function(con, table, call = caller_env()) {
+  path <- as_table_path(table, con, error_call = call)
+  parts <- table_path_components(path, con)[[1]]
+
+  if (length(parts) == 1) {
+    sql <- sql_glue2(
+      con,
+      "SELECT name, type FROM pragma_table_info({parts})"
+    )
+  } else {
+    schema <- parts[[length(parts) - 1]]
+    name <- parts[[length(parts)]]
+    sql <- sql_glue2(
+      con,
+      "SELECT name, type FROM pragma_table_info({name}, {schema})"
+    )
+  }
+  col_info_df <- DBI::dbGetQuery(con, sql)
+  set_names(col_info_df[["type"]], col_info_df[["name"]])
+}
+
+#' @export
 sql_query_explain.sql_dialect_sqlite <- function(con, sql, ...) {
   sql_glue2(con, "EXPLAIN QUERY PLAN {sql}")
 }

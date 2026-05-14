@@ -41,6 +41,7 @@
 * `copy_inline()` now works with blob columns (#1515).
 * `copy_to()` now works when source is in the same DB as destination when using `overwrite = TRUE` (@liudvikasakelis, #1535).
 * `.data$col`, `.data[[col]]`, `.env$var`, and `.env$[[var]]` now work correctly inside `across()` (#1520).
+* `db_col_types()` gains a SQLite method so that `rows_*()` operations can preserve column types when copying data (#1821).
 * `db_supports_table_alias_with_as()` and `supports_window_clause()` generics have been removed. They are now part of the `sql_dialect()` data structure (#1760).
 * `db_table_drop_if_exists()` is a new generic that allows backends to customize how tables are dropped when `overwrite = TRUE` (#1695).
 * `db_table_temporary()` has been renamed to `sql_table_temporary()` for consistency with other SQL generation functions (#1760).
