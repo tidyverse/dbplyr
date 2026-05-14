@@ -32,6 +32,7 @@
 * SQL Server: version 17.0 (2025) now supports stringr regex functions: `str_detect()`, `str_starts()`, `str_ends()`, `str_replace()`, `str_replace_all()`, `str_remove()`, `str_remove_all()`, `str_extract()`, and `str_count()`. Fixed pattern versions of `str_detect()`, `str_starts()`, and `str_ends()` work on all SQL Server versions (#1671).
 * SQL Server: uses `DATEDIFF_BIG` instead of `DATEDIFF` to work regardless of data size (@edward-burn, #1666).
 * All set operations now error if you pass extra arguments (instead of silently ignoring them) (#1585).
+* `anyNA()` is now translated to SQL as `any(is.na(x))` (#1814).
 * `arrange()` now applies consecutively, matching dplyr's behavior: `arrange(y) |> arrange(x)` is now equivalent to `arrange(x, y)`. Empty `arrange()` now preserves existing ordering instead of clearing it (#789).
 * `as(x, "type")` is now translated to `CAST(x AS type)`, allowing you to cast to arbitrary database types not covered by the standard `as.*()` functions (#1729).
 * `as.sql()` is now deprecated as part of major internal refactoring of how `sql()` and `ident()` are used.
