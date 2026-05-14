@@ -116,6 +116,13 @@ test_that("filter() inlined after mutate()", {
   expect_equal(lq$select$name, c("z", "y"))
   expect_equal(lq$where, list(expr(x == 1)))
 
+  # does not rename field names of `$` that collide with renamed columns (#1812)
+  ltr <- list(z = "A", x = "B")
+  out <- lf |>
+    rename(z = x) |>
+    filter(z == ltr$z)
+  expect_equal(out$lazy_query$where, list(expr(x == (!!ltr)$z)))
+
   # does not inline if uses mutated variable
   out2 <- lf |>
     mutate(x = x + 1) |>

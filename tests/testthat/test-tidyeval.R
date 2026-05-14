@@ -87,3 +87,28 @@ test_that("fails with multi-classes", {
   x <- structure(list(), class = c('a', 'b'))
   expect_error(partial_eval(x, lf), "Unknown input type", fixed = TRUE)
 })
+
+# replace_sym1 -----------------------------------------------------------------
+
+test_that("replace_sym1() replaces matching symbols", {
+  expect_equal(replace_sym1(sym("x"), "x", sym("y")), sym("y"))
+  expect_equal(replace_sym1(sym("z"), "x", sym("y")), sym("z"))
+  expect_equal(replace_sym1(expr(x + z), "x", sym("y")), expr(y + z))
+  expect_equal(replace_sym1(1, "x", sym("y")), 1)
+})
+
+test_that("replace_sym1() supports list of replacements", {
+  expect_equal(
+    replace_sym1(expr(x + y), c("x", "y"), list(sym("a"), sym("b"))),
+    expr(a + b)
+  )
+})
+
+test_that("replace_sym1() does not rewrite field names of `$` and `@` (#1812)", {
+  expect_equal(replace_sym1(expr(ltr$x), "x", sym("y")), expr(ltr$x))
+  expect_equal(replace_sym1(expr(ltr@x), "x", sym("y")), expr(ltr@x))
+
+  # but still recurses into the object
+  expect_equal(replace_sym1(expr(x$foo), "x", sym("y")), expr(y$foo))
+  expect_equal(replace_sym1(expr(x@foo), "x", sym("y")), expr(y@foo))
+})
