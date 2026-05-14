@@ -223,6 +223,8 @@
 - `na_matches = "na"` now works correctly with inequality and overlap
   joins, preserving the comparison operator instead of converting to
   equality ([\#1505](https://github.com/tidyverse/dbplyr/issues/1505)).
+- `%notin%` is now translated to `NOT IN`
+  ([\#1820](https://github.com/tidyverse/dbplyr/issues/1820)).
 - `pivot_wider()` now accepts anonymous functions
   (e.g. `\(x) max(x, na.rm = TRUE)`) in `values_fn`, not just
   purrr-style lambdas
