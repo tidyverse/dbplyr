@@ -51,6 +51,7 @@
 * `fill()` now errors if you attempt to rename a column, for consistency with dplyr (#1536).
 * `filter()` after `left_join()` or `inner_join()` no longer creates a subquery (#722).
 * `filter()` followed by a `summarise()` is once again inlined correctly (#1707).
+* `filter()` after `rename()` no longer rewrites field names of `$` and `@` expressions, so e.g. `filter(z == ltr$z)` after `rename(z = x)` now looks up `ltr$z`, not `ltr$x` (#1812).
 * `if_else()` and `ifelse()` now give a clear error if `true`/`false` or `yes`/`no` are missing (#1798).
 * `if_else()` uses simpler translation for `missing` (#1573).
 * `join_by(between())` now correctly handles column renames (#1572).
