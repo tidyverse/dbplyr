@@ -494,17 +494,13 @@ is_scalar <- function(x) {
 
 
 resolve_fun <- function(x, var, arg = caller_arg(x), call = caller_env()) {
-  if (is_formula(x)) {
+  if (is_formula(x) || is_function(x)) {
     .fn_expr <- across_fun(x, env = empty_env(), dots = NULL, fn = "across")
     exec(.fn_expr, var, NULL)
   } else {
-    fn_name <- find_fun(x)
-    if (is_null(fn_name)) {
-      cli_abort(
-        "Can't convert {.arg {arg}}, {.code {as_label(x)}}, to a function.",
-        call = call
-      )
-    }
-    call2(fn_name, var)
+    cli_abort(
+      "Can't convert {.arg {arg}}, {.code {as_label(x)}}, to a function.",
+      call = call
+    )
   }
 }
