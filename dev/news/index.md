@@ -223,6 +223,10 @@
 - `na_matches = "na"` now works correctly with inequality and overlap
   joins, preserving the comparison operator instead of converting to
   equality ([\#1505](https://github.com/tidyverse/dbplyr/issues/1505)).
+- `pivot_wider()` now accepts anonymous functions
+  (e.g. `\(x) max(x, na.rm = TRUE)`) in `values_fn`, not just
+  purrr-style lambdas
+  ([\#1816](https://github.com/tidyverse/dbplyr/issues/1816)).
 - [`pull()`](https://dplyr.tidyverse.org/reference/pull.html) now
   handles `name` as a quosure of `NULL`
   ([\#1808](https://github.com/tidyverse/dbplyr/issues/1808)).

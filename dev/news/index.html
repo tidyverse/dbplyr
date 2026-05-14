@@ -150,6 +150,8 @@
 <li>
 <code>na_matches = "na"</code> now works correctly with inequality and overlap joins, preserving the comparison operator instead of converting to equality (<a href="https://github.com/tidyverse/dbplyr/issues/1505" class="external-link">#1505</a>).</li>
 <li>
+<code>pivot_wider()</code> now accepts anonymous functions (e.g. <code>\(x) max(x, na.rm = TRUE)</code>) in <code>values_fn</code>, not just purrr-style lambdas (<a href="https://github.com/tidyverse/dbplyr/issues/1816" class="external-link">#1816</a>).</li>
+<li>
 <code><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull()</a></code> now handles <code>name</code> as a quosure of <code>NULL</code> (<a href="https://github.com/tidyverse/dbplyr/issues/1808" class="external-link">#1808</a>).</li>
 <li>
 <code><a href="../reference/remote_name.html">remote_table()</a></code> now returns <code><a href="../reference/sql.html">sql()</a></code> containing the (correctly quoted) table identifier, rather than the internal <code>dbplyr_table_path</code>. This makes the result suitable for inlining into <code><a href="../reference/build_sql.html">build_sql()</a></code> and <code><a href="../reference/sql_glue.html">sql_glue2()</a></code>.</li>
