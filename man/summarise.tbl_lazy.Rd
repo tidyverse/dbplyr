@@ -37,7 +37,7 @@ query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
 \description{
-This is a method for the dplyr \code{\link[dplyr:summarise]{dplyr::summarise()}} generic. It generates the
+This is a method for the dplyr \code{\link[dplyr:summarise]{summarise()}} generic. It generates the
 \code{SELECT} clause of the SQL query, and generally needs to be combined with
 \code{group_by()}.
 }

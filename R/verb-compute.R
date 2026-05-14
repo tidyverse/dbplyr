@@ -58,7 +58,7 @@ compute.tbl_sql <- function(
     ...
   )
 
-  new_tbl_sql(x$con, name, vars = colnames(x)) |>
+  dplyr::tbl(x$con, from = name, vars = colnames(x)) |>
     group_by(!!!syms(op_grps(x))) |>
     window_order(!!!op_sort(x))
 }

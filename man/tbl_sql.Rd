@@ -30,6 +30,6 @@ many \code{tbl}s with known variables.}
 \description{
 This function creates a lazy tbl object from a table in a database.
 It's primarily intended for backend authors who need to create custom
-subclasses; most users should use \code{\link[dplyr:tbl]{dplyr::tbl()}} instead.
+subclasses; most users should use \code{\link[dplyr:tbl]{tbl()}} instead.
 }
 \keyword{internal}

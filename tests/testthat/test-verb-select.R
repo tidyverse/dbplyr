@@ -217,6 +217,35 @@ test_that("select() after left_join() is inlined", {
   expect_s3_class(out$lazy_query, "lazy_select_query")
 })
 
+test_that("select() after filter() on join preserves qualified where", {
+  lf1 <- lazy_frame(x = 1, y = 2, .name = "t1")
+  lf2 <- lazy_frame(x = 1, z = 3, .name = "t2")
+
+  # drop a column referenced in $where: must fall through to lazy_select_query
+  # so the join's WHERE still qualifies z as t2.z.
+  out <- lf1 |>
+    left_join(lf2, by = "x") |>
+    filter(z > 0) |>
+    select(-z)
+  expect_s3_class(out$lazy_query, "lazy_select_query")
+  expect_snapshot(out)
+
+  # rename a column referenced in $where: same handling.
+  out <- lf1 |>
+    left_join(lf2, by = "x") |>
+    filter(z > 0) |>
+    rename(zz = z)
+  expect_s3_class(out$lazy_query, "lazy_select_query")
+  expect_snapshot(out)
+
+  # dropping a column not in $where stays inline.
+  out <- lf1 |>
+    left_join(lf2, by = "x") |>
+    filter(z > 0) |>
+    select(-y)
+  expect_s3_class(out$lazy_query, "lazy_multi_join_query")
+})
+
 test_that("select() after semi_join() is inlined", {
   lf1 <- lazy_frame(x = 1, a = 1, .name = "lf1")
   lf2 <- lazy_frame(x = 1, b = 2, .name = "lf2")

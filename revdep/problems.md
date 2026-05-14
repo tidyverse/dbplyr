@@ -1,124 +1,4 @@
-# bigrquery (1.6.1)
-
-* GitHub: <https://github.com/r-dbi/bigrquery>
-* Email: <mailto:hadley@posit.co>
-* GitHub mirror: <https://github.com/cran/bigrquery>
-
-Run `revdepcheck::cloud_details(, "bigrquery")` for more info
-
-## Newly broken
-
-*   checking tests ... ERROR
-     ```
-     ...
-       `expected`: "SAFE_CAST(`x` AS INT64)"             
-       
-       ── Failure ('test-dplyr.R:153:3'): casting uses bigquery types ─────────────────
-       Expected `sql$select[[3]]` to equal "SAFE_CAST(`x` AS FLOAT64)".
-       Differences:
-       `class(actual)` is a character vector ('sql', 'character')
-       `class(expected)` is absent
-       
-       `actual`:   "<SQL> SAFE_CAST(`x` AS FLOAT64) AS `z`"
-       `expected`: "SAFE_CAST(`x` AS FLOAT64)"             
-       
-       ── Failure ('test-dplyr.R:163:3'): %||% translates to IFNULL ───────────────────
-       Expected `sql$select[[2]]` to equal "IFNULL(`x`, 2)".
-       Differences:
-       `class(actual)` is a character vector ('sql', 'character')
-       `class(expected)` is absent
-       
-       `actual`:   "<SQL> IFNULL(`x`, 2) AS `y`"
-       `expected`: "IFNULL(`x`, 2)"             
-       
-       
-       [ FAIL 3 | WARN 0 | SKIP 97 | PASS 119 ]
-       Error:
-       ! Test failures.
-       Execution halted
-     ```
-
-# CohortCharacteristics (1.1.0)
-
-* GitHub: <https://github.com/darwin-eu/CohortCharacteristics>
-* Email: <mailto:marti.catalasabate@ndorms.ox.ac.uk>
-* GitHub mirror: <https://github.com/cran/CohortCharacteristics>
-
-Run `revdepcheck::cloud_details(, "CohortCharacteristics")` for more info
-
-## Newly broken
-
-*   checking tests ... ERROR
-     ```
-     ...
-        11. │           └─DBI::dbSendStatement(conn, statement, ...)
-        12. │             ├─DBI::dbSendQuery(conn, statement, ...)
-        13. │             └─duckdb::dbSendQuery(conn, statement, ...)
-        14. │               └─duckdb (local) .local(conn, statement, ...)
-        15. │                 └─duckdb:::rethrow_rapi_prepare(conn@conn_ref, statement, env)
-        16. │                   ├─rlang::try_fetch(...)
-        17. │                   │ ├─base::tryCatch(...)
-        18. │                   │ │ └─base (local) tryCatchList(expr, classes, parentenv, handlers)
-        19. │                   │ │   └─base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
-        20. │                   │ │     └─base (local) doTryCatch(return(expr), name, parentenv, handler)
-        21. │                   │ └─base::withCallingHandlers(...)
-        22. │                   └─duckdb:::rapi_prepare(conn, query, env)
-        23. ├─duckdb (local) `<fn>`(...)
-        24. │ └─rlang::abort(error_parts, class = "duckdb_error", !!!fields)
-        25. │   └─rlang:::signal_abort(cnd, .file)
-        26. │     └─base::signalCondition(cnd)
-        27. └─rlang (local) `<fn>`(`<dckdb_rr>`)
-        28.   └─handlers[[1L]](cnd)
-        29.     └─duckdb:::rethrow_error_from_rapi(e, call)
-        30.       └─rlang::abort(msg, call = call)
-       
-       [ FAIL 1 | WARN 17 | SKIP 24 | PASS 228 ]
-       Error:
-       ! Test failures.
-       Execution halted
-     ```
-
-# dbi.table (1.0.6)
-
-* GitHub: <https://github.com/kjellpk/dbi.table>
-* Email: <mailto:kjellk@gmail.com>
-* GitHub mirror: <https://github.com/cran/dbi.table>
-
-Run `revdepcheck::cloud_details(, "dbi.table")` for more info
-
-## Newly broken
-
-*   checking tests ... ERROR
-     ```
-     ...
-       > # It is recommended that you do not modify it.
-       > #
-       > # Where should you do additional test configuration?
-       > # Learn more about the roles of various files in:
-       > # * https://r-pkgs.org/testing-design.html#sec-tests-files-overview
-       > # * https://testthat.r-lib.org/articles/special-files.html
-       > 
-       > library(testthat)
-       > library(dbi.table)
-       > 
-       > test_check("dbi.table")
-       Saving _problems/test-assumptions-10.R
-       [ FAIL 1 | WARN 0 | SKIP 2 | PASS 417 ]
-       
-       ══ Skipped tests (2) ═══════════════════════════════════════════════════════════
-       • On CRAN (2): 'test-mariadb.R:10:3', 'test-postgres.R:11:3'
-       
-       ══ Failed tests ════════════════════════════════════════════════════════════════
-       ── Failure ('test-assumptions.R:8:3'): dbplyr::translate_sql_ borks ────────────
-       Expected `{ ... }` to throw a error.
-       
-       [ FAIL 1 | WARN 0 | SKIP 2 | PASS 417 ]
-       Error:
-       ! Test failures.
-       Execution halted
-     ```
-
-# diseasystore (0.3.2)
+# diseasystore (0.3.3)
 
 * GitHub: <https://github.com/ssi-dk/diseasystore>
 * Email: <mailto:rske@ssi.dk>
@@ -131,52 +11,52 @@ Run `revdepcheck::cloud_details(, "diseasystore")` for more info
 *   checking tests ... ERROR
      ```
      ...
-       <purrr_error_indexed/rlang_error/error/condition>
-       Error in `map(.x, .f, ..., .progress = .progress)`: i In index: 1.
-       Caused by error in `pmap()`:
-       i In index: 1.
-       Caused by error:
-       ! no such table: `SCDB_digest_to_checksum_BrP2VHaKPx`
-       ── Error ('test-drop_diseasystore.R:127:5'): drop_diseasystore can delete single table in default schema ──
-       <purrr_error_indexed/rlang_error/error/condition>
-       Error in `map(.x, .f, ..., .progress = .progress)`: i In index: 1.
-       Caused by error in `pmap()`:
-       i In index: 1.
-       Caused by error:
-       ! no such table: `SCDB_digest_to_checksum_KFxPNpSEmX`
+        10. │       ├─base::withCallingHandlers(...)
+        11. │       └─mask$eval_all_filter(dots_expanded, invert, env_filter)
+        12. │         └─dplyr (local) eval()
+        13. ├─dplyr:::dplyr_internal_error(...)
+        14. │ └─rlang::abort(class = c(class, "dplyr:::internal_error"), dplyr_error_data = data)
+        15. │   └─rlang:::signal_abort(cnd, .file)
+        16. │     └─base::signalCondition(cnd)
+        17. └─dplyr (local) `<fn>`(`<dpl:::__>`)
+        18.   └─rlang::abort(message, class = error_class, parent = parent, call = error_call)
        ── Failure ('test-zzz.R:12:3'): data is not written locally ────────────────────
        Expected `dir(recursive = TRUE)` to have the same values as `current_files`.
-       Actual: "_problems/test-DiseasystoreBase-134.R", "_problems/test-DiseasystoreBase-290.R", "_problems/test-DiseasystoreEcdcRespitoryViruses-14.R", "_problems/test-DiseasystoreGoogleCovid19-11.R", "_problems/test-drop_diseasystore-128.R", "_problems/test-drop_diseasystore-69.R", "helper-setup.R", "setup.R", "test-0_R6_utils.R", ...
+       Actual: "_problems/test-DiseasystoreBase-162.R", "_problems/test-DiseasystoreBase-241.R", "_problems/test-DiseasystoreBase-318.R", "_problems/test-DiseasystoreBase-408.R", "_problems/test-DiseasystoreEcdcRespitoryViruses-14.R", "_problems/test-DiseasystoreGoogleCovid19-11.R", "_problems/test-age_helpers-150.R", "_problems/test-age_helpers-210.R", "_problems/test-age_helpers-271.R", ...
        Expected: "helper-setup.R", "setup.R", "test-0_R6_utils.R", "test-0_documentation.R", "test-0_linters.R", "test-0_rd_files.R", "test-DiseasystoreBase.R", "test-DiseasystoreEcdcRespitoryViruses.R", "test-DiseasystoreGoogleCovid19.R", ...
-       Needs: "_problems/test-DiseasystoreBase-134.R", "_problems/test-DiseasystoreBase-290.R", "_problems/test-DiseasystoreEcdcRespitoryViruses-14.R", "_problems/test-DiseasystoreGoogleCovid19-11.R", "_problems/test-drop_diseasystore-128.R", "_problems/test-drop_diseasystore-69.R"
+       Needs: "_problems/test-DiseasystoreBase-162.R", "_problems/test-DiseasystoreBase-241.R", "_problems/test-DiseasystoreBase-318.R", "_problems/test-DiseasystoreBase-408.R", "_problems/test-DiseasystoreEcdcRespitoryViruses-14.R", "_problems/test-DiseasystoreGoogleCovid19-11.R", "_problems/test-age_helpers-150.R", "_problems/test-age_helpers-210.R", "_problems/test-age_helpers-271.R", ...
        
-       [ FAIL 22 | WARN 5 | SKIP 12 | PASS 443 ]
+       [ FAIL 32 | WARN 0 | SKIP 12 | PASS 387 ]
        Error:
        ! Test failures.
-       Warning message:
-       In connection_release(conn@ptr) : Already disconnected
+       Warning messages:
+       1: In connection_release(conn@ptr) : Already disconnected
+       2: call dbDisconnect() when finished working with a connection 
        Execution halted
+       Warning messages:
+       1: In connection_release(conn@ptr) : Already disconnected
+       2: In connection_release(conn@ptr) : Already disconnected
      ```
 
 *   checking re-building of vignette outputs ... ERROR
      ```
      ...
-          ▆
-       1. └─`<fn>`(`<Logger>`)
-       2.   └─.subset2(e, ".__enclos_env__")$private$finalize()
-       3.     └─self$finalize_db_entry()
-       4.       └─dbplyr::build_sql(...)
-       5.         └─purrr::map_chr(enexprs(...), escape_expr, con = con)
-       6.           └─purrr:::map_("character", .x, .f, ..., .progress = .progress)
-       7.             ├─purrr:::with_indexed_errors(...)
-       8.             │ └─base::withCallingHandlers(...)
-       9.             ├─purrr:::call_with_cleanup(...)
-      10.             └─dbplyr (local) .f(.x[[i]], ...)
-      11.               ├─dbplyr::escape(val, con = con)
-      12.               └─dbplyr:::escape.default(val, con = con)
-      13.                 └─dbplyr:::error_embed(obj_type_friendly(x), "x")
-      14.                   └─cli::cli_abort(...)
-      15.                     └─rlang::abort(...)
+     
+     Quitting from extending-diseasystore-example.Rmd:490-496 [get_feature_sex]
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     <error/rlang_error>
+     Error:
+     ! Lock not released within 30 minutes. Giving up.
+     ---
+     Backtrace:
+         ▆
+      1. └─ds$get_feature(...)
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     
+     Error: processing vignette 'extending-diseasystore-example.Rmd' failed with diagnostics:
+     Lock not released within 30 minutes. Giving up.
+     --- failed re-building ‘extending-diseasystore-example.Rmd’
+     
      Warning: Connection already closed.
      --- re-building ‘extending-diseasystore.Rmd’ using rmarkdown
      --- finished re-building ‘extending-diseasystore.Rmd’
@@ -188,7 +68,7 @@ Run `revdepcheck::cloud_details(, "diseasystore")` for more info
      Execution halted
      ```
 
-# dm (1.0.12)
+# dm (1.1.1)
 
 * GitHub: <https://github.com/cynkra/dm>
 * Email: <mailto:kirill@cynkra.com>
@@ -198,103 +78,33 @@ Run `revdepcheck::cloud_details(, "dm")` for more info
 
 ## Newly broken
 
-*   checking examples ... ERROR
-     ```
-     ...
-       4. │   └─base::eval(ei, envir)
-       5. │     └─base::eval(ei, envir)
-       6. ├─dm::dm_sql(dm, con)
-       7. │ └─dm::dm_ddl_post(dm, dest, table_names, temporary)
-       8. │   └─dm:::ddl_get_index_defs(fks, con, table_names)
-       9. │     └─... %>% ...
-      10. ├─dplyr::summarize(...)
-      11. ├─dplyr::group_by(., name)
-      12. ├─dplyr::mutate(...)
-      13. ├─dplyr:::mutate.data.frame(...)
-      14. │ └─dplyr:::mutate_cols(.data, dplyr_quosures(...), by)
-      15. │   ├─base::withCallingHandlers(...)
-      16. │   └─dplyr:::mutate_col(dots[[i]], data, mask, new_columns)
-      17. │     └─mask$eval_all_mutate(quo)
-      18. │       └─dplyr (local) eval()
-      19. ├─purrr::map_chr(...)
-      20. │ └─purrr:::map_("character", .x, .f, ..., .progress = .progress)
-      21. │   └─purrr:::vctrs_vec_compat(.x, .purrr_user_env)
-      22. ├─DBI::dbUnquoteIdentifier(con, DBI::SQL(remote_name))
-      23. ├─DBI::dbUnquoteIdentifier(con, DBI::SQL(remote_name))
-      24. │ └─base::stop("Can't unquote ", x[bad[[1]]], call. = FALSE)
-      25. └─base::.handleSimpleError(...)
-      26.   └─dplyr (local) h(simpleError(msg, call))
-      27.     └─rlang::abort(message, class = error_class, parent = parent, call = error_call)
-     Execution halted
-     ```
-
 *   checking tests ... ERROR
      ```
      ...
-         Ran 7/7 deferred expressions
-         Error in deferred_run(env) : could not find function "deferred_run"
-         Calls: <Anonymous>
-         
+       Deferring nyc_comp
+       Deferring dm_for_autoinc_1
+       Error in `source_dir()`:
+       ! Failed to evaluate './setup.R'.
+       Caused by error in `local_mocked_bindings()`:
+       ! Can't find binding for `tbl_sum.tbl_sql`
        Backtrace:
             ▆
          1. └─testthat::test_check("dm")
          2.   └─testthat::test_dir(...)
          3.     └─testthat:::test_files(...)
-         4.       └─testthat:::test_files_parallel(...)
-         5.         ├─withr::with_dir(...)
-         6.         │ └─base::force(code)
-         7.         ├─testthat::with_reporter(...)
-         8.         │ └─base::tryCatch(...)
-         9.         │   └─base (local) tryCatchList(expr, classes, parentenv, handlers)
-        10.         │     └─base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
-        11.         │       └─base (local) doTryCatch(return(expr), name, parentenv, handler)
-        12.         └─testthat:::parallel_event_loop_chunky(queue, reporters, ".")
-        13.           └─queue$poll(Inf)
-        14.             └─base::lapply(...)
-        15.               └─testthat (local) FUN(X[[i]], ...)
-        16.                 └─private$handle_error(msg, i)
-        17.                   └─cli::cli_abort(...)
-        18.                     └─rlang::abort(...)
-       Execution halted
-     ```
-
-# etl (0.4.2)
-
-* GitHub: <https://github.com/beanumber/etl>
-* Email: <mailto:ben.baumer@gmail.com>
-* GitHub mirror: <https://github.com/cran/etl>
-
-Run `revdepcheck::cloud_details(, "etl")` for more info
-
-## Newly broken
-
-*   checking tests ... ERROR
-     ```
-     ...
-       
-           intersect, setdiff, setequal, union
-       
-       > 
-       > test_check("etl")
-       Saving _problems/test-etl-97.R
-       [ FAIL 1 | WARN 1 | SKIP 3 | PASS 30 ]
-       
-       ══ Skipped tests (3) ═══════════════════════════════════════════════════════════
-       • On CRAN (2): 'test-etl.R:102:3', 'test-etl.R:119:3'
-       • empty test (1): 'test-etl.R:51:1'
-       
-       ══ Failed tests ════════════════════════════════════════════════════════════════
-       ── Failure ('test-etl.R:97:3'): etl works ──────────────────────────────────────
-       Expected output from `print(cars)` to match regexp "sqlite".
-       Actual output:
-       ✖ │ dir:  2 files occupying 0 GB
-         │ <S4 class 'SQLiteConnection' [package "RSQLite"] with 8 slots>NULL
-       
-       [ FAIL 1 | WARN 1 | SKIP 3 | PASS 30 ]
-       Error:
-       ! Test failures.
-       Warning message:
-       call dbDisconnect() when finished working with a connection 
+         4.       └─testthat:::test_files_serial(...)
+         5.         └─testthat:::test_files_setup_state(...)
+         6.           └─testthat::source_test_setup(".", env)
+         7.             └─testthat::source_dir(path, "^setup.*\\.[rR]$", env = env, wrap = FALSE)
+         8.               └─base::lapply(...)
+         9.                 └─testthat (local) FUN(X[[i]], ...)
+        10.                   └─testthat::source_file(...)
+        11.                     ├─base::withCallingHandlers(...)
+        12.                     └─base::eval(exprs, env)
+        13.                       └─base::eval(exprs, env)
+        14.                         └─testthat::local_mocked_bindings(...) at ./setup.R:14:3
+        15.                           └─cli::cli_abort("Can't find binding for {.arg {missing}}")
+        16.                             └─rlang::abort(...)
        Execution halted
      ```
 
@@ -338,47 +148,7 @@ Run `revdepcheck::cloud_details(, "healthdb")` for more info
        Execution halted
      ```
 
-# lazysf (0.2.0)
-
-* GitHub: <https://github.com/hypertidy/lazysf>
-* Email: <mailto:mdsumner@gmail.com>
-* GitHub mirror: <https://github.com/cran/lazysf>
-
-Run `revdepcheck::cloud_details(, "lazysf")` for more info
-
-## Newly broken
-
-*   checking examples ... ERROR
-     ```
-     ...
-     ! Failed to find table "nc.gpkg".
-     ℹ Did you mean `from = I("nc.gpkg")`?
-     Caused by error in `dbplyr_query_fields()`:
-     ! <SFSQLConnection> uses dbplyr's 1st edition interface, which is no
-       longer supported.
-     ℹ Please contact the maintainer of the package for a solution.
-     Backtrace:
-          ▆
-       1. ├─lazysf::lazysf(f)
-       2. └─lazysf:::lazysf.character(f)
-       3.   ├─lazysf::lazysf(db, layer, ..., query = query)
-       4.   └─lazysf:::lazysf.SFSQLConnection(db, layer, ..., query = query)
-       5.     ├─dplyr::tbl(x, layer)
-       6.     └─dplyr:::tbl.DBIConnection(x, layer)
-       7.       ├─dplyr::tbl(...)
-       8.       └─dbplyr:::tbl.src_dbi(...)
-       9.         └─dbplyr:::db_table(src$con, from, vars = vars)
-      10.           ├─vars %||% find_variables(con, from, call = call)
-      11.           └─dbplyr:::find_variables(con, from, call = call)
-      12.             ├─base::withCallingHandlers(...)
-      13.             └─dbplyr:::dbplyr_query_fields(con, source)
-      14.               └─dbplyr:::check_2ed(con)
-      15.                 └─cli::cli_abort(...)
-      16.                   └─rlang::abort(...)
-     Execution halted
-     ```
-
-# mlr3db (0.7.0)
+# mlr3db (0.7.1)
 
 * GitHub: <https://github.com/mlr-org/mlr3db>
 * Email: <mailto:marcbecker@posteo.de>
@@ -391,6 +161,8 @@ Run `revdepcheck::cloud_details(, "mlr3db")` for more info
 *   checking tests ... ERROR
      ```
      ...
+        60. │                                   ├─data.table::setDT(...)
+        61. │                                   │ └─data.table::is.data.table(x)
         62. │                                   ├─dplyr::collect(...)
         63. │                                   └─dbplyr:::collect.tbl_sql(...)
         64. │                                     ├─base::withCallingHandlers(...)
@@ -411,10 +183,8 @@ Run `revdepcheck::cloud_details(, "mlr3db")` for more info
        [ FAIL 3 | WARN 1 | SKIP 3 | PASS 1133 ]
        Error:
        ! Test failures.
-       Warning messages:
-       1: call dbDisconnect() when finished working with a connection 
-       2: In .Internal(gc(verbose, reset, full)) :
-         closing unused connection 4 (<-localhost:33345)
+       Warning message:
+       call dbDisconnect() when finished working with a connection 
        Execution halted
      ```
 
@@ -431,16 +201,6 @@ Run `revdepcheck::cloud_details(, "osdc")` for more info
 *   checking tests ... ERROR
      ```
      ...
-       > # * https://testthat.r-lib.org/articles/special-files.html
-       > 
-       > library(testthat)
-       > library(osdc)
-       > 
-       > test_check("osdc")
-       Saving _problems/test-classify-diabetes-36.R
-       [ FAIL 1 | WARN 0 | SKIP 0 | PASS 43 ]
-       
-       ══ Failed tests ════════════════════════════════════════════════════════════════
        ── Error ('test-classify-diabetes.R:25:1'): (code run outside of `test_that()`) ──
        Error in `dplyr::collect(classify_diabetes(kontakter = cases_vs_nc$kontakter, diagnoser = cases_vs_nc$diagnoser, lpr_diag = cases_vs_nc$lpr_diag, lpr_adm = cases_vs_nc$lpr_adm, sysi = cases_vs_nc$sysi, sssy = cases_vs_nc$sssy, lab_forsker = cases_vs_nc$lab_forsker, bef = cases_vs_nc$bef, lmdb = cases_vs_nc$lmdb))`: Failed to collect lazy table.
        Caused by error in `DBI::dbSendQuery()`:
@@ -451,48 +211,18 @@ Run `revdepcheck::cloud_details(, "osdc")` for more info
                                           ^
        i Context: rapi_prepare
        i Error type: CATALOG
+       ── Error ('test-classify-variable-casing.R:9:3'): casing of input variables doesn't matter ──
+       Error in `dplyr::collect(classify_diabetes(kontakter = registers$kontakter, diagnoser = registers$diagnoser, lpr_diag = registers$lpr_diag, lpr_adm = registers$lpr_adm, sysi = registers$sysi, sssy = registers$sssy, lab_forsker = registers$lab_forsker, bef = registers$bef, lmdb = registers$lmdb))`: Failed to collect lazy table.
+       Caused by error in `DBI::dbSendQuery()`:
+       ! Catalog Error: Table with name as_tbl_duckplyr_UkT4ROds7b does not exist!
+       Did you mean "as_tbl_duckplyr_gdmBRjnkgK"?
        
-       [ FAIL 1 | WARN 0 | SKIP 0 | PASS 43 ]
-       Error:
-       ! Test failures.
-       Execution halted
-     ```
-
-# PatientProfiles (1.4.5)
-
-* GitHub: <https://github.com/darwin-eu/PatientProfiles>
-* Email: <mailto:marti.catalasabate@ndorms.ox.ac.uk>
-* GitHub mirror: <https://github.com/cran/PatientProfiles>
-
-Run `revdepcheck::cloud_details(, "PatientProfiles")` for more info
-
-## Newly broken
-
-*   checking tests ... ERROR
-     ```
-     ...
-       ══ Failed tests ════════════════════════════════════════════════════════════════
-       ── Failure ('test-filterInObservation.R:67:3'): test filterInObservation ───────
-       Expected `... <- NULL` not to throw any errors.
-       Actually got a <rlang_error> with message:
-         Failed to collect lazy table.
-         Caused by error in `DBI::dbSendQuery()`:
-         ! Binder Error: Referenced column "id_vgz" not found in FROM clause!
-         Candidate bindings: "sig", "visit_detail_id", "period_type_concept_id", "days_supply"
-         
-         LINE 5: WHERE (id_vgz <= drug_exposure_start_date AND drug_exposure_start_...
-                        ^
-         i Context: rapi_prepare
-         i Error type: BINDER
-       ── Error ('test-filterInObservation.R:73:3'): test filterInObservation ─────────
-       Error in `eval(code, test_env)`: object 'xS' not found
-       Backtrace:
-           ▆
-        1. └─testthat::expect_identical(xS, c(1L, 4L)) at test-filterInObservation.R:73:3
-        2.   └─testthat::quasi_label(enquo(object), label)
-        3.     └─rlang::eval_bare(expr, quo_get_env(quo))
+       LINE 219:                     FROM as_tbl_duckplyr_UkT4ROds7b
+                                          ^
+       i Context: rapi_prepare
+       i Error type: CATALOG
        
-       [ FAIL 2 | WARN 61 | SKIP 109 | PASS 192 ]
+       [ FAIL 2 | WARN 0 | SKIP 0 | PASS 42 ]
        Error:
        ! Test failures.
        Execution halted
@@ -648,7 +378,7 @@ Run `revdepcheck::cloud_details(, "RPresto")` for more info
        Execution halted
      ```
 
-# SCDB (0.5.2)
+# SCDB (0.6.0)
 
 * GitHub: <https://github.com/ssi-dk/SCDB>
 * Email: <mailto:rske@ssi.dk>
@@ -661,88 +391,88 @@ Run `revdepcheck::cloud_details(, "SCDB")` for more info
 *   checking examples ... ERROR
      ```
      ...
-     + 
-     +   dplyr::tbl(conn, "test.mtcars")
-     + 
-     +   close_connection(conn)
-     + ## Don't show: 
-     + }) # examplesIf
-     > conn <- get_connection()
-     > data <- dplyr::copy_to(conn, mtcars)
-     > update_snapshot(head(data, 3), conn = conn, db_table = "test.mtcars", 
-     +     timestamp = Sys.time())
-     Warning: `log_path` and `log_tbl` are both `NULL` and therefore NO file or database logging will be done.
-     Consider adding options SCDB.log_table_id and/or SCDB.log_path to your .Rprofile
-     2026-01-23 15:10:28.382 - root - INFO - Started
-     2026-01-23 15:10:28.382 - root - INFO - Parsing data for table main.test.mtcars started
-     2026-01-23 15:10:28.382 - root - INFO - Given timestamp for table is 2026-01-23 15:10:28.382749
-     2026-01-23 15:10:28.583 - root - INFO - Calculated checksums
-     2026-01-23 15:10:28.693 - root - INFO - Deactivating records
-     Warning: `as.sql()` was deprecated in dbplyr 2.6.0.
-     ℹ Please use `as_table_path()` instead.
-     ℹ The deprecated feature was likely used in the SCDB package.
-       Please report the issue at <https://github.com/ssi-dk/SCDB/issues>.
-     2026-01-23 15:10:28.776 - root - INFO - Deactivate records count: 0
-     2026-01-23 15:10:28.776 - root - INFO - Adding new records
-     Error: no such table: `SCDB_digest_to_checksum_Ry23f5MYPf`
+       1. ├─base::withAutoprint(...)
+       2. │ └─base::source(...)
+       3. │   ├─base::withVisible(eval(ei, envir))
+       4. │   └─base::eval(ei, envir)
+       5. │     └─base::eval(ei, envir)
+       6. ├─SCDB::create_index(conn, mt, c("mpg", "cyl"))
+       7. ├─SCDB:::create_index.SQLiteConnection(conn, mt, c("mpg", "cyl"))
+       8. │ ├─SCDB::id(db_table, conn)
+       9. │ └─SCDB:::id.tbl_dbi(db_table, conn)
+      10. │   └─... %>% dplyr::filter(.data$table == (!!table))
+      11. ├─dplyr::filter(., .data$table == !!table)
+      12. ├─dplyr:::filter.data.frame(., .data$table == !!table)
+      13. │ └─dplyr:::filter_impl(...)
+      14. │   └─dplyr:::filter_rows(...)
+      15. │     └─dplyr:::filter_eval(...)
+      16. │       ├─base::withCallingHandlers(...)
+      17. │       └─mask$eval_all_filter(dots_expanded, invert, env_filter)
+      18. │         └─dplyr (local) eval()
+      19. ├─dplyr:::dplyr_internal_error(...)
+      20. │ └─rlang::abort(class = c(class, "dplyr:::internal_error"), dplyr_error_data = data)
+      21. │   └─rlang:::signal_abort(cnd, .file)
+      22. │     └─base::signalCondition(cnd)
+      23. └─dplyr (local) `<fn>`(`<dpl:::__>`)
+      24.   └─rlang::abort(message, class = error_class, parent = parent, call = error_call)
      Execution halted
      ```
 
 *   checking tests ... ERROR
      ```
      ...
-       Warning message:
-       call dbDisconnect() when finished working with a connection 
+         Caused by error:
+         ! `..1` must be of size 20 or 1, not size 0.
+       ── Failure ('test-update_snapshot.R:624:5'): update_snapshot() works with across connection ──
+       Expected `update_snapshot(...)` not to throw any errors.
+       Actually got a <rlang_error> with message:
+         i In argument: `.data$table == NULL`.
+         Caused by error:
+         ! `..1` must be of size 14 or 1, not size 0.
+       ── Failure ('test-update_snapshot.R:670:5'): update_snapshot() works with across connection ──
+       Expected `update_snapshot(...)` not to throw any errors.
+       Actually got a <rlang_error> with message:
+         i In argument: `.data$table == NULL`.
+         Caused by error:
+         ! `..1` must be of size 2 or 1, not size 0.
+       ── Failure ('test-update_snapshot.R:670:5'): update_snapshot() works with across connection ──
+       Expected `update_snapshot(...)` not to throw any errors.
+       Actually got a <rlang_error> with message:
+         i In argument: `.data$table == NULL`.
+         Caused by error:
+         ! `..1` must be of size 3 or 1, not size 0.
+       
+       [ FAIL 43 | WARN 0 | SKIP 1 | PASS 471 ]
+       Error:
+       ! Test failures.
        Execution halted
-       Error in `purrr::map_chr()`:
-       ℹ In index: 2.
-       Caused by error:
-       ! Cannot translate a <Id> object to SQL.
-       ℹ Do you want to force evaluation in R with (e.g.) `!!x` or `local(x)`?
-       Backtrace:
-            ▆
-         1. └─`<fn>`(`<Logger>`)
-         2.   └─.subset2(e, ".__enclos_env__")$private$finalize()
-         3.     └─self$finalize_db_entry()
-         4.       └─dbplyr::build_sql(...)
-         5.         └─purrr::map_chr(enexprs(...), escape_expr, con = con)
-         6.           └─purrr:::map_("character", .x, .f, ..., .progress = .progress)
-         7.             ├─purrr:::with_indexed_errors(...)
-         8.             │ └─base::withCallingHandlers(...)
-         9.             ├─purrr:::call_with_cleanup(...)
-        10.             └─dbplyr (local) .f(.x[[i]], ...)
-        11.               ├─dbplyr::escape(val, con = con)
-        12.               └─dbplyr:::escape.default(val, con = con)
-        13.                 └─dbplyr:::error_embed(obj_type_friendly(x), "x")
-        14.                   └─cli::cli_abort(...)
-        15.                     └─rlang::abort(...)
      ```
 
 *   checking re-building of vignette outputs ... ERROR
      ```
      ...
-      5.       └─RSQLite (local) .local(conn, statement, ...)
-      6.         ├─methods::new(...)
-      7.         │ ├─methods::initialize(value, ...)
-      8.         │ └─methods::initialize(value, ...)
-      9.         └─RSQLite:::result_create(conn@ptr, statement)
+       8. ├─dplyr:::filter.data.frame(., .data$table == !!table)
+       9. │ └─dplyr:::filter_impl(...)
+      10. │   └─dplyr:::filter_rows(...)
+      11. │     └─dplyr:::filter_eval(...)
+      12. │       ├─base::withCallingHandlers(...)
+      13. │       └─mask$eval_all_filter(dots_expanded, invert, env_filter)
+      14. │         └─dplyr (local) eval()
+      15. └─dplyr:::dplyr_internal_error(...)
      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      
-     Error: processing vignette 'SCDB.Rmd' failed with diagnostics:
-     no such table: `SCDB_digest_to_checksum_qs6CYZ5vrf`
-     --- failed re-building ‘SCDB.Rmd’
-     
-     --- re-building ‘benchmarks.Rmd’ using rmarkdown
-     Loading required namespace: here
-     fatal: not a git repository (or any of the parent directories): .git
-     --- finished re-building ‘benchmarks.Rmd’
+     Error: processing vignette 'delta-loading.Rmd' failed with diagnostics:
+     ℹ In argument: `.data$table == NULL`.
+     Caused by error:
+     ! `..1` must be of size 3 or 1, not size 0.
+     --- failed re-building ‘delta-loading.Rmd’
      
      --- re-building ‘slowly-changing-dimension.Rmd’ using rmarkdown
      Loading required namespace: tidyverse
      --- finished re-building ‘slowly-changing-dimension.Rmd’
      
-     SUMMARY: processing the following file failed:
-       ‘SCDB.Rmd’
+     SUMMARY: processing the following files failed:
+       ‘SCDB.Rmd’ ‘delta-loading.Rmd’
      
      Error: Vignette re-building failed.
      Execution halted
