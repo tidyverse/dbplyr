@@ -2,8 +2,8 @@
 
 These are methods for the dplyr
 [`dplyr::count()`](https://dplyr.tidyverse.org/reference/count.html) and
-[`dplyr::tally()`](https://dplyr.tidyverse.org/reference/count.html)
-generics. They wrap up
+[`tally()`](https://dplyr.tidyverse.org/reference/count.html) generics.
+They wrap up
 [`group_by.tbl_lazy()`](https://dbplyr.tidyverse.org/dev/reference/group_by.tbl_lazy.md),
 [`summarise.tbl_lazy()`](https://dbplyr.tidyverse.org/dev/reference/summarise.tbl_lazy.md)
 and, optionally,

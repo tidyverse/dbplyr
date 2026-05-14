@@ -1,8 +1,8 @@
 # Use a local data frame in a dbplyr query
 
 This is an alternative to
-[`dplyr::copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html)
-that does not need write access and is faster for small data.
+[`copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html) that
+does not need write access and is faster for small data.
 
 ## Usage
 
@@ -38,8 +38,8 @@ It writes the data directly in the SQL query via the `VALUES` clause.
 
 ## See also
 
-[`dplyr::copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html)
-to copy the data into a new database table.
+[`copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html) to
+copy the data into a new database table.
 
 ## Examples
 

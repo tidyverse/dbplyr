@@ -55,8 +55,18 @@ remote_query_plan(x, ...)
 
 ## Value
 
-A string, or `NULL` if not a remote table, or not applicable. For
-example, computed queries do not have a "name".
+- `remote_name()` returns a string, or `NULL` if not a remote table, or
+  not applicable. For example, computed queries do not have a "name".
+
+- `remote_table()` returns a
+  [`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md) object
+  containing the (correctly quoted) table identifier, or the custom
+  query if the table was created from
+  [`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md). Returns
+  `NULL` if applied to a lazy query that no longer corresponds to a
+  single table (e.g. after a
+  [`filter()`](https://dplyr.tidyverse.org/reference/filter.html) or a
+  join), or if applied to a local lazy table.
 
 ## Examples
 
@@ -65,7 +75,18 @@ mf <- memdb_frame(x = 1:5, y = 5:1, .name = "blorp")
 remote_name(mf)
 #> [1] "blorp"
 remote_src(mf)
-#> <SQLiteConnection> :memory: (with extensions)NULL
+#> src:  sqlite 3.52.0 [:memory:]
+#> tbls: blorp, dbplyr_tmp_0v58wsNw8H, dbplyr_tmp_1LAQiggRXt,
+#>   dbplyr_tmp_8mT77KhL68, dbplyr_tmp_BBVkzIbwPc, dbplyr_tmp_EGgYqj4qNZ,
+#>   dbplyr_tmp_I6Ojtgl00s, dbplyr_tmp_IlBpEtJTVT, dbplyr_tmp_JjVgkVmyiq,
+#>   dbplyr_tmp_LBw8zKN1yQ, dbplyr_tmp_MRz71neMYl, dbplyr_tmp_OmdEEAbgKY,
+#>   dbplyr_tmp_Pg2ZRmBV2z, dbplyr_tmp_SwlKLUUEdL, dbplyr_tmp_Vs7TnBty9u,
+#>   dbplyr_tmp_YEz3cqGOVP, dbplyr_tmp_YO68LSSy0I, dbplyr_tmp_YWxNDvhncr,
+#>   dbplyr_tmp_YrKPRds3Z4, dbplyr_tmp_ZE6kU1N7gY, dbplyr_tmp_acgWfAlMkP,
+#>   dbplyr_tmp_gjzX6JVzH3, dbplyr_tmp_l623TKpjGw, dbplyr_tmp_sBTMwgonEI,
+#>   dbplyr_tmp_srAteYGaUs, dbplyr_tmp_vQgF0fivjF, dbplyr_tmp_w7oQFtAa74,
+#>   df, dplyr::band_instruments, dplyr::band_members, iris,
+#>   sqlite_stat1, sqlite_stat4, squirrels
 remote_con(mf)
 #> <SQLiteConnection>
 #>   Path: :memory:
@@ -78,7 +99,18 @@ mf2 <- dplyr::filter(mf, x > 3)
 remote_name(mf2)
 #> NULL
 remote_src(mf2)
-#> <SQLiteConnection> :memory: (with extensions)NULL
+#> src:  sqlite 3.52.0 [:memory:]
+#> tbls: blorp, dbplyr_tmp_0v58wsNw8H, dbplyr_tmp_1LAQiggRXt,
+#>   dbplyr_tmp_8mT77KhL68, dbplyr_tmp_BBVkzIbwPc, dbplyr_tmp_EGgYqj4qNZ,
+#>   dbplyr_tmp_I6Ojtgl00s, dbplyr_tmp_IlBpEtJTVT, dbplyr_tmp_JjVgkVmyiq,
+#>   dbplyr_tmp_LBw8zKN1yQ, dbplyr_tmp_MRz71neMYl, dbplyr_tmp_OmdEEAbgKY,
+#>   dbplyr_tmp_Pg2ZRmBV2z, dbplyr_tmp_SwlKLUUEdL, dbplyr_tmp_Vs7TnBty9u,
+#>   dbplyr_tmp_YEz3cqGOVP, dbplyr_tmp_YO68LSSy0I, dbplyr_tmp_YWxNDvhncr,
+#>   dbplyr_tmp_YrKPRds3Z4, dbplyr_tmp_ZE6kU1N7gY, dbplyr_tmp_acgWfAlMkP,
+#>   dbplyr_tmp_gjzX6JVzH3, dbplyr_tmp_l623TKpjGw, dbplyr_tmp_sBTMwgonEI,
+#>   dbplyr_tmp_srAteYGaUs, dbplyr_tmp_vQgF0fivjF, dbplyr_tmp_w7oQFtAa74,
+#>   df, dplyr::band_instruments, dplyr::band_members, iris,
+#>   sqlite_stat1, sqlite_stat4, squirrels
 remote_con(mf2)
 #> <SQLiteConnection>
 #>   Path: :memory:

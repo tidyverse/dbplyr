@@ -4,10 +4,10 @@ Use [`tbl()`](https://dplyr.tidyverse.org/reference/tbl.html) to create
 a SQL query backed by a database. Manipulating this object with dplyr
 verbs then builds up a SQL query that will only be executed when you
 explicitly ask for it, either by printing the object, calling
-[`dplyr::collect()`](https://dplyr.tidyverse.org/reference/compute.html)
-to bring the data back to R or calling
-[`dplyr::compute()`](https://dplyr.tidyverse.org/reference/compute.html)
-to create a new table in the database. You can see the query without
+[`collect()`](https://dplyr.tidyverse.org/reference/compute.html) to
+bring the data back to R or calling
+[`compute()`](https://dplyr.tidyverse.org/reference/compute.html) to
+create a new table in the database. You can see the query without
 executing it with
 [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md).
 

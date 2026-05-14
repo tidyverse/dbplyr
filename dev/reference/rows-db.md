@@ -1,13 +1,12 @@
 # Edit individual rows in the underlying database table
 
 These are methods for the dplyr
-[`dplyr::rows_insert()`](https://dplyr.tidyverse.org/reference/rows.html),
-[`dplyr::rows_append()`](https://dplyr.tidyverse.org/reference/rows.html),
-[`dplyr::rows_update()`](https://dplyr.tidyverse.org/reference/rows.html),
-[`dplyr::rows_patch()`](https://dplyr.tidyverse.org/reference/rows.html),
-[`dplyr::rows_upsert()`](https://dplyr.tidyverse.org/reference/rows.html),
-and
-[`dplyr::rows_delete()`](https://dplyr.tidyverse.org/reference/rows.html)
+[`rows_insert()`](https://dplyr.tidyverse.org/reference/rows.html),
+[`rows_append()`](https://dplyr.tidyverse.org/reference/rows.html),
+[`rows_update()`](https://dplyr.tidyverse.org/reference/rows.html),
+[`rows_patch()`](https://dplyr.tidyverse.org/reference/rows.html),
+[`rows_upsert()`](https://dplyr.tidyverse.org/reference/rows.html), and
+[`rows_delete()`](https://dplyr.tidyverse.org/reference/rows.html)
 generics.
 
 When `in_place = TRUE` these verbs do not generate `SELECT` queries, but
@@ -93,10 +92,9 @@ rows_delete(
 - x:
 
   A lazy table. For `in_place = TRUE`, this must be a table instantiated
-  with [`dplyr::tbl()`](https://dplyr.tidyverse.org/reference/tbl.html)
-  or
-  [`dplyr::compute()`](https://dplyr.tidyverse.org/reference/compute.html),
-  not to a lazy query. The
+  with [`tbl()`](https://dplyr.tidyverse.org/reference/tbl.html) or
+  [`compute()`](https://dplyr.tidyverse.org/reference/compute.html), not
+  to a lazy query. The
   [`remote_name()`](https://dbplyr.tidyverse.org/dev/reference/remote_name.md)
   function is used to determine the name of the table to be updated.
 

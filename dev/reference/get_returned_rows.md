@@ -3,23 +3,20 @@
 **\[experimental\]**
 
 `get_returned_rows()` extracts the `RETURNING` rows produced by
-[`dplyr::rows_insert()`](https://dplyr.tidyverse.org/reference/rows.html),
-[`dplyr::rows_append()`](https://dplyr.tidyverse.org/reference/rows.html),
-[`dplyr::rows_update()`](https://dplyr.tidyverse.org/reference/rows.html),
-[`dplyr::rows_upsert()`](https://dplyr.tidyverse.org/reference/rows.html),
-or
-[`dplyr::rows_delete()`](https://dplyr.tidyverse.org/reference/rows.html)
-if these are called with the `returning` argument. An error is raised if
+[`rows_insert()`](https://dplyr.tidyverse.org/reference/rows.html),
+[`rows_append()`](https://dplyr.tidyverse.org/reference/rows.html),
+[`rows_update()`](https://dplyr.tidyverse.org/reference/rows.html),
+[`rows_upsert()`](https://dplyr.tidyverse.org/reference/rows.html), or
+[`rows_delete()`](https://dplyr.tidyverse.org/reference/rows.html) if
+these are called with the `returning` argument. An error is raised if
 this information is not available.
 
 `has_returned_rows()` checks if `x` has stored RETURNING rows produced
-by
-[`dplyr::rows_insert()`](https://dplyr.tidyverse.org/reference/rows.html),
-[`dplyr::rows_append()`](https://dplyr.tidyverse.org/reference/rows.html),
-[`dplyr::rows_update()`](https://dplyr.tidyverse.org/reference/rows.html),
-[`dplyr::rows_upsert()`](https://dplyr.tidyverse.org/reference/rows.html),
-or
-[`dplyr::rows_delete()`](https://dplyr.tidyverse.org/reference/rows.html).
+by [`rows_insert()`](https://dplyr.tidyverse.org/reference/rows.html),
+[`rows_append()`](https://dplyr.tidyverse.org/reference/rows.html),
+[`rows_update()`](https://dplyr.tidyverse.org/reference/rows.html),
+[`rows_upsert()`](https://dplyr.tidyverse.org/reference/rows.html), or
+[`rows_delete()`](https://dplyr.tidyverse.org/reference/rows.html).
 
 ## Usage
 

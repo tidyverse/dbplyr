@@ -14,7 +14,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/tidyverse/dbplyr/blob/v2.5.2/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/tidyverse/dbplyr/blob/main/DESCRIPTION)
 
 Wickham H, Girlich M, Ruiz E (2026). *dbplyr: A 'dplyr' Back End for
 Databases*. R package version 2.5.2.9000,

@@ -12,7 +12,7 @@ Key differences for this backend are:
 - Temporary tables get `#` prefix and use `LOCAL TEMPORARY COLUMN`.
 
 - No table analysis performed in
-  [`dplyr::copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html).
+  [`copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html).
 
 - [`paste()`](https://rdrr.io/r/base/paste.html) uses `||`
 
