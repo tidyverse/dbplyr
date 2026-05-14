@@ -22,6 +22,6 @@ talking to the database.}
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 
-\code{do()} is deprecated. Instead of \code{do()} you should use \code{\link[dplyr:compute]{dplyr::collect()}} and then
+\code{do()} is deprecated. Instead of \code{do()} you should use \code{\link[dplyr:collect]{collect()}} and then
 your favourite combination of purrr and dplyr functions.
 }

@@ -33,8 +33,20 @@ memdb <- function() {
 #' @rdname memdb
 #' @export
 memdb_frame <- function(.name = unique_table_name(), ...) {
-  x <- copy_to(memdb(), tibble(...), name = .name)
-  x
+  if (is.data.frame(.name)) {
+    lifecycle::deprecate_warn(
+      "2.6.0",
+      I("memdb_frame(data.frame(...))"),
+      details = "Use `copy_to(memdb(), df)` instead."
+    )
+    df <- .name
+    .name <- unique_table_name()
+  } else {
+    check_string(.name)
+    df <- tibble::tibble(...)
+  }
+
+  copy_to(memdb(), df, name = .name)
 }
 
 #' @rdname memdb

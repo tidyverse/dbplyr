@@ -54,6 +54,36 @@
       LEFT JOIN "lf2"
         ON ("lf1"."x" = "lf2"."x")
 
+# select() after filter() on join preserves qualified where
+
+    Code
+      out
+    Output
+      <SQL>
+      SELECT "x", "y"
+      FROM (
+        SELECT "t1".*, "z"
+        FROM "t1"
+        LEFT JOIN "t2"
+          ON ("t1"."x" = "t2"."x")
+        WHERE ("t2"."z" > 0.0)
+      ) AS "q01"
+
+---
+
+    Code
+      out
+    Output
+      <SQL>
+      SELECT "x", "y", "z" AS "zz"
+      FROM (
+        SELECT "t1".*, "z"
+        FROM "t1"
+        LEFT JOIN "t2"
+          ON ("t1"."x" = "t2"."x")
+        WHERE ("t2"."z" > 0.0)
+      ) AS "q01"
+
 # select() after semi_join() is inlined
 
     Code

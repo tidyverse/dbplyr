@@ -238,7 +238,7 @@ dbplyr_write_table.DBIConnection <- function(
       row.names = FALSE
     ),
     error = function(cnd) {
-      msg <- "Can't write table table {.field {format(table, con = con)}}."
+      msg <- "Can't write table {.field {format(table, con = con)}}."
       cli_abort(msg, parent = cnd)
     }
   )

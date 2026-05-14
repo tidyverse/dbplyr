@@ -2,6 +2,7 @@
 % Please edit documentation in R/escape.R
 \name{escape}
 \alias{escape}
+\alias{db-quote}
 \alias{sql_escape_ident}
 \alias{sql_escape_logical}
 \alias{sql_escape_date}
@@ -82,9 +83,9 @@ sql_escape_date(con, Sys.time())
 sql_escape_raw(con, charToRaw("hi"))
 }
 \seealso{
-Other generic: 
+Other generic:
 \code{\link{db-sql}},
-\code{\link{db_connection_describe}()},
-\code{\link{db_copy_to}()}
+\code{\link[=db_connection_describe]{db_connection_describe()}},
+\code{\link[=db_copy_to]{db_copy_to()}}
 }
 \concept{generic}

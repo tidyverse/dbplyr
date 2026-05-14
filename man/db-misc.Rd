@@ -33,10 +33,10 @@ See below for more details.
 }
 }
 \seealso{
-Other generic: 
+Other generic:
 \code{\link{db-sql}},
-\code{\link{db_copy_to}()},
-\code{\link{escape}()}
+\code{\link[=db_copy_to]{db_copy_to()}},
+\code{\link[=escape]{escape()}}
 }
 \concept{generic}
 \keyword{internal}

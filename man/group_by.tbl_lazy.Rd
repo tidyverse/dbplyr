@@ -15,16 +15,12 @@ order.}
 
 \item{.add}{When \code{FALSE}, the default, \code{group_by()} will
 override existing groups. To add to the existing groups, use
-\code{.add = TRUE}.
-
-This argument was previously called \code{add}, but that prevented
-creating a new grouping variable called \code{add}, and conflicts with
-our naming conventions.}
+\code{.add = TRUE}.}
 
 \item{.drop}{Not supported by this method.}
 }
 \description{
-This is a method for the dplyr \code{\link[dplyr:group_by]{dplyr::group_by()}} generic. It is translated to
+This is a method for the dplyr \code{\link[dplyr:group_by]{group_by()}} generic. It is translated to
 the \verb{GROUP BY} clause of the SQL query when used with
 \code{\link[=summarise.tbl_lazy]{summarise()}} and to the \verb{PARTITION BY} clause of
 window functions when used with \code{\link[=mutate.tbl_lazy]{mutate()}}.

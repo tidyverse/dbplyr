@@ -1,7 +1,7 @@
 Type: Package
 Package: dbplyr
 Title: A 'dplyr' Back End for Databases
-Version: 2.5.1.9000
+Version: 2.5.2.9000
 Authors@R: c(
     person("Hadley", "Wickham", , "hadley@posit.co", role = c("aut", "cre")),
     person("Maximilian", "Girlich", role = "aut"),
@@ -59,7 +59,6 @@ Config/testthat/parallel: TRUE
 Encoding: UTF-8
 Language: en-gb
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Collate: 
     'verb-copy-inline.R'
     'verb-copy-to.R'
@@ -95,6 +94,7 @@ Collate:
     'backend-spark-sql.R'
     'backend-sqlite.R'
     'backend-teradata.R'
+    'backward-compatibility.R'
     'bind-queries.R'
     'data-cache.R'
     'data-lahman.R'
@@ -162,3 +162,4 @@ Collate:
     'verb-window.R'
     'with-dialect.R'
     'zzz.R'
+Config/roxygen2/version: 8.0.0
