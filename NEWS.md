@@ -1,6 +1,5 @@
 # dbplyr (development version)
 
-* Verb pull now appropriately handles name as a quosure of NULL (#1808)
 * JDBC connections are now supported. dbplyr automatically detects the underlying database type from the JDBC connection class and uses the appropriate SQL dialect (#1359).
 * CTEs now correctly quote table names when the same query is used multiple times (#1559).
 * Custom translations of functions starting with `.` work (@MichaelChirico, #1529).
@@ -59,6 +58,7 @@
 * `mutate()` gains `.order` and `.frame` arguments for specifying window function ordering and frame bounds within a single mutate call, similar to how `.by` works for grouping (#1542).
 * `n_distinct()` now has an `na.rm` argument, which regularly warns when it's not `TRUE` (#1579).
 * `na_matches = "na"` now works correctly with inequality and overlap joins, preserving the comparison operator instead of converting to equality (#1505).
+* `pull()` now handles `name` as a quosure of `NULL` (#1808).
 * `semi_join()` and `anti_join()` once again work with filtered windowed values (#1534, #1606).
 * `set_op_query()` no longer has an `all` argument.
 * `show_query()` gains `use_colour` argument (#1590).
