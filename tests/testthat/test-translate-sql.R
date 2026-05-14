@@ -101,6 +101,12 @@ test_that("na_if is translated to NULLIF (#211)", {
   expect_translation(con, na_if(x, 0L), "NULLIF(\"x\", 0)")
 })
 
+test_that("anyNA() translates like any(is.na()) (#1814)", {
+  con <- dialect_ansi()
+  expect_translation(con, anyNA(x), 'MAX(("x" IS NULL))', window = FALSE)
+  expect_translation(con, anyNA(x), 'MAX(("x" IS NULL)) OVER ()', window = TRUE)
+})
+
 test_that("connection affects quoting character", {
   lf <- lazy_frame(field1 = 1, field2 = 2, con = dialect_sqlite())
   out <- select(lf, field1)

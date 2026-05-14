@@ -469,6 +469,11 @@ sql_exp <- function(a, x) {
   }
 }
 
+sql_any_na <- function(x, window = FALSE) {
+  exp <- expr(any(is.na(!!x)))
+  translate_sql(!!exp, con = sql_current_con(), window = window)
+}
+
 #' @export
 #' @rdname sql_variant
 #' @format NULL
@@ -484,6 +489,7 @@ base_agg <- sql_translator(
   # https://blog.jooq.org/a-true-sql-gem-you-didnt-know-yet-the-every-aggregate-function/#comment-344695
   all = sql_aggregate("MIN"),
   any = sql_aggregate("MAX"),
+  anyNA = \(x) sql_any_na(x, window = FALSE),
 
   sd = sql_not_supported("sd"),
   var = sql_not_supported("var"),
@@ -584,6 +590,7 @@ base_win <- sql_translator(
 
   all = win_aggregate("MIN"),
   any = win_aggregate("MAX"),
+  anyNA = \(x) sql_any_na(x, window = TRUE),
 
   sd = sql_not_supported("sd"),
   var = sql_not_supported("var"),
@@ -649,6 +656,7 @@ base_no_win <- sql_translator(
   max = win_absent("max"),
   all = win_absent("all"),
   any = win_absent("any"),
+  anyNA = win_absent("anyNA"),
   median = win_absent("median"),
   quantile = win_absent("quantile"),
   n = win_absent("n"),
