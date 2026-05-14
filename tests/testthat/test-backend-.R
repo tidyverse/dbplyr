@@ -103,6 +103,14 @@ test_that("useful error if $ used with inlined value", {
   expect_snapshot(lazy_frame(x = 1) |> filter(x == y$id), error = TRUE)
 })
 
+test_that("if_else() and ifelse() require true/yes and false/no", {
+  con <- dialect_ansi()
+  expect_translation_snapshot(con, if_else(x), error = TRUE)
+  expect_translation_snapshot(con, if_else(x, 1L), error = TRUE)
+  expect_translation_snapshot(con, ifelse(x), error = TRUE)
+  expect_translation_snapshot(con, ifelse(x, 1L), error = TRUE)
+})
+
 # window ------------------------------------------------------------------
 
 test_that("lead and lag translate n to integers", {

@@ -336,6 +336,9 @@ mssql_scalar_base <- function() {
       )
     },
     if_else = function(condition, true, false, missing = NULL) {
+      check_required(true)
+      check_required(false)
+
       mssql_sql_if(
         enquo(condition),
         enquo(true),
@@ -344,6 +347,9 @@ mssql_scalar_base <- function() {
       )
     },
     ifelse = function(test, yes, no) {
+      check_required(yes)
+      check_required(no)
+
       mssql_sql_if(enquo(test), enquo(yes), enquo(no))
     },
     case_when = mssql_case_when,
