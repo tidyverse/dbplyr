@@ -59,6 +59,7 @@
 * `mutate()` gains `.order` and `.frame` arguments for specifying window function ordering and frame bounds within a single mutate call, similar to how `.by` works for grouping (#1542).
 * `n_distinct()` now has an `na.rm` argument, which regularly warns when it's not `TRUE` (#1579).
 * `na_matches = "na"` now works correctly with inequality and overlap joins, preserving the comparison operator instead of converting to equality (#1505).
+* `pull()` now handles `name` as a quosure of `NULL` (#1808).
 * `remote_table()` now returns `sql()` containing the (correctly quoted) table identifier, rather than the internal `dbplyr_table_path`. This makes the result suitable for inlining into `build_sql()` and `sql_glue2()`.
 * `semi_join()` and `anti_join()` once again work with filtered windowed values (#1534, #1606).
 * `set_op_query()` no longer has an `all` argument.

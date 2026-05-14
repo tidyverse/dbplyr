@@ -21,6 +21,8 @@ pull.tbl_sql <- function(.data, var = -1, name = NULL, ...) {
   name_quo <- enquo(name)
   if (!quo_is_null(name_quo)) {
     name <- tidyselect::vars_pull(vars, !!name_quo, error_arg = "name")
+  } else {
+    name <- NULL
   }
 
   .data <- ungroup(.data)
