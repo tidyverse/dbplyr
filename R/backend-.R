@@ -450,11 +450,8 @@ sql_exp <- function(a, x) {
 }
 
 sql_any_na <- function(x, window = FALSE) {
-  variant <- dbplyr_sql_translation(sql_current_con())
-  is_na <- variant$scalar$is.na(x)
-  any <- if (window) variant$window$any else variant$aggregate$any
-
-  any(is_na)
+  exp <- expr(any(is.na(!!x)))
+  translate_sql(!!exp, con = sql_current_con(), window = window)
 }
 
 #' @export
