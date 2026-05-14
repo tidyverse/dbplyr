@@ -61,6 +61,25 @@ test_that("%in% with empty vector", {
   expect_translation(con, x %in% !!integer(), "FALSE")
 })
 
+test_that("%notin% translation parenthesises when needed", {
+  con <- dialect_ansi()
+  expect_translation(con, x %notin% 1L, "\"x\" NOT IN (1)")
+  expect_translation(con, x %notin% c(1L), "\"x\" NOT IN (1)")
+  expect_translation(con, x %notin% 1:2, "\"x\" NOT IN (1, 2)")
+  expect_translation(con, x %notin% y, "\"x\" NOT IN \"y\"")
+})
+
+test_that("%notin% strips vector names", {
+  con <- dialect_ansi()
+  expect_translation(con, x %notin% c(a = 1L), "\"x\" NOT IN (1)")
+  expect_translation(con, x %notin% !!c(a = 1L), "\"x\" NOT IN (1)")
+})
+
+test_that("%notin% with empty vector", {
+  con <- dialect_ansi()
+  expect_translation(con, x %notin% !!integer(), "TRUE")
+})
+
 test_that("n_distinct(x) translated to COUNT(distinct, x)", {
   con <- dialect_ansi()
   expect_translation(

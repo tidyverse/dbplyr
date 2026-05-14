@@ -173,6 +173,18 @@ base_scalar <- sql_translator(
       sql_glue("{x} IN {table*}")
     }
   },
+  `%notin%` = function(x, table) {
+    if (is.ident(table)) {
+      return(sql_glue("{x} NOT IN {table}"))
+    }
+
+    table <- unname(table)
+    if (length(table) == 0) {
+      sql("TRUE")
+    } else {
+      sql_glue("{x} NOT IN {table*}")
+    }
+  },
 
   `!` = sql_prefix("NOT"),
   `&` = sql_infix("AND"),
