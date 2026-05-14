@@ -121,6 +121,9 @@
 - All set operations now error if you pass extra arguments (instead of
   silently ignoring them)
   ([\#1585](https://github.com/tidyverse/dbplyr/issues/1585)).
+- [`anyNA()`](https://rdrr.io/r/base/NA.html) is now translated to SQL
+  as `any(is.na(x))`
+  ([\#1814](https://github.com/tidyverse/dbplyr/issues/1814)).
 - [`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html) now
   applies consecutively, matching dplyr’s behavior:
   `arrange(y) |> arrange(x)` is now equivalent to `arrange(x, y)`. Empty
@@ -196,6 +199,12 @@
   [`summarise()`](https://dplyr.tidyverse.org/reference/summarise.html)
   is once again inlined correctly
   ([\#1707](https://github.com/tidyverse/dbplyr/issues/1707)).
+- [`filter()`](https://dplyr.tidyverse.org/reference/filter.html) after
+  [`rename()`](https://dplyr.tidyverse.org/reference/rename.html) no
+  longer rewrites field names of `$` and `@` expressions, so
+  e.g. `filter(z == ltr$z)` after `rename(z = x)` now looks up `ltr$z`,
+  not `ltr$x`
+  ([\#1812](https://github.com/tidyverse/dbplyr/issues/1812)).
 - [`if_else()`](https://dplyr.tidyverse.org/reference/if_else.html) and
   [`ifelse()`](https://rdrr.io/r/base/ifelse.html) now give a clear
   error if `true`/`false` or `yes`/`no` are missing
