@@ -19,8 +19,8 @@ Tables:
 - `sql_table_analyze(con, table)` generates SQL that "analyzes" the
   table, ensuring that the database has up-to-date statistics for use in
   the query planner. It called from
-  [`copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html) when
-  `analyze = TRUE`.
+  [`dplyr::copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html)
+  when `analyze = TRUE`.
 
 - `sql_table_index()` generates SQL for adding an index to table.
 

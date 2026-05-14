@@ -1,7 +1,7 @@
 # Arrange rows by column values
 
 This is an method for the dplyr
-[`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html)
+[`dplyr::arrange()`](https://dplyr.tidyverse.org/reference/arrange.html)
 generic. It generates the `ORDER BY` clause of the SQL query. It also
 affects the
 [`window_order()`](https://dbplyr.tidyverse.org/dev/reference/window_order.md)

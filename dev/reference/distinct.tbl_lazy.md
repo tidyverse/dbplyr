@@ -1,7 +1,7 @@
 # Subset distinct/unique rows
 
 This is a method for the dplyr
-[`distinct()`](https://dplyr.tidyverse.org/reference/distinct.html)
+[`dplyr::distinct()`](https://dplyr.tidyverse.org/reference/distinct.html)
 generic. It adds the `DISTINCT` clause to the SQL query.
 
 ## Usage

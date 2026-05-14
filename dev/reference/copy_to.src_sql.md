@@ -1,7 +1,7 @@
 # Copy a local data frame to a remote database
 
 This is an implementation of the dplyr
-[`copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html)
+[`dplyr::copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html)
 generic and it mostly a wrapper around
 [`DBI::dbWriteTable()`](https://dbi.r-dbi.org/reference/dbWriteTable.html).
 

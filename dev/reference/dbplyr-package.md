@@ -21,8 +21,6 @@ Useful links:
 
 Authors:
 
-- Hadley Wickham <hadley@posit.co>
-
 - Maximilian Girlich
 
 - Edgar Ruiz

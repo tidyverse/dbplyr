@@ -1,7 +1,7 @@
 # Join SQL tables
 
 These are methods for the dplyr
-[join](https://dplyr.tidyverse.org/reference/mutate-joins.html)
+[dplyr::join](https://dplyr.tidyverse.org/reference/mutate-joins.html)
 generics. They are translated to the following SQL queries:
 
 - `inner_join(x, y)`: `SELECT * FROM x JOIN y ON x.a = y.a`
@@ -232,7 +232,8 @@ anti_join(
   Should NA (NULL) values match one another? The default, "never", is
   how databases usually work. `"na"` makes the joins behave like the
   dplyr join functions, [`merge()`](https://rdrr.io/r/base/merge.html),
-  [`base::match()`](https://rdrr.io/r/base/match.html), and `%in%`.
+  [`bit64::match()`](https://bit64.r-lib.org/reference/bit64S3.html),
+  and `%in%`.
 
 - multiple, unmatched:
 

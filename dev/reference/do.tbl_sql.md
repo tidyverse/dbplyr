@@ -5,8 +5,8 @@
 [`do()`](https://dplyr.tidyverse.org/reference/do.html) is deprecated.
 Instead of [`do()`](https://dplyr.tidyverse.org/reference/do.html) you
 should use
-[`collect()`](https://dplyr.tidyverse.org/reference/compute.html) and
-then your favourite combination of purrr and dplyr functions.
+[`dplyr::collect()`](https://dplyr.tidyverse.org/reference/compute.html)
+and then your favourite combination of purrr and dplyr functions.
 
 ## Usage
 

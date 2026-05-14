@@ -1,9 +1,10 @@
 # Subset, rename, and reorder columns using their names
 
 These are methods for the dplyr
-[`select()`](https://dplyr.tidyverse.org/reference/select.html),
-[`rename()`](https://dplyr.tidyverse.org/reference/rename.html), and
-[`relocate()`](https://dplyr.tidyverse.org/reference/relocate.html)
+[`dplyr::select()`](https://dplyr.tidyverse.org/reference/select.html),
+[`dplyr::rename()`](https://dplyr.tidyverse.org/reference/rename.html),
+and
+[`dplyr::relocate()`](https://dplyr.tidyverse.org/reference/relocate.html)
 generics. They generate the `SELECT` clause of the SQL query.
 
 These functions do not support predicate functions, i.e. you can not use

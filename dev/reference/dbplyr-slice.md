@@ -1,9 +1,10 @@
 # Subset rows using their positions
 
 These are methods for the dplyr generics
-[`slice_min()`](https://dplyr.tidyverse.org/reference/slice.html),
-[`slice_max()`](https://dplyr.tidyverse.org/reference/slice.html), and
-[`slice_sample()`](https://dplyr.tidyverse.org/reference/slice.html).
+[`dplyr::slice_min()`](https://dplyr.tidyverse.org/reference/slice.html),
+[`dplyr::slice_max()`](https://dplyr.tidyverse.org/reference/slice.html),
+and
+[`dplyr::slice_sample()`](https://dplyr.tidyverse.org/reference/slice.html).
 They are translated to SQL using
 [`dplyr::filter()`](https://dplyr.tidyverse.org/reference/filter.html)
 and window functions (`ROWNUMBER`, `MIN_RANK`, or `CUME_DIST` depending

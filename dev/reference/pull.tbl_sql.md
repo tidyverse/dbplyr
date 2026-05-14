@@ -1,8 +1,8 @@
 # Extract a single column
 
 This is a method for the dplyr
-[`pull()`](https://dplyr.tidyverse.org/reference/pull.html) generic. It
-evaluates the query retrieving just the specified column.
+[`dplyr::pull()`](https://dplyr.tidyverse.org/reference/pull.html)
+generic. It evaluates the query retrieving just the specified column.
 
 ## Usage
 

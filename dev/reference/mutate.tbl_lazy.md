@@ -1,8 +1,9 @@
 # Create, modify, and delete columns
 
 These are methods for the dplyr
-[`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html) and
-[`transmute()`](https://dplyr.tidyverse.org/reference/transmute.html)
+[`dplyr::mutate()`](https://dplyr.tidyverse.org/reference/mutate.html)
+and
+[`dplyr::transmute()`](https://dplyr.tidyverse.org/reference/transmute.html)
 generics. They are translated to computed expressions in the `SELECT`
 clause of the SQL query.
 
@@ -48,14 +49,15 @@ mutate(
 
   \<[`data-masking`](https://rlang.r-lib.org/reference/args_data_masking.html)\>
   A selection of columns to control ordering for window functions within
-  this [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html)
+  this
+  [`dplyr::mutate()`](https://dplyr.tidyverse.org/reference/mutate.html)
   call. Use [`c()`](https://rdrr.io/r/base/c.html) to order by multiple
   columns, e.g. `.order = c(x, y)`. Each column can be wrapped in
-  [`desc()`](https://dplyr.tidyverse.org/reference/desc.html) to specify
-  descending order. Equivalent to calling
+  [`dplyr::desc()`](https://dplyr.tidyverse.org/reference/desc.html) to
+  specify descending order. Equivalent to calling
   [`window_order()`](https://dbplyr.tidyverse.org/dev/reference/window_order.md)
   before and clearing it after the
-  [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html).
+  [`dplyr::mutate()`](https://dplyr.tidyverse.org/reference/mutate.html).
 
 - .frame:
 
@@ -66,7 +68,7 @@ mutate(
   calling
   [`window_frame()`](https://dbplyr.tidyverse.org/dev/reference/window_order.md)
   before and clearing it after the
-  [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html).
+  [`dplyr::mutate()`](https://dplyr.tidyverse.org/reference/mutate.html).
 
 - .keep:
 

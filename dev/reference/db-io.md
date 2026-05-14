@@ -38,8 +38,9 @@ backend has special handling of temporary tables.
 
 - `db_table_drop_if_exists()` is used to drop a table if it exists. This
   is used when `overwrite = TRUE` in
-  [`copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html) and
-  [`compute()`](https://dplyr.tidyverse.org/reference/compute.html).
+  [`dplyr::copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html)
+  and
+  [`dplyr::compute()`](https://dplyr.tidyverse.org/reference/compute.html).
 
 ## Usage
 

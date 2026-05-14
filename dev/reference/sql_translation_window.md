@@ -14,8 +14,9 @@ to define how R window functions should be translated to SQL.
 
 - `win_current_group()` and `win_current_order()` allow you to access
   the grouping and order context set up by
-  [`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html)
-  and [`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html).
+  [`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html)
+  and
+  [`dplyr::arrange()`](https://dplyr.tidyverse.org/reference/arrange.html).
 
 ## Usage
 

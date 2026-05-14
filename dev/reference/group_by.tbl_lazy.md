@@ -1,7 +1,7 @@
 # Group by one or more variables
 
 This is a method for the dplyr
-[`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html)
+[`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html)
 generic. It is translated to the `GROUP BY` clause of the SQL query when
 used with
 [`summarise()`](https://dbplyr.tidyverse.org/dev/reference/summarise.tbl_lazy.md)
