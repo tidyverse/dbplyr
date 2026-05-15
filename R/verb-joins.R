@@ -254,6 +254,7 @@ cross_join.tbl_lazy <- function(
   x_as = NULL,
   y_as = NULL
 ) {
+  check_dots_empty()
   x$lazy_query <- add_join(
     x,
     y,
@@ -266,8 +267,7 @@ cross_join.tbl_lazy <- function(
     keep = NULL,
     na_matches = "never",
     x_as = x_as,
-    y_as = y_as,
-    ...
+    y_as = y_as
   )
 
   x
