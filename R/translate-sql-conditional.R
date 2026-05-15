@@ -12,7 +12,7 @@ sql_case_match <- function(.x, ..., .default = NULL, .ptype = NULL) {
   }
 
   con <- sql_current_con()
-  clauses <- sql_recode_formula_clauses(
+  clauses <- sql_recode_clauses_formula(
     formulas,
     .x,
     con,
@@ -137,51 +137,43 @@ sql_recode_clauses <- function(
 ) {
   has_from <- !is_null(from)
   has_to <- !is_null(to)
-  formulas <- list2(...)
-  formulas <- purrr::compact(formulas)
+  formulas <- purrr::compact(list2(...))
   has_dots <- length(formulas) > 0
 
   if (has_dots) {
-    if (has_from) {
+    if (!has_from && !has_to) {
+      sql_recode_clauses_formula(formulas, x, con, error_call = error_call)
+    } else if (has_from) {
       cli_abort(
         "Can't supply both {.arg from} and {.arg ...}.",
         call = error_call
       )
-    }
-    if (has_to) {
+    } else {
       cli_abort(
         "Can't supply both {.arg to} and {.arg ...}.",
         call = error_call
       )
     }
-    return(sql_recode_formula_clauses(
-      formulas,
-      x,
-      con,
-      error_call = error_call
-    ))
-  }
-
-  if (has_from || has_to) {
-    if (!has_from || !has_to) {
+  } else {
+    if (has_from && has_to) {
+      sql_recode_clauses_vector(from, to, x, con, error_call = error_call)
+    } else if (xor(has_from, has_to)) {
       cli_abort(
         "Must supply both {.arg from} and {.arg to}.",
         call = error_call
       )
+    } else if (allow_empty) {
+      character()
+    } else {
+      cli_abort(
+        "Must supply either {.arg ...} or both {.arg from} and {.arg to}.",
+        call = error_call
+      )
     }
-    return(sql_recode_vector_clauses(from, to, x, con, error_call = error_call))
   }
-
-  if (allow_empty) {
-    return(character())
-  }
-  cli_abort(
-    "Must supply either {.arg ...} or both {.arg from} and {.arg to}.",
-    call = error_call
-  )
 }
 
-sql_recode_formula_clauses <- function(formulas, x, con, error_call) {
+sql_recode_clauses_formula <- function(formulas, x, con, error_call) {
   n <- length(formulas)
   clauses <- character(n)
   for (i in seq_len(n)) {
@@ -203,8 +195,8 @@ sql_recode_formula_clauses <- function(formulas, x, con, error_call) {
   clauses
 }
 
-sql_recode_vector_clauses <- function(from, to, x, con, error_call) {
-  if (vctrs::obj_is_list(to)) {
+sql_recode_clauses_vector <- function(from, to, x, con, error_call) {
+  if (is.list(to)) {
     cli_abort(
       "List {.arg to} is not supported in SQL translation.",
       call = error_call
@@ -224,19 +216,14 @@ sql_recode_vector_clauses <- function(from, to, x, con, error_call) {
 }
 
 sql_recode_in_clause <- function(from_values, x, con) {
-  na_loc <- is.na(from_values)
-  has_na <- any(na_loc)
-  non_na <- from_values[!na_loc]
+  is_na <- is.na(from_values)
+  non_na <- from_values[!is_na]
 
-  query <- NULL
-  if (length(non_na) > 0) {
-    non_na_list <- as.list(non_na)
-    query <- sql_glue("{x} IN {non_na_list*}")
-  }
-  if (has_na) {
-    query <- paste(c(query, sql_glue2(con, "{x} IS NULL")), collapse = " OR ")
-  }
-  query
+  query <- c(
+    if (length(non_na) > 0) sql_glue("{x} IN {non_na*}"),
+    if (any(is_na)) sql_glue2(con, "{x} IS NULL")
+  )
+  paste0(query, collapse = " OR ")
 }
 
 sql_case_finalize <- function(clauses) {
