@@ -452,6 +452,17 @@
       Error in `inner_join()`:
       ! `suffix` must be a character vector of length 2, not an integer of length 1.
 
+# cross_join() errors if `...` is not empty (#1792)
+
+    Code
+      cross_join(lf1, lf2, lf3)
+    Condition
+      Error in `cross_join()`:
+      ! `...` must be empty.
+      x Problematic argument:
+      * ..1 = lf3
+      i Did you forget to name an argument?
+
 # joins reuse queries in cte mode
 
     Code
