@@ -41,7 +41,7 @@
 #'   right-hand side of the join respectively.
 #' @param na_matches Should NA (NULL) values match one another?
 #'   The default, "never", is how databases usually work. `"na"` makes
-#'   the joins behave like the dplyr join functions, [merge()], [match()],
+#'   the joins behave like the dplyr join functions, [merge()], [base::match()],
 #'   and `%in%`.
 #' @param multiple,unmatched Unsupported in database backends. As a workaround
 #'   for multiple use a unique key and for unmatched a foreign key constraint.
@@ -254,6 +254,7 @@ cross_join.tbl_lazy <- function(
   x_as = NULL,
   y_as = NULL
 ) {
+  check_dots_empty()
   x$lazy_query <- add_join(
     x,
     y,
@@ -266,8 +267,7 @@ cross_join.tbl_lazy <- function(
     keep = NULL,
     na_matches = "never",
     x_as = x_as,
-    y_as = y_as,
-    ...
+    y_as = y_as
   )
 
   x

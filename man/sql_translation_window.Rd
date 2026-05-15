@@ -64,7 +64,7 @@ to define how R window functions should be translated to SQL.
 \item \code{win_absent()}, \code{win_rank()}, \code{win_aggregate()}, and \code{win_cumulative()}
 provide helpers for constructing common types of window functions.
 \item \code{win_current_group()} and \code{win_current_order()} allow you to access
-the grouping and order context set up by \code{\link[dplyr:group_by]{dplyr::group_by()}} and \code{\link[dplyr:arrange]{dplyr::arrange()}}.
+the grouping and order context set up by \code{\link[dplyr:group_by]{group_by()}} and \code{\link[dplyr:arrange]{arrange()}}.
 }
 }
 \examples{
@@ -77,10 +77,10 @@ win_over(sql("avg(x)"), order = c("x", "y"), con = con)
 win_over(sql("avg(x)"), frame = c(-Inf, 0), order = "y", con = con)
 }
 \seealso{
-Other SQL translation helpers: 
+Other SQL translation helpers:
 \code{\link{sql_translation_agg}},
 \code{\link{sql_translation_scalar}},
 \code{\link{sql_translation_string}},
-\code{\link{sql_variant}()}
+\code{\link[=sql_variant]{sql_variant()}}
 }
 \concept{SQL translation helpers}

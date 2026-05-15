@@ -50,3 +50,15 @@ test_that("ungroup() produces nice error messages", {
     local_memdb_frame("df", x = 1) |> pull(x, "name_non_existent")
   })
 })
+
+test_that("can use NULL as name in quosure", {
+  x <- 1:3
+  y <- letters[x]
+  df <- local_memdb_frame(x = x, y = y)
+
+  xquo <- rlang::quo(x)
+  nmquo <- rlang::quo(NULL)
+
+  expect_equal(pull(df, !!xquo, !!nmquo), pull(df, x))
+  expect_equal(pull(df, !!xquo, !!nmquo), pull(df, x, NULL))
+})

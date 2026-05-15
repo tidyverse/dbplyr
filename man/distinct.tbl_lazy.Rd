@@ -23,7 +23,7 @@ query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
 \description{
-This is a method for the dplyr \code{\link[dplyr:distinct]{dplyr::distinct()}} generic. It adds the
+This is a method for the dplyr \code{\link[dplyr:distinct]{distinct()}} generic. It adds the
 \code{DISTINCT} clause to the SQL query.
 }
 \examples{

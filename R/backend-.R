@@ -173,6 +173,18 @@ base_scalar <- sql_translator(
       sql_glue("{x} IN {table*}")
     }
   },
+  `%notin%` = function(x, table) {
+    if (is.ident(table)) {
+      return(sql_glue("{x} NOT IN {table}"))
+    }
+
+    table <- unname(table)
+    if (length(table) == 0) {
+      sql("TRUE")
+    } else {
+      sql_glue("{x} NOT IN {table*}")
+    }
+  },
 
   `!` = sql_prefix("NOT"),
   `&` = sql_infix("AND"),
@@ -238,6 +250,9 @@ base_scalar <- sql_translator(
     sql_if(enquo(cond), enquo(if_true), enquo(if_false))
   },
   if_else = function(condition, true, false, missing = NULL) {
+    check_required(true)
+    check_required(false)
+
     sql_if(
       enquo(condition),
       enquo(true),
@@ -245,7 +260,12 @@ base_scalar <- sql_translator(
       enquo(missing)
     )
   },
-  ifelse = \(test, yes, no) sql_if(enquo(test), enquo(yes), enquo(no)),
+  ifelse = function(test, yes, no) {
+    check_required(yes)
+    check_required(no)
+
+    sql_if(enquo(test), enquo(yes), enquo(no))
+  },
 
   switch = \(x, ...) sql_switch(x, ...),
   case_when = function(..., .default = NULL, .ptype = NULL, .size = NULL) {
@@ -449,6 +469,11 @@ sql_exp <- function(a, x) {
   }
 }
 
+sql_any_na <- function(x, window = FALSE) {
+  exp <- expr(any(is.na(!!x)))
+  translate_sql(!!exp, con = sql_current_con(), window = window)
+}
+
 #' @export
 #' @rdname sql_variant
 #' @format NULL
@@ -464,6 +489,7 @@ base_agg <- sql_translator(
   # https://blog.jooq.org/a-true-sql-gem-you-didnt-know-yet-the-every-aggregate-function/#comment-344695
   all = sql_aggregate("MIN"),
   any = sql_aggregate("MAX"),
+  anyNA = \(x) sql_any_na(x, window = FALSE),
 
   sd = sql_not_supported("sd"),
   var = sql_not_supported("var"),
@@ -564,6 +590,7 @@ base_win <- sql_translator(
 
   all = win_aggregate("MIN"),
   any = win_aggregate("MAX"),
+  anyNA = \(x) sql_any_na(x, window = TRUE),
 
   sd = sql_not_supported("sd"),
   var = sql_not_supported("var"),
@@ -629,6 +656,7 @@ base_no_win <- sql_translator(
   max = win_absent("max"),
   all = win_absent("all"),
   any = win_absent("any"),
+  anyNA = win_absent("anyNA"),
   median = win_absent("median"),
   quantile = win_absent("quantile"),
   n = win_absent("n"),

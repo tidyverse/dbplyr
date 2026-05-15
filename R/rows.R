@@ -759,7 +759,7 @@ target_table <- function(x, in_place) {
     return(NULL)
   }
 
-  table <- remote_table(x)
+  table <- remote_table_path(x)
   if (is_null(table)) {
     cli_abort(
       "Can't determine name for target table. Set {.code in_place = FALSE} to return a lazy table."
@@ -798,7 +798,7 @@ rows_auto_copy <- function(x, y, copy, call = caller_env()) {
     return(y)
   }
 
-  table <- remote_table(x)
+  table <- remote_table_path(x)
   x_types <- db_col_types(remote_con(x), table, call)
 
   if (!is_null(x_types)) {

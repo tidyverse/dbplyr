@@ -71,7 +71,7 @@ sql_dialect.sql_dialect <- function(con) {
 }
 
 #' @export
-sql_dialect.DBIConnection <- function(con) {
+sql_dialect.default <- function(con) {
   # For backward compatibility: connections without a dialect method
   # pass through unchanged
   con

@@ -45,9 +45,7 @@ If \code{n} is greater than the number of rows in the group (or \code{prop} > 1)
 the result will be silently truncated to the group size. If the proportion
 of a group size is not an integer, it is rounded down.}
 
-\item{by}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
-
-<\code{\link[dplyr:dplyr_tidy_select]{tidy-select}}> Optionally, a selection of columns to
+\item{by}{<\code{\link[dplyr:dplyr_tidy_select]{tidy-select}}> Optionally, a selection of columns to
 group by for just this operation, functioning as an alternative to \code{\link[dplyr:group_by]{group_by()}}. For
 details and examples, see \link[dplyr:dplyr_by]{?dplyr_by}.}
 
@@ -63,8 +61,8 @@ reach \code{n}/\code{prop}.}
 \item{weight_by, replace}{Not supported for database backends.}
 }
 \description{
-These are methods for the dplyr generics \code{\link[dplyr:slice]{dplyr::slice_min()}}, \code{\link[dplyr:slice]{dplyr::slice_max()}}, and
-\code{\link[dplyr:slice]{dplyr::slice_sample()}}. They are translated to SQL using \code{\link[dplyr:filter]{dplyr::filter()}} and
+These are methods for the dplyr generics \code{\link[dplyr:slice_min]{slice_min()}}, \code{\link[dplyr:slice_max]{slice_max()}}, and
+\code{\link[dplyr:slice_sample]{slice_sample()}}. They are translated to SQL using \code{\link[dplyr:filter]{dplyr::filter()}} and
 window functions (\code{ROWNUMBER}, \code{MIN_RANK}, or \code{CUME_DIST} depending on
 arguments). \code{slice()}, \code{slice_head()}, and \code{slice_tail()} are not supported
 since database tables have no intrinsic order.

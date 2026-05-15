@@ -24,6 +24,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Hadley Wickham \email{hadley@posit.co}
   \item Maximilian Girlich
   \item Edgar Ruiz
 }

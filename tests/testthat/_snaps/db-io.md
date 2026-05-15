@@ -23,7 +23,7 @@
       Error in `db_copy_to()`:
       ! Can't copy data to table `tmp`.
       Caused by error in `dbplyr_write_table()`:
-      ! Can't write table table `tmp`.
+      ! Can't write table `tmp`.
       Caused by error:
       ! dummy DBI error
 

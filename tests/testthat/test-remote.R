@@ -4,7 +4,7 @@ test_that("remote_table returns name when it makes sense", {
   # produces name after `group_by()`
   expect_equal(
     mf |> group_by(x) |> remote_table(),
-    table_path("`refxiudlph`")
+    sql("`refxiudlph`")
   )
 
   # produces name after compute()
@@ -15,7 +15,7 @@ test_that("remote_table returns name when it makes sense", {
 
 test_that("remote_table returns null for computed tables", {
   mf <- local_memdb_frame("refxiudlph", x = 5, y = 1)
-  expect_equal(remote_table(mf), table_path("`refxiudlph`"))
+  expect_equal(remote_table(mf), sql("`refxiudlph`"))
 
   expect_null(mf |> filter(x == 3) |> remote_table())
   expect_null(mf |> distinct(x) |> remote_table())
@@ -30,34 +30,63 @@ test_that("remote_table returns null for computed tables", {
   expect_null(lf |> group_by(x) |> remote_table())
 
   lf <- lazy_frame(x = 1)
-  expect_equal(lf |> remote_table(null_if_local = FALSE), table_path('"df"'))
+  expect_equal(lf |> remote_table(null_if_local = FALSE), sql('"df"'))
   expect_equal(
     lf |> group_by(x) |> remote_table(null_if_local = FALSE),
-    table_path('"df"')
+    sql('"df"')
   )
 })
 
 test_that("remote_name and remote_table can handle different table identifiers", {
-  test_remote_table <- function(
-    x,
-    exp_tbl = as_table_path(x, dialect_ansi())
-  ) {
+  test_remote_table <- function(x, exp_tbl) {
     lf <- lazy_frame(x = 1, .name = x)
     expect_equal(remote_table(lf, null_if_local = FALSE), exp_tbl)
     expect_equal(remote_name(lf, null_if_local = FALSE), "tbl")
   }
 
-  test_remote_table("tbl")
-  test_remote_table(ident("tbl"))
-  test_remote_table(in_schema("schema", "tbl"))
-  test_remote_table(in_catalog("catalog", "schema", "tbl"))
-  test_remote_table(DBI::Id(
-    catalog = "catalog",
-    schema = "schema",
-    table = "tbl"
-  ))
-  test_remote_table(ident_q("schema.tbl"))
-  test_remote_table(I("schema.tbl"))
+  test_remote_table("tbl", sql('"tbl"'))
+  test_remote_table(ident("tbl"), sql('"tbl"'))
+  test_remote_table(in_schema("schema", "tbl"), sql('"schema"."tbl"'))
+  test_remote_table(
+    in_catalog("catalog", "schema", "tbl"),
+    sql('"catalog"."schema"."tbl"')
+  )
+  test_remote_table(
+    DBI::Id(catalog = "catalog", schema = "schema", table = "tbl"),
+    sql('"catalog"."schema"."tbl"')
+  )
+  test_remote_table(ident_q("schema.tbl"), sql("schema.tbl"))
+  test_remote_table(I("schema.tbl"), sql("schema.tbl"))
+})
+
+test_that("remote_name() returns NULL when there is no single table name", {
+  mf <- local_memdb_frame("ulfxutwbnh", x = 1)
+
+  # NULL when lazy query no longer corresponds to a single table
+  expect_null(mf |> filter(x == 1) |> remote_name())
+  expect_null(mf |> mutate(y = x + 1) |> remote_name())
+  expect_null(left_join(mf, mf, by = "x") |> remote_name())
+
+  # NULL when source is a custom sql() query
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  withr::defer(DBI::dbDisconnect(con))
+  DBI::dbWriteTable(con, "mytbl", data.frame(x = 1))
+  custom <- tbl(con, sql("SELECT * FROM mytbl"))
+  expect_null(remote_name(custom))
+})
+
+test_that("remote_table() result can be inlined into build_sql()", {
+  con <- dialect_ansi()
+  lf <- lazy_frame(x = 1, .name = in_schema("myschema", "mytbl"), con = con)
+
+  expect_equal(
+    build_sql(
+      "SELECT * FROM ",
+      remote_table(lf, null_if_local = FALSE),
+      con = con
+    ),
+    sql('SELECT * FROM "myschema"."mytbl"')
+  )
 })
 
 test_that("can retrieve query, src and con metadata", {

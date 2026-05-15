@@ -335,6 +335,10 @@ replace_sym1 <- function(call, sym, replace) {
     } else {
       replace
     }
+  } else if (is_call(call, c("$", "@"))) {
+    # The 2nd argument is a field/slot name, not a variable reference
+    call[[2]] <- replace_sym1(call[[2]], sym, replace)
+    call
   } else if (is_call(call)) {
     call[] <- lapply(call, replace_sym1, sym = sym, replace = replace)
     call

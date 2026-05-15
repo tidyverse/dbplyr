@@ -28,7 +28,7 @@ many \code{tbl}s with known variables.}
 Use \code{tbl()} to create a SQL query backed by a database. Manipulating this
 object with dplyr verbs then builds up a SQL query that will only be executed
 when you explicitly ask for it, either by printing the object, calling
-\code{\link[dplyr:compute]{dplyr::collect()}} to bring the data back to R or calling \code{\link[dplyr:compute]{dplyr::compute()}} to create a
+\code{\link[dplyr:collect]{collect()}} to bring the data back to R or calling \code{\link[dplyr:compute]{compute()}} to create a
 new table in the database. You can see the query without executing it with
 \code{\link[=show_query]{show_query()}}.
 

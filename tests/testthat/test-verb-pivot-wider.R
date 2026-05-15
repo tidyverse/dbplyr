@@ -239,13 +239,19 @@ test_that("values_fn can be a single function", {
   )
 })
 
-test_that("values_fn can be a formula", {
+test_that("values_fn can be a formula or function", {
   df <- lazy_frame(a = c(1, 1, 2), key = c("x", "x", "x"), val = c(1, 10, 100))
 
   expect_snapshot(dbplyr_pivot_wider_spec(
     df,
     spec1,
     values_fn = ~ sum(.x, na.rm = TRUE)
+  ))
+
+  expect_snapshot(dbplyr_pivot_wider_spec(
+    df,
+    spec1,
+    values_fn = function(x) sum(x, na.rm = TRUE)
   ))
 })
 

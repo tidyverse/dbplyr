@@ -22,24 +22,22 @@
 functions of variables. Use \code{\link[dplyr:desc]{desc()}} to sort a variable in descending
 order.}
 
-\item{.by}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
-
-<\code{\link[dplyr:dplyr_tidy_select]{tidy-select}}> Optionally, a selection of columns to
+\item{.by}{<\code{\link[dplyr:dplyr_tidy_select]{tidy-select}}> Optionally, a selection of columns to
 group by for just this operation, functioning as an alternative to \code{\link[dplyr:group_by]{group_by()}}. For
 details and examples, see \link[dplyr:dplyr_by]{?dplyr_by}.}
 
 \item{.order}{<\code{\link[rlang:args_data_masking]{data-masking}}> A selection of
 columns to control ordering for window functions within this
-\code{\link[dplyr:mutate]{dplyr::mutate()}} call. Use \code{c()} to order by multiple columns, e.g.
-\code{.order = c(x, y)}. Each column can be wrapped in \code{\link[dplyr:desc]{dplyr::desc()}} to specify
+\code{\link[dplyr:mutate]{mutate()}} call. Use \code{c()} to order by multiple columns, e.g.
+\code{.order = c(x, y)}. Each column can be wrapped in \code{\link[dplyr:desc]{desc()}} to specify
 descending order. Equivalent to calling \code{\link[=window_order]{window_order()}} before and
-clearing it after the \code{\link[dplyr:mutate]{dplyr::mutate()}}.}
+clearing it after the \code{\link[dplyr:mutate]{mutate()}}.}
 
 \item{.frame}{A length-2 numeric vector specifying the bounds for
 window function frames. The first element is the lower bound (use \code{-Inf}
 for "unbounded preceding") and the second is the upper bound (use \code{Inf}
 for "unbounded following", \code{0} for "current row"). Equivalent to calling
-\code{\link[=window_frame]{window_frame()}} before and clearing it after the \code{\link[dplyr:mutate]{dplyr::mutate()}}.}
+\code{\link[=window_frame]{window_frame()}} before and clearing it after the \code{\link[dplyr:mutate]{mutate()}}.}
 
 \item{.keep}{Control which columns from \code{.data} are retained in the output. Grouping
 columns and columns created by \code{...} are always kept.
@@ -65,7 +63,7 @@ query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
 \description{
-These are methods for the dplyr \code{\link[dplyr:mutate]{dplyr::mutate()}} and \code{\link[dplyr:transmute]{dplyr::transmute()}} generics.
+These are methods for the dplyr \code{\link[dplyr:mutate]{mutate()}} and \code{\link[dplyr:transmute]{transmute()}} generics.
 They are translated to computed expressions in the \code{SELECT} clause of
 the SQL query.
 }

@@ -129,3 +129,18 @@ test_that("can explain a query", {
   )
   expect_snapshot(db |> filter(x > 2) |> explain())
 })
+
+test_that("db_col_types() returns column types (#1821)", {
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  withr::defer(DBI::dbDisconnect(con))
+
+  DBI::dbExecute(con, "CREATE TABLE df (id INTEGER, val REAL, name TEXT)")
+  expect_equal(
+    db_col_types(con, "df"),
+    c(id = "INTEGER", val = "REAL", name = "TEXT")
+  )
+
+  # including with schema
+  DBI::dbExecute(con, "ATTACH DATABASE ':memory:' AS aux")
+  DBI::dbExecute(con, "CREATE TABLE aux.df (a INTEGER, b TEXT)")
+})
