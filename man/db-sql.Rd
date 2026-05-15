@@ -4,6 +4,7 @@
 \name{db-sql}
 \alias{db-sql}
 \alias{sql_expr_matches}
+\alias{sql_expr_not_matches}
 \alias{sql_translation}
 \alias{sql_random}
 \alias{sql_table_analyze}
@@ -25,6 +26,8 @@
 \title{SQL generation generics}
 \usage{
 sql_expr_matches(con, x, y, ...)
+
+sql_expr_not_matches(con, x, y, ...)
 
 sql_translation(con)
 
@@ -111,6 +114,10 @@ SQL translation:
 \item \code{sql_expr_matches(con, x, y)} generates an alternative to \code{x = y} when a
 pair of \code{NULL}s should match. The default translation uses a \verb{CASE WHEN}
 as described in \url{https://modern-sql.com/feature/is-distinct-from}.
+\item \code{sql_expr_not_matches(con, x, y)} generates the negation of
+\code{sql_expr_matches()}. The default translation negates \code{sql_expr_matches()}
+but backends may override it to use a more direct form (e.g.
+\verb{IS DISTINCT FROM} in Postgres).
 \item \code{sql_translation(con)} generates a SQL translation environment.
 \item Deprecated: \code{sql_random(con)} generates SQL to get a random number which can be used
 to select random rows in \code{slice_sample()}. This is now replaced by adding

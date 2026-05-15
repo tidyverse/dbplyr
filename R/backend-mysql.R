@@ -234,6 +234,13 @@ sql_expr_matches.sql_dialect_mariadb <- function(con, x, y, ...) {
 #' @export
 sql_expr_matches.sql_dialect_mysql <- sql_expr_matches.sql_dialect_mariadb
 
+#' @export
+sql_expr_not_matches.sql_dialect_mariadb <- function(con, x, y, ...) {
+  sql_glue2(con, "NOT ({x} <=> {y})")
+}
+#' @export
+sql_expr_not_matches.sql_dialect_mysql <- sql_expr_not_matches.sql_dialect_mariadb
+
 # https://modern-sql.com/blog/2018-08/whats-new-in-mariadb-10.3#3.values
 # MariaDB doesn't accept `ROW` unlike MySQL
 #' @export

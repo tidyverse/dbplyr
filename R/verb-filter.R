@@ -1,7 +1,19 @@
-#' Subset rows using column values
+#' Keep or drop rows that match a condition
 #'
-#' This is a method for the dplyr [dplyr::filter()] generic. It generates the
-#' `WHERE` clause of the SQL query.
+#' @description
+#' These are methods for the dplyr [dplyr::filter()] and [dplyr::filter_out()]
+#' generics. They generate the `WHERE` clause of the SQL query.
+#'
+#' `filter()` is translated directly to `WHERE`, which already matches dplyr's
+#' behaviour of treating `NA` like `FALSE` (SQL's three-valued logic drops
+#' `NULL` rows from `WHERE`).
+#'
+#' `filter_out()` keeps rows where the combined condition is `FALSE` or `NA`.
+#' This is translated to `WHERE` using the backend-specific
+#' `sql_expr_not_matches()` (see [db-sql]; e.g. `IS DISTINCT FROM TRUE` on
+#' PostgreSQL, `IS NOT TRUE` on SQLite). The extra check is needed because
+#' SQL's `WHERE` would otherwise drop rows where the condition is `NULL`,
+#' which would not match dplyr's behaviour.
 #'
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::filter
@@ -12,6 +24,7 @@
 #'
 #' db <- memdb_frame(x = c(2, NA, 5, NA, 10), y = 1:5)
 #' db |> filter(x < 5) |> show_query()
+#' db |> filter_out(x < 5) |> show_query()
 #' db |> filter(is.na(x)) |> show_query()
 #' @importFrom dplyr filter
 #' @exportS3Method NULL
@@ -40,6 +53,30 @@ filter.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
     .data$lazy_query$group_vars <- character()
   }
   .data
+}
+
+#' @rdname filter.tbl_lazy
+#' @importFrom dplyr filter_out
+#' @export
+filter_out.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
+  check_unsupported_arg(.preserve, FALSE)
+  check_filter(..., fn = "filter_out")
+
+  if (missing(...)) {
+    return(.data)
+  }
+
+  dots <- enquos(...)
+  exprs <- lapply(dots, quo_get_expr)
+
+  # Multiple conditions are AND-combined and wrapped in an internal marker
+  # that `sql_expr_not_matches()` translates to a backend-specific
+  # "IS DISTINCT FROM TRUE" check.
+  combined <- Reduce(function(a, b) expr((!!a) & (!!b)), exprs)
+  marker <- expr(dbplyr_filter_out_cond(!!combined))
+  quo <- new_quosure(marker, quo_get_env(dots[[1]]))
+
+  filter(.data, !!quo, .by = {{ .by }})
 }
 
 add_filter <- function(lazy_query, con, exprs) {
@@ -132,7 +169,7 @@ filter_via_having <- function(lazy_query, exprs) {
   lazy_query
 }
 
-check_filter <- function(...) {
+check_filter <- function(..., fn = "filter") {
   dots <- enquos(...)
   named <- have_name(dots)
 
@@ -144,7 +181,7 @@ check_filter <- function(...) {
     expr <- quo_get_expr(quo)
     cli_abort(
       c(
-        "Problem with {.fun filter} input `..{i}`.",
+        "Problem with {.fun {fn}} input `..{i}`.",
         x = "Input `..{i}` is named.",
         i = "This usually means that you've used {.code =} instead of {.code ==}.",
         i = "Did you mean `{names(dots)[i]} == {as_label(expr)}`?"

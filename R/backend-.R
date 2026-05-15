@@ -288,6 +288,12 @@ base_scalar <- sql_translator(
   na_if = sql_prefix("NULLIF", 2),
   coalesce = sql_prefix("COALESCE"),
 
+  # Internal helper used by `filter_out.tbl_lazy()`.
+  # Not intended for direct use.
+  dbplyr_filter_out_cond = function(x) {
+    sql_expr_not_matches(sql_current_con(), sql_glue("({x})"), sql("TRUE"))
+  },
+
   as.numeric = sql_cast("NUMERIC"),
   as.double = sql_cast("NUMERIC"),
   as.integer = sql_cast("INTEGER"),

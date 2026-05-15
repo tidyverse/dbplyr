@@ -168,6 +168,11 @@ sql_expr_matches.sql_dialect_sqlite <- function(con, x, y, ...) {
 }
 
 #' @export
+sql_expr_not_matches.sql_dialect_sqlite <- function(con, x, y, ...) {
+  sql_glue2(con, "{x} IS NOT {y}")
+}
+
+#' @export
 values_prepare.sql_dialect_sqlite <- function(con, df) {
   needs_escape <- purrr::map_lgl(
     df,

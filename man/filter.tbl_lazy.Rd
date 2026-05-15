@@ -2,9 +2,12 @@
 % Please edit documentation in R/verb-filter.R
 \name{filter.tbl_lazy}
 \alias{filter.tbl_lazy}
-\title{Subset rows using column values}
+\alias{filter_out.tbl_lazy}
+\title{Keep or drop rows that match a condition}
 \usage{
 \method{filter}{tbl_lazy}(.data, ..., .by = NULL, .preserve = FALSE)
+
+\method{filter_out}{tbl_lazy}(.data, ..., .by = NULL, .preserve = FALSE)
 }
 \arguments{
 \item{.data}{A lazy data frame backed by a database query.}
@@ -25,13 +28,25 @@ query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
 \description{
-This is a method for the dplyr \code{\link[dplyr:filter]{dplyr::filter()}} generic. It generates the
-\code{WHERE} clause of the SQL query.
+These are methods for the dplyr \code{\link[dplyr:filter]{dplyr::filter()}} and \code{\link[dplyr:filter_out]{dplyr::filter_out()}}
+generics. They generate the \code{WHERE} clause of the SQL query.
+
+\code{filter()} is translated directly to \code{WHERE}, which already matches dplyr's
+behaviour of treating \code{NA} like \code{FALSE} (SQL's three-valued logic drops
+\code{NULL} rows from \code{WHERE}).
+
+\code{filter_out()} keeps rows where the combined condition is \code{FALSE} or \code{NA}.
+This is translated to \code{WHERE} using the backend-specific
+\code{sql_expr_not_matches()} (see \link{db-sql}; e.g. \verb{IS DISTINCT FROM TRUE} on
+PostgreSQL, \verb{IS NOT TRUE} on SQLite). The extra check is needed because
+SQL's \code{WHERE} would otherwise drop rows where the condition is \code{NULL},
+which would not match dplyr's behaviour.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(x = c(2, NA, 5, NA, 10), y = 1:5)
 db |> filter(x < 5) |> show_query()
+db |> filter_out(x < 5) |> show_query()
 db |> filter(is.na(x)) |> show_query()
 }

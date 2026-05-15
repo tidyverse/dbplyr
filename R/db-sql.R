@@ -8,6 +8,11 @@
 #'   pair of `NULL`s should match. The default translation uses a `CASE WHEN`
 #'   as described in <https://modern-sql.com/feature/is-distinct-from>.
 #'
+#' * `sql_expr_not_matches(con, x, y)` generates the negation of
+#'   `sql_expr_matches()`. The default translation negates `sql_expr_matches()`
+#'   but backends may override it to use a more direct form (e.g.
+#'   `IS DISTINCT FROM` in Postgres).
+#'
 #' * `sql_translation(con)` generates a SQL translation environment.
 #'
 #' * Deprecated: `sql_random(con)` generates SQL to get a random number which can be used
@@ -80,6 +85,21 @@ sql_expr_matches.DBIConnection <- function(con, x, y, ...) {
 
 #' @export
 sql_expr_matches.sql_dialect <- sql_expr_matches.DBIConnection
+
+#' @export
+#' @rdname db-sql
+sql_expr_not_matches <- function(con, x, y, ...) {
+  check_dots_used()
+  UseMethod("sql_expr_not_matches", sql_dialect(con))
+}
+
+#' @export
+sql_expr_not_matches.DBIConnection <- function(con, x, y, ...) {
+  sql_glue2(con, "NOT ({sql_expr_matches(con, x, y)})")
+}
+
+#' @export
+sql_expr_not_matches.sql_dialect <- sql_expr_not_matches.DBIConnection
 
 #' @export
 #' @rdname db-sql

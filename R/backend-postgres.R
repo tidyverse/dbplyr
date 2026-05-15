@@ -354,6 +354,11 @@ sql_expr_matches.sql_dialect_postgres <- function(con, x, y, ...) {
   sql_glue2(con, "{x} IS NOT DISTINCT FROM {y}")
 }
 
+#' @export
+sql_expr_not_matches.sql_dialect_postgres <- function(con, x, y, ...) {
+  sql_glue2(con, "{x} IS DISTINCT FROM {y}")
+}
+
 # http://www.postgresql.org/docs/9.3/static/sql-explain.html
 #' @export
 sql_query_explain.sql_dialect_postgres <- function(
