@@ -18,18 +18,31 @@ db_col_types(con, table, call)
 
 dbplyr_edition(con)
 }
+\arguments{
+\item{con}{A database connection.}
+
+\item{table}{A table identifier, or \code{NULL}. Use a string to refer to tables
+in the current schema/catalog or \code{I()} to refer to tables in other
+schemas/catalogs.}
+
+\item{call}{The execution environment of a currently running function, used
+to report errors.}
+}
 \description{
+These are used when creating a new dbplyr backend and should generally not
+be called directly.
 \itemize{
 \item \code{db_connection_describe()} provides a short string describing the
 database connection, helping users tell which database a table comes
 from. It should be a single line, and ideally less than 60 characters wide.
-}
-}
-\details{
-\itemize{
 \item \code{dbplyr_edition()} declares which version of the dbplyr API you want.
-See below for more details.
-\item \code{db_col_types()} returns the column types of a table.
+\item \code{db_col_types()} introspects an existing table and returns a named
+character vector mapping column names to their database-native SQL types.
+The result is suitable for use as the \code{field.types} argument of
+\code{\link[DBI:dbWriteTable]{DBI::dbWriteTable()}}, allowing dbplyr to preserve column types when
+copying data with \verb{rows_*()}.
+
+Returns \code{NULL} if the backend does not implement introspection.
 }
 }
 \seealso{
