@@ -154,6 +154,10 @@
   `overwrite = TRUE`
   ([@liudvikasakelis](https://github.com/liudvikasakelis),
   [\#1535](https://github.com/tidyverse/dbplyr/issues/1535)).
+- [`cross_join()`](https://dplyr.tidyverse.org/reference/cross_join.html)
+  now gives a clear error when called with extra unnamed arguments
+  instead of a confusing message about `multiple`
+  ([\#1792](https://github.com/tidyverse/dbplyr/issues/1792)).
 - `.data$col`, `.data[[col]]`, `.env$var`, and `.env$[[var]]` now work
   correctly inside
   [`across()`](https://dplyr.tidyverse.org/reference/across.html)

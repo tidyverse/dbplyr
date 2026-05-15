@@ -112,6 +112,8 @@
 <li>
 <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to()</a></code> now works when source is in the same DB as destination when using <code>overwrite = TRUE</code> (<a href="https://github.com/liudvikasakelis" class="external-link">@liudvikasakelis</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1535" class="external-link">#1535</a>).</li>
 <li>
+<code><a href="https://dplyr.tidyverse.org/reference/cross_join.html" class="external-link">cross_join()</a></code> now gives a clear error when called with extra unnamed arguments instead of a confusing message about <code>multiple</code> (<a href="https://github.com/tidyverse/dbplyr/issues/1792" class="external-link">#1792</a>).</li>
+<li>
 <code>.data$col</code>, <code>.data[[col]]</code>, <code>.env$var</code>, and <code>.env$[[var]]</code> now work correctly inside <code><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across()</a></code> (<a href="https://github.com/tidyverse/dbplyr/issues/1520" class="external-link">#1520</a>).</li>
 <li>
 <code>db_supports_table_alias_with_as()</code> and <code>supports_window_clause()</code> generics have been removed. They are now part of the <code><a href="../reference/sql_dialect.html">sql_dialect()</a></code> data structure (<a href="https://github.com/tidyverse/dbplyr/issues/1760" class="external-link">#1760</a>).</li>
