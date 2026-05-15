@@ -217,6 +217,7 @@ test_that("conditionals check arguments", {
 # case_match --------------------------------------------------------------
 
 test_that("LHS can handle different types", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   con <- dialect_ansi()
   expect_translation(
     con,
@@ -244,6 +245,7 @@ test_that("LHS can handle different types", {
 })
 
 test_that("LHS can match multiple values", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   con <- dialect_ansi()
   expect_translation(
     con,
@@ -271,6 +273,7 @@ test_that("LHS can match multiple values", {
 })
 
 test_that("LHS can match NA", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   con <- dialect_ansi()
   expect_translation(
     con,
@@ -286,6 +289,7 @@ test_that("LHS can match NA", {
 })
 
 test_that("LHS can handle bang bang", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   con <- dialect_ansi()
   expect_snapshot({
     translate_sql(case_match(x, !!1L ~ "x"), con = con)
@@ -295,6 +299,7 @@ test_that("LHS can handle bang bang", {
 })
 
 test_that("`NULL` values in `...` are dropped", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   con <- dialect_ansi()
   expect_translation(
     con,
@@ -304,6 +309,7 @@ test_that("`NULL` values in `...` are dropped", {
 })
 
 test_that("requires at least one condition", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   con <- dialect_ansi()
   expect_snapshot(error = TRUE, {
     translate_sql(case_match(x), con = con)
@@ -314,6 +320,7 @@ test_that("requires at least one condition", {
 })
 
 test_that("passes through `.default` correctly", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   con <- dialect_ansi()
   expect_translation(
     con,
@@ -323,6 +330,7 @@ test_that("passes through `.default` correctly", {
 })
 
 test_that("can handle multiple cases", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   con <- dialect_ansi()
   expect_translation(
     con,
@@ -339,6 +347,7 @@ test_that("can handle multiple cases", {
 })
 
 test_that("`.ptype` not supported", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   con <- dialect_ansi()
   expect_snapshot({
     (expect_error(translate_sql(
@@ -349,10 +358,16 @@ test_that("`.ptype` not supported", {
 })
 
 test_that(".x must be a symbol", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   con <- dialect_ansi()
   expect_snapshot({
     (expect_error(translate_sql(case_match(1, 1 ~ 1), con = con)))
   })
+})
+
+test_that("case_match() is deprecated", {
+  con <- dialect_ansi()
+  expect_snapshot(. <- translate_sql(case_match(x, 1L ~ "a"), con = con))
 })
 
 # recode_values -----------------------------------------------------------

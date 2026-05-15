@@ -61,6 +61,52 @@ The following changes and new capabilities are of interest to dbplyr backend dev
 
 * `db_supports_table_alias_with_as()` and `supports_window_clause()` generics have been removed. They were not used by any packages and are now part of the `new_sql_dialect()` data structure (#1760).
 * `db_table_drop_if_exists()` is a new generic that allows backends to customize how tables are dropped when `overwrite = TRUE` (#1695). This was added to support Oracle.
+* JDBC connections are now supported. dbplyr automatically detects the underlying database type from the JDBC connection class and uses the appropriate SQL dialect (#1359).
+* CTEs now correctly quote table names when the same query is used multiple times (#1559).
+* Custom translations of functions starting with `.` work (@MichaelChirico, #1529).
+* dbplyr 1e interfaces are now deprecated (#1197). Backend developers have had >2 years to update.
+* dbplyr no longer attempts to translate `pi` to `PI()`. This caused problems if you had a column called `pi` (#1531).
+* dbplyr now uses the base pipe (#1626).
+* Defunct functions have been removed:
+  * `src_sql()` deprecated in 1.4.0 (2019-04-23)
+  * `partial_eval(var)` deprecated in 2.2.0 (2022-06-05).
+  * `group_by(add = )` deprecated in dplyr 1.1.0 (2020-06-01).
+* Internal testing functions `src_test()`, `test_frame()` and `test_load()`, `test_register_src()` and `test_register_con()` have been removed.
+* Set operations (`union()`, `intersect()`, `setdiff()`) now use the `sql_set_op_method()` generic to generate the SQL set operation keyword. This allows backends to customize the behavior, e.g., using "UNION DISTINCT" instead of "UNION" for databases that require it, or "MINUS" instead of "EXCEPT" for Oracle (#1596).
+* Single-table SELECT queries now use unqualified `*` (e.g., `SELECT *`) instead of table-qualified `*` (e.g., `SELECT "df".*`) for most backends. Oracle and Teradata continue to use qualified stars as required by their syntax (#1577, #1485).
+* The `copy` argument of join, set, and row operations now accepts `"inline"` to use `copy_inline()` instead of copying to a temporary table (#863).
+* The print method no longer mentions the "source" in the header, because it's an outdated dplyr concept (#897).
+* MS Access: correctly generates SQL for multiple joins by adding required parentheses (#1576).
+* MySQL: gains slightly better translation for `as.integer()` and `as.integer64()` (#1647).
+* Oracle: temporary tables now use private temporary tables (Oracle 18c+) instead of global temporary tables. This ensures data persists correctly and table names are automatically prefixed with `ORA$PTT_` (#750).
+* PostgreSQL: improved translation for `seconds()`, `minutes()`, `hours()`, `days()`, `weeks()`, `months()`, and `years()`.
+* Postgres, Redshift, Snowflake, and Spark: new translations for `str_ilike()` (@edward-burn, #1628).
+* Redshift: `dbplyr_uncount()` now works (@owenjonesuob, #1601).
+* Redshift: corrected error message for `quantile()` and `median()` in `mutate()` (@edward-burn, #1571).
+* Redshift: fixed syntax error in `date_build()` translation (#1512).
+* Snowflake: correctly translates `$` to `:` (@jsowder, #1608).
+* Snowflake: fixed translations that were being reported as unknown (@edward-burn, #1570).
+* SQL Server: `between()` now uses `CASE WHEN` instead of `IIF()` for compatibility with Azure Synapse (@rehbbea, #1773).
+* SQL Server: `if_else()` now uses `CASE WHEN` instead of `IIF`. This ensures the handling of `NULL`s matches R's `NA` handling rules (#1569).
+* SQL Server: `slice_sample()` returns different results each run (@thomashulst, #1503).
+* SQL Server: `str_like()` and `str_ilike()` now have consistent behaviour (@edward-burn, #1669).
+* SQL Server: version 17.0 (2025) now supports stringr regex functions: `str_detect()`, `str_starts()`, `str_ends()`, `str_replace()`, `str_replace_all()`, `str_remove()`, `str_remove_all()`, `str_extract()`, and `str_count()`. Fixed pattern versions of `str_detect()`, `str_starts()`, and `str_ends()` work on all SQL Server versions (#1671).
+* SQL Server: uses `DATEDIFF_BIG` instead of `DATEDIFF` to work regardless of data size (@edward-burn, #1666).
+* All set operations now error if you pass extra arguments (instead of silently ignoring them) (#1585).
+* `anyNA()` is now translated to SQL as `any(is.na(x))` (#1814).
+* `arrange()` now applies consecutively, matching dplyr's behavior: `arrange(y) |> arrange(x)` is now equivalent to `arrange(x, y)`. Empty `arrange()` now preserves existing ordering instead of clearing it (#789).
+* `as(x, "type")` is now translated to `CAST(x AS type)`, allowing you to cast to arbitrary database types not covered by the standard `as.*()` functions (#1729).
+* `as.sql()` is now deprecated as part of major internal refactoring of how `sql()` and `ident()` are used.
+* `bind_queries()` makes it easy to combine multiple lazy queries using `UNION ALL` (#1342).
+* `case_match()` is deprecated, matching its deprecation in dplyr 1.2.0. Use `recode_values()` instead (#1796).
+* `collapse()`, `collect()`, and `compute()` now have their own documentation pages.
+* `copy_inline()` now works with blob columns (#1515).
+* `copy_to()` now works when source is in the same DB as destination when using `overwrite = TRUE` (@liudvikasakelis, #1535).
+* `cross_join()` now gives a clear error when called with extra unnamed arguments instead of a confusing message about `multiple` (#1792).
+* `.data$col`, `.data[[col]]`, `.env$var`, and `.env$[[var]]` now work correctly inside `across()` (#1520).
+* `db_col_types()` gains a SQLite method so that `rows_*()` operations can preserve column types when copying data (#1821).
+* `db_supports_table_alias_with_as()` and `supports_window_clause()` generics have been removed. They are now part of the `sql_dialect()` data structure (#1760).
+* `db_table_drop_if_exists()` is a new generic that allows backends to customize how tables are dropped when `overwrite = TRUE` (#1695).
 * `db_table_temporary()` has been renamed to `sql_table_temporary()` for consistency with other SQL generation functions (#1760).
 * `dialect_*()` translations use (approximately) correct quoting for all backends, so the generated SQL looks more like what you'll actually get when connected to a real database (#1464).
 * `remote_table()` returns an `sql()` object containing the (correctly quoted) table identifier, rather than the internal `dbplyr_table_path`. This makes the result suitable for inlining into `build_sql()` and `sql_glue2()` (#1807).

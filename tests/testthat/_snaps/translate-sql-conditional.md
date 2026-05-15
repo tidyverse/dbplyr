@@ -138,6 +138,15 @@
       Error in `case_match()`:
       ! `.x` must be a variable or function call, not a number.
 
+# case_match() is deprecated
+
+    Code
+      . <- translate_sql(case_match(x, 1L ~ "a"), con = con)
+    Condition
+      Warning:
+      `case_match()` was deprecated in dbplyr 2.6.0.
+      i Please use `recode_values()` instead.
+
 # `ptype` and `unmatched = "error"` are unsupported
 
     Code
