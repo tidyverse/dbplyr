@@ -2,12 +2,9 @@
 % Please edit documentation in R/backend-db2.R
 \name{backend-db2}
 \alias{dialect_db2}
-\alias{simulate_db2}
 \title{DB2 backend}
 \usage{
 dialect_db2()
-
-simulate_db2()
 }
 \description{
 This backend supports IBM DB2 databases, typically accessed via ODBC.
@@ -18,6 +15,14 @@ Key differences for this backend are:
 \itemize{
 \item Uses \verb{FETCH FIRST n ROWS ONLY} instead of \verb{LIMIT n}
 \item Uses double quotes for identifier quoting
+\item \code{paste()} uses \code{||}
+\item DB2-specific data type names for casts (e.g. \code{VARCHAR(255)}, \code{DOUBLE})
+\item Date component extraction via \code{YEAR()}, \code{MONTH()}, ..., \code{DAYOFYEAR()},
+\code{DAYOFWEEK()}, \code{QUARTER()}, \code{WEEK()}
+\item \code{str_flatten()} uses \code{LISTAGG}
+\item Statistical summaries \code{sd()}, \code{var()}, \code{cor()}, \code{cov()}
+\item \code{runif()} translates to \code{RAND()}
+\item Regular expression functions (DB2 11.1+)
 }
 
 See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
@@ -28,4 +33,6 @@ library(dplyr, warn.conflicts = FALSE)
 
 lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_db2())
 lf |> head()
+lf |> transmute(x = paste0(d, " times"))
+lf |> summarise(x = sd(b, na.rm = TRUE))
 }
