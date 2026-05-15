@@ -162,6 +162,10 @@
   correctly inside
   [`across()`](https://dplyr.tidyverse.org/reference/across.html)
   ([\#1520](https://github.com/tidyverse/dbplyr/issues/1520)).
+- [`db_col_types()`](https://dbplyr.tidyverse.org/dev/reference/db-misc.md)
+  gains a SQLite method so that `rows_*()` operations can preserve
+  column types when copying data
+  ([\#1821](https://github.com/tidyverse/dbplyr/issues/1821)).
 - `db_supports_table_alias_with_as()` and `supports_window_clause()`
   generics have been removed. They are now part of the
   [`sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)

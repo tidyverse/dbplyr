@@ -116,6 +116,8 @@
 <li>
 <code>.data$col</code>, <code>.data[[col]]</code>, <code>.env$var</code>, and <code>.env$[[var]]</code> now work correctly inside <code><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across()</a></code> (<a href="https://github.com/tidyverse/dbplyr/issues/1520" class="external-link">#1520</a>).</li>
 <li>
+<code><a href="../reference/db-misc.html">db_col_types()</a></code> gains a SQLite method so that <code>rows_*()</code> operations can preserve column types when copying data (<a href="https://github.com/tidyverse/dbplyr/issues/1821" class="external-link">#1821</a>).</li>
+<li>
 <code>db_supports_table_alias_with_as()</code> and <code>supports_window_clause()</code> generics have been removed. They are now part of the <code><a href="../reference/sql_dialect.html">sql_dialect()</a></code> data structure (<a href="https://github.com/tidyverse/dbplyr/issues/1760" class="external-link">#1760</a>).</li>
 <li>
 <code><a href="../reference/db-io.html">db_table_drop_if_exists()</a></code> is a new generic that allows backends to customize how tables are dropped when <code>overwrite = TRUE</code> (<a href="https://github.com/tidyverse/dbplyr/issues/1695" class="external-link">#1695</a>).</li>
