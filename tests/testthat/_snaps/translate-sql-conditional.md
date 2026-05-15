@@ -138,3 +138,84 @@
       Error in `case_match()`:
       ! `.x` must be a variable or function call, not a number.
 
+# `ptype` and `unmatched = "error"` are unsupported
+
+    Code
+      translate_sql(recode_values(x, 1L ~ "a", ptype = character()), con = con)
+    Condition
+      Error in `recode_values()`:
+      ! Argument `ptype` isn't supported on database backends.
+
+---
+
+    Code
+      translate_sql(recode_values(x, 1L ~ "a", unmatched = "error"), con = con)
+    Condition
+      Error in `recode_values()`:
+      ! `unmatched = "error"` isn't supported on database backends.
+      i It must be "default" instead.
+
+# can't mix `...` with `from`/`to`
+
+    Code
+      translate_sql(recode_values(x, 1 ~ 2, from = 1, to = 2), con = con)
+    Condition
+      Error in `recode_values()`:
+      ! Can't supply both `from` and `...`.
+
+---
+
+    Code
+      translate_sql(recode_values(x, from = 1), con = con)
+    Condition
+      Error in `recode_values()`:
+      ! Must supply both `from` and `to`.
+
+---
+
+    Code
+      translate_sql(recode_values(x, to = 1), con = con)
+    Condition
+      Error in `recode_values()`:
+      ! Must supply both `from` and `to`.
+
+# recode_values() requires at least one case
+
+    Code
+      translate_sql(recode_values(x), con = con)
+    Condition
+      Error in `recode_values()`:
+      ! Must supply either `...` or both `from` and `to`.
+
+# `x` must be a symbol or call
+
+    Code
+      translate_sql(recode_values("foo", "foo" ~ "FOO"), con = con)
+    Condition
+      Error in `recode_values()`:
+      ! `x` must be a variable or function call, not a string.
+
+# list `to` is not supported
+
+    Code
+      translate_sql(recode_values(x, from = !!c("a"), to = !!list(1:4)), con = con)
+    Condition
+      Error in `recode_values()`:
+      ! List `to` is not supported in SQL translation.
+
+# replace_values() input checks
+
+    Code
+      translate_sql(replace_values(x, 1 ~ 2, from = 1, to = 2), con = con)
+    Condition
+      Error in `replace_values()`:
+      ! Can't supply both `from` and `...`.
+
+---
+
+    Code
+      translate_sql(replace_values("foo", "foo" ~ "FOO"), con = con)
+    Condition
+      Error in `replace_values()`:
+      ! `x` must be a variable or function call, not a string.
+
