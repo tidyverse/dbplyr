@@ -24,6 +24,10 @@ test_that("jdbc_class_to_dialect maps known databases", {
     "sql_dialect_mssql"
   )
   expect_s3_class(
+    jdbc_class_to_dialect("com.ibm.db2.jcc.DB2Connection"),
+    "sql_dialect_db2"
+  )
+  expect_s3_class(
     jdbc_class_to_dialect("com.sap.db.jdbc.HanaConnection"),
     "sql_dialect_hana"
   )

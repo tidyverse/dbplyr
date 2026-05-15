@@ -21,3 +21,4 @@ vignettes/*.R
 revdep/checks
 revdep/library
 docs
+/scratch/

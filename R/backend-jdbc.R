@@ -14,6 +14,7 @@
 #' * SQLite (`org.sqlite.*`): [dialect_sqlite()]
 #' * Oracle (`oracle.*`): [dialect_oracle()]
 #' * SQL Server (`com.microsoft.sqlserver.*`): [dialect_mssql()]
+#' * IBM DB2 (`com.ibm.db2.*`): [dialect_db2()]
 #' * SAP HANA (`com.sap.db.*`): [dialect_hana()]
 #' * Teradata (`com.teradata.*`): [dialect_teradata()]
 #' * Apache Hive (`org.apache.hive.*`): [dialect_hive()]
@@ -74,6 +75,8 @@ jdbc_class_to_dialect <- function(class_name) {
     dialect_oracle()
   } else if (startsWith(class_name, "com.microsoft.sqlserver.")) {
     dialect_mssql()
+  } else if (startsWith(class_name, "com.ibm.db2.")) {
+    dialect_db2()
   } else if (startsWith(class_name, "com.sap.db.")) {
     dialect_hana()
   } else if (startsWith(class_name, "com.teradata.")) {
