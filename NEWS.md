@@ -66,7 +66,9 @@
 * `%notin%` is now translated to `NOT IN` (#1820).
 * `pivot_wider()` now accepts anonymous functions (e.g. `\(x) max(x, na.rm = TRUE)`) in `values_fn`, not just purrr-style lambdas (#1816).
 * `pull()` now handles `name` as a quosure of `NULL` (#1808).
+* `recode_values()` is now translated to a `CASE WHEN` statement, supporting both the formula and `from`/`to` interfaces (#1796).
 * `remote_table()` now returns `sql()` containing the (correctly quoted) table identifier, rather than the internal `dbplyr_table_path`. This makes the result suitable for inlining into `build_sql()` and `sql_glue2()`.
+* `replace_values()` is now translated to a `CASE WHEN` statement that preserves unmatched values, supporting both the formula and `from`/`to` interfaces (#1796).
 * `semi_join()` and `anti_join()` once again work with filtered windowed values (#1534, #1606).
 * `set_op_query()` no longer has an `all` argument.
 * `show_query()` gains `use_colour` argument (#1590).

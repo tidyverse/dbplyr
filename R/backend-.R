@@ -272,6 +272,8 @@ base_scalar <- sql_translator(
     sql_case_when(..., .default = .default, .ptype = .ptype, .size = .size)
   },
   case_match = sql_case_match,
+  recode_values = sql_recode_values,
+  replace_values = sql_replace_values,
 
   `(` = function(x) {
     sql_glue("({x})")

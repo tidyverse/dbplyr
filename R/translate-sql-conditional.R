@@ -42,16 +42,7 @@ sql_case_match <- function(.x, ..., .default = NULL, .ptype = NULL) {
     clauses[[n + 1]] <- paste0("ELSE ", .default)
   }
 
-  same_line_sql <- sql(paste0("CASE ", paste0(clauses, collapse = " "), " END"))
-  if (nchar(same_line_sql) <= 80) {
-    return(same_line_sql)
-  }
-
-  sql(paste0(
-    "CASE\n",
-    paste0(clauses, collapse = "\n"),
-    "\nEND"
-  ))
+  sql_case_finalize(clauses)
 }
 
 sql_case_match_clause <- function(f, x, con) {
@@ -89,6 +80,192 @@ sql_case_match_clause <- function(f, x, con) {
   }
 
   query
+}
+
+sql_recode_values <- function(
+  x,
+  ...,
+  from = NULL,
+  to = NULL,
+  default = NULL,
+  unmatched = "default",
+  ptype = NULL
+) {
+  error_call <- current_call()
+  check_unsupported_arg(ptype, call = error_call)
+  check_unsupported_arg(unmatched, allowed = "default", call = error_call)
+
+  x_expr <- enexpr(x)
+  if (!is_symbol(x_expr) && !is_call(x_expr)) {
+    msg <- "{.arg x} must be a variable or function call, not {.obj_type_friendly {x}}."
+    cli_abort(msg, call = error_call)
+  }
+
+  con <- sql_current_con()
+  clauses <- sql_recode_clauses(
+    ...,
+    x = x,
+    from = from,
+    to = to,
+    con = con,
+    allow_empty = FALSE,
+    error_call = error_call
+  )
+
+  if (!is_null(default)) {
+    clauses <- c(clauses, paste0("ELSE ", escape(default, con = con)))
+  }
+
+  sql_case_finalize(clauses)
+}
+
+sql_replace_values <- function(x, ..., from = NULL, to = NULL) {
+  error_call <- current_call()
+
+  x_expr <- enexpr(x)
+  if (!is_symbol(x_expr) && !is_call(x_expr)) {
+    msg <- "{.arg x} must be a variable or function call, not {.obj_type_friendly {x}}."
+    cli_abort(msg, call = error_call)
+  }
+
+  con <- sql_current_con()
+  clauses <- sql_recode_clauses(
+    ...,
+    x = x,
+    from = from,
+    to = to,
+    con = con,
+    allow_empty = TRUE,
+    error_call = error_call
+  )
+
+  if (length(clauses) == 0) {
+    return(x)
+  }
+
+  clauses <- c(clauses, paste0("ELSE ", escape(x, con = con)))
+  sql_case_finalize(clauses)
+}
+
+sql_recode_clauses <- function(
+  ...,
+  x,
+  from,
+  to,
+  con,
+  allow_empty,
+  error_call
+) {
+  has_from <- !is_null(from)
+  has_to <- !is_null(to)
+  formulas <- list2(...)
+  formulas <- purrr::compact(formulas)
+  has_dots <- length(formulas) > 0
+
+  if (has_dots) {
+    if (has_from) {
+      cli_abort(
+        "Can't supply both {.arg from} and {.arg ...}.",
+        call = error_call
+      )
+    }
+    if (has_to) {
+      cli_abort(
+        "Can't supply both {.arg to} and {.arg ...}.",
+        call = error_call
+      )
+    }
+    return(sql_recode_formula_clauses(
+      formulas,
+      x,
+      con,
+      error_call = error_call
+    ))
+  }
+
+  if (has_from || has_to) {
+    if (!has_from || !has_to) {
+      cli_abort(
+        "Must supply both {.arg from} and {.arg to}.",
+        call = error_call
+      )
+    }
+    return(sql_recode_vector_clauses(from, to, x, con, error_call = error_call))
+  }
+
+  if (allow_empty) {
+    return(character())
+  }
+  cli_abort(
+    "Must supply either {.arg ...} or both {.arg from} and {.arg to}.",
+    call = error_call
+  )
+}
+
+sql_recode_formula_clauses <- function(formulas, x, con, error_call) {
+  n <- length(formulas)
+  clauses <- character(n)
+  for (i in seq_len(n)) {
+    f <- formulas[[i]]
+    if (!is_formula(f, lhs = TRUE)) {
+      cli_abort(
+        "{.arg ...} must contain only two-sided formulas.",
+        call = error_call
+      )
+    }
+    env <- environment(f)
+    query <- sql_case_match_clause(f, x, con)
+    value <- escape(
+      enpar(quo(!!f[[3]]), tidy = FALSE, env = env),
+      con = con
+    )
+    clauses[[i]] <- paste0("WHEN (", query, ") THEN ", value)
+  }
+  clauses
+}
+
+sql_recode_vector_clauses <- function(from, to, x, con, error_call) {
+  if (vctrs::obj_is_list(to)) {
+    cli_abort(
+      "List {.arg to} is not supported in SQL translation.",
+      call = error_call
+    )
+  }
+
+  n <- length(from)
+  to <- vctrs::vec_recycle(to, n, x_arg = "to", call = error_call)
+
+  clauses <- character(n)
+  for (i in seq_len(n)) {
+    query <- sql_recode_in_clause(from[[i]], x, con)
+    value <- escape(to[[i]], con = con)
+    clauses[[i]] <- paste0("WHEN (", query, ") THEN ", value)
+  }
+  clauses
+}
+
+sql_recode_in_clause <- function(from_values, x, con) {
+  na_loc <- is.na(from_values)
+  has_na <- any(na_loc)
+  non_na <- from_values[!na_loc]
+
+  query <- NULL
+  if (length(non_na) > 0) {
+    non_na_list <- as.list(non_na)
+    query <- sql_glue("{x} IN {non_na_list*}")
+  }
+  if (has_na) {
+    query <- paste(c(query, sql_glue2(con, "{x} IS NULL")), collapse = " OR ")
+  }
+  query
+}
+
+sql_case_finalize <- function(clauses) {
+  same_line_sql <- sql(paste0("CASE ", paste0(clauses, collapse = " "), " END"))
+  if (nchar(same_line_sql) <= 80) {
+    return(same_line_sql)
+  }
+  sql(paste0("CASE\n", paste0(clauses, collapse = "\n"), "\nEND"))
 }
 
 
@@ -168,16 +345,7 @@ sql_case_when <- function(
     clauses[[n + 1]] <- paste0("ELSE ", .default)
   }
 
-  same_line_sql <- sql(paste0("CASE ", paste0(clauses, collapse = " "), " END"))
-  if (nchar(same_line_sql) <= 80) {
-    return(same_line_sql)
-  }
-
-  sql(paste0(
-    "CASE\n",
-    paste0(clauses, collapse = "\n"),
-    "\nEND"
-  ))
+  sql_case_finalize(clauses)
 }
 
 sql_switch <- function(x, ...) {
