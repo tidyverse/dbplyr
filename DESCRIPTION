@@ -39,6 +39,7 @@ Imports:
     withr (>= 2.5.0)
 Suggests:
     adbcdrivermanager,
+    adbcsqlite,
     adbi,
     bit64,
     covr,
