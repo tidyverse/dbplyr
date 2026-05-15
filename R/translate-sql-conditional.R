@@ -1,45 +1,23 @@
 sql_case_match <- function(.x, ..., .default = NULL, .ptype = NULL) {
   error_call <- current_call()
-  check_unsupported_arg(.ptype)
-
-  x_expr <- enexpr(.x)
-  if (!is_symbol(x_expr) && !is_call(x_expr)) {
-    msg <- "{.arg .x} must be a variable or function call, not {.obj_type_friendly {.x}}."
-    cli_abort(msg, call = error_call)
-  }
+  check_unsupported_arg(.ptype, call = error_call)
+  check_recode_x(enexpr(.x), .x, arg = ".x", error_call = error_call)
 
   formulas <- list2(...)
   formulas <- purrr::compact(formulas)
-
-  n <- length(formulas)
-
-  if (n == 0) {
+  if (length(formulas) == 0) {
     cli_abort("No cases provided", call = error_call)
   }
 
   con <- sql_current_con()
-  query <- vector("list", n)
-  value <- vector("list", n)
-
-  for (i in seq_len(n)) {
-    f <- formulas[[i]]
-    env <- environment(f)
-
-    query[[i]] <- sql_case_match_clause(f, .x, con)
-    value[[i]] <- escape(
-      enpar(quo(!!f[[3]]), tidy = FALSE, env = env),
-      con = con
-    )
-  }
-
-  clauses <- purrr::map2_chr(
-    query,
-    value,
-    \(lhs, rhs) paste0("WHEN (", lhs, ") THEN ", rhs)
+  clauses <- sql_recode_formula_clauses(
+    formulas,
+    .x,
+    con,
+    error_call = error_call
   )
   if (!is_null(.default)) {
-    .default <- escape(enpar(quo(.default), tidy = FALSE, env = env), con = con)
-    clauses[[n + 1]] <- paste0("ELSE ", .default)
+    clauses <- c(clauses, paste0("ELSE ", escape(.default, con = con)))
   }
 
   sql_case_finalize(clauses)
@@ -94,12 +72,7 @@ sql_recode_values <- function(
   error_call <- current_call()
   check_unsupported_arg(ptype, call = error_call)
   check_unsupported_arg(unmatched, allowed = "default", call = error_call)
-
-  x_expr <- enexpr(x)
-  if (!is_symbol(x_expr) && !is_call(x_expr)) {
-    msg <- "{.arg x} must be a variable or function call, not {.obj_type_friendly {x}}."
-    cli_abort(msg, call = error_call)
-  }
+  check_recode_x(enexpr(x), x, error_call = error_call)
 
   con <- sql_current_con()
   clauses <- sql_recode_clauses(
@@ -121,12 +94,7 @@ sql_recode_values <- function(
 
 sql_replace_values <- function(x, ..., from = NULL, to = NULL) {
   error_call <- current_call()
-
-  x_expr <- enexpr(x)
-  if (!is_symbol(x_expr) && !is_call(x_expr)) {
-    msg <- "{.arg x} must be a variable or function call, not {.obj_type_friendly {x}}."
-    cli_abort(msg, call = error_call)
-  }
+  check_recode_x(enexpr(x), x, error_call = error_call)
 
   con <- sql_current_con()
   clauses <- sql_recode_clauses(
@@ -145,6 +113,15 @@ sql_replace_values <- function(x, ..., from = NULL, to = NULL) {
 
   clauses <- c(clauses, paste0("ELSE ", escape(x, con = con)))
   sql_case_finalize(clauses)
+}
+
+check_recode_x <- function(x_expr, x, arg = "x", error_call = caller_env()) {
+  if (!is_symbol(x_expr) && !is_call(x_expr)) {
+    cli_abort(
+      "{.arg {arg}} must be a variable or function call, not {.obj_type_friendly {x}}.",
+      call = error_call
+    )
+  }
 }
 
 sql_recode_clauses <- function(
