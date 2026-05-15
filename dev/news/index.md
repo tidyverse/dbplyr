@@ -53,6 +53,14 @@
 - The print method no longer mentions the “source” in the header,
   because it’s an outdated dplyr concept
   ([\#897](https://github.com/tidyverse/dbplyr/issues/897)).
+- IBM DB2: new backend with support for FETCH FIRST n ROWS ONLY syntax
+  and automatic detection for JDBC connections using com.ibm.db2 drivers
+  ([@shearerpmm](https://github.com/shearerpmm)). Includes translations
+  for
+  [`paste()`](https://rdrr.io/r/base/paste.html)/[`paste0()`](https://rdrr.io/r/base/paste.html)
+  (using `||`), DB2-specific casts,
+  [`runif()`](https://rdrr.io/r/stats/Uniform.html), string functions,
+  date functions, clock helpers, and statistical aggregates.
 - MS Access: correctly generates SQL for multiple joins by adding
   required parentheses
   ([\#1576](https://github.com/tidyverse/dbplyr/issues/1576)).

@@ -26,6 +26,9 @@ The following databases are recognized via their JDBC connection class:
 - SQL Server (`com.microsoft.sqlserver.*`):
   [`dialect_mssql()`](https://dbplyr.tidyverse.org/dev/reference/backend-mssql.md)
 
+- IBM DB2 (`com.ibm.db2.*`):
+  [`dialect_db2()`](https://dbplyr.tidyverse.org/dev/reference/backend-db2.md)
+
 - SAP HANA (`com.sap.db.*`):
   [`dialect_hana()`](https://dbplyr.tidyverse.org/dev/reference/backend-hana.md)
 
