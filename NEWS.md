@@ -37,6 +37,7 @@
 * `as(x, "type")` is now translated to `CAST(x AS type)`, allowing you to cast to arbitrary database types not covered by the standard `as.*()` functions (#1729).
 * `as.sql()` is now deprecated as part of major internal refactoring of how `sql()` and `ident()` are used.
 * `bind_queries()` makes it easy to combine multiple lazy queries using `UNION ALL` (#1342).
+* `case_match()` is deprecated, matching its deprecation in dplyr 1.2.0. Use `recode_values()` instead (#1796).
 * `collapse()`, `collect()`, and `compute()` now have their own documentation pages.
 * `copy_inline()` now works with blob columns (#1515).
 * `copy_to()` now works when source is in the same DB as destination when using `overwrite = TRUE` (@liudvikasakelis, #1535).

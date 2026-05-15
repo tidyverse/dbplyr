@@ -1,4 +1,6 @@
 sql_case_match <- function(.x, ..., .default = NULL, .ptype = NULL) {
+  lifecycle::deprecate_warn("2.6.0", "case_match()", "recode_values()")
+
   error_call <- current_call()
   check_unsupported_arg(.ptype, call = error_call)
   check_recode_x(enexpr(.x), .x, arg = ".x", error_call = error_call)
