@@ -36,11 +36,12 @@ behaviour of treating \code{NA} like \code{FALSE} (SQL's three-valued logic drop
 \code{NULL} rows from \code{WHERE}).
 
 \code{filter_out()} keeps rows where the combined condition is \code{FALSE} or \code{NA}.
-This is translated to \code{WHERE} using the backend-specific
-\code{sql_expr_not_matches()} (see \link{db-sql}; e.g. \verb{IS DISTINCT FROM TRUE} on
-PostgreSQL, \verb{IS NOT TRUE} on SQLite). The extra check is needed because
-SQL's \code{WHERE} would otherwise drop rows where the condition is \code{NULL},
-which would not match dplyr's behaviour.
+Multiple conditions are AND-combined and wrapped in
+\code{is_distinct_from(., TRUE)}, which is translated using the backend's
+\code{is_distinct_from()} (e.g. \verb{IS DISTINCT FROM} on PostgreSQL, \verb{IS NOT} on
+SQLite). The extra check is needed because SQL's \code{WHERE} would otherwise
+drop rows where the condition is \code{NULL}, which would not match dplyr's
+behaviour.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)

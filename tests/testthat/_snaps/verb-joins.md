@@ -408,7 +408,7 @@
       SELECT "lf1"."x" AS "x"
       FROM "lf1"
       LEFT JOIN "lf2"
-        ON ("lf1"."x" IS NOT DISTINCT FROM "lf2"."x")
+        ON (("lf1"."x") IS NOT DISTINCT FROM ("lf2"."x"))
 
 ---
 
@@ -420,7 +420,7 @@
       FROM "lf1"
       WHERE EXISTS (
         SELECT 1 FROM "lf2"
-        WHERE ("lf1"."x" IS NOT DISTINCT FROM "lf2"."x")
+        WHERE (("lf1"."x") IS NOT DISTINCT FROM ("lf2"."x"))
       )
 
 ---

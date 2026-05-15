@@ -392,7 +392,17 @@ sql_join_tbls <- function(con, by, na_matches) {
       compare <- purrr::map_chr(seq_along(lhs), function(i) {
         op <- by$condition[[i]]
         if (op == "==") {
-          sql_expr_matches(con, lhs[[i]], rhs[[i]])
+          withr::local_options(lifecycle_verbosity = "quiet")
+          # `sql_expr_matches()` is deprecated; fall back to the
+          # `is_not_distinct_from()` translation if no backend overrides it.
+          out <- sql_expr_matches(con, lhs[[i]], rhs[[i]])
+          if (is.null(out)) {
+            out <- translate_sql(
+              is_not_distinct_from(!!lhs[[i]], !!rhs[[i]]),
+              con = con
+            )
+          }
+          out
         } else {
           sql_glue2(
             con,

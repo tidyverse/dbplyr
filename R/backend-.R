@@ -288,10 +288,20 @@ base_scalar <- sql_translator(
   na_if = sql_prefix("NULLIF", 2),
   coalesce = sql_prefix("COALESCE"),
 
-  # Internal helper used by `filter_out.tbl_lazy()`.
-  # Not intended for direct use.
-  dbplyr_filter_out_cond = function(x) {
-    sql_expr_not_matches(sql_current_con(), sql_glue("({x})"), sql("TRUE"))
+  # `is_distinct_from()` and `is_not_distinct_from()` are dbplyr-only
+  # translations that emit SQL's `IS DISTINCT FROM` / `IS NOT DISTINCT FROM`.
+  # The default falls back to a portable `CASE WHEN`, see
+  # https://modern-sql.com/feature/is-distinct-from. Backends should override
+  # these in `sql_translation()`.
+  is_distinct_from = function(x, y) {
+    sql_glue(
+      "CASE WHEN (({x}) = ({y})) OR (({x}) IS NULL AND ({y}) IS NULL) THEN 0 ELSE 1 END = 1"
+    )
+  },
+  is_not_distinct_from = function(x, y) {
+    sql_glue(
+      "CASE WHEN (({x}) = ({y})) OR (({x}) IS NULL AND ({y}) IS NULL) THEN 0 ELSE 1 END = 0"
+    )
   },
 
   as.numeric = sql_cast("NUMERIC"),

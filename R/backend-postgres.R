@@ -112,6 +112,11 @@ sql_translation.sql_dialect_postgres <- function(con) {
   sql_variant(
     sql_translator(
       .parent = base_scalar,
+      # https://www.postgresql.org/docs/current/functions-comparison.html
+      is_distinct_from = \(x, y) sql_glue("({x}) IS DISTINCT FROM ({y})"),
+      is_not_distinct_from = \(x, y) {
+        sql_glue("({x}) IS NOT DISTINCT FROM ({y})")
+      },
       bitwXor = sql_infix("#"),
       log10 = \(x) sql_glue("LOG({x})"),
       log = sql_log(),
@@ -346,17 +351,6 @@ sql_translation.sql_dialect_postgres <- function(con) {
       quantile = sql_win_not_supported("quantile", "PostgreSQL")
     )
   )
-}
-
-#' @export
-sql_expr_matches.sql_dialect_postgres <- function(con, x, y, ...) {
-  # https://www.postgresql.org/docs/current/functions-comparison.html
-  sql_glue2(con, "{x} IS NOT DISTINCT FROM {y}")
-}
-
-#' @export
-sql_expr_not_matches.sql_dialect_postgres <- function(con, x, y, ...) {
-  sql_glue2(con, "{x} IS DISTINCT FROM {y}")
 }
 
 # http://www.postgresql.org/docs/9.3/static/sql-explain.html

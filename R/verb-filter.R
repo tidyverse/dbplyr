@@ -9,11 +9,12 @@
 #' `NULL` rows from `WHERE`).
 #'
 #' `filter_out()` keeps rows where the combined condition is `FALSE` or `NA`.
-#' This is translated to `WHERE` using the backend-specific
-#' `sql_expr_not_matches()` (see [db-sql]; e.g. `IS DISTINCT FROM TRUE` on
-#' PostgreSQL, `IS NOT TRUE` on SQLite). The extra check is needed because
-#' SQL's `WHERE` would otherwise drop rows where the condition is `NULL`,
-#' which would not match dplyr's behaviour.
+#' Multiple conditions are AND-combined and wrapped in
+#' `is_distinct_from(., TRUE)`, which is translated using the backend's
+#' `is_distinct_from()` (e.g. `IS DISTINCT FROM` on PostgreSQL, `IS NOT` on
+#' SQLite). The extra check is needed because SQL's `WHERE` would otherwise
+#' drop rows where the condition is `NULL`, which would not match dplyr's
+#' behaviour.
 #'
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::filter
@@ -67,14 +68,15 @@ filter_out.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
   }
 
   dots <- enquos(...)
+  # Multiple conditions are AND-combined to match dplyr's semantics, then
+  # wrapped in `is_distinct_from(., TRUE)`. The backend translation of
+  # `is_distinct_from()` provides the dialect-specific SQL.
   exprs <- lapply(dots, quo_get_expr)
-
-  # Multiple conditions are AND-combined and wrapped in an internal marker
-  # that `sql_expr_not_matches()` translates to a backend-specific
-  # "IS DISTINCT FROM TRUE" check.
   combined <- Reduce(function(a, b) expr((!!a) & (!!b)), exprs)
-  marker <- expr(dbplyr_filter_out_cond(!!combined))
-  quo <- new_quosure(marker, quo_get_env(dots[[1]]))
+  quo <- new_quosure(
+    expr(is_distinct_from(!!combined, TRUE)),
+    quo_get_env(dots[[1]])
+  )
 
   filter(.data, !!quo, .by = {{ .by }})
 }

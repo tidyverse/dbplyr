@@ -143,6 +143,11 @@ sql_translation.sql_dialect_oracle <- function(con) {
   sql_variant(
     sql_translator(
       .parent = base_odbc_scalar,
+      # https://docs.oracle.com/cd/B19306_01/server.102/b14200/functions040.htm
+      is_distinct_from = \(x, y) sql_glue("(decode(({x}), ({y}), 0, 1) = 1)"),
+      is_not_distinct_from = \(x, y) {
+        sql_glue("(decode(({x}), ({y}), 0, 1) = 0)")
+      },
       # Data type conversions are mostly based on this article
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements001.htm
 
@@ -357,12 +362,6 @@ sql_set_op_method.sql_dialect_oracle <- function(con, op, ...) {
   # Oracle uses MINUS instead of EXCEPT:
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries004.htm
   switch(op, "EXCEPT" = "MINUS", op)
-}
-
-#' @export
-sql_expr_matches.sql_dialect_oracle <- function(con, x, y, ...) {
-  # https://docs.oracle.com/cd/B19306_01/server.102/b14200/functions040.htm
-  sql_glue2(con, "decode({x}, {y}, 0, 1) = 0")
 }
 
 # roacle package ----------------------------------------------------------

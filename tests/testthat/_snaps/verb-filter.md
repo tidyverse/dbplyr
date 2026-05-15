@@ -171,21 +171,21 @@
       <SQL>
       SELECT *
       FROM "df"
-      WHERE (("x" = 1.0 AND "y" = 3.0) IS DISTINCT FROM TRUE)
+      WHERE (("x" = 1.0 AND "y" = 3.0) IS DISTINCT FROM (TRUE))
     Code
       filter_out_backend(simulate_sqlite())
     Output
       <SQL>
       SELECT *
       FROM `df`
-      WHERE ((`x` = 1.0 AND `y` = 3.0) IS NOT TRUE)
+      WHERE ((`x` = 1.0 AND `y` = 3.0) IS NOT (1))
     Code
       filter_out_backend(simulate_dbi())
     Output
       <SQL>
       SELECT *
       FROM "df"
-      WHERE (NOT (CASE WHEN (("x" = 1.0 AND "y" = 3.0) = TRUE) OR (("x" = 1.0 AND "y" = 3.0) IS NULL AND TRUE IS NULL) THEN 0 ELSE 1 END = 0))
+      WHERE (CASE WHEN (("x" = 1.0 AND "y" = 3.0) = (TRUE)) OR (("x" = 1.0 AND "y" = 3.0) IS NULL AND (TRUE) IS NULL) THEN 0 ELSE 1 END = 1)
 
 # filter_out errors for named input
 

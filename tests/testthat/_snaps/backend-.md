@@ -50,6 +50,38 @@
       Error in `x$id`:
       ! $ operator is invalid for atomic vectors
 
+# if_else() and ifelse() require true/yes and false/no
+
+    Code
+      translate_sql(if_else(x), con = con)
+    Condition
+      Error in `if_else()`:
+      ! `true` is absent but must be supplied.
+
+---
+
+    Code
+      translate_sql(if_else(x, 1L), con = con)
+    Condition
+      Error in `if_else()`:
+      ! `false` is absent but must be supplied.
+
+---
+
+    Code
+      translate_sql(ifelse(x), con = con)
+    Condition
+      Error in `ifelse()`:
+      ! `yes` is absent but must be supplied.
+
+---
+
+    Code
+      translate_sql(ifelse(x, 1L), con = con)
+    Condition
+      Error in `ifelse()`:
+      ! `no` is absent but must be supplied.
+
 # can only translate case sensitive str_like
 
     Code
@@ -112,36 +144,4 @@
       SELECT *
       FROM `df`
       WHERE (`x` IN (X'616263', X'0102'))
-
-# if_else() and ifelse() require true/yes and false/no
-
-    Code
-      translate_sql(if_else(x), con = con)
-    Condition
-      Error in `if_else()`:
-      ! `true` is absent but must be supplied.
-
----
-
-    Code
-      translate_sql(if_else(x, 1L), con = con)
-    Condition
-      Error in `if_else()`:
-      ! `false` is absent but must be supplied.
-
----
-
-    Code
-      translate_sql(ifelse(x), con = con)
-    Condition
-      Error in `ifelse()`:
-      ! `yes` is absent but must be supplied.
-
----
-
-    Code
-      translate_sql(ifelse(x, 1L), con = con)
-    Condition
-      Error in `ifelse()`:
-      ! `no` is absent but must be supplied.
 

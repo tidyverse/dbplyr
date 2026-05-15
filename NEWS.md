@@ -53,7 +53,8 @@
 * `filter()` after `left_join()` or `inner_join()` no longer creates a subquery (#722).
 * `filter()` followed by a `summarise()` is once again inlined correctly (#1707).
 * `filter()` after `rename()` no longer rewrites field names of `$` and `@` expressions, so e.g. `filter(z == ltr$z)` after `rename(z = x)` now looks up `ltr$z`, not `ltr$x` (#1812).
-* `filter_out()` is now supported. Conditions are AND-combined and translated via the new `sql_expr_not_matches()` generic, producing backend-appropriate SQL such as `IS DISTINCT FROM TRUE` on PostgreSQL or `IS NOT TRUE` on SQLite, so rows where the condition is `NA` are kept (#1803).
+* `filter_out()` is now supported. The combined condition is wrapped in `is_distinct_from(., TRUE)`, producing backend-appropriate SQL such as `IS DISTINCT FROM TRUE` on PostgreSQL or `IS NOT TRUE` on SQLite, so rows where the condition is `NA` are kept (#1803).
+* New `is_distinct_from()` and `is_not_distinct_from()` SQL translations expose `IS DISTINCT FROM` / `IS NOT DISTINCT FROM` semantics with backend-specific dialects. `sql_expr_matches()` is deprecated; provide an `is_not_distinct_from()` translation in `sql_translation()` instead.
 * `if_else()` and `ifelse()` now give a clear error if `true`/`false` or `yes`/`no` are missing (#1798).
 * `if_else()` uses simpler translation for `missing` (#1573).
 * `join_by(between())` now correctly handles column renames (#1572).

@@ -95,6 +95,9 @@ sql_translation.sql_dialect_sqlite <- function(con) {
   sql_variant(
     sql_translator(
       .parent = base_scalar,
+      # https://sqlite.org/lang_expr.html#isisnot
+      is_distinct_from = \(x, y) sql_glue("({x}) IS NOT ({y})"),
+      is_not_distinct_from = \(x, y) sql_glue("({x}) IS ({y})"),
       as.numeric = sql_cast("REAL"),
       as.double = sql_cast("REAL"),
       log = function(x, base = exp(1)) {
@@ -159,17 +162,6 @@ sql_escape_logical.sql_dialect_sqlite <- function(con, x) {
   y <- as.character(as.integer(x))
   y[is.na(x)] <- "NULL"
   sql(y)
-}
-
-#' @export
-sql_expr_matches.sql_dialect_sqlite <- function(con, x, y, ...) {
-  # https://sqlite.org/lang_expr.html#isisnot
-  sql_glue2(con, "{x} IS {y}")
-}
-
-#' @export
-sql_expr_not_matches.sql_dialect_sqlite <- function(con, x, y, ...) {
-  sql_glue2(con, "{x} IS NOT {y}")
 }
 
 #' @export

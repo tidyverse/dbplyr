@@ -71,7 +71,7 @@
       SELECT "df_LHS"."x" AS "x"
       FROM "df" "df_LHS"
       LEFT JOIN "df" "df_RHS"
-        ON (decode("df_LHS"."x", "df_RHS"."x", 0, 1) = 0)
+        ON ((decode(("df_LHS"."x"), ("df_RHS"."x"), 0, 1) = 0))
 
 ---
 
