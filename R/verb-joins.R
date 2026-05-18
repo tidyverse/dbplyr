@@ -682,12 +682,10 @@ join_prepare_by <- function(
 ) {
   if (identical(by, character()) && is.null(sql_on)) {
     if (type != "cross") {
-      lifecycle::deprecate_warn(
+      lifecycle::deprecate_stop(
         when = "1.1.0",
         what = I("Using `by = character()` to perform a cross join"),
-        with = "cross_join()",
-        env = env,
-        user_env = user_env
+        with = "cross_join()"
       )
     }
     type <- "cross"

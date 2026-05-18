@@ -100,12 +100,10 @@ deprecate_across_dots <- function(call, env, user_env) {
       ),
       collapse = "\n"
     )
-    lifecycle::deprecate_warn(
+    lifecycle::deprecate_stop(
       when = "2.3.0",
       what = "across(...)",
-      details = details,
-      env = env,
-      user_env = user_env
+      details = details
     )
   }
 }

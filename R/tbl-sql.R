@@ -21,7 +21,7 @@ tbl_sql <- function(
   check_dots_empty()
 
   if (lifecycle::is_present(check_from)) {
-    lifecycle::deprecate_warn("2.5.0", "tbl_sql(check_from)")
+    lifecycle::deprecate_stop("2.5.0", "tbl_sql(check_from)")
   }
 
   db_table(src$con, from, vars = vars, subclass = subclass)

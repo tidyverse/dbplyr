@@ -11,6 +11,7 @@
   * `src_sql()` deprecated in 1.4.0 (2019-04-23)
   * `partial_eval(var)` deprecated in 2.2.0 (2022-06-05).
   * `group_by(add = )` deprecated in dplyr 1.1.0 (2020-06-01).
+* Previously-warning deprecations are now defunct (i.e., they error): passing extra `...` to `across()` and `if_all()`/`if_any()` (deprecated in 2.3.0), using `by = character()` to perform a cross join (deprecated in 1.1.0), `compute(temporary = FALSE)` without a `name` (deprecated in 2.3.3), `sql_random()` (deprecated in 2.3.2), `sql_query_append()` with a lazy table for `from` (deprecated in 2.3.2), and `tbl_sql(check_from)` (deprecated in 2.5.0).
 * Internal testing functions `src_test()`, `test_frame()` and `test_load()`, `test_register_src()` and `test_register_con()` have been removed.
 * Set operations (`union()`, `intersect()`, `setdiff()`) now use the `sql_set_op_method()` generic to generate the SQL set operation keyword. This allows backends to customize the behavior, e.g., using "UNION DISTINCT" instead of "UNION" for databases that require it, or "MINUS" instead of "EXCEPT" for Oracle (#1596).
 * Single-table SELECT queries now use unqualified `*` (e.g., `SELECT *`) instead of table-qualified `*` (e.g., `SELECT "df".*`) for most backends. Oracle and Teradata continue to use qualified stars as required by their syntax (#1577, #1485).
@@ -46,6 +47,7 @@
 * `.data$col`, `.data[[col]]`, `.env$var`, and `.env$[[var]]` now work correctly inside `across()` (#1520).
 * `db_col_types()` gains a SQLite method so that `rows_*()` operations can preserve column types when copying data (#1821).
 * `db_supports_table_alias_with_as()` and `supports_window_clause()` generics have been removed. They are now part of the `sql_dialect()` data structure (#1760).
+* `db_sql_render(cte)` now always warns when used; pass `sql_options = sql_options(cte = TRUE)` instead.
 * `db_table_drop_if_exists()` is a new generic that allows backends to customize how tables are dropped when `overwrite = TRUE` (#1695).
 * `db_table_temporary()` has been renamed to `sql_table_temporary()` for consistency with other SQL generation functions (#1760).
 * `distinct()` after a join no longer creates a subquery (#722).

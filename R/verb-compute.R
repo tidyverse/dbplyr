@@ -29,7 +29,7 @@ compute.tbl_sql <- function(
 
   if (is.null(name)) {
     if (!temporary) {
-      lifecycle::deprecate_warn(
+      lifecycle::deprecate_stop(
         "2.3.3",
         what = "compute(name = 'must be provided when `temporary = FALSE`')"
       )

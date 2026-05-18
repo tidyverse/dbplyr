@@ -30,5 +30,9 @@
 
 # compute(temporary = FALSE) without a name is deprecated
 
-    The `name` argument of `compute()` must be provided when `temporary = FALSE` as of dbplyr 2.3.3.
+    Code
+      compute(df, temporary = FALSE)
+    Condition
+      Error:
+      ! The `name` argument of `compute()` must be provided when `temporary = FALSE` as of dbplyr 2.3.3.
 

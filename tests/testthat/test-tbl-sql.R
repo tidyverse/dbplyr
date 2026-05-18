@@ -77,7 +77,10 @@ test_that("check_from is deprecated", {
   con <- local_sqlite_connection()
   DBI::dbExecute(con, "CREATE TABLE x (y)")
 
-  expect_snapshot(out <- tbl_sql("foo", src_dbi(con), "x", check_from = FALSE))
+  expect_snapshot(
+    error = TRUE,
+    tbl_sql("foo", src_dbi(con), "x", check_from = FALSE)
+  )
 })
 
 # n_groups ----------------------------------------------------------------
