@@ -115,15 +115,6 @@
       Caused by error:
       ! Object `non_existent` not found.
     Code
-      mutate(lazy_frame(x = 1), across(x, mean, na.rm = z))
-    Condition
-      Error in `mutate()`:
-      i In argument: `across(x, mean, na.rm = z)`
-      Caused by error in `across()`:
-      ! Problem while evaluating `na.rm = z`.
-      Caused by error:
-      ! Object `z` not found.
-    Code
       mutate(lazy_frame(x = 1), across(x, .fns = "a"))
     Condition
       Error in `mutate()`:

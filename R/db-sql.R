@@ -95,12 +95,11 @@ dbplyr_sql_translation <- function(con) {
 #' @export
 #' @rdname db-sql
 sql_random <- function(con) {
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_stop(
     "2.3.2",
     "sql_random()",
     with = I("Please add a translation for `runif(n())` instead.")
   )
-  UseMethod("sql_random")
 }
 
 
@@ -451,22 +450,10 @@ sql_query_append <- function(
   returning_cols = NULL
 ) {
   if (is_tbl_lazy(from)) {
-    lifecycle::deprecate_warn(
+    lifecycle::deprecate_stop(
       when = "2.3.2",
       what = "sql_query_append(from = 'must be a table identifier or an SQL query, not a lazy table.')"
     )
-
-    insert_cols <- colnames(from)
-    from <- sql_render(from, con = con, lvl = 1)
-    out <- sql_query_append(
-      con = con,
-      table = table,
-      from = from,
-      insert_cols = insert_cols,
-      returning_cols = returning_cols
-    )
-
-    return(out)
   }
 
   check_table_id(table)

@@ -11,6 +11,7 @@
   * `src_sql()` deprecated in 1.4.0 (2019-04-23)
   * `partial_eval(var)` deprecated in 2.2.0 (2022-06-05).
   * `group_by(add = )` deprecated in dplyr 1.1.0 (2020-06-01).
+* Previously-warning deprecations are now defunct (i.e., they error): passing extra `...` to `across()` and `if_all()`/`if_any()` (deprecated in 2.3.0), using `by = character()` to perform a cross join (deprecated in 1.1.0), `compute(temporary = FALSE)` without a `name` (deprecated in 2.3.3), `sql_random()` (deprecated in 2.3.2), `sql_query_append()` with a lazy table for `from` (deprecated in 2.3.2), and `tbl_sql(check_from)` (deprecated in 2.5.0).
 * Internal testing functions `src_test()`, `test_frame()` and `test_load()`, `test_register_src()` and `test_register_con()` have been removed.
 * Set operations (`union()`, `intersect()`, `setdiff()`) now use the `sql_set_op_method()` generic to generate the SQL set operation keyword. This allows backends to customize the behavior, e.g., using "UNION DISTINCT" instead of "UNION" for databases that require it, or "MINUS" instead of "EXCEPT" for Oracle (#1596).
 * Single-table SELECT queries now use unqualified `*` (e.g., `SELECT *`) instead of table-qualified `*` (e.g., `SELECT "df".*`) for most backends. Oracle and Teradata continue to use qualified stars as required by their syntax (#1577, #1485).
@@ -39,6 +40,7 @@
 * `as(x, "type")` is now translated to `CAST(x AS type)`, allowing you to cast to arbitrary database types not covered by the standard `as.*()` functions (#1729).
 * `as.sql()` is now deprecated as part of major internal refactoring of how `sql()` and `ident()` are used.
 * `bind_queries()` makes it easy to combine multiple lazy queries using `UNION ALL` (#1342).
+* The `cte` argument of `collect()`, `compute()`, `db_sql_render()`, `remote_query()`, and `show_query()` now always warns when used; pass `sql_options = sql_options(cte = TRUE)` instead. `collect()` and `compute()` gain an `sql_options` argument to support this.
 * `collapse()`, `collect()`, and `compute()` now have their own documentation pages.
 * `copy_inline()` now works with blob columns (#1515).
 * `copy_to()` now works when source is in the same DB as destination when using `overwrite = TRUE` (@liudvikasakelis, #1535).
@@ -78,6 +80,7 @@
 * `sql_check_na_rm()` is now exported for use in other backends (#1483).
 * `sql_dialect()` is a new generic that provides a way for database connections to choose a SQL dialect, using `new_sql_dialect()` to create a `sql_dialect` class. This allows connections to more easily share translations, and lays the foundation for better translations for connections via ODBC/JDBC/ADBC (#1624).
 * `sql_escape_string()` now defaults to using `'`.
+* `sql_options()` is no longer marked experimental.
 * `sql_glue()` and `sql_glue2()` provide a convenient syntax for building SQL strings. These functions replace the now superseded `build_sql()`, `sql_expr()`, and `sql_call2()` (#1249).
 * `sql_glue2()` is now exported for building SQL strings with glue syntax and type markers (#1249).
 * `sql_infix()` no longer has a `con` argument since the connection needs to be determined at call time, not at definition time.

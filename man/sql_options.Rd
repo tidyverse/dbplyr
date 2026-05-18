@@ -21,7 +21,7 @@ multiple tables.}
 A <dbplyr_sql_options> object.
 }
 \description{
-Options for generating SQL
+Customise SQL generation with these three options.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)

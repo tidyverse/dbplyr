@@ -79,7 +79,7 @@ test_that("compute can handle schema", {
 test_that("compute(temporary = FALSE) without a name is deprecated", {
   df <- local_memdb_frame(x = 1:10)
 
-  expect_snapshot_warning(df |> compute(temporary = FALSE))
+  expect_snapshot(error = TRUE, df |> compute(temporary = FALSE))
 })
 
 test_that("sorting preserved across compute", {

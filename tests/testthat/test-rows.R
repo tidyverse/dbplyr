@@ -364,7 +364,7 @@ test_that("`sql_query_append()` works", {
   )
 })
 
-test_that("sql_query_append supports old interface works", {
+test_that("sql_query_append old interface is defunct", {
   con <- dialect_ansi()
   df_y <- lazy_frame(
     a = 2:3,
@@ -377,6 +377,7 @@ test_that("sql_query_append supports old interface works", {
     mutate(c = c + 1)
 
   expect_snapshot(
+    error = TRUE,
     sql_query_append(
       con = con,
       table = ident("df_x"),
