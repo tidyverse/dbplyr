@@ -40,6 +40,7 @@
 * `as(x, "type")` is now translated to `CAST(x AS type)`, allowing you to cast to arbitrary database types not covered by the standard `as.*()` functions (#1729).
 * `as.sql()` is now deprecated as part of major internal refactoring of how `sql()` and `ident()` are used.
 * `bind_queries()` makes it easy to combine multiple lazy queries using `UNION ALL` (#1342).
+* The `cte` argument of `collect()`, `compute()`, `db_sql_render()`, `remote_query()`, and `show_query()` now always warns when used; pass `sql_options = sql_options(cte = TRUE)` instead. `collect()` and `compute()` gain an `sql_options` argument to support this.
 * `collapse()`, `collect()`, and `compute()` now have their own documentation pages.
 * `copy_inline()` now works with blob columns (#1515).
 * `copy_to()` now works when source is in the same DB as destination when using `overwrite = TRUE` (@liudvikasakelis, #1535).
@@ -47,7 +48,6 @@
 * `.data$col`, `.data[[col]]`, `.env$var`, and `.env$[[var]]` now work correctly inside `across()` (#1520).
 * `db_col_types()` gains a SQLite method so that `rows_*()` operations can preserve column types when copying data (#1821).
 * `db_supports_table_alias_with_as()` and `supports_window_clause()` generics have been removed. They are now part of the `sql_dialect()` data structure (#1760).
-* `db_sql_render(cte)` now always warns when used; pass `sql_options = sql_options(cte = TRUE)` instead.
 * `db_table_drop_if_exists()` is a new generic that allows backends to customize how tables are dropped when `overwrite = TRUE` (#1695).
 * `db_table_temporary()` has been renamed to `sql_table_temporary()` for consistency with other SQL generation functions (#1760).
 * `distinct()` after a join no longer creates a subquery (#722).
@@ -80,6 +80,7 @@
 * `sql_check_na_rm()` is now exported for use in other backends (#1483).
 * `sql_dialect()` is a new generic that provides a way for database connections to choose a SQL dialect, using `new_sql_dialect()` to create a `sql_dialect` class. This allows connections to more easily share translations, and lays the foundation for better translations for connections via ODBC/JDBC/ADBC (#1624).
 * `sql_escape_string()` now defaults to using `'`.
+* `sql_options()` is no longer marked experimental.
 * `sql_glue()` and `sql_glue2()` provide a convenient syntax for building SQL strings. These functions replace the now superseded `build_sql()`, `sql_expr()`, and `sql_call2()` (#1249).
 * `sql_glue2()` is now exported for building SQL strings with glue syntax and type markers (#1249).
 * `sql_infix()` no longer has a `con` argument since the connection needs to be determined at call time, not at definition time.

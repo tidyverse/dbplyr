@@ -124,6 +124,8 @@ db_col_types.default <- function(con, table, call) {
 
 #' Options for generating SQL
 #'
+#' Customise SQL generation with these three options.
+#'
 #' @param cte If `FALSE`, the default, subqueries are used. If `TRUE` common
 #'   table expressions are used.
 #' @param use_star If `TRUE`, the default, `*` is used to select all columns of
