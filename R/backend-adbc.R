@@ -20,14 +20,12 @@
 #' * Amazon Redshift: [dialect_redshift()]
 #'
 #' If your database is not recognized, dbplyr will fall back to a generic ODBC
-#' dialect. Please file an issue if you'd like support for additional
-#' databases.
+#' dialect. In this case, or if dbplyr guesses wrong, you can use
+#' [with_dialect()] to choose a specific dialect.
 #'
 #' See `vignette("translation-function")` and `vignette("translation-verb")` for
 #' details of overall translation technology.
 #'
-#' @seealso [with_dialect()] to use a different dialect if dbplyr guesses
-#'   incorrectly, or a more specific translation is available.
 #' @name backend-adbc
 #' @examples
 #' # ADBC connections require the adbi package and an ADBC driver.
@@ -51,59 +49,43 @@ dbplyr_edition.AdbiConnection <- function(con) {
   2L
 }
 
-# Returns the vendor name reported by the ADBC driver.
 adbc_vendor_name <- function(con) {
-  # ADBC_INFO_VENDOR_NAME has code 0
   info <- as.list(adbcdrivermanager::adbc_connection_get_info(
     con@connection,
-    info_codes = 0L
+    info_codes = 0L # ADBC_INFO_VENDOR_NAME
   ))
   info$info_value$string_value
 }
 
-# Maps ADBC vendor name to the appropriate dialect.
 adbc_vendor_to_dialect <- function(vendor) {
-  # Vendor names come from the server itself and the casing may vary, so
-  # match case-insensitively.
-  vendor <- tolower(vendor)
+  postgres <- dialect_postgres()
+  mysql <- dialect_mysql()
+  mssql <- dialect_mssql()
+  redshift <- dialect_redshift()
 
-  if (vendor == "sqlite") {
-    dialect_sqlite()
-  } else if (
-    vendor %in%
-      c(
-        "postgresql",
-        "cedardb",
-        "citus",
-        "cockroachdb",
-        "cratedb",
-        "neon",
-        "paradedb",
-        "timescaledb",
-        "yellowbrick",
-        "yugabytedb"
-      )
-  ) {
-    dialect_postgres()
-  } else if (vendor == "mariadb") {
-    dialect_mariadb()
-  } else if (vendor %in% c("mysql", "tidb", "vitess")) {
-    dialect_mysql()
-  } else if (
-    vendor %in%
-      c(
-        "microsoft sql server",
-        "mssql",
-        "sql server"
-      )
-  ) {
-    dialect_mssql()
-  } else if (vendor == "snowflake") {
-    dialect_snowflake()
-  } else if (vendor %in% c("redshift", "amazon redshift")) {
-    dialect_redshift()
-  } else {
-    # Fall back to generic ODBC dialect
-    dialect_odbc()
-  }
+  dialects <- list(
+    sqlite = dialect_sqlite(),
+    postgresql = postgres,
+    cedardb = postgres,
+    citus = postgres,
+    cockroachdb = postgres,
+    cratedb = postgres,
+    neon = postgres,
+    paradedb = postgres,
+    timescaledb = postgres,
+    yellowbrick = postgres,
+    yugabytedb = postgres,
+    mariadb = dialect_mariadb(),
+    mysql = mysql,
+    tidb = mysql,
+    vitess = mysql,
+    "microsoft sql server" = mssql,
+    mssql = mssql,
+    "sql server" = mssql,
+    snowflake = dialect_snowflake(),
+    redshift = redshift,
+    "amazon redshift" = redshift
+  )
+
+  dialects[[tolower(vendor)]] %||% dialect_odbc()
 }

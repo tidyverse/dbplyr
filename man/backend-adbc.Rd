@@ -24,8 +24,8 @@ otherwise)
 }
 
 If your database is not recognized, dbplyr will fall back to a generic ODBC
-dialect. Please file an issue if you'd like support for additional
-databases.
+dialect. In this case, or if dbplyr guesses wrong, you can use
+\code{\link[=with_dialect]{with_dialect()}} to choose a specific dialect.
 
 See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
 details of overall translation technology.
@@ -39,8 +39,4 @@ details of overall translation technology.
 #
 # con <- DBI::dbConnect(adbi::adbi("adbcsqlite"), uri = ":memory:")
 # tbl(con, "my_table") |> filter(x > 1)
-}
-\seealso{
-\code{\link[=with_dialect]{with_dialect()}} to use a different dialect if dbplyr guesses
-incorrectly, or a more specific translation is available.
 }
