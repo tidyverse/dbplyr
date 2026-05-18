@@ -59,23 +59,35 @@ filter.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
 filter_out.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
   check_unsupported_arg(.preserve, FALSE)
   check_filter(..., fn = "filter_out")
+  by <- compute_by(
+    {{ .by }},
+    .data,
+    by_arg = ".by",
+    data_arg = ".data",
+    error_call = caller_env()
+  )
 
   if (missing(...)) {
-    return(.data)
+    return(filter(.data, FALSE))
   }
 
-  dots <- enquos(...)
+  if (by$from_by) {
+    .data$lazy_query$group_vars <- by$names
+  }
+  dots <- partial_eval_dots(.data, ..., .named = FALSE)
+
+  dots_and <- Reduce(function(a, b) expr((!!a) & (!!b)), dots)
+  dots2 <- list(expr(is_distinct_from(!!dots_and, TRUE)))
+
   # Multiple conditions are AND-combined to match dplyr's semantics, then
   # wrapped in `is_distinct_from(., TRUE)`. The backend translation of
   # `is_distinct_from()` provides the dialect-specific SQL.
-  exprs <- lapply(dots, quo_get_expr)
-  combined <- Reduce(function(a, b) expr((!!a) & (!!b)), exprs)
-  quo <- new_quosure(
-    expr(is_distinct_from(!!combined, TRUE)),
-    quo_get_env(dots[[1]])
-  )
+  .data$lazy_query <- add_filter(.data$lazy_query, remote_con(.data), dots2)
 
-  filter(.data, !!quo, .by = {{ .by }})
+  if (by$from_by) {
+    .data$lazy_query$group_vars <- character()
+  }
+  .data
 }
 
 add_filter <- function(lazy_query, con, exprs) {

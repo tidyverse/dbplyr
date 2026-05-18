@@ -418,9 +418,9 @@ test_that("filter_out uses backend-aware IS DISTINCT FROM TRUE", {
   })
 })
 
-test_that("filter_out with no conditions returns the input unchanged", {
+test_that("filter_out with no conditions returns no rows", {
   lf <- lazy_frame(x = 1:3, y = 1:3)
-  expect_equal(lf |> filter_out(), lf)
+  expect_equal(lf |> filter_out(), lf |> filter(FALSE))
 })
 
 test_that("filter_out errors for named input", {
