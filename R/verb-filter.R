@@ -8,13 +8,10 @@
 #' behaviour of treating `NA` like `FALSE` (SQL's three-valued logic drops
 #' `NULL` rows from `WHERE`).
 #'
-#' `filter_out()` keeps rows where the combined condition is `FALSE` or `NA`.
-#' Multiple conditions are AND-combined and wrapped in
-#' `is_distinct_from(., TRUE)`, which is translated using the backend's
-#' `is_distinct_from()` (e.g. `IS DISTINCT FROM` on PostgreSQL, `IS NOT` on
-#' SQLite). The extra check is needed because SQL's `WHERE` would otherwise
-#' drop rows where the condition is `NULL`, which would not match dplyr's
-#' behaviour.
+#' `filter_out()` requires an additional step, where the combined condition
+#' is wrapped in `is_distinct_from(., TRUE)`, which is then translated using
+#' the backend (e.g. to `IS DISTINCT FROM` on PostgreSQL, `IS NOT` on SQLite).
+#' This ensures that the SQL translation matches dplyr's semantics.
 #'
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::filter

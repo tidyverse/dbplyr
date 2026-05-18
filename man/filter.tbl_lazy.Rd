@@ -35,13 +35,10 @@ generics. They generate the \code{WHERE} clause of the SQL query.
 behaviour of treating \code{NA} like \code{FALSE} (SQL's three-valued logic drops
 \code{NULL} rows from \code{WHERE}).
 
-\code{filter_out()} keeps rows where the combined condition is \code{FALSE} or \code{NA}.
-Multiple conditions are AND-combined and wrapped in
-\code{is_distinct_from(., TRUE)}, which is translated using the backend's
-\code{is_distinct_from()} (e.g. \verb{IS DISTINCT FROM} on PostgreSQL, \verb{IS NOT} on
-SQLite). The extra check is needed because SQL's \code{WHERE} would otherwise
-drop rows where the condition is \code{NULL}, which would not match dplyr's
-behaviour.
+\code{filter_out()} requires an additional step, where the combined condition
+is wrapped in \code{is_distinct_from(., TRUE)}, which is then translated using
+the backend (e.g. to \verb{IS DISTINCT FROM} on PostgreSQL, \verb{IS NOT} on SQLite).
+This ensures that the SQL translation matches dplyr's semantics.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)
