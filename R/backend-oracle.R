@@ -144,10 +144,8 @@ sql_translation.sql_dialect_oracle <- function(con) {
     sql_translator(
       .parent = base_odbc_scalar,
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/functions040.htm
-      is_distinct_from = \(x, y) sql_glue("(decode(({x}), ({y}), 0, 1) = 1)"),
-      is_not_distinct_from = \(x, y) {
-        sql_glue("(decode(({x}), ({y}), 0, 1) = 0)")
-      },
+      is_distinct_from = \(x, y) sql_glue("(decode({x}, {y}, 0, 1) = 1)"),
+      is_not_distinct_from = \(x, y) sql_glue("(decode({x}, {y}, 0, 1) = 0)"),
       # Data type conversions are mostly based on this article
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements001.htm
 
