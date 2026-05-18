@@ -2,6 +2,10 @@
 
 ## dbplyr (development version)
 
+- ADBC connections (via the adbi package) are now supported. dbplyr
+  automatically detects the underlying database type by querying the
+  ADBC driver’s vendor name and uses the appropriate SQL dialect
+  ([\#1787](https://github.com/tidyverse/dbplyr/issues/1787)).
 - JDBC connections are now supported. dbplyr automatically detects the
   underlying database type from the JDBC connection class and uses the
   appropriate SQL dialect

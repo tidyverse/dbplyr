@@ -16,6 +16,7 @@
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/arrange.tbl_lazy.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/as.sql.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-access.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-adbc.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-ansi.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-db2.html</loc></url>
 <url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-hana.html</loc></url>

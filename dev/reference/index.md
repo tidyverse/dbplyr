@@ -124,6 +124,8 @@
 - [`dialect_access()`](https://dbplyr.tidyverse.org/dev/reference/backend-access.md)
   [`simulate_access()`](https://dbplyr.tidyverse.org/dev/reference/backend-access.md)
   : MS Access backend
+- [`backend-adbc`](https://dbplyr.tidyverse.org/dev/reference/backend-adbc.md)
+  : ADBC backend
 - [`dialect_db2()`](https://dbplyr.tidyverse.org/dev/reference/backend-db2.md)
   : DB2 backend
 - [`dialect_hana()`](https://dbplyr.tidyverse.org/dev/reference/backend-hana.md)
