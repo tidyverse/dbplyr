@@ -1435,6 +1435,14 @@ test_that("right_join uses *", {
   )
 })
 
+test_that("cross_join() errors if `...` is not empty (#1792)", {
+  lf1 <- lazy_frame(a = 1)
+  lf2 <- lazy_frame(b = 1)
+  lf3 <- lazy_frame(c = 1)
+
+  expect_snapshot(cross_join(lf1, lf2, lf3), error = TRUE)
+})
+
 test_that("cross_join uses *", {
   lf1 <- lazy_frame(a = 1, b = 1)
   lf2 <- lazy_frame(x = 1, y = 1)

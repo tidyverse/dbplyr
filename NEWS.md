@@ -15,6 +15,7 @@
 * Single-table SELECT queries now use unqualified `*` (e.g., `SELECT *`) instead of table-qualified `*` (e.g., `SELECT "df".*`) for most backends. Oracle and Teradata continue to use qualified stars as required by their syntax (#1577, #1485).
 * The `copy` argument of join, set, and row operations now accepts `"inline"` to use `copy_inline()` instead of copying to a temporary table (#863).
 * The print method no longer mentions the "source" in the header, because it's an outdated dplyr concept (#897).
+* IBM DB2: new backend with support for FETCH FIRST n ROWS ONLY syntax and automatic detection for JDBC connections using com.ibm.db2 drivers (@shearerpmm). Includes translations for `paste()`/`paste0()` (using `||`), DB2-specific casts, `runif()`, string functions, date functions, clock helpers, and statistical aggregates.
 * MS Access: correctly generates SQL for multiple joins by adding required parentheses (#1576).
 * MySQL: gains slightly better translation for `as.integer()` and `as.integer64()` (#1647).
 * Oracle: temporary tables now use private temporary tables (Oracle 18c+) instead of global temporary tables. This ensures data persists correctly and table names are automatically prefixed with `ORA$PTT_` (#750).
@@ -40,7 +41,9 @@
 * `collapse()`, `collect()`, and `compute()` now have their own documentation pages.
 * `copy_inline()` now works with blob columns (#1515).
 * `copy_to()` now works when source is in the same DB as destination when using `overwrite = TRUE` (@liudvikasakelis, #1535).
+* `cross_join()` now gives a clear error when called with extra unnamed arguments instead of a confusing message about `multiple` (#1792).
 * `.data$col`, `.data[[col]]`, `.env$var`, and `.env$[[var]]` now work correctly inside `across()` (#1520).
+* `db_col_types()` gains a SQLite method so that `rows_*()` operations can preserve column types when copying data (#1821).
 * `db_supports_table_alias_with_as()` and `supports_window_clause()` generics have been removed. They are now part of the `sql_dialect()` data structure (#1760).
 * `db_table_drop_if_exists()` is a new generic that allows backends to customize how tables are dropped when `overwrite = TRUE` (#1695).
 * `db_table_temporary()` has been renamed to `sql_table_temporary()` for consistency with other SQL generation functions (#1760).
