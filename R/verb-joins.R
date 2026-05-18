@@ -676,19 +676,14 @@ join_prepare_by <- function(
   type,
   x_names,
   y_names,
-  error_call,
-  env = caller_env(2),
-  user_env = caller_env(3)
+  error_call
 ) {
-  if (identical(by, character()) && is.null(sql_on)) {
-    if (type != "cross") {
-      lifecycle::deprecate_stop(
-        when = "1.1.0",
-        what = I("Using `by = character()` to perform a cross join"),
-        with = "cross_join()"
-      )
-    }
-    type <- "cross"
+  if (identical(by, character()) && is.null(sql_on) && type != "cross") {
+    lifecycle::deprecate_stop(
+      when = "1.1.0",
+      what = I("Using `by = character()` to perform a cross join"),
+      with = "cross_join()"
+    )
   }
 
   if (!is.null(sql_on)) {
