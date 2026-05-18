@@ -13,6 +13,17 @@ test_that("can copy to from remote sources", {
   expect_equal(collect(df_3), df)
 })
 
+test_that("copy_to() within same source uses compute() and ignores types", {
+  con <- local_sqlite_connection()
+  df_1 <- copy_to(con, tibble(x = 1L), "df1", types = c(x = "INT"))
+  df_2 <- copy_to(con, df_1, "df2", types = c(x = "DOUBLE"))
+
+  expect_equal(
+    DBI::dbGetQuery(con, "SELECT typeof(x) FROM df2")[[1]],
+    "integer"
+  )
+})
+
 test_that("only overwrite existing table if explicitly requested", {
   con <- local_sqlite_connection()
   local_db_table(con, data.frame(x = 1:5), "df")
