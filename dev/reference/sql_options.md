@@ -1,6 +1,6 @@
 # Options for generating SQL
 
-Options for generating SQL
+Customise SQL generation with these three options.
 
 ## Usage
 

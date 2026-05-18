@@ -29,6 +29,18 @@
     deprecated in 1.4.0 (2019-04-23)
   - `partial_eval(var)` deprecated in 2.2.0 (2022-06-05).
   - `group_by(add = )` deprecated in dplyr 1.1.0 (2020-06-01).
+- Previously-warning deprecations are now defunct (i.e., they error):
+  passing extra `...` to
+  [`across()`](https://dplyr.tidyverse.org/reference/across.html) and
+  [`if_all()`](https://dplyr.tidyverse.org/reference/across.html)/[`if_any()`](https://dplyr.tidyverse.org/reference/across.html)
+  (deprecated in 2.3.0), using `by = character()` to perform a cross
+  join (deprecated in 1.1.0), `compute(temporary = FALSE)` without a
+  `name` (deprecated in 2.3.3),
+  [`sql_random()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  (deprecated in 2.3.2),
+  [`sql_query_append()`](https://dbplyr.tidyverse.org/dev/reference/sql_query_insert.md)
+  with a lazy table for `from` (deprecated in 2.3.2), and
+  `tbl_sql(check_from)` (deprecated in 2.5.0).
 - Internal testing functions `src_test()`, `test_frame()` and
   `test_load()`, `test_register_src()` and `test_register_con()` have
   been removed.
@@ -154,6 +166,18 @@
 - [`bind_queries()`](https://dbplyr.tidyverse.org/dev/reference/bind_queries.md)
   makes it easy to combine multiple lazy queries using `UNION ALL`
   ([\#1342](https://github.com/tidyverse/dbplyr/issues/1342)).
+- The `cte` argument of
+  [`collect()`](https://dplyr.tidyverse.org/reference/compute.html),
+  [`compute()`](https://dplyr.tidyverse.org/reference/compute.html),
+  [`db_sql_render()`](https://dbplyr.tidyverse.org/dev/reference/db-misc.md),
+  [`remote_query()`](https://dbplyr.tidyverse.org/dev/reference/remote_name.md),
+  and
+  [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
+  now always warns when used; pass
+  `sql_options = sql_options(cte = TRUE)` instead.
+  [`collect()`](https://dplyr.tidyverse.org/reference/compute.html) and
+  [`compute()`](https://dplyr.tidyverse.org/reference/compute.html) gain
+  an `sql_options` argument to support this.
 - [`collapse()`](https://dplyr.tidyverse.org/reference/compute.html),
   [`collect()`](https://dplyr.tidyverse.org/reference/compute.html), and
   [`compute()`](https://dplyr.tidyverse.org/reference/compute.html) now
@@ -304,6 +328,8 @@
   ([\#1624](https://github.com/tidyverse/dbplyr/issues/1624)).
 - [`sql_escape_string()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   now defaults to using `'`.
+- [`sql_options()`](https://dbplyr.tidyverse.org/dev/reference/sql_options.md)
+  is no longer marked experimental.
 - [`sql_glue()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
   and
   [`sql_glue2()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
