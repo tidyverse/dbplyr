@@ -204,14 +204,6 @@
       Error in `recode_values()`:
       ! `x` must be a variable or function call, not a string.
 
-# list `to` is not supported
-
-    Code
-      translate_sql(recode_values(x, from = !!c("a"), to = !!list(1:4)), con = con)
-    Condition
-      Error in `recode_values()`:
-      ! List `to` is not supported in SQL translation.
-
 # replace_values() input checks
 
     Code

@@ -496,14 +496,18 @@ test_that("`x` must be a symbol or call", {
   })
 })
 
-test_that("list `to` is not supported", {
+test_that("list `to` allows column references and mixed scalars", {
   con <- dialect_ansi()
-  expect_snapshot(error = TRUE, {
-    translate_sql(
-      recode_values(x, from = !!c("a"), to = !!list(1:4)),
-      con = con
-    )
-  })
+  expect_translation(
+    con,
+    recode_values(x, from = c("a", "b"), to = list(col_a, col_b)),
+    "CASE WHEN (\"x\" IN ('a')) THEN \"col_a\" WHEN (\"x\" IN ('b')) THEN \"col_b\" END"
+  )
+  expect_translation(
+    con,
+    recode_values(x, from = c("a", "b"), to = list("A", col_b)),
+    "CASE WHEN (\"x\" IN ('a')) THEN 'A' WHEN (\"x\" IN ('b')) THEN \"col_b\" END"
+  )
 })
 
 # replace_values ----------------------------------------------------------

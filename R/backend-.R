@@ -325,6 +325,9 @@ base_scalar <- sql_translator(
   c = function(...) {
     c(...)
   },
+  list = function(...) {
+    list(...)
+  },
   `:` = \(from, to) from:to,
 
   between = function(x, left, right) {
