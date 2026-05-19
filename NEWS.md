@@ -3,16 +3,16 @@
 ## Lifecycle changes
 
 * Newly deprecated:
-  * dbplyr 1e interfaces. Backend developers have had over 2 years to update (#1197).
-  * `as.sql()` as part of major internal refactoring of how `sql()` and `ident()` are used (#1752).
-  * The `cte` argument of `collect()`, `compute()`, `db_sql_render()`, `remote_query()`, and `show_query()` now always warns when used; pass `sql_options = sql_options(cte = TRUE)` instead. `collect()` and `compute()` gain an `sql_options` argument to support this (#1834).
+  * dbplyr 1st edition interfaces no longer work. This concludes over 2 years of work with backend developers to get everyone moved to the 2nd edition (#1197).
+  * `as.sql()`, as part of major internal refactoring of how `sql()` and `ident()` are used (#1752).
+  * The `cte` argument of `collect()`, `compute()`, `db_sql_render()`, `remote_query()`, and `show_query()`; pass `sql_options = sql_options(cte = TRUE)` instead. `collect()` and `compute()` gain an `sql_options` argument to support this (#1834).
   * `do()`. Use `collect()` then your favourite tidyverse functions instead (#1767).
-  * `escape_ansi()`. Use `escape(x, con = simulate_dbi())` instead (#1793).
-  * `memdb_frame()` with a data frame; it was never explicitly supported but worked by coincidence. Use `copy_to(memdb(), df)` instead (#1704).
+  * `escape_ansi()`. Use `escape(x, con = dialect_ansi())` instead (#1793).
+  * `memdb_frame()` no longer accepts dataframes; this was never explicitly supported but worked by coincidence. Use `copy_to(memdb(), df)` instead (#1704).
   * `sql_expr_matches()`; provide an `is_not_distinct_from()` translation in `sql_translation()` instead (#1803).
-  * `src_memdb()` and `tbl_memdb()`; use `memdb()` and `copy_to(memdb(), df)` instead. New `local_memdb_frame()` for use in tests (#1704).
-  * `str_like()` argument `ignore_case` (@edward-burn, #1630).
-* Previously-warning deprecations are now defunct, i.e. they error (#1834):
+  * `src_memdb()` and `tbl_memdb()`; use `memdb()` and `copy_to(memdb(), df)` instead. There's also a new `local_memdb_frame()` for use in tests (#1704).
+  * `str_like(ignore_case = )`; use `str_ilike()` instead (@edward-burn, #1630).
+* Previously-warning deprecations are defunct (#1834):
   * Passing extra `...` to `across()` and `if_all()`/`if_any()` (deprecated in 2.3.0, 2023-01-16).
   * Using `by = character()` to perform a cross join (deprecated in dplyr 1.1.0, 2023-01-29).
   * `compute(temporary = FALSE)` without a `name` (deprecated in 2.3.3, 2023-07-07).
@@ -23,101 +23,107 @@
   * `group_by(add = )`, deprecated in dplyr 1.0.0 (2020-06-01).
   * `partial_eval(var)`, deprecated in 2.2.0 (2022-06-05).
   * `src_sql()`, deprecated in 1.4.0 (2019-04-23).
-  * `win_rank_tdata()`, deprecated in 2.4.0 (2023-10-25).
+  * `win_rank_tdata()`, deprecated in 2.4.0 (2023-10-25). (This is earlier than our usual policy because it was only used by the Terdata backend.)
 * Internal testing functions have been removed: `src_test()`, `test_frame()`, `test_load()`, `test_register_src()`, and `test_register_con()` (#1712).
+* `build_sql()`, `sql_expr()`, and `sql_call2()` are superseded in favour of `sql_glue()` and `sql_glue2()` (#1249).
 * `sql_options()` is no longer marked experimental.
 
-## New backends
+## New features
 
-* ADBC connections (via the adbi package) are now supported. dbplyr automatically detects the underlying database type by querying the ADBC driver's vendor name and uses the appropriate SQL dialect (#1787).
-* JDBC connections are now supported. dbplyr automatically detects the underlying database type from the JDBC connection class and uses the appropriate SQL dialect (#1359).
-* IBM DB2: new backend with support for FETCH FIRST n ROWS ONLY syntax and automatic detection for JDBC connections using com.ibm.db2 drivers (@shearerpmm, #1800). Includes translations for `paste()`/`paste0()` (using `||`), DB2-specific casts, `runif()`, string functions, date functions, clock helpers, and statistical aggregates.
-* `sql_dialect()` is a new generic that provides a way for database connections to choose a SQL dialect, using `new_sql_dialect()` to create a `sql_dialect` class. This allows connections to more easily share translations, and lays the foundation for better translations for the ODBC/JDBC/ADBC backends (#1624).
+### New backends
+
+* ADBC connections (via {adbi}): dbplyr automatically detects the underlying database type by querying the ADBC driver's vendor name and uses the appropriate SQL dialect (#1787).
+* JDBC connections (via {RJDBC}): dbplyr automatically detects the underlying database type from the JDBC connection class and uses the appropriate SQL dialect (#1359).
+* IBM DB2 (@shearerpmm, #1800). Includes translations for `paste()`/`paste0()` (using `||`), DB2-specific casts, `runif()`, string functions, date functions, clock helpers, statistical aggregates, and more.
+* `sql_dialect()` is a new generic that provides a way for database connections to choose a SQL dialect. You won't use this directly as a dbplyr user, but it makes it easier for connections to share translations, and empowers the new JDBC and ADBC backends (#1624).
 * `with_dialect()` overrides the default SQL dialect for a connection, which is useful if dbplyr guesses incorrectly (#1784).
 
-## New translations
+### New verb support 
 
-New verbs:
-
-* `bind_queries()` makes it easy to combine multiple lazy queries using `UNION ALL` (#1342).
-* `filter_out()` is supported. The combined condition is wrapped in `is_distinct_from(., TRUE)`, producing backend-appropriate SQL such as `IS DISTINCT FROM TRUE` on PostgreSQL or `IS NOT TRUE` on SQLite, so rows where the condition is `NA` are kept (#1803).
+* `bind_queries()` makes it easy to combine multiple lazy queries using `UNION ALL` (#1342). It's the equivalent to `dplyr::bind_rows()` for dbplyr.
+* `filter_out()`, from dplyr 1.2.0, is now supported. The combined condition is wrapped in `is_distinct_from(., TRUE)`, producing backend-appropriate SQL such as `IS DISTINCT FROM TRUE` on PostgreSQL or `IS NOT TRUE` on SQLite, so rows where the condition is `NA` are kept (#1803).
 * `mutate()` gains `.order` and `.frame` arguments for specifying window function ordering and frame bounds within a single mutate call, similar to how `.by` works for grouping (#1542).
 
-New functions:
+### New function translations
 
 * `anyNA()` is translated to SQL as `any(is.na(x))` (#1814).
 * `as(x, "type")` is translated to `CAST(x AS type)`, allowing you to cast to arbitrary database types not covered by the standard `as.*()` functions (#1729).
 * `is_distinct_from()` and `is_not_distinct_from()` expose `IS DISTINCT FROM` / `IS NOT DISTINCT FROM` semantics with backend-specific dialects (#1803).
-* `%notin%` is translated to `NOT IN` (#1820).
+* `%notin%` (introduced in R 4.6.0) is translated to `NOT IN` (#1820).
+
+### Other new helpers:
+
+* `last_sql()` retrieves the most recent SQL query generated by dbplyr, which is useful for debugging (#1471).
+* The `copy` argument of join, set, and row operations accepts `"inline"` to use `copy_inline()` instead of copying to a temporary table (#863).
 
 ## Extensions
 
-* Set operations (`union()`, `intersect()`, `setdiff()`) now use the `sql_set_op_method()` generic to generate the SQL set operation keyword. This allows backends to customize the behavior, e.g., using "UNION DISTINCT" instead of "UNION" for databases that require it, or "MINUS" instead of "EXCEPT" for Oracle (#1596).
-* `db_supports_table_alias_with_as()` and `supports_window_clause()` generics have been removed. They are now part of the `sql_dialect()` data structure (#1760).
-* `db_table_drop_if_exists()` is a new generic that allows backends to customize how tables are dropped when `overwrite = TRUE` (#1695).
+The following changes and new capabilities are of interest to dbplyr backend developers:
+
+* `db_supports_table_alias_with_as()` and `supports_window_clause()` generics have been removed. They were not used by any pacakge and are now part of the `new_sql_dialect()` data structure (#1760).
+* `db_table_drop_if_exists()` is a new generic that allows backends to customize how tables are dropped when `overwrite = TRUE` (#1695). This was added to support Oracle.
 * `db_table_temporary()` has been renamed to `sql_table_temporary()` for consistency with other SQL generation functions (#1760).
-* `remote_table()` now returns `sql()` containing the (correctly quoted) table identifier, rather than the internal `dbplyr_table_path`. This makes the result suitable for inlining into `build_sql()` and `sql_glue2()` (#1807).
+* `dialect_*()` translations use (approximately) correct quoting for all backends, so the generated SQL looks more like what you'll actually get when connected to a real database (#1464).
+* `remote_table()` returns an `sql()` object containing the (correctly quoted) table identifier, rather than the internal `dbplyr_table_path`. This makes the result suitable for inlining into `build_sql()` and `sql_glue2()` (#1807).
+* New `sql_dialect()` generic allows database connections to choose a SQL dialect, using `new_sql_dialect()` to create a `sql_dialect` class. `new_sql_dialect()` allows you to customise SQL generation including how identifiers are quoted (#1624).
 * `set_op_query()` no longer has an `all` argument.
-* `simulate_*()` now uses (approximately) correct quoting for all backends, so the generated SQL looks more like what you'll actually get when connected to a real database (#1464).
-* `sql_check_na_rm()` is now exported for use in other backends (#1483).
-* `sql_escape_string()` now defaults to using `'` (#1701).
-* `sql_glue()` and `sql_glue2()` provide a convenient syntax for building SQL strings. These functions replace the now superseded `build_sql()`, `sql_expr()`, and `sql_call2()` (#1249).
-* `sql_glue2()` is now exported for building SQL strings with glue syntax and type markers (#1249).
-* `sql_infix()` no longer has a `con` argument since the connection needs to be determined at call time, not at definition time.
-* `sql_optimise()` is no longer used. It was only used for two cases (filter + summarise and arrange + summarise), and these are now handled at a higher level (#1720). It will be removed in a future version.
+* `sql_check_na_rm()` is exported for use in other backends (#1483).
+* `sql_escape_string()` defaults to using `'` (#1701).
+* `sql_glue()` and `sql_glue2()` are exported and provide a convenient syntax for building SQL strings; `sql_glue2()` adds support for type markers (#1249).
+* `sql_infix()` no longer has a `con` argument; the connection needs to be determined at call time, not at definition time.
+* `sql_optimise()` is no longer used. It was only used for two cases (filter + summarise and arrange + summarise), and these are handled at a higher level (#1720). It will be removed in a future version.
+* New `sql_set_op_method()` generic allows set operations (`union()`, `intersect()`, `setdiff()`) to customise the SQL keyword. This allows backends to customize the behavior, e.g., using `UNION DISTINCT` instead of `UNION` for databases that require it, or `MINUS` instead of `EXCEPT` for Oracle (#1596).
 
 ## SQL translation improvements
 
-* Single-table SELECT queries now use unqualified `*` (e.g., `SELECT *`) instead of table-qualified `*` (e.g., `SELECT "df".*`) for most backends. Oracle and Teradata continue to use qualified stars as required by their syntax (#1577, #1485).
-* `.sql` pronoun makes it a little easier to use known SQL functions in packages, requiring only `@importFrom dbplyr .sql` (#1117).
+* Single-table SELECT queries use unqualified `*` (e.g., `SELECT *`) instead of table-qualified `*` (e.g., `SELECT "df".*`) for most backends. Oracle and Teradata continue to use qualified stars as required by their syntax (#1577, #1485).
+* `.sql` pronoun makes it a little easier to use known SQL functions in packages, requiring only `@importFrom dbplyr .sql` (#1117). Now you can write `db |> mutate(.sql$custom_sql_function(x, y, z))` and only need to `@importFrom dbplyr .sql` to quiet all `R CMD check` notes.
 * Custom translations of functions starting with `.` work (@MichaelChirico, #1529).
 * `pi` is no longer translated to `PI()`. This caused problems if you had a column called `pi` (#1531).
-* `arrange()` now applies consecutively, matching dplyr's behavior: `arrange(y) |> arrange(x)` is now equivalent to `arrange(x, y)`. Empty `arrange()` now preserves existing ordering instead of clearing it (#789).
-* `.data$col`, `.data[[col]]`, `.env$var`, and `.env$[[var]]` now work correctly inside `across()` (#1520).
+* `arrange()` applies consecutively, matching dplyr's behavior, i.e. `arrange(y) |> arrange(x)` is equivalent to `arrange(x, y)`. Empty `arrange()` preserves existing ordering instead of clearing it (#789).
+* `.data$col`, `.data[[col]]`, `.env$var`, and `.env$[[var]]` work correctly inside `across()` (#1520).
 * `distinct()` after a join no longer creates a subquery (#722).
-* `distinct()` with computed columns now ignores grouping, matching dplyr's behavior (#1081).
+* `distinct()` with computed columns ignores grouping, matching dplyr's behavior (#1081).
 * `filter()` after `left_join()` or `inner_join()` no longer creates a subquery (#722).
 * `filter()` followed by a `summarise()` is once again inlined correctly (#1707).
-* `filter()` after `rename()` no longer rewrites field names of `$` and `@` expressions, so e.g. `filter(z == ltr$z)` after `rename(z = x)` now looks up `ltr$z`, not `ltr$x` (#1812).
-* `if_else()` uses simpler translation for `missing` (#1573).
-* `join_by(between())` now correctly handles column renames (#1572).
-* `last_sql()` retrieves the most recent SQL query generated by dbplyr, which is useful for debugging (#1471).
-* `n_distinct()` now has an `na.rm` argument, which regularly warns when it's not `TRUE` (#1579).
-* `na_matches = "na"` now works correctly with inequality and overlap joins, preserving the comparison operator instead of converting to equality (#1505).
+* `filter()` after `rename()` no longer rewrites field names of `$` and `@` expressions, so e.g. `filter(z == ltr$z)` after `rename(z = x)` looks up `ltr$z`, not `ltr$x` (#1812).
+* `if_else()` uses a simpler translation for the `missing` argument (#1573).
+* `join_by(between())` correctly handles column renames (#1572).
+* `n_distinct()` gains an `na.rm` argument, which warns whenever it's not `TRUE` (#1579).
+* `na_matches = "na"` works correctly with inequality and overlap joins, preserving the comparison operator instead of converting to equality (#1505).
 * `semi_join()` and `anti_join()` once again work with filtered windowed values (#1534, #1606).
-* `slice_*()` now handles missing values in line with the documentation, i.e. they are always removed (#1599).
-* `str_flatten()` now has an `na.rm` argument, which regularly warns when it's not `TRUE` (#1540).
-* `str_like()` now uses case-sensitive `LIKE` when argument `ignore_case` is set as `FALSE` (@edward-burn, #1488).
+* `slice_*()` handles missing values in line with the documentation, i.e., they are always removed (#1599).
+* `str_flatten()` gains an `na.rm` argument, which warns whenever it's not `TRUE` (#1540).
+* `str_like()` uses case-sensitive `LIKE` when argument `ignore_case` is set as `FALSE` (@edward-burn, #1488).
 * `window_order()` works with `dplyr::desc()` (not just `desc()`) (#1486).
 * Backend-specific improvements:
   * MS Access: correctly generates SQL for multiple joins by adding required parentheses (#1576).
   * MySQL: gains slightly better translation for `as.integer()` and `as.integer64()` (#1647).
-  * Oracle: temporary tables now use private temporary tables (Oracle 18c+) instead of global temporary tables. This ensures data persists correctly and table names are automatically prefixed with `ORA$PTT_` (#750).
+  * Oracle: temporary tables use private temporary tables (Oracle 18c+) instead of global temporary tables. This ensures data persists correctly and table names are automatically prefixed with `ORA$PTT_` (#750).
   * PostgreSQL: improved translation for `seconds()`, `minutes()`, `hours()`, `days()`, `weeks()`, `months()`, and `years()`.
   * Postgres, Redshift, Snowflake, and Spark: new translations for `str_ilike()` (@edward-burn, #1628).
-  * Redshift: `dbplyr_uncount()` now works (@owenjonesuob, #1601); corrected error message for `quantile()` and `median()` in `mutate()` (@edward-burn, #1571); fixed syntax error in `date_build()` translation (#1512).
+  * Redshift: `dbplyr_uncount()` works (@owenjonesuob, #1601); corrected error message for `quantile()` and `median()` in `mutate()` (@edward-burn, #1571); fixed syntax error in `date_build()` translation (#1512).
   * Snowflake: correctly translates `$` to `:` (@jsowder, #1608); fixed translations that were being reported as unknown (@edward-burn, #1570).
-  * SQL Server: `between()` now uses `CASE WHEN` instead of `IIF()` for compatibility with Azure Synapse (@rehbbea, #1773); `if_else()` now uses `CASE WHEN` instead of `IIF` so `NULL` handling matches R's `NA` handling rules (#1569); `slice_sample()` returns different results each run (@thomashulst, #1503); `str_like()` and `str_ilike()` now have consistent behaviour (@edward-burn, #1669); version 17.0 (2025) now supports stringr regex functions: `str_detect()`, `str_starts()`, `str_ends()`, `str_replace()`, `str_replace_all()`, `str_remove()`, `str_remove_all()`, `str_extract()`, and `str_count()`. Fixed pattern versions of `str_detect()`, `str_starts()`, and `str_ends()` work on all SQL Server versions (#1671); uses `DATEDIFF_BIG` instead of `DATEDIFF` to work regardless of data size (@edward-burn, #1666).
+  * SQL Server: `between()` uses `CASE WHEN` instead of `IIF()` for compatibility with Azure Synapse (@rehbbea, #1773); `if_else()` uses `CASE WHEN` instead of `IIF` so `NULL` handling matches R's `NA` handling (#1569); `slice_sample()` returns different results each run (@thomashulst, #1503); `str_like()` and `str_ilike()` behave consistently (@edward-burn, #1669); on version 17.0 (2025) the stringr regex functions `str_detect()`, `str_starts()`, `str_ends()`, `str_replace()`, `str_replace_all()`, `str_remove()`, `str_remove_all()`, `str_extract()`, and `str_count()` are translated, and fixed-pattern versions of `str_detect()`, `str_starts()`, and `str_ends()` work on all versions (#1671); uses `DATEDIFF_BIG` instead of `DATEDIFF` so `tally()` and `count()` work regardless of data size (@edward-burn, #1666).
 
 ## Minor improvements and bug fixes
 
-* CTEs now correctly quote table names when the same query is used multiple times (#1559).
-* dbplyr now uses the base pipe (#1626).
-* The `copy` argument of join, set, and row operations now accepts `"inline"` to use `copy_inline()` instead of copying to a temporary table (#863).
+* CTEs correctly quote table names when the same query is used multiple times (#1559).
+* dbplyr uses the base pipe in all examples (#1626).
 * The print method no longer mentions the "source" in the header, because it's an outdated dplyr concept (#897).
-* All set operations now error if you pass extra arguments (instead of silently ignoring them) (#1585).
-* `collapse()`, `collect()`, and `compute()` now have their own documentation pages (#1637).
-* `copy_inline()` now works with blob columns (#1515).
-* `copy_to()` now works when source is in the same DB as destination when using `overwrite = TRUE` (@liudvikasakelis, #1535).
-* `cross_join()` now gives a clear error when called with extra unnamed arguments instead of a confusing message about `multiple` (#1792).
+* All set operations error if you pass extra arguments (instead of silently ignoring them) (#1585).
+* `collapse()`, `collect()`, and `compute()` have their own documentation pages (#1637).
+* `copy_inline()` works with blob columns (#1515).
+* `copy_to()` works when the source is in the same database as the destination and `overwrite = TRUE` (@liudvikasakelis, #1535).
+* `cross_join()` gives a clear error when called with extra unnamed arguments instead of a confusing message about `multiple` (#1792).
 * `db_col_types()` gains a SQLite method so that `rows_*()` operations can preserve column types when copying data (#1821).
-* `expand()` now errors when column expressions don't reference any columns in the data, instead of generating invalid SQL (#720).
-* `fill()` now errors if you attempt to rename a column, for consistency with dplyr (#1536).
-* `if_else()` and `ifelse()` now give a clear error if `true`/`false` or `yes`/`no` are missing (#1798).
-* `pivot_wider()` now accepts anonymous functions (e.g. `\(x) max(x, na.rm = TRUE)`) in `values_fn`, not just purrr-style lambdas (#1816).
-* `pull()` now handles `name` as a quosure of `NULL` (#1808).
-* `show_query()` gains `use_colour` argument (#1590).
-* `summarise()` now reports grouping immediately, rather than when you the SQL is generated (#1721).
+* `expand()` errors when column expressions don't reference any columns in the data, instead of generating invalid SQL (#720).
+* `fill()` errors if you attempt to rename a column, for consistency with dplyr (#1536).
+* `if_else()` and `ifelse()` give a clear error if `true`/`false` or `yes`/`no` are missing (#1798).
+* `pivot_wider()` accepts anonymous functions (e.g. `\(x) max(x, na.rm = TRUE)`) in `values_fn`, not just purrr-style lambdas (#1816).
+* `pull()` correctly handles a `NULL` quosure passed to `name` (#1808).
+* `show_query()` gains a `use_colour` argument (#1590).
+* `summarise()` reports grouping immediately, rather than when the SQL is generated (#1721).
 
 # dbplyr 2.5.2
 
