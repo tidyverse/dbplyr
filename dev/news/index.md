@@ -2,236 +2,285 @@
 
 ## dbplyr (development version)
 
-- ADBC connections (via the adbi package) are now supported. dbplyr
-  automatically detects the underlying database type by querying the
-  ADBC driver’s vendor name and uses the appropriate SQL dialect
+### Lifecycle changes
+
+- Newly deprecated:
+  - dbplyr 1st edition interfaces no longer work. This concludes over 2
+    years of work with backend developers to get everyone moved to the
+    2nd edition
+    ([\#1197](https://github.com/tidyverse/dbplyr/issues/1197)).
+  - [`as.sql()`](https://dbplyr.tidyverse.org/dev/reference/as.sql.md),
+    as part of major internal refactoring of how
+    [`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md) and
+    [`ident()`](https://dbplyr.tidyverse.org/dev/reference/ident.md) are
+    used ([\#1752](https://github.com/tidyverse/dbplyr/issues/1752)).
+  - The `cte` argument of
+    [`collect()`](https://dplyr.tidyverse.org/reference/compute.html),
+    [`compute()`](https://dplyr.tidyverse.org/reference/compute.html),
+    [`db_sql_render()`](https://dbplyr.tidyverse.org/dev/reference/db-misc.md),
+    [`remote_query()`](https://dbplyr.tidyverse.org/dev/reference/remote_name.md),
+    and
+    [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md);
+    pass `sql_options = sql_options(cte = TRUE)` instead.
+    [`collect()`](https://dplyr.tidyverse.org/reference/compute.html)
+    and
+    [`compute()`](https://dplyr.tidyverse.org/reference/compute.html)
+    gain an `sql_options` argument to support this
+    ([\#1834](https://github.com/tidyverse/dbplyr/issues/1834)).
+  - [`do()`](https://dplyr.tidyverse.org/reference/do.html). Use
+    [`collect()`](https://dplyr.tidyverse.org/reference/compute.html)
+    then your favourite tidyverse functions instead
+    ([\#1767](https://github.com/tidyverse/dbplyr/issues/1767)).
+  - [`escape_ansi()`](https://dbplyr.tidyverse.org/dev/reference/escape_ansi.md).
+    Use `escape(x, con = dialect_ansi())` instead
+    ([\#1793](https://github.com/tidyverse/dbplyr/issues/1793)).
+  - [`memdb_frame()`](https://dbplyr.tidyverse.org/dev/reference/memdb.md)
+    no longer accepts dataframes; this was never explicitly supported
+    but worked by coincidence. Use `copy_to(memdb(), df)` instead
+    ([\#1704](https://github.com/tidyverse/dbplyr/issues/1704)).
+  - [`sql_expr_matches()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md);
+    provide an `is_not_distinct_from()` translation in
+    [`sql_translation()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+    instead ([\#1803](https://github.com/tidyverse/dbplyr/issues/1803)).
+  - [`src_memdb()`](https://dbplyr.tidyverse.org/dev/reference/src_memdb.md)
+    and
+    [`tbl_memdb()`](https://dbplyr.tidyverse.org/dev/reference/src_memdb.md);
+    use [`memdb()`](https://dbplyr.tidyverse.org/dev/reference/memdb.md)
+    and `copy_to(memdb(), df)` instead. There’s also a new
+    [`local_memdb_frame()`](https://dbplyr.tidyverse.org/dev/reference/memdb.md)
+    for use in tests
+    ([\#1704](https://github.com/tidyverse/dbplyr/issues/1704)).
+  - `str_like(ignore_case = )`; use `str_ilike()` instead
+    ([@edward-burn](https://github.com/edward-burn),
+    [\#1630](https://github.com/tidyverse/dbplyr/issues/1630)).
+- Previously-warning deprecations are defunct
+  ([\#1834](https://github.com/tidyverse/dbplyr/issues/1834)):
+  - Passing extra `...` to
+    [`across()`](https://dplyr.tidyverse.org/reference/across.html) and
+    [`if_all()`](https://dplyr.tidyverse.org/reference/across.html)/[`if_any()`](https://dplyr.tidyverse.org/reference/across.html)
+    (deprecated in 2.3.0, 2023-01-16).
+  - Using `by = character()` to perform a cross join (deprecated in
+    dplyr 1.1.0, 2023-01-29).
+  - `compute(temporary = FALSE)` without a `name` (deprecated in 2.3.3,
+    2023-07-07).
+  - [`sql_random()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+    (deprecated in 2.3.2, 2023-03-21).
+  - [`sql_query_append()`](https://dbplyr.tidyverse.org/dev/reference/sql_query_insert.md)
+    with a lazy table for `from` (deprecated in 2.3.2, 2023-03-21).
+  - `tbl_sql(check_from)` (deprecated in 2.5.0, 2024-03-15).
+- Previously-defunct functions have been removed:
+  - `group_by(add = )`, deprecated in dplyr 1.0.0 (2020-06-01).
+  - `partial_eval(var)`, deprecated in 2.2.0 (2022-06-05).
+  - [`src_sql()`](https://dbplyr.tidyverse.org/dev/reference/src_sql.md),
+    deprecated in 1.4.0 (2019-04-23).
+  - `win_rank_tdata()`, deprecated in 2.4.0 (2023-10-25). (This is
+    earlier than our usual policy because it was only used by the
+    Terdata backend.)
+- Internal testing functions have been removed: `src_test()`,
+  `test_frame()`, `test_load()`, `test_register_src()`, and
+  `test_register_con()`
+  ([\#1712](https://github.com/tidyverse/dbplyr/issues/1712)).
+- [`build_sql()`](https://dbplyr.tidyverse.org/dev/reference/build_sql.md),
+  [`sql_expr()`](https://dbplyr.tidyverse.org/dev/reference/sql_expr.md),
+  and
+  [`sql_call2()`](https://dbplyr.tidyverse.org/dev/reference/sql_expr.md)
+  are superseded in favour of
+  [`sql_glue()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
+  and
+  [`sql_glue2()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
+  ([\#1249](https://github.com/tidyverse/dbplyr/issues/1249)).
+- [`sql_options()`](https://dbplyr.tidyverse.org/dev/reference/sql_options.md)
+  is no longer marked experimental.
+
+### New features
+
+#### New backends
+
+- ADBC connections (via {adbi}): dbplyr automatically detects the
+  underlying database type by querying the ADBC driver’s vendor name and
+  uses the appropriate SQL dialect
   ([\#1787](https://github.com/tidyverse/dbplyr/issues/1787)).
-- JDBC connections are now supported. dbplyr automatically detects the
+- JDBC connections (via {RJDBC}): dbplyr automatically detects the
   underlying database type from the JDBC connection class and uses the
   appropriate SQL dialect
   ([\#1359](https://github.com/tidyverse/dbplyr/issues/1359)).
-- CTEs now correctly quote table names when the same query is used
-  multiple times
-  ([\#1559](https://github.com/tidyverse/dbplyr/issues/1559)).
-- Custom translations of functions starting with `.` work
-  ([@MichaelChirico](https://github.com/MichaelChirico),
-  [\#1529](https://github.com/tidyverse/dbplyr/issues/1529)).
-- dbplyr 1e interfaces are now deprecated
-  ([\#1197](https://github.com/tidyverse/dbplyr/issues/1197)). Backend
-  developers have had \>2 years to update.
-- dbplyr no longer attempts to translate `pi` to `PI()`. This caused
-  problems if you had a column called `pi`
-  ([\#1531](https://github.com/tidyverse/dbplyr/issues/1531)).
-- dbplyr now uses the base pipe
-  ([\#1626](https://github.com/tidyverse/dbplyr/issues/1626)).
-- Defunct functions have been removed:
-  - [`src_sql()`](https://dbplyr.tidyverse.org/dev/reference/src_sql.md)
-    deprecated in 1.4.0 (2019-04-23)
-  - `partial_eval(var)` deprecated in 2.2.0 (2022-06-05).
-  - `group_by(add = )` deprecated in dplyr 1.1.0 (2020-06-01).
-- Previously-warning deprecations are now defunct (i.e., they error):
-  passing extra `...` to
-  [`across()`](https://dplyr.tidyverse.org/reference/across.html) and
-  [`if_all()`](https://dplyr.tidyverse.org/reference/across.html)/[`if_any()`](https://dplyr.tidyverse.org/reference/across.html)
-  (deprecated in 2.3.0), using `by = character()` to perform a cross
-  join (deprecated in 1.1.0), `compute(temporary = FALSE)` without a
-  `name` (deprecated in 2.3.3),
-  [`sql_random()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
-  (deprecated in 2.3.2),
-  [`sql_query_append()`](https://dbplyr.tidyverse.org/dev/reference/sql_query_insert.md)
-  with a lazy table for `from` (deprecated in 2.3.2), and
-  `tbl_sql(check_from)` (deprecated in 2.5.0).
-- Internal testing functions `src_test()`, `test_frame()` and
-  `test_load()`, `test_register_src()` and `test_register_con()` have
-  been removed.
-- Set operations
-  ([`union()`](https://generics.r-lib.org/reference/setops.html),
-  [`intersect()`](https://generics.r-lib.org/reference/setops.html),
-  [`setdiff()`](https://generics.r-lib.org/reference/setops.html)) now
-  use the
-  [`sql_set_op_method()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
-  generic to generate the SQL set operation keyword. This allows
-  backends to customize the behavior, e.g., using “UNION DISTINCT”
-  instead of “UNION” for databases that require it, or “MINUS” instead
-  of “EXCEPT” for Oracle
-  ([\#1596](https://github.com/tidyverse/dbplyr/issues/1596)).
-- Single-table SELECT queries now use unqualified `*` (e.g., `SELECT *`)
-  instead of table-qualified `*` (e.g., `SELECT "df".*`) for most
-  backends. Oracle and Teradata continue to use qualified stars as
-  required by their syntax
-  ([\#1577](https://github.com/tidyverse/dbplyr/issues/1577),
-  [\#1485](https://github.com/tidyverse/dbplyr/issues/1485)).
-- The `copy` argument of join, set, and row operations now accepts
+- IBM DB2 ([@shearerpmm](https://github.com/shearerpmm),
+  [\#1800](https://github.com/tidyverse/dbplyr/issues/1800)). Includes
+  translations for
+  [`paste()`](https://rdrr.io/r/base/paste.html)/[`paste0()`](https://rdrr.io/r/base/paste.html)
+  (using `||`), DB2-specific casts,
+  [`runif()`](https://rdrr.io/r/stats/Uniform.html), string functions,
+  date functions, clock helpers, statistical aggregates, and more.
+- [`sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
+  is a new generic that provides a way for database connections to
+  choose a SQL dialect. You won’t use this directly as a dbplyr user,
+  but it makes it easier for connections to share translations, and
+  empowers the new JDBC and ADBC backends
+  ([\#1624](https://github.com/tidyverse/dbplyr/issues/1624)).
+- [`with_dialect()`](https://dbplyr.tidyverse.org/dev/reference/with_dialect.md)
+  overrides the default SQL dialect for a connection, which is useful if
+  dbplyr guesses incorrectly
+  ([\#1784](https://github.com/tidyverse/dbplyr/issues/1784)).
+
+#### New verb support
+
+- [`bind_queries()`](https://dbplyr.tidyverse.org/dev/reference/bind_queries.md)
+  makes it easy to combine multiple lazy queries using `UNION ALL`
+  ([\#1342](https://github.com/tidyverse/dbplyr/issues/1342)). It’s the
+  equivalent to
+  [`dplyr::bind_rows()`](https://dplyr.tidyverse.org/reference/bind_rows.html)
+  for dbplyr.
+- [`filter_out()`](https://dplyr.tidyverse.org/reference/filter.html),
+  from dplyr 1.2.0, is now supported. The combined condition is wrapped
+  in `is_distinct_from(., TRUE)`, producing backend-appropriate SQL such
+  as `IS DISTINCT FROM TRUE` on PostgreSQL or `IS NOT TRUE` on SQLite,
+  so rows where the condition is `NA` are kept
+  ([\#1803](https://github.com/tidyverse/dbplyr/issues/1803)).
+- [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html) gains
+  `.order` and `.frame` arguments for specifying window function
+  ordering and frame bounds within a single mutate call, similar to how
+  `.by` works for grouping
+  ([\#1542](https://github.com/tidyverse/dbplyr/issues/1542)).
+
+#### New function translations
+
+- [`anyNA()`](https://rdrr.io/r/base/NA.html) is translated to SQL as
+  `any(is.na(x))`
+  ([\#1814](https://github.com/tidyverse/dbplyr/issues/1814)).
+- `as(x, "type")` is translated to `CAST(x AS type)`, allowing you to
+  cast to arbitrary database types not covered by the standard `as.*()`
+  functions ([\#1729](https://github.com/tidyverse/dbplyr/issues/1729)).
+- `is_distinct_from()` and `is_not_distinct_from()` expose
+  `IS DISTINCT FROM` / `IS NOT DISTINCT FROM` semantics with
+  backend-specific dialects
+  ([\#1803](https://github.com/tidyverse/dbplyr/issues/1803)).
+- `%notin%` (introduced in R 4.6.0) is translated to `NOT IN`
+  ([\#1820](https://github.com/tidyverse/dbplyr/issues/1820)).
+
+#### Other new helpers:
+
+- [`last_sql()`](https://dbplyr.tidyverse.org/dev/reference/last_sql.md)
+  retrieves the most recent SQL query generated by dbplyr, which is
+  useful for debugging
+  ([\#1471](https://github.com/tidyverse/dbplyr/issues/1471)).
+- The `copy` argument of join, set, and row operations accepts
   `"inline"` to use
   [`copy_inline()`](https://dbplyr.tidyverse.org/dev/reference/copy_inline.md)
   instead of copying to a temporary table
   ([\#863](https://github.com/tidyverse/dbplyr/issues/863)).
-- The print method no longer mentions the “source” in the header,
-  because it’s an outdated dplyr concept
-  ([\#897](https://github.com/tidyverse/dbplyr/issues/897)).
-- IBM DB2: new backend with support for FETCH FIRST n ROWS ONLY syntax
-  and automatic detection for JDBC connections using com.ibm.db2 drivers
-  ([@shearerpmm](https://github.com/shearerpmm)). Includes translations
-  for
-  [`paste()`](https://rdrr.io/r/base/paste.html)/[`paste0()`](https://rdrr.io/r/base/paste.html)
-  (using `||`), DB2-specific casts,
-  [`runif()`](https://rdrr.io/r/stats/Uniform.html), string functions,
-  date functions, clock helpers, and statistical aggregates.
-- MS Access: correctly generates SQL for multiple joins by adding
-  required parentheses
-  ([\#1576](https://github.com/tidyverse/dbplyr/issues/1576)).
-- MySQL: gains slightly better translation for
-  [`as.integer()`](https://rdrr.io/r/base/integer.html) and
-  `as.integer64()`
-  ([\#1647](https://github.com/tidyverse/dbplyr/issues/1647)).
-- Oracle: temporary tables now use private temporary tables (Oracle
-  18c+) instead of global temporary tables. This ensures data persists
-  correctly and table names are automatically prefixed with `ORA$PTT_`
-  ([\#750](https://github.com/tidyverse/dbplyr/issues/750)).
-- PostgreSQL: improved translation for `seconds()`, `minutes()`,
-  `hours()`, `days()`, `weeks()`,
-  [`months()`](https://rdrr.io/r/base/weekday.POSIXt.html), and
-  `years()`.
-- Postgres, Redshift, Snowflake, and Spark: new translations for
-  `str_ilike()` ([@edward-burn](https://github.com/edward-burn),
-  [\#1628](https://github.com/tidyverse/dbplyr/issues/1628)).
-- Redshift:
-  [`dbplyr_uncount()`](https://dbplyr.tidyverse.org/dev/reference/dbplyr_uncount.md)
-  now works ([@owenjonesuob](https://github.com/owenjonesuob),
-  [\#1601](https://github.com/tidyverse/dbplyr/issues/1601)).
-- Redshift: corrected error message for
-  [`quantile()`](https://rdrr.io/r/stats/quantile.html) and
-  [`median()`](https://rdrr.io/r/stats/median.html) in
-  [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html)
-  ([@edward-burn](https://github.com/edward-burn),
-  [\#1571](https://github.com/tidyverse/dbplyr/issues/1571)).
-- Redshift: fixed syntax error in `date_build()` translation
-  ([\#1512](https://github.com/tidyverse/dbplyr/issues/1512)).
-- Snowflake: correctly translates `$` to `:`
-  ([@jsowder](https://github.com/jsowder),
-  [\#1608](https://github.com/tidyverse/dbplyr/issues/1608)).
-- Snowflake: fixed translations that were being reported as unknown
-  ([@edward-burn](https://github.com/edward-burn),
-  [\#1570](https://github.com/tidyverse/dbplyr/issues/1570)).
-- SQL Server:
-  [`between()`](https://dplyr.tidyverse.org/reference/between.html) now
-  uses `CASE WHEN` instead of `IIF()` for compatibility with Azure
-  Synapse ([@rehbbea](https://github.com/rehbbea),
-  [\#1773](https://github.com/tidyverse/dbplyr/issues/1773)).
-- SQL Server:
-  [`if_else()`](https://dplyr.tidyverse.org/reference/if_else.html) now
-  uses `CASE WHEN` instead of `IIF`. This ensures the handling of
-  `NULL`s matches R’s `NA` handling rules
-  ([\#1569](https://github.com/tidyverse/dbplyr/issues/1569)).
-- SQL Server:
-  [`slice_sample()`](https://dplyr.tidyverse.org/reference/slice.html)
-  returns different results each run
-  ([@thomashulst](https://github.com/thomashulst),
-  [\#1503](https://github.com/tidyverse/dbplyr/issues/1503)).
-- SQL Server: `str_like()` and `str_ilike()` now have consistent
-  behaviour ([@edward-burn](https://github.com/edward-burn),
-  [\#1669](https://github.com/tidyverse/dbplyr/issues/1669)).
-- SQL Server: version 17.0 (2025) now supports stringr regex functions:
-  `str_detect()`, `str_starts()`, `str_ends()`, `str_replace()`,
-  `str_replace_all()`, `str_remove()`, `str_remove_all()`,
-  `str_extract()`, and `str_count()`. Fixed pattern versions of
-  `str_detect()`, `str_starts()`, and `str_ends()` work on all SQL
-  Server versions
-  ([\#1671](https://github.com/tidyverse/dbplyr/issues/1671)).
-- SQL Server: uses `DATEDIFF_BIG` instead of `DATEDIFF` to work
-  regardless of data size
-  ([@edward-burn](https://github.com/edward-burn),
-  [\#1666](https://github.com/tidyverse/dbplyr/issues/1666)).
-- All set operations now error if you pass extra arguments (instead of
-  silently ignoring them)
-  ([\#1585](https://github.com/tidyverse/dbplyr/issues/1585)).
-- [`anyNA()`](https://rdrr.io/r/base/NA.html) is now translated to SQL
-  as `any(is.na(x))`
-  ([\#1814](https://github.com/tidyverse/dbplyr/issues/1814)).
-- [`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html) now
-  applies consecutively, matching dplyr’s behavior:
-  `arrange(y) |> arrange(x)` is now equivalent to `arrange(x, y)`. Empty
-  [`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html) now
-  preserves existing ordering instead of clearing it
-  ([\#789](https://github.com/tidyverse/dbplyr/issues/789)).
-- `as(x, "type")` is now translated to `CAST(x AS type)`, allowing you
-  to cast to arbitrary database types not covered by the standard
-  `as.*()` functions
-  ([\#1729](https://github.com/tidyverse/dbplyr/issues/1729)).
-- [`as.sql()`](https://dbplyr.tidyverse.org/dev/reference/as.sql.md) is
-  now deprecated as part of major internal refactoring of how
-  [`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md) and
-  [`ident()`](https://dbplyr.tidyverse.org/dev/reference/ident.md) are
-  used.
-- [`bind_queries()`](https://dbplyr.tidyverse.org/dev/reference/bind_queries.md)
-  makes it easy to combine multiple lazy queries using `UNION ALL`
-  ([\#1342](https://github.com/tidyverse/dbplyr/issues/1342)).
-- The `cte` argument of
-  [`collect()`](https://dplyr.tidyverse.org/reference/compute.html),
-  [`compute()`](https://dplyr.tidyverse.org/reference/compute.html),
-  [`db_sql_render()`](https://dbplyr.tidyverse.org/dev/reference/db-misc.md),
-  [`remote_query()`](https://dbplyr.tidyverse.org/dev/reference/remote_name.md),
-  and
-  [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
-  now always warns when used; pass
-  `sql_options = sql_options(cte = TRUE)` instead.
-  [`collect()`](https://dplyr.tidyverse.org/reference/compute.html) and
-  [`compute()`](https://dplyr.tidyverse.org/reference/compute.html) gain
-  an `sql_options` argument to support this.
-- [`collapse()`](https://dplyr.tidyverse.org/reference/compute.html),
-  [`collect()`](https://dplyr.tidyverse.org/reference/compute.html), and
-  [`compute()`](https://dplyr.tidyverse.org/reference/compute.html) now
-  have their own documentation pages.
-- [`copy_inline()`](https://dbplyr.tidyverse.org/dev/reference/copy_inline.md)
-  now works with blob columns
-  ([\#1515](https://github.com/tidyverse/dbplyr/issues/1515)).
-- [`copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html) now
-  works when source is in the same DB as destination when using
-  `overwrite = TRUE`
-  ([@liudvikasakelis](https://github.com/liudvikasakelis),
-  [\#1535](https://github.com/tidyverse/dbplyr/issues/1535)).
-- [`cross_join()`](https://dplyr.tidyverse.org/reference/cross_join.html)
-  now gives a clear error when called with extra unnamed arguments
-  instead of a confusing message about `multiple`
-  ([\#1792](https://github.com/tidyverse/dbplyr/issues/1792)).
-- `.data$col`, `.data[[col]]`, `.env$var`, and `.env$[[var]]` now work
-  correctly inside
-  [`across()`](https://dplyr.tidyverse.org/reference/across.html)
-  ([\#1520](https://github.com/tidyverse/dbplyr/issues/1520)).
-- [`db_col_types()`](https://dbplyr.tidyverse.org/dev/reference/db-misc.md)
-  gains a SQLite method so that `rows_*()` operations can preserve
-  column types when copying data
-  ([\#1821](https://github.com/tidyverse/dbplyr/issues/1821)).
+
+### Extensions
+
+The following changes and new capabilities are of interest to dbplyr
+backend developers:
+
 - `db_supports_table_alias_with_as()` and `supports_window_clause()`
-  generics have been removed. They are now part of the
-  [`sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
+  generics have been removed. They were not used by any pacakge and are
+  now part of the
+  [`new_sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
   data structure
   ([\#1760](https://github.com/tidyverse/dbplyr/issues/1760)).
 - [`db_table_drop_if_exists()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md)
   is a new generic that allows backends to customize how tables are
   dropped when `overwrite = TRUE`
-  ([\#1695](https://github.com/tidyverse/dbplyr/issues/1695)).
+  ([\#1695](https://github.com/tidyverse/dbplyr/issues/1695)). This was
+  added to support Oracle.
 - `db_table_temporary()` has been renamed to
   [`sql_table_temporary()`](https://dbplyr.tidyverse.org/dev/reference/db-io.md)
   for consistency with other SQL generation functions
   ([\#1760](https://github.com/tidyverse/dbplyr/issues/1760)).
+- `dialect_*()` translations use (approximately) correct quoting for all
+  backends, so the generated SQL looks more like what you’ll actually
+  get when connected to a real database
+  ([\#1464](https://github.com/tidyverse/dbplyr/issues/1464)).
+- [`remote_table()`](https://dbplyr.tidyverse.org/dev/reference/remote_name.md)
+  returns an
+  [`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md) object
+  containing the (correctly quoted) table identifier, rather than the
+  internal `dbplyr_table_path`. This makes the result suitable for
+  inlining into
+  [`build_sql()`](https://dbplyr.tidyverse.org/dev/reference/build_sql.md)
+  and
+  [`sql_glue2()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
+  ([\#1807](https://github.com/tidyverse/dbplyr/issues/1807)).
+- New
+  [`sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
+  generic allows database connections to choose a SQL dialect, using
+  [`new_sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
+  to create a `sql_dialect` class.
+  [`new_sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
+  allows you to customise SQL generation including how identifiers are
+  quoted ([\#1624](https://github.com/tidyverse/dbplyr/issues/1624)).
+- [`set_op_query()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)
+  no longer has an `all` argument.
+- [`sql_check_na_rm()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_agg.md)
+  is exported for use in other backends
+  ([\#1483](https://github.com/tidyverse/dbplyr/issues/1483)).
+- [`sql_escape_string()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
+  defaults to using `'`
+  ([\#1701](https://github.com/tidyverse/dbplyr/issues/1701)).
+- [`sql_glue()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
+  and
+  [`sql_glue2()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
+  are exported and provide a convenient syntax for building SQL strings;
+  [`sql_glue2()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
+  adds support for type markers
+  ([\#1249](https://github.com/tidyverse/dbplyr/issues/1249)).
+- [`sql_infix()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_scalar.md)
+  no longer has a `con` argument; the connection needs to be determined
+  at call time, not at definition time.
+- [`sql_optimise()`](https://dbplyr.tidyverse.org/dev/reference/sql_optimise.md)
+  is no longer used. It was only used for two cases (filter + summarise
+  and arrange + summarise), and these are handled at a higher level
+  ([\#1720](https://github.com/tidyverse/dbplyr/issues/1720)). It will
+  be removed in a future version.
+- New
+  [`sql_set_op_method()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  generic allows set operations
+  ([`union()`](https://generics.r-lib.org/reference/setops.html),
+  [`intersect()`](https://generics.r-lib.org/reference/setops.html),
+  [`setdiff()`](https://generics.r-lib.org/reference/setops.html)) to
+  customise the SQL keyword. This allows backends to customize the
+  behavior, e.g., using `UNION DISTINCT` instead of `UNION` for
+  databases that require it, or `MINUS` instead of `EXCEPT` for Oracle
+  ([\#1596](https://github.com/tidyverse/dbplyr/issues/1596)).
+
+### SQL translation improvements
+
+- Single-table SELECT queries use unqualified `*` (e.g., `SELECT *`)
+  instead of table-qualified `*` (e.g., `SELECT "df".*`) for most
+  backends. Oracle and Teradata continue to use qualified stars as
+  required by their syntax
+  ([\#1577](https://github.com/tidyverse/dbplyr/issues/1577),
+  [\#1485](https://github.com/tidyverse/dbplyr/issues/1485)).
+- `.sql` pronoun makes it a little easier to use known SQL functions in
+  packages, requiring only `@importFrom dbplyr .sql`
+  ([\#1117](https://github.com/tidyverse/dbplyr/issues/1117)). Now you
+  can write `db |> mutate(.sql$custom_sql_function(x, y, z))` and only
+  need to `@importFrom dbplyr .sql` to quiet all `R CMD check` notes.
+- Custom translations of functions starting with `.` work
+  ([@MichaelChirico](https://github.com/MichaelChirico),
+  [\#1529](https://github.com/tidyverse/dbplyr/issues/1529)).
+- `pi` is no longer translated to `PI()`. This caused problems if you
+  had a column called `pi`
+  ([\#1531](https://github.com/tidyverse/dbplyr/issues/1531)).
+- [`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html)
+  applies consecutively, matching dplyr’s behavior,
+  i.e. `arrange(y) |> arrange(x)` is equivalent to `arrange(x, y)`.
+  Empty
+  [`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html)
+  preserves existing ordering instead of clearing it
+  ([\#789](https://github.com/tidyverse/dbplyr/issues/789)).
+- `.data$col`, `.data[[col]]`, `.env$var`, and `.env$[[var]]` work
+  correctly inside
+  [`across()`](https://dplyr.tidyverse.org/reference/across.html)
+  ([\#1520](https://github.com/tidyverse/dbplyr/issues/1520)).
 - [`distinct()`](https://dplyr.tidyverse.org/reference/distinct.html)
   after a join no longer creates a subquery
   ([\#722](https://github.com/tidyverse/dbplyr/issues/722)).
 - [`distinct()`](https://dplyr.tidyverse.org/reference/distinct.html)
-  with computed columns now ignores grouping, matching dplyr’s behavior
+  with computed columns ignores grouping, matching dplyr’s behavior
   ([\#1081](https://github.com/tidyverse/dbplyr/issues/1081)).
-- [`do()`](https://dplyr.tidyverse.org/reference/do.html) is deprecated.
-  Use [`collect()`](https://dplyr.tidyverse.org/reference/compute.html)
-  then your favourite tidyverse functions instead.
-- [`escape_ansi()`](https://dbplyr.tidyverse.org/dev/reference/escape_ansi.md)
-  is deprecated. Use `escape(x, con = simulate_dbi())` instead.
-- `expand()` now errors when column expressions don’t reference any
-  columns in the data, instead of generating invalid SQL
-  ([\#720](https://github.com/tidyverse/dbplyr/issues/720)).
-- `fill()` now errors if you attempt to rename a column, for consistency
-  with dplyr
-  ([\#1536](https://github.com/tidyverse/dbplyr/issues/1536)).
 - [`filter()`](https://dplyr.tidyverse.org/reference/filter.html) after
   [`left_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html)
   or
@@ -246,153 +295,162 @@
 - [`filter()`](https://dplyr.tidyverse.org/reference/filter.html) after
   [`rename()`](https://dplyr.tidyverse.org/reference/rename.html) no
   longer rewrites field names of `$` and `@` expressions, so
-  e.g. `filter(z == ltr$z)` after `rename(z = x)` now looks up `ltr$z`,
-  not `ltr$x`
-  ([\#1812](https://github.com/tidyverse/dbplyr/issues/1812)).
-- [`filter_out()`](https://dplyr.tidyverse.org/reference/filter.html) is
-  now supported. The combined condition is wrapped in
-  `is_distinct_from(., TRUE)`, producing backend-appropriate SQL such as
-  `IS DISTINCT FROM TRUE` on PostgreSQL or `IS NOT TRUE` on SQLite, so
-  rows where the condition is `NA` are kept
-  ([\#1803](https://github.com/tidyverse/dbplyr/issues/1803)).
-- New `is_distinct_from()` and `is_not_distinct_from()` SQL translations
-  expose `IS DISTINCT FROM` / `IS NOT DISTINCT FROM` semantics with
-  backend-specific dialects.
-  [`sql_expr_matches()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
-  is deprecated; provide an `is_not_distinct_from()` translation in
-  [`sql_translation()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
-  instead.
-- [`if_else()`](https://dplyr.tidyverse.org/reference/if_else.html) and
-  [`ifelse()`](https://rdrr.io/r/base/ifelse.html) now give a clear
-  error if `true`/`false` or `yes`/`no` are missing
-  ([\#1798](https://github.com/tidyverse/dbplyr/issues/1798)).
+  e.g. `filter(z == ltr$z)` after `rename(z = x)` looks up `ltr$z`, not
+  `ltr$x` ([\#1812](https://github.com/tidyverse/dbplyr/issues/1812)).
 - [`if_else()`](https://dplyr.tidyverse.org/reference/if_else.html) uses
-  simpler translation for `missing`
+  a simpler translation for the `missing` argument
   ([\#1573](https://github.com/tidyverse/dbplyr/issues/1573)).
-- `join_by(between())` now correctly handles column renames
+- `join_by(between())` correctly handles column renames
   ([\#1572](https://github.com/tidyverse/dbplyr/issues/1572)).
-- [`last_sql()`](https://dbplyr.tidyverse.org/dev/reference/last_sql.md)
-  retrieves the most recent SQL query generated by dbplyr, which is
-  useful for debugging
-  ([\#1471](https://github.com/tidyverse/dbplyr/issues/1471)).
-- [`memdb_frame()`](https://dbplyr.tidyverse.org/dev/reference/memdb.md)
-  with a data frame is now deprecated; it was never explicitly support
-  but worked by coincidence. Use `copy_to(memdb(), df)` instead.
-- [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html) gains
-  `.order` and `.frame` arguments for specifying window function
-  ordering and frame bounds within a single mutate call, similar to how
-  `.by` works for grouping
-  ([\#1542](https://github.com/tidyverse/dbplyr/issues/1542)).
 - [`n_distinct()`](https://dplyr.tidyverse.org/reference/n_distinct.html)
-  now has an `na.rm` argument, which regularly warns when it’s not
-  `TRUE` ([\#1579](https://github.com/tidyverse/dbplyr/issues/1579)).
-- `na_matches = "na"` now works correctly with inequality and overlap
-  joins, preserving the comparison operator instead of converting to
-  equality ([\#1505](https://github.com/tidyverse/dbplyr/issues/1505)).
-- `%notin%` is now translated to `NOT IN`
-  ([\#1820](https://github.com/tidyverse/dbplyr/issues/1820)).
-- `pivot_wider()` now accepts anonymous functions
-  (e.g. `\(x) max(x, na.rm = TRUE)`) in `values_fn`, not just
-  purrr-style lambdas
-  ([\#1816](https://github.com/tidyverse/dbplyr/issues/1816)).
-- [`pull()`](https://dplyr.tidyverse.org/reference/pull.html) now
-  handles `name` as a quosure of `NULL`
-  ([\#1808](https://github.com/tidyverse/dbplyr/issues/1808)).
-- [`remote_table()`](https://dbplyr.tidyverse.org/dev/reference/remote_name.md)
-  now returns
-  [`sql()`](https://dbplyr.tidyverse.org/dev/reference/sql.md)
-  containing the (correctly quoted) table identifier, rather than the
-  internal `dbplyr_table_path`. This makes the result suitable for
-  inlining into
-  [`build_sql()`](https://dbplyr.tidyverse.org/dev/reference/build_sql.md)
-  and
-  [`sql_glue2()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md).
+  gains an `na.rm` argument, which warns whenever it’s not `TRUE`
+  ([\#1579](https://github.com/tidyverse/dbplyr/issues/1579)).
+- `na_matches = "na"` works correctly with inequality and overlap joins,
+  preserving the comparison operator instead of converting to equality
+  ([\#1505](https://github.com/tidyverse/dbplyr/issues/1505)).
 - [`semi_join()`](https://dplyr.tidyverse.org/reference/filter-joins.html)
   and
   [`anti_join()`](https://dplyr.tidyverse.org/reference/filter-joins.html)
   once again work with filtered windowed values
   ([\#1534](https://github.com/tidyverse/dbplyr/issues/1534),
   [\#1606](https://github.com/tidyverse/dbplyr/issues/1606)).
-- [`set_op_query()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)
-  no longer has an `all` argument.
-- [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
-  gains `use_colour` argument
-  ([\#1590](https://github.com/tidyverse/dbplyr/issues/1590)).
-- `simulate_*()` now uses (approximately) correct quoting for all
-  backends, so the generated SQL looks more like what you’ll actually
-  get when connected to a real database
-  ([\#1464](https://github.com/tidyverse/dbplyr/issues/1464)).
-- `slice_*()` now handles missing values in line with the documentation,
-  i.e. they are always removed
+- `slice_*()` handles missing values in line with the documentation,
+  i.e., they are always removed
   ([\#1599](https://github.com/tidyverse/dbplyr/issues/1599)).
-- `.sql` pronoun makes it a little easier to use known SQL functions in
-  packages, requiring only `@importFrom dbplyr .sql`
-  ([\#1117](https://github.com/tidyverse/dbplyr/issues/1117)).
-- [`sql_check_na_rm()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_agg.md)
-  is now exported for use in other backends
-  ([\#1483](https://github.com/tidyverse/dbplyr/issues/1483)).
-- [`sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
-  is a new generic that provides a way for database connections to
-  choose a SQL dialect, using
-  [`new_sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
-  to create a `sql_dialect` class. This allows connections to more
-  easily share translations, and lays the foundation for better
-  translations for connections via ODBC/JDBC/ADBC
-  ([\#1624](https://github.com/tidyverse/dbplyr/issues/1624)).
-- [`sql_escape_string()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
-  now defaults to using `'`.
-- [`sql_options()`](https://dbplyr.tidyverse.org/dev/reference/sql_options.md)
-  is no longer marked experimental.
-- [`sql_glue()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
-  and
-  [`sql_glue2()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
-  provide a convenient syntax for building SQL strings. These functions
-  replace the now superseded
-  [`build_sql()`](https://dbplyr.tidyverse.org/dev/reference/build_sql.md),
-  [`sql_expr()`](https://dbplyr.tidyverse.org/dev/reference/sql_expr.md),
-  and
-  [`sql_call2()`](https://dbplyr.tidyverse.org/dev/reference/sql_expr.md)
-  ([\#1249](https://github.com/tidyverse/dbplyr/issues/1249)).
-- [`sql_glue2()`](https://dbplyr.tidyverse.org/dev/reference/sql_glue.md)
-  is now exported for building SQL strings with glue syntax and type
-  markers ([\#1249](https://github.com/tidyverse/dbplyr/issues/1249)).
-- [`sql_infix()`](https://dbplyr.tidyverse.org/dev/reference/sql_translation_scalar.md)
-  no longer has a `con` argument since the connection needs to be
-  determined at call time, not at definition time.
-- [`sql_optimise()`](https://dbplyr.tidyverse.org/dev/reference/sql_optimise.md)
-  is no longer used. It was only used for two cases (filter + summarise
-  and arrange + summarise), and these are now handled at a higher level
-  ([\#1720](https://github.com/tidyverse/dbplyr/issues/1720)).
-- [`src_memdb()`](https://dbplyr.tidyverse.org/dev/reference/src_memdb.md)
-  and
-  [`tbl_memdb()`](https://dbplyr.tidyverse.org/dev/reference/src_memdb.md)
-  are deprecated; use
-  [`memdb()`](https://dbplyr.tidyverse.org/dev/reference/memdb.md) and
-  `copy_to(memdb(), df)` instead. New
-  [`local_memdb_frame()`](https://dbplyr.tidyverse.org/dev/reference/memdb.md)
-  for use in tests.
-- `str_flatten()` now has an `na.rm` argument, which regularly warns
-  when it’s not `TRUE`
+- `str_flatten()` gains an `na.rm` argument, which warns whenever it’s
+  not `TRUE`
   ([\#1540](https://github.com/tidyverse/dbplyr/issues/1540)).
-- `str_like()` argument `ignore_case` has been deprecated
-  ([@edward-burn](https://github.com/edward-burn),
-  [\#1630](https://github.com/tidyverse/dbplyr/issues/1630)).
-- `str_like()` now uses case-sensitive `LIKE` when argument
-  `ignore_case` is set as `FALSE`
-  ([@edward-burn](https://github.com/edward-burn),
+- `str_like()` uses case-sensitive `LIKE` when argument `ignore_case` is
+  set as `FALSE` ([@edward-burn](https://github.com/edward-burn),
   [\#1488](https://github.com/tidyverse/dbplyr/issues/1488)).
-- [`summarise()`](https://dplyr.tidyverse.org/reference/summarise.html)
-  now reports grouping immediately, rather than when you summarise.
-- `win_rank_tdata()` has been removed after being deprecated.
 - [`window_order()`](https://dbplyr.tidyverse.org/dev/reference/window_order.md)
   works with
   [`dplyr::desc()`](https://dplyr.tidyverse.org/reference/desc.html)
   (not just [`desc()`](https://dplyr.tidyverse.org/reference/desc.html))
   ([\#1486](https://github.com/tidyverse/dbplyr/issues/1486)).
-- [`with_dialect()`](https://dbplyr.tidyverse.org/dev/reference/with_dialect.md)
-  overrides the default SQL dialect for a connection, which is useful if
-  dbplyr guesses incorrectly
-  ([\#1784](https://github.com/tidyverse/dbplyr/issues/1784)).
+- Backend-specific improvements:
+  - MS Access: correctly generates SQL for multiple joins by adding
+    required parentheses
+    ([\#1576](https://github.com/tidyverse/dbplyr/issues/1576)).
+  - MySQL: gains slightly better translation for
+    [`as.integer()`](https://rdrr.io/r/base/integer.html) and
+    `as.integer64()`
+    ([\#1647](https://github.com/tidyverse/dbplyr/issues/1647)).
+  - Oracle: temporary tables use private temporary tables (Oracle 18c+)
+    instead of global temporary tables. This ensures data persists
+    correctly and table names are automatically prefixed with `ORA$PTT_`
+    ([\#750](https://github.com/tidyverse/dbplyr/issues/750)).
+  - PostgreSQL: improved translation for `seconds()`, `minutes()`,
+    `hours()`, `days()`, `weeks()`,
+    [`months()`](https://rdrr.io/r/base/weekday.POSIXt.html), and
+    `years()`.
+  - Postgres, Redshift, Snowflake, and Spark: new translations for
+    `str_ilike()` ([@edward-burn](https://github.com/edward-burn),
+    [\#1628](https://github.com/tidyverse/dbplyr/issues/1628)).
+  - Redshift:
+    [`dbplyr_uncount()`](https://dbplyr.tidyverse.org/dev/reference/dbplyr_uncount.md)
+    works ([@owenjonesuob](https://github.com/owenjonesuob),
+    [\#1601](https://github.com/tidyverse/dbplyr/issues/1601));
+    corrected error message for
+    [`quantile()`](https://rdrr.io/r/stats/quantile.html) and
+    [`median()`](https://rdrr.io/r/stats/median.html) in
+    [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html)
+    ([@edward-burn](https://github.com/edward-burn),
+    [\#1571](https://github.com/tidyverse/dbplyr/issues/1571)); fixed
+    syntax error in `date_build()` translation
+    ([\#1512](https://github.com/tidyverse/dbplyr/issues/1512)).
+  - Snowflake: correctly translates `$` to `:`
+    ([@jsowder](https://github.com/jsowder),
+    [\#1608](https://github.com/tidyverse/dbplyr/issues/1608)); fixed
+    translations that were being reported as unknown
+    ([@edward-burn](https://github.com/edward-burn),
+    [\#1570](https://github.com/tidyverse/dbplyr/issues/1570)).
+  - SQL Server:
+    [`between()`](https://dplyr.tidyverse.org/reference/between.html)
+    uses `CASE WHEN` instead of `IIF()` for compatibility with Azure
+    Synapse ([@rehbbea](https://github.com/rehbbea),
+    [\#1773](https://github.com/tidyverse/dbplyr/issues/1773));
+    [`if_else()`](https://dplyr.tidyverse.org/reference/if_else.html)
+    uses `CASE WHEN` instead of `IIF` so `NULL` handling matches R’s
+    `NA` handling
+    ([\#1569](https://github.com/tidyverse/dbplyr/issues/1569));
+    [`slice_sample()`](https://dplyr.tidyverse.org/reference/slice.html)
+    returns different results each run
+    ([@thomashulst](https://github.com/thomashulst),
+    [\#1503](https://github.com/tidyverse/dbplyr/issues/1503));
+    `str_like()` and `str_ilike()` behave consistently
+    ([@edward-burn](https://github.com/edward-burn),
+    [\#1669](https://github.com/tidyverse/dbplyr/issues/1669)); on
+    version 17.0 (2025) the stringr regex functions `str_detect()`,
+    `str_starts()`, `str_ends()`, `str_replace()`, `str_replace_all()`,
+    `str_remove()`, `str_remove_all()`, `str_extract()`, and
+    `str_count()` are translated, and fixed-pattern versions of
+    `str_detect()`, `str_starts()`, and `str_ends()` work on all
+    versions
+    ([\#1671](https://github.com/tidyverse/dbplyr/issues/1671)); uses
+    `DATEDIFF_BIG` instead of `DATEDIFF` so
+    [`tally()`](https://dplyr.tidyverse.org/reference/count.html) and
+    [`count()`](https://dplyr.tidyverse.org/reference/count.html) work
+    regardless of data size
+    ([@edward-burn](https://github.com/edward-burn),
+    [\#1666](https://github.com/tidyverse/dbplyr/issues/1666)).
+
+### Minor improvements and bug fixes
+
+- CTEs correctly quote table names when the same query is used multiple
+  times ([\#1559](https://github.com/tidyverse/dbplyr/issues/1559)).
+- dbplyr uses the base pipe in all examples
+  ([\#1626](https://github.com/tidyverse/dbplyr/issues/1626)).
+- The print method no longer mentions the “source” in the header,
+  because it’s an outdated dplyr concept
+  ([\#897](https://github.com/tidyverse/dbplyr/issues/897)).
+- All set operations error if you pass extra arguments (instead of
+  silently ignoring them)
+  ([\#1585](https://github.com/tidyverse/dbplyr/issues/1585)).
+- [`collapse()`](https://dplyr.tidyverse.org/reference/compute.html),
+  [`collect()`](https://dplyr.tidyverse.org/reference/compute.html), and
+  [`compute()`](https://dplyr.tidyverse.org/reference/compute.html) have
+  their own documentation pages
+  ([\#1637](https://github.com/tidyverse/dbplyr/issues/1637)).
+- [`copy_inline()`](https://dbplyr.tidyverse.org/dev/reference/copy_inline.md)
+  works with blob columns
+  ([\#1515](https://github.com/tidyverse/dbplyr/issues/1515)).
+- [`copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html)
+  works when the source is in the same database as the destination and
+  `overwrite = TRUE`
+  ([@liudvikasakelis](https://github.com/liudvikasakelis),
+  [\#1535](https://github.com/tidyverse/dbplyr/issues/1535)).
+- [`cross_join()`](https://dplyr.tidyverse.org/reference/cross_join.html)
+  gives a clear error when called with extra unnamed arguments instead
+  of a confusing message about `multiple`
+  ([\#1792](https://github.com/tidyverse/dbplyr/issues/1792)).
+- [`db_col_types()`](https://dbplyr.tidyverse.org/dev/reference/db-misc.md)
+  gains a SQLite method so that `rows_*()` operations can preserve
+  column types when copying data
+  ([\#1821](https://github.com/tidyverse/dbplyr/issues/1821)).
+- `expand()` errors when column expressions don’t reference any columns
+  in the data, instead of generating invalid SQL
+  ([\#720](https://github.com/tidyverse/dbplyr/issues/720)).
+- `fill()` errors if you attempt to rename a column, for consistency
+  with dplyr
+  ([\#1536](https://github.com/tidyverse/dbplyr/issues/1536)).
+- [`if_else()`](https://dplyr.tidyverse.org/reference/if_else.html) and
+  [`ifelse()`](https://rdrr.io/r/base/ifelse.html) give a clear error if
+  `true`/`false` or `yes`/`no` are missing
+  ([\#1798](https://github.com/tidyverse/dbplyr/issues/1798)).
+- `pivot_wider()` accepts anonymous functions
+  (e.g. `\(x) max(x, na.rm = TRUE)`) in `values_fn`, not just
+  purrr-style lambdas
+  ([\#1816](https://github.com/tidyverse/dbplyr/issues/1816)).
+- [`pull()`](https://dplyr.tidyverse.org/reference/pull.html) correctly
+  handles a `NULL` quosure passed to `name`
+  ([\#1808](https://github.com/tidyverse/dbplyr/issues/1808)).
+- [`show_query()`](https://dbplyr.tidyverse.org/dev/reference/show_query.md)
+  gains a `use_colour` argument
+  ([\#1590](https://github.com/tidyverse/dbplyr/issues/1590)).
+- [`summarise()`](https://dplyr.tidyverse.org/reference/summarise.html)
+  reports grouping immediately, rather than when the SQL is generated
+  ([\#1721](https://github.com/tidyverse/dbplyr/issues/1721)).
 
 ## dbplyr 2.5.2
 
