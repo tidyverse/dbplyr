@@ -23,7 +23,7 @@ sql_quote(x, quote)
 
 ## Value
 
-A vector of .
+A vector of [sql](https://dbplyr.tidyverse.org/dev/reference/sql.md).
 
 ## Examples
 

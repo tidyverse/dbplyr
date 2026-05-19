@@ -5,9 +5,9 @@
 ### Lifecycle changes
 
 - Newly deprecated:
-  - dbplyr 1st edition interfaces no longer work. This concludes over 2
-    years of work with backend developers to get everyone moved to the
-    2nd edition
+  - dbplyr 1st edition backends no longer work. This concludes over 2
+    years of work with backend developers to get everyone moved over to
+    the 2nd edition
     ([\#1197](https://github.com/tidyverse/dbplyr/issues/1197)).
   - [`as.sql()`](https://dbplyr.tidyverse.org/dev/reference/as.sql.md),
     as part of major internal refactoring of how
@@ -35,7 +35,7 @@
     Use `escape(x, con = dialect_ansi())` instead
     ([\#1793](https://github.com/tidyverse/dbplyr/issues/1793)).
   - [`memdb_frame()`](https://dbplyr.tidyverse.org/dev/reference/memdb.md)
-    no longer accepts dataframes; this was never explicitly supported
+    no longer accepts data frames; this was never explicitly supported
     but worked by coincidence. Use `copy_to(memdb(), df)` instead
     ([\#1704](https://github.com/tidyverse/dbplyr/issues/1704)).
   - [`sql_expr_matches()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md);
@@ -56,8 +56,7 @@
 - Previously-warning deprecations are defunct
   ([\#1834](https://github.com/tidyverse/dbplyr/issues/1834)):
   - Passing extra `...` to
-    [`across()`](https://dplyr.tidyverse.org/reference/across.html) and
-    [`if_all()`](https://dplyr.tidyverse.org/reference/across.html)/[`if_any()`](https://dplyr.tidyverse.org/reference/across.html)
+    [`across()`](https://dplyr.tidyverse.org/reference/across.html)/[`if_all()`](https://dplyr.tidyverse.org/reference/across.html)/[`if_any()`](https://dplyr.tidyverse.org/reference/across.html)
     (deprecated in 2.3.0, 2023-01-16).
   - Using `by = character()` to perform a cross join (deprecated in
     dplyr 1.1.0, 2023-01-29).
@@ -75,7 +74,7 @@
     deprecated in 1.4.0 (2019-04-23).
   - `win_rank_tdata()`, deprecated in 2.4.0 (2023-10-25). (This is
     earlier than our usual policy because it was only used by the
-    Terdata backend.)
+    Teradata backend.)
 - Internal testing functions have been removed: `src_test()`,
   `test_frame()`, `test_load()`, `test_register_src()`, and
   `test_register_con()`
@@ -96,14 +95,18 @@
 
 #### New backends
 
-- ADBC connections (via {adbi}): dbplyr automatically detects the
-  underlying database type by querying the ADBC driver’s vendor name and
-  uses the appropriate SQL dialect
-  ([\#1787](https://github.com/tidyverse/dbplyr/issues/1787)).
-- JDBC connections (via {RJDBC}): dbplyr automatically detects the
-  underlying database type from the JDBC connection class and uses the
-  appropriate SQL dialect
-  ([\#1359](https://github.com/tidyverse/dbplyr/issues/1359)).
+- ADBC (via {adbi},
+  [\#1787](https://github.com/tidyverse/dbplyr/issues/1787)) and JDBC
+  (via {RJDBC},
+  [\#1359](https://github.com/tidyverse/dbplyr/issues/1359)) connections
+  are supported. Both use the connection name/class to dispatch to SQL
+  dialects for existing backends. This is made possible by
+  [`sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md),
+  a new generic that allows connections to choose a SQL dialect
+  ([\#1624](https://github.com/tidyverse/dbplyr/issues/1624)). If the
+  default dialect is incorrect, you can override it with
+  [`with_dialect()`](https://dbplyr.tidyverse.org/dev/reference/with_dialect.md)
+  ([\#1784](https://github.com/tidyverse/dbplyr/issues/1784)).
 - IBM DB2 ([@shearerpmm](https://github.com/shearerpmm),
   [\#1800](https://github.com/tidyverse/dbplyr/issues/1800)). Includes
   translations for
@@ -111,27 +114,16 @@
   (using `||`), DB2-specific casts,
   [`runif()`](https://rdrr.io/r/stats/Uniform.html), string functions,
   date functions, clock helpers, statistical aggregates, and more.
-- [`sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
-  is a new generic that provides a way for database connections to
-  choose a SQL dialect. You won’t use this directly as a dbplyr user,
-  but it makes it easier for connections to share translations, and
-  empowers the new JDBC and ADBC backends
-  ([\#1624](https://github.com/tidyverse/dbplyr/issues/1624)).
-- [`with_dialect()`](https://dbplyr.tidyverse.org/dev/reference/with_dialect.md)
-  overrides the default SQL dialect for a connection, which is useful if
-  dbplyr guesses incorrectly
-  ([\#1784](https://github.com/tidyverse/dbplyr/issues/1784)).
 
 #### New verb support
 
 - [`bind_queries()`](https://dbplyr.tidyverse.org/dev/reference/bind_queries.md)
   makes it easy to combine multiple lazy queries using `UNION ALL`
   ([\#1342](https://github.com/tidyverse/dbplyr/issues/1342)). It’s the
-  equivalent to
-  [`dplyr::bind_rows()`](https://dplyr.tidyverse.org/reference/bind_rows.html)
-  for dbplyr.
+  dbplyr equivalent of
+  [`dplyr::bind_rows()`](https://dplyr.tidyverse.org/reference/bind_rows.html).
 - [`filter_out()`](https://dplyr.tidyverse.org/reference/filter.html),
-  from dplyr 1.2.0, is now supported. The combined condition is wrapped
+  from dplyr 1.2.0, is now translated. The combined condition is wrapped
   in `is_distinct_from(., TRUE)`, producing backend-appropriate SQL such
   as `IS DISTINCT FROM TRUE` on PostgreSQL or `IS NOT TRUE` on SQLite,
   so rows where the condition is `NA` are kept
@@ -144,8 +136,8 @@
 
 #### New function translations
 
-- [`anyNA()`](https://rdrr.io/r/base/NA.html) is translated to SQL as
-  `any(is.na(x))`
+- [`anyNA()`](https://rdrr.io/r/base/NA.html) is translated to SQL in
+  the same way as `any(is.na(x))`
   ([\#1814](https://github.com/tidyverse/dbplyr/issues/1814)).
 - `as(x, "type")` is translated to `CAST(x AS type)`, allowing you to
   cast to arbitrary database types not covered by the standard `as.*()`
@@ -157,7 +149,7 @@
 - `%notin%` (introduced in R 4.6.0) is translated to `NOT IN`
   ([\#1820](https://github.com/tidyverse/dbplyr/issues/1820)).
 
-#### Other new helpers:
+#### Other new helpers
 
 - [`last_sql()`](https://dbplyr.tidyverse.org/dev/reference/last_sql.md)
   retrieves the most recent SQL query generated by dbplyr, which is
@@ -175,7 +167,7 @@ The following changes and new capabilities are of interest to dbplyr
 backend developers:
 
 - `db_supports_table_alias_with_as()` and `supports_window_clause()`
-  generics have been removed. They were not used by any pacakge and are
+  generics have been removed. They were not used by any packages and are
   now part of the
   [`new_sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
   data structure
@@ -209,7 +201,7 @@ backend developers:
   [`new_sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
   to create a `sql_dialect` class.
   [`new_sql_dialect()`](https://dbplyr.tidyverse.org/dev/reference/sql_dialect.md)
-  allows you to customise SQL generation including how identifiers are
+  allows you to customize SQL generation including how identifiers are
   quoted ([\#1624](https://github.com/tidyverse/dbplyr/issues/1624)).
 - [`set_op_query()`](https://dbplyr.tidyverse.org/dev/reference/sql_build.md)
   no longer has an `all` argument.
@@ -240,15 +232,15 @@ backend developers:
   ([`union()`](https://generics.r-lib.org/reference/setops.html),
   [`intersect()`](https://generics.r-lib.org/reference/setops.html),
   [`setdiff()`](https://generics.r-lib.org/reference/setops.html)) to
-  customise the SQL keyword. This allows backends to customize the
-  behavior, e.g., using `UNION DISTINCT` instead of `UNION` for
-  databases that require it, or `MINUS` instead of `EXCEPT` for Oracle
+  customize the SQL keyword, e.g. using `UNION DISTINCT` instead of
+  `UNION` for databases that require it, or `MINUS` instead of `EXCEPT`
+  for Oracle
   ([\#1596](https://github.com/tidyverse/dbplyr/issues/1596)).
 
 ### SQL translation improvements
 
-- Single-table SELECT queries use unqualified `*` (e.g., `SELECT *`)
-  instead of table-qualified `*` (e.g., `SELECT "df".*`) for most
+- Single-table SELECT queries use unqualified `*` (e.g. `SELECT *`)
+  instead of table-qualified `*` (e.g. `SELECT "df".*`) for most
   backends. Oracle and Teradata continue to use qualified stars as
   required by their syntax
   ([\#1577](https://github.com/tidyverse/dbplyr/issues/1577),
@@ -257,16 +249,16 @@ backend developers:
   packages, requiring only `@importFrom dbplyr .sql`
   ([\#1117](https://github.com/tidyverse/dbplyr/issues/1117)). Now you
   can write `db |> mutate(.sql$custom_sql_function(x, y, z))` and only
-  need to `@importFrom dbplyr .sql` to quiet all `R CMD check` notes.
+  need to import one function (`.sql`) to quiet all `R CMD check` notes.
 - Custom translations of functions starting with `.` work
   ([@MichaelChirico](https://github.com/MichaelChirico),
   [\#1529](https://github.com/tidyverse/dbplyr/issues/1529)).
 - `pi` is no longer translated to `PI()`. This caused problems if you
   had a column called `pi`
   ([\#1531](https://github.com/tidyverse/dbplyr/issues/1531)).
-- [`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html)
-  applies consecutively, matching dplyr’s behavior,
-  i.e. `arrange(y) |> arrange(x)` is equivalent to `arrange(x, y)`.
+- [`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html) is
+  applied consecutively, matching dplyr’s behavior,
+  e.g. `arrange(y) |> arrange(x)` is equivalent to `arrange(x, y)`.
   Empty
   [`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html)
   preserves existing ordering instead of clearing it
@@ -315,13 +307,13 @@ backend developers:
   ([\#1534](https://github.com/tidyverse/dbplyr/issues/1534),
   [\#1606](https://github.com/tidyverse/dbplyr/issues/1606)).
 - `slice_*()` handles missing values in line with the documentation,
-  i.e., they are always removed
+  i.e. they are always removed
   ([\#1599](https://github.com/tidyverse/dbplyr/issues/1599)).
 - `str_flatten()` gains an `na.rm` argument, which warns whenever it’s
   not `TRUE`
   ([\#1540](https://github.com/tidyverse/dbplyr/issues/1540)).
-- `str_like()` uses case-sensitive `LIKE` when argument `ignore_case` is
-  set as `FALSE` ([@edward-burn](https://github.com/edward-burn),
+- `str_like()` uses case-sensitive `LIKE` when `ignore_case` is set to
+  `FALSE` ([@edward-burn](https://github.com/edward-burn),
   [\#1488](https://github.com/tidyverse/dbplyr/issues/1488)).
 - [`window_order()`](https://dbplyr.tidyverse.org/dev/reference/window_order.md)
   works with
@@ -401,12 +393,15 @@ backend developers:
   times ([\#1559](https://github.com/tidyverse/dbplyr/issues/1559)).
 - dbplyr uses the base pipe in all examples
   ([\#1626](https://github.com/tidyverse/dbplyr/issues/1626)).
-- The print method no longer mentions the “source” in the header,
-  because it’s an outdated dplyr concept
+- The print method no longer mentions the “source”, because that is an
+  outdated dplyr concept
   ([\#897](https://github.com/tidyverse/dbplyr/issues/897)).
-- All set operations error if you pass extra arguments (instead of
-  silently ignoring them)
-  ([\#1585](https://github.com/tidyverse/dbplyr/issues/1585)).
+- All set operations
+  ([\#1585](https://github.com/tidyverse/dbplyr/issues/1585)) and
+  [`cross_join()`](https://dplyr.tidyverse.org/reference/cross_join.html)
+  ([\#1792](https://github.com/tidyverse/dbplyr/issues/1792)) error if
+  you pass extra arguments (instead of silently ignoring them or giving
+  a confusing error).
 - [`collapse()`](https://dplyr.tidyverse.org/reference/compute.html),
   [`collect()`](https://dplyr.tidyverse.org/reference/compute.html), and
   [`compute()`](https://dplyr.tidyverse.org/reference/compute.html) have
@@ -420,10 +415,6 @@ backend developers:
   `overwrite = TRUE`
   ([@liudvikasakelis](https://github.com/liudvikasakelis),
   [\#1535](https://github.com/tidyverse/dbplyr/issues/1535)).
-- [`cross_join()`](https://dplyr.tidyverse.org/reference/cross_join.html)
-  gives a clear error when called with extra unnamed arguments instead
-  of a confusing message about `multiple`
-  ([\#1792](https://github.com/tidyverse/dbplyr/issues/1792)).
 - [`db_col_types()`](https://dbplyr.tidyverse.org/dev/reference/db-misc.md)
   gains a SQLite method so that `rows_*()` operations can preserve
   column types when copying data
