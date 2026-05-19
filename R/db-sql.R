@@ -68,7 +68,7 @@ NULL
 #' @export
 #' @rdname db-sql
 sql_expr_matches <- function(con, x, y, ...) {
-  lifecycle::deprecate_soft(
+  lifecycle::deprecate_warn(
     "2.6.0",
     "sql_expr_matches()",
     with = I(

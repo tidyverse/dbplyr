@@ -29,7 +29,7 @@
 # Registered onLoad
 filter.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
   check_unsupported_arg(.preserve, FALSE)
-  check_filter(...)
+  check_filter(..., .fn = "filter")
   by <- compute_by(
     {{ .by }},
     .data,
@@ -58,7 +58,7 @@ filter.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
 #' @export
 filter_out.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
   check_unsupported_arg(.preserve, FALSE)
-  check_filter(..., fn = "filter_out")
+  check_filter(..., .fn = "filter_out")
   by <- compute_by(
     {{ .by }},
     .data,
@@ -74,14 +74,14 @@ filter_out.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
   if (by$from_by) {
     .data$lazy_query$group_vars <- by$names
   }
-  dots <- partial_eval_dots(.data, ..., .named = FALSE)
-
-  dots_and <- Reduce(function(a, b) expr((!!a) & (!!b)), dots)
-  dots2 <- list(expr(is_distinct_from(!!dots_and, TRUE)))
 
   # Multiple conditions are AND-combined to match dplyr's semantics, then
   # wrapped in `is_distinct_from(., TRUE)`. The backend translation of
   # `is_distinct_from()` provides the dialect-specific SQL.
+  dots <- partial_eval_dots(.data, ..., .named = FALSE)
+  dots_and <- Reduce(function(a, b) expr((!!a) & (!!b)), dots)
+  dots2 <- list(expr(is_distinct_from(!!dots_and, TRUE)))
+
   .data$lazy_query <- add_filter(.data$lazy_query, remote_con(.data), dots2)
 
   if (by$from_by) {
@@ -180,7 +180,7 @@ filter_via_having <- function(lazy_query, exprs) {
   lazy_query
 }
 
-check_filter <- function(..., fn = "filter") {
+check_filter <- function(..., .fn) {
   dots <- enquos(...)
   named <- have_name(dots)
 
@@ -192,7 +192,7 @@ check_filter <- function(..., fn = "filter") {
     expr <- quo_get_expr(quo)
     cli_abort(
       c(
-        "Problem with {.fun {fn}} input `..{i}`.",
+        "Problem with {.fun {(.fn)}} input `..{i}`.",
         x = "Input `..{i}` is named.",
         i = "This usually means that you've used {.code =} instead of {.code ==}.",
         i = "Did you mean `{names(dots)[i]} == {as_label(expr)}`?"

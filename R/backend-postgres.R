@@ -114,7 +114,7 @@ sql_translation.sql_dialect_postgres <- function(con) {
       .parent = base_scalar,
       # https://www.postgresql.org/docs/current/functions-comparison.html
       is_distinct_from = \(x, y) sql_glue("({x}) IS DISTINCT FROM ({y})"),
-      is_not_distinct_from = \(x, y) {
+      is_not_distinct_from = function(x, y) {
         sql_glue("({x}) IS NOT DISTINCT FROM ({y})")
       },
       bitwXor = sql_infix("#"),
