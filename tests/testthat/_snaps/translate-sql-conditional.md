@@ -253,3 +253,10 @@
     Output
       <SQL> CASE WHEN ("x" IN ('a')) THEN 'A' WHEN ("x" IN ('b')) THEN 'B' ELSE "x" END AS "y"
 
+# recode_values() translates the RHS of formulas
+
+    Code
+      out$select[[2]]
+    Output
+      <SQL> CASE WHEN ("x" IN ('a', 'b')) THEN "x" WHEN ("x" IN ('c')) THEN 'OTHER' END AS "y"
+

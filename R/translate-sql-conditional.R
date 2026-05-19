@@ -126,7 +126,8 @@ check_recode_x <- function(x_expr, x, arg = "x", error_call = caller_env()) {
   }
 }
 
-# Only x & default are translated; all other argument are evaluated in R
+# * x, default, RHS of formuals are translated
+# * All other argument are evaluated locally.
 # See partial_call() for details
 sql_recode_clauses <- function(
   ...,
