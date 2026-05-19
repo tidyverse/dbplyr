@@ -1,7 +1,17 @@
-#' Subset rows using column values
+#' Keep or drop rows that match a condition
 #'
-#' This is a method for the dplyr [dplyr::filter()] generic. It generates the
-#' `WHERE` clause of the SQL query.
+#' @description
+#' These are methods for the dplyr [dplyr::filter()] and [dplyr::filter_out()]
+#' generics. They generate the `WHERE` clause of the SQL query.
+#'
+#' `filter()` is translated directly to `WHERE`, which already matches dplyr's
+#' behaviour of treating `NA` like `FALSE` (SQL's three-valued logic drops
+#' `NULL` rows from `WHERE`).
+#'
+#' `filter_out()` requires an additional step, where the combined condition
+#' is wrapped in `is_distinct_from(., TRUE)`, which is then translated using
+#' the backend (e.g. to `IS DISTINCT FROM` on PostgreSQL, `IS NOT` on SQLite).
+#' This ensures that the SQL translation matches dplyr's semantics.
 #'
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::filter
@@ -12,13 +22,14 @@
 #'
 #' db <- memdb_frame(x = c(2, NA, 5, NA, 10), y = 1:5)
 #' db |> filter(x < 5) |> show_query()
+#' db |> filter_out(x < 5) |> show_query()
 #' db |> filter(is.na(x)) |> show_query()
 #' @importFrom dplyr filter
 #' @exportS3Method NULL
 # Registered onLoad
 filter.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
   check_unsupported_arg(.preserve, FALSE)
-  check_filter(...)
+  check_filter(..., .fn = "filter")
   by <- compute_by(
     {{ .by }},
     .data,
@@ -36,6 +47,43 @@ filter.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
   }
   dots <- partial_eval_dots(.data, ..., .named = FALSE)
   .data$lazy_query <- add_filter(.data$lazy_query, remote_con(.data), dots)
+  if (by$from_by) {
+    .data$lazy_query$group_vars <- character()
+  }
+  .data
+}
+
+#' @rdname filter.tbl_lazy
+#' @importFrom dplyr filter_out
+#' @export
+filter_out.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
+  check_unsupported_arg(.preserve, FALSE)
+  check_filter(..., .fn = "filter_out")
+  by <- compute_by(
+    {{ .by }},
+    .data,
+    by_arg = ".by",
+    data_arg = ".data",
+    error_call = caller_env()
+  )
+
+  if (missing(...)) {
+    return(filter(.data, FALSE))
+  }
+
+  if (by$from_by) {
+    .data$lazy_query$group_vars <- by$names
+  }
+
+  # Multiple conditions are AND-combined to match dplyr's semantics, then
+  # wrapped in `is_distinct_from(., TRUE)`. The backend translation of
+  # `is_distinct_from()` provides the dialect-specific SQL.
+  dots <- partial_eval_dots(.data, ..., .named = FALSE)
+  dots_and <- Reduce(function(a, b) expr((!!a) & (!!b)), dots)
+  dots2 <- list(expr(is_distinct_from(!!dots_and, TRUE)))
+
+  .data$lazy_query <- add_filter(.data$lazy_query, remote_con(.data), dots2)
+
   if (by$from_by) {
     .data$lazy_query$group_vars <- character()
   }
@@ -132,7 +180,7 @@ filter_via_having <- function(lazy_query, exprs) {
   lazy_query
 }
 
-check_filter <- function(...) {
+check_filter <- function(..., .fn) {
   dots <- enquos(...)
   named <- have_name(dots)
 
@@ -144,7 +192,7 @@ check_filter <- function(...) {
     expr <- quo_get_expr(quo)
     cli_abort(
       c(
-        "Problem with {.fun filter} input `..{i}`.",
+        "Problem with {.fun {(.fn)}} input `..{i}`.",
         x = "Input `..{i}` is named.",
         i = "This usually means that you've used {.code =} instead of {.code ==}.",
         i = "Did you mean `{names(dots)[i]} == {as_label(expr)}`?"

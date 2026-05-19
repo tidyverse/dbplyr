@@ -158,3 +158,11 @@ n_selects <- function(x) {
   sql <- as.character(sql_render(x))
   length(gregexpr("SELECT", sql)[[1]])
 }
+
+# R implementations of "distinct" equality comparison
+is_distinct_from <- function(x, y) {
+  !vctrs::vec_equal(x, y, na_equal = TRUE)
+}
+is_not_distinct_from <- function(x, y) {
+  vctrs::vec_equal(x, y, na_equal = TRUE)
+}

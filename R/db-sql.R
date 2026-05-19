@@ -4,11 +4,12 @@
 #'
 #' SQL translation:
 #'
-#' * `sql_expr_matches(con, x, y)` generates an alternative to `x = y` when a
-#'   pair of `NULL`s should match. The default translation uses a `CASE WHEN`
-#'   as described in <https://modern-sql.com/feature/is-distinct-from>.
-#'
 #' * `sql_translation(con)` generates a SQL translation environment.
+#'
+#' * Deprecated: `sql_expr_matches(con, x, y)` previously generated an
+#'   alternative to `x = y` when a pair of `NULL`s should match. This is now
+#'   handled by the `is_not_distinct_from()` translation; provide a backend
+#'   override there instead.
 #'
 #' * Deprecated: `sql_random(con)` generates SQL to get a random number which can be used
 #'   to select random rows in `slice_sample()`. This is now replaced by adding
@@ -67,19 +68,21 @@ NULL
 #' @export
 #' @rdname db-sql
 sql_expr_matches <- function(con, x, y, ...) {
+  lifecycle::deprecate_warn(
+    "2.6.0",
+    "sql_expr_matches()",
+    with = I(
+      "a translation for `is_not_distinct_from()` in `sql_translation()`"
+    )
+  )
   check_dots_used()
   UseMethod("sql_expr_matches", sql_dialect(con))
 }
 
 #' @export
-sql_expr_matches.DBIConnection <- function(con, x, y, ...) {
-  # https://modern-sql.com/feature/is-distinct-from
-  sql <- "CASE WHEN ({x} = {y}) OR ({x} IS NULL AND {y} IS NULL) THEN 0 ELSE 1 END = 0"
-  sql_glue2(con, sql)
+sql_expr_matches.default <- function(con, x, y, ...) {
+  NULL
 }
-
-#' @export
-sql_expr_matches.sql_dialect <- sql_expr_matches.DBIConnection
 
 #' @export
 #' @rdname db-sql

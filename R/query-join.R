@@ -388,22 +388,23 @@ sql_join_tbls <- function(con, by, na_matches) {
     lhs <- sql_table_prefix(con, by$x_as %||% "LHS", by$x)
     rhs <- sql_table_prefix(con, by$y_as %||% "RHS", by$y)
 
+    by$condition[by$condition == "=="] <- "="
+    join_params <- list(lhs = lhs, rhs = rhs, op = by$condition)
+
     if (na_matches == "na") {
-      compare <- purrr::map_chr(seq_along(lhs), function(i) {
-        op <- by$condition[[i]]
-        if (op == "==") {
-          sql_expr_matches(con, lhs[[i]], rhs[[i]])
+      compare <- purrr::pmap_chr(join_params, function(lhs, rhs, op) {
+        if (op == "=") {
+          translate_sql(is_not_distinct_from(!!lhs, !!rhs), con = con)
         } else {
           sql_glue2(
             con,
-            "({lhs[[i]]} {.sql op} {rhs[[i]]} OR ({lhs[[i]]} IS NULL AND {rhs[[i]]} IS NULL))"
+            "({lhs} {.sql op} {rhs} OR ({lhs} IS NULL AND {rhs} IS NULL))"
           )
         }
       })
     } else {
-      by$condition[by$condition == "=="] <- "="
-      compare <- purrr::map_chr(seq_along(lhs), function(i) {
-        sql_glue2(con, "{lhs[i]} {.sql by$condition[[i]]} {rhs[i]}")
+      compare <- purrr::pmap_chr(join_params, function(lhs, rhs, op) {
+        sql_glue2(con, "{lhs} {.sql op} {rhs}")
       })
     }
 

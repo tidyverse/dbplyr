@@ -288,6 +288,20 @@ base_scalar <- sql_translator(
   na_if = sql_prefix("NULLIF", 2),
   coalesce = sql_prefix("COALESCE"),
 
+  # `is_distinct_from()` and `is_not_distinct_from()` are dbplyr-only
+  # translations that emit SQL's `IS DISTINCT FROM` / `IS NOT DISTINCT FROM`.
+  # Defaults use approach from https://modern-sql.com/feature/is-distinct-from
+  is_distinct_from = function(x, y) {
+    sql_glue(
+      "CASE WHEN (({x}) = ({y})) OR (({x}) IS NULL AND ({y}) IS NULL) THEN 0 ELSE 1 END = 1"
+    )
+  },
+  is_not_distinct_from = function(x, y) {
+    sql_glue(
+      "CASE WHEN (({x}) = ({y})) OR (({x}) IS NULL AND ({y}) IS NULL) THEN 0 ELSE 1 END = 0"
+    )
+  },
+
   as.numeric = sql_cast("NUMERIC"),
   as.double = sql_cast("NUMERIC"),
   as.integer = sql_cast("INTEGER"),
