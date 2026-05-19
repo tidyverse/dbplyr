@@ -545,3 +545,36 @@ test_that("replace_values() input checks", {
     translate_sql(replace_values("foo", "foo" ~ "FOO"), con = con)
   })
 })
+
+# integration: partial_eval + translation -----------------------------------
+
+test_that("recode_values() inside mutate() resolves locals in non-first args", {
+  # `x` and `default` are translated; `from` and `to` are evaluatd locally
+  from <- \() list(c("a", "apple"), c("b", "banana"))
+  to <- \() c("A", "B")
+  lf <- lazy_frame(x = "a", default = "b")
+
+  out <- lf |>
+    mutate(y = recode_values(x, from = from(), to = to(), default = default)) |>
+    sql_build()
+  expect_snapshot(out$select[[2]])
+
+  # `from`/`to` can also come from a local data frame via `$`.
+  table <- tibble::tibble(from = c("a", "b"), to = c("A", "B"))
+  out <- lf |>
+    mutate(y = recode_values(x, from = table$from, to = table$to)) |>
+    sql_build()
+  expect_snapshot(out$select[[2]])
+})
+
+test_that("replace_values() inside mutate() resolves locals in non-first args", {
+  # `x` is translated; `from` and `to` are evaluatd locally
+  from <- \() c("a", "b")
+  to <- \() c("A", "B")
+  lf <- lazy_frame(x = "a", default = "b")
+
+  out <- lf |>
+    mutate(y = replace_values(x, from = from(), to = to())) |>
+    sql_build()
+  expect_snapshot(out$select[[2]])
+})
