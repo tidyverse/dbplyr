@@ -14,7 +14,7 @@ symmetric quotes (e.g., \code{"'"} or \code{'"'}), or a length 2 character vecto
 for asymmetric quotes (e.g., \code{c("[", "]")}).}
 }
 \value{
-A vector of \if{html}{\out{<sql>}}.
+A vector of \link{sql}.
 }
 \description{
 If the quote character is present in the string, it will be doubled.

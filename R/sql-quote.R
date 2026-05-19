@@ -8,7 +8,7 @@
 #'   symmetric quotes (e.g., `"'"` or `'"'`), or a length 2 character vector
 #'   for asymmetric quotes (e.g., `c("[", "]")`).
 #' @export
-#' @return A vector of <sql>.
+#' @return A vector of [sql].
 #' @keywords internal
 #' @examples
 #' sql_quote("abc", "'")
