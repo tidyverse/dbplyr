@@ -126,9 +126,8 @@ check_recode_x <- function(x_expr, x, arg = "x", error_call = caller_env()) {
   }
 }
 
-# * x, default, RHS of formuals are translated
-# * All other argument are evaluated locally.
-# See partial_call() for details
+# The rules for which elements are translated and evaluated locally are
+# complicated: see partial_call() for details
 sql_recode_clauses <- function(
   ...,
   x,
@@ -199,13 +198,6 @@ sql_recode_clauses_formula <- function(formulas, x, con, error_call) {
 }
 
 sql_recode_clauses_vector <- function(from, to, x, con, error_call) {
-  if (is.list(to)) {
-    cli_abort(
-      "List {.arg to} is not supported in SQL translation.",
-      call = error_call
-    )
-  }
-
   n <- length(from)
   to <- vctrs::vec_recycle(to, n, x_arg = "to", call = error_call)
 
