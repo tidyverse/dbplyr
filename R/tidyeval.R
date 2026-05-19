@@ -264,6 +264,25 @@ partial_eval_call <- function(call, data, env) {
       # Only the 1st argument is evaluated
       call[[2]] <- partial_eval(call[[2]], data = data, env = env)
       call
+    } else if (is_call(call, c("recode_values", "replace_values"))) {
+      if (is_call(call, "recode_values")) {
+        call <- call_match(call, fn = dplyr::recode_values)
+      } else {
+        call <- call_match(call, fn = dplyr::replace_values)
+      }
+
+      # `x` and `default` are translated;
+      # the rest (`from`, `to`, ...) are evaluated locally
+      for (i in seq_along(call)[-1]) {
+        nm <- names(call)[[i]]
+        if (names(call)[i] %in% c("x", "default")) {
+          call[[nm]] <- partial_eval(call[[nm]], data = data, env = env)
+        } else {
+          call[[i]] <- eval_bare(call[[i]], env = env)
+        }
+      }
+
+      call
     } else {
       # Check for shiny reactives before processing unknown function calls
       if (is_symbol(fun)) {

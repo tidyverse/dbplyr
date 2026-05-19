@@ -228,3 +228,28 @@
       Error in `replace_values()`:
       ! `x` must be a variable or function call, not a string.
 
+# recode_values() inside mutate() resolves locals in non-first args
+
+    Code
+      out$select[[2]]
+    Output
+      <SQL> CASE
+      WHEN ("x" IN ('a', 'apple')) THEN 'A'
+      WHEN ("x" IN ('b', 'banana')) THEN 'B'
+      ELSE "default"
+      END AS "y"
+
+---
+
+    Code
+      out$select[[2]]
+    Output
+      <SQL> CASE WHEN ("x" IN ('a')) THEN 'A' WHEN ("x" IN ('b')) THEN 'B' END AS "y"
+
+# replace_values() inside mutate() resolves locals in non-first args
+
+    Code
+      out$select[[2]]
+    Output
+      <SQL> CASE WHEN ("x" IN ('a')) THEN 'A' WHEN ("x" IN ('b')) THEN 'B' ELSE "x" END AS "y"
+
