@@ -578,3 +578,12 @@ test_that("replace_values() inside mutate() resolves locals in non-first args", 
     sql_build()
   expect_snapshot(out$select[[2]])
 })
+
+test_that("recode_values() translates the RHS of formulas", {
+  lf <- lazy_frame(x = "a", new = "B")
+
+  out <- lf |>
+    mutate(y = recode_values(x, c("a", "b") ~ x, "c" ~ "OTHER")) |>
+    sql_build()
+  expect_snapshot(out$select[[2]])
+})

@@ -271,12 +271,14 @@ partial_eval_call <- function(call, data, env) {
         call <- call_match(call, fn = dplyr::replace_values)
       }
 
-      # `x` and `default` are translated;
+      # `x`, `default`, and formula RHSs are translated;
       # the rest (`from`, `to`, ...) are evaluated locally
       for (i in seq_along(call)[-1]) {
         nm <- names(call)[[i]]
-        if (names(call)[i] %in% c("x", "default")) {
-          call[[nm]] <- partial_eval(call[[nm]], data = data, env = env)
+        if (nm %in% c("x", "default")) {
+          call[[i]] <- partial_eval(call[[i]], data = data, env = env)
+        } else if (is_call(call[[i]], "~") && length(call[[i]]) == 3) {
+          call[[i]][[3]] <- partial_eval(call[[i]][[3]], data = data, env = env)
         } else {
           call[[i]] <- eval_bare(call[[i]], env = env)
         }

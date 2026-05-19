@@ -103,8 +103,14 @@ test_that("recode_values/replace_values only translates x + default", {
 
   out <- capture_dot(lf, recode_values(x, "a" ~ "b", "A" ~ "B"))
   expect_equal(out$x, sym("x"))
-  expect_equal(out[[3]], "a" ~ "b")
-  expect_equal(out[[4]], "A" ~ "B")
+  expect_equal(out[[3]], expr("a" ~ "b"))
+  expect_equal(out[[4]], expr("A" ~ "B"))
+
+  # Formula RHS is translated: column refs stay as symbols, locals get inlined.
+  local_val <- "LOCAL"
+  out <- capture_dot(lf, recode_values(x, "a" ~ y, "b" ~ local_val))
+  expect_equal(out[[3]], expr("a" ~ y))
+  expect_equal(out[[4]], expr("b" ~ "LOCAL"))
 })
 
 # replace_sym1 -----------------------------------------------------------------
