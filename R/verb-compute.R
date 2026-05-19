@@ -23,13 +23,23 @@ compute.tbl_sql <- function(
   indexes = list(),
   analyze = TRUE,
   ...,
-  cte = FALSE
+  sql_options = NULL,
+  cte = deprecated()
 ) {
   check_bool(temporary)
+  rlang::check_exclusive(sql_options, cte, .require = FALSE)
+  if (lifecycle::is_present(cte)) {
+    lifecycle::deprecate_warn(
+      when = "2.4.0",
+      what = "compute(cte)",
+      with = I("compute(sql_options = sql_options(cte = TRUE))")
+    )
+    sql_options <- dbplyr::sql_options(cte = cte)
+  }
 
   if (is.null(name)) {
     if (!temporary) {
-      lifecycle::deprecate_warn(
+      lifecycle::deprecate_stop(
         "2.3.3",
         what = "compute(name = 'must be provided when `temporary = FALSE`')"
       )
@@ -44,7 +54,7 @@ compute.tbl_sql <- function(
   compute_check_indexes(x, unique_indexes)
 
   x_aliased <- select(x, !!!syms(vars)) # avoids problems with SQLite quoting (#1754)
-  sql <- db_sql_render(x$con, x_aliased$lazy_query, cte = cte)
+  sql <- db_sql_render(x$con, x_aliased$lazy_query, sql_options = sql_options)
 
   name <- db_compute(
     x$con,

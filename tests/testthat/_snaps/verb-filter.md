@@ -163,3 +163,47 @@
       ) AS "q01"
       WHERE ("col01" = 1.0)
 
+# filter_out uses backend-aware IS DISTINCT FROM TRUE
+
+    Code
+      filter_out_backend(simulate_postgres())
+    Output
+      <SQL>
+      SELECT *
+      FROM "df"
+      WHERE (("x" = 1.0 AND "y" = 3.0) IS DISTINCT FROM (TRUE))
+    Code
+      filter_out_backend(simulate_sqlite())
+    Output
+      <SQL>
+      SELECT *
+      FROM `df`
+      WHERE ((`x` = 1.0 AND `y` = 3.0) IS NOT (1))
+    Code
+      filter_out_backend(simulate_dbi())
+    Output
+      <SQL>
+      SELECT *
+      FROM "df"
+      WHERE (CASE WHEN (("x" = 1.0 AND "y" = 3.0) = (TRUE)) OR (("x" = 1.0 AND "y" = 3.0) IS NULL AND (TRUE) IS NULL) THEN 0 ELSE 1 END = 1)
+
+# filter_out errors for named input
+
+    Code
+      filter_out(lf, x = 1)
+    Condition
+      Error in `filter_out()`:
+      ! Problem with `filter_out()` input `..1`.
+      x Input `..1` is named.
+      i This usually means that you've used `=` instead of `==`.
+      i Did you mean `x == 1`?
+
+# filter_out errors for .preserve = TRUE
+
+    Code
+      filter_out(lf, x == 1, .preserve = TRUE)
+    Condition
+      Error in `filter_out()`:
+      ! `.preserve = TRUE` isn't supported on database backends.
+      i It must be FALSE instead.
+

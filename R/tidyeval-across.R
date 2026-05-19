@@ -39,7 +39,7 @@ partial_eval_across <- function(call, data, env, error_call = caller_env()) {
     dots_expand = FALSE,
     dots_env = env
   )
-  deprecate_across_dots(call, env = current_env(), user_env = env)
+  deprecate_across_dots(call)
   check_unsupported_arg(call$.unpack, FALSE, arg = ".unpack", call = error_call)
 
   across_setup(
@@ -65,7 +65,7 @@ partial_eval_if <- function(
   error_call = caller_env()
 ) {
   call <- match.call(dplyr::if_any, call, expand.dots = FALSE, envir = env)
-  deprecate_across_dots(call, env = current_env(), user_env = env)
+  deprecate_across_dots(call)
 
   if (reduce == "&") {
     fn <- "if_all()"
@@ -86,7 +86,7 @@ partial_eval_if <- function(
   Reduce(\(x, y) call2(reduce, x, y), conditions)
 }
 
-deprecate_across_dots <- function(call, env, user_env) {
+deprecate_across_dots <- function(call) {
   if (!is_empty(call$...)) {
     details <- paste(
       c(
@@ -100,17 +100,15 @@ deprecate_across_dots <- function(call, env, user_env) {
       ),
       collapse = "\n"
     )
-    lifecycle::deprecate_warn(
+    lifecycle::deprecate_stop(
       when = "2.3.0",
       what = "across(...)",
-      details = details,
-      env = env,
-      user_env = user_env
+      details = details
     )
   }
 }
 
-across_funs <- function(funs, env, dots, names_spec, fn, evaluated = FALSE) {
+across_funs <- function(funs, env, names_spec, fn, evaluated = FALSE) {
   if (is.null(funs)) {
     fns <- list(`1` = \(x, ...) x)
     names_spec <- names_spec %||% "{.col}"
@@ -118,7 +116,6 @@ across_funs <- function(funs, env, dots, names_spec, fn, evaluated = FALSE) {
     return(across_funs(
       quo_squash(funs),
       env,
-      dots,
       names_spec,
       fn,
       evaluated = evaluated
@@ -127,7 +124,6 @@ across_funs <- function(funs, env, dots, names_spec, fn, evaluated = FALSE) {
     return(across_funs(
       funs[[3]],
       env,
-      dots,
       names_spec,
       fn,
       evaluated = evaluated
@@ -152,21 +148,20 @@ across_funs <- function(funs, env, dots, names_spec, fn, evaluated = FALSE) {
       return(across_funs(
         funs,
         env,
-        dots,
         names_spec,
         fn,
         evaluated = evaluated
       ))
     }
 
-    fns <- list(`1` = across_fun(funs, env, dots = dots, fn = fn))
+    fns <- list(`1` = across_fun(funs, env, fn = fn))
     names_spec <- names_spec %||% "{.col}"
   } else if (is_call(funs, "list")) {
     args <- call_args(funs)
-    fns <- lapply(args, across_fun, env, dots = dots, fn = fn)
+    fns <- lapply(args, across_fun, env, fn = fn)
     names_spec <- names_spec %||% "{.col}_{.fn}"
   } else if (is.list(funs)) {
-    fns <- lapply(funs, across_fun, env, dots = dots, fn = fn)
+    fns <- lapply(funs, across_fun, env, fn = fn)
     names_spec <- names_spec %||% "{.col}_{.fn}"
   } else if (!is.null(env) && !evaluated) {
     # Try evaluating once, just in case
@@ -174,7 +169,6 @@ across_funs <- function(funs, env, dots, names_spec, fn, evaluated = FALSE) {
     return(across_funs(
       funs,
       env,
-      dots = dots,
       names_spec = NULL,
       fn = fn,
       evaluated = TRUE
@@ -189,27 +183,16 @@ across_funs <- function(funs, env, dots, names_spec, fn, evaluated = FALSE) {
   list(fns = fns, names = names_spec)
 }
 
-across_fun <- function(fun, env, dots, fn) {
+across_fun <- function(fun, env, fn) {
   if (is_function(fun)) {
     fn_name <- find_fun(fun)
     if (!is_null(fn_name)) {
-      return(\(x, cur_col) call2(fn_name, x, !!!dots))
+      return(\(x, cur_col) call2(fn_name, x))
     }
     partial_eval_fun(fun, env, fn)
   } else if (is_symbol(fun) || is_string(fun)) {
-    \(x, cur_col) call2(fun, x, !!!dots)
+    \(x, cur_col) call2(fun, x)
   } else if (is_call(fun, "~")) {
-    if (!is_empty(dots)) {
-      cli_abort(
-        c(
-          "Can't use `...` when a purrr-style lambda is used in {.arg .fns}.",
-          i = "Use a lambda instead.",
-          i = "Or inline them via a purrr-style lambda."
-        ),
-        call = call2(fn, .ns = "dbplyr")
-      )
-    }
-
     partial_eval_prepare_fun(f_rhs(fun), c(".", ".x", "..1"), env)
   } else if (is_call(fun, "function")) {
     fun <- eval(fun, env)
@@ -297,29 +280,10 @@ across_setup <- function(data, call, env, allow_rename, fn, error_call) {
     names_vars <- colnames(tbl)[locs]
   }
 
-  dots <- call$...
-  for (i in seq_along(call$...)) {
-    dot <- call$...[[i]]
-    withCallingHandlers(
-      dots[[i]] <- partial_eval(
-        dot,
-        data = data,
-        env = env,
-        error_call = error_call
-      ),
-      error = function(cnd) {
-        label <- expr_as_label(dot, names2(call$...)[[i]])
-        msg <- "Problem while evaluating {.code {label}}."
-        cli_abort(msg, call = call(fn), parent = cnd)
-      }
-    )
-  }
-
   names_spec <- eval(call$.names, env)
   funs_across_data <- across_funs(
     funs = call$.fns,
     env = env,
-    dots = dots,
     names_spec = names_spec,
     fn = fn
   )

@@ -114,6 +114,9 @@ sql_translation.sql_dialect_mariadb <- function(con) {
   sql_variant(
     sql_translator(
       .parent = base_scalar,
+      # https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_equal-to
+      is_distinct_from = \(x, y) sql_glue("NOT (({x}) <=> ({y}))"),
+      is_not_distinct_from = \(x, y) sql_glue("({x}) <=> ({y})"),
       # basic type casts as per:
       # https://mariadb.com/kb/en/cast/
       # https://dev.mysql.com/doc/refman/8.0/en/cast-functions.html#function_cast
@@ -225,14 +228,6 @@ sql_query_join.sql_dialect_mariadb <- function(
 #' @export
 sql_query_join.sql_dialect_mysql <- sql_query_join.sql_dialect_mariadb
 
-
-#' @export
-sql_expr_matches.sql_dialect_mariadb <- function(con, x, y, ...) {
-  # https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_equal-to
-  sql_glue2(con, "{x} <=> {y}")
-}
-#' @export
-sql_expr_matches.sql_dialect_mysql <- sql_expr_matches.sql_dialect_mariadb
 
 # https://modern-sql.com/blog/2018-08/whats-new-in-mariadb-10.3#3.values
 # MariaDB doesn't accept `ROW` unlike MySQL

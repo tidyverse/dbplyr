@@ -385,3 +385,66 @@ test_that("generates correct lazy_select_query", {
     )
   )
 })
+
+# filter_out ------------------------------------------------------------------
+
+test_that("filter_out keeps rows where the condition is FALSE or NA", {
+  db <- memdb_frame(x = c(2, NA, 5, NA, 10), y = 1:5)
+  out <- db |> filter_out(x < 5) |> collect()
+  expect_equal(out$x, c(NA, 5, NA, 10))
+  expect_equal(out$y, c(2L, 3L, 4L, 5L))
+})
+
+test_that("filter_out matches local dplyr semantics with multiple conditions", {
+  local_df <- tibble(x = c(1, 2, NA), y = c(1, NA, 3))
+  db <- memdb_frame(x = local_df$x, y = local_df$y)
+
+  expect_equal(
+    db |> filter_out(x == 1, y == 3) |> collect(),
+    filter_out(local_df, x == 1, y == 3)
+  )
+})
+
+test_that("filter_out uses backend-aware IS DISTINCT FROM TRUE", {
+  filter_out_backend <- function(con) {
+    lf <- lazy_frame(x = 1, y = 2, con = con)
+    lf |> filter_out(x == 1, y == 3)
+  }
+
+  expect_snapshot({
+    filter_out_backend(simulate_postgres())
+    filter_out_backend(simulate_sqlite())
+    filter_out_backend(simulate_dbi())
+  })
+})
+
+test_that("filter_out with no conditions returns no rows", {
+  lf <- lazy_frame(x = 1:3, y = 1:3)
+  expect_equal(lf |> filter_out(), lf |> filter(FALSE))
+})
+
+test_that("filter_out errors for named input", {
+  lf <- lazy_frame(x = 1, y = 2)
+  expect_snapshot(error = TRUE, filter_out(lf, x = 1))
+})
+
+test_that("filter_out errors for .preserve = TRUE", {
+  lf <- lazy_frame(x = 1:3, y = 1:3)
+  expect_snapshot(error = TRUE, lf |> filter_out(x == 1, .preserve = TRUE))
+})
+
+test_that("filter_out supports .by", {
+  db <- local_memdb_frame(g = c(1, 1, 2, 1, 2), x = c(5, 10, 1, 2, 3))
+  out <- filter_out(db, x > mean(x, na.rm = TRUE), .by = g) |>
+    arrange(g, x) |>
+    collect()
+
+  expect_equal(out$g, c(1, 1, 2))
+  expect_equal(out$x, c(2, 5, 1))
+})
+
+test_that("filter_out captures local variables", {
+  mf <- local_memdb_frame(x = 1:5, y = 5:1, id = 1:5)
+  z <- 3
+  expect_equal(mf |> filter_out(x > z) |> pull(), 1:3)
+})

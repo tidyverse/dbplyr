@@ -215,13 +215,10 @@ test_that("cross join via by = character() is deprecated", {
   df1 <- local_memdb_frame(x = 1:5)
   df2 <- local_memdb_frame(y = 1:5)
 
-  expect_snapshot({
-    out_inner <- collect(inner_join(df1, df2, by = character()))
-    out_full <- collect(full_join(df1, df2, by = character()))
+  expect_snapshot(error = TRUE, {
+    inner_join(df1, df2, by = character())
+    full_join(df1, df2, by = character())
   })
-
-  expect_equal(nrow(out_inner), 25)
-  expect_equal(nrow(out_full), 25)
 })
 
 df1 <- local_memdb_frame(x = 1:5, y = 1:5)

@@ -38,6 +38,9 @@ Imports:
     vctrs (>= 0.6.3),
     withr (>= 2.5.0)
 Suggests:
+    adbcdrivermanager,
+    adbcsqlite,
+    adbi,
     bit64,
     covr,
     knitr,
@@ -79,6 +82,8 @@ Collate:
     'translate-sql-conditional.R'
     'backend-.R'
     'backend-access.R'
+    'backend-adbc.R'
+    'backend-db2.R'
     'backend-hana.R'
     'backend-hive.R'
     'backend-impala.R'

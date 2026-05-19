@@ -108,10 +108,11 @@ sql_query_union(con, x, unions, ..., lvl = 0)
 \description{
 SQL translation:
 \itemize{
-\item \code{sql_expr_matches(con, x, y)} generates an alternative to \code{x = y} when a
-pair of \code{NULL}s should match. The default translation uses a \verb{CASE WHEN}
-as described in \url{https://modern-sql.com/feature/is-distinct-from}.
 \item \code{sql_translation(con)} generates a SQL translation environment.
+\item Deprecated: \code{sql_expr_matches(con, x, y)} previously generated an
+alternative to \code{x = y} when a pair of \code{NULL}s should match. This is now
+handled by the \code{is_not_distinct_from()} translation; provide a backend
+override there instead.
 \item Deprecated: \code{sql_random(con)} generates SQL to get a random number which can be used
 to select random rows in \code{slice_sample()}. This is now replaced by adding
 a translation for \code{runif(n())}.

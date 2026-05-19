@@ -61,7 +61,7 @@ sql_join_suffix.sql_dialect <- sql_join_suffix.DBIConnection
 db_sql_render <- function(con, sql, ..., cte = FALSE, sql_options = NULL) {
   check_bool(cte)
   if (cte) {
-    lifecycle::deprecate_soft(
+    lifecycle::deprecate_warn(
       when = "2.4.0",
       what = "db_sql_render(cte)",
       with = I("db_sql_render(sql_options = sql_options(cte = TRUE))")
@@ -123,6 +123,8 @@ db_col_types.default <- function(con, table, call) {
 }
 
 #' Options for generating SQL
+#'
+#' Customise SQL generation with these three options.
 #'
 #' @param cte If `FALSE`, the default, subqueries are used. If `TRUE` common
 #'   table expressions are used.

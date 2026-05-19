@@ -4,11 +4,12 @@
 #'
 #' SQL translation:
 #'
-#' * `sql_expr_matches(con, x, y)` generates an alternative to `x = y` when a
-#'   pair of `NULL`s should match. The default translation uses a `CASE WHEN`
-#'   as described in <https://modern-sql.com/feature/is-distinct-from>.
-#'
 #' * `sql_translation(con)` generates a SQL translation environment.
+#'
+#' * Deprecated: `sql_expr_matches(con, x, y)` previously generated an
+#'   alternative to `x = y` when a pair of `NULL`s should match. This is now
+#'   handled by the `is_not_distinct_from()` translation; provide a backend
+#'   override there instead.
 #'
 #' * Deprecated: `sql_random(con)` generates SQL to get a random number which can be used
 #'   to select random rows in `slice_sample()`. This is now replaced by adding
@@ -67,19 +68,21 @@ NULL
 #' @export
 #' @rdname db-sql
 sql_expr_matches <- function(con, x, y, ...) {
+  lifecycle::deprecate_warn(
+    "2.6.0",
+    "sql_expr_matches()",
+    with = I(
+      "a translation for `is_not_distinct_from()` in `sql_translation()`"
+    )
+  )
   check_dots_used()
   UseMethod("sql_expr_matches", sql_dialect(con))
 }
 
 #' @export
-sql_expr_matches.DBIConnection <- function(con, x, y, ...) {
-  # https://modern-sql.com/feature/is-distinct-from
-  sql <- "CASE WHEN ({x} = {y}) OR ({x} IS NULL AND {y} IS NULL) THEN 0 ELSE 1 END = 0"
-  sql_glue2(con, sql)
+sql_expr_matches.default <- function(con, x, y, ...) {
+  NULL
 }
-
-#' @export
-sql_expr_matches.sql_dialect <- sql_expr_matches.DBIConnection
 
 #' @export
 #' @rdname db-sql
@@ -95,12 +98,11 @@ dbplyr_sql_translation <- function(con) {
 #' @export
 #' @rdname db-sql
 sql_random <- function(con) {
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_stop(
     "2.3.2",
     "sql_random()",
     with = I("Please add a translation for `runif(n())` instead.")
   )
-  UseMethod("sql_random")
 }
 
 
@@ -451,22 +453,10 @@ sql_query_append <- function(
   returning_cols = NULL
 ) {
   if (is_tbl_lazy(from)) {
-    lifecycle::deprecate_warn(
+    lifecycle::deprecate_stop(
       when = "2.3.2",
       what = "sql_query_append(from = 'must be a table identifier or an SQL query, not a lazy table.')"
     )
-
-    insert_cols <- colnames(from)
-    from <- sql_render(from, con = con, lvl = 1)
-    out <- sql_query_append(
-      con = con,
-      table = table,
-      from = from,
-      insert_cols = insert_cols,
-      returning_cols = returning_cols
-    )
-
-    return(out)
   }
 
   check_table_id(table)
