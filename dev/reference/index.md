@@ -33,7 +33,8 @@
 - [`distinct(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/distinct.tbl_lazy.md)
   : Subset distinct/unique rows
 - [`filter(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/filter.tbl_lazy.md)
-  : Subset rows using column values
+  [`filter_out(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/filter.tbl_lazy.md)
+  : Keep or drop rows that match a condition
 - [`head(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/head.tbl_lazy.md)
   : Subset the first rows
 - [`slice_min(`*`<tbl_lazy>`*`)`](https://dbplyr.tidyverse.org/dev/reference/dbplyr-slice.md)

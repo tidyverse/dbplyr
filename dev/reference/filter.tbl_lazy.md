@@ -1,14 +1,30 @@
-# Subset rows using column values
+# Keep or drop rows that match a condition
 
-This is a method for the dplyr
+These are methods for the dplyr
 [`dplyr::filter()`](https://dplyr.tidyverse.org/reference/filter.html)
-generic. It generates the `WHERE` clause of the SQL query.
+and
+[`dplyr::filter_out()`](https://dplyr.tidyverse.org/reference/filter.html)
+generics. They generate the `WHERE` clause of the SQL query.
+
+[`filter()`](https://dplyr.tidyverse.org/reference/filter.html) is
+translated directly to `WHERE`, which already matches dplyr's behaviour
+of treating `NA` like `FALSE` (SQL's three-valued logic drops `NULL`
+rows from `WHERE`).
+
+[`filter_out()`](https://dplyr.tidyverse.org/reference/filter.html)
+requires an additional step, where the combined condition is wrapped in
+`is_distinct_from(., TRUE)`, which is then translated using the backend
+(e.g. to `IS DISTINCT FROM` on PostgreSQL, `IS NOT` on SQLite). This
+ensures that the SQL translation matches dplyr's semantics.
 
 ## Usage
 
 ``` r
 # S3 method for class 'tbl_lazy'
 filter(.data, ..., .by = NULL, .preserve = FALSE)
+
+# S3 method for class 'tbl_lazy'
+filter_out(.data, ..., .by = NULL, .preserve = FALSE)
 ```
 
 ## Arguments
@@ -56,6 +72,11 @@ db |> filter(x < 5) |> show_query()
 #> SELECT *
 #> FROM `dbplyr_tmp_Pg2ZRmBV2z`
 #> WHERE (`x` < 5.0)
+db |> filter_out(x < 5) |> show_query()
+#> <SQL>
+#> SELECT *
+#> FROM `dbplyr_tmp_Pg2ZRmBV2z`
+#> WHERE ((`x` < 5.0) IS NOT (1))
 db |> filter(is.na(x)) |> show_query()
 #> <SQL>
 #> SELECT *

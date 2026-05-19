@@ -2,12 +2,12 @@
 
 SQL translation:
 
-- `sql_expr_matches(con, x, y)` generates an alternative to `x = y` when
-  a pair of `NULL`s should match. The default translation uses a
-  `CASE WHEN` as described in
-  <https://modern-sql.com/feature/is-distinct-from>.
-
 - `sql_translation(con)` generates a SQL translation environment.
+
+- Deprecated: `sql_expr_matches(con, x, y)` previously generated an
+  alternative to `x = y` when a pair of `NULL`s should match. This is
+  now handled by the `is_not_distinct_from()` translation; provide a
+  backend override there instead.
 
 - Deprecated: `sql_random(con)` generates SQL to get a random number
   which can be used to select random rows in
