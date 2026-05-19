@@ -42,15 +42,10 @@ filter.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
     return(.data)
   }
 
-  if (by$from_by) {
-    .data$lazy_query$group_vars <- by$names
-  }
+  .data <- set_by_groups(.data, by)
   dots <- partial_eval_dots(.data, ..., .named = FALSE)
   .data$lazy_query <- add_filter(.data$lazy_query, remote_con(.data), dots)
-  if (by$from_by) {
-    .data$lazy_query$group_vars <- character()
-  }
-  .data
+  clear_by_groups(.data, by)
 }
 
 #' @rdname filter.tbl_lazy
@@ -71,9 +66,7 @@ filter_out.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
     return(filter(.data, FALSE))
   }
 
-  if (by$from_by) {
-    .data$lazy_query$group_vars <- by$names
-  }
+  .data <- set_by_groups(.data, by)
 
   # Multiple conditions are AND-combined to match dplyr's semantics, then
   # wrapped in `is_distinct_from(., TRUE)`. The backend translation of
@@ -84,10 +77,7 @@ filter_out.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
 
   .data$lazy_query <- add_filter(.data$lazy_query, remote_con(.data), dots2)
 
-  if (by$from_by) {
-    .data$lazy_query$group_vars <- character()
-  }
-  .data
+  clear_by_groups(.data, by)
 }
 
 add_filter <- function(lazy_query, con, exprs) {
