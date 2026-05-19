@@ -51,9 +51,7 @@ mutate.tbl_lazy <- function(
   keep <- arg_match(.keep)
 
   by <- compute_by({{ .by }}, .data, by_arg = ".by", data_arg = ".data")
-  if (by$from_by) {
-    .data$lazy_query$group_vars <- by$names
-  }
+  .data <- set_by_groups(.data, by)
 
   names_original <- colnames(.data)
 
@@ -80,9 +78,7 @@ mutate.tbl_lazy <- function(
     out$lazy_query <- add_mutate(out$lazy_query, layer)
   }
 
-  if (by$from_by) {
-    out$lazy_query$group_vars <- character()
-  }
+  out <- clear_by_groups(out, by)
 
   if (!is.null(order)) {
     out$lazy_query$order_vars <- old_order

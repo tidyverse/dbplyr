@@ -150,9 +150,7 @@ slice_by <- function(
     data_arg = "data",
     error_call = call
   )
-  if (by$from_by) {
-    .data$lazy_query$group_vars <- by$names
-  }
+  .data <- set_by_groups(.data, by)
 
   value <- switch(size$type, n = size$n, prop = size$prop)
   if (with_ties) {
@@ -179,12 +177,7 @@ slice_by <- function(
     window_fun <- call2(fun_name, call2("tibble", !!!order_by))
   }
   out <- filter(.data, !!window_fun <= !!value)
-
-  if (by$from_by) {
-    out$lazy_query$group_vars <- character()
-  }
-
-  out
+  clear_by_groups(out, by)
 }
 
 

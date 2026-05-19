@@ -45,9 +45,9 @@ summarise.tbl_lazy <- function(.data, ..., .by = NULL, .groups = NULL) {
   )
 
   if (by$from_by) {
-    .data$lazy_query$group_vars <- by$names
     .groups <- "drop"
   }
+  .data <- set_by_groups(.data, by)
 
   dots <- summarise_eval_dots(.data, ...)
   .data$lazy_query <- add_summarise(
@@ -57,10 +57,7 @@ summarise.tbl_lazy <- function(.data, ..., .by = NULL, .groups = NULL) {
     env_caller = caller_env()
   )
 
-  if (by$from_by) {
-    .data$lazy_query$group_vars <- character()
-  }
-  .data
+  clear_by_groups(.data, by)
 }
 
 #' @export
@@ -312,4 +309,22 @@ eval_select_by <- function(by, data, error_call = caller_env()) {
 
 new_by <- function(from_by, names) {
   structure(list(from_by = from_by, names = names), class = "dbplyr_by")
+}
+
+# Apply `.by` groups for a single verb call. `set_by_groups()` installs the
+# groups before the operation so window functions and HAVING clauses see them;
+# `clear_by_groups()` removes them after so they don't leak into subsequent
+# operations (matching dplyr's `.by` semantics).
+set_by_groups <- function(.data, by) {
+  if (by$from_by) {
+    .data$lazy_query$group_vars <- by$names
+  }
+  .data
+}
+
+clear_by_groups <- function(.data, by) {
+  if (by$from_by) {
+    .data$lazy_query$group_vars <- character()
+  }
+  .data
 }
