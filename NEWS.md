@@ -20,10 +20,10 @@
   * `sql_query_append()` with a lazy table for `from` (deprecated in 2.3.2, 2023-03-21).
   * `tbl_sql(check_from)` (deprecated in 2.5.0, 2024-03-15).
 * Previously-defunct functions have been removed:
-  * `group_by(add = )`, deprecated in dplyr 1.0.0 (2020-06-01).
-  * `partial_eval(var)`, deprecated in 2.2.0 (2022-06-05).
-  * `src_sql()`, deprecated in 1.4.0 (2019-04-23).
-  * `win_rank_tdata()`, deprecated in 2.4.0 (2023-10-25). (This is earlier than our usual policy because it was only used by the Teradata backend.)
+  * `group_by(add = )`, deprecated in dplyr 1.0.0 (2020-06-01) (#1632).
+  * `partial_eval(var)`, deprecated in 2.2.0 (2022-06-05) (#1632).
+  * `src_sql()`, deprecated in 1.4.0 (2019-04-23) (#1632).
+  * `win_rank_tdata()`, deprecated in 2.4.0 (2023-10-25) (#1642). (This is earlier than our usual policy because it was only used by the Teradata backend.)
 * Internal testing functions have been removed: `src_test()`, `test_frame()`, `test_load()`, `test_register_src()`, and `test_register_con()` (#1712).
 * `build_sql()`, `sql_expr()`, and `sql_call2()` are superseded in favour of `sql_glue()` and `sql_glue2()` (#1249).
 * `sql_options()` is no longer marked experimental.
