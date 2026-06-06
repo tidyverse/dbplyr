@@ -24,6 +24,6 @@ For \code{show_query()}, ignored.}
 Use the \code{sql_options} argument instead.}
 }
 \description{
-\code{show_sql()} displays the SQL query that will be dispatched to the database;
+\code{show_query()} displays the SQL query that will be dispatched to the database;
 \code{explain()} displays both the SQL query and the query plan.
 }

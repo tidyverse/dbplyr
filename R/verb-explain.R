@@ -1,6 +1,6 @@
 #' Show generated SQL and query plan
 #'
-#' `show_sql()` displays the SQL query that will be dispatched to the database;
+#' `show_query()` displays the SQL query that will be dispatched to the database;
 #' `explain()` displays both the SQL query and the query plan.
 #'
 #' @param ... For `explain()`, further arguments to [remote_query_plan()].

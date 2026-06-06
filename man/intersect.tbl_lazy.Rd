@@ -45,3 +45,15 @@ These are methods for the dplyr generics \code{dplyr::intersect()},
 \code{dplyr::union()}, and \code{dplyr::setdiff()}. They are translated to
 \code{INTERSECT}, \code{UNION}, and \code{EXCEPT} respectively.
 }
+\examples{
+\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) withAutoprint(\{ # examplesIf}
+library(dplyr, warn.conflicts = FALSE)
+
+lf1 <- lazy_frame(x = 1, y = 2)
+lf2 <- lazy_frame(x = 1, y = 3)
+
+intersect(lf1, lf2)
+union(lf1, lf2)
+setdiff(lf1, lf2)
+\dontshow{\}) # examplesIf}
+}

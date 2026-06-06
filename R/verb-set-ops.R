@@ -7,6 +7,15 @@
 #' @inheritParams left_join.tbl_lazy
 #' @param ... Must be empty.
 #' @param all If `TRUE`, includes all matches in output, not just unique rows.
+#' @examplesIf requireNamespace("RSQLite", quietly = TRUE)
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' lf1 <- lazy_frame(x = 1, y = 2)
+#' lf2 <- lazy_frame(x = 1, y = 3)
+#'
+#' intersect(lf1, lf2)
+#' union(lf1, lf2)
+#' setdiff(lf1, lf2)
 #' @exportS3Method dplyr::intersect
 #' @importFrom dplyr intersect
 intersect.tbl_lazy <- function(x, y, copy = "none", ..., all = FALSE) {
