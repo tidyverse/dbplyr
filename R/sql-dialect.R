@@ -130,7 +130,7 @@ sql_has_table_alias_with_as <- function(con) {
   if (is_sql_dialect(dialect)) {
     dialect$has$table_alias_with_as
   } else {
-    # For backward comptaibility
+    # For backward compatibility
     TRUE
   }
 }
@@ -141,7 +141,7 @@ sql_has_window_clause <- function(con) {
   if (is_sql_dialect(dialect)) {
     dialect$has$window_clause
   } else {
-    # For backward comptaibility
+    # For backward compatibility
     FALSE
   }
 }
