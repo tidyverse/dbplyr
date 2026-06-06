@@ -26,7 +26,7 @@
 #'     as possible by giving more data to the query planner.
 #'
 #'   * `"inline"`: `y` will be inlined into the query using [copy_inline()].
-#'     This is should faster for small datasets and doesn't require write
+#'     This should be faster for small datasets and doesn't require write
 #'     access.
 #'
 #'   `TRUE` (`"temp-table"`) and `FALSE` (`"none"`) are also accepted for
@@ -36,7 +36,7 @@
 #'   there are matching indexes in `x`.
 #' @param sql_on A custom join predicate as an SQL expression.
 #'   Usually joins use column equality, but you can perform more complex
-#'   queries by supply `sql_on` which should be a SQL expression that
+#'   queries by supplying `sql_on` which should be a SQL expression that
 #'   uses `LHS` and `RHS` aliases to refer to the left-hand side or
 #'   right-hand side of the join respectively.
 #' @param na_matches Should NA (NULL) values match one another?

@@ -161,7 +161,7 @@ database as \code{x}. \verb{*_join()} will automatically run \code{ANALYZE} on t
 created table in the hope that this will make your queries as efficient
 as possible by giving more data to the query planner.
 \item \code{"inline"}: \code{y} will be inlined into the query using \code{\link[=copy_inline]{copy_inline()}}.
-This is should faster for small datasets and doesn't require write
+This should be faster for small datasets and doesn't require write
 access.
 }
 
@@ -198,7 +198,7 @@ for multiple use a unique key and for unmatched a foreign key constraint.}
 
 \item{sql_on}{A custom join predicate as an SQL expression.
 Usually joins use column equality, but you can perform more complex
-queries by supply \code{sql_on} which should be a SQL expression that
+queries by supplying \code{sql_on} which should be a SQL expression that
 uses \code{LHS} and \code{RHS} aliases to refer to the left-hand side or
 right-hand side of the join respectively.}
 
