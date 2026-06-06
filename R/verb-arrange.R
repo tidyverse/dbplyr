@@ -1,16 +1,16 @@
 #' Arrange rows by column values
 #'
 #' @description
-#' This is an method for the dplyr [arrange()] generic. It generates
+#' This is a method for the dplyr [arrange()] generic. It generates
 #' the `ORDER BY` clause of the SQL query. It also affects the
 #' [window_order()] of windowed expressions in [mutate.tbl_lazy()].
 #'
-#' Note that `ORDER BY` clauses can not generally appear in subqueries, which
+#' Note that `ORDER BY` clauses cannot generally appear in subqueries, which
 #' means that you should `arrange()` as late as possible in your pipelines.
 #'
 #' @section Missing values:
-#' Unlike R, most databases sorts `NA` (`NULL`s) at the front. You can
-#' can override this behaviour by explicitly sorting on `is.na(x)`.
+#' Unlike R, most databases sort `NA` (`NULL`s) at the front. You can
+#' override this behaviour by explicitly sorting on `is.na(x)`.
 #'
 #' @param .data A lazy data frame backed by a database query.
 #' @inheritParams dplyr::arrange

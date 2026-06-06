@@ -22,17 +22,17 @@ query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
 \description{
-This is an method for the dplyr \code{\link[dplyr:arrange]{arrange()}} generic. It generates
+This is a method for the dplyr \code{\link[dplyr:arrange]{arrange()}} generic. It generates
 the \verb{ORDER BY} clause of the SQL query. It also affects the
 \code{\link[=window_order]{window_order()}} of windowed expressions in \code{\link[=mutate.tbl_lazy]{mutate.tbl_lazy()}}.
 
-Note that \verb{ORDER BY} clauses can not generally appear in subqueries, which
+Note that \verb{ORDER BY} clauses cannot generally appear in subqueries, which
 means that you should \code{arrange()} as late as possible in your pipelines.
 }
 \section{Missing values}{
 
-Unlike R, most databases sorts \code{NA} (\code{NULL}s) at the front. You can
-can override this behaviour by explicitly sorting on \code{is.na(x)}.
+Unlike R, most databases sort \code{NA} (\code{NULL}s) at the front. You can
+override this behaviour by explicitly sorting on \code{is.na(x)}.
 }
 
 \examples{

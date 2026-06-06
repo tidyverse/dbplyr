@@ -20,7 +20,7 @@ quoting them using the identifier rules for your database. It is used
 primarily in \code{\link[=translate_sql]{translate_sql()}} to label variables as identifiers; use
 elsewhere should be regarded with suspicion.
 
-\code{ident()} is for internal use only; if you need to supply an table name that
+\code{ident()} is for internal use only; if you need to supply a table name that
 is qualified with schema or catalog use \code{I()}.
 }
 \examples{

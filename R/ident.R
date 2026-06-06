@@ -6,7 +6,7 @@
 #' primarily in [translate_sql()] to label variables as identifiers; use
 #' elsewhere should be regarded with suspicion.
 #'
-#' `ident()` is for internal use only; if you need to supply an table name that
+#' `ident()` is for internal use only; if you need to supply a table name that
 #' is qualified with schema or catalog use `I()`.
 #'
 #' @param ... A character vector, or name-value pairs.
