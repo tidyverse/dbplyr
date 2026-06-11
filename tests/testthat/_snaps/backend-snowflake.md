@@ -49,3 +49,12 @@
       FROM "df"
       ORDER BY "y"
 
+# window functions use inline OVER, not named WINDOW clause
+
+    Code
+      mutate(group_by(mf, a), b = mean(b))
+    Output
+      <SQL>
+      SELECT "a", AVG("b") OVER (PARTITION BY "a") AS "b"
+      FROM "df"
+
