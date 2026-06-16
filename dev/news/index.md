@@ -360,7 +360,12 @@ backend developers:
     [\#1608](https://github.com/tidyverse/dbplyr/issues/1608)); fixed
     translations that were being reported as unknown
     ([@edward-burn](https://github.com/edward-burn),
-    [\#1570](https://github.com/tidyverse/dbplyr/issues/1570)).
+    [\#1570](https://github.com/tidyverse/dbplyr/issues/1570));
+    [`pmin()`](https://rdrr.io/r/base/Extremes.html) and
+    [`pmax()`](https://rdrr.io/r/base/Extremes.html) with `na.rm = TRUE`
+    use `LEAST_IGNORE_NULLS()` and `GREATEST_IGNORE_NULLS()` instead of
+    a bespoke workaround ([@mnelsonr](https://github.com/mnelsonr),
+    [\#1850](https://github.com/tidyverse/dbplyr/issues/1850)).
   - SQL Server:
     [`between()`](https://dplyr.tidyverse.org/reference/between.html)
     uses `CASE WHEN` instead of `IIF()` for compatibility with Azure
