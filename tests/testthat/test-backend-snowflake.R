@@ -456,6 +456,11 @@ test_that("row_number() with and without group_by() and arrange(): unordered def
   expect_snapshot(mf |> arrange(y) |> mutate(rown = row_number()))
 })
 
+test_that("window functions use inline OVER, not named WINDOW clause", {
+  mf <- lazy_frame(a = 1, b = 2, con = dialect_snowflake())
+  expect_snapshot(mf |> group_by(a) |> mutate(b = mean(b)))
+})
+
 test_that("correctly translates $", {
   con <- dialect_snowflake()
   expect_translation(con, x$y, "\"x\":\"y\"")
