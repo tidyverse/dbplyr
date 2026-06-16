@@ -35,7 +35,7 @@ Will signal error if not correct.}
 
 \item{type}{SQL type name as a string.}
 
-\item{rand_expr}{An string giving an SQL expression that generates a
+\item{rand_expr}{A string giving an SQL expression that generates a
 random number between 0 and 1, e.g. \code{"RANDOM()"}.}
 
 \item{min, max}{Range of random values.}

@@ -29,7 +29,7 @@ database as \code{x}. \verb{*_join()} will automatically run \code{ANALYZE} on t
 created table in the hope that this will make your queries as efficient
 as possible by giving more data to the query planner.
 \item \code{"inline"}: \code{y} will be inlined into the query using \code{\link[=copy_inline]{copy_inline()}}.
-This is should faster for small datasets and doesn't require write
+This should be faster for small datasets and doesn't require write
 access.
 }
 

@@ -132,7 +132,7 @@ sql_cot <- function() {
 }
 
 #' @rdname sql_translation_scalar
-#' @param rand_expr An string giving an SQL expression that generates a
+#' @param rand_expr A string giving an SQL expression that generates a
 #'   random number between 0 and 1, e.g. `"RANDOM()"`.
 #' @param min,max Range of random values.
 #' @export
