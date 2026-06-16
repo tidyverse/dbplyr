@@ -107,6 +107,14 @@ test_that("anyNA() translates like any(is.na()) (#1814)", {
   expect_translation(con, anyNA(x), 'MAX(("x" IS NULL)) OVER ()', window = TRUE)
 })
 
+test_that("anyNA() never warns about na.rm", {
+  local_show_na_rm_warning()
+
+  con <- dialect_ansi()
+  expect_no_warning(translate_sql(anyNA(x), con = con, window = FALSE))
+  expect_no_warning(translate_sql(anyNA(x), con = con, window = TRUE))
+})
+
 test_that("connection affects quoting character", {
   lf <- lazy_frame(field1 = 1, field2 = 2, con = dialect_sqlite())
   out <- select(lf, field1)
