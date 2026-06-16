@@ -20,3 +20,4 @@
 ^\.devcontainer$
 ^\.claude$
 ^research$
+^AGENTS\.md$
