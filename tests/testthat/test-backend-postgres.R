@@ -130,12 +130,16 @@ test_that("custom lubridate functions translated correctly", {
   expect_translation(con, isoyear(x), "EXTRACT(YEAR FROM \"x\")")
 
   expect_translation(con, seconds(x), "MAKE_INTERVAL(secs => \"x\")")
-  expect_translation(con, minutes(x), "MAKE_INTERVAL(mins => \"x\")")
-  expect_translation(con, hours(x), "MAKE_INTERVAL(hours => \"x\")")
-  expect_translation(con, days(x), "MAKE_INTERVAL(days => \"x\")")
-  expect_translation(con, weeks(x), "MAKE_INTERVAL(weeks => \"x\")")
-  expect_translation(con, months(x), "MAKE_INTERVAL(months => \"x\")")
-  expect_translation(con, years(x), "MAKE_INTERVAL(years => \"x\")")
+  expect_translation(
+    con,
+    days(x),
+    "MAKE_INTERVAL(days => CAST(\"x\" AS integer))"
+  )
+
+  # Whole-number doubles are rendered as integer literals (#1848)
+  expect_translation(con, seconds(1.5), "MAKE_INTERVAL(secs => 1.5)")
+  expect_translation(con, days(1), "MAKE_INTERVAL(days => 1)")
+  expect_translation(con, months(1), "MAKE_INTERVAL(months => 1)")
 
   expect_translation(con, floor_date(x, "month"), "DATE_TRUNC('month', \"x\")")
   expect_translation(con, floor_date(x, "week"), "DATE_TRUNC('week', \"x\")")
