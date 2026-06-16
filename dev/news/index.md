@@ -360,6 +360,45 @@ backend developers:
     [\#1608](https://github.com/tidyverse/dbplyr/issues/1608)); fixed
     translations that were being reported as unknown
     ([@edward-burn](https://github.com/edward-burn),
+    [\#1570](https://github.com/tidyverse/dbplyr/issues/1570)).
+  - SQL Server:
+    [`between()`](https://dplyr.tidyverse.org/reference/between.html)
+    uses `CASE WHEN` instead of `IIF()` for compatibility with Azure
+    Synapse ([@rehbbea](https://github.com/rehbbea),
+    [\#1773](https://github.com/tidyverse/dbplyr/issues/1773));
+    [`if_else()`](https://dplyr.tidyverse.org/reference/if_else.html)
+    uses `CASE WHEN` instead of `IIF` so `NULL` handling matches R’s
+    `NA` handling
+    ([\#1569](https://github.com/tidyverse/dbplyr/issues/1569));
+    [`slice_sample()`](https://dplyr.tidyverse.org/reference/slice.html)
+    returns different results each run
+    ([@thomashulst](https://github.com/thomashulst),
+    [\#1503](https://github.com/tidyverse/dbplyr/issues/1503));
+    `str_like()` and `str_ilike()` behave consistently
+    ([@edward-burn](https://github.com/edward-burn),
+    [\#1669](https://github.com/tidyverse/dbplyr/issues/1669)); on
+    version 17.0 (2025) the stringr regex functions `str_detect()`,
+    `str_starts()`, `str_ends()`, `str_replace()`, `str_replace_all()`,
+    `str_remove()`, `str_remove_all()`, `str_extract()`, and
+    `str_count()` are translated, and fixed-pattern versions of
+    `str_detect()`, `str_starts()`, and `str_ends()` work on all
+    versions
+    ([\#1671](https://github.com/tidyverse/dbplyr/issues/1671)); uses
+    `DATEDIFF_BIG` instead of `DATEDIFF` so
+    [`tally()`](https://dplyr.tidyverse.org/reference/count.html) and
+    [`count()`](https://dplyr.tidyverse.org/reference/count.html) work
+    regardless of data size
+    ([@edward-burn](https://github.com/edward-burn),
+    [\#1666](https://github.com/tidyverse/dbplyr/issues/1666));
+    [`filter()`](https://dplyr.tidyverse.org/reference/filter.html)
+    correctly casts logical columns to `BIT` when the filtered table is
+    the right-hand side of a join
+    ([\#1839](https://github.com/tidyverse/dbplyr/issues/1839)).
+  - Snowflake: correctly translates `$` to `:`
+    ([@jsowder](https://github.com/jsowder),
+    [\#1608](https://github.com/tidyverse/dbplyr/issues/1608)); fixed
+    translations that were being reported as unknown
+    ([@edward-burn](https://github.com/edward-burn),
     [\#1570](https://github.com/tidyverse/dbplyr/issues/1570));
     [`pmin()`](https://rdrr.io/r/base/Extremes.html) and
     [`pmax()`](https://rdrr.io/r/base/Extremes.html) with `na.rm = TRUE`
