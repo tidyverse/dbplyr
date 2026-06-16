@@ -287,13 +287,16 @@ sql_translation.sql_dialect_snowflake <- function(con) {
 
         sql_glue("DATEDIFF(DAY, {time2}, {time1})")
       },
-      # LEAST / GREATEST on Snowflake will not respect na.rm = TRUE by default (similar to Oracle/Access)
+      # LEAST / GREATEST on Snowflake return NULL if any argument is NULL.
+      # The *_IGNORE_NULLS variants skip NULLs, matching `na.rm = TRUE`.
       # https://docs.snowflake.com/en/sql-reference/functions/least
       # https://docs.snowflake.com/en/sql-reference/functions/greatest
+      # https://docs.snowflake.com/en/sql-reference/functions/least_ignore_nulls
+      # https://docs.snowflake.com/en/sql-reference/functions/greatest_ignore_nulls
       pmin = function(..., na.rm = FALSE) {
         dots <- list(...)
         if (identical(na.rm, TRUE)) {
-          snowflake_pmin_pmax_sql_expression(dots = dots, comparison = "<=")
+          sql_glue("LEAST_IGNORE_NULLS({dots})")
         } else {
           sql_glue("LEAST({dots})")
         }
@@ -301,7 +304,7 @@ sql_translation.sql_dialect_snowflake <- function(con) {
       pmax = function(..., na.rm = FALSE) {
         dots <- list(...)
         if (identical(na.rm, TRUE)) {
-          snowflake_pmin_pmax_sql_expression(dots = dots, comparison = ">=")
+          sql_glue("GREATEST_IGNORE_NULLS({dots})")
         } else {
           sql_glue("GREATEST({dots})")
         }
@@ -389,22 +392,4 @@ snowflake_paste <- function(default_sep) {
     check_collapse(collapse)
     sql_glue("ARRAY_TO_STRING(ARRAY_CONSTRUCT_COMPACT({...}), {sep})")
   }
-}
-
-snowflake_pmin_pmax_sql_expression <- function(dots, comparison) {
-  dot_combined <- dots[[1]]
-  for (i in 2:length(dots)) {
-    dot_combined <- snowflake_pmin_pmax_builder(
-      dots[i],
-      dot_combined,
-      comparison
-    )
-  }
-  dot_combined
-}
-
-snowflake_pmin_pmax_builder <- function(dot_1, dot_2, comparison) {
-  sql_glue(
-    "COALESCE(IFF({dot_2} {.sql comparison} {dot_1}, {dot_2}, {dot_1}), {dot_2}, {dot_1})"
-  )
 }
