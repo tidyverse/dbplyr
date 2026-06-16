@@ -493,6 +493,25 @@
       INNER JOIN [df]
         ON ([LHS].[x] = [df].[x])
 
+---
+
+    Code
+      left_join(lhs, rhs, by = "a")
+    Output
+      <SQL>
+      SELECT [LHS].*, [b2]
+      FROM (
+        SELECT *
+        FROM [df]
+        WHERE (cast([b1] AS [BIT]) = 1)
+      ) AS [LHS]
+      LEFT JOIN (
+        SELECT *
+        FROM [df]
+        WHERE (cast([b2] AS [BIT]) = 1)
+      ) AS [RHS]
+        ON ([LHS].[a] = [RHS].[a])
+
 # row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per empty_order)
 
     Code
