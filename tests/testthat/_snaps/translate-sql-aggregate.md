@@ -1,3 +1,15 @@
+# aggregation functions warn once if na.rm = FALSE
+
+    Code
+      translate_sql(mean(x, na.rm = FALSE), con = con)
+    Condition
+      Warning:
+      Missing values are always removed in SQL aggregation functions.
+      Use `na.rm = TRUE` to silence this warning
+      This warning is displayed once every 8 hours.
+    Output
+      <SQL> AVG("x") OVER ()
+
 # warns informatively with unsupported function
 
     Code

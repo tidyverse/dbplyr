@@ -21,3 +21,8 @@ expect_translation_snapshot <- function(con, expr, ..., error = FALSE) {
 }
 
 scrub_sqlite_version <- \(x) gsub(sqlite_version(), "<version>", x)
+
+local_show_na_rm_warning <- function(frame = caller_env()) {
+  reset_warning_verbosity("dbplyr_check_na_rm")
+  local_mocked_bindings(is_testing = function() FALSE, .env = frame)
+}
