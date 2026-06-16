@@ -103,7 +103,17 @@ postgres_round <- function(x, digits = 0L) {
 }
 
 # https://neon.com/postgresql/postgresql-date-functions/postgresql-make_interval
+# All MAKE_INTERVAL() parameters are integer typed, except `secs`, so we must
+# coerce the argument to an integer. R doubles are escaped with a trailing `.0`
+# (e.g. `months(1)` gives `1.0`), which MAKE_INTERVAL() rejects.
 postgres_period <- function(x, unit) {
+  if (unit != "secs") {
+    if (is.numeric(x)) {
+      x <- as.integer(x)
+    } else if (is.ident(x)) {
+      x <- sql_glue("CAST({x} AS integer)")
+    }
+  }
   sql_glue("MAKE_INTERVAL({.sql unit} => {x})")
 }
 
