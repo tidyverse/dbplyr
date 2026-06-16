@@ -417,26 +417,6 @@ test_that("min() and max()", {
 test_that("pmin() and pmax() respect na.rm", {
   con <- dialect_snowflake()
 
-  # Snowflake default for LEAST/GREATEST: If any of the argument values is NULL, the result is NULL.
-  # https://docs.snowflake.com/en/sql-reference/functions/least
-  # https://docs.snowflake.com/en/sql-reference/functions/greatest
-
-  # na.rm = TRUE: override default behavior for Snowflake (only supports pairs)
-  expect_translation(
-    con,
-    pmin(x, y, na.rm = TRUE),
-    "COALESCE(IFF(\"x\" <= \"y\", \"x\", \"y\"), \"x\", \"y\")"
-  )
-  expect_translation(
-    con,
-    pmax(x, y, na.rm = TRUE),
-    "COALESCE(IFF(\"x\" >= \"y\", \"x\", \"y\"), \"x\", \"y\")"
-  )
-
-  expect_snapshot(translate_sql(pmin(x, y, z, na.rm = TRUE), con = con))
-  expect_snapshot(translate_sql(pmax(x, y, z, na.rm = TRUE), con = con))
-
-  # na.rm = FALSE: leverage default behavior for Snowflake
   expect_translation(
     con,
     pmin(x, y, z, na.rm = FALSE),
@@ -444,8 +424,19 @@ test_that("pmin() and pmax() respect na.rm", {
   )
   expect_translation(
     con,
+    pmin(x, y, z, na.rm = TRUE),
+    "LEAST_IGNORE_NULLS(\"x\", \"y\", \"z\")"
+  )
+
+  expect_translation(
+    con,
     pmax(x, y, z, na.rm = FALSE),
     "GREATEST(\"x\", \"y\", \"z\")"
+  )
+  expect_translation(
+    con,
+    pmax(x, y, z, na.rm = TRUE),
+    "GREATEST_IGNORE_NULLS(\"x\", \"y\", \"z\")"
   )
 })
 
