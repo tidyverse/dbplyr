@@ -601,6 +601,11 @@ test_that("atoms and symbols are cast to bit in `filter`", {
 
   # in a subquery
   expect_snapshot(mf |> filter(x) |> inner_join(mf, by = "x"))
+
+  # on the RHS of a join (#1839)
+  lhs <- lazy_frame(a = 1, b1 = TRUE, con = dialect_mssql()) |> filter(b1)
+  rhs <- lazy_frame(a = 1, b2 = TRUE, con = dialect_mssql()) |> filter(b2)
+  expect_snapshot(left_join(lhs, rhs, by = "a"))
 })
 
 test_that("row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per empty_order)", {
