@@ -197,7 +197,7 @@ anti_join(
 
   - `"inline"`: `y` will be inlined into the query using
     [`copy_inline()`](https://dbplyr.tidyverse.org/dev/reference/copy_inline.md).
-    This is should faster for small datasets and doesn't require write
+    This should be faster for small datasets and doesn't require write
     access.
 
   `TRUE` (`"temp-table"`) and `FALSE` (`"none"`) are also accepted for
@@ -246,9 +246,9 @@ anti_join(
 - sql_on:
 
   A custom join predicate as an SQL expression. Usually joins use column
-  equality, but you can perform more complex queries by supply `sql_on`
-  which should be a SQL expression that uses `LHS` and `RHS` aliases to
-  refer to the left-hand side or right-hand side of the join
+  equality, but you can perform more complex queries by supplying
+  `sql_on` which should be a SQL expression that uses `LHS` and `RHS`
+  aliases to refer to the left-hand side or right-hand side of the join
   respectively.
 
 - auto_index:

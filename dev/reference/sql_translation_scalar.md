@@ -59,7 +59,7 @@ sql_runif(rand_expr, n = n(), min = 0, max = 1)
 
 - rand_expr:
 
-  An string giving an SQL expression that generates a random number
+  A string giving an SQL expression that generates a random number
   between 0 and 1, e.g. `"RANDOM()"`.
 
 - min, max:

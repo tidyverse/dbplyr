@@ -175,7 +175,7 @@ arguments:</p>
 the class name).</li>
 <li>
 <code>quote_identifier</code>: A function that quotes identifiers.
-This will typically b e either a call to <code><a href="../reference/sql_quote.html">sql_quote()</a></code> or to
+This will typically be either a call to <code><a href="../reference/sql_quote.html">sql_quote()</a></code> or to
 <code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html" class="external-link">DBI::dbQuoteIdentifier()</a></code>
 </li>
 </ul>
@@ -190,7 +190,7 @@ database (e.g. direct, ODBC, JDBC, ADBC).</p>
 <p>In general, generics that start with <code>sql_</code> should have a
 sql_dialect method, and generics that start with <code>db_</code> should
 use a DBI connection method. It should be relatively rare to need a
-method for <code>db_</code> generic, but occassionally dbplyr’s SQL
+method for <code>db_</code> generic, but occasionally dbplyr’s SQL
 generation system is not quite flexible enough. If you find this, it’s
 worth filing an issue so I can look into it.</p>
 </div>
@@ -349,14 +349,14 @@ allows sharing translations between different connection types:</p>
 <span>    window <span class="op">=</span> <span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span><span class="va">base_win</span>, <span class="va">...</span><span class="op">)</span> <span class="co"># Window functions (lead, lag, rank, etc.)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p>Each translator will inherits from the base (ANSI SQL) translator and
-overrides only what’s different for your backend:</p>
+<p>Each translator will inherit from the base (ANSI SQL) translator and
+override only what’s different for your backend:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sql_variant.html">sql_translator</a></span><span class="op">(</span></span>
 <span>  <span class="va">base_scalar</span>, <span class="co"># Inherit most translations</span></span>
 <span>  <span class="co"># Override specific functions for your backend</span></span>
 <span>  `+` <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_scalar.html">sql_infix</a></span><span class="op">(</span><span class="st">"+"</span><span class="op">)</span>,</span>
-<span>  mean <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_agg.html">sql_aggregate</a></span><span class="op">(</span><span class="st">"AVERAGE"</span>, <span class="st">"mean"</span><span class="op">)</span></span>
+<span>  mean <span class="op">=</span> <span class="fu"><a href="../reference/sql_translation_agg.html">sql_aggregate</a></span><span class="op">(</span><span class="st">"AVG"</span>, <span class="st">"mean"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="scalar-function-helpers">Scalar function helpers<a class="anchor" aria-label="anchor" href="#scalar-function-helpers"></a>

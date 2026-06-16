@@ -45,7 +45,7 @@ setdiff(x, y, copy = "none", ..., all = FALSE)
 
   - `"inline"`: `y` will be inlined into the query using
     [`copy_inline()`](https://dbplyr.tidyverse.org/dev/reference/copy_inline.md).
-    This is should faster for small datasets and doesn't require write
+    This should be faster for small datasets and doesn't require write
     access.
 
   `TRUE` (`"temp-table"`) and `FALSE` (`"none"`) are also accepted for
