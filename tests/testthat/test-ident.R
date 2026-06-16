@@ -12,3 +12,11 @@ test_that("ident quotes", {
 test_that("can format ident", {
   expect_snapshot(ident())
 })
+
+test_that("as_ident_or_sql() accepts character subclasses like glue", {
+  expect_equal(as_ident_or_sql(glue::glue("x")), ident("x"))
+})
+
+test_that("as_ident_or_sql() gives informative error for non-character", {
+  expect_snapshot(as_ident_or_sql(1), error = TRUE)
+})
