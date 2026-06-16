@@ -75,7 +75,7 @@ mf <- memdb_frame(x = 1:5, y = 5:1, .name = "blorp")
 remote_name(mf)
 #> [1] "blorp"
 remote_src(mf)
-#> src:  sqlite 3.52.0 [:memory:]
+#> src:  sqlite 3.53.1 [:memory:]
 #> tbls: blorp, dbplyr_tmp_0v58wsNw8H, dbplyr_tmp_1LAQiggRXt,
 #>   dbplyr_tmp_8mT77KhL68, dbplyr_tmp_BBVkzIbwPc, dbplyr_tmp_EGgYqj4qNZ,
 #>   dbplyr_tmp_I6Ojtgl00s, dbplyr_tmp_IlBpEtJTVT, dbplyr_tmp_JjVgkVmyiq,
@@ -99,7 +99,7 @@ mf2 <- dplyr::filter(mf, x > 3)
 remote_name(mf2)
 #> NULL
 remote_src(mf2)
-#> src:  sqlite 3.52.0 [:memory:]
+#> src:  sqlite 3.53.1 [:memory:]
 #> tbls: blorp, dbplyr_tmp_0v58wsNw8H, dbplyr_tmp_1LAQiggRXt,
 #>   dbplyr_tmp_8mT77KhL68, dbplyr_tmp_BBVkzIbwPc, dbplyr_tmp_EGgYqj4qNZ,
 #>   dbplyr_tmp_I6Ojtgl00s, dbplyr_tmp_IlBpEtJTVT, dbplyr_tmp_JjVgkVmyiq,

@@ -237,7 +237,7 @@ memdb_frame(
     values_from = value
   )
 #> # A query:  ?? x 3
-#> # Database: sqlite 3.52.0 [:memory:]
+#> # Database: sqlite 3.53.1 [:memory:]
 #>      id     x     y
 #>   <dbl> <int> <int>
 #> 1     1     1     2

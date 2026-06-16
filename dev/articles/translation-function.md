@@ -178,7 +178,7 @@ df |> mutate(x %% y)
 #> 4   -10    -3     -1
 db |> mutate(x %% y)
 #> # A query:  ?? x 3
-#> # Database: sqlite 3.52.0 [:memory:]
+#> # Database: sqlite 3.53.1 [:memory:]
 #>       x     y `x%%y`
 #>   <int> <int>  <int>
 #> 1    10     3      1
