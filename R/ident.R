@@ -45,12 +45,12 @@ is.ident <- function(x) inherits(x, "ident")
 # those functions recommended that you use sql() to escape table names.
 # Also needed in win_over() since the user might be generating their own
 # syntax
-as_ident_or_sql <- function(x) {
+as_ident_or_sql <- function(x, call = caller_env()) {
   if (is.sql(x)) {
     x
   } else if (is.ident(x)) {
     x
-  } else if (is_bare_character(x)) {
+  } else if (is.character(x)) {
     ident(x)
   } else {
     cli::cli_abort(
