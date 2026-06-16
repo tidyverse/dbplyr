@@ -1,13 +1,9 @@
 test_that("aggregation functions warn once if na.rm = FALSE", {
+  local_show_na_rm_warning()
   con <- dialect_ansi()
-  reset_warning_verbosity("dbplyr_check_na_rm")
-  local_mocked_bindings(is_testing = function() FALSE)
 
   expect_no_warning(translate_sql(mean(x, na.rm = TRUE), con = con))
-  expect_warning(
-    translate_sql(mean(x, na.rm = FALSE), con = con),
-    "Missing values"
-  )
+  expect_snapshot(translate_sql(mean(x, na.rm = FALSE), con = con))
   expect_no_warning(translate_sql(mean(x, na.rm = FALSE), con = con))
 })
 

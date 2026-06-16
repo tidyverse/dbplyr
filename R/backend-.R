@@ -484,7 +484,7 @@ sql_exp <- function(a, x) {
 }
 
 sql_any_na <- function(x, window = FALSE) {
-  exp <- expr(any(is.na(!!x)))
+  exp <- expr(any(is.na(!!x), na.rm = TRUE))
   translate_sql(!!exp, con = sql_current_con(), window = window)
 }
 
