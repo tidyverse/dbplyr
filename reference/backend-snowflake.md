@@ -1,0 +1,32 @@
+# Snowflake backend
+
+This backend supports Snowflake databases, typically accessed via odbc.
+Use `dialect_snowflake()` with
+[`lazy_frame()`](https://dbplyr.tidyverse.org/reference/tbl_lazy.md) to
+see simulated SQL without connecting to a live database.
+
+See
+[`vignette("translation-function")`](https://dbplyr.tidyverse.org/articles/translation-function.md)
+and
+[`vignette("translation-verb")`](https://dbplyr.tidyverse.org/articles/translation-verb.md)
+for details of overall translation technology.
+
+## Usage
+
+``` r
+dialect_snowflake()
+
+simulate_snowflake()
+```
+
+## Examples
+
+``` r
+library(dplyr, warn.conflicts = FALSE)
+
+lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_snowflake())
+lf |> transmute(x = paste0(d, " times"))
+#> <SQL>
+#> SELECT ARRAY_TO_STRING(ARRAY_CONSTRUCT_COMPACT("d", ' times'), '') AS "x"
+#> FROM "df"
+```

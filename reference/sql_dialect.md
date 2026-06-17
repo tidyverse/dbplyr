@@ -1,0 +1,95 @@
+# SQL dialects
+
+The dialect system allows multiple database connection classes to share
+SQL generation code. A dialect object encapsulates the SQL syntax rules
+for a particular database, independent of the connection mechanism.
+
+- `sql_dialect()` returns the dialect for a connection. For connections
+  that haven't implemented a dialect method, returns the connection
+  itself for backward compatibility.
+
+- `new_sql_dialect()` creates a new dialect object. This is primarily
+  intended for dbplyr backend authors.
+
+## Usage
+
+``` r
+sql_dialect(con)
+
+new_sql_dialect(
+  dialect,
+  quote_identifier,
+  has_window_clause = FALSE,
+  has_table_alias_with_as = TRUE,
+  has_star_table_prefix = FALSE
+)
+```
+
+## Arguments
+
+- con:
+
+  A database connection.
+
+- dialect:
+
+  A string giving the dialect name (e.g., "postgres", "mysql").
+
+- quote_identifier:
+
+  A function that quotes identifiers. Should accept a character vector
+  and return a [sql](https://dbplyr.tidyverse.org/reference/sql.md)
+  vector.
+
+- has_window_clause:
+
+  Does the backend support named window definitions (the `WINDOW`
+  clause)?
+
+- has_table_alias_with_as:
+
+  Does the backend support using `AS` when aliasing a table in a
+  subquery?
+
+- has_star_table_prefix:
+
+  Does the backend require table prefixes when selecting all columns in
+  single-table queries (e.g., `"table".*` vs `*`)?
+
+## Value
+
+- `sql_dialect()` returns a dialect object (class `sql_dialect`) or the
+  connection itself for backward compatibility.
+
+- `new_sql_dialect()` returns a dialect object with class
+  `c("sql_dialect_{name}", "sql_dialect")`.
+
+## Dispatching on dialect
+
+For backward compatibility, all `sql_` generics (and a handful of
+others) call `sql_dialect()` on the `con` argument in order to dispatch
+further on the dialect object, if possible:
+
+    sql_generic <- function(con, arg1, arg2, ...) {
+      UseMethod("sql_generic", sql_dialect(con))
+    }
+
+Unfortunately, due to the way that
+[`UseMethod()`](https://rdrr.io/r/base/UseMethod.html) works, this uses
+`sql_dialect(con)` to control which method is selected, but still passes
+the original `con` to the method. This means that if you are
+implementing a method for a dialect and need to access dialect
+properties, you must call `sql_dialect(con)` again inside the method.
+
+## Examples
+
+``` r
+# Create a custom dialect
+my_dialect <- new_sql_dialect(
+  "custom",
+  quote_identifier = function(x) sql_quote(x, "`"),
+  has_window_clause = TRUE
+)
+class(my_dialect)
+#> [1] "sql_dialect_custom" "sql_dialect"       
+```

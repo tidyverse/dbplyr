@@ -1,0 +1,172 @@
+# Verb translation
+
+There are two parts to dbplyr SQL translation: translating dplyr verbs,
+and translating expressions within those verbs. This vignette describes
+how entire verbs are translated;
+[`vignette("translation-function")`](https://dbplyr.tidyverse.org/articles/translation-function.md)
+describes how individual expressions within those verbs are translated.
+
+All dplyr verbs generate a `SELECT` statement. To demonstrate we’ll make
+a temporary database with a couple of tables
+
+``` r
+
+library(dbplyr)
+library(dplyr)
+
+con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+flights <- copy_to(con, nycflights13::flights)
+airports <- copy_to(con, nycflights13::airports)
+```
+
+## Single table verbs
+
+- [`select()`](https://dplyr.tidyverse.org/reference/select.html) and
+  [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html) modify
+  the `SELECT` clause:
+
+  ``` r
+
+  flights |>
+    select(contains("delay")) |>
+    show_query()
+  #> <SQL>
+  #> SELECT `dep_delay`, `arr_delay`
+  #> FROM `nycflights13::flights`
+
+  flights |>
+    select(distance, air_time) |>  
+    mutate(speed = distance / (air_time / 60)) |>
+    show_query()
+  #> <SQL>
+  #> SELECT `distance`, `air_time`, `distance` / (`air_time` / 60.0) AS `speed`
+  #> FROM `nycflights13::flights`
+  ```
+
+- [`filter()`](https://dplyr.tidyverse.org/reference/filter.html)
+  generates a `WHERE` clause:
+
+  ``` r
+
+  flights |> 
+    filter(month == 1, day == 1) |>
+    show_query()
+  #> <SQL>
+  #> SELECT *
+  #> FROM `nycflights13::flights`
+  #> WHERE (`month` = 1.0) AND (`day` = 1.0)
+  ```
+
+- [`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html)
+  generates an `ORDER BY` clause:
+
+  ``` r
+
+  flights |> 
+    arrange(carrier, desc(arr_delay)) |>
+    show_query()
+  #> <SQL>
+  #> SELECT *
+  #> FROM `nycflights13::flights`
+  #> ORDER BY `carrier`, `arr_delay` DESC
+  ```
+
+- [`summarise()`](https://dplyr.tidyverse.org/reference/summarise.html)
+  and
+  [`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html)
+  work together to generate a `GROUP BY` clause:
+
+  ``` r
+
+  flights |>
+    group_by(month, day) |>
+    summarise(delay = mean(dep_delay, na.rm = TRUE)) |>
+    show_query()
+  #> ! Grouped output by "month".
+  #> ℹ Override behaviour and silence this message with the `.groups`
+  #>   argument.
+  #> ℹ Or use `.by` instead of `group_by()`.
+  #> <SQL>
+  #> SELECT `month`, `day`, AVG(`dep_delay`) AS `delay`
+  #> FROM `nycflights13::flights`
+  #> GROUP BY `month`, `day`
+  ```
+
+## Subqueries
+
+It’s not always possible to translate a single dplyr verb into a single
+SQL query. For example, in SQL, variables in the `SELECT` clause have to
+come from another table; you can’t refer to a variable that you just
+created. For that reason, dbplyr will create subqueries where needed:
+
+``` r
+
+flights |>
+  select(distance, air_time) |>  
+  mutate(
+    air_time_h = air_time / 60,
+    speed = distance / air_time_h) |>
+  show_query()
+#> <SQL>
+#> SELECT *, `distance` / `air_time_h` AS `speed`
+#> FROM (
+#>   SELECT `distance`, `air_time`, `air_time` / 60.0 AS `air_time_h`
+#>   FROM `nycflights13::flights`
+#> ) AS `q01`
+```
+
+It’s also possible to use a CTE if you so desire:
+
+``` r
+
+flights |>
+  select(distance, air_time) |>  
+  mutate(
+    air_time_h = air_time / 60,
+    speed = distance / air_time_h) |>
+  show_query(sql_options = sql_options(cte = TRUE))
+#> <SQL>
+#> WITH `q01` AS (
+#>   SELECT `distance`, `air_time`, `air_time` / 60.0 AS `air_time_h`
+#>   FROM `nycflights13::flights`
+#> )
+#> SELECT *, `distance` / `air_time_h` AS `speed`
+#> FROM `q01`
+```
+
+Sometimes dbplyr will create a subquery where it’s not strictly
+necessary. We strive to avoid this as much as possible, but our analysis
+of the generated SQL is not always complete, so we’ll typically err on
+the side of safety (creating more subqueries) rather than performance.
+
+It’s important to know that most SQL dialects either error or include
+`LIMIT` and `ORDER BY` statements inside of subqueries. For that reason,
+you should always put [`head()`](https://rdrr.io/r/utils/head.html) and
+[`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html) as
+late as possible in your pipeline.
+
+## Dual table verbs
+
+| R | SQL |
+|----|----|
+| [`inner_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html) | `SELECT * FROM x JOIN y ON x.a = y.a` |
+| [`left_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html) | `SELECT * FROM x LEFT JOIN y ON x.a = y.a` |
+| [`right_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html) | `SELECT * FROM x RIGHT JOIN y ON x.a = y.a` |
+| [`full_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html) | `SELECT * FROM x FULL JOIN y ON x.a = y.a` |
+| [`semi_join()`](https://dplyr.tidyverse.org/reference/filter-joins.html) | `SELECT * FROM x WHERE EXISTS (SELECT 1 FROM y WHERE x.a = y.a)` |
+| [`anti_join()`](https://dplyr.tidyverse.org/reference/filter-joins.html) | `SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = y.a)` |
+| `intersect(x, y)` | `SELECT * FROM x INTERSECT SELECT * FROM y` |
+| `union(x, y)` | `SELECT * FROM x UNION SELECT * FROM y` |
+| `setdiff(x, y)` | `SELECT * FROM x EXCEPT SELECT * FROM y` |
+
+`x` and `y` don’t have to be tables in the same database. If you specify
+`copy = TRUE`, dplyr will copy the `y` table into the same location as
+the `x` variable. This is useful if you’ve downloaded a summarised
+dataset and determined a subset of interest that you now want the full
+data for. You can use `semi_join(x, y, copy = TRUE)` to upload the
+indices of interest to a temporary table in the same database as `x`,
+and then perform a efficient semi join in the database.
+
+If you’re working with large data, it maybe also be helpful to set
+`auto_index = TRUE`. That will automatically add an index on the join
+variables to the temporary table.
