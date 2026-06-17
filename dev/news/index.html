@@ -10,7 +10,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.5.2.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.6.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,6 +30,7 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">News</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-news"><li><h6 class="dropdown-header" data-toc-skip>Releases</h6></li>
+    <li><a class="external-link dropdown-item" href="https://opensource.posit.co/blog/2026-06-17_dbplyr-2-6-0/">Version 2.6.0</a></li>
     <li><a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2024/04/dbplyr-2-5-0/">Version 2.5.0</a></li>
     <li><a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/10/dbplyr-2-4-0/">Version 2.4.0</a></li>
     <li><a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/01/dbplyr-2-3-0/">Version 2.3.0</a></li>
@@ -59,8 +60,11 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.6.0" id="dbplyr-260">dbplyr 2.6.0<a class="anchor" aria-label="anchor" href="#dbplyr-260"></a></h2>
 <div class="section level3">
-<h3 id="lifecycle-changes-development-version">Lifecycle changes<a class="anchor" aria-label="anchor" href="#lifecycle-changes-development-version"></a></h3>
+<h3 id="lifecycle-changes-2-6-0">Lifecycle changes<a class="anchor" aria-label="anchor" href="#lifecycle-changes-2-6-0"></a></h3>
 <ul><li>Newly deprecated:
 <ul><li>dbplyr 1st edition backends no longer work. This concludes over 2 years of work with backend developers to get everyone moved over to the 2nd edition (<a href="https://github.com/tidyverse/dbplyr/issues/1197" class="external-link">#1197</a>).</li>
 <li>
@@ -108,14 +112,14 @@
 <code><a href="../reference/sql_options.html">sql_options()</a></code> is no longer marked experimental.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-2-6-0">New features<a class="anchor" aria-label="anchor" href="#new-features-2-6-0"></a></h3>
 <div class="section level4">
-<h4 id="new-backends-development-version">New backends<a class="anchor" aria-label="anchor" href="#new-backends-development-version"></a></h4>
+<h4 id="new-backends-2-6-0">New backends<a class="anchor" aria-label="anchor" href="#new-backends-2-6-0"></a></h4>
 <ul><li>ADBC (via {adbi}, <a href="https://github.com/tidyverse/dbplyr/issues/1787" class="external-link">#1787</a>) and JDBC (via {RJDBC}, <a href="https://github.com/tidyverse/dbplyr/issues/1359" class="external-link">#1359</a>) connections are supported. Both use the connection name/class to dispatch to SQL dialects for existing backends. This is made possible by <code><a href="../reference/sql_dialect.html">sql_dialect()</a></code>, a new generic that allows connections to choose a SQL dialect (<a href="https://github.com/tidyverse/dbplyr/issues/1624" class="external-link">#1624</a>). If the default dialect is incorrect, you can override it with <code><a href="../reference/with_dialect.html">with_dialect()</a></code> (<a href="https://github.com/tidyverse/dbplyr/issues/1784" class="external-link">#1784</a>).</li>
 <li>IBM DB2 (<a href="https://github.com/shearerpmm" class="external-link">@shearerpmm</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1800" class="external-link">#1800</a>). Includes translations for <code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste()</a></code>/<code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0()</a></code> (using <code>||</code>), DB2-specific casts, <code><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif()</a></code>, string functions, date functions, clock helpers, statistical aggregates, and more.</li>
 </ul></div>
 <div class="section level4">
-<h4 id="new-verb-support-development-version">New verb support<a class="anchor" aria-label="anchor" href="#new-verb-support-development-version"></a></h4>
+<h4 id="new-verb-support-2-6-0">New verb support<a class="anchor" aria-label="anchor" href="#new-verb-support-2-6-0"></a></h4>
 <ul><li>
 <code><a href="../reference/bind_queries.html">bind_queries()</a></code> makes it easy to combine multiple lazy queries using <code>UNION ALL</code> (<a href="https://github.com/tidyverse/dbplyr/issues/1342" class="external-link">#1342</a>). It’s the dbplyr equivalent of <code><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">dplyr::bind_rows()</a></code>.</li>
 <li>
@@ -124,7 +128,7 @@
 <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code> gains <code>.order</code> and <code>.frame</code> arguments for specifying window function ordering and frame bounds within a single mutate call, similar to how <code>.by</code> works for grouping (<a href="https://github.com/tidyverse/dbplyr/issues/1542" class="external-link">#1542</a>).</li>
 </ul></div>
 <div class="section level4">
-<h4 id="new-function-translations-development-version">New function translations<a class="anchor" aria-label="anchor" href="#new-function-translations-development-version"></a></h4>
+<h4 id="new-function-translations-2-6-0">New function translations<a class="anchor" aria-label="anchor" href="#new-function-translations-2-6-0"></a></h4>
 <ul><li>
 <code><a href="https://rdrr.io/r/base/NA.html" class="external-link">anyNA()</a></code> is translated to SQL in the same way as <code>any(is.na(x))</code> (<a href="https://github.com/tidyverse/dbplyr/issues/1814" class="external-link">#1814</a>).</li>
 <li>
@@ -135,14 +139,14 @@
 <code>%notin%</code> (introduced in R 4.6.0) is translated to <code>NOT IN</code> (<a href="https://github.com/tidyverse/dbplyr/issues/1820" class="external-link">#1820</a>).</li>
 </ul></div>
 <div class="section level4">
-<h4 id="other-new-helpers-development-version">Other new helpers<a class="anchor" aria-label="anchor" href="#other-new-helpers-development-version"></a></h4>
+<h4 id="other-new-helpers-2-6-0">Other new helpers<a class="anchor" aria-label="anchor" href="#other-new-helpers-2-6-0"></a></h4>
 <ul><li>
 <code><a href="../reference/last_sql.html">last_sql()</a></code> retrieves the most recent SQL query generated by dbplyr, which is useful for debugging (<a href="https://github.com/tidyverse/dbplyr/issues/1471" class="external-link">#1471</a>).</li>
 <li>The <code>copy</code> argument of join, set, and row operations accepts <code>"inline"</code> to use <code><a href="../reference/copy_inline.html">copy_inline()</a></code> instead of copying to a temporary table (<a href="https://github.com/tidyverse/dbplyr/issues/863" class="external-link">#863</a>).</li>
 </ul></div>
 </div>
 <div class="section level3">
-<h3 id="extensions-development-version">Extensions<a class="anchor" aria-label="anchor" href="#extensions-development-version"></a></h3>
+<h3 id="extensions-2-6-0">Extensions<a class="anchor" aria-label="anchor" href="#extensions-2-6-0"></a></h3>
 <p>The following changes and new capabilities are of interest to dbplyr backend developers:</p>
 <ul><li>
 <code>db_supports_table_alias_with_as()</code> and <code>supports_window_clause()</code> generics have been removed. They were not used by any packages and are now part of the <code><a href="../reference/sql_dialect.html">new_sql_dialect()</a></code> data structure (<a href="https://github.com/tidyverse/dbplyr/issues/1760" class="external-link">#1760</a>).</li>
@@ -170,7 +174,7 @@
 <li>New <code><a href="../reference/db-sql.html">sql_set_op_method()</a></code> generic allows set operations (<code><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">union()</a></code>, <code><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">intersect()</a></code>, <code><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">setdiff()</a></code>) to customize the SQL keyword, e.g. using <code>UNION DISTINCT</code> instead of <code>UNION</code> for databases that require it, or <code>MINUS</code> instead of <code>EXCEPT</code> for Oracle (<a href="https://github.com/tidyverse/dbplyr/issues/1596" class="external-link">#1596</a>).</li>
 </ul></div>
 <div class="section level3">
-<h3 id="sql-translation-improvements-development-version">SQL translation improvements<a class="anchor" aria-label="anchor" href="#sql-translation-improvements-development-version"></a></h3>
+<h3 id="sql-translation-improvements-2-6-0">SQL translation improvements<a class="anchor" aria-label="anchor" href="#sql-translation-improvements-2-6-0"></a></h3>
 <ul><li>Single-table SELECT queries use unqualified <code>*</code> (e.g. <code>SELECT *</code>) instead of table-qualified <code>*</code> (e.g. <code>SELECT "df".*</code>) for most backends. Oracle and Teradata continue to use qualified stars as required by their syntax (<a href="https://github.com/tidyverse/dbplyr/issues/1577" class="external-link">#1577</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1485" class="external-link">#1485</a>).</li>
 <li>
 <code>.sql</code> pronoun makes it a little easier to use known SQL functions in packages, requiring only <code>@importFrom dbplyr .sql</code> (<a href="https://github.com/tidyverse/dbplyr/issues/1117" class="external-link">#1117</a>). Now you can write <code>db |&gt; mutate(.sql$custom_sql_function(x, y, z))</code> and only need to import one function (<code>.sql</code>) to quiet all <code>R CMD check</code> notes.</li>
@@ -223,7 +227,7 @@
 </ul></li>
 </ul></div>
 <div class="section level3">
-<h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
+<h3 id="minor-improvements-and-bug-fixes-2-6-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-2-6-0"></a></h3>
 <ul><li>CTEs correctly quote table names when the same query is used multiple times (<a href="https://github.com/tidyverse/dbplyr/issues/1559" class="external-link">#1559</a>).</li>
 <li>dbplyr uses the base pipe in all examples (<a href="https://github.com/tidyverse/dbplyr/issues/1626" class="external-link">#1626</a>).</li>
 <li>The print method no longer mentions the “source”, because that is an outdated dplyr concept (<a href="https://github.com/tidyverse/dbplyr/issues/897" class="external-link">#897</a>).</li>

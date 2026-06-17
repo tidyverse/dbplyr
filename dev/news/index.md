@@ -2,6 +2,8 @@
 
 ## dbplyr (development version)
 
+## dbplyr 2.6.0
+
 ### Lifecycle changes
 
 - Newly deprecated:
