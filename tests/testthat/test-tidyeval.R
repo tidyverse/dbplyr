@@ -88,6 +88,31 @@ test_that("fails with multi-classes", {
   expect_error(partial_eval(x, lf), "Unknown input type", fixed = TRUE)
 })
 
+test_that("recode_values/replace_values only translates x + default", {
+  lf <- lazy_frame(x = 1, y = 1)
+  df <- data.frame(x = c("a", "b"), y = c("A", "B"))
+  fr <- \() c("a", "b")
+  to <- \() c("A", "B")
+
+  # `from`/`to` named args with function calls are evaluated locally.
+  out <- capture_dot(lf, recode_values(x, from = df$x, to = df$y, default = y))
+  expect_equal(out$x, sym("x"))
+  expect_equal(out$from, c("a", "b"))
+  expect_equal(out$to, c("A", "B"))
+  expect_equal(out$default, sym("y"))
+
+  out <- capture_dot(lf, recode_values(x, "a" ~ "b", "A" ~ "B"))
+  expect_equal(out$x, sym("x"))
+  expect_equal(out[[3]], expr("a" ~ "b"))
+  expect_equal(out[[4]], expr("A" ~ "B"))
+
+  # Formula RHS is translated: column refs stay as symbols, locals get inlined.
+  local_val <- "LOCAL"
+  out <- capture_dot(lf, recode_values(x, "a" ~ y, "b" ~ local_val))
+  expect_equal(out[[3]], expr("a" ~ y))
+  expect_equal(out[[4]], expr("b" ~ "LOCAL"))
+})
+
 # replace_sym1 -----------------------------------------------------------------
 
 test_that("replace_sym1() replaces matching symbols", {

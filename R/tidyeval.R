@@ -264,6 +264,30 @@ partial_eval_call <- function(call, data, env) {
       # Only the 1st argument is evaluated
       call[[2]] <- partial_eval(call[[2]], data = data, env = env)
       call
+    } else if (is_call(call, c("recode_values", "replace_values"))) {
+      if (is_call(call, "recode_values")) {
+        call <- call_match(call, fn = dplyr::recode_values)
+      } else {
+        call <- call_match(call, fn = dplyr::replace_values)
+      }
+
+      # Translate all components that get recycled to match `x` because
+      # these could be column names (or functions). All others are evaluated
+      # locally
+      for (i in seq_along(call)[-1]) {
+        nm <- names(call)[[i]]
+        if (nm %in% c("x", "default")) {
+          call[[i]] <- partial_eval(call[[i]], data = data, env = env)
+        } else if (nm == "to" && is_call(call[[i]], "list")) {
+          call[[i]] <- partial_eval(call[[i]], data = data, env = env)
+        } else if (is_call(call[[i]], "~") && length(call[[i]]) == 3) {
+          call[[i]][[3]] <- partial_eval(call[[i]][[3]], data = data, env = env)
+        } else {
+          call[[i]] <- eval_bare(call[[i]], env = env)
+        }
+      }
+
+      call
     } else {
       # Check for shiny reactives before processing unknown function calls
       if (is_symbol(fun)) {
