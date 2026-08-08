@@ -166,7 +166,25 @@ sql_translation.sql_dialect_mariadb <- function(con) {
       },
       str_replace_all = function(string, pattern, replacement) {
         sql_glue("REGEXP_REPLACE({string}, {pattern}, {replacement})")
-      }
+      },
+
+      # lubridate
+      seconds  = function(x) sql_glue("INTERVAL {x} SECOND"),
+      minutes  = function(x) sql_glue("INTERVAL {x} MINUTE"),
+      hours    = function(x) sql_glue("INTERVAL {x} HOUR"),
+      days     = function(x) sql_glue("INTERVAL {x} DAY"),
+      weeks    = function(x) sql_glue("INTERVAL {x} WEEK"),
+      months   = function(x) sql_glue("INTERVAL {x} MONTH"),
+      years    = function(x) sql_glue("INTERVAL {x} YEAR"),
+      dseconds = function(x) sql_glue("INTERVAL {x} SECOND"),
+      dminutes = function(x) sql_glue("INTERVAL {x} MINUTE"),
+      dhours   = function(x) sql_glue("INTERVAL {x} HOUR"),
+      ddays    = function(x) sql_glue("INTERVAL {x} DAY"),
+      dweeks   = function(x) sql_glue("INTERVAL {x} WEEK"),
+      day      = function(x) sql_glue("DAY({x})"),
+      mday     = function(x) sql_glue("DAYOFMONTH({x})"),
+      month    = function(x) sql_glue("MONTH({x})"),
+      year     = function(x) sql_glue("YEAR({x})")
     ),
     sql_translator(
       .parent = base_agg,
