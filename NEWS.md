@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `sql_cut()` now errors when `breaks` has zero values, instead of failing later with a subscript out of bounds error.
+
 # dbplyr 2.6.0
 
 ## Lifecycle changes
