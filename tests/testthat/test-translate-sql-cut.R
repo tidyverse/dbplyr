@@ -159,3 +159,8 @@ test_that("cut checks arguments", {
   expect_translation_snapshot(con, cut(x, c(1, 1)), error = TRUE)
   expect_translation_snapshot(con, cut(x, c(1, 2, NA)), error = TRUE)
 })
+
+test_that("cut errors if breaks is empty", {
+  con <- dialect_ansi()
+  expect_error(translate_sql(cut(x, !!numeric(0)), con = con), "at least two values")
+})
