@@ -162,5 +162,8 @@ test_that("cut checks arguments", {
 
 test_that("cut errors if breaks is empty", {
   con <- dialect_ansi()
-  expect_error(translate_sql(cut(x, !!numeric(0)), con = con), "at least two values")
+  expect_error(
+    translate_sql(cut(x, !!numeric(0)), con = con),
+    "at least two values"
+  )
 })
