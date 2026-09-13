@@ -10,7 +10,7 @@ sql_cut <- function(
     cli_abort("{.arg breaks} are not unique.")
   }
   n <- length(breaks)
-  if (n == 1) {
+  if (n <= 1) {
     cli_abort("{.arg breaks} must have at least two values.")
   }
   if (any(is.na(breaks))) {
