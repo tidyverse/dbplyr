@@ -25,7 +25,7 @@ NULL
 dialect_impala <- function() {
   new_sql_dialect(
     "impala",
-    quote_identifier = function(x) sql_quote(x, '"'),
+    quote_identifier = function(x) sql_quote(x, "`"),
     has_window_clause = TRUE
   )
 }
