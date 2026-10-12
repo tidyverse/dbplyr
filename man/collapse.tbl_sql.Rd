@@ -20,6 +20,7 @@ database/dbplyr limitations.
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(a = c(3, 4, 1, 2), b = c(5, 1, 2, NA))
-db |> filter(a <= 2) |> show_query()
-db |> filter(a <= 2) |> collapse() |> show_query()
+db |> filter(a <= 2) |> mutate(c = a + 1) |> show_query()
+
+db |> filter(a <= 2) |> collapse() |> mutate(c = a + 1) |> show_query()
 }
