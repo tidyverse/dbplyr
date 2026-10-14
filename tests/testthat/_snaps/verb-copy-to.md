@@ -22,7 +22,7 @@
       Error:
       ! `x` and `y` must share the same source.
       i Use `copy = "temp-table"` to copy `y` to a temporary table.
-      i USe `copy = "inline"` to convert `y` to inline SQL.
+      i Use `copy = "inline"` to convert `y` to inline SQL.
 
 ---
 
@@ -32,5 +32,5 @@
       Error:
       ! `x` and `y` must share the same source.
       i Use `copy = "temp-table"` to copy `y` to a temporary table.
-      i USe `copy = "inline"` to convert `y` to inline SQL.
+      i Use `copy = "inline"` to convert `y` to inline SQL.
 
