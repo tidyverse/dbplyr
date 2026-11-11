@@ -228,24 +228,24 @@ df4 <- local_memdb_frame(a = 5:1, z = 5:1)
 
 test_that("named by join by different x and y vars", {
   j1 <- collect(inner_join(df1, df2, c("x" = "a")))
-  expect_equal(names(j1), c("x", "y", "b"))
+  expect_named(j1, c("x", "y", "b"))
   expect_shape(j1, nrow = 5)
 
   j2 <- collect(inner_join(df1, df2, c("x" = "a", "y" = "b")))
-  expect_equal(names(j2), c("x", "y"))
-  expect_shape(j1, nrow = 1)
+  expect_named(j2, c("x", "y"))
+  expect_shape(j2, nrow = 1)
 })
 
 test_that("named by join by same z vars", {
   j1 <- collect(inner_join(df3, df4, c("z" = "z")))
+  expect_named(j1, c("x", "z", "a"))
   expect_shape(j1, nrow = 5)
-  expect_equal(names(j1), c("x", "z", "a"))
 })
 
 test_that("join with both same and different vars", {
   j1 <- collect(left_join(df1, df3, by = c("y" = "z", "x")))
+  expect_named(j1, c("x", "y"))
   expect_shape(j1, nrow = 5)
-  expect_equal(names(j1), c("x", "y"))
 })
 
 test_that("joining over arbitrary predicates", {
