@@ -130,7 +130,7 @@ base_scalar <- sql_translator(
   },
 
   `$` = function(x, name) {
-    if (is.ident(x)) {
+    if (is.ident(x) || is.sql(x)) {
       sql_glue("{x}.{name}")
     } else {
       eval(bquote(`$`(x, .(substitute(name)))))
