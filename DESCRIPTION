@@ -53,7 +53,7 @@ Suggests:
     RPostgres (>= 1.4.5),
     RPostgreSQL,
     RSQLite (>= 2.3.8),
-    testthat (>= 3.1.10)
+    testthat (>= 3.3.0)
 VignetteBuilder: 
     knitr
 Config/Needs/website: tidyverse/tidytemplate
