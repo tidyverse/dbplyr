@@ -45,6 +45,11 @@ sql_dialect.RedshiftConnection <- function(con) {
 sql_dialect.Redshift <- sql_dialect.RedshiftConnection
 
 #' @export
+sql_escape_string.sql_dialect_redshift <- function(con, x) {
+  sql_escape_string_backslash(x)
+}
+
+#' @export
 dbplyr_edition.RedshiftConnection <- function(con) {
   2L
 }

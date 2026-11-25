@@ -46,6 +46,11 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
 }
 
 #' @export
+sql_escape_string.sql_dialect_spark_sql <- function(con, x) {
+  sql_escape_string_backslash(x)
+}
+
+#' @export
 `dbplyr_edition.Spark SQL` <- function(con) {
   2L
 }

@@ -3,6 +3,11 @@ test_that("simulate_mysql() and simulate_mariadb() still work", {
   expect_translation(simulate_mariadb(), x + 1, "`x` + 1.0")
 })
 
+test_that("string literals escape backslashes", {
+  expect_equal(escape("a\\b", con = dialect_mysql()), sql("'a\\\\b'"))
+  expect_equal(escape("a\\b", con = dialect_mariadb()), sql("'a\\\\b'"))
+})
+
 # function translation ----------------------------------------------------
 
 test_that("custom scalar translated correctly", {

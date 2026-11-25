@@ -2,6 +2,10 @@ test_that("simulate_spark_sql() still works", {
   expect_translation(simulate_spark_sql(), x + 1, "`x` + 1.0")
 })
 
+test_that("string literals escape backslashes", {
+  expect_equal(escape("a\\b", con = dialect_spark_sql()), sql("'a\\\\b'"))
+})
+
 test_that("custom clock functions translated correctly", {
   con <- dialect_spark_sql()
   expect_translation(con, add_years(x, 1), "ADD_MONTHS(`x`, 1.0 * 12)")
