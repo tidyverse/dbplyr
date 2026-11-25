@@ -494,6 +494,10 @@ backend developers:
 - [`summarise()`](https://dplyr.tidyverse.org/reference/summarise.html)
   reports grouping immediately, rather than when the SQL is generated
   ([\#1721](https://github.com/tidyverse/dbplyr/issues/1721)).
+- `x$y$z` again translates as `x.y.z`, which is required for nested
+  protobuf field access in {bigrquery}
+  ([@michaelchirico](https://github.com/michaelchirico),
+  [\#1881](https://github.com/tidyverse/dbplyr/issues/1881)).
 
 ## dbplyr 2.5.2
 

@@ -254,6 +254,8 @@
 <code><a href="../reference/show_query.html">show_query()</a></code> gains a <code>use_colour</code> argument (<a href="https://github.com/tidyverse/dbplyr/issues/1590" class="external-link">#1590</a>).</li>
 <li>
 <code><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise()</a></code> reports grouping immediately, rather than when the SQL is generated (<a href="https://github.com/tidyverse/dbplyr/issues/1721" class="external-link">#1721</a>).</li>
+<li>
+<code>x$y$z</code> again translates as <code>x.y.z</code>, which is required for nested protobuf field access in {bigrquery} (<a href="https://github.com/michaelchirico" class="external-link">@michaelchirico</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1881" class="external-link">#1881</a>).</li>
 </ul></div>
 </div>
     <div class="section level2">
