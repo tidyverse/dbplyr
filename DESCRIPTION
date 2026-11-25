@@ -57,6 +57,7 @@ Suggests:
 VignetteBuilder: 
     knitr
 Config/Needs/website: tidyverse/tidytemplate
+Config/roxygen2/version: 8.1.1
 Config/testthat/edition: 3
 Config/testthat/parallel: TRUE
 Encoding: UTF-8
@@ -167,4 +168,3 @@ Collate:
     'verb-window.R'
     'with-dialect.R'
     'zzz.R'
-Config/roxygen2/version: 8.0.0
