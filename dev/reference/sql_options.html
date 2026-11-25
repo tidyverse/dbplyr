@@ -100,33 +100,48 @@ multiple tables.</p></dd>
 <span class="r-in"><span><span class="va">lf2</span> <span class="op">&lt;-</span> <span class="fu"><a href="tbl_lazy.html">lazy_frame</a></span><span class="op">(</span>key <span class="op">=</span> <span class="fl">1</span>, a <span class="op">=</span> <span class="fl">1</span>, c <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">lf1</span>, <span class="va">lf2</span>, by <span class="op">=</span> <span class="st">"key"</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">c</span> <span class="op">&gt;=</span> <span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>d <span class="op">=</span> <span class="va">b</span> <span class="op">+</span> <span class="va">c</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">d</span> <span class="op">&gt;=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   "df_LHS"."key"<span style="color: #0000BB;"> AS </span>"key",</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   "df_LHS"."a"<span style="color: #0000BB;"> AS </span>"a.x",</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   "b",</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   "df_RHS"."a"<span style="color: #0000BB;"> AS </span>"a.y",</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   "c"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> "df"<span style="color: #0000BB;"> AS </span>"df_LHS"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">LEFT JOIN</span> "df"<span style="color: #0000BB;"> AS </span>"df_RHS"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">ON</span> ("df_LHS"."key" = "df_RHS"."key")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">WHERE</span> ("df_RHS"."c" &gt;= 3.0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> (</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span> *, "b" + "c"<span style="color: #0000BB;"> AS </span>"d"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> (</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #0000BB;">SELECT</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       "df_LHS"."key"<span style="color: #0000BB;"> AS </span>"key",</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       "df_LHS"."a"<span style="color: #0000BB;"> AS </span>"a.x",</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       "b",</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       "df_RHS"."a"<span style="color: #0000BB;"> AS </span>"a.y",</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       "c"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #0000BB;">FROM</span> "df"<span style="color: #0000BB;"> AS </span>"df_LHS"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #0000BB;">LEFT JOIN</span> "df"<span style="color: #0000BB;"> AS </span>"df_RHS"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       <span style="color: #0000BB;">ON</span> ("df_LHS"."key" = "df_RHS"."key")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ) <span style="color: #0000BB;">AS </span>"q01"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ) <span style="color: #0000BB;">AS </span>"q01"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">WHERE</span> ("d" &gt;= 3.0)</span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">sql_options</span> <span class="op">&lt;-</span> <span class="fu">sql_options</span><span class="op">(</span>cte <span class="op">=</span> <span class="cn">TRUE</span>, qualify_all_columns <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="show_query.html">show_query</a></span><span class="op">(</span><span class="va">result</span>, sql_options <span class="op">=</span> <span class="va">sql_options</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   "df_LHS"."key"<span style="color: #0000BB;"> AS </span>"key",</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   "df_LHS"."a"<span style="color: #0000BB;"> AS </span>"a.x",</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   "df_LHS"."b"<span style="color: #0000BB;"> AS </span>"b",</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   "df_RHS"."a"<span style="color: #0000BB;"> AS </span>"a.y",</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   "df_RHS"."c"<span style="color: #0000BB;"> AS </span>"c"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> "df"<span style="color: #0000BB;"> AS </span>"df_LHS"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">LEFT JOIN</span> "df"<span style="color: #0000BB;"> AS </span>"df_RHS"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">ON</span> ("df_LHS"."key" = "df_RHS"."key")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">WHERE</span> ("df_RHS"."c" &gt;= 3.0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> WITH "q01" AS (</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     "df_LHS"."key"<span style="color: #0000BB;"> AS </span>"key",</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     "df_LHS"."a"<span style="color: #0000BB;"> AS </span>"a.x",</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     "df_LHS"."b"<span style="color: #0000BB;"> AS </span>"b",</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     "df_RHS"."a"<span style="color: #0000BB;"> AS </span>"a.y",</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     "df_RHS"."c"<span style="color: #0000BB;"> AS </span>"c"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> "df"<span style="color: #0000BB;"> AS </span>"df_LHS"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">LEFT JOIN</span> "df"<span style="color: #0000BB;"> AS </span>"df_RHS"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #0000BB;">ON</span> ("df_LHS"."key" = "df_RHS"."key")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ),</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "q02" AS (</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span> *, "b" + "c"<span style="color: #0000BB;"> AS </span>"d"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> "q01"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> "q02"<span style="color: #0000BB;"> AS </span>"q01"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">WHERE</span> ("d" &gt;= 3.0)</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -28,14 +28,18 @@ collapse(x, ...)
 library(dplyr, warn.conflicts = FALSE)
 
 db <- memdb_frame(a = c(3, 4, 1, 2), b = c(5, 1, 2, NA))
-db |> filter(a <= 2) |> show_query()
+db |> filter(a <= 2) |> mutate(c = a + 1) |> show_query()
 #> <SQL>
+#> SELECT *, `a` + 1.0 AS `c`
+#> FROM `dbplyr_tmp_vQgF0fivjF`
+#> WHERE (`a` <= 2.0)
+
+db |> filter(a <= 2) |> collapse() |> mutate(c = a + 1) |> show_query()
+#> <SQL>
+#> SELECT *, `a` + 1.0 AS `c`
+#> FROM (
 #> SELECT *
 #> FROM `dbplyr_tmp_vQgF0fivjF`
 #> WHERE (`a` <= 2.0)
-db |> filter(a <= 2) |> collapse() |> show_query()
-#> <SQL>
-#> SELECT *
-#> FROM `dbplyr_tmp_vQgF0fivjF`
-#> WHERE (`a` <= 2.0)
+#> ) AS `q01`
 ```
