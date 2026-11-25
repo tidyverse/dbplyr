@@ -124,6 +124,7 @@ The following changes and new capabilities are of interest to dbplyr backend dev
 * `pull()` correctly handles a `NULL` quosure passed to `name` (#1808).
 * `show_query()` gains a `use_colour` argument (#1590).
 * `summarise()` reports grouping immediately, rather than when the SQL is generated (#1721).
+* `x$y$z` again translates as `x.y.z`, which is required for nested protobuf field access in {bigrquery} (@michaelchirico, #1881).
 
 # dbplyr 2.5.2
 
