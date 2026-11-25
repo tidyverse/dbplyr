@@ -83,6 +83,8 @@ test_that("log becomes ln", {
 test_that("can translate subsetting", {
   con <- dialect_ansi()
   expect_translation(con, a$b, '"a"."b"')
+  expect_translation(con, a$b$c, '"a"."b"."c"')
+  expect_translation(con, f(a)$b, 'f("a")."b"')
   expect_translation(con, a[["b"]], '"a"."b"')
   expect_translation(con, f(a)[["b"]], 'f("a")."b"')
   expect_translation(con, a[["b"]][[1]], '"a"."b"[1]')
