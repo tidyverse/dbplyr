@@ -247,7 +247,7 @@ sql_table_temporary.sql_dialect_oracle <- function(con, table, temporary, ...) {
       paste0("Created a temporary table named ", new_name),
       class = c("dbplyr_message_temp_table", "dbplyr_message")
     )
-    table = table_path(new_name)
+    table <- table_path(new_name)
   }
 
   list(table = table, temporary = temporary)
