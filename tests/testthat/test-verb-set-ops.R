@@ -96,7 +96,7 @@ test_that("but it can work with another backend", {
   db <- local_db_table(con, tibble(x = 1:2), "db")
 
   out <- collect(head(union_all(db, db), 2))
-  expect_equal(nrow(out), 2)
+  expect_shape(out, nrow = 2)
 })
 
 test_that("intersect works with copy = 'temp-table'", {
