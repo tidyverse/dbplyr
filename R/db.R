@@ -145,11 +145,9 @@ db_col_types.default <- function(con, table, call) {
 #' result <- left_join(lf1, lf2, by = "key") |>
 #'   mutate(d = b + c) |>
 #'   filter(d >= 3)
-#'
 #' show_query(result)
 #'
 #' sql_options <- sql_options(cte = TRUE, qualify_all_columns = TRUE)
-#'
 #' show_query(result, sql_options = sql_options)
 sql_options <- function(
   cte = FALSE,

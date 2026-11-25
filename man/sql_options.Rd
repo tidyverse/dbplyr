@@ -31,10 +31,8 @@ lf2 <- lazy_frame(key = 1, a = 1, c = 3)
 result <- left_join(lf1, lf2, by = "key") |>
   mutate(d = b + c) |>
   filter(d >= 3)
-
 show_query(result)
 
 sql_options <- sql_options(cte = TRUE, qualify_all_columns = TRUE)
-
 show_query(result, sql_options = sql_options)
 }
