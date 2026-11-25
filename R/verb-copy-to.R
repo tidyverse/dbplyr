@@ -130,7 +130,7 @@ dbplyr_auto_copy <- function(
       c(
         "{.arg x} and {.arg y} must share the same source.",
         i = "Use {.code copy = \"temp-table\"} to copy {.arg y} to a temporary table.",
-        i = "USe {.code copy = \"inline\"} to convert {.arg y} to inline SQL."
+        i = "Use {.code copy = \"inline\"} to convert {.arg y} to inline SQL."
       ),
       call = call
     )
