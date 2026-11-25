@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `n_distinct()` now errors if passed multiple columns, rather than silently treating the second argument as `na.rm` (#1879).
+
 # dbplyr 2.6.0
 
 ## Lifecycle changes
