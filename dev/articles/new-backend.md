@@ -38,7 +38,7 @@ DBI::dbWriteTable(con, "mtcars", mtcars)
 
 tbl(con, "mtcars")
 #> # A query:  ?? x 11
-#> # Database: sqlite 3.53.1 []
+#> # Database: sqlite 3.53.3 []
 #>     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #>   <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
 #> 1  21       6   160   110  3.9   2.62  16.5     0     1     4     4

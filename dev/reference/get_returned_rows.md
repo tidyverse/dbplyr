@@ -56,7 +56,7 @@ rows_insert(info, rows1, conflict = "ignore", in_place = TRUE)
 #> Matching, by = "number"
 info
 #> # A query:  ?? x 2
-#> # Database: sqlite 3.53.1 [:memory:]
+#> # Database: sqlite 3.53.3 [:memory:]
 #>      id number
 #>   <int>  <int>
 #> 1     1      1
@@ -75,7 +75,7 @@ info <- rows_insert(
 #> Matching, by = "number"
 info
 #> # A query:  ?? x 2
-#> # Database: sqlite 3.53.1 [:memory:]
+#> # Database: sqlite 3.53.3 [:memory:]
 #>      id number
 #>   <int>  <int>
 #> 1     1      1

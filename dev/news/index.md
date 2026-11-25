@@ -4,6 +4,8 @@
 
 ## dbplyr 2.6.0
 
+CRAN release: 2026-06-17
+
 ### Lifecycle changes
 
 - Newly deprecated:

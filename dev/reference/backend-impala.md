@@ -30,6 +30,6 @@ library(dplyr, warn.conflicts = FALSE)
 lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = dialect_impala())
 lf |> transmute(X = bitwNot(bitwOr(b, c)))
 #> <SQL>
-#> SELECT BITNOT(BITOR("b", "c")) AS "X"
-#> FROM "df"
+#> SELECT BITNOT(BITOR(`b`, `c`)) AS `X`
+#> FROM `df`
 ```
