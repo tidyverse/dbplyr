@@ -56,6 +56,19 @@ redshift_round <- function(x, digits = 0L) {
   sql_glue("ROUND(({x})::float, {digits})")
 }
 
+# Redshift doesn't support MAKE_INTERVAL(), so build an interval from a
+# string literal instead.
+# https://docs.aws.amazon.com/redshift/latest/dg/r_interval_data_types.html
+redshift_period <- function(x, unit) {
+  if (is.numeric(x)) {
+    interval <- paste0(x, " ", unit)
+    sql_glue("CAST({interval} AS INTERVAL)")
+  } else {
+    suffix <- paste0(" ", unit)
+    sql_glue("CAST(({x}) || {suffix} AS INTERVAL)")
+  }
+}
+
 #' @export
 sql_translation.sql_dialect_redshift <- function(con) {
   postgres <- sql_translation(dialect_postgres())
@@ -88,6 +101,15 @@ sql_translation.sql_dialect_redshift <- function(con) {
       str_replace_all = function(string, pattern, replacement) {
         sql_glue("REGEXP_REPLACE({string}, {pattern}, {replacement})")
       },
+
+      # lubridate -------------------------------------------------------------
+      seconds = function(x) redshift_period(x, "seconds"),
+      minutes = function(x) redshift_period(x, "minutes"),
+      hours = function(x) redshift_period(x, "hours"),
+      days = function(x) redshift_period(x, "days"),
+      weeks = function(x) redshift_period(x, "weeks"),
+      months = function(x) redshift_period(x, "months"),
+      years = function(x) redshift_period(x, "years"),
 
       # clock ---------------------------------------------------------------
       add_days = function(x, n, ...) {
