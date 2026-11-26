@@ -54,5 +54,5 @@ can_inline_head <- function(lazy_query) {
 
 #' @export
 tail.tbl_lazy <- function(x, n = 6L, ...) {
-  stop_unsupported_function("tail")
+  stop_unsupported_verb("tail")
 }

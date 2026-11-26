@@ -108,6 +108,7 @@ reference:
   - sql_glue2
   - sql_variant
   - sql_query_insert
+  - backend_errors
   - sql_translation_scalar
   - sql_translation_string
   - sql_translation_agg

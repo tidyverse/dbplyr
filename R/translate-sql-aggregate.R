@@ -14,7 +14,8 @@
 #'   functions with any number of arguments and an optional `na.rm` parameter
 #'   (e.g., `LEAST()`, `GREATEST()`).
 #' * `sql_not_supported()` creates a function that throws an informative error
-#'   when a function is not supported in SQL.
+#'   when a function is not supported in SQL, either in general or in a
+#'   specific translation context (`summarise()` or `mutate()`).
 #' * `sql_check_na_rm()` is a helper that you can use in aggregate functions
 #'   to direct the user towards setting `na.rm = TRUE`.
 #'
@@ -87,22 +88,32 @@ sql_check_na_rm <- function(na.rm) {
 }
 
 #' @rdname sql_translation_agg
+#' @param context The translation context in which the function is not
+#'   supported: `"scalar"`, `"agg"` (used in `summarise()`), or `"win"` (used
+#'   in `mutate()` as a window function). The `"agg"` and `"win"` contexts
+#'   produce an error message that suggests a workaround.
+#' @param backend The name of the backend, used in the error message for the
+#'   `"agg"` and `"win"` contexts.
 #' @export
-sql_not_supported <- function(f) {
+sql_not_supported <- function(
+  f,
+  context = c("scalar", "agg", "win"),
+  backend = NULL
+) {
   check_string(f)
+  context <- arg_match(context)
 
-  function(...) {
-    cli_abort(
-      "{.fun {f}} is not available in this SQL variant.",
-      class = "dbplyr_error_unsupported_fn"
-    )
+  if (context == "scalar") {
+    return(function(...) {
+      cli_abort(
+        "{.fun {f}} is not available in this SQL variant.",
+        class = "dbplyr_error_unsupported_fn"
+      )
+    })
   }
-}
 
-sql_agg_not_supported <- function(f, backend) {
-  check_string(f)
-
-  msg <- "Translation of {.fun {f}} in {.fun summarise} is not supported"
+  verb <- if (context == "agg") "summarise" else "mutate"
+  msg <- "Translation of {.fun {f}} in {.fun {verb}} is not supported"
 
   if (is.null(backend)) {
     msg <- paste0(msg, " on database backends.")
@@ -113,35 +124,20 @@ sql_agg_not_supported <- function(f, backend) {
   function(...) {
     dots <- enexprs(...)
     f_call_str <- as_label(call2(f, !!!dots))
-    msg <- c(
-      msg,
-      i = "Use a combination of {.fun distinct} and {.fun mutate} for the same result:",
-      " " = "{.code mutate(<col> = {f_call_str}) |> distinct(<col>)}"
-    )
-    cli_abort(msg)
-  }
-}
 
-sql_win_not_supported <- function(f, backend) {
-  check_string(f)
+    if (context == "agg") {
+      hint <- c(
+        i = "Use a combination of {.fun distinct} and {.fun mutate} for the same result:",
+        " " = "{.code mutate(<col> = {f_call_str}) |> distinct(<col>)}"
+      )
+    } else {
+      hint <- c(
+        i = "Use a combination of {.fun summarise} and {.fun left_join} instead:",
+        " " = "{.code df |> left_join(summarise(<col> = {f_call_str}))}."
+      )
+    }
 
-  msg <- "Translation of {.fun {f}} in {.fun mutate} is not supported"
-
-  if (is.null(backend)) {
-    msg <- paste0(msg, " on database backends.")
-  } else {
-    msg <- paste0(msg, " for {backend}.")
-  }
-
-  function(...) {
-    dots <- enexprs(...)
-    f_call_str <- as_label(call2(f, !!!dots))
-    msg <- c(
-      msg,
-      i = "Use a combination of {.fun summarise} and {.fun left_join} instead:",
-      " " = "{.code df |> left_join(summarise(<col> = {f_call_str}))}."
-    )
-    cli_abort(msg)
+    cli_abort(c(msg, hint), class = "dbplyr_error_unsupported_fn")
   }
 }
 

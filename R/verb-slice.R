@@ -50,19 +50,19 @@ NULL
 #' @importFrom dplyr slice
 #' @export
 slice.tbl_lazy <- function(.data, ...) {
-  stop_unsupported_function("slice")
+  stop_unsupported_verb("slice")
 }
 
 #' @importFrom dplyr slice_head
 #' @export
 slice_head.tbl_lazy <- function(.data, ..., n, prop, by = NULL) {
-  stop_unsupported_function("slice_head", with = "slice_min")
+  stop_unsupported_verb("slice_head", with = "slice_min")
 }
 
 #' @importFrom dplyr slice_tail
 #' @export
 slice_tail.tbl_lazy <- function(.data, ..., n, prop, by = NULL) {
-  stop_unsupported_function("slice_tail", with = "slice_max")
+  stop_unsupported_verb("slice_tail", with = "slice_max")
 }
 
 #' @rdname dbplyr-slice

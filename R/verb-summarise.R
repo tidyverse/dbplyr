@@ -63,7 +63,7 @@ summarise.tbl_lazy <- function(.data, ..., .by = NULL, .groups = NULL) {
 #' @export
 #' @importFrom dplyr reframe
 reframe.tbl_lazy <- function(.data, ..., .by = NULL) {
-  stop_unsupported_function("reframe")
+  stop_unsupported_verb("reframe")
 }
 
 summarise_eval_dots <- function(.data, ..., error_call = caller_env()) {
