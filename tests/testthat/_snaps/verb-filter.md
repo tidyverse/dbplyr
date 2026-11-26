@@ -1,3 +1,23 @@
+# can construct %in% vector inline with c() (#1870)
+
+    Code
+      show_query(out)
+    Output
+      <SQL>
+      SELECT *
+      FROM `df`
+      WHERE (`x` IN ('1', '2', 'A', 'B'))
+
+# c() can't combine columns (#1870)
+
+    Code
+      filter(lf, x %in% c(x, y))
+    Condition
+      Error in `filter()`:
+      i In argument: `x %in% c(x, y)`
+      Caused by error:
+      ! object 'x' not found
+
 # two filters equivalent to one
 
     Code

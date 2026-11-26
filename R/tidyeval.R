@@ -24,6 +24,9 @@
 #' computation, by using the `.data` and `.env` pronouns of tidy evaluation,
 #' or by using dbplyr's own `.sql` pronoun.
 #'
+#' `c()` is an exception: it is always evaluated locally, since it has no
+#' useful SQL translation.
+#'
 #' @param call an unevaluated expression, as produced by [quote()]
 #' @param data A lazy data frame backed by a database query.
 #' @param env environment in which to search for local values
@@ -260,6 +263,9 @@ partial_eval_call <- function(call, data, env) {
       call[[2]]
     } else if (is_call(call, "sql")) {
       eval_bare(call, env = env)
+    } else if (is_call(call, "c")) {
+      # `c()` has no useful SQL translation so is always evaluated locally
+      eval_bare(call, env)
     } else if (is_call(call, "$")) {
       # Only the 1st argument is evaluated
       call[[2]] <- partial_eval(call[[2]], data = data, env = env)

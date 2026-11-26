@@ -8,6 +8,8 @@
 * `sql_quote()` gains a `backslash` argument for escaping quotes and backslashes in SQL literals (#1862).
 * Redshift once again translates lubridate period functions (e.g. `days()`, `months()`, `years()`) with `CAST(... AS INTERVAL)` instead of `MAKE_INTERVAL()`, which Redshift doesn't support (#1869).
 
+* `c()` is now always evaluated locally during translation, so inline expressions like `filter(x %in% c(as.character(1:4), LETTERS[1:4]))` now work as expected (#1870).
+
 # dbplyr 2.6.0
 
 ## Lifecycle changes

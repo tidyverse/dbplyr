@@ -28,6 +28,15 @@ test_that("names are stripped", {
   expect_equal(partial_eval(quote(x %in% y), lf), expr(x %in% !!c("a", "b")))
 })
 
+test_that("c() is always evaluated locally (#1870)", {
+  lf <- lazy_frame(x = "a")
+
+  expect_equal(
+    partial_eval(quote(x %in% c(as.character(1:2), LETTERS[1:2])), lf),
+    expr(x %in% !!c("1", "2", "A", "B"))
+  )
+})
+
 test_that("using environment of inlined quosures", {
   lf <- lazy_frame(x = 1:10, y = 1:10)
 
