@@ -46,6 +46,9 @@ You can override the guesses using
 computation, by using the `.data` and `.env` pronouns of tidy
 evaluation, or by using dbplyr's own `.sql` pronoun.
 
+[`c()`](https://rdrr.io/r/base/c.html) is an exception: it is always
+evaluated locally, since it has no useful SQL translation.
+
 ## Examples
 
 ``` r

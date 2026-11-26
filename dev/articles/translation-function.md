@@ -111,6 +111,45 @@ There are two fundamental differences between R and SQL:
   #> FROM "df"
   ```
 
+## Local evaluation
+
+Not every part of your R code is translated to SQL. The values of local
+variables are evaluated in R and inlined into the query:
+
+``` r
+
+ids <- c("a", "b")
+lf |> filter(g %in% ids)
+#> <SQL>
+#> SELECT *
+#> FROM "df"
+#> WHERE ("g" IN ('a', 'b'))
+```
+
+Similarly, [`c()`](https://rdrr.io/r/base/c.html) is always evaluated in
+R, so you can construct a vector on the fly:
+
+``` r
+
+lf |> filter(g %in% c(tolower(LETTERS[1:2])))
+#> <SQL>
+#> SELECT *
+#> FROM "df"
+#> WHERE ("g" IN ('a', 'b'))
+```
+
+You can also force any expression to be evaluated in R by wrapping it in
+[`local()`](https://rdrr.io/r/base/eval.html):
+
+``` r
+
+lf |> filter(g %in% local(sort(ids, decreasing = TRUE)))
+#> <SQL>
+#> SELECT *
+#> FROM "df"
+#> WHERE ("g" IN ('b', 'a'))
+```
+
 ## Known functions
 
 ### Mathematics

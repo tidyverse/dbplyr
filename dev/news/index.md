@@ -7,34 +7,45 @@
   [`copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html) and
   [`compute()`](https://dplyr.tidyverse.org/reference/compute.html) now
   work ([\#1867](https://github.com/tidyverse/dbplyr/issues/1867)).
+
 - String literals on Hive, Impala, MySQL/MariaDB, Redshift, Snowflake,
   and Spark SQL now use backslash escaping, so embedded quotes and
   backslashes are preserved
   ([\#1862](https://github.com/tidyverse/dbplyr/issues/1862)).
+
 - [`n_distinct()`](https://dplyr.tidyverse.org/reference/n_distinct.html)
   now errors if passed multiple columns, rather than silently treating
   the second argument as `na.rm`
   ([\#1879](https://github.com/tidyverse/dbplyr/issues/1879)).
+
 - [`sql_escape_string()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   now delegates to
   [`DBI::dbQuoteString()`](https://dbi.r-dbi.org/reference/dbQuoteString.html)
   for real database connections, so backends whose drivers customize
   string quoting (e.g. BigQuery) once again generate valid string
   literals ([\#1862](https://github.com/tidyverse/dbplyr/issues/1862)).
+
 - New
   [`sql_table_create()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
   generic for backends that need custom `CREATE TABLE` syntax
   ([\#1867](https://github.com/tidyverse/dbplyr/issues/1867)).
+
 - [`sql_quote()`](https://dbplyr.tidyverse.org/dev/reference/sql_quote.md)
   gains a `backslash` argument for escaping quotes and backslashes in
   SQL literals
   ([\#1862](https://github.com/tidyverse/dbplyr/issues/1862)).
+
 - Redshift once again translates lubridate period functions
   (e.g. `days()`,
   [`months()`](https://rdrr.io/r/base/weekday.POSIXt.html), `years()`)
   with `CAST(... AS INTERVAL)` instead of `MAKE_INTERVAL()`, which
   Redshift doesn’t support
   ([\#1869](https://github.com/tidyverse/dbplyr/issues/1869)).
+
+- [`c()`](https://rdrr.io/r/base/c.html) is now always evaluated locally
+  during translation, so inline expressions like
+  `filter(x %in% c(as.character(1:4), LETTERS[1:4]))` now work as
+  expected ([\#1870](https://github.com/tidyverse/dbplyr/issues/1870)).
 
 ## dbplyr 2.6.0
 

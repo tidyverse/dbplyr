@@ -111,6 +111,8 @@ variable, then remote.</p></li>
 </ul><p>You can override the guesses using <code><a href="https://rdrr.io/r/base/eval.html" class="external-link">local()</a></code> and <code>remote()</code> to force
 computation, by using the <code>.data</code> and <code>.env</code> pronouns of tidy evaluation,
 or by using dbplyr's own <code>.sql</code> pronoun.</p>
+<p><code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code> is an exception: it is always evaluated locally, since it has no
+useful SQL translation.</p>
     </div>
 
     <div class="section level2">
