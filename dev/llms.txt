@@ -350,6 +350,7 @@ Documentation for authors of new dbplyr backends
   [`sql_query_explain()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
   [`sql_query_fields()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
   [`sql_query_save()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  [`sql_table_create()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
   [`sql_query_wrap()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
   [`sql_indent_subquery()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
   [`sql_query_rows()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)

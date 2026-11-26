@@ -2,16 +2,29 @@
 
 ## dbplyr (development version)
 
+- The SAP HANA backend now creates temporary tables with
+  `CREATE LOCAL TEMPORARY COLUMN TABLE`, so
+  [`copy_to()`](https://dplyr.tidyverse.org/reference/copy_to.html) and
+  [`compute()`](https://dplyr.tidyverse.org/reference/compute.html) now
+  work ([\#1867](https://github.com/tidyverse/dbplyr/issues/1867)).
 - String literals on Hive, Impala, MySQL/MariaDB, Redshift, Snowflake,
   and Spark SQL now use backslash escaping, so embedded quotes and
   backslashes are preserved
   ([\#1862](https://github.com/tidyverse/dbplyr/issues/1862)).
+- [`n_distinct()`](https://dplyr.tidyverse.org/reference/n_distinct.html)
+  now errors if passed multiple columns, rather than silently treating
+  the second argument as `na.rm`
+  ([\#1879](https://github.com/tidyverse/dbplyr/issues/1879)).
 - [`sql_escape_string()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
   now delegates to
   [`DBI::dbQuoteString()`](https://dbi.r-dbi.org/reference/dbQuoteString.html)
   for real database connections, so backends whose drivers customize
   string quoting (e.g. BigQuery) once again generate valid string
   literals ([\#1862](https://github.com/tidyverse/dbplyr/issues/1862)).
+- New
+  [`sql_table_create()`](https://dbplyr.tidyverse.org/dev/reference/db-sql.md)
+  generic for backends that need custom `CREATE TABLE` syntax
+  ([\#1867](https://github.com/tidyverse/dbplyr/issues/1867)).
 - [`sql_quote()`](https://dbplyr.tidyverse.org/dev/reference/sql_quote.md)
   gains a `backslash` argument for escaping quotes and backslashes in
   SQL literals
