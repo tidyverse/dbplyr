@@ -8,6 +8,14 @@ test_that("string literals escape backslashes", {
   expect_equal(escape("a\\b", con = dialect_mariadb()), sql("'a\\\\b'"))
 })
 
+test_that("DBI SQL fragments are left unchanged", {
+  con <- dialect_mysql()
+  fragment <- DBI::SQL("CURRENT_TIMESTAMP")
+
+  expect_equal(translate_sql(!!fragment, con = con), sql("CURRENT_TIMESTAMP"))
+  expect_equal(escape(DBI::SQL("'a\\b'"), con = con), sql("'a\\b'"))
+})
+
 # function translation ----------------------------------------------------
 
 test_that("custom scalar translated correctly", {

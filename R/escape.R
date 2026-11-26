@@ -194,6 +194,10 @@ sql_escape_string_base <- function(x) {
 
 # For backends where backslash is an escape character in string literals
 sql_escape_string_backslash <- function(x) {
+  if (inherits(x, "SQL")) {
+    return(sql(unclass(x)))
+  }
+
   sql_quote(gsub("\\", "\\\\", x, fixed = TRUE), "'")
 }
 
