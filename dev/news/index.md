@@ -2,6 +2,13 @@
 
 ## dbplyr (development version)
 
+- Redshift once again translates lubridate period functions
+  (e.g. `days()`,
+  [`months()`](https://rdrr.io/r/base/weekday.POSIXt.html), `years()`)
+  with `CAST(... AS INTERVAL)` instead of `MAKE_INTERVAL()`, which
+  Redshift doesn’t support
+  ([\#1869](https://github.com/tidyverse/dbplyr/issues/1869)).
+
 ## dbplyr 2.6.0
 
 CRAN release: 2026-06-17
