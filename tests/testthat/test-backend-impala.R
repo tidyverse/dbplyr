@@ -30,3 +30,10 @@ test_that("generates custom sql", {
 
   expect_snapshot(sql_table_analyze(con, in_schema("schema", "tbl")))
 })
+
+test_that("can escape Inf", {
+  expect_equal(
+    escape(Inf, con = dialect_impala()),
+    sql("CAST('inf' AS DOUBLE)")
+  )
+})

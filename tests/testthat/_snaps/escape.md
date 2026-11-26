@@ -1,3 +1,12 @@
+# -Inf and Inf error by default
+
+    Code
+      escape(Inf, con = con)
+    Condition
+      Error in `sql_escape_infinity()`:
+      ! Don't know how to escape infinity for this connection.
+      i Please file an issue: <https://github.com/tidyverse/dbplyr/issues>
+
 # con must not be NULL
 
     Code

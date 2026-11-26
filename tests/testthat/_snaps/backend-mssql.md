@@ -556,3 +556,11 @@
     Message
       Created a temporary table named #bar
 
+# can not escape Inf
+
+    Code
+      escape(Inf, con = dialect_mssql())
+    Condition
+      Error in `sql_escape_infinity()`:
+      ! SQL Server does not support infinite values.
+

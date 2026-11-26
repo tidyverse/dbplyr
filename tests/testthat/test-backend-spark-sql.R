@@ -96,3 +96,10 @@ test_that("difftime is translated correctly", {
     )
   )
 })
+
+test_that("can escape Inf", {
+  con <- dialect_spark_sql()
+
+  expect_equal(escape(Inf, con = con), sql("CAST('Infinity' AS DOUBLE)"))
+  expect_equal(escape(-Inf, con = con), sql("CAST('-Infinity' AS DOUBLE)"))
+})

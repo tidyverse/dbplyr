@@ -10,6 +10,8 @@
 
 * `c()` is now always evaluated locally during translation, so inline expressions like `filter(x %in% c(as.character(1:4), LETTERS[1:4]))` now work as expected (#1870).
 
+* `sql_escape_infinity()` is a new generic that controls how `Inf` and `-Inf` are translated to SQL. The default errors, since most backends don't support the previous translation (`'Infinity'`), and methods now provide correct translations for DuckDB, Impala, Oracle, PostgreSQL, Redshift, Snowflake, Spark SQL, and SQLite. MySQL, MariaDB, and SQL Server give informative errors as they don't support infinite values (#1598, #1838, #1878).
+
 # dbplyr 2.6.0
 
 ## Lifecycle changes

@@ -313,3 +313,12 @@ sql_escape_datetime.sql_dialect_mariadb <- function(con, x) {
 }
 #' @export
 sql_escape_datetime.sql_dialect_mysql <- sql_escape_datetime.sql_dialect_mariadb
+
+#' @export
+sql_escape_infinity.sql_dialect_mysql <- function(con, x) {
+  cli_abort("MySQL does not support infinite values.")
+}
+
+#' @export
+sql_escape_infinity.sql_dialect_mariadb <-
+  sql_escape_infinity.sql_dialect_mysql

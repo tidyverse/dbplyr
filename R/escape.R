@@ -184,6 +184,30 @@ sql_escape_string.default <- function(con, x) {
   sql_quote(x, "'")
 }
 
+# infinity ------------------------------------------------------------------
+
+#' @export
+#' @rdname escape
+sql_escape_infinity <- function(con, x) {
+  UseMethod("sql_escape_infinity", sql_dialect(con))
+}
+
+#' @export
+sql_escape_infinity.default <- function(con, x) {
+  cli_abort(
+    c(
+      "Don't know how to escape infinity for this connection.",
+      i = "Please file an issue: {.url https://github.com/tidyverse/dbplyr/issues}"
+    )
+  )
+}
+
+# Used by duckdb
+#' @export
+sql_escape_infinity.duckdb_connection <- function(con, x) {
+  ifelse(x > 0, "'inf'", "'-inf'")
+}
+
 # double ------------------------------------------------------------------
 
 #' @export
@@ -193,8 +217,9 @@ escape.double <- function(x, parens = NA, collapse = ", ", con = NULL) {
   # Special values
   out[is.na(x)] <- "NULL"
   inf <- is.infinite(x)
-  out[inf & x > 0] <- "'Infinity'"
-  out[inf & x < 0] <- "'-Infinity'"
+  if (any(inf)) {
+    out[inf] <- sql_escape_infinity(con, x[inf])
+  }
 
   sql_vector(out, parens, collapse, con = con)
 }

@@ -110,3 +110,19 @@
         id select_type table type possible_keys  key key_len  ref rows Extra
       1  1      SIMPLE  test  ALL          <NA> <NA>    <NA> <NA>    3      
 
+# can not escape Inf
+
+    Code
+      escape(Inf, con = dialect_mysql())
+    Condition
+      Error in `sql_escape_infinity()`:
+      ! MySQL does not support infinite values.
+
+---
+
+    Code
+      escape(Inf, con = dialect_mariadb())
+    Condition
+      Error in `sql_escape_infinity()`:
+      ! MySQL does not support infinite values.
+

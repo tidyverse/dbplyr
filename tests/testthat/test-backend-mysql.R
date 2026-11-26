@@ -225,3 +225,8 @@ test_that("casts integer, bigint, and longtext columns", {
   types_expected <- c(id = "int(11)", val = "bigint(20)", ltext = "longtext")
   expect_equal(db_col_types(con, "df2"), types_expected)
 })
+
+test_that("can not escape Inf", {
+  expect_snapshot(escape(Inf, con = dialect_mysql()), error = TRUE)
+  expect_snapshot(escape(Inf, con = dialect_mariadb()), error = TRUE)
+})

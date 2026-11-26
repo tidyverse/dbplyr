@@ -8,6 +8,11 @@ test_that("logicals translated to integers", {
   expect_equal(escape(NA, con = dialect_sqlite()), sql("NULL"))
 })
 
+test_that("can escape Inf", {
+  expect_equal(escape(Inf, con = dialect_sqlite()), sql("9e999"))
+  expect_equal(escape(-Inf, con = dialect_sqlite()), sql("-9e999"))
+})
+
 test_that("vectorised translations", {
   con <- dialect_sqlite()
 

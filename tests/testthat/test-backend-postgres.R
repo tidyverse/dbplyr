@@ -565,3 +565,15 @@ test_that("correctly escapes dates", {
   dd <- as.Date("2022-03-04")
   expect_equal(escape(dd, con = con), sql("'2022-03-04'::date"))
 })
+
+test_that("can escape Inf", {
+  con <- dialect_postgres()
+
+  expect_equal(escape(Inf, con = con), sql("'Infinity'"))
+  expect_equal(escape(-Inf, con = con), sql("'-Infinity'"))
+
+  expect_equal(
+    escape(c(1, Inf, NA, -Inf), con = con),
+    sql("(1.0, 'Infinity', NULL, '-Infinity')")
+  )
+})
