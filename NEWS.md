@@ -8,7 +8,7 @@
 * `sql_quote()` gains a `backslash` argument for escaping quotes and backslashes in SQL literals (#1862).
 * Redshift once again translates lubridate period functions (e.g. `days()`, `months()`, `years()`) with `CAST(... AS INTERVAL)` instead of `MAKE_INTERVAL()`, which Redshift doesn't support (#1869).
 
-* `sql_cut()` now errors when `breaks` has zero values, instead of failing later with a subscript out of bounds error.
+* `sql_cut()` now errors when `breaks` has zero values, instead of failing later with a subscript out of bounds error (#1868, @sims1253).
 
 # dbplyr 2.6.0
 

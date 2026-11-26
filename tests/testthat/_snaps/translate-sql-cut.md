@@ -30,3 +30,11 @@
       Error in `cut()`:
       ! `breaks` values must not be missing.
 
+# cut errors if breaks is empty
+
+    Code
+      translate_sql(cut(x, !!numeric(0)), con = con)
+    Condition
+      Error in `cut()`:
+      ! `breaks` must have at least two values.
+
