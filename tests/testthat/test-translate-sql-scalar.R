@@ -30,6 +30,19 @@ test_that("sql_prefix checks arguments", {
   expect_snapshot(error = TRUE, sin_db(sin(a = 1)))
 })
 
+test_that("sql_cast() dispatches on the dialect", {
+  expect_translation(dialect_ansi(), as.integer(x), 'CAST("x" AS INTEGER)')
+  expect_translation(dialect_postgres(), as.integer(x), '("x")::INTEGER')
+})
+
+test_that("sql_cast() parenthesises to protect precedence", {
+  expect_translation(
+    dialect_postgres(),
+    as.integer(1000 * x),
+    '(1000.0 * "x")::INTEGER'
+  )
+})
+
 test_that("runif is translated", {
   con <- dialect_ansi()
   expect_translation(con, runif(n()), "RANDOM()")
