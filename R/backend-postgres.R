@@ -493,6 +493,13 @@ sql_query_upsert_on_conflict <- function(
 sql_values_subquery.sql_dialect_postgres <- sql_values_subquery_column_alias
 
 #' @export
+sql_cast_clause.sql_dialect_postgres <- function(con, x, type) {
+  # Always parenthesise because `::` binds tightly,
+  # e.g. `x * y::INT` would only cast `y`
+  sql_glue("({x})::{.sql type}")
+}
+
+#' @export
 sql_escape_date.sql_dialect_postgres <- function(con, x) {
   sql(paste0(sql_quote(as.character(x), "'"), "::date"))
 }

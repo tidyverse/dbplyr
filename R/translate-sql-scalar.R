@@ -8,6 +8,8 @@
 #' * `sql_infix()` creates SQL infix operators like `+`, `-`, `*`, `/`.
 #' * `sql_prefix()` creates SQL prefix functions like `ABS()`, `SQRT()`.
 #' * `sql_cast()` creates SQL cast expressions like `CAST(x AS type)`.
+#'   Backends can customise the generated SQL by implementing a method for
+#'   the `sql_cast_clause()` generic.
 #' * `sql_try_cast()` creates SQL try_cast expressions (for safe casting).
 #' * `sql_log()` creates a SQL logarithm function with optional base.
 #' * `sql_cot()` creates a SQL cotangent function (as `1 / TAN(x)`).
@@ -97,8 +99,21 @@ sql_prefix <- function(f, n = NULL) {
 #' @export
 sql_cast <- function(type) {
   function(x) {
-    sql_glue("CAST({x} AS {.sql type})")
+    sql_cast_clause(sql_current_con(), x, type)
   }
+}
+
+#' @rdname db-sql
+#' @param x SQL expression to cast.
+#' @param type SQL type name as a string.
+#' @export
+sql_cast_clause <- function(con, x, type) {
+  UseMethod("sql_cast_clause", sql_dialect(con))
+}
+
+#' @export
+sql_cast_clause.default <- function(con, x, type) {
+  sql_glue("CAST({x} AS {.sql type})")
 }
 
 #' @rdname sql_translation_scalar

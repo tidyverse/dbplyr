@@ -48,6 +48,8 @@ to define how R functions should be translated to SQL.
 \item \code{sql_infix()} creates SQL infix operators like \code{+}, \code{-}, \code{*}, \code{/}.
 \item \code{sql_prefix()} creates SQL prefix functions like \code{ABS()}, \code{SQRT()}.
 \item \code{sql_cast()} creates SQL cast expressions like \verb{CAST(x AS type)}.
+Backends can customise the generated SQL by implementing a method for
+the \code{sql_cast_clause()} generic.
 \item \code{sql_try_cast()} creates SQL try_cast expressions (for safe casting).
 \item \code{sql_log()} creates a SQL logarithm function with optional base.
 \item \code{sql_cot()} creates a SQL cotangent function (as \code{1 / TAN(x)}).

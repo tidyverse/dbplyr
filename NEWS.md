@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `sql_cast()` now generates SQL via the new `sql_cast_clause()` generic, so backends can customise cast syntax. The Postgres backend uses this to generate the more compact `::` operator, e.g. `("x")::INTEGER` (#1875).
+
 # dbplyr 2.6.0
 
 ## Lifecycle changes
