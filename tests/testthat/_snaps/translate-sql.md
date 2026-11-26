@@ -53,10 +53,7 @@
       translate_sql(n_distinct(x, y), con = con, window = FALSE)
     Condition
       Error in `n_distinct()`:
-      ! `...` must be empty.
-      x Problematic argument:
-      * ..1 = y
-      i Did you forget to name an argument?
+      ! Additional arguments aren't supported in this translation.
 
 ---
 
@@ -64,10 +61,7 @@
       translate_sql(n_distinct(x, y), con = con, window = TRUE)
     Condition
       Error in `n_distinct()`:
-      ! `...` must be empty.
-      x Problematic argument:
-      * ..1 = y
-      i Did you forget to name an argument?
+      ! Additional arguments aren't supported in this translation.
 
 # as() translates to CAST
 

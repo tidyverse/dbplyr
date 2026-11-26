@@ -158,6 +158,17 @@ check_unsupported_arg <- function(
   cli_abort(msg, call = call, class = "dbplyr_error_unsupported_arg")
 }
 
+check_dots_unsupported <- function(..., call = caller_env()) {
+  if (...length() == 0) {
+    return(invisible(NULL))
+  }
+
+  cli_abort(
+    "Additional arguments aren't supported in this translation.",
+    call = call
+  )
+}
+
 stop_unsupported_function <- function(
   f,
   ...,
