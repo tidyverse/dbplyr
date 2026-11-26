@@ -246,6 +246,42 @@ dbplyr_write_table.DBIConnection <- function(
   table
 }
 
+# Used by backends where DBI::dbWriteTable() can't generate the required
+# `CREATE TABLE` syntax (e.g. Oracle's PRIVATE TEMPORARY TABLE, HANA's
+# LOCAL TEMPORARY TABLE): create the table via `sql_table_create()`, then
+# append the data.
+dbplyr_write_table_ddl <- function(
+  con,
+  table,
+  types,
+  values,
+  temporary = TRUE,
+  overwrite = FALSE
+) {
+  if (overwrite) {
+    db_table_drop_if_exists(con, table)
+  }
+
+  fields <- types %||% values
+  create_sql <- sql_table_create(con, table, fields, temporary = temporary)
+  DBI::dbExecute(con, create_sql)
+  DBI::dbAppendTable(con, DBI::SQL(table), values)
+
+  table
+}
+
+# Convert a data frame or named character vector of field types to
+# comma-separated `"name" TYPE` definitions (like
+# `DBI:::sqlCreateTable_DBIConnection()`)
+sql_field_types <- function(con, fields) {
+  if (is.data.frame(fields)) {
+    fields <- vapply(fields, function(x) DBI::dbDataType(con, x), character(1))
+  }
+
+  field_names <- sql_escape_ident(con, names(fields))
+  sql(paste0(field_names, " ", unname(fields)))
+}
+
 # Utility functions ------------------------------------------------------------
 
 create_indexes <- function(con, table, indexes = NULL, unique = FALSE, ...) {

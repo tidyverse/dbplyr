@@ -109,9 +109,9 @@ test_that("generates custom sql", {
   lf <- lazy_frame(x = 1, con = con)
   expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
 
-  # With ORA$PTT_ prefix -> creates PRIVATE TEMPORARY TABLE
+  # temporary = TRUE -> creates PRIVATE TEMPORARY TABLE
   expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), "ORA$PTT_tbl"))
-  # Without ORA$PTT_ prefix -> creates regular TABLE
+  # temporary = FALSE -> creates regular TABLE
   expect_snapshot(sql_query_save(
     con,
     sql("SELECT * FROM foo"),
@@ -122,22 +122,23 @@ test_that("generates custom sql", {
   expect_snapshot(slice_sample(lf, n = 1))
 })
 
-test_that("oracle_sql_table_create generates correct SQL", {
+test_that("sql_table_create generates correct SQL", {
   con <- dialect_oracle()
 
   expect_snapshot({
-    # Temporary table (has ORA$PTT_ prefix)
-    oracle_sql_table_create(
+    # Temporary table
+    sql_table_create(
       con,
       table_path("ORA$PTT_test"),
       c(x = "INTEGER", y = "TEXT")
     )
 
     # Regular table
-    oracle_sql_table_create(
+    sql_table_create(
       con,
       table_path("test"),
-      c(x = "INTEGER", y = "TEXT")
+      c(x = "INTEGER", y = "TEXT"),
+      temporary = FALSE
     )
   })
 })
