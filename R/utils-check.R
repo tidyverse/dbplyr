@@ -159,12 +159,12 @@ check_unsupported_arg <- function(
 }
 
 check_dots_unsupported <- function(..., call = caller_env()) {
-  if (...length() == 0) {
+  if (missing(...)) {
     return(invisible(NULL))
   }
 
   cli_abort(
-    "Additional arguments aren't supported in this translation.",
+    "Additional arguments aren't supported bys this translation.",
     call = call
   )
 }

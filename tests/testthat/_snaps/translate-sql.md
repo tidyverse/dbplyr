@@ -53,7 +53,7 @@
       translate_sql(n_distinct(x, y), con = con, window = FALSE)
     Condition
       Error in `n_distinct()`:
-      ! Additional arguments aren't supported in this translation.
+      ! Additional arguments aren't supported by this translation.
 
 ---
 
@@ -61,7 +61,7 @@
       translate_sql(n_distinct(x, y), con = con, window = TRUE)
     Condition
       Error in `n_distinct()`:
-      ! Additional arguments aren't supported in this translation.
+      ! Additional arguments aren't supported by this translation.
 
 # as() translates to CAST
 
