@@ -37,6 +37,9 @@ variable, then remote.
 You can override the guesses using \code{local()} and \code{remote()} to force
 computation, by using the \code{.data} and \code{.env} pronouns of tidy evaluation,
 or by using dbplyr's own \code{.sql} pronoun.
+
+\code{c()} is an exception: it is always evaluated locally, since it has no
+useful SQL translation.
 }
 
 \examples{
