@@ -14,6 +14,8 @@ test_that("can construct %in% vector inline with c() (#1870)", {
 })
 
 test_that("c() can't combine columns (#1870)", {
+  skip_if(getRversion() < "4.3.0", "Error call differs on older R versions")
+
   lf <- lazy_frame(x = 1, y = 2)
 
   expect_snapshot(filter(lf, x %in% c(x, y)), error = TRUE)
