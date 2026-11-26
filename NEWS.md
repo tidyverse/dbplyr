@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Removed the internal `glue_sql2()` function; upgrade duckdb to 1.5.6 or later to use it with dbplyr (#1864).
+
 # dbplyr 2.6.0
 
 ## Lifecycle changes
