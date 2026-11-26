@@ -88,7 +88,8 @@
     Code
       sql_query_save(con, sql("SELECT * FROM foo"), "tbl", temporary = FALSE)
     Output
-      <SQL> CREATE TABLE "tbl" AS
+      <SQL> CREATE TABLE
+      "tbl" AS
       SELECT * FROM foo
 
 ---
@@ -108,18 +109,20 @@
       ) "q01"
       WHERE ("col01" <= 1)
 
-# oracle_sql_table_create generates correct SQL
+# sql_table_create generates correct SQL
 
     Code
-      oracle_sql_table_create(con, table_path("ORA$PTT_test"), c(x = "INTEGER", y = "TEXT"))
+      sql_table_create(con, table_path("ORA$PTT_test"), c(x = "INTEGER", y = "TEXT"))
     Output
       <SQL> CREATE PRIVATE TEMPORARY TABLE ORA$PTT_test
       ("x" INTEGER, "y" TEXT)
       ON COMMIT PRESERVE DEFINITION
     Code
-      oracle_sql_table_create(con, table_path("test"), c(x = "INTEGER", y = "TEXT"))
+      sql_table_create(con, table_path("test"), c(x = "INTEGER", y = "TEXT"),
+      temporary = FALSE)
     Output
-      <SQL> CREATE TABLE test 
+      <SQL> CREATE TABLE
+      test
       ("x" INTEGER, "y" TEXT)
 
 # copy_inline uses UNION ALL

@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* The SAP HANA backend now creates temporary tables with `CREATE LOCAL TEMPORARY COLUMN TABLE`, so `copy_to()` and `compute()` now work (#1867).
+* New `sql_table_create()` generic for backends that need custom `CREATE TABLE` syntax (#1867).
+
 # dbplyr 2.6.0
 
 ## Lifecycle changes

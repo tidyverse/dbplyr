@@ -2,6 +2,33 @@ test_that("simulate_hana() still works", {
   expect_translation(simulate_hana(), x + 1, '"x" + 1.0')
 })
 
+test_that("temporary tables get # prefix", {
+  con <- dialect_hana()
+  expect_snapshot(
+    out <- sql_table_temporary(con, table_path("foo"), temporary = TRUE)
+  )
+  expect_equal(out, list(table = table_path('"#foo"'), temporary = TRUE))
+})
+
+test_that("temporary tables use CREATE LOCAL TEMPORARY COLUMN", {
+  con <- dialect_hana()
+
+  expect_snapshot(
+    sql_query_save(con, sql("SELECT * FROM foo"), table_path("#tmp"))
+  )
+  expect_snapshot(
+    sql_query_save(
+      con,
+      sql("SELECT * FROM foo"),
+      table_path("tbl"),
+      temporary = FALSE
+    )
+  )
+
+  fields <- c(x = "INTEGER", y = "VARCHAR(10)")
+  expect_snapshot(sql_table_create(con, table_path("#tmp"), fields))
+})
+
 test_that("custom string translations", {
   con <- dialect_hana()
 

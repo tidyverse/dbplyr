@@ -1,3 +1,35 @@
+# temporary tables get # prefix
+
+    Code
+      out <- sql_table_temporary(con, table_path("foo"), temporary = TRUE)
+    Message
+      Created a temporary table named #foo
+
+# temporary tables use CREATE LOCAL TEMPORARY COLUMN
+
+    Code
+      sql_query_save(con, sql("SELECT * FROM foo"), table_path("#tmp"))
+    Output
+      <SQL> CREATE LOCAL TEMPORARY COLUMN TABLE #tmp AS
+      SELECT * FROM foo
+
+---
+
+    Code
+      sql_query_save(con, sql("SELECT * FROM foo"), table_path("tbl"), temporary = FALSE)
+    Output
+      <SQL> CREATE TABLE
+      tbl AS
+      SELECT * FROM foo
+
+---
+
+    Code
+      sql_table_create(con, table_path("#tmp"), fields)
+    Output
+      <SQL> CREATE LOCAL TEMPORARY COLUMN TABLE #tmp
+      ("x" INTEGER, "y" VARCHAR(10))
+
 # custom string translations
 
     Code

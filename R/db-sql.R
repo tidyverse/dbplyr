@@ -221,14 +221,55 @@ sql_query_save.DBIConnection <- function(
   temporary = TRUE,
   ...
 ) {
-  sql <- as_table_source(sql)
-
-  table <- if (temporary) "TEMPORARY TABLE" else "TABLE"
-  sql_glue2(con, "CREATE {.sql table}\n{.tbl {name}} AS\n{sql}")
+  sql_table_create(con, name, as = sql, temporary = temporary)
 }
 
 #' @export
 sql_query_save.sql_dialect <- sql_query_save.DBIConnection
+
+#' @rdname db-sql
+#' @export
+sql_table_create <- function(
+  con,
+  table,
+  fields = NULL,
+  as = NULL,
+  temporary = TRUE,
+  ...
+) {
+  check_table_id(table)
+  check_exclusive(fields, as)
+  check_bool(temporary)
+  check_dots_used()
+
+  UseMethod("sql_table_create", sql_dialect(con))
+}
+#' @export
+sql_table_create.DBIConnection <- function(
+  con,
+  table,
+  fields = NULL,
+  as = NULL,
+  temporary = TRUE,
+  ...
+) {
+  prefix <- if (temporary) "CREATE TEMPORARY TABLE" else "CREATE TABLE"
+
+  if (is.null(as)) {
+    fields_sql <- sql_field_types(con, fields)
+    sql_glue2(
+      con,
+      "{.sql prefix}
+      {.tbl table}
+      ({fields_sql})"
+    )
+  } else {
+    sql_glue2(con, "{.sql prefix}\n{.tbl {table}} AS\n{as_table_source(as)}")
+  }
+}
+
+#' @export
+sql_table_create.sql_dialect <- sql_table_create.DBIConnection
 #' @export
 #' @rdname db-sql
 sql_query_wrap <- function(con, from, name = NULL, ..., lvl = 0) {

@@ -72,15 +72,85 @@ sql_translation.sql_dialect_hana <- function(con) {
   )
 }
 
-# nocov start
 #' @export
 sql_table_temporary.sql_dialect_hana <- function(con, table, temporary, ...) {
+  # HANA temporary tables must start with `#` and be created with
+  # `CREATE LOCAL TEMPORARY TABLE`
+  # https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-sql-reference-guide/create-table-statement-data-definition
   list(
     table = add_temporary_prefix(con, table, temporary = temporary),
-    temporary = FALSE
+    temporary = temporary
   )
 }
+
+# nocov start
+#' @export
+dbplyr_write_table.HDB <- function(
+  con,
+  table,
+  types,
+  values,
+  temporary = TRUE,
+  ...,
+  overwrite = FALSE
+) {
+  if (!temporary) {
+    dbplyr_write_table.DBIConnection(
+      con,
+      table,
+      types,
+      values,
+      temporary = FALSE,
+      ...,
+      overwrite = overwrite
+    )
+  } else {
+    dbplyr_write_table_ddl(
+      con,
+      table,
+      types,
+      values,
+      temporary = TRUE,
+      overwrite = overwrite
+    )
+  }
+}
 # nocov end
+
+#' @export
+sql_table_create.sql_dialect_hana <- function(
+  con,
+  table,
+  fields = NULL,
+  as = NULL,
+  temporary = TRUE,
+  ...
+) {
+  if (!temporary) {
+    return(sql_table_create.DBIConnection(
+      con,
+      table,
+      fields = fields,
+      as = as,
+      temporary = FALSE
+    ))
+  }
+
+  if (is.null(as)) {
+    fields_sql <- sql_field_types(con, fields)
+    sql_glue2(
+      con,
+      "CREATE LOCAL TEMPORARY COLUMN TABLE {.tbl table}
+      ({fields_sql})"
+    )
+  } else {
+    sql_glue2(
+      con,
+      "CREATE LOCAL TEMPORARY COLUMN TABLE {.tbl table} AS
+      {as_table_source(as)}"
+    )
+  }
+}
 
 #' @export
 sql_table_analyze.sql_dialect_hana <- function(con, table, ...) {

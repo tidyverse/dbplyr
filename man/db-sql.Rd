@@ -11,6 +11,7 @@
 \alias{sql_query_explain}
 \alias{sql_query_fields}
 \alias{sql_query_save}
+\alias{sql_table_create}
 \alias{sql_query_wrap}
 \alias{sql_indent_subquery}
 \alias{sql_query_rows}
@@ -47,6 +48,8 @@ sql_query_explain(con, sql, ...)
 sql_query_fields(con, sql, ...)
 
 sql_query_save(con, sql, name, temporary = TRUE, ...)
+
+sql_table_create(con, table, fields = NULL, as = NULL, temporary = TRUE, ...)
 
 sql_query_wrap(con, from, name = NULL, ..., lvl = 0)
 
