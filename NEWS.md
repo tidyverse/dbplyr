@@ -2,6 +2,8 @@
 
 * `n_distinct()` now errors if passed multiple columns, rather than silently treating the second argument as `na.rm` (#1879).
 
+* Redshift once again translates lubridate period functions (e.g. `days()`, `months()`, `years()`) with `CAST(... AS INTERVAL)` instead of `MAKE_INTERVAL()`, which Redshift doesn't support (#1869).
+
 # dbplyr 2.6.0
 
 ## Lifecycle changes
