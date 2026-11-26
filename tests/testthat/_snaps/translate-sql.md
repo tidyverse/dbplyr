@@ -47,6 +47,22 @@
       Error in `base::abbreviate()`:
       ! No known SQL translation
 
+# n_distinct() errors on multiple columns (#1879)
+
+    Code
+      translate_sql(n_distinct(x, y), con = con, window = FALSE)
+    Condition
+      Error in `n_distinct()`:
+      ! Additional arguments aren't supported by this translation.
+
+---
+
+    Code
+      translate_sql(n_distinct(x, y), con = con, window = TRUE)
+    Condition
+      Error in `n_distinct()`:
+      ! Additional arguments aren't supported by this translation.
+
 # as() translates to CAST
 
     Code
