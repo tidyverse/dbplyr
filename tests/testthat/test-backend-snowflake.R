@@ -455,4 +455,12 @@ test_that("window functions use inline OVER, not named WINDOW clause", {
 test_that("correctly translates $", {
   con <- dialect_snowflake()
   expect_translation(con, x$y, "\"x\":\"y\"")
+  expect_translation(con, x$y$z, "\"x\":\"y\":\"z\"")
+  expect_translation(con, f(x)$y, "f(\"x\"):\"y\"")
+
+  local <- list(y = 1L)
+  expect_equal(
+    lazy_frame(x = 1, con = con) |> filter(x == local$y) |> remote_query(),
+    sql("SELECT *\nFROM \"df\"\nWHERE (\"x\" = 1)")
+  )
 })

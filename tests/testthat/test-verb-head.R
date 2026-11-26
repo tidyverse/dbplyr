@@ -2,7 +2,7 @@ test_that("head limits rows", {
   db <- head(local_memdb_frame(x = 1:100), 10)
 
   expect_equal(sql_build(db)$limit, 10)
-  expect_equal(nrow(collect(db)), 10)
+  expect_shape(collect(db), nrow = 10)
 })
 
 test_that("correctly inlines across all verbs", {

@@ -43,5 +43,5 @@ test_that("verbs work through wrapper", {
   collected <- db_mtcars |>
     filter(mpg > 30) |>
     collect()
-  expect_equal(nrow(collected), 4)
+  expect_shape(collected, nrow = 4)
 })
