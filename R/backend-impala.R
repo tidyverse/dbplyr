@@ -40,6 +40,11 @@ sql_dialect.Impala <- function(con) {
 }
 
 #' @export
+sql_escape_string.sql_dialect_impala <- function(con, x) {
+  sql_quote(x, "'", backslash = TRUE)
+}
+
+#' @export
 dbplyr_edition.Impala <- function(con) {
   2L
 }

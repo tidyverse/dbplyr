@@ -96,6 +96,18 @@ test_that("n_distinct(x) translated to COUNT(distinct, x)", {
   )
 })
 
+test_that("n_distinct() errors on multiple columns (#1879)", {
+  con <- dialect_ansi()
+  expect_snapshot(
+    translate_sql(n_distinct(x, y), con = con, window = FALSE),
+    error = TRUE
+  )
+  expect_snapshot(
+    translate_sql(n_distinct(x, y), con = con, window = TRUE),
+    error = TRUE
+  )
+})
+
 test_that("na_if is translated to NULLIF (#211)", {
   con <- dialect_ansi()
   expect_translation(con, na_if(x, 0L), "NULLIF(\"x\", 0)")

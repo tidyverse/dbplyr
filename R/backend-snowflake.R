@@ -41,6 +41,11 @@ dbplyr_edition.Snowflake <- function(con) {
 }
 
 #' @export
+sql_escape_string.sql_dialect_snowflake <- function(con, x) {
+  sql_quote(x, "'", backslash = TRUE)
+}
+
+#' @export
 sql_translation.sql_dialect_snowflake <- function(con) {
   sql_variant(
     sql_translator(
@@ -78,8 +83,6 @@ sql_translation.sql_dialect_snowflake <- function(con) {
         con <- sql_current_con()
         check_bool(negate)
 
-        # Snowflake needs backslashes escaped, so we must increase the level of escaping
-        pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
         if (negate) {
           sql_glue("REGEXP_INSTR({string}, {pattern}) = 0")
         } else {
@@ -90,8 +93,6 @@ sql_translation.sql_dialect_snowflake <- function(con) {
         con <- sql_current_con()
         check_bool(negate)
 
-        # Snowflake needs backslashes escaped, so we must increase the level of escaping
-        pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
         if (negate) {
           sql_glue("REGEXP_INSTR({string}, {pattern}) != 1")
         } else {
@@ -102,8 +103,6 @@ sql_translation.sql_dialect_snowflake <- function(con) {
         con <- sql_current_con()
         check_bool(negate)
 
-        # Snowflake needs backslashes escaped, so we must increase the level of escaping
-        pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
         if (negate) {
           sql_glue(
             "REGEXP_INSTR({string}, {pattern}, 1, 1, 1) != (LENGTH({string}) + 1)"
@@ -119,22 +118,16 @@ sql_translation.sql_dialect_snowflake <- function(con) {
       #                <position> , <occurrence> , <parameters> ] )
       # so we must set <occurrence> to 1 if not replacing all.  See:
       # https://docs.snowflake.com/en/sql-reference/functions/regexp_replace.html
-      # Also, Snowflake needs backslashes escaped, so we must increase the
-      # level of escaping by 1
       str_replace = function(string, pattern, replacement) {
-        pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
         sql_glue("REGEXP_REPLACE({string}, {pattern}, {replacement}, 1, 1)")
       },
       str_replace_all = function(string, pattern, replacement) {
-        pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
         sql_glue("REGEXP_REPLACE({string}, {pattern}, {replacement})")
       },
       str_remove = function(string, pattern) {
-        pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
         sql_glue("REGEXP_REPLACE({string}, {pattern}, '', 1, 1)")
       },
       str_remove_all = function(string, pattern) {
-        pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
         sql_glue("REGEXP_REPLACE({string}, {pattern})")
       },
       str_trim = function(string) {
@@ -375,8 +368,6 @@ snowflake_grepl <- function(
   if (ignore.case) {
     regexp_parameters <- "i"
   }
-  # Snowflake needs backslashes escaped, so we must increase the level of escaping
-  pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
   sql_glue("REGEXP_INSTR({x}, {pattern}, 1, 1, 0, {regexp_parameters}) != 0")
 }
 

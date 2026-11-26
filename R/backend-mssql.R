@@ -691,7 +691,8 @@ sql_translation.sql_dialect_mssql <- function(con) {
       any = mssql_bit_int_bit(win_aggregate("MAX")),
       row_number = win_rank("ROW_NUMBER", empty_order = TRUE),
 
-      n_distinct = function(x, na.rm = FALSE) {
+      n_distinct = function(x, ..., na.rm = FALSE) {
+        check_dots_unsupported(...)
         sql_check_na_rm(na.rm)
         cli_abort(
           "No translation available in `mutate()`/`filter()` for SQL server."
