@@ -95,6 +95,12 @@ test_that("can escape strings", {
   expect_equal(escape(DBI::SQL("x"), con = con), sql("x"))
 })
 
+test_that("simulated connections without a dialect use standard escaping", {
+  con <- simulate_dbi("FakeConnection")
+
+  expect_equal(escape("x", con = con), sql("'x'"))
+})
+
 # Date-time ---------------------------------------------------------------
 
 test_that("date and date-times are converted to ISO 8601", {

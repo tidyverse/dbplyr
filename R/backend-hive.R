@@ -45,6 +45,11 @@ sql_dialect.Hive <- function(con) {
 }
 
 #' @export
+sql_escape_string.sql_dialect_hive <- function(con, x) {
+  sql_quote(x, "'", backslash = TRUE)
+}
+
+#' @export
 dbplyr_edition.Hive <- function(con) {
   2L
 }

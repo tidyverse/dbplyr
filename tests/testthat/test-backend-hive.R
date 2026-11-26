@@ -2,6 +2,11 @@ test_that("simulate_hive() still works", {
   expect_translation(simulate_hive(), x + 1, '"x" + 1.0')
 })
 
+test_that("string literals escape backslashes and quotes", {
+  expect_equal(escape("a\\b", con = dialect_hive()), sql("'a\\\\b'"))
+  expect_equal(escape("a\\'b", con = dialect_hive()), sql("'a\\\\\\'b'"))
+})
+
 test_that("custom scalar & string functions translated correctly", {
   con <- dialect_hive()
 

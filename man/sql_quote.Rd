@@ -4,25 +4,30 @@
 \alias{sql_quote}
 \title{Helper function for quoting sql elements}
 \usage{
-sql_quote(x, quote)
+sql_quote(x, quote, backslash = FALSE)
 }
 \arguments{
-\item{x}{Character vector to escape.}
+\item{x}{Character vector to escape. Strings wrapped in \code{\link[DBI:SQL]{DBI::SQL()}} are
+treated as already quoted.}
 
 \item{quote}{Quote character. Either a length 1 character vector for
 symmetric quotes (e.g., \code{"'"} or \code{'"'}), or a length 2 character vector
 for asymmetric quotes (e.g., \code{c("[", "]")}).}
+
+\item{backslash}{If \code{TRUE}, double backslashes and escape closing quote
+characters with a backslash instead of doubling them.}
 }
 \value{
 A vector of \link{sql}.
 }
 \description{
-If the quote character is present in the string, it will be doubled.
-\code{NA}s will be replaced with NULL.
+If the closing quote character is present in the string, it will be doubled
+or escaped with a backslash. \code{NA}s will be replaced with NULL.
 }
 \examples{
 sql_quote("abc", "'")
 sql_quote("I've had a good day", "'")
+sql_quote("I've had a good day", "'", backslash = TRUE)
 sql_quote(c("abc", NA), "'")
 
 sql_quote(c("abc", NA), c("[", "]"))

@@ -15,4 +15,9 @@
     Condition
       Error in `sql_quote()`:
       ! `quote` must be length 1 or 2.
+    Code
+      sql_quote("x", "'", backslash = NA)
+    Condition
+      Error in `sql_quote()`:
+      ! `backslash` must be `TRUE` or `FALSE`, not `NA`.
 

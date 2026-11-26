@@ -1,7 +1,9 @@
 # dbplyr (development version)
 
+* String literals on Hive, Impala, MySQL/MariaDB, Redshift, Snowflake, and Spark SQL now use backslash escaping, so embedded quotes and backslashes are preserved (#1862).
 * `n_distinct()` now errors if passed multiple columns, rather than silently treating the second argument as `na.rm` (#1879).
-
+* `sql_escape_string()` now delegates to `DBI::dbQuoteString()` for real database connections, so backends whose drivers customize string quoting (e.g. BigQuery) once again generate valid string literals (#1862).
+* `sql_quote()` gains a `backslash` argument for escaping quotes and backslashes in SQL literals (#1862).
 * Redshift once again translates lubridate period functions (e.g. `days()`, `months()`, `years()`) with `CAST(... AS INTERVAL)` instead of `MAKE_INTERVAL()`, which Redshift doesn't support (#1869).
 
 # dbplyr 2.6.0
