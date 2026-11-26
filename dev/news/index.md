@@ -2,6 +2,20 @@
 
 ## dbplyr (development version)
 
+- String literals on Hive, Impala, MySQL/MariaDB, Redshift, Snowflake,
+  and Spark SQL now use backslash escaping, so embedded quotes and
+  backslashes are preserved
+  ([\#1862](https://github.com/tidyverse/dbplyr/issues/1862)).
+- [`sql_escape_string()`](https://dbplyr.tidyverse.org/dev/reference/escape.md)
+  now delegates to
+  [`DBI::dbQuoteString()`](https://dbi.r-dbi.org/reference/dbQuoteString.html)
+  for real database connections, so backends whose drivers customize
+  string quoting (e.g. BigQuery) once again generate valid string
+  literals ([\#1862](https://github.com/tidyverse/dbplyr/issues/1862)).
+- [`sql_quote()`](https://dbplyr.tidyverse.org/dev/reference/sql_quote.md)
+  gains a `backslash` argument for escaping quotes and backslashes in
+  SQL literals
+  ([\#1862](https://github.com/tidyverse/dbplyr/issues/1862)).
 - Redshift once again translates lubridate period functions
   (e.g. `days()`,
   [`months()`](https://rdrr.io/r/base/weekday.POSIXt.html), `years()`)
