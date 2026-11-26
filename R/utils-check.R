@@ -113,6 +113,38 @@ check_scalar_sql <- function(x, ..., arg = caller_arg(x), call = caller_env()) {
 
 # Other checks ------------------------------------------------------------
 
+#' Signal that a feature is not supported
+#'
+#' @description
+#' These helpers produce consistent error messages when a feature is not
+#' supported by a database backend. They are useful both when implementing
+#' dplyr verbs and when writing SQL translations for a new backend.
+#'
+#' * `check_unsupported_arg()` errors if an argument has a value that can't
+#'   be translated to SQL.
+#' * `stop_unsupported_verb()` errors that a dplyr verb is not supported on
+#'   database backends, optionally suggesting an alternative verb.
+#'
+#' @param x An argument supplied by the user.
+#' @param allowed The only supported value for `x`. If `NULL`, the argument
+#'   is not supported at all.
+#' @param allow_null Is `NULL` an allowed value for `x`?
+#' @param backend The name of the backend, used in the error message.
+#' @param f The name of the unsupported verb or function, as a string.
+#' @param with The name of an alternative verb to suggest instead.
+#' @param arg An argument name as a string. This argument will be mentioned
+#'   in error messages as the input that is at the origin of a problem.
+#' @param call The execution environment of a currently running function,
+#'   e.g. [caller_env()]. The function will be mentioned in error messages
+#'   as the source of the error.
+#' @param ... Reserved for future expansion; must be empty.
+#' @seealso [sql_not_supported()] for signalling that a function has no SQL
+#'   translation.
+#' @name backend_errors
+NULL
+
+#' @rdname backend_errors
+#' @export
 check_unsupported_arg <- function(
   x,
   allowed = NULL,
@@ -158,7 +190,9 @@ check_unsupported_arg <- function(
   cli_abort(msg, call = call, class = "dbplyr_error_unsupported_arg")
 }
 
-stop_unsupported_function <- function(
+#' @rdname backend_errors
+#' @export
+stop_unsupported_verb <- function(
   f,
   ...,
   with = NULL,
@@ -169,7 +203,8 @@ stop_unsupported_function <- function(
       "{.fun {f}} is not supported on database backends.",
       i = if (!is_null(with)) "Please use {.fun {with}} instead."
     ),
-    call = call
+    call = call,
+    class = "dbplyr_error_unsupported_verb"
   )
 }
 

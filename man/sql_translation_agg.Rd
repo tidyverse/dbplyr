@@ -17,7 +17,7 @@ sql_aggregate_n(f, f_r = f)
 
 sql_check_na_rm(na.rm)
 
-sql_not_supported(f)
+sql_not_supported(f, context = c("scalar", "agg", "win"), backend = NULL)
 }
 \arguments{
 \item{f}{The name of the SQL function as a string.}
@@ -27,6 +27,14 @@ sql_not_supported(f)
 \item{na.rm}{Logical indicating whether missing values should be removed.
 In SQL, missing values are always removed in aggregate functions, so this
 function will warn if \code{na.rm} is not \code{TRUE}.}
+
+\item{context}{The translation context in which the function is not
+supported: \code{"scalar"}, \code{"agg"} (used in \code{summarise()}), or \code{"win"} (used
+in \code{mutate()} as a window function). The \code{"agg"} and \code{"win"} contexts
+produce an error message that suggests a workaround.}
+
+\item{backend}{The name of the backend, used in the error message for the
+\code{"agg"} and \code{"win"} contexts.}
 }
 \description{
 These functions help you create custom aggregate SQL translations when
@@ -42,7 +50,8 @@ functions with exactly two arguments (e.g., \code{CORR()}, \code{COVAR_SAMP()}).
 functions with any number of arguments and an optional \code{na.rm} parameter
 (e.g., \code{LEAST()}, \code{GREATEST()}).
 \item \code{sql_not_supported()} creates a function that throws an informative error
-when a function is not supported in SQL.
+when a function is not supported in SQL, either in general or in a
+specific translation context (\code{summarise()} or \code{mutate()}).
 \item \code{sql_check_na_rm()} is a helper that you can use in aggregate functions
 to direct the user towards setting \code{na.rm = TRUE}.
 }

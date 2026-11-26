@@ -638,8 +638,8 @@ sql_translation.sql_dialect_mssql <- function(con) {
         sql_glue("STRING_AGG({x}, {collapse})")
       },
 
-      median = sql_agg_not_supported("median", "SQL Server"),
-      quantile = sql_agg_not_supported("quantile", "SQL Server"),
+      median = sql_not_supported("median", "agg", "SQL Server"),
+      quantile = sql_not_supported("quantile", "agg", "SQL Server"),
       all = mssql_bit_int_bit(sql_aggregate("MIN")),
       any = mssql_bit_int_bit(sql_aggregate("MAX"))
     ),

@@ -18,6 +18,37 @@
       Error:
       ! `cor()` is not available in this SQL variant.
 
+# agg and win contexts suggest workarounds
+
+    Code
+      sql_not_supported("median", "agg", "SQL Server")(x)
+    Condition
+      Error:
+      ! Translation of `median()` in `summarise()` is not supported for SQL Server.
+      i Use a combination of `distinct()` and `mutate()` for the same result:
+        `mutate(<col> = median(x)) |> distinct(<col>)`
+    Code
+      sql_not_supported("median", "agg")(x)
+    Condition
+      Error:
+      ! Translation of `median()` in `summarise()` is not supported on database backends.
+      i Use a combination of `distinct()` and `mutate()` for the same result:
+        `mutate(<col> = median(x)) |> distinct(<col>)`
+    Code
+      sql_not_supported("median", "win", "Redshift")(x)
+    Condition
+      Error:
+      ! Translation of `median()` in `mutate()` is not supported for Redshift.
+      i Use a combination of `summarise()` and `left_join()` instead:
+        `df |> left_join(summarise(<col> = median(x)))`.
+    Code
+      sql_not_supported("median", "win")(x)
+    Condition
+      Error:
+      ! Translation of `median()` in `mutate()` is not supported on database backends.
+      i Use a combination of `summarise()` and `left_join()` instead:
+        `df |> left_join(summarise(<col> = median(x)))`.
+
 # quantile and median don't change without warning
 
     Code

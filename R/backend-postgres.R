@@ -357,8 +357,8 @@ sql_translation.sql_dialect_postgres <- function(con) {
           order = win_current_order()
         )
       },
-      median = sql_win_not_supported("median", "PostgreSQL"),
-      quantile = sql_win_not_supported("quantile", "PostgreSQL")
+      median = sql_not_supported("median", "win", "PostgreSQL"),
+      quantile = sql_not_supported("quantile", "win", "PostgreSQL")
     )
   )
 }

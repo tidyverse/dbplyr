@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `check_unsupported_arg()` and `stop_unsupported_verb()` are now exported so backend authors can signal unsupported arguments and verbs with consistent error messages (#1865).
+* `sql_not_supported()` gains `context` and `backend` arguments so backend authors can signal that a function is unsupported specifically in `summarise()` or `mutate()` (as a window function), with a suggested workaround (#1865).
+
 # dbplyr 2.6.0
 
 ## Lifecycle changes

@@ -11,6 +11,15 @@ test_that("warns informatively with unsupported function", {
   expect_snapshot(error = TRUE, sql_not_supported("cor")())
 })
 
+test_that("agg and win contexts suggest workarounds", {
+  expect_snapshot(error = TRUE, {
+    sql_not_supported("median", "agg", "SQL Server")(x)
+    sql_not_supported("median", "agg")(x)
+    sql_not_supported("median", "win", "Redshift")(x)
+    sql_not_supported("median", "win")(x)
+  })
+})
+
 test_that("quantile and median don't change without warning", {
   con <- dialect_ansi()
   expect_snapshot(translate_sql(
