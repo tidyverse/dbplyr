@@ -85,6 +85,20 @@ test_that("copy_inline uses UNION ALL", {
   })
 })
 
+test_that("lubridate period functions translated correctly", {
+  con <- dialect_redshift()
+
+  expect_translation(con, seconds(x), 'CAST(("x") || \' seconds\' AS INTERVAL)')
+  expect_translation(con, minutes(x), 'CAST(("x") || \' minutes\' AS INTERVAL)')
+  expect_translation(con, hours(x), 'CAST(("x") || \' hours\' AS INTERVAL)')
+  expect_translation(con, days(x), 'CAST(("x") || \' days\' AS INTERVAL)')
+  expect_translation(con, weeks(x), 'CAST(("x") || \' weeks\' AS INTERVAL)')
+  expect_translation(con, months(x), 'CAST(("x") || \' months\' AS INTERVAL)')
+  expect_translation(con, years(x), 'CAST(("x") || \' years\' AS INTERVAL)')
+
+  expect_translation(con, days(1), "CAST('1 days' AS INTERVAL)")
+})
+
 test_that("custom clock functions translated correctly", {
   con <- dialect_redshift()
   expect_translation(
