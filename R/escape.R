@@ -171,36 +171,18 @@ sql_escape_string.DBIConnection <- function(con, x) {
 
 #' @export
 sql_escape_string.TestConnection <- function(con, x) {
-  sql_escape_string_base(x)
+  sql_quote(x, "'")
 }
 
 #' @export
 sql_escape_string.sql_dialect <- function(con, x) {
-  sql_escape_string_base(x)
+  sql_quote(x, "'")
 }
 
 #' @export
 sql_escape_string.default <- function(con, x) {
-  sql_escape_string_base(x)
+  sql_quote(x, "'")
 }
-
-sql_escape_string_base <- function(x) {
-  if (inherits(x, "SQL")) {
-    sql(unclass(x))
-  } else {
-    sql_quote(x, "'")
-  }
-}
-
-# For backends where backslash is an escape character in string literals
-sql_escape_string_backslash <- function(x) {
-  if (inherits(x, "SQL")) {
-    return(sql(unclass(x)))
-  }
-
-  sql_quote(gsub("\\", "\\\\", x, fixed = TRUE), "'")
-}
-
 
 # double ------------------------------------------------------------------
 

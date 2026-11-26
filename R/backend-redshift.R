@@ -46,7 +46,7 @@ sql_dialect.Redshift <- sql_dialect.RedshiftConnection
 
 #' @export
 sql_escape_string.sql_dialect_redshift <- function(con, x) {
-  sql_escape_string_backslash(x)
+  sql_quote(x, "'", backslash = TRUE)
 }
 
 #' @export

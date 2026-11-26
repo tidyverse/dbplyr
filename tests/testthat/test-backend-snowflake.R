@@ -2,9 +2,10 @@ test_that("simulate_snowflake() still works", {
   expect_translation(simulate_snowflake(), x + 1, '"x" + 1.0')
 })
 
-test_that("string literals escape backslashes", {
+test_that("string literals escape backslashes and quotes", {
   con <- dialect_snowflake()
   expect_equal(escape("a\\b", con = con), sql("'a\\\\b'"))
+  expect_equal(escape("a\\'b", con = con), sql("'a\\\\\\'b'"))
   expect_translation(
     con,
     str_detect(x, "\\."),

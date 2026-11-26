@@ -42,7 +42,7 @@ dbplyr_edition.Snowflake <- function(con) {
 
 #' @export
 sql_escape_string.sql_dialect_snowflake <- function(con, x) {
-  sql_escape_string_backslash(x)
+  sql_quote(x, "'", backslash = TRUE)
 }
 
 #' @export

@@ -1,7 +1,8 @@
 # dbplyr (development version)
 
-* String literals on Hive, Impala, MySQL/MariaDB, Redshift, Snowflake, and Spark SQL now escape backslashes, so regular expressions and other strings containing `\` generate valid SQL (#1862).
+* String literals on Hive, Impala, MySQL/MariaDB, Redshift, Snowflake, and Spark SQL now use backslash escaping, so embedded quotes and backslashes are preserved (#1862).
 * `sql_escape_string()` now delegates to `DBI::dbQuoteString()` for real database connections, so backends whose drivers customize string quoting (e.g. BigQuery) once again generate valid string literals (#1862).
+* `sql_quote()` gains a `backslash` argument for escaping quotes and backslashes in SQL literals (#1862).
 
 # dbplyr 2.6.0
 
