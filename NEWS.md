@@ -2,6 +2,7 @@
 
 * The SAP HANA backend now creates temporary tables with `CREATE LOCAL TEMPORARY COLUMN TABLE`, so `copy_to()` and `compute()` now work (#1867).
 * New `sql_table_create()` generic for backends that need custom `CREATE TABLE` syntax (#1867).
+* Redshift once again translates lubridate period functions (e.g. `days()`, `months()`, `years()`) with `CAST(... AS INTERVAL)` instead of `MAKE_INTERVAL()`, which Redshift doesn't support (#1869).
 
 # dbplyr 2.6.0
 
