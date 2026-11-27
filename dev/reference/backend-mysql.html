@@ -7,6 +7,8 @@ Key differences for this backend are:
 paste() uses CONCAT_WS()
 String translations for str_detect(), str_locate(), and
 str_replace_all()
+Lubridate period (e.g. days(), months()) and duration (e.g. ddays())
+functions, plus yday(), wday(), quarter(), and floor_date()
 Clear error message for unsupported full joins
 
 
@@ -19,6 +21,8 @@ Key differences for this backend are:
 paste() uses CONCAT_WS()
 String translations for str_detect(), str_locate(), and
 str_replace_all()
+Lubridate period (e.g. days(), months()) and duration (e.g. ddays())
+functions, plus yday(), wday(), quarter(), and floor_date()
 Clear error message for unsupported full joins
 
 
@@ -91,6 +95,8 @@ to a live database.</p>
 <p>Key differences for this backend are:</p><ul><li><p><code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste()</a></code> uses <code>CONCAT_WS()</code></p></li>
 <li><p>String translations for <code>str_detect()</code>, <code>str_locate()</code>, and
 <code>str_replace_all()</code></p></li>
+<li><p>Lubridate period (e.g. <code>days()</code>, <code><a href="https://rdrr.io/r/base/weekday.POSIXt.html" class="external-link">months()</a></code>) and duration (e.g. <code>ddays()</code>)
+functions, plus <code>yday()</code>, <code>wday()</code>, <code>quarter()</code>, and <code>floor_date()</code></p></li>
 <li><p>Clear error message for unsupported full joins</p></li>
 </ul><p>See <code><a href="../articles/translation-function.html">vignette("translation-function")</a></code> and <code><a href="../articles/translation-verb.html">vignette("translation-verb")</a></code> for
 details of overall translation technology.</p>

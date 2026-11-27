@@ -35,6 +35,14 @@
   SQL literals
   ([\#1862](https://github.com/tidyverse/dbplyr/issues/1862)).
 
+- MySQL and MariaDB now translate lubridate period functions
+  (e.g. `days()`,
+  [`months()`](https://rdrr.io/r/base/weekday.POSIXt.html), `years()`)
+  and duration functions (e.g. `ddays()`, `dhours()`) to `INTERVAL`
+  expressions, and support `yday()`, `wday()`, `quarter()`, and
+  `floor_date()` ([@tejomaygadgil](https://github.com/tejomaygadgil),
+  [\#1863](https://github.com/tidyverse/dbplyr/issues/1863)).
+
 - Redshift once again translates lubridate period functions
   (e.g. `days()`,
   [`months()`](https://rdrr.io/r/base/weekday.POSIXt.html), `years()`)

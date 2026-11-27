@@ -14,6 +14,11 @@ Key differences for this backend are:
 - String translations for `str_detect()`, `str_locate()`, and
   `str_replace_all()`
 
+- Lubridate period (e.g. `days()`,
+  [`months()`](https://rdrr.io/r/base/weekday.POSIXt.html)) and duration
+  (e.g. `ddays()`) functions, plus `yday()`, `wday()`, `quarter()`, and
+  `floor_date()`
+
 - Clear error message for unsupported full joins
 
 See
