@@ -217,6 +217,7 @@ test_that("conditionals check arguments", {
 # case_match --------------------------------------------------------------
 
 test_that("LHS can handle different types", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   con <- dialect_ansi()
   expect_translation(
     con,
@@ -244,6 +245,7 @@ test_that("LHS can handle different types", {
 })
 
 test_that("LHS can match multiple values", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   con <- dialect_ansi()
   expect_translation(
     con,
@@ -271,6 +273,7 @@ test_that("LHS can match multiple values", {
 })
 
 test_that("LHS can match NA", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   con <- dialect_ansi()
   expect_translation(
     con,
@@ -286,6 +289,7 @@ test_that("LHS can match NA", {
 })
 
 test_that("LHS can handle bang bang", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   con <- dialect_ansi()
   expect_snapshot({
     translate_sql(case_match(x, !!1L ~ "x"), con = con)
@@ -295,6 +299,7 @@ test_that("LHS can handle bang bang", {
 })
 
 test_that("`NULL` values in `...` are dropped", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   con <- dialect_ansi()
   expect_translation(
     con,
@@ -304,6 +309,7 @@ test_that("`NULL` values in `...` are dropped", {
 })
 
 test_that("requires at least one condition", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   con <- dialect_ansi()
   expect_snapshot(error = TRUE, {
     translate_sql(case_match(x), con = con)
@@ -314,6 +320,7 @@ test_that("requires at least one condition", {
 })
 
 test_that("passes through `.default` correctly", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   con <- dialect_ansi()
   expect_translation(
     con,
@@ -323,6 +330,7 @@ test_that("passes through `.default` correctly", {
 })
 
 test_that("can handle multiple cases", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   con <- dialect_ansi()
   expect_translation(
     con,
@@ -339,6 +347,7 @@ test_that("can handle multiple cases", {
 })
 
 test_that("`.ptype` not supported", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   con <- dialect_ansi()
   expect_snapshot({
     (expect_error(translate_sql(
@@ -349,8 +358,236 @@ test_that("`.ptype` not supported", {
 })
 
 test_that(".x must be a symbol", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   con <- dialect_ansi()
   expect_snapshot({
     (expect_error(translate_sql(case_match(1, 1 ~ 1), con = con)))
   })
+})
+
+test_that("case_match() is deprecated", {
+  con <- dialect_ansi()
+  expect_snapshot(. <- translate_sql(case_match(x, 1L ~ "a"), con = con))
+})
+
+# recode_values -----------------------------------------------------------
+
+test_that("formula interface translates to CASE WHEN", {
+  con <- dialect_ansi()
+  expect_translation(
+    con,
+    recode_values(z, 1L ~ "a"),
+    "CASE WHEN (\"z\" IN (1)) THEN 'a' END"
+  )
+  expect_translation(
+    con,
+    recode_values(z, 1L ~ "a", 2L ~ "b"),
+    "CASE WHEN (\"z\" IN (1)) THEN 'a' WHEN (\"z\" IN (2)) THEN 'b' END"
+  )
+})
+
+test_that("LHS can match multiple values and NA", {
+  con <- dialect_ansi()
+  expect_translation(
+    con,
+    recode_values(z, c(1L, 2L) ~ "a"),
+    "CASE WHEN (\"z\" IN (1, 2)) THEN 'a' END"
+  )
+  expect_translation(
+    con,
+    recode_values(z, NA ~ "missing"),
+    "CASE WHEN (\"z\" IS NULL) THEN 'missing' END"
+  )
+  expect_translation(
+    con,
+    recode_values(z, c(1L, NA) ~ "a"),
+    "CASE WHEN (\"z\" IN (1) OR \"z\" IS NULL) THEN 'a' END"
+  )
+})
+
+test_that("default arg becomes ELSE", {
+  con <- dialect_ansi()
+  expect_translation(
+    con,
+    recode_values(z, 1L ~ "a", default = "other"),
+    "CASE WHEN (\"z\" IN (1)) THEN 'a' ELSE 'other' END"
+  )
+})
+
+test_that("NULL values in `...` are dropped", {
+  con <- dialect_ansi()
+  expect_translation(
+    con,
+    recode_values(x, 1L ~ "a", NULL, 2L ~ "b", NULL),
+    "CASE WHEN (\"x\" IN (1)) THEN 'a' WHEN (\"x\" IN (2)) THEN 'b' END"
+  )
+})
+
+test_that("from/to vector interface works", {
+  con <- dialect_ansi()
+  expect_translation(
+    con,
+    recode_values(x, from = !!c("a", "b"), to = !!c("A", "B")),
+    "CASE WHEN (\"x\" IN ('a')) THEN 'A' WHEN (\"x\" IN ('b')) THEN 'B' END"
+  )
+  # `to` recycled to size of `from`
+  expect_translation(
+    con,
+    recode_values(x, from = !!c("a", "b"), to = "X"),
+    "CASE WHEN (\"x\" IN ('a')) THEN 'X' WHEN (\"x\" IN ('b')) THEN 'X' END"
+  )
+})
+
+test_that("from/to list interface works", {
+  con <- dialect_ansi()
+  expect_translation(
+    con,
+    recode_values(x, from = !!list(c("a", "b"), "c"), to = !!c("AB", "C")),
+    "CASE WHEN (\"x\" IN ('a', 'b')) THEN 'AB' WHEN (\"x\" IN ('c')) THEN 'C' END"
+  )
+})
+
+test_that("from with NA via vector interface", {
+  con <- dialect_ansi()
+  expect_translation(
+    con,
+    recode_values(x, from = !!c(NA, "x"), to = !!c("missing", "X")),
+    "CASE WHEN (\"x\" IS NULL) THEN 'missing' WHEN (\"x\" IN ('x')) THEN 'X' END"
+  )
+})
+
+test_that("`ptype` and `unmatched = \"error\"` are unsupported", {
+  con <- dialect_ansi()
+  expect_snapshot(error = TRUE, {
+    translate_sql(recode_values(x, 1L ~ "a", ptype = character()), con = con)
+  })
+  expect_snapshot(error = TRUE, {
+    translate_sql(
+      recode_values(x, 1L ~ "a", unmatched = "error"),
+      con = con
+    )
+  })
+})
+
+test_that("can't mix `...` with `from`/`to`", {
+  con <- dialect_ansi()
+  expect_snapshot(error = TRUE, {
+    translate_sql(recode_values(x, 1 ~ 2, from = 1, to = 2), con = con)
+  })
+  expect_snapshot(error = TRUE, {
+    translate_sql(recode_values(x, from = 1), con = con)
+  })
+  expect_snapshot(error = TRUE, {
+    translate_sql(recode_values(x, to = 1), con = con)
+  })
+})
+
+test_that("recode_values() requires at least one case", {
+  con <- dialect_ansi()
+  expect_snapshot(error = TRUE, {
+    translate_sql(recode_values(x), con = con)
+  })
+})
+
+test_that("`x` must be a symbol or call", {
+  con <- dialect_ansi()
+  expect_snapshot(error = TRUE, {
+    translate_sql(recode_values("foo", "foo" ~ "FOO"), con = con)
+  })
+})
+
+test_that("list `to` allows column references and mixed scalars", {
+  con <- dialect_ansi()
+  expect_translation(
+    con,
+    recode_values(x, from = c("a", "b"), to = list(col_a, col_b)),
+    "CASE WHEN (\"x\" IN ('a')) THEN \"col_a\" WHEN (\"x\" IN ('b')) THEN \"col_b\" END"
+  )
+  expect_translation(
+    con,
+    recode_values(x, from = c("a", "b"), to = list("A", col_b)),
+    "CASE WHEN (\"x\" IN ('a')) THEN 'A' WHEN (\"x\" IN ('b')) THEN \"col_b\" END"
+  )
+})
+
+# replace_values ----------------------------------------------------------
+
+test_that("formula interface preserves original value via ELSE x", {
+  con <- dialect_ansi()
+  expect_translation(
+    con,
+    replace_values(z, 1L ~ "a"),
+    "CASE WHEN (\"z\" IN (1)) THEN 'a' ELSE \"z\" END"
+  )
+  expect_translation(
+    con,
+    replace_values(z, NA ~ "missing"),
+    "CASE WHEN (\"z\" IS NULL) THEN 'missing' ELSE \"z\" END"
+  )
+})
+
+test_that("from/to interface for replace_values()", {
+  con <- dialect_ansi()
+  expect_translation(
+    con,
+    replace_values(x, from = !!c("a", "b"), to = !!c("A", "B")),
+    "CASE WHEN (\"x\" IN ('a')) THEN 'A' WHEN (\"x\" IN ('b')) THEN 'B' ELSE \"x\" END"
+  )
+})
+
+test_that("replace_values() with no cases is a no-op", {
+  con <- dialect_ansi()
+  expect_translation(con, replace_values(x), "\"x\"")
+})
+
+test_that("replace_values() input checks", {
+  con <- dialect_ansi()
+  expect_snapshot(error = TRUE, {
+    translate_sql(replace_values(x, 1 ~ 2, from = 1, to = 2), con = con)
+  })
+  expect_snapshot(error = TRUE, {
+    translate_sql(replace_values("foo", "foo" ~ "FOO"), con = con)
+  })
+})
+
+# integration: partial_eval + translation -----------------------------------
+
+test_that("recode_values() inside mutate() resolves locals in non-first args", {
+  # `x` and `default` are translated; `from` and `to` are evaluatd locally
+  from <- \() list(c("a", "apple"), c("b", "banana"))
+  to <- \() c("A", "B")
+  lf <- lazy_frame(x = "a", default = "b")
+
+  out <- lf |>
+    mutate(y = recode_values(x, from = from(), to = to(), default = default)) |>
+    sql_build()
+  expect_snapshot(out$select[[2]])
+
+  # `from`/`to` can also come from a local data frame via `$`.
+  table <- tibble::tibble(from = c("a", "b"), to = c("A", "B"))
+  out <- lf |>
+    mutate(y = recode_values(x, from = table$from, to = table$to)) |>
+    sql_build()
+  expect_snapshot(out$select[[2]])
+})
+
+test_that("replace_values() inside mutate() resolves locals in non-first args", {
+  # `x` is translated; `from` and `to` are evaluatd locally
+  from <- \() c("a", "b")
+  to <- \() c("A", "B")
+  lf <- lazy_frame(x = "a", default = "b")
+
+  out <- lf |>
+    mutate(y = replace_values(x, from = from(), to = to())) |>
+    sql_build()
+  expect_snapshot(out$select[[2]])
+})
+
+test_that("recode_values() translates the RHS of formulas", {
+  lf <- lazy_frame(x = "a", new = "B")
+
+  out <- lf |>
+    mutate(y = recode_values(x, c("a", "b") ~ x, "c" ~ "OTHER")) |>
+    sql_build()
+  expect_snapshot(out$select[[2]])
 })
