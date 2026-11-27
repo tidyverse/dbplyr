@@ -274,7 +274,15 @@ partial_eval_call <- function(call, data, env) {
       # Check for shiny reactives before processing unknown function calls
       if (is_symbol(fun)) {
         fun_name <- as_string(fun)
-        obj <- env_get(env, fun_name, default = NULL, inherit = TRUE)
+        fun_env <- env
+        while (
+          !identical(fun_env, empty_env()) &&
+            env_has(fun_env, fun_name) &&
+            env_binding_are_lazy(fun_env, fun_name)
+        ) {
+          fun_env <- env_parent(fun_env)
+        }
+        obj <- env_get(fun_env, fun_name, default = NULL, inherit = TRUE)
         if (inherits(obj, "reactive")) {
           error_embed("a shiny reactive", "foo()")
         }

@@ -89,6 +89,35 @@ test_that("can't refer to freshly created variables", {
   })
 })
 
+test_that("can call a function with the same name as a freshly created variable (#1859)", {
+  lf <- lazy_frame(a = 1, b = 1)
+  expect_equal(
+    summarise(lf, sum = sum(a, na.rm = TRUE), sum_b = sum(b, na.rm = TRUE)) |>
+      sql_build(),
+    summarise(lf, x = sum(a, na.rm = TRUE), sum_b = sum(b, na.rm = TRUE)) |>
+      sql_build() |>
+      (\(q) {
+        q$select[1] <- sql('SUM("a") AS "sum"')
+        q
+      })()
+  )
+  expect_equal(
+    summarise(lf, n = n(), n2 = n()) |> sql_build() |> _$select,
+    sql('COUNT(*) AS "n"', 'COUNT(*) AS "n2"')
+  )
+  expect_error(
+    summarise(lf, sum = sum(a), bad = sum(sum)),
+    "cannot use a variable created in the same"
+  )
+
+  # still errors for shiny reactives with the same name
+  foo <- structure(function() 1, class = "reactive")
+  expect_error(
+    summarise(lf, foo = sum(a), y = foo()),
+    "Cannot translate a shiny reactive to SQL"
+  )
+})
+
 test_that("summarise(.groups=)", {
   df <- lazy_frame(x = 1, y = 2) |> group_by(x, y)
 
