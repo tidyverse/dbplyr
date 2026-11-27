@@ -206,3 +206,10 @@ test_that("difftime is translated correctly", {
     )
   )
 })
+
+test_that("can escape Inf", {
+  con <- dialect_oracle()
+
+  expect_equal(escape(Inf, con = con), sql("BINARY_DOUBLE_INFINITY"))
+  expect_equal(escape(-Inf, con = con), sql("-BINARY_DOUBLE_INFINITY"))
+})

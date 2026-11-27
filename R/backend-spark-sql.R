@@ -202,3 +202,12 @@ sql_table_analyze.sql_dialect_spark_sql <- function(con, table, ...) {
 
   table
 }
+
+#' @export
+sql_escape_infinity.sql_dialect_spark_sql <- function(con, x) {
+  ifelse(
+    x > 0,
+    "CAST('Infinity' AS DOUBLE)",
+    "CAST('-Infinity' AS DOUBLE)"
+  )
+}

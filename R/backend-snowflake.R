@@ -384,3 +384,8 @@ snowflake_paste <- function(default_sep) {
     sql_glue("ARRAY_TO_STRING(ARRAY_CONSTRUCT_COMPACT({...}), {sep})")
   }
 }
+
+#' @export
+sql_escape_infinity.sql_dialect_snowflake <- function(con, x) {
+  ifelse(x > 0, "'inf'", "'-inf'")
+}

@@ -475,3 +475,10 @@ test_that("correctly translates $", {
     sql("SELECT *\nFROM \"df\"\nWHERE (\"x\" = 1)")
   )
 })
+
+test_that("can escape Inf", {
+  con <- dialect_snowflake()
+
+  expect_equal(escape(Inf, con = con), sql("'inf'"))
+  expect_equal(escape(-Inf, con = con), sql("'-inf'"))
+})

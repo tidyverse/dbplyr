@@ -353,3 +353,8 @@ dbplyr_write_table.OraConnection <- dbplyr_write_table.Oracle
 
 #' @export
 db_table_drop_if_exists.OraConnection <- db_table_drop_if_exists.Oracle
+
+#' @export
+sql_escape_infinity.sql_dialect_oracle <- function(con, x) {
+  ifelse(x > 0, "BINARY_DOUBLE_INFINITY", "-BINARY_DOUBLE_INFINITY")
+}

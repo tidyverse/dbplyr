@@ -8,6 +8,7 @@
 \alias{sql_escape_date}
 \alias{sql_escape_datetime}
 \alias{sql_escape_string}
+\alias{sql_escape_infinity}
 \alias{sql_escape_raw}
 \alias{sql_vector}
 \title{Escape/quote a value}
@@ -23,6 +24,8 @@ sql_escape_date(con, x)
 sql_escape_datetime(con, x)
 
 sql_escape_string(con, x)
+
+sql_escape_infinity(con, x)
 
 sql_escape_raw(con, x)
 

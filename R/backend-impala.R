@@ -75,3 +75,8 @@ sql_table_analyze.sql_dialect_impala <- function(con, table, ...) {
   # https://www.cloudera.com/documentation/enterprise/5-9-x/topics/impala_compute_stats.html
   sql_glue2(con, "COMPUTE STATS {.tbl table}")
 }
+
+#' @export
+sql_escape_infinity.sql_dialect_impala <- function(con, x) {
+  ifelse(x > 0, "CAST('inf' AS DOUBLE)", "CAST('-inf' AS DOUBLE)")
+}

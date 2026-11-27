@@ -198,3 +198,8 @@ values_prepare.sql_dialect_sqlite <- function(con, df) {
     \(col) escape(col, con = con, parens = FALSE, collapse = NULL)
   )
 }
+
+#' @export
+sql_escape_infinity.sql_dialect_sqlite <- function(con, x) {
+  ifelse(x > 0, "9e999", "-9e999")
+}

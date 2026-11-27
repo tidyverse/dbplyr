@@ -924,3 +924,8 @@ bit_to_boolean <- function(x_expr) {
 }
 
 utils::globalVariables(c("cast", "%AS%", "BIT"))
+
+#' @export
+sql_escape_infinity.sql_dialect_mssql <- function(con, x) {
+  cli_abort("SQL Server does not support infinite values.")
+}

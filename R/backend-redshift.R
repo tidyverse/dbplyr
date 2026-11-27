@@ -226,3 +226,8 @@ sql_values_subquery.sql_dialect_redshift <- function(
 ) {
   sql_values_subquery_union(con, df, types = types, lvl = lvl)
 }
+
+#' @export
+sql_escape_infinity.sql_dialect_redshift <- function(con, x) {
+  ifelse(x > 0, "'Infinity'", "'-Infinity'")
+}

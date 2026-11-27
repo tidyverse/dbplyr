@@ -955,3 +955,7 @@ test_that("can delete with returning", {
     )
   )
 })
+
+test_that("can not escape Inf", {
+  expect_snapshot(escape(Inf, con = dialect_mssql()), error = TRUE)
+})

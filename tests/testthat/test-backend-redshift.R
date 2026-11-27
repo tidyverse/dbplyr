@@ -213,3 +213,7 @@ test_that("window functions with redshift specific error message", {
     "Redshift"
   )
 })
+
+test_that("can escape Inf", {
+  expect_equal(escape(Inf, con = dialect_redshift()), sql("'Infinity'"))
+})

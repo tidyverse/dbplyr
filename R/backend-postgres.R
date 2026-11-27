@@ -518,3 +518,8 @@ db_col_types.PqConnection <- function(con, table, call) {
 
 #' @export
 db_col_types.PostgreSQL <- db_col_types.PqConnection
+
+#' @export
+sql_escape_infinity.sql_dialect_postgres <- function(con, x) {
+  ifelse(x > 0, "'Infinity'", "'-Infinity'")
+}

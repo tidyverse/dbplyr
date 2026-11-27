@@ -48,10 +48,9 @@ test_that("missing values become null", {
   expect_equal(escape(NA_character_, con = con), sql("NULL"))
 })
 
-test_that("-Inf and Inf are expanded and quoted", {
+test_that("-Inf and Inf error by default", {
   con <- dialect_ansi()
-  expect_equal(escape(Inf, con = con), sql("'Infinity'"))
-  expect_equal(escape(-Inf, con = con), sql("'-Infinity'"))
+  expect_snapshot(escape(Inf, con = con), error = TRUE)
 })
 
 test_that("can escape integer64 values", {
