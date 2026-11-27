@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* `summarise()` once again allows calling a function with the same name as a variable created earlier in the same `summarise()`, e.g. `summarise(sum = sum(x), sum2 = sum(x^2))` (#1859).
 * The SAP HANA backend now creates temporary tables with `CREATE LOCAL TEMPORARY COLUMN TABLE`, so `copy_to()` and `compute()` now work (#1867).
 * String literals on Hive, Impala, MySQL/MariaDB, Redshift, Snowflake, and Spark SQL now use backslash escaping, so embedded quotes and backslashes are preserved (#1862).
 * `n_distinct()` now errors if passed multiple columns, rather than silently treating the second argument as `na.rm` (#1879).
