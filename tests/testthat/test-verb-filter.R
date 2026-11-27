@@ -5,6 +5,22 @@ test_that("filter captures local variables", {
   expect_equal(mf |> filter(x > z) |> pull(), c(4, 5))
 })
 
+test_that("can construct %in% vector inline with c() (#1870)", {
+  mf <- local_memdb_frame("df", x = c("1", "2", "a", "z"))
+
+  out <- mf |> filter(x %in% c(as.character(1:2), LETTERS[1:2]))
+  expect_equal(out |> pull(), c("1", "2"))
+  expect_snapshot(out |> show_query())
+})
+
+test_that("c() can't combine columns (#1870)", {
+  skip_if(getRversion() < "4.3.0", "Error call differs on older R versions")
+
+  lf <- lazy_frame(x = 1, y = 2)
+
+  expect_snapshot(filter(lf, x %in% c(x, y)), error = TRUE)
+})
+
 test_that("two filters equivalent to one", {
   unique_column_name_reset()
   mf <- local_memdb_frame("df", x = 1:5, y = 5:1, id = 1:5)

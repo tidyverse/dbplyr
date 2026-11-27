@@ -1,3 +1,12 @@
+# custom lubridate functions translated correctly
+
+    Code
+      translate_sql(quarter(x, fiscal_start = 2), con = con)
+    Condition
+      Error in `quarter()`:
+      ! `fiscal_start = 2` isn't supported in MySQL/MariaDB translation.
+      i It must be 1 instead.
+
 # generates custom sql
 
     Code

@@ -11,6 +11,8 @@
 #' * `paste()` uses `CONCAT_WS()`
 #' * String translations for `str_detect()`, `str_locate()`, and
 #'   `str_replace_all()`
+#' * Lubridate period (e.g. `days()`, `months()`) and duration (e.g. `ddays()`)
+#'   functions, plus `yday()`, `wday()`, `quarter()`, and `floor_date()`
 #' * Clear error message for unsupported full joins
 #'
 #' See `vignette("translation-function")` and `vignette("translation-verb")` for
@@ -173,6 +175,82 @@ sql_translation.sql_dialect_mariadb <- function(con) {
       },
       str_replace_all = function(string, pattern, replacement) {
         sql_glue("REGEXP_REPLACE({string}, {pattern}, {replacement})")
+      },
+
+      # lubridate
+      seconds = function(x) sql_glue("INTERVAL {x} SECOND"),
+      minutes = function(x) sql_glue("INTERVAL {x} MINUTE"),
+      hours = function(x) sql_glue("INTERVAL {x} HOUR"),
+      days = function(x) sql_glue("INTERVAL {x} DAY"),
+      weeks = function(x) sql_glue("INTERVAL {x} WEEK"),
+      months = function(x) sql_glue("INTERVAL {x} MONTH"),
+      years = function(x) sql_glue("INTERVAL {x} YEAR"),
+      dseconds = function(x) sql_glue("INTERVAL {x} SECOND"),
+      dminutes = function(x) sql_glue("INTERVAL {x} MINUTE"),
+      dhours = function(x) sql_glue("INTERVAL {x} HOUR"),
+      ddays = function(x) sql_glue("INTERVAL {x} DAY"),
+      dweeks = function(x) sql_glue("INTERVAL {x} WEEK"),
+
+      yday = function(x) sql_glue("DAYOFYEAR({x})"),
+      wday = function(x, label = FALSE, abbr = TRUE, week_start = NULL) {
+        check_bool(label)
+        check_bool(abbr)
+        check_number_whole(week_start, allow_null = TRUE)
+        if (!label) {
+          week_start <- week_start %||% getOption("lubridate.week.start", 7)
+          offset <- as.integer(7 - week_start)
+          sql_glue("MOD(DAYOFWEEK({x}) - 1 + {offset}, 7) + 1")
+        } else if (label && !abbr) {
+          sql_glue("DAYNAME({x})")
+        } else if (label && abbr) {
+          sql_glue("SUBSTR(DAYNAME({x}), 1, 3)")
+        } else {
+          cli_abort("Unrecognized arguments to {.arg wday}")
+        }
+      },
+      quarter = function(x, with_year = FALSE, fiscal_start = 1) {
+        check_bool(with_year)
+        check_unsupported_arg(fiscal_start, 1, backend = "MySQL/MariaDB")
+
+        if (with_year) {
+          sql_glue("CONCAT(YEAR({x}), '.', QUARTER({x}))")
+        } else {
+          sql_glue("QUARTER({x})")
+        }
+      },
+
+      # No DATE_TRUNC() in MySQL/MariaDB, so emulate with date arithmetic
+      floor_date = function(x, unit = "seconds") {
+        unit <- arg_match(
+          unit,
+          c(
+            "second",
+            "minute",
+            "hour",
+            "day",
+            "week",
+            "month",
+            "quarter",
+            "year"
+          )
+        )
+        switch(
+          unit,
+          second = sql_glue("{x} - INTERVAL MICROSECOND({x}) MICROSECOND"),
+          minute = sql_glue(
+            "{x} - INTERVAL SECOND({x}) SECOND - INTERVAL MICROSECOND({x}) MICROSECOND"
+          ),
+          hour = sql_glue(
+            "{x} - INTERVAL MINUTE({x}) MINUTE - INTERVAL SECOND({x}) SECOND - INTERVAL MICROSECOND({x}) MICROSECOND"
+          ),
+          day = sql_glue("DATE({x})"),
+          week = sql_glue("DATE({x}) - INTERVAL DAYOFWEEK({x}) - 1 DAY"),
+          month = sql_glue("DATE({x}) - INTERVAL DAYOFMONTH({x}) - 1 DAY"),
+          quarter = sql_glue(
+            "MAKEDATE(YEAR({x}), 1) + INTERVAL (QUARTER({x}) - 1) * 3 MONTH"
+          ),
+          year = sql_glue("MAKEDATE(YEAR({x}), 1)")
+        )
       }
     ),
     sql_translator(

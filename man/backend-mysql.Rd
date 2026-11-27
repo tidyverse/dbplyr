@@ -26,6 +26,8 @@ Key differences for this backend are:
 \item \code{paste()} uses \code{CONCAT_WS()}
 \item String translations for \code{str_detect()}, \code{str_locate()}, and
 \code{str_replace_all()}
+\item Lubridate period (e.g. \code{days()}, \code{months()}) and duration (e.g. \code{ddays()})
+functions, plus \code{yday()}, \code{wday()}, \code{quarter()}, and \code{floor_date()}
 \item Clear error message for unsupported full joins
 }
 
