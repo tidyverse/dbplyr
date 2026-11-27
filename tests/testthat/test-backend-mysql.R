@@ -32,6 +32,89 @@ test_that("custom scalar translated correctly", {
   )
 })
 
+test_that("custom lubridate functions translated correctly", {
+  con <- dialect_mysql()
+
+  expect_translation(con, seconds(x), "INTERVAL `x` SECOND")
+  expect_translation(con, minutes(x), "INTERVAL `x` MINUTE")
+  expect_translation(con, hours(x), "INTERVAL `x` HOUR")
+  expect_translation(con, days(x), "INTERVAL `x` DAY")
+  expect_translation(con, weeks(x), "INTERVAL `x` WEEK")
+  expect_translation(con, months(x), "INTERVAL `x` MONTH")
+  expect_translation(con, years(x), "INTERVAL `x` YEAR")
+  expect_translation(con, days(1), "INTERVAL 1.0 DAY")
+
+  expect_translation(con, dseconds(x), "INTERVAL `x` SECOND")
+  expect_translation(con, dminutes(x), "INTERVAL `x` MINUTE")
+  expect_translation(con, dhours(x), "INTERVAL `x` HOUR")
+  expect_translation(con, ddays(x), "INTERVAL `x` DAY")
+  expect_translation(con, dweeks(x), "INTERVAL `x` WEEK")
+
+  # extraction functions inherited from base
+  expect_translation(con, day(x), "EXTRACT(day FROM `x`)")
+  expect_translation(con, mday(x), "EXTRACT(day FROM `x`)")
+  expect_translation(con, month(x), "EXTRACT(month FROM `x`)")
+  expect_translation(con, year(x), "EXTRACT(year FROM `x`)")
+
+  expect_translation(con, yday(x), "DAYOFYEAR(`x`)")
+  expect_translation(con, wday(x), "MOD(DAYOFWEEK(`x`) - 1 + 0, 7) + 1")
+  expect_translation(
+    con,
+    wday(x, week_start = 1),
+    "MOD(DAYOFWEEK(`x`) - 1 + 6, 7) + 1"
+  )
+  expect_translation(con, wday(x, label = TRUE), "SUBSTR(DAYNAME(`x`), 1, 3)")
+  expect_translation(
+    con,
+    wday(x, label = TRUE, abbr = FALSE),
+    "DAYNAME(`x`)"
+  )
+
+  expect_translation(con, quarter(x), "QUARTER(`x`)")
+  expect_translation(
+    con,
+    quarter(x, with_year = TRUE),
+    "CONCAT(YEAR(`x`), '.', QUARTER(`x`))"
+  )
+  expect_snapshot(
+    error = TRUE,
+    translate_sql(quarter(x, fiscal_start = 2), con = con)
+  )
+
+  expect_translation(
+    con,
+    floor_date(x, "second"),
+    "`x` - INTERVAL MICROSECOND(`x`) MICROSECOND"
+  )
+  expect_translation(
+    con,
+    floor_date(x, "minute"),
+    "`x` - INTERVAL SECOND(`x`) SECOND - INTERVAL MICROSECOND(`x`) MICROSECOND"
+  )
+  expect_translation(
+    con,
+    floor_date(x, "hour"),
+    "`x` - INTERVAL MINUTE(`x`) MINUTE - INTERVAL SECOND(`x`) SECOND - INTERVAL MICROSECOND(`x`) MICROSECOND"
+  )
+  expect_translation(con, floor_date(x, "day"), "DATE(`x`)")
+  expect_translation(
+    con,
+    floor_date(x, "week"),
+    "DATE(`x`) - INTERVAL DAYOFWEEK(`x`) - 1 DAY"
+  )
+  expect_translation(
+    con,
+    floor_date(x, "month"),
+    "DATE(`x`) - INTERVAL DAYOFMONTH(`x`) - 1 DAY"
+  )
+  expect_translation(
+    con,
+    floor_date(x, "quarter"),
+    "MAKEDATE(YEAR(`x`), 1) + INTERVAL (QUARTER(`x`) - 1) * 3 MONTH"
+  )
+  expect_translation(con, floor_date(x, "year"), "MAKEDATE(YEAR(`x`), 1)")
+})
+
 test_that("custom aggregators translated correctly", {
   con <- dialect_mysql()
 
