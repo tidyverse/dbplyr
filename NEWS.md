@@ -6,6 +6,7 @@
 * `sql_escape_string()` now delegates to `DBI::dbQuoteString()` for real database connections, so backends whose drivers customize string quoting (e.g. BigQuery) once again generate valid string literals (#1862).
 * New `sql_table_create()` generic for backends that need custom `CREATE TABLE` syntax (#1867).
 * `sql_quote()` gains a `backslash` argument for escaping quotes and backslashes in SQL literals (#1862).
+* MySQL and MariaDB now translate lubridate period functions (e.g. `days()`, `months()`, `years()`) and duration functions (e.g. `ddays()`, `dhours()`) to `INTERVAL` expressions, and support `yday()`, `wday()`, `quarter()`, and `floor_date()` (@tejomaygadgil, #1863).
 * Redshift once again translates lubridate period functions (e.g. `days()`, `months()`, `years()`) with `CAST(... AS INTERVAL)` instead of `MAKE_INTERVAL()`, which Redshift doesn't support (#1869).
 
 * `c()` is now always evaluated locally during translation, so inline expressions like `filter(x %in% c(as.character(1:4), LETTERS[1:4]))` now work as expected (#1870).
